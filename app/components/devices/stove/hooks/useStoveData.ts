@@ -20,7 +20,7 @@ import { getMaintenanceStatus } from '@/lib/maintenanceService';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
-import type { ThermorossiStatusResponse } from '@/types/thermorossiProxy';
+import type { StoveState, ThermorossiStatusResponse } from '@/types/thermorossiProxy';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 
 /**
@@ -38,7 +38,7 @@ export interface UseStoveDataParams {
  */
 export interface UseStoveDataReturn {
   // Core state
-  status: string;
+  status: StoveState;
   fanLevel: number | null;
   powerLevel: number | null;
   loading: boolean;
@@ -99,7 +99,7 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
   const { hasPendingCommands, pendingCommands, lastSyncedCommand } = useBackgroundSync();
 
   // Core state
-  const [status, setStatus] = useState<string>('off');
+  const [status, setStatus] = useState<StoveState>('off');
   const [fanLevel, setFanLevel] = useState<number | null>(null);
   const [powerLevel, setPowerLevel] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -126,11 +126,14 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
 
   // Staleness state — derived from proxy data_freshness field
   const [isStale, setIsStale] = useState(false);
+  const [lastPollAt, setLastPollAt] = useState<Date | null>(null);
 
-  // Staleness object: null when LIVE, { isStale: true } when STALE
+  // Staleness object: populated when STALE or when lastPollAt is available
   const staleness: StalenessInfo | null = isStale
-    ? { isStale: true, cachedAt: null, ageSeconds: 0 }
-    : null;
+    ? { isStale: true, cachedAt: lastPollAt, ageSeconds: lastPollAt ? Math.floor((Date.now() - lastPollAt.getTime()) / 1000) : 0 }
+    : lastPollAt
+      ? { isStale: false, cachedAt: lastPollAt, ageSeconds: Math.floor((Date.now() - lastPollAt.getTime()) / 1000) }
+      : null;
 
   // Derived state — exact equality against proxy StoveState values
   const isAccesa = status === 'working' || status === 'igniting' || status === 'modulating';
@@ -170,12 +173,13 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
       if (!res.ok) throw new Error(`Status fetch failed: ${res.status}`);
       const json = await res.json() as ThermorossiStatusResponse;
 
-      const { stove_state, power_level, fan_level, data_freshness, error_code, error_description } = json;
+      const { stove_state, power_level, fan_level, data_freshness, last_poll_at, error_code, error_description } = json;
 
       setStatus(stove_state);
       setFanLevel(fan_level);
       setPowerLevel(power_level);
       setIsStale(data_freshness === 'STALE');
+      setLastPollAt(last_poll_at ? new Date(last_poll_at) : null);
 
       if (stove_state === 'alarm') {
         const code = error_code ?? 0;

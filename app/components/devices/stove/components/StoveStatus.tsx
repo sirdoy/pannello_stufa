@@ -4,11 +4,12 @@ import { Badge, Heading, Text } from '../../../ui';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import type { getStatusInfo, getStatusDisplay } from '../stoveStatusUtils';
+import type { StoveState } from '@/types/thermorossiProxy';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 
 interface StoveStatusProps {
-  status: string;
+  status: StoveState;
   fanLevel: number | null;
   powerLevel: number | null;
   errorCode: number;

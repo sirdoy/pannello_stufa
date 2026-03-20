@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import StoveStatus from '@/app/components/devices/stove/components/StoveStatus';
 import { getStatusInfo, getStatusDisplay } from '@/app/components/devices/stove/stoveStatusUtils';
+import type { StoveState } from '@/types/thermorossiProxy';
+import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 
 // Mock useVisibility to control visibility state in tests
 jest.mock('@/lib/hooks/useVisibility', () => ({
@@ -11,11 +13,11 @@ import { useVisibility } from '@/lib/hooks/useVisibility';
 
 describe('StoveStatus', () => {
   const defaultProps = {
-    status: 'working',
+    status: 'working' as StoveState,
     fanLevel: 3,
     powerLevel: 2,
     errorCode: 0,
-    staleness: null,
+    staleness: null as StalenessInfo | null,
     statusInfo: getStatusInfo('working'),
     statusDisplay: getStatusDisplay('working'),
   };
@@ -47,7 +49,7 @@ describe('StoveStatus', () => {
     const staleness = {
       isStale: true,
       cachedAt: new Date('2024-01-01T12:00:00Z'),
-      lastFetch: new Date('2024-01-01T12:00:00Z'),
+      ageSeconds: 0,
     };
     render(<StoveStatus {...defaultProps} staleness={staleness} />);
     expect(screen.getByText('Dati non aggiornati')).toBeInTheDocument();
@@ -57,7 +59,7 @@ describe('StoveStatus', () => {
     const staleness = {
       isStale: true,
       cachedAt: new Date('2024-01-01T12:00:00Z'),
-      lastFetch: new Date('2024-01-01T12:00:00Z'),
+      ageSeconds: 0,
     };
     render(<StoveStatus {...defaultProps} errorCode={5} staleness={staleness} />);
     expect(screen.queryByText('Dati non aggiornati')).not.toBeInTheDocument();
@@ -69,7 +71,7 @@ describe('StoveStatus', () => {
     const staleness = {
       isStale: true,
       cachedAt: new Date('2024-01-01T12:00:00Z'),
-      lastFetch: new Date('2024-01-01T12:00:00Z'),
+      ageSeconds: 0,
     };
     render(<StoveStatus {...defaultProps} staleness={staleness} />);
     expect(screen.queryByText('Dati non aggiornati')).not.toBeInTheDocument();
@@ -79,7 +81,7 @@ describe('StoveStatus', () => {
     const staleness = {
       isStale: false,
       cachedAt: new Date('2024-01-01T12:00:00Z'),
-      lastFetch: new Date('2024-01-01T12:00:00Z'),
+      ageSeconds: 0,
     };
     render(<StoveStatus {...defaultProps} staleness={staleness} />);
     expect(screen.getByText(/Ultimo aggiornamento:/)).toBeInTheDocument();

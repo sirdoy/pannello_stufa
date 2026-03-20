@@ -14,9 +14,10 @@
 
 import { Card, Button, Text } from '@/app/components/ui';
 import type { StovePageStatusConfig, StovePageTheme } from '../stovePageTheme';
+import type { StoveState } from '@/types/thermorossiProxy';
 
 export interface StovePageHeroProps {
-  status: string;
+  status: StoveState;
   statusConfig: StovePageStatusConfig;
   theme: StovePageTheme;
   fanLevel: number | null;

@@ -65,10 +65,17 @@ describe('useStoveData', () => {
     jest.mocked(schedulerService.getFullSchedulerMode).mockResolvedValue({
       enabled: false,
       semiManual: false,
+      lastUpdated: '2026-03-19T12:00:00Z',
     });
     jest.mocked(maintenanceService.getMaintenanceStatus).mockResolvedValue({
       needsCleaning: false,
       currentHours: 10,
+      targetHours: 1000,
+      lastCleanedAt: null,
+      lastUpdatedAt: null,
+      percentage: 1,
+      remainingHours: 990,
+      isNearLimit: false,
     });
 
     // Mock fetch globally with proxy-shaped response
@@ -182,7 +189,7 @@ describe('useStoveData', () => {
     });
   });
 
-  it('sets staleness to { isStale: true } when data_freshness is STALE', async () => {
+  it('sets staleness to { isStale: true, cachedAt } when data_freshness is STALE', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
@@ -205,10 +212,11 @@ describe('useStoveData', () => {
 
     await waitFor(() => {
       expect(result.current.staleness?.isStale).toBe(true);
+      expect(result.current.staleness?.cachedAt).toEqual(new Date('2026-03-19T11:00:00Z'));
     });
   });
 
-  it('sets staleness to null when data_freshness is LIVE', async () => {
+  it('sets staleness.isStale to false with cachedAt when data_freshness is LIVE', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
@@ -217,6 +225,33 @@ describe('useStoveData', () => {
         fan_level: 4,
         data_freshness: 'LIVE',
         last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    });
+
+    const { result } = renderHook(() =>
+      useStoveData({
+        checkVersion: mockCheckVersion,
+        userId: mockUserId,
+      })
+    );
+
+    await waitFor(() => {
+      expect(result.current.staleness?.isStale).toBe(false);
+      expect(result.current.staleness?.cachedAt).toEqual(new Date('2026-03-19T12:00:00Z'));
+    });
+  });
+
+  it('sets staleness to null when last_poll_at is null and data is LIVE', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 4,
+        data_freshness: 'LIVE',
+        last_poll_at: null,
         error_code: null,
         error_description: null,
       }),

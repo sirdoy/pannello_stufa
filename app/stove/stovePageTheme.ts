@@ -3,6 +3,8 @@
  * Pure functions for status-to-theme mapping (immersive volcanic design)
  */
 
+import type { StoveState } from '@/types/thermorossiProxy';
+
 export interface StovePageStatusConfig {
   label: string;
   icon: string;
@@ -21,7 +23,7 @@ export interface StovePageTheme {
 /**
  * Map stove status to display configuration
  */
-export function getStovePageStatusConfig(status: string): StovePageStatusConfig {
+export function getStovePageStatusConfig(status: StoveState | string): StovePageStatusConfig {
   if (!status) return { label: 'CARICAMENTO', icon: '⏳', theme: 'slate', pulse: true };
 
   const s = status.toUpperCase();

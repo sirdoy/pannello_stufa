@@ -59,7 +59,7 @@ See `.planning/milestones/` for full archives.
 
 #### Phase 106: Proxy Client + Types + Read Endpoints
 
-- [ ] **Phase 106: Proxy Client + Types + Read Endpoints** — Hue proxy client with shared transport, TypeScript types, and all read endpoints migrated
+- [x] **Phase 106: Proxy Client + Types + Read Endpoints** — Hue proxy client with shared transport, TypeScript types, and all read endpoints migrated (completed 2026-03-20)
 
 #### Phase 107: Control Endpoints
 
@@ -159,7 +159,7 @@ Plans:
 | 92-95 | v11.1 | 9/9 | ✓ Complete | 2026-03-18 |
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
-| 106 | 1/2 | In Progress|  | - |
+| 106 | 2/2 | Complete   | 2026-03-20 | - |
 | 107 | v14.0 | 0/TBD | Not started | - |
 | 108 | v14.0 | 0/TBD | Not started | - |
 | 109 | v14.0 | 0/TBD | Not started | - |

@@ -15,13 +15,13 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 
 ### Read Endpoints
 
-- [ ] **READ-01**: GET /lights migrated with capability_tier, ct_kelvin, room enrichment
-- [ ] **READ-02**: GET /lights/{light_id} migrated
-- [ ] **READ-03**: GET /groups migrated with member lights array
-- [ ] **READ-04**: GET /groups/{group_id} migrated
-- [ ] **READ-05**: GET /scenes migrated with group_id filter support
-- [ ] **READ-06**: GET /health migrated with data_freshness (LIVE/STALE/UNREACHABLE→503)
-- [ ] **READ-07**: GET /history migrated with auto-granularity pagination
+- [x] **READ-01**: GET /lights migrated with capability_tier, ct_kelvin, room enrichment
+- [x] **READ-02**: GET /lights/{light_id} migrated
+- [x] **READ-03**: GET /groups migrated with member lights array
+- [x] **READ-04**: GET /groups/{group_id} migrated
+- [x] **READ-05**: GET /scenes migrated with group_id filter support
+- [x] **READ-06**: GET /health migrated with data_freshness (LIVE/STALE/UNREACHABLE→503)
+- [x] **READ-07**: GET /history migrated with auto-granularity pagination
 
 ### Control Endpoints
 
@@ -76,13 +76,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLIENT-01 | Phase 106 | Complete |
 | CLIENT-02 | Phase 106 | Complete |
 | CLIENT-03 | Phase 106 | Complete |
-| READ-01 | Phase 106 | Pending |
-| READ-02 | Phase 106 | Pending |
-| READ-03 | Phase 106 | Pending |
-| READ-04 | Phase 106 | Pending |
-| READ-05 | Phase 106 | Pending |
-| READ-06 | Phase 106 | Pending |
-| READ-07 | Phase 106 | Pending |
+| READ-01 | Phase 106 | Complete |
+| READ-02 | Phase 106 | Complete |
+| READ-03 | Phase 106 | Complete |
+| READ-04 | Phase 106 | Complete |
+| READ-05 | Phase 106 | Complete |
+| READ-06 | Phase 106 | Complete |
+| READ-07 | Phase 106 | Complete |
 | CMD-01 | Phase 107 | Pending |
 | CMD-02 | Phase 107 | Pending |
 | CMD-03 | Phase 107 | Pending |

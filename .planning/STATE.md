@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
-status: unknown
-stopped_at: Completed 106-01-PLAN.md
-last_updated: "2026-03-20T13:35:38.713Z"
+status: executing
+stopped_at: Completed 106-02-PLAN.md
+last_updated: "2026-03-20T14:00:00.000Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 106 (proxy-client-types-read-endpoints) — EXECUTING
-Plan: 1 of 2
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -42,6 +42,7 @@ Plan: 1 of 2
 | v12.0 Data Fetching & E2E | 96-98 | 4 | 2 days |
 | v13.0 Thermorossi Proxy | 99-105 | 11 | 2 days |
 | Phase 106 P01 | 3 | 2 tasks | 3 files |
+| Phase 106 P02 | 15m | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -55,6 +56,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
 - Scene CRUD deferred — proxy endpoints marked "planned", not yet available
 - [Phase 106]: on_state and reachable in HueHistoryItem typed as number | null (not boolean) — SQLite stores integers, Pydantic Optional[int]
 - [Phase 106]: getScenes accepts optional groupId string (not URLSearchParams) — single query param, simpler API
+- [106-02]: GET handlers in lights/[id] and rooms/[id] migrated to withAuthAndErrorHandler; PUT handlers kept unchanged for Phase 107
+- [106-02]: rooms/route.ts no longer does Promise.all(rooms+zones); getGroups() returns both from proxy
 
 ### Pending Todos
 
@@ -67,6 +70,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T13:35:38.709Z
-Stopped at: Completed 106-01-PLAN.md
+Last session: 2026-03-20T14:00:00.000Z
+Stopped at: Completed 106-02-PLAN.md
 Resume file: None

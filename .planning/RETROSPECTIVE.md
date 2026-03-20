@@ -157,6 +157,48 @@
 
 ---
 
+## Milestone: v13.0 — Thermorossi Proxy Migration
+
+**Shipped:** 2026-03-20
+**Phases:** 7 | **Plans:** 11
+
+### What Was Built
+- Thermorossi proxy client via shared haGet/haPost transport (completing unified API architecture for all 4 providers)
+- All read and control endpoints migrated with typed proxy wrappers, 202 Accepted pattern for commands
+- Frontend hooks rewritten: stove_state exact equality (switch/case), data_freshness staleness, 409 Conflict handling
+- Scheduler/cron fully migrated: single getStatus() call, alarm detection, proxy health tracking
+- WiNet infrastructure deleted: stoveApi, sandbox, dead routes, API key, service worker cache rule
+- Gap closure: body key mismatch (Phase 104) and debug panel URL fixes (Phase 105)
+
+### What Worked
+- Proxy client pattern well-established by v10.0/v11.0 — thermorossiProxy.ts followed exact same function module pattern
+- Milestone audit caught 3 integration breaks (BROKEN-01, BROKEN-02, BROKEN-03) before shipping — all fixed by gap closure phases
+- Small focused gap closure phases (1 plan each) resolved issues in minutes
+- switch/case on TypeScript union type provides compile-time exhaustiveness — any future stove_state addition will cause tsc error
+
+### What Was Inefficient
+- SUMMARY frontmatter still not populated with requirements-completed or one_liner — 4th consecutive milestone with this issue
+- Nyquist validation 0/7 phases compliant — validation infrastructure exists but executor agents skip it
+- Phase 101 useStoveCommands used shorthand `{ level }` instead of `{ value: level }` — subtle JavaScript object shorthand bug that audit caught
+- staleness.cachedAt remains null (dead code) — known issue documented but not fixed
+
+### Patterns Established
+- 202 Accepted + suggested_poll_delay_s as command response pattern (15s ignite/shutdown, 5s settings adjustments)
+- stove_state exact equality (TypeScript union + switch/case) replacing regex/substring matching
+- Single proxy status call replacing multi-endpoint Promise.all (proxy bundles power_level + fan_level in status)
+
+### Key Lessons
+1. **Object shorthand is a subtle trap** — `{ level }` creates key `level`, not `value`. Audit caught this; tests didn't because they mocked at wrong layer.
+2. **Debug panel URLs need to match file-system routes** — when routes change during migration, debug panel POST URLs must be updated in the same phase.
+3. **Proxy migration is now a well-paved path** — v10.0 Netatmo took 9 phases, v13.0 Thermorossi took 5 core phases + 2 gap closure. Pattern maturity reduces scope.
+4. **SUMMARY frontmatter quality remains the top tooling gap** — one_liner and requirements-completed consistently empty, blocking milestone tooling.
+
+### Cost Observations
+- Model mix: balanced profile (sonnet executors, sonnet verifiers)
+- Notable: 7 phases in 2 days — fast execution, proxy pattern fully established. Gap closure phases completed in minutes.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -168,6 +210,7 @@
 | v11.0 | 8 | 13 | Transport unification + new device onboarding |
 | v11.1 | 4 | 9 | Test cleanup + memoization removal |
 | v12.0 | 3 | 4 | Polling unification + E2E smoke tests |
+| v13.0 | 7 | 11 | Thermorossi proxy migration — unified all 4 providers |
 
 ### Cumulative Quality
 
@@ -178,6 +221,7 @@
 | v11.0 | 4,000+ | 18/18 requirements | +11,425 |
 | v11.1 | 4,000+ | 16/16 requirements | -264 |
 | v12.0 | 4,000+ | 18/18 requirements | +2,709 |
+| v13.0 | 4,000+ | 26/26 requirements | +5,130 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -187,3 +231,5 @@
 4. **Established patterns accelerate** — new device onboarding follows Fritz!Box's proxy/card/page/cron template (verified v11.0)
 5. **Cleanup milestones after feature milestones** — v11.1 cleaned up v9.0-v11.0 tech debt in 1 day, keeping codebase healthy (verified v11.1)
 6. **Focused milestones ship faster** — v12.0 (3 phases, 4 plans) completed in 2 days with zero tech debt accumulated (verified v12.0)
+7. **Proxy migration speed improves with pattern maturity** — v10.0 (9 phases) → v13.0 (5+2 phases) for equivalent-scope migration (verified v13.0)
+8. **SUMMARY frontmatter quality is a persistent tooling gap** — one_liner and requirements-completed consistently empty across v11.0-v13.0, needs executor-level fix

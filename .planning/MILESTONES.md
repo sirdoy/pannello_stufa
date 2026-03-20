@@ -1,5 +1,43 @@
 # Project Milestones: Pannello Stufa
 
+## v13.0 Thermorossi Proxy Migration (Shipped: 2026-03-20)
+
+**Delivered:** Complete migration of Thermorossi stove from direct WiNet cloud API to shared HomeAssistant proxy — new typed proxy client via haGet/haPost, all read and control endpoints migrated with 202 Accepted pattern, frontend hooks rewritten for stove_state exact equality, scheduler fully migrated, WiNet infrastructure deleted, and audit-driven gap closure fixing body key mismatch and debug panel URLs.
+
+**Phases completed:** 99-105 (11 plans total)
+
+**Key accomplishments:**
+
+- Thermorossi proxy client (`lib/thermorossiProxy.ts`) with typed wrappers using shared `haGet`/`haPost` transport (X-API-Key auth) — completes unified API architecture for all 4 device providers
+- All read endpoints migrated (status, power, fan-level, health) with `data_freshness` (LIVE/STALE) and `error_code`/`error_description` fields; history endpoint added with auto-granularity pagination
+- All control endpoints migrated with 202 Accepted pattern: ignit, shutdown, setPower, setFan, setWaterTemperature — `suggested_poll_delay_s` drives delayed refresh (15s commands, 5s settings)
+- Frontend hooks rewritten: `stoveStatusUtils` uses switch/case on `StoveState` union (no regex), `useStoveData` reads `data_freshness` for staleness, `useStoveCommands` handles 202 + 409 Conflict
+- Scheduler/cron fully migrated: single `getStatus()` replaces 3-way Promise.all, alarm detection via `stove_state === 'alarm'` with 1-hour cooldown, proxy health saved to Firebase
+- WiNet infrastructure deleted: stoveApi.ts, sandboxService.ts, StoveService.ts, dead routes (getRoomTemperature, getActualWaterTemperature, etc.), WiNet API key, sandbox UI, service worker cache rule
+- Audit-driven gap closure (Phases 104-105): body key mismatch `{ level }` → `{ value: level }` for fan/power commands, debug panel POST URLs corrected to Next.js routes, 3 stale route entries removed
+
+**Stats:**
+
+- 11 plans executed across 7 phases (5 core + 2 gap closure)
+- 26/26 v13.0 requirements satisfied (100%)
+- 101 files changed (+9,857 insertions, -4,727 deletions, net +5,130 LOC)
+- 76 git commits with atomic changes
+- 2 days (2026-03-19 → 2026-03-20)
+
+**Git range:** `feat(99-01)` (24f22fc) → `fix(stove)` (30bb3e1)
+
+**Archives:**
+
+- [Roadmap](milestones/v13.0-ROADMAP.md)
+- [Requirements](milestones/v13.0-REQUIREMENTS.md)
+- [Audit](milestones/v13.0-MILESTONE-AUDIT.md)
+
+**Tech debt:** SUMMARY frontmatter `requirements-completed` missing on 5/7 phases (metadata only, all requirements confirmed via VERIFICATION.md). Nyquist validation partial (0/7 compliant). `staleness.cachedAt` always null for stove (dead code). `UseStoveDataReturn.status` typed as `string` instead of `StoveState` (pre-existing). 2 routes without frontend consumer (setWaterTemperature, history — by design, UI deferred).
+
+**What's next:** All 4 device providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi) unified behind shared HA proxy. WiNet eliminated. Ready for next milestone planning.
+
+---
+
 ## v12.0 Data Fetching Simplification & E2E Verification (Shipped: 2026-03-19)
 
 **Delivered:** Unified all device polling to 60s intervals via useAdaptivePolling, removed Firebase RTDB real-time listener and sync-external-state from the stove hook, and added Playwright smoke tests verifying all 9 application pages load without errors.
@@ -24,6 +62,7 @@
 **Git range:** `docs(96)` (a22ad2b) → `docs(phase-98)` (073046a)
 
 **Archives:**
+
 - [Roadmap](milestones/v12.0-ROADMAP.md)
 - [Requirements](milestones/v12.0-REQUIREMENTS.md)
 - [Audit](milestones/v12.0-MILESTONE-AUDIT.md)
@@ -59,6 +98,7 @@
 **Git range:** `docs(92)` (e4246fc) → `docs(phase-95)` (0e0b489)
 
 **Archives:**
+
 - [Roadmap](milestones/v11.1-ROADMAP.md)
 - [Requirements](milestones/v11.1-REQUIREMENTS.md)
 - [Audit](milestones/v11.1-MILESTONE-AUDIT.md)
@@ -95,6 +135,7 @@
 **Git range:** `feat(84-01)` (4e5c74c) → `docs(v11.0)` (b5aaf56)
 
 **Archives:**
+
 - [Roadmap](milestones/v11.0-ROADMAP.md)
 - [Requirements](milestones/v11.0-REQUIREMENTS.md)
 - [Audit](milestones/v11.0-MILESTONE-AUDIT.md)
@@ -131,6 +172,7 @@
 **Git range:** `feat(75-01)` (2462ce8) → `docs(phase-83)` (3d44459)
 
 **Archives:**
+
 - [Roadmap](milestones/v10.0-ROADMAP.md)
 - [Requirements](milestones/v10.0-REQUIREMENTS.md)
 - [Audit](milestones/v10.0-MILESTONE-AUDIT.md)
@@ -172,6 +214,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `test(55-02)` (54da7fa) → `docs(60-05)` (85af0e5)
 
 **Archives:**
+
 - [Roadmap](milestones/v7.0-ROADMAP.md)
 - [Requirements](milestones/v7.0-REQUIREMENTS.md)
 - [Audit](milestones/v7.0-MILESTONE-AUDIT.md)
@@ -208,6 +251,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `feat(49-01)` → `docs(phase-54)`
 
 **Archives:**
+
 - [Roadmap](milestones/v6.0-ROADMAP.md)
 - [Requirements](milestones/v6.0-REQUIREMENTS.md)
 
@@ -242,6 +286,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `chore(44-01)` → `docs(phase-48)`
 
 **Archives:**
+
 - [Roadmap](milestones/v5.1-ROADMAP.md)
 - [Requirements](milestones/v5.1-REQUIREMENTS.md)
 - [Audit](milestones/v5.1-MILESTONE-AUDIT.md)
@@ -281,6 +326,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `feat(37-01)` → `docs(43-08)`
 
 **Archives:**
+
 - [Roadmap](milestones/v5.0-ROADMAP.md)
 - [Requirements](milestones/v5.0-REQUIREMENTS.md)
 
@@ -316,6 +362,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `feat(30-01)` → `docs(36)`
 
 **Archives:**
+
 - [Roadmap](milestones/v4.0-ROADMAP.md)
 - [Requirements](milestones/v4.0-REQUIREMENTS.md)
 - [Audit](milestones/v4.0-MILESTONE-AUDIT.md)
@@ -352,6 +399,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `docs(25)` → `docs(29)`
 
 **Archives:**
+
 - [Roadmap](milestones/v3.2-ROADMAP.md)
 - [Requirements](milestones/v3.2-REQUIREMENTS.md)
 - [Audit](milestones/v3.2-MILESTONE-AUDIT.md)
@@ -388,6 +436,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `feat(19-01)` → `feat(24)`
 
 **Archives:**
+
 - [Roadmap](milestones/v3.1-ROADMAP.md)
 - [Requirements](milestones/v3.1-REQUIREMENTS.md)
 - [Audit](milestones/v3.1-MILESTONE-AUDIT.md)
@@ -426,6 +475,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `feat(11-01)` → `feat(18-04)`
 
 **Archives:**
+
 - [Roadmap](milestones/v3.0-ROADMAP.md)
 - [Requirements](milestones/v3.0-REQUIREMENTS.md)
 - [Audit](milestones/v3.0-MILESTONE-AUDIT.md)
@@ -463,6 +513,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `feat(06-01)` (1763a1d) → `feat(10-05)` (575a214)
 
 **Archives:**
+
 - [Roadmap](milestones/v2.0-ROADMAP.md)
 - [Requirements](milestones/v2.0-REQUIREMENTS.md)
 - [Audit](milestones/v2.0-MILESTONE-AUDIT.md)
@@ -496,6 +547,7 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 **Git range:** `feat(01-01)` → `docs(05)`
 
 **Archives:**
+
 - [Roadmap](milestones/v1.0-ROADMAP.md)
 - [Requirements](milestones/v1.0-REQUIREMENTS.md)
 - [Audit](milestones/v1.0-MILESTONE-AUDIT.md)
@@ -506,7 +558,6 @@ Historical record of shipped milestones for the Pannello Stufa smart home contro
 
 _For current project status, see `.planning/PROJECT.md`_
 _To start next milestone, run `/gsd:new-milestone`_
-
 
 ## v8.0 Fritz!Box Network Monitor (Shipped: 2026-02-16)
 
@@ -536,6 +587,7 @@ _To start next milestone, run `/gsd:new-milestone`_
 **Git range:** `feat(61-01)` (c359453) → `docs(phase-67)` (2dff5c7)
 
 **Archives:**
+
 - [Roadmap](milestones/v8.0-ROADMAP.md)
 - [Requirements](milestones/v8.0-REQUIREMENTS.md)
 
@@ -544,7 +596,6 @@ _To start next milestone, run `/gsd:new-milestone`_
 **What's next:** Fritz!Box network monitoring fully operational. Consider advanced monitoring (guest network, anomaly detection, per-device usage tracking) for future milestones.
 
 ---
-
 
 ## v8.1 Masonry Dashboard (Shipped: 2026-02-18)
 
@@ -571,6 +622,7 @@ _To start next milestone, run `/gsd:new-milestone`_
 **Git range:** `docs: start milestone v8.1` (06d261c) → `fix(ci)` (a358b57)
 
 **Archives:**
+
 - [Roadmap](milestones/v8.1-ROADMAP.md)
 - [Requirements](milestones/v8.1-REQUIREMENTS.md)
 
@@ -579,7 +631,6 @@ _To start next milestone, run `/gsd:new-milestone`_
 **What's next:** Dashboard layout optimized. Consider next milestone for new features or operational improvements.
 
 ---
-
 
 ## v9.0 Performance Optimization (Shipped: 2026-02-19)
 
@@ -608,6 +659,7 @@ _To start next milestone, run `/gsd:new-milestone`_
 **Git range:** `docs(70)` (0cc9915) → `docs(phase-74)` (0daf258)
 
 **Archives:**
+
 - [Roadmap](milestones/v9.0-ROADMAP.md)
 - [Requirements](milestones/v9.0-REQUIREMENTS.md)
 
@@ -616,4 +668,3 @@ _To start next milestone, run `/gsd:new-milestone`_
 **What's next:** Performance optimization complete. App has measurement tooling, compiler auto-memoization, code splitting, render optimization, and Suspense streaming. Ready for next milestone planning.
 
 ---
-

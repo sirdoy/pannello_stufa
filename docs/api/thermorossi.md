@@ -114,17 +114,35 @@ Returns stove telemetry values in a single combined response.
   "power_level": 3,
   "fan_level": 4,
   "data_freshness": "LIVE",
-  "last_poll_at": "2026-03-15T10:30:00+00:00"
+  "last_poll_at": "2026-03-15T10:30:00+00:00",
+  "error_code": null,
+  "error_description": null
+}
+```
+
+**Response when `stove_state` is `"alarm"`:**
+
+```json
+{
+  "stove_state": "alarm",
+  "power_level": null,
+  "fan_level": null,
+  "data_freshness": "LIVE",
+  "last_poll_at": "2026-03-19T10:30:00+00:00",
+  "error_code": 14,
+  "error_description": "Mancata accensione"
 }
 ```
 
 ```typescript
 interface ThermorossiStatusResponse {
-  stove_state: "off" | "igniting" | "working" | "standby" | "cleaning" | "alarm";
+  stove_state: "off" | "igniting" | "working" | "standby" | "cleaning" | "alarm" | "modulating";
   power_level: number | null;          // 1-5
   fan_level: number | null;            // 1-6
   data_freshness: "LIVE" | "STALE";
   last_poll_at: string | null;         // ISO 8601
+  error_code: number | null;           // WiNet Error field, populated only when stove_state is "alarm"
+  error_description: string | null;    // WiNet ErrorDescription, populated only when stove_state is "alarm"
 }
 ```
 
@@ -300,7 +318,7 @@ interface ThermorossiHistoryItem {
   timestamp: number;               // Unix epoch int
 
   // Raw tier only
-  stove_state: string | null;      // "off" | "igniting" | "working" | "standby" | "cleaning" | "alarm"
+  stove_state: string | null;      // "off" | "igniting" | "working" | "standby" | "cleaning" | "alarm" | "modulating"
   power_level: number | null;
   fan_level: number | null;
 
@@ -378,10 +396,10 @@ Commands are blocked unless the stove is in an allowed state. The server returns
 | Command | Allowed States | Notes |
 |---------|---------------|-------|
 | `ignite` | `off`, `standby` | Cannot re-ignite a running stove |
-| `shutdown` | `working`, `alarm` | Emergency remote shutdown allowed in alarm state |
-| `set_power` | `working`, `igniting`, `cleaning` | Settings adjustable while active |
-| `set_fan` | `working`, `igniting`, `cleaning` | Settings adjustable while active |
-| `set_water_temp` | `working`, `igniting`, `cleaning` | Settings adjustable while active |
+| `shutdown` | `working`, `alarm`, `igniting`, `modulating` | Emergency remote shutdown allowed in alarm state |
+| `set_power` | `working`, `igniting`, `cleaning`, `modulating` | Settings adjustable while active |
+| `set_fan` | `working`, `igniting`, `cleaning`, `modulating` | Settings adjustable while active |
+| `set_water_temp` | `working`, `igniting`, `cleaning`, `modulating` | Settings adjustable while active |
 
 > **Note:** `STALE` data freshness does **not** block commands -- the state gate uses the last known state regardless of data age.
 
@@ -418,7 +436,7 @@ Shuts down the stove. Also allowed from `alarm` state for emergency remote shutd
 
 **Request body:** None
 
-**Allowed states:** `working`, `alarm`
+**Allowed states:** `working`, `alarm`, `igniting`, `modulating`
 
 **`suggested_poll_delay_s`:** 15
 
@@ -426,7 +444,7 @@ Shuts down the stove. Also allowed from `alarm` state for emergency remote shutd
 
 | Status | Condition |
 |--------|-----------|
-| `409 Conflict` | Stove is not in `working` or `alarm` state |
+| `409 Conflict` | Stove is not in `working`, `alarm`, `igniting`, or `modulating` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |
@@ -439,7 +457,7 @@ Sets the stove power level. Valid range: 1-5.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
-**Allowed states:** `working`, `igniting`, `cleaning`
+**Allowed states:** `working`, `igniting`, `cleaning`, `modulating`
 
 **`suggested_poll_delay_s`:** 5
 
@@ -456,7 +474,7 @@ Sets the stove power level. Valid range: 1-5.
 | Status | Condition |
 |--------|-----------|
 | `422 Unprocessable Entity` | `value` is outside 1-5 range |
-| `409 Conflict` | Stove is not in `working`, `igniting`, or `cleaning` state |
+| `409 Conflict` | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |
@@ -469,7 +487,7 @@ Sets the stove fan speed level. Valid range: 1-6.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
-**Allowed states:** `working`, `igniting`, `cleaning`
+**Allowed states:** `working`, `igniting`, `cleaning`, `modulating`
 
 **`suggested_poll_delay_s`:** 5
 
@@ -486,7 +504,7 @@ Sets the stove fan speed level. Valid range: 1-6.
 | Status | Condition |
 |--------|-----------|
 | `422 Unprocessable Entity` | `value` is outside 1-6 range |
-| `409 Conflict` | Stove is not in `working`, `igniting`, or `cleaning` state |
+| `409 Conflict` | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |
@@ -499,7 +517,7 @@ Sets the hydronic water temperature setpoint. Valid range: 40-80C.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
-**Allowed states:** `working`, `igniting`, `cleaning`
+**Allowed states:** `working`, `igniting`, `cleaning`, `modulating`
 
 **`suggested_poll_delay_s`:** 5
 
@@ -516,10 +534,32 @@ Sets the hydronic water temperature setpoint. Valid range: 40-80C.
 | Status | Condition |
 |--------|-----------|
 | `422 Unprocessable Entity` | `value` is outside 40-80 range |
-| `409 Conflict` | Stove is not in `working`, `igniting`, or `cleaning` state |
+| `409 Conflict` | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |
+
+---
+
+## State Mapping Reference
+
+The proxy maps WiNet's integer `Status` field to semantic string values. The PWA should use exact equality checks (`===`) on `stove_state`, not substring matching.
+
+| WiNet `Status` (int) | WiNet `StatusDescription` | Proxy `stove_state` | Confidence |
+|---|---|---|---|
+| 0 | `START` | `"igniting"` | Community docs |
+| 1 | `OFF` | `"off"` | HIGH (live-verified 2026-03-18) |
+| 2 | `WAIT` / `STANDBY` | `"standby"` | Community docs |
+| 3 | `WORK` | `"working"` | HIGH (live-verified 2026-03-18) |
+| 4 | `CLEAN` / `CLEANING` | `"cleaning"` | Community docs |
+| 5 | `ERROR` / `ALARM` | `"alarm"` | Community docs |
+| 6 | `MODULATION` | `"modulating"` | Community docs (not yet live-verified) |
+| Other | Unknown | `"off"` (fallback, logged as warning) | N/A |
+
+**Notes:**
+- The proxy maps by **integer**, not by string — `StatusDescription` is informational only.
+- Unknown `Status` values fall back to `"off"` and emit a structured log warning (`thermorossi.unknown_state`).
+- When `stove_state` is `"alarm"`, the response includes `error_code` (int) and `error_description` (string) from WiNet's `Error` and `ErrorDescription` fields.
 
 ---
 

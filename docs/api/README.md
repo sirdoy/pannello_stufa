@@ -14,6 +14,7 @@ This API exposes real-time and historical data from your home network via a modu
 | [Netatmo](./netatmo.md) | `/api/v1/netatmo` | Energy (thermostat control, room temperatures, schedules), valve calibration (NRV status and calibration), and security camera (status, streams, snapshots, monitoring, events) — 21 endpoints |
 | [DIRIGERA](./dirigera.md) | `/api/v1/dirigera` | IKEA smart home — contact and motion sensors, telemetry, history — 8 endpoints |
 | [Thermorossi](./thermorossi.md) | `/api/v1/thermorossi` | Pellet stove — state monitoring, history, and remote controls — 10 endpoints |
+| [Hue](./hue.md) | `/api/v1/hue` | Philips Hue — lights, groups, scenes, light control, and history — 10 endpoints |
 | [Raspberry Pi](./raspberry-pi.md) | `/api/v1/raspi` | System stats — CPU, RAM, disk, temperature, uptime, network — 5 endpoints |
 
 See also: [Netatmo Setup Guide](../NETATMO_SETUP.md)

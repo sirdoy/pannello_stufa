@@ -8,24 +8,10 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, lu
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: v13.0 Thermorossi Proxy Migration
-
-**Goal:** Migrate the Thermorossi stove provider from direct WiNet cloud API to the shared HomeAssistant proxy, completing the unified API architecture for all device providers.
-
-**Target features:**
-- Thermorossi proxy client via shared `haGet`/`haPost` transport (X-API-Key auth)
-- All read endpoints migrated: status (with error_code/error_description), power, fan-level
-- All control endpoints migrated: ignit, shutdown, set power/fan/water temp (202 Accepted pattern)
-- Telemetry history via proxy `/history` endpoint (new capability)
-- Frontend hooks updated: `stove_state` exact equality, `data_freshness` from proxy
-- Scheduler/cron updated for new response formats and status strings
-- Dead WiNet infrastructure deleted (API key, direct cloud calls, sandbox mode)
-- Debug panel updated for proxy endpoints
-
 ## Current State
 
-**Version:** v13.0 (started 2026-03-19)
-**Status:** v13.0 gap closure complete — Phase 105 complete (debug panel URLs fixed, stale routes removed). All gap closure phases done.
+**Version:** v13.0 (shipped 2026-03-20)
+**Status:** All milestones complete. All 4 device providers unified behind shared HomeAssistant proxy. Ready for next milestone planning.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -39,7 +25,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
 - Fritz!Box TR-064 API integration via server-side proxy
-- Shared HomeAssistant API client (`haGet`/`haPost`) for all providers (Fritz!Box, Netatmo, Raspberry Pi)
+- Shared HomeAssistant API client (`haGet`/`haPost`) for all providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi)
 - Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
 - Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
@@ -455,9 +441,51 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 **E2E Page Verification:**
 - ✓ **E2E-01** through **E2E-10**: Playwright verification for all 9 pages — v12.0 (Phase 97)
 
+**v13.0 Thermorossi Proxy Migration (Shipped 2026-03-20):**
+
+**Proxy Client:**
+- ✓ **CLIENT-01**: Thermorossi proxy client uses shared haGet/haPost transport — v13.0 (Phase 99)
+- ✓ **CLIENT-02**: TypeScript types for all proxy response interfaces — v13.0 (Phase 99)
+- ✓ **CLIENT-03**: Convenience wrappers for each endpoint — v13.0 (Phase 99)
+
+**Read Endpoints:**
+- ✓ **READ-01**: GET /status migrated with stove_state, data_freshness, error_code — v13.0 (Phase 99)
+- ✓ **READ-02**: GET /power migrated with data_freshness — v13.0 (Phase 99)
+- ✓ **READ-03**: GET /fan-level migrated with data_freshness — v13.0 (Phase 99)
+- ✓ **READ-04**: GET /health migrated — v13.0 (Phase 99)
+- ✓ **READ-05**: GET /history with auto-granularity pagination — v13.0 (Phase 100)
+
+**Control Endpoints:**
+- ✓ **CMD-01**: POST /commands/ignit via proxy (202 Accepted) — v13.0 (Phase 100)
+- ✓ **CMD-02**: POST /commands/shutdown via proxy (202 Accepted) — v13.0 (Phase 100)
+- ✓ **CMD-03**: POST /settings/power with { value: N } — v13.0 (Phase 104)
+- ✓ **CMD-04**: POST /settings/fan-level with { value: N } — v13.0 (Phase 104)
+- ✓ **CMD-05**: POST /settings/temperature/water — v13.0 (Phase 100)
+
+**Frontend:**
+- ✓ **UI-01**: useStoveData reads stove_state exact equality — v13.0 (Phase 101)
+- ✓ **UI-02**: stoveStatusUtils rewritten for exact matching — v13.0 (Phase 101)
+- ✓ **UI-03**: useStoveCommands handles 202 Accepted — v13.0 (Phase 104)
+- ✓ **UI-04**: Error display uses error_code/error_description — v13.0 (Phase 101)
+- ✓ **UI-05**: data_freshness replaces custom staleness — v13.0 (Phase 101)
+
+**Scheduler/Cron:**
+- ✓ **CRON-01**: Scheduler reads stove_state instead of StatusDescription — v13.0 (Phase 102)
+- ✓ **CRON-02**: Health monitoring reads error_code/error_description — v13.0 (Phase 102)
+- ✓ **CRON-03**: All scheduler calls route through proxy client — v13.0 (Phase 102)
+
+**Cleanup:**
+- ✓ **CLEAN-01**: WiNet direct API client deleted — v13.0 (Phase 103)
+- ✓ **CLEAN-02**: WiNet API key removed — v13.0 (Phase 103)
+- ✓ **CLEAN-03**: Sandbox mode removed — v13.0 (Phase 103)
+- ✓ **CLEAN-04**: Dead API routes removed — v13.0 (Phase 105)
+
+**Debug Panel:**
+- ✓ **DEBUG-01**: StoveTab updated with proxy endpoints — v13.0 (Phase 105)
+
 ### Active
 
-v13.0 Thermorossi Proxy Migration — requirements being defined
+(No active milestone — run `/gsd:new-milestone` to start next)
 
 ### Out of Scope
 
@@ -498,14 +526,14 @@ v13.0 Thermorossi Proxy Migration — requirements being defined
 - GDPR-compliant analytics con consent banner
 - Playwright E2E smoke tests for all 9 app pages
 - All device polling unified at 60s via useAdaptivePolling (no Firebase RTDB real-time listener)
-- 17 milestones shipped, 98 phases, 375 plans executed
+- 18 milestones shipped, 105 phases, 386 plans executed
 
-**v12.0 Milestone (2026-03-18 → 2026-03-19):**
-- 3 phases executed (4 plans)
-- 18/18 requirements satisfied (100%)
-- 44 files changed (+3,363 insertions, -654 deletions)
-- 19 git commits with atomic changes
-- 2 days from phase 96 start to completion
+**v13.0 Milestone (2026-03-19 → 2026-03-20):**
+- 7 phases executed (11 plans, 5 core + 2 gap closure)
+- 26/26 requirements satisfied (100%)
+- 101 files changed (+9,857 insertions, -4,727 deletions)
+- 76 git commits with atomic changes
+- 2 days from phase 99 start to completion
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -605,6 +633,11 @@ v13.0 Thermorossi Proxy Migration — requirements being defined
 | Stove-specific staleness thresholds | 90s when on, 180s when off via optional thresholdMs param | ✓ Good — Safety-critical staleness detection preserved (v12.0) |
 | collectConsoleErrors helper pattern | Attach listener before goto, cleanup before assertion | ✓ Good — Prevents late-arriving messages from polluting error arrays (v12.0) |
 | E2E-09 /admin maps to /debug | No /admin route exists, debug page serves admin function | ✓ Good — Requirement satisfied by existing route (v12.0) |
+| Thermorossi proxy as function module | Consistent with Netatmo/Fritz!Box/Raspi pattern, no class state | ✓ Good — Unified 4 providers on same pattern (v13.0) |
+| stove_state exact equality (switch/case) | TypeScript exhaustiveness check, no regex/substring on status strings | ✓ Good — Catches missing state variants at compile time (v13.0) |
+| 202 Accepted + suggested_poll_delay_s | Proxy convention for async commands, drives delayed refresh timing | ✓ Good — 15s for ignit/shutdown, 5s for settings (v13.0) |
+| Single getStatus() replacing 3-way Promise.all | Proxy response includes fan_level and power_level in status | ✓ Good — Scheduler reduced from 3 calls to 1 (v13.0) |
+| Audit-driven gap closure (Phases 104-105) | Milestone audit found 3 integration breaks before shipping | ✓ Good — Body key mismatch + debug URLs caught pre-ship (v13.0) |
 
 ## Constraints
 
@@ -616,4 +649,4 @@ v13.0 Thermorossi Proxy Migration — requirements being defined
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-20 after Phase 105 complete — debug panel URLs fixed, stale routes removed (BROKEN-01 + BROKEN-03 closed)*
+*Last updated: 2026-03-20 after v13.0 milestone — Thermorossi proxy migration complete, all 4 providers unified*

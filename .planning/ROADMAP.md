@@ -88,7 +88,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 102: Scheduler Update** - Cron/scheduler updated for stove_state strings and proxy client (completed 2026-03-19)
 - [x] **Phase 103: Cleanup & Debug Panel** - WiNet infrastructure deleted, debug panel updated for proxy endpoints (completed 2026-03-19)
 - [x] **Phase 104: Fix Command Body Key Mismatch** - Align useStoveCommands body key with setPower/setFan route expectations (gap closure) (completed 2026-03-20)
-- [ ] **Phase 105: Fix Debug Panel URLs & Stale Routes** - Fix StoveTab POST URLs and remove stale route entries (gap closure)
+- [x] **Phase 105: Fix Debug Panel URLs & Stale Routes** - Fix StoveTab POST URLs and remove stale route entries (gap closure) (completed 2026-03-20)
 
 ## Phase Details
 
@@ -191,7 +191,7 @@ Plans:
   1. StoveTab POST URLs point to Next.js routes (`/api/stove/ignite`, `/api/stove/shutdown`, `/api/stove/setPower`, `/api/stove/setFan`, `/api/stove/setWaterTemperature`) — not HA proxy internal paths
   2. `lib/routes.ts` has no entries for deleted API routes (getRoomTemperature, getSettings, setSettings)
   3. All 5 POST operations in StoveTab return non-404 responses
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 105-01-PLAN.md — Fix StoveTab POST URLs + remove stale route entries
@@ -223,7 +223,7 @@ Plans:
 | 102. Scheduler Update | 1/1 | Complete    | 2026-03-19 | - |
 | 103. Cleanup & Debug Panel | 2/2 | Complete    | 2026-03-19 | - |
 | 104. Fix Command Body Key Mismatch | 1/1 | Complete    | 2026-03-20 | - |
-| 105. Fix Debug Panel URLs & Stale Routes | 0/1 | Planned | - | - |
+| 105. Fix Debug Panel URLs & Stale Routes | 1/1 | Complete   | 2026-03-20 | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases complete, 2 gap closure phases planned).
 

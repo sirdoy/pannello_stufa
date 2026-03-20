@@ -48,11 +48,11 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 - [x] **CLEAN-01**: WiNet direct API client deleted (lib/stoveApi.ts cloud functions)
 - [x] **CLEAN-02**: WiNet API key removed from environment/config
 - [x] **CLEAN-03**: Sandbox mode removed (localhost WiNet simulation)
-- [ ] **CLEAN-04**: Dead API routes removed (getRoomTemperature, getActualWaterTemperature, getWaterSetTemperature, settings, setSettings)
+- [x] **CLEAN-04**: Dead API routes removed (getRoomTemperature, getActualWaterTemperature, getWaterSetTemperature, settings, setSettings)
 
 ### Debug Panel
 
-- [ ] **DEBUG-01**: StoveTab updated with proxy endpoint URLs and response formats
+- [x] **DEBUG-01**: StoveTab updated with proxy endpoint URLs and response formats
 
 ## Future Requirements
 
@@ -97,8 +97,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLEAN-01 | Phase 103 | Complete |
 | CLEAN-02 | Phase 103 | Complete |
 | CLEAN-03 | Phase 103 | Complete |
-| CLEAN-04 | Phase 105 | Pending |
-| DEBUG-01 | Phase 105 | Pending |
+| CLEAN-04 | Phase 105 | Complete |
+| DEBUG-01 | Phase 105 | Complete |
 
 **Coverage:**
 - v13.0 requirements: 26 total

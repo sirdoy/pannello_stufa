@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: Phase 105 context gathered
-last_updated: "2026-03-20T09:51:42.501Z"
+stopped_at: Completed 105-01-PLAN.md
+last_updated: "2026-03-20T10:00:43.090Z"
 progress:
   total_phases: 7
-  completed_phases: 6
-  total_plans: 10
-  completed_plans: 10
+  completed_phases: 7
+  total_plans: 11
+  completed_plans: 11
 ---
 
 # Project State
@@ -19,11 +19,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 104 — fix-command-body-key-mismatch
+**Current focus:** Phase 105 — fix-debug-panel-urls-stale-routes
 
 ## Current Position
 
-Phase: 104 (fix-command-body-key-mismatch) — EXECUTING
+Phase: 105 (fix-debug-panel-urls-stale-routes) — EXECUTING
 Plan: 1 of 1
 
 ## Performance Metrics
@@ -51,6 +51,7 @@ Plan: 1 of 1
 | Phase 103 P02 | 5 | 1 tasks | 2 files |
 | Phase 103 P01 | 454 | 2 tasks | 17 files |
 | Phase 104-fix-command-body-key-mismatch P01 | 2 | 1 tasks | 2 files |
+| Phase 105-fix-debug-panel-urls-stale-routes P01 | 5 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,8 @@ Phase 99 Plan 01 decisions:
 - [Phase 103]: healthMonitoring.ts migrated to getStatus() from thermorossiProxy with lowercase exact state constants
 - [Phase 103]: sw.ts dead WiNet service worker cache rule removed (wsthermorossi.cloudwinet.it)
 - [Phase 104-01]: Fan/power commands use { value: level, source: 'manual' } body key to match route extraction body['value'] -- shorthand { level } was silently sending undefined to proxy
+- [Phase 105-fix-debug-panel-urls-stale-routes]: Debug panel POST URLs updated to match actual Next.js file-system routes, not HA proxy internal paths
+- [Phase 105-fix-debug-panel-urls-stale-routes]: STOVE_ROUTES trimmed to 7 live entries: status, ignite, shutdown, getFan, getPower, setFan, setPower
 
 ### Pending Todos
 
@@ -106,6 +109,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T09:51:42.493Z
-Stopped at: Phase 105 context gathered
-Resume file: .planning/phases/105-fix-debug-panel-urls-stale-routes/105-CONTEXT.md
+Last session: 2026-03-20T10:00:35.260Z
+Stopped at: Completed 105-01-PLAN.md
+Resume file: None

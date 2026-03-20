@@ -191,6 +191,10 @@ Plans:
   1. StoveTab POST URLs point to Next.js routes (`/api/stove/ignite`, `/api/stove/shutdown`, `/api/stove/setPower`, `/api/stove/setFan`, `/api/stove/setWaterTemperature`) — not HA proxy internal paths
   2. `lib/routes.ts` has no entries for deleted API routes (getRoomTemperature, getSettings, setSettings)
   3. All 5 POST operations in StoveTab return non-404 responses
+**Plans:** 1 plan
+
+Plans:
+- [ ] 105-01-PLAN.md — Fix StoveTab POST URLs + remove stale route entries
 
 ## Progress
 
@@ -219,10 +223,10 @@ Plans:
 | 102. Scheduler Update | 1/1 | Complete    | 2026-03-19 | - |
 | 103. Cleanup & Debug Panel | 2/2 | Complete    | 2026-03-19 | - |
 | 104. Fix Command Body Key Mismatch | 1/1 | Complete    | 2026-03-20 | - |
-| 105. Fix Debug Panel URLs & Stale Routes | 0/0 | Planned | - | - |
+| 105. Fix Debug Panel URLs & Stale Routes | 0/1 | Planned | - | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases complete, 2 gap closure phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-20 — Phase 104 planned: 1 plan in 1 wave*
+*Roadmap updated: 2026-03-20 — Phase 105 planned: 1 plan in 1 wave*

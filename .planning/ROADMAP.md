@@ -85,11 +85,11 @@ See `.planning/milestones/` for full archives.
   3. getLights() returns lights with capability_tier, ct_kelvin, and room enrichment
   4. getGroups() returns groups with member lights array; getScenes() supports group_id filter
   5. getHealth() reports data_freshness (LIVE/STALE) and 503 when UNREACHABLE; getHistory() paginates with auto-granularity
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 106-01: Hue proxy client + types + read endpoint wrappers
-- [ ] 106-02: Next.js API routes for all read endpoints
+- [ ] 106-01-PLAN.md — Hue proxy types + client module + client tests
+- [ ] 106-02-PLAN.md — API route rewrites (7 routes) + route tests
 
 ### Phase 107: Control Endpoints
 **Goal**: Users can control Hue lights and groups through the proxy — all commands accepted with 202 Accepted and delayed-refresh pattern
@@ -100,7 +100,7 @@ Plans:
   2. PUT /groups/{id}/action via proxy returns 202 Accepted
   3. POST /groups/{gid}/scenes/{sid} activates scene via proxy with 202 Accepted
   4. 409 Conflict response from proxy is surfaced to caller (unreachable light detection)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 107-01: Control endpoint wrappers + Next.js API routes (light state, group action, scene activate, 409 handling)
@@ -116,7 +116,7 @@ Plans:
   4. Scene activation calls POST /groups/{gid}/scenes/{sid} (new path pattern)
   5. 202 Accepted triggers delayed refresh using suggested_poll_delay_s
   6. data_freshness from proxy drives staleness indicator (replaces custom connection checks)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 108-01: useLightsData + useLightsCommands rewrite for proxy shapes
@@ -132,7 +132,7 @@ Plans:
   3. hueConnectionStrategy.ts and bridge discovery/pairing routes are deleted
   4. hueRemoteTokenHelper.ts (OAuth) and hueLocalHelper.ts (Firebase bridge credentials) are deleted
   5. HUE_CLIENT_SECRET, NEXT_PUBLIC_HUE_CLIENT_ID, NEXT_PUBLIC_HUE_APP_ID env vars removed from .env.local and all references
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 109-01: Delete legacy Hue files + env vars + verify no broken imports

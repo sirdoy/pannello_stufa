@@ -25,15 +25,15 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 
 - [x] **CMD-01**: POST /commands/ignit via proxy — handles 202 Accepted with suggested_poll_delay_s
 - [x] **CMD-02**: POST /commands/shutdown via proxy — handles 202 Accepted with suggested_poll_delay_s
-- [x] **CMD-03**: POST /settings/power via proxy — sends { value: N }, handles 202 Accepted
-- [x] **CMD-04**: POST /settings/fan-level via proxy — sends { value: N }, handles 202 Accepted
+- [ ] **CMD-03**: POST /settings/power via proxy — sends { value: N }, handles 202 Accepted
+- [ ] **CMD-04**: POST /settings/fan-level via proxy — sends { value: N }, handles 202 Accepted
 - [x] **CMD-05**: POST /settings/temperature/water via proxy — sends { value: N }, range 40-80°C
 
 ### Frontend
 
 - [x] **UI-01**: useStoveData reads stove_state (exact equality), power_level, fan_level from proxy response
 - [x] **UI-02**: stoveStatusUtils rewritten for exact stove_state matching (working, off, igniting, standby, cleaning, alarm, modulating)
-- [x] **UI-03**: useStoveCommands handles 202 Accepted response pattern from proxy
+- [ ] **UI-03**: useStoveCommands handles 202 Accepted response pattern from proxy
 - [x] **UI-04**: Error display uses error_code and error_description from proxy status
 - [x] **UI-05**: data_freshness from proxy replaces custom staleness logic for stove provider
 
@@ -48,11 +48,11 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 - [x] **CLEAN-01**: WiNet direct API client deleted (lib/stoveApi.ts cloud functions)
 - [x] **CLEAN-02**: WiNet API key removed from environment/config
 - [x] **CLEAN-03**: Sandbox mode removed (localhost WiNet simulation)
-- [x] **CLEAN-04**: Dead API routes removed (getRoomTemperature, getActualWaterTemperature, getWaterSetTemperature, settings, setSettings)
+- [ ] **CLEAN-04**: Dead API routes removed (getRoomTemperature, getActualWaterTemperature, getWaterSetTemperature, settings, setSettings)
 
 ### Debug Panel
 
-- [x] **DEBUG-01**: StoveTab updated with proxy endpoint URLs and response formats
+- [ ] **DEBUG-01**: StoveTab updated with proxy endpoint URLs and response formats
 
 ## Future Requirements
 
@@ -83,12 +83,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | READ-05 | Phase 100 | Complete |
 | CMD-01 | Phase 100 | Complete |
 | CMD-02 | Phase 100 | Complete |
-| CMD-03 | Phase 100 | Complete |
-| CMD-04 | Phase 100 | Complete |
+| CMD-03 | Phase 104 | Pending |
+| CMD-04 | Phase 104 | Pending |
 | CMD-05 | Phase 100 | Complete |
 | UI-01 | Phase 101 | Complete |
 | UI-02 | Phase 101 | Complete |
-| UI-03 | Phase 101 | Complete |
+| UI-03 | Phase 104 | Pending |
 | UI-04 | Phase 101 | Complete |
 | UI-05 | Phase 101 | Complete |
 | CRON-01 | Phase 102 | Complete |
@@ -97,14 +97,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLEAN-01 | Phase 103 | Complete |
 | CLEAN-02 | Phase 103 | Complete |
 | CLEAN-03 | Phase 103 | Complete |
-| CLEAN-04 | Phase 103 | Complete |
-| DEBUG-01 | Phase 103 | Complete |
+| CLEAN-04 | Phase 105 | Pending |
+| DEBUG-01 | Phase 105 | Pending |
 
 **Coverage:**
 - v13.0 requirements: 26 total
+- Satisfied: 21
+- Pending (gap closure): 5 (CMD-03, CMD-04, UI-03, DEBUG-01, CLEAN-04)
 - Mapped to phases: 26
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 — traceability populated after roadmap creation*
+*Last updated: 2026-03-20 — gap closure phases 104-105 added, 5 requirements reset to Pending*

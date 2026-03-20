@@ -87,6 +87,8 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 101: Frontend Hooks** - useStoveData and useStoveCommands updated for proxy response format (completed 2026-03-19)
 - [x] **Phase 102: Scheduler Update** - Cron/scheduler updated for stove_state strings and proxy client (completed 2026-03-19)
 - [x] **Phase 103: Cleanup & Debug Panel** - WiNet infrastructure deleted, debug panel updated for proxy endpoints (completed 2026-03-19)
+- [ ] **Phase 104: Fix Command Body Key Mismatch** - Align useStoveCommands body key with setPower/setFan route expectations (gap closure)
+- [ ] **Phase 105: Fix Debug Panel URLs & Stale Routes** - Fix StoveTab POST URLs and remove stale route entries (gap closure)
 
 ## Phase Details
 
@@ -166,6 +168,26 @@ Plans:
 - [ ] 103-01-PLAN.md — WiNet client + sandbox + dead routes + dead service deletion + import cleanup
 - [ ] 103-02-PLAN.md — Debug panel StoveTab rewrite for proxy endpoints
 
+### Phase 104: Fix Command Body Key Mismatch
+**Goal**: Fan and power level commands from the UI reach the proxy with the correct body key
+**Depends on**: Phase 100, Phase 101
+**Requirements**: CMD-03, CMD-04, UI-03
+**Gap Closure:** Closes BROKEN-02 from v13.0 audit
+**Success Criteria** (what must be TRUE):
+  1. `useStoveCommands` sends the body key that `setPower` and `setFan` routes expect — no `undefined` value reaches the proxy
+  2. Unit tests verify the correct body shape for fan and power commands
+  3. The fan/power adjustment E2E flow is unbroken from UI → route → proxy
+
+### Phase 105: Fix Debug Panel URLs & Stale Routes
+**Goal**: Debug panel POST operations work and no stale route references remain
+**Depends on**: Phase 103
+**Requirements**: DEBUG-01, CLEAN-04
+**Gap Closure:** Closes BROKEN-01 and BROKEN-03 from v13.0 audit
+**Success Criteria** (what must be TRUE):
+  1. StoveTab POST URLs point to Next.js routes (`/api/stove/ignite`, `/api/stove/shutdown`, `/api/stove/setPower`, `/api/stove/setFan`, `/api/stove/setWaterTemperature`) — not HA proxy internal paths
+  2. `lib/routes.ts` has no entries for deleted API routes (getRoomTemperature, getSettings, setSettings)
+  3. All 5 POST operations in StoveTab return non-404 responses
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -192,8 +214,10 @@ Plans:
 | 101. Frontend Hooks | 2/2 | Complete    | 2026-03-19 | - |
 | 102. Scheduler Update | 1/1 | Complete    | 2026-03-19 | - |
 | 103. Cleanup & Debug Panel | 2/2 | Complete    | 2026-03-19 | - |
+| 104. Fix Command Body Key Mismatch | 0/0 | Planned | - | - |
+| 105. Fix Debug Panel URLs & Stale Routes | 0/0 | Planned | - | - |
 
-**Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases planned).
+**Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases complete, 2 gap closure phases planned).
 
 ---
 

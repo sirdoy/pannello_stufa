@@ -11,7 +11,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v14.0 (in progress)
-**Status:** v14.0 Hue Proxy Migration in progress. Phase 106 complete — Hue proxy client, types, and all read endpoints migrated. Next: Phase 107 (Control Endpoints).
+**Status:** v14.0 Hue Proxy Migration in progress. Phase 107 complete — Hue control endpoints migrated (light state PUT, group action PUT, scene activate POST via proxy with 202 Accepted). Next: Phase 108 (Frontend Hooks Rewrite).
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -659,4 +659,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-20 after Phase 106 complete — Hue proxy client + types + read endpoints*
+*Last updated: 2026-03-20 after Phase 107 complete — Hue control endpoints (light state, group action, scene activate) via proxy*

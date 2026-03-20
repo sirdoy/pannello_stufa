@@ -94,6 +94,14 @@ async function mapResponseError(response: Response): Promise<never> {
     );
   }
 
+  if (parsedStatus === HTTP_STATUS.CONFLICT) {
+    throw new ApiError(
+      ERROR_CODES.CONFLICT,
+      detail ?? 'Conflict',
+      HTTP_STATUS.CONFLICT
+    );
+  }
+
   throw new ApiError(
     ERROR_CODES.EXTERNAL_API_ERROR,
     detail ?? `HA proxy error: ${response.statusText}`,
@@ -183,6 +191,50 @@ export async function haPost<T>(
   try {
     const response = await fetch(`${baseUrl}${endpoint}`, {
       method: 'POST',
+      headers: {
+        'X-API-Key': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      return await mapResponseError(response);
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    return mapCaughtError(error);
+  }
+}
+
+/**
+ * Generic PUT request to the HA proxy.
+ *
+ * @param endpoint - Path relative to HA_API_URL (e.g. '/api/v1/hue/lights/1/state')
+ * @param body     - Request body; serialized as JSON
+ * @param options  - Optional { timeout } in milliseconds (default 15000)
+ * @returns Parsed JSON response as T
+ * @throws ApiError on any failure
+ */
+export async function haPut<T>(
+  endpoint: string,
+  body: Record<string, unknown>,
+  options: HaRequestOptions = {}
+): Promise<T> {
+  const { baseUrl, apiKey } = getEnvConfig();
+  const { timeout = DEFAULT_TIMEOUT_MS } = options;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
+      method: 'PUT',
       headers: {
         'X-API-Key': apiKey,
         'Content-Type': 'application/json',

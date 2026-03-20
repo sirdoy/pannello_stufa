@@ -179,3 +179,38 @@ export interface HueHistoryResponse {
   from: number | null;                 // Unix epoch (serialization_alias on from_ts field)
   to: number | null;                   // Unix epoch (serialization_alias on to_ts field)
 }
+
+// =============================================================================
+// COMMAND TYPES
+// =============================================================================
+
+/**
+ * Request body for PUT /lights/{id}/state and PUT /groups/{id}/action.
+ * Uses v1 flat format — NOT CLIP v2 nested objects.
+ * Source: docs/api/hue.md — HueLightStateRequest
+ */
+export interface HueLightStateRequest {
+  on?: boolean;
+  bri?: number;                       // 0-254
+  ct?: number;                        // 153-500 mirek
+  hue?: number;                       // 0-65535
+  sat?: number;                       // 0-254
+  effect?: 'none' | 'colorloop';
+  alert?: 'none' | 'select' | 'lselect';
+}
+
+/**
+ * Response from proxy command endpoints (202 Accepted).
+ * Discriminated by 'command' field value.
+ * Source: docs/api/hue.md — 202 response shapes
+ */
+export interface HueCommandResponse {
+  command: 'set_light_state' | 'set_group_action' | 'activate_scene';
+  status: 'accepted';
+  light_id?: string;
+  group_id?: string;
+  scene_id?: string;
+  requested_state?: Partial<HueLightStateRequest>;
+  suggested_poll_delay_s: number;
+  poll_endpoint: string;
+}

@@ -87,7 +87,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 101: Frontend Hooks** - useStoveData and useStoveCommands updated for proxy response format (completed 2026-03-19)
 - [x] **Phase 102: Scheduler Update** - Cron/scheduler updated for stove_state strings and proxy client (completed 2026-03-19)
 - [x] **Phase 103: Cleanup & Debug Panel** - WiNet infrastructure deleted, debug panel updated for proxy endpoints (completed 2026-03-19)
-- [ ] **Phase 104: Fix Command Body Key Mismatch** - Align useStoveCommands body key with setPower/setFan route expectations (gap closure)
+- [x] **Phase 104: Fix Command Body Key Mismatch** - Align useStoveCommands body key with setPower/setFan route expectations (gap closure) (completed 2026-03-20)
 - [ ] **Phase 105: Fix Debug Panel URLs & Stale Routes** - Fix StoveTab POST URLs and remove stale route entries (gap closure)
 
 ## Phase Details
@@ -177,7 +177,7 @@ Plans:
   1. `useStoveCommands` sends the body key that `setPower` and `setFan` routes expect — no `undefined` value reaches the proxy
   2. Unit tests verify the correct body shape for fan and power commands
   3. The fan/power adjustment E2E flow is unbroken from UI → route → proxy
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 - [ ] 104-01-PLAN.md — Fix body key from level to value in useStoveCommands + update test assertions
@@ -218,7 +218,7 @@ Plans:
 | 101. Frontend Hooks | 2/2 | Complete    | 2026-03-19 | - |
 | 102. Scheduler Update | 1/1 | Complete    | 2026-03-19 | - |
 | 103. Cleanup & Debug Panel | 2/2 | Complete    | 2026-03-19 | - |
-| 104. Fix Command Body Key Mismatch | 0/1 | Planned | - | - |
+| 104. Fix Command Body Key Mismatch | 1/1 | Complete   | 2026-03-20 | - |
 | 105. Fix Debug Panel URLs & Stale Routes | 0/0 | Planned | - | - |
 
 **Total:** 17 milestones shipped, 98 phases complete, 375 plans executed. v13.0 in progress (5 phases complete, 2 gap closure phases planned).

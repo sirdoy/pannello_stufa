@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v13.0
 milestone_name: Thermorossi Proxy Migration
 status: unknown
-stopped_at: Completed 103-01-PLAN.md
-last_updated: "2026-03-19T20:48:30.363Z"
+stopped_at: Completed 104-01-PLAN.md
+last_updated: "2026-03-20T09:38:23.614Z"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 9
-  completed_plans: 9
+  total_phases: 7
+  completed_phases: 6
+  total_plans: 10
+  completed_plans: 10
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 103 — cleanup-debug-panel
+**Current focus:** Phase 104 — fix-command-body-key-mismatch
 
 ## Current Position
 
-Phase: 103 (cleanup-debug-panel) — EXECUTING
-Plan: 2 of 2 (COMPLETE)
+Phase: 104 (fix-command-body-key-mismatch) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Plan: 2 of 2 (COMPLETE)
 | Phase 102 P01 | 14 | 2 tasks | 3 files |
 | Phase 103 P02 | 5 | 1 tasks | 2 files |
 | Phase 103 P01 | 454 | 2 tasks | 17 files |
+| Phase 104-fix-command-body-key-mismatch P01 | 2 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,7 @@ Phase 99 Plan 01 decisions:
 - [Phase 103-02]: POST body uses { value: N } for settings (proxy convention), empty {} for commands (ignit/shutdown)
 - [Phase 103]: healthMonitoring.ts migrated to getStatus() from thermorossiProxy with lowercase exact state constants
 - [Phase 103]: sw.ts dead WiNet service worker cache rule removed (wsthermorossi.cloudwinet.it)
+- [Phase 104-01]: Fan/power commands use { value: level, source: 'manual' } body key to match route extraction body['value'] -- shorthand { level } was silently sending undefined to proxy
 
 ### Pending Todos
 
@@ -104,6 +106,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-19T20:38:06.133Z
-Stopped at: Completed 103-01-PLAN.md
+Last session: 2026-03-20T09:38:23.608Z
+Stopped at: Completed 104-01-PLAN.md
 Resume file: None

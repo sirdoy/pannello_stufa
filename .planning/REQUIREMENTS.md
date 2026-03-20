@@ -25,15 +25,15 @@ Requirements for Thermorossi Proxy Migration. Each maps to roadmap phases.
 
 - [x] **CMD-01**: POST /commands/ignit via proxy — handles 202 Accepted with suggested_poll_delay_s
 - [x] **CMD-02**: POST /commands/shutdown via proxy — handles 202 Accepted with suggested_poll_delay_s
-- [ ] **CMD-03**: POST /settings/power via proxy — sends { value: N }, handles 202 Accepted
-- [ ] **CMD-04**: POST /settings/fan-level via proxy — sends { value: N }, handles 202 Accepted
+- [x] **CMD-03**: POST /settings/power via proxy — sends { value: N }, handles 202 Accepted
+- [x] **CMD-04**: POST /settings/fan-level via proxy — sends { value: N }, handles 202 Accepted
 - [x] **CMD-05**: POST /settings/temperature/water via proxy — sends { value: N }, range 40-80°C
 
 ### Frontend
 
 - [x] **UI-01**: useStoveData reads stove_state (exact equality), power_level, fan_level from proxy response
 - [x] **UI-02**: stoveStatusUtils rewritten for exact stove_state matching (working, off, igniting, standby, cleaning, alarm, modulating)
-- [ ] **UI-03**: useStoveCommands handles 202 Accepted response pattern from proxy
+- [x] **UI-03**: useStoveCommands handles 202 Accepted response pattern from proxy
 - [x] **UI-04**: Error display uses error_code and error_description from proxy status
 - [x] **UI-05**: data_freshness from proxy replaces custom staleness logic for stove provider
 
@@ -83,12 +83,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | READ-05 | Phase 100 | Complete |
 | CMD-01 | Phase 100 | Complete |
 | CMD-02 | Phase 100 | Complete |
-| CMD-03 | Phase 104 | Pending |
-| CMD-04 | Phase 104 | Pending |
+| CMD-03 | Phase 104 | Complete |
+| CMD-04 | Phase 104 | Complete |
 | CMD-05 | Phase 100 | Complete |
 | UI-01 | Phase 101 | Complete |
 | UI-02 | Phase 101 | Complete |
-| UI-03 | Phase 104 | Pending |
+| UI-03 | Phase 104 | Complete |
 | UI-04 | Phase 101 | Complete |
 | UI-05 | Phase 101 | Complete |
 | CRON-01 | Phase 102 | Complete |

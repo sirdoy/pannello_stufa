@@ -82,6 +82,31 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
     }
   };
 
+  const callPutEndpoint = async (name: string, url: string, body: any) => {
+    setLoadingPost((prev) => ({ ...prev, [name]: true }));
+    const startTime = Date.now();
+    try {
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      const timing = Date.now() - startTime;
+      setTimings((prev) => ({ ...prev, [name]: timing }));
+      setPostResponses((prev) => ({ ...prev, [name]: data }));
+
+      // Refresh GET endpoints after successful PUT
+      if (res.ok) {
+        setTimeout(fetchAllGetEndpoints, 1000);
+      }
+    } catch (error) {
+      setPostResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
+    } finally {
+      setLoadingPost((prev) => ({ ...prev, [name]: false }));
+    }
+  };
+
   // Initial fetch
   useEffect(() => {
     fetchAllGetEndpoints();
@@ -172,10 +197,10 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
         </div>
       </div>
 
-      {/* POST Endpoints */}
+      {/* Command Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📤 POST Endpoints
+          📤 Command Endpoints
         </Heading>
         <div className="space-y-3">
           <PostEndpointCard
@@ -191,7 +216,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             loading={loadingPost.controlLight ?? false}
             timing={timings.controlLight}
             onExecute={(values) =>
-              callPostEndpoint('controlLight', `/api/hue/lights/${values.lightId}`, {
+              callPutEndpoint('controlLight', `/api/hue/lights/${values.lightId}`, {
                 on: values.on === 'true',
                 brightness: values.brightness,
               })
@@ -213,7 +238,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             loading={loadingPost.controlRoom ?? false}
             timing={timings.controlRoom}
             onExecute={(values) =>
-              callPostEndpoint('controlRoom', `/api/hue/rooms/${values.roomId}`, {
+              callPutEndpoint('controlRoom', `/api/hue/rooms/${values.roomId}`, {
                 on: values.on === 'true',
                 brightness: values.brightness,
               })
@@ -224,13 +249,16 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
 
           <PostEndpointCard
             name="Activate Scene"
-            url="/api/hue/scenes/[id]/activate"
+            url="/api/hue/groups/[groupId]/scenes/[sceneId]"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene/{id}"
-            params={[{ name: 'sceneId', label: 'Scene ID', type: 'text', defaultValue: '' }]}
+            params={[
+              { name: 'groupId', label: 'Group ID', type: 'text', defaultValue: '' },
+              { name: 'sceneId', label: 'Scene ID', type: 'text', defaultValue: '' },
+            ]}
             response={postResponses.activateScene}
             loading={loadingPost.activateScene ?? false}
             timing={timings.activateScene}
-            onExecute={(values) => callPostEndpoint('activateScene', `/api/hue/scenes/${values.sceneId}/activate`, {})}
+            onExecute={(values) => callPostEndpoint('activateScene', `/api/hue/groups/${values.groupId}/scenes/${values.sceneId}`, {})}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene/{id}')}
             isCopied={copiedUrl === 'https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene/{id}'}
           />

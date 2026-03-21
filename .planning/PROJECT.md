@@ -11,7 +11,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v14.0 (complete)
-**Status:** v14.0 Hue Proxy Migration complete. Phase 111 closed final gaps — `xy` field added to `HueLightStateRequest` type, all 27 requirement checkboxes and traceability statuses verified Complete.
+**Status:** v14.0 Hue Proxy Migration complete. Phase 112 fixed debug panel HueTab bugs — PUT method for light/room control, correct scene activation URL with groupId+sceneId, stale display labels updated.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -659,4 +659,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-21 after Phase 111 complete — v14.0 Hue Proxy Migration milestone complete (xy type field, checkbox sync, 27/27 requirements)*
+*Last updated: 2026-03-21 after Phase 112 complete — debug panel HueTab fixes (PUT method, scene URL, display labels)*

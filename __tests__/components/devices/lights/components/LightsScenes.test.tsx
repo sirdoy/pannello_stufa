@@ -1,14 +1,15 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LightsScenes from '@/app/components/devices/lights/components/LightsScenes';
+import type { HueScene } from '@/types/hueProxy';
 
 describe('LightsScenes', () => {
   const mockOnSceneActivate = jest.fn();
 
-  const mockScenes = [
-    { id: 'scene1', metadata: { name: 'Relax' } },
-    { id: 'scene2', metadata: { name: 'Concentrate' } },
-    { id: 'scene3', metadata: { name: 'Energize' } },
+  const mockScenes: HueScene[] = [
+    { scene_id: 'scene1', name: 'Relax', group_id: '1', group_name: 'Soggiorno', lights: ['1'], type: 'GroupScene' },
+    { scene_id: 'scene2', name: 'Concentrate', group_id: '1', group_name: 'Soggiorno', lights: ['1'], type: 'GroupScene' },
+    { scene_id: 'scene3', name: 'Energize', group_id: '1', group_name: 'Soggiorno', lights: ['1'], type: 'GroupScene' },
   ];
 
   const defaultProps = {
@@ -40,7 +41,7 @@ describe('LightsScenes', () => {
     expect(screen.getByRole('button', { name: /energize/i })).toBeInTheDocument();
   });
 
-  it('renders scene names from metadata', () => {
+  it('renders scene names', () => {
     render(<LightsScenes {...defaultProps} />);
     expect(screen.getByText('Relax')).toBeInTheDocument();
     expect(screen.getByText('Concentrate')).toBeInTheDocument();
@@ -57,12 +58,12 @@ describe('LightsScenes', () => {
     });
   });
 
-  it('calls onSceneActivate with scene id when clicked', async () => {
+  it('calls onSceneActivate with sceneId and groupId when clicked', async () => {
     const user = userEvent.setup();
     render(<LightsScenes {...defaultProps} />);
 
     await user.click(screen.getByRole('button', { name: /relax/i }));
-    expect(mockOnSceneActivate).toHaveBeenCalledWith('scene1');
+    expect(mockOnSceneActivate).toHaveBeenCalledWith('scene1', '1');
   });
 
   it('disables scene buttons when refreshing', () => {
@@ -74,9 +75,9 @@ describe('LightsScenes', () => {
 
   describe('Scroll Indicator', () => {
     it('shows scroll indicator when more than 3 scenes', () => {
-      const manyScenes = [
+      const manyScenes: HueScene[] = [
         ...mockScenes,
-        { id: 'scene4', metadata: { name: 'Scene 4' } },
+        { scene_id: 'scene4', name: 'Scene 4', group_id: '1', group_name: 'Soggiorno', lights: ['1'], type: 'GroupScene' },
       ];
       render(<LightsScenes {...defaultProps} roomScenes={manyScenes} />);
       expect(screen.getByText(/scorri per vedere tutte le 4 scene/i)).toBeInTheDocument();
@@ -88,36 +89,24 @@ describe('LightsScenes', () => {
     });
 
     it('shows correct count in scroll indicator', () => {
-      const manyScenes = Array.from({ length: 7 }, (_, i) => ({
-        id: `scene${i + 1}`,
-        metadata: { name: `Scene ${i + 1}` },
+      const manyScenes: HueScene[] = Array.from({ length: 7 }, (_, i) => ({
+        scene_id: `scene${i + 1}`,
+        name: `Scene ${i + 1}`,
+        group_id: '1',
+        group_name: 'Soggiorno',
+        lights: ['1'],
+        type: 'GroupScene',
       }));
       render(<LightsScenes {...defaultProps} roomScenes={manyScenes} />);
       expect(screen.getByText(/7 scene/i)).toBeInTheDocument();
     });
   });
 
-  describe('Fallback Names', () => {
-    it('renders "Scena" when metadata.name is missing', () => {
-      const scenesWithoutNames = [
-        { id: 'scene1', metadata: {} },
-        { id: 'scene2', metadata: { name: null } },
-      ];
-      render(<LightsScenes {...defaultProps} roomScenes={scenesWithoutNames} />);
-      const scenaButtons = screen.getAllByText('Scena');
-      expect(scenaButtons).toHaveLength(2);
-    });
-
-    it('renders aria-label with fallback name', () => {
-      const sceneWithoutName = [{ id: 'scene1', metadata: {} }];
-      render(<LightsScenes {...defaultProps} roomScenes={sceneWithoutName} />);
-      expect(screen.getByRole('button', { name: /attiva scena scena/i })).toBeInTheDocument();
-    });
-  });
-
   describe('Edge Cases', () => {
     it('handles single scene correctly', () => {
-      const singleScene = [{ id: 'scene1', metadata: { name: 'Only Scene' } }];
+      const singleScene: HueScene[] = [
+        { scene_id: 'scene1', name: 'Only Scene', group_id: '1', group_name: 'Soggiorno', lights: ['1'], type: 'GroupScene' },
+      ];
       render(<LightsScenes {...defaultProps} roomScenes={singleScene} />);
       expect(screen.getByRole('button', { name: /only scene/i })).toBeInTheDocument();
       expect(screen.queryByText(/scorri/i)).not.toBeInTheDocument();
@@ -130,9 +119,9 @@ describe('LightsScenes', () => {
     });
 
     it('handles exactly 4 scenes (shows indicator)', () => {
-      const fourScenes = [
+      const fourScenes: HueScene[] = [
         ...mockScenes,
-        { id: 'scene4', metadata: { name: 'Scene 4' } },
+        { scene_id: 'scene4', name: 'Scene 4', group_id: '1', group_name: 'Soggiorno', lights: ['1'], type: 'GroupScene' },
       ];
       render(<LightsScenes {...defaultProps} roomScenes={fourScenes} />);
       expect(screen.getByText(/4 scene/i)).toBeInTheDocument();

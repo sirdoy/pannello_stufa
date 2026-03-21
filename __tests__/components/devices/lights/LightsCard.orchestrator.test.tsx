@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import LightsCard from '@/app/components/devices/lights/LightsCard';
 import fs from 'fs';
 import path from 'path';
+import type { HueGroup, HueLight, HueScene } from '@/types/hueProxy';
 
 // Mock all hooks and components
 jest.mock('next/navigation', () => ({
@@ -44,41 +45,83 @@ jest.mock('@/app/components/devices/lights/components/LightsScenes', () => ({
 // Import after mocking
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
 import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
+import { buildLightsBanners } from '@/app/components/devices/lights/components/LightsBanners';
 
 const mockUseLightsData = useLightsData as jest.MockedFunction<typeof useLightsData>;
 const mockUseLightsCommands = useLightsCommands as jest.MockedFunction<typeof useLightsCommands>;
+const mockBuildLightsBanners = buildLightsBanners as jest.MockedFunction<typeof buildLightsBanners>;
+
+const mockGroup: HueGroup = {
+  group_id: '1',
+  name: 'Soggiorno',
+  type: 'Room',
+  group_class: 'Living room',
+  lights: ['1'],
+  any_on: true,
+  all_on: false,
+  brightness: 200,
+  color_temp: null,
+  colormode: null,
+};
+
+const mockGroup2: HueGroup = {
+  group_id: '2',
+  name: 'Camera',
+  type: 'Room',
+  group_class: 'Bedroom',
+  lights: ['2'],
+  any_on: false,
+  all_on: false,
+  brightness: null,
+  color_temp: null,
+  colormode: null,
+};
+
+const mockLight: HueLight = {
+  light_id: '1',
+  name: 'Lampada',
+  on: true,
+  brightness: 200,
+  ct_mirek: null,
+  ct_kelvin: null,
+  hue: null,
+  saturation: null,
+  colormode: null,
+  reachable: true,
+  capability_tier: 'ambiance',
+  room_id: '1',
+  room_name: 'Soggiorno',
+  model_id: null,
+  light_type: null,
+};
+
+const mockScene: HueScene = {
+  scene_id: 'abc',
+  name: 'Relax',
+  group_id: '1',
+  group_name: 'Soggiorno',
+  lights: ['1'],
+  type: 'GroupScene',
+};
 
 describe('LightsCard Orchestrator', () => {
   const defaultLightsData = {
     loading: false,
     error: null,
     connected: true,
-    connectionMode: 'local' as const,
-    remoteConnected: false,
-    rooms: [
-      { id: 'room-1', metadata: { name: 'Living Room' } },
-      { id: 'room-2', metadata: { name: 'Bedroom' } },
-    ],
-    lights: [
-      { id: 'light-1', on: { on: true } },
-      { id: 'light-2', on: { on: false } },
-    ],
-    scenes: [{ id: 'scene-1', metadata: { name: 'Relax' } }],
-    selectedRoomId: 'room-1',
+    stale: false,
+    groups: [mockGroup, mockGroup2],
+    lights: [mockLight],
+    scenes: [mockScene],
+    selectedGroupId: '1',
     refreshing: false,
     loadingMessage: '',
     localBrightness: null,
-    pairing: false,
-    pairingStep: null,
-    discoveredBridges: [],
-    selectedBridge: null,
-    pairingCountdown: 30,
-    pairingError: null,
-    selectedRoom: { id: 'room-1', metadata: { name: 'Living Room' } },
-    selectedRoomGroupedLightId: 'group-1',
-    roomLights: [{ id: 'light-1', on: { on: true } }],
-    roomScenes: [{ id: 'scene-1', metadata: { name: 'Relax' } }],
-    effectiveLights: [{ id: 'light-1', on: { on: true } }],
+    selectedGroup: mockGroup,
+    selectedGroupId_action: '1',
+    roomLights: [mockLight],
+    roomScenes: [mockScene],
+    effectiveLights: [mockLight],
     hasColorLights: true,
     lightsOnCount: 1,
     lightsOffCount: 0,
@@ -86,7 +129,7 @@ describe('LightsCard Orchestrator', () => {
     allLightsOff: false,
     isRoomOn: true,
     totalLightsOn: 1,
-    totalLightsOff: 1,
+    totalLightsOff: 0,
     allHouseLightsOn: false,
     allHouseLightsOff: false,
     hasAnyLights: true,
@@ -109,20 +152,14 @@ describe('LightsCard Orchestrator', () => {
       brightnessPanel: '',
       brightnessValue: '',
     },
-    setSelectedRoomId: jest.fn(),
+    setSelectedGroupId: jest.fn(),
     setError: jest.fn(),
     setRefreshing: jest.fn(),
     setLoadingMessage: jest.fn(),
     setLocalBrightness: jest.fn(),
-    setPairing: jest.fn(),
-    setPairingStep: jest.fn(),
-    setDiscoveredBridges: jest.fn(),
-    setSelectedBridge: jest.fn(),
-    setPairingCountdown: jest.fn(),
-    setPairingError: jest.fn(),
-    pairingTimerRef: { current: null },
     checkConnection: jest.fn(),
     fetchData: jest.fn(),
+    handleRefresh: jest.fn(),
   };
 
   const defaultCommands = {
@@ -130,12 +167,6 @@ describe('LightsCard Orchestrator', () => {
     handleBrightnessChange: jest.fn(),
     handleSceneActivate: jest.fn(),
     handleAllLightsToggle: jest.fn(),
-    handleStartPairing: jest.fn(),
-    handleRemoteAuth: jest.fn(),
-    handleCancelPairing: jest.fn(),
-    handleConfirmButtonPressed: jest.fn(),
-    handleSelectBridge: jest.fn(),
-    handleRetryPairing: jest.fn(),
     hueRoomCmd: { isExecuting: false, lastError: null, retry: jest.fn() },
     hueSceneCmd: { isExecuting: false, lastError: null, retry: jest.fn() },
   };
@@ -168,51 +199,84 @@ describe('LightsCard Orchestrator', () => {
     expect(screen.getByTestId('lights-house-control')).toBeInTheDocument();
   });
 
-  it('renders RoomSelector with room names', () => {
+  it('renders RoomSelector with group names', () => {
     render(<LightsCard />);
-    // RoomSelector renders a select element
-    const select = screen.getByRole('combobox');
-    expect(select).toBeInTheDocument();
+    // RoomSelector renders when multiple groups are present
+    // Camera appears once; Soggiorno may appear multiple times in Radix select
+    expect(screen.getAllByText('Soggiorno').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Camera').length).toBeGreaterThan(0);
   });
 
-  it('renders LightsRoomControl when selectedRoom exists', () => {
+  it('passes groups mapped as { id: group_id, name: group.name } to RoomSelector', () => {
+    const filePath = path.join(process.cwd(), 'app/components/devices/lights/LightsCard.tsx');
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    // Verify the mapping in source uses proxy field names
+    expect(fileContent).toContain('group.group_id');
+    expect(fileContent).toContain('group.name');
+  });
+
+  it('renders LightsRoomControl when selectedGroup exists', () => {
     render(<LightsCard />);
     expect(screen.getByTestId('lights-room-control')).toBeInTheDocument();
   });
 
-  it('renders LightsScenes when selectedRoom exists', () => {
+  it('renders LightsScenes when selectedGroup exists', () => {
     render(<LightsCard />);
     expect(screen.getByTestId('lights-scenes')).toBeInTheDocument();
   });
 
-  it('renders EmptyState when no selectedRoom', () => {
+  it('renders EmptyState when no selectedGroup', () => {
     mockUseLightsData.mockReturnValue({
       ...defaultLightsData,
-      selectedRoom: null,
+      selectedGroup: undefined,
     } as any);
 
     render(<LightsCard />);
     expect(screen.getByText('Nessuna stanza disponibile')).toBeInTheDocument();
   });
 
-  it('does NOT render LightsRoomControl when no selectedRoom', () => {
+  it('does NOT render LightsRoomControl when no selectedGroup', () => {
     mockUseLightsData.mockReturnValue({
       ...defaultLightsData,
-      selectedRoom: null,
+      selectedGroup: undefined,
     } as any);
 
     render(<LightsCard />);
     expect(screen.queryByTestId('lights-room-control')).not.toBeInTheDocument();
   });
 
-  it('does NOT render LightsScenes when no selectedRoom', () => {
+  it('does NOT render LightsScenes when no selectedGroup', () => {
     mockUseLightsData.mockReturnValue({
       ...defaultLightsData,
-      selectedRoom: null,
+      selectedGroup: undefined,
     } as any);
 
     render(<LightsCard />);
     expect(screen.queryByTestId('lights-scenes')).not.toBeInTheDocument();
+  });
+
+  it('does NOT render "Connetti Bridge Hue" button', () => {
+    render(<LightsCard />);
+    expect(screen.queryByText('Connetti Bridge Hue')).not.toBeInTheDocument();
+  });
+
+  it('passes stale=true to buildLightsBanners when stale', () => {
+    mockUseLightsData.mockReturnValue({
+      ...defaultLightsData,
+      stale: true,
+    } as any);
+
+    render(<LightsCard />);
+    expect(mockBuildLightsBanners).toHaveBeenCalledWith(
+      expect.objectContaining({ stale: true })
+    );
+  });
+
+  it('passes stale=false to buildLightsBanners when not stale', () => {
+    render(<LightsCard />);
+    expect(mockBuildLightsBanners).toHaveBeenCalledWith(
+      expect.objectContaining({ stale: false })
+    );
   });
 
   it('LightsCard.tsx line count is <= 200 lines (enforcement test)', () => {
@@ -244,5 +308,23 @@ describe('LightsCard Orchestrator', () => {
     expect(fileContent).toContain('LightsRoomControl');
     expect(fileContent).toContain('LightsScenes');
     expect(fileContent).toContain('buildLightsBanners');
+  });
+
+  it('orchestrator uses proxy field names (no CLIP v2 fields)', () => {
+    const filePath = path.join(process.cwd(), 'app/components/devices/lights/LightsCard.tsx');
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+
+    expect(fileContent).toContain('lightsData.groups');
+    expect(fileContent).toContain('lightsData.selectedGroup');
+    expect(fileContent).toContain('lightsData.selectedGroupId');
+    expect(fileContent).toContain('lightsData.stale');
+    expect(fileContent).toContain('group.group_id');
+    expect(fileContent).toContain('group.name');
+
+    expect(fileContent).not.toContain('room.metadata?.name');
+    expect(fileContent).not.toContain('room.id');
+    expect(fileContent).not.toContain('connectionMode');
+    expect(fileContent).not.toContain('setPairing');
+    expect(fileContent).not.toContain('handleStartPairing');
   });
 });

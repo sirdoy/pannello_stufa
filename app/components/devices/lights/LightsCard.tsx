@@ -35,15 +35,7 @@ export default function LightsCard() {
       setLoadingMessage: lightsData.setLoadingMessage,
       setError: lightsData.setError,
       fetchData: lightsData.fetchData,
-      rooms: lightsData.rooms,
-      setPairing: lightsData.setPairing,
-      setPairingStep: lightsData.setPairingStep,
-      setDiscoveredBridges: lightsData.setDiscoveredBridges,
-      setSelectedBridge: lightsData.setSelectedBridge,
-      setPairingCountdown: lightsData.setPairingCountdown,
-      setPairingError: lightsData.setPairingError,
-      pairingTimerRef: lightsData.pairingTimerRef,
-      selectedBridge: lightsData.selectedBridge,
+      groups: lightsData.groups,
       checkConnection: lightsData.checkConnection,
       connected: lightsData.connected,
     },
@@ -54,50 +46,29 @@ export default function LightsCard() {
   const banners = buildLightsBanners({
     hueRoomCmd: commands.hueRoomCmd,
     hueSceneCmd: commands.hueSceneCmd,
-    pairing: lightsData.pairing,
-    pairingStep: lightsData.pairingStep,
-    pairingCountdown: lightsData.pairingCountdown,
-    pairingError: lightsData.pairingError,
-    discoveredBridges: lightsData.discoveredBridges,
-    selectedBridge: lightsData.selectedBridge,
+    stale: lightsData.stale,
     error: lightsData.error,
-    onRemoteAuth: commands.handleRemoteAuth,
-    onCancelPairing: commands.handleCancelPairing,
-    onConfirmButtonPressed: commands.handleConfirmButtonPressed,
-    onSelectBridge: commands.handleSelectBridge,
-    onRetryPairing: commands.handleRetryPairing,
     onDismissError: () => lightsData.setError(null),
-    onDismissPairingError: () => lightsData.setPairingError(null),
   });
 
   // Derived display properties
-  const infoBoxes = lightsData.selectedRoom ? [
+  const infoBoxes = lightsData.selectedGroup ? [
     { icon: '💡', label: 'Luci Stanza', value: lightsData.roomLights.length },
-    { icon: '🚪', label: 'Stanze', value: lightsData.rooms.length },
+    { icon: '🚪', label: 'Stanze', value: lightsData.groups.length },
     { icon: '🎨', label: 'Scene', value: lightsData.scenes.length },
   ] : [];
 
-  const footerActions = lightsData.selectedRoom ? [{
+  const footerActions = lightsData.selectedGroup ? [{
     label: 'Tutte le Stanze e Scene →',
     variant: 'outline' as any,
     size: 'sm',
     onClick: () => router.push('/lights')
   }] : [];
 
-  // Connection mode badge for DeviceCard header
-  const getStatusBadge = () => {
-    if (!lightsData.connected || !lightsData.connectionMode) return null;
-
-    const badges: Record<string, { icon: string; label: string; color: string }> = {
-      'local': { icon: '📡', label: 'Local', color: 'sage' },
-      'remote': { icon: '☁️', label: 'Cloud', color: 'ocean' },
-      'hybrid': { icon: '🔄', label: 'Hybrid', color: 'warning' },
-    };
-
-    return badges[lightsData.connectionMode] || null;
-  };
-
-  const statusBadge = getStatusBadge();
+  // Staleness badge for DeviceCard header
+  const statusBadge = lightsData.stale
+    ? { icon: '⏳', label: 'Stale', color: 'warning' }
+    : null;
 
   // Skeleton/loading guard
   if (lightsData.loading) {
@@ -110,11 +81,9 @@ export default function LightsCard() {
       title="Luci"
       colorTheme="warning"
       connected={lightsData.connected}
-      onConnect={commands.handleStartPairing}
-      connectButtonLabel="Connetti Bridge Hue"
       connectInfoRoute="/lights"
-      loading={lightsData.loading || lightsData.refreshing || lightsData.pairing}
-      loadingMessage={lightsData.pairingStep === 'discovering' ? 'Ricerca bridge...' : lightsData.pairingStep === 'pairing' ? `Pairing in corso... ${lightsData.pairingCountdown}s` : lightsData.loadingMessage}
+      loading={lightsData.loading || lightsData.refreshing}
+      loadingMessage={lightsData.loadingMessage}
       skeletonComponent={lightsData.loading ? <Skeleton.LightsCard /> : null}
       statusBadge={statusBadge as any}
       banners={banners}
@@ -135,20 +104,20 @@ export default function LightsCard() {
 
       {/* Room Selection */}
       <RoomSelector
-        rooms={lightsData.rooms.map((room: any) => ({
-          id: room.id,
-          name: room.metadata?.name || 'Stanza'
+        rooms={lightsData.groups.map((group) => ({
+          id: group.group_id,
+          name: group.name,
         }))}
-        selectedRoomId={lightsData.selectedRoomId || undefined}
-        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => lightsData.setSelectedRoomId(e.target.value)}
+        selectedRoomId={lightsData.selectedGroupId || undefined}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => lightsData.setSelectedGroupId(e.target.value)}
       />
 
       {/* Selected Room Controls */}
-      {lightsData.selectedRoom ? (
+      {lightsData.selectedGroup ? (
         <div className="space-y-4 sm:space-y-6">
           <LightsRoomControl
-            selectedRoom={lightsData.selectedRoom}
-            selectedRoomGroupedLightId={lightsData.selectedRoomGroupedLightId}
+            selectedGroup={lightsData.selectedGroup}
+            selectedGroupId={lightsData.selectedGroupId_action}
             roomLights={lightsData.roomLights}
             isRoomOn={lightsData.isRoomOn}
             lightsOnCount={lightsData.lightsOnCount}

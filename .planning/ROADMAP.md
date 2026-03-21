@@ -120,8 +120,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 108-01-PLAN.md — Route array wrapping fix + useLightsData/useLightsCommands rewrite + colorUtils adaptation + hook tests
-- [ ] 108-02-PLAN.md — LightsCard orchestrator + LightsBanners + LightsScenes + LightsRoomControl wiring update + integration tests
+- [x] 108-01-PLAN.md — Route array wrapping fix + useLightsData/useLightsCommands rewrite + colorUtils adaptation + hook tests
+- [x] 108-02-PLAN.md — LightsCard orchestrator + LightsBanners + LightsScenes + LightsRoomControl wiring update + integration tests
 
 ### Phase 109: Cleanup
 **Goal**: All legacy Hue infrastructure is deleted — no direct Bridge API code, no OAuth, no bridge discovery, no Hue-specific env vars remain in the codebase
@@ -132,11 +132,12 @@ Plans:
   2. hueRemoteApi.ts (v1 remote/cloud client) is deleted
   3. hueConnectionStrategy.ts and bridge discovery/pairing routes are deleted
   4. hueRemoteTokenHelper.ts (OAuth) and hueLocalHelper.ts (Firebase bridge credentials) are deleted
-  5. HUE_CLIENT_SECRET, NEXT_PUBLIC_HUE_CLIENT_ID, NEXT_PUBLIC_HUE_APP_ID env vars removed from .env.local and all references
+  5. HUE_CLIENT_SECRET, NEXT_PUBLIC_HUE_CLIENT_ID, NEXT_PUBLIC_HUE_APP_ID env vars removed from .env.example and all references
 **Plans**: 2 plans
 
 Plans:
-- [ ] 109-01: Delete legacy Hue files + env vars + verify no broken imports
+- [ ] 109-01-PLAN.md — Delete legacy Hue files + routes + clean surviving imports + lib/core dead helpers
+- [ ] 109-02-PLAN.md — Documentation updates (hue-setup.md rewrite + hue.md endpoint cleanup)
 
 ## Progress
 
@@ -162,11 +163,11 @@ Plans:
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
 | 106 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 107 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
-| 108 | 2/2 | Complete    | 2026-03-21 | - |
-| 109 | v14.0 | 0/TBD | Not started | - |
+| 108 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
+| 109 | v14.0 | 0/2 | Not started | - |
 
-**Total:** 18 milestones shipped, 107 phases complete, 390 plans executed. v14.0 in progress (4 phases planned).
+**Total:** 18 milestones shipped, 108 phases complete, 390 plans executed. v14.0 in progress (4 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-20 — Phase 108 plans created (2 plans, 2 waves)*
+*Roadmap updated: 2026-03-21 — Phase 109 plans created (2 plans, 2 waves)*

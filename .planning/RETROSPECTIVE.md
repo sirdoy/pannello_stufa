@@ -199,6 +199,49 @@
 
 ---
 
+## Milestone: v14.0 — Hue Proxy Migration
+
+**Shipped:** 2026-03-22
+**Phases:** 7 | **Plans:** 12
+
+### What Was Built
+- Hue proxy client (`hueProxy.ts`) with typed wrappers for all 10 endpoints via shared haGet/haPost/haPut transport
+- All read endpoints migrated: lights, groups, scenes, health, history with data_freshness/capability_tier enrichment
+- All control endpoints migrated with 202 Accepted + suggested_poll_delay_s + 409 Conflict handling
+- Frontend hooks rewritten: useLightsData reads flat format, useLightsCommands sends v1 body (on/bri/ct/xy)
+- Legacy Hue infrastructure deleted: CLIP v2 client, remote API, OAuth, bridge discovery/pairing, connection strategy, 3 env vars
+- Audit-driven gap closure (3 phases): full pages rewritten, xy type field added, debug panel method/URL fixes
+
+### What Worked
+- Proxy migration is now a fully paved path — v14.0 Hue followed exact same pattern as v10.0 Netatmo and v13.0 Thermorossi
+- haPut transport added cleanly as copy of haPost with method PUT — consistent with codebase pattern, no unnecessary abstraction
+- 3 audit rounds caught 7 integration gaps (INT-01 through INT-DEBUG-METHOD) before shipping — all resolved
+- Full pages (lights/page.tsx, scenes/page.tsx) successfully delegated to proxy hooks after gap closure
+- CLIP v1 flat body format via proxy dramatically simplified frontend code vs CLIP v2 nested objects
+
+### What Was Inefficient
+- 3 audit rounds were needed (vs 1-2 for previous milestones) — full pages and debug panel were blind spots not caught initially
+- Phase 109 cleanup left `remoteApiAvailable = false` dead constant in lights/page.tsx — Phase 110 had to remove it
+- Debug panel HueTab issues (wrong method, wrong URL, wrong field names) persisted through 2 audit rounds before being addressed in Phase 112
+- SUMMARY frontmatter quality still inconsistent — 5th consecutive milestone with this issue
+
+### Patterns Established
+- haPut as 3rd transport method alongside haGet/haPost — all 5 device providers now use the shared transport
+- callPutEndpoint pattern in debug panels mirroring callPostEndpoint — consistent fetch wrapper for debug tools
+- 3-round audit for complex migrations — core phases → full page gaps → debug panel gaps
+
+### Key Lessons
+1. **All 5 providers unified** — Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue all use shared haGet/haPost/haPut. No direct device APIs remain.
+2. **Full pages are a blind spot** — migration phases focused on hooks and routes, but full pages (lights/page.tsx) used legacy patterns that hooks refactoring didn't touch. Budget a full-page verification pass.
+3. **Debug panels lag behind production code** — debug panel URLs, methods, and field names were stale after migration. Treat debug panels as first-class consumers during migration.
+4. **Gap closure is getting more granular** — v10.0 had 4 gap closure phases, v13.0 had 2, v14.0 had 3 but each was smaller (1 plan). The issues are smaller but more numerous.
+
+### Cost Observations
+- Model mix: balanced profile (sonnet executors, sonnet verifiers)
+- Notable: 7 phases in 2 days — consistent with v10.0 and v13.0 migration pace. All proxy migrations converging on 2-day timeline regardless of provider complexity.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -211,6 +254,7 @@
 | v11.1 | 4 | 9 | Test cleanup + memoization removal |
 | v12.0 | 3 | 4 | Polling unification + E2E smoke tests |
 | v13.0 | 7 | 11 | Thermorossi proxy migration — unified all 4 providers |
+| v14.0 | 7 | 12 | Hue proxy migration — unified all 5 providers, no direct APIs remain |
 
 ### Cumulative Quality
 
@@ -222,6 +266,7 @@
 | v11.1 | 4,000+ | 16/16 requirements | -264 |
 | v12.0 | 4,000+ | 18/18 requirements | +2,709 |
 | v13.0 | 4,000+ | 26/26 requirements | +5,130 |
+| v14.0 | 4,000+ | 27/27 requirements | +5,258 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -231,5 +276,6 @@
 4. **Established patterns accelerate** — new device onboarding follows Fritz!Box's proxy/card/page/cron template (verified v11.0)
 5. **Cleanup milestones after feature milestones** — v11.1 cleaned up v9.0-v11.0 tech debt in 1 day, keeping codebase healthy (verified v11.1)
 6. **Focused milestones ship faster** — v12.0 (3 phases, 4 plans) completed in 2 days with zero tech debt accumulated (verified v12.0)
-7. **Proxy migration speed improves with pattern maturity** — v10.0 (9 phases) → v13.0 (5+2 phases) for equivalent-scope migration (verified v13.0)
-8. **SUMMARY frontmatter quality is a persistent tooling gap** — one_liner and requirements-completed consistently empty across v11.0-v13.0, needs executor-level fix
+7. **Proxy migration speed improves with pattern maturity** — v10.0 (9 phases) → v13.0 (5+2 phases) → v14.0 (4+3 phases), all completing in 2 days (verified v10.0-v14.0)
+8. **SUMMARY frontmatter quality is a persistent tooling gap** — one_liner and requirements-completed consistently empty across v11.0-v14.0, needs executor-level fix
+9. **Full pages and debug panels are migration blind spots** — hooks/routes get migrated first, but full pages and debug tools use legacy patterns that audit must catch (verified v14.0)

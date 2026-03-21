@@ -1,5 +1,44 @@
 # Project Milestones: Pannello Stufa
 
+## v14.0 Hue Proxy Migration (Shipped: 2026-03-22)
+
+**Delivered:** Complete migration of Philips Hue from direct Bridge API (CLIP v2 local + v1 remote/cloud) to shared HomeAssistant proxy — new typed proxy client via haGet/haPost/haPut, all read and control endpoints migrated with 202 Accepted pattern, frontend hooks rewritten for proxy-native flat format, legacy Hue infrastructure deleted, and audit-driven gap closure fixing full pages, types, and debug panel.
+
+**Phases completed:** 106-112 (12 plans total)
+
+**Key accomplishments:**
+
+- Hue proxy client (`lib/hue/hueProxy.ts`) with typed wrappers for all 10 endpoints via shared `haGet`/`haPost`/`haPut` transport (X-API-Key auth) — completes unified API architecture for all 5 device providers
+- All read endpoints migrated (lights, groups, scenes, health, history) with `data_freshness`/`capability_tier`/`ct_kelvin` enrichment; history endpoint with auto-granularity pagination
+- All control endpoints migrated with 202 Accepted pattern: light state PUT, group action PUT, scene activate POST — `suggested_poll_delay_s` drives delayed refresh, 409 Conflict surfaces unreachable lights
+- Frontend hooks rewritten: `useLightsData` reads proxy-native flat format (no CLIP v2 nested objects), `useLightsCommands` sends v1 body (on/bri/ct/xy), brightness 0-254 at proxy boundary
+- Legacy Hue infrastructure deleted: CLIP v2 client, remote/cloud API, OAuth token management, bridge discovery/pairing, connection strategy, Firebase bridge credentials, 3 env vars
+- Audit-driven gap closure (Phases 110-112): full pages rewritten for proxy hooks, `xy` field added to HueLightStateRequest, debug panel HueTab method/URL fixes — 3 audit rounds caught 7 integration gaps
+
+**Stats:**
+
+- 12 plans executed across 7 phases (4 core + 3 gap closure)
+- 27/27 v14.0 requirements satisfied (100%)
+- 124 files changed (+12,527 insertions, -7,269 deletions, net +5,258 LOC)
+- 75 git commits with atomic changes
+- 2 days (2026-03-20 → 2026-03-22)
+
+**Git range:** `feat(106-01)` (595204d) → `feat(112-01)` (1c440c2)
+
+**Tech debt (info-level):**
+- Debug panel HueTab: `bridgeConnected` field mismatch (should be `connected`), `brightness` key (should be `bri`)
+- GET /api/hue/history has no frontend consumer (infrastructure ready for future analytics)
+- SUMMARY frontmatter uses inconsistent `requirements_*` field naming
+- 7 phases have VALIDATION.md in draft Nyquist status
+
+**Archives:**
+
+- [Roadmap](milestones/v14.0-ROADMAP.md)
+- [Requirements](milestones/v14.0-REQUIREMENTS.md)
+- [Audit](milestones/v14.0-MILESTONE-AUDIT.md)
+
+---
+
 ## v13.0 Thermorossi Proxy Migration (Shipped: 2026-03-20)
 
 **Delivered:** Complete migration of Thermorossi stove from direct WiNet cloud API to shared HomeAssistant proxy — new typed proxy client via haGet/haPost, all read and control endpoints migrated with 202 Accepted pattern, frontend hooks rewritten for stove_state exact equality, scheduler fully migrated, WiNet infrastructure deleted, and audit-driven gap closure fixing body key mismatch and debug panel URLs.

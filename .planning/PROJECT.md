@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v14.0 (complete)
-**Status:** v14.0 Hue Proxy Migration complete. Phase 112 fixed debug panel HueTab bugs — PUT method for light/room control, correct scene activation URL with groupId+sceneId, stale display labels updated.
+**Version:** v14.0 (shipped 2026-03-22)
+**Status:** All 5 device providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue) migrated to shared HomeAssistant proxy with unified haGet/haPost/haPut transport. No direct device APIs remain.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -25,7 +25,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
 - Fritz!Box TR-064 API integration via server-side proxy
-- Shared HomeAssistant API client (`haGet`/`haPost`) for all providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi)
+- Shared HomeAssistant API client (`haGet`/`haPost`/`haPut`) for all 5 providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue)
 - Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
 - Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
@@ -483,19 +483,48 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 **Debug Panel:**
 - ✓ **DEBUG-01**: StoveTab updated with proxy endpoints — v13.0 (Phase 105)
 
+**v14.0 Hue Proxy Migration (Shipped 2026-03-22):**
+
+**Proxy Client:**
+- ✓ **CLIENT-01**: Hue proxy client uses shared haGet/haPost transport (X-API-Key auth) — v14.0 (Phase 106)
+- ✓ **CLIENT-02**: TypeScript types for all proxy response interfaces — v14.0 (Phase 106)
+- ✓ **CLIENT-03**: Convenience wrappers for each endpoint — v14.0 (Phase 106)
+
+**Read Endpoints:**
+- ✓ **READ-01**: GET /lights migrated with capability_tier, ct_kelvin, room enrichment — v14.0 (Phase 106)
+- ✓ **READ-02**: GET /lights/{light_id} migrated — v14.0 (Phase 106)
+- ✓ **READ-03**: GET /groups migrated with member lights array — v14.0 (Phase 110)
+- ✓ **READ-04**: GET /groups/{group_id} migrated — v14.0 (Phase 106)
+- ✓ **READ-05**: GET /scenes migrated with group_id filter — v14.0 (Phase 106)
+- ✓ **READ-06**: GET /health migrated with data_freshness — v14.0 (Phase 106)
+- ✓ **READ-07**: GET /history migrated with auto-granularity pagination — v14.0 (Phase 106)
+
+**Control Endpoints:**
+- ✓ **CMD-01**: PUT /lights/{id}/state via proxy (202 Accepted, v1 body) — v14.0 (Phase 107, 110)
+- ✓ **CMD-02**: PUT /groups/{id}/action via proxy (202 Accepted) — v14.0 (Phase 107, 110)
+- ✓ **CMD-03**: POST /groups/{gid}/scenes/{sid} via proxy (202 Accepted) — v14.0 (Phase 107, 110)
+- ✓ **CMD-04**: Frontend handles 409 Conflict for unreachable lights — v14.0 (Phase 107)
+
+**Frontend:**
+- ✓ **UI-01**: useLightsData reads proxy response shapes (flat format, capability_tier) — v14.0 (Phase 108, 110)
+- ✓ **UI-02**: useLightsCommands sends v1 body format (on/bri/ct/xy) — v14.0 (Phase 108, 110)
+- ✓ **UI-03**: Brightness conversion 0-100% ↔ 0-254 at client boundary — v14.0 (Phase 108)
+- ✓ **UI-04**: Scene activate uses new path pattern — v14.0 (Phase 108, 110)
+- ✓ **UI-05**: 202 Accepted + suggested_poll_delay_s drives delayed refresh — v14.0 (Phase 108)
+- ✓ **UI-06**: data_freshness replaces custom staleness/connection checks — v14.0 (Phase 108)
+
+**Cleanup:**
+- ✓ **CLEAN-01**: CLIP v2 local API client deleted — v14.0 (Phase 109)
+- ✓ **CLEAN-02**: v1 remote/cloud API client deleted — v14.0 (Phase 109)
+- ✓ **CLEAN-03**: Connection strategy deleted — v14.0 (Phase 109)
+- ✓ **CLEAN-04**: Bridge discovery and pairing routes deleted — v14.0 (Phase 110)
+- ✓ **CLEAN-05**: OAuth token management deleted — v14.0 (Phase 110)
+- ✓ **CLEAN-06**: Firebase bridge credentials persistence deleted — v14.0 (Phase 110)
+- ✓ **CLEAN-07**: Hue-specific env vars removed — v14.0 (Phase 109)
+
 ### Active
 
-## Current Milestone: v14.0 Hue Proxy Migration
-
-**Goal:** Migrate Philips Hue from direct Bridge API (CLIP v2 local + v1 remote/cloud) to shared HomeAssistant proxy, eliminating OAuth, bridge discovery/pairing, and dual connection strategy — same pattern as Netatmo (v10.0) and Thermorossi (v13.0).
-
-**Target features:**
-- New Hue proxy client using shared haGet/haPost transport (X-API-Key auth)
-- All read endpoints migrated (health, lights, groups, scenes)
-- All control endpoints migrated (light state, group action, scene activate)
-- Frontend hooks rewritten for proxy response shapes (v1 flat format, capability_tier, 202 Accepted)
-- Bridge discovery, pairing, OAuth, remote API, and connection strategy infrastructure deleted
-- Scene CRUD deferred until proxy team implements planned endpoints
+(No active requirements — next milestone not yet defined)
 
 ### Out of Scope
 
@@ -536,14 +565,15 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - GDPR-compliant analytics con consent banner
 - Playwright E2E smoke tests for all 9 app pages
 - All device polling unified at 60s via useAdaptivePolling (no Firebase RTDB real-time listener)
-- 18 milestones shipped, 105 phases, 386 plans executed
+- 19 milestones shipped, 112 phases, 398 plans executed
 
-**v13.0 Milestone (2026-03-19 → 2026-03-20):**
-- 7 phases executed (11 plans, 5 core + 2 gap closure)
-- 26/26 requirements satisfied (100%)
-- 101 files changed (+9,857 insertions, -4,727 deletions)
-- 76 git commits with atomic changes
-- 2 days from phase 99 start to completion
+**v14.0 Milestone (2026-03-20 → 2026-03-22):**
+- 7 phases executed (12 plans, 4 core + 3 gap closure)
+- 27/27 requirements satisfied (100%)
+- 124 files changed (+12,527 insertions, -7,269 deletions, net +5,258 LOC)
+- 75 git commits with atomic changes
+- 2 days from phase 106 start to completion
+- All 5 device providers now use shared HA proxy (migration complete)
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -648,6 +678,10 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | 202 Accepted + suggested_poll_delay_s | Proxy convention for async commands, drives delayed refresh timing | ✓ Good — 15s for ignit/shutdown, 5s for settings (v13.0) |
 | Single getStatus() replacing 3-way Promise.all | Proxy response includes fan_level and power_level in status | ✓ Good — Scheduler reduced from 3 calls to 1 (v13.0) |
 | Audit-driven gap closure (Phases 104-105) | Milestone audit found 3 integration breaks before shipping | ✓ Good — Body key mismatch + debug URLs caught pre-ship (v13.0) |
+| Hue proxy with haPut transport | PUT method for light/group control, consistent with haGet/haPost pattern | ✓ Good — All 5 providers unified on shared transport (v14.0) |
+| CLIP v1 flat body format via proxy | Proxy uses v1 (on/bri/ct/xy) not CLIP v2 nested objects — simpler, sufficient | ✓ Good — Frontend code dramatically simplified (v14.0) |
+| Audit-driven gap closure (Phases 110-112) | 3 audit rounds caught 7 integration gaps (full pages, types, debug panel) | ✓ Good — All gaps resolved pre-ship (v14.0) |
+| Scene CRUD deferred | Proxy endpoints marked "planned" but not yet available | — Pending — Revisit when proxy team implements |
 
 ## Constraints
 
@@ -659,4 +693,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-21 after Phase 112 complete — debug panel HueTab fixes (PUT method, scene URL, display labels)*
+*Last updated: 2026-03-22 after v14.0 milestone — Hue Proxy Migration complete, all 5 device providers on shared HA proxy*

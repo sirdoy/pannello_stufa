@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
-status: unknown
-stopped_at: Completed 112-01-PLAN.md
-last_updated: "2026-03-21T23:24:17.912Z"
+status: complete
+stopped_at: Milestone v14.0 shipped
+last_updated: "2026-03-22T12:00:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 7
@@ -16,15 +16,15 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-21)
+See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 112 — debug-panel-hue-fixes
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 112
-Plan: Not started
+Phase: Milestone v14.0 complete
+Plan: N/A — start next milestone with /gsd:new-milestone
 
 ## Performance Metrics
 

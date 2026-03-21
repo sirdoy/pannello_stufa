@@ -12,5 +12,5 @@ export const dynamic = 'force-dynamic';
 export const GET = withAuthAndErrorHandler(async (request) => {
   const groupId = request.nextUrl.searchParams.get('group_id') ?? undefined;
   const data = await getScenes(groupId);
-  return success(data as unknown as Record<string, unknown>);
+  return success({ scenes: data });
 }, 'Hue/Scenes');

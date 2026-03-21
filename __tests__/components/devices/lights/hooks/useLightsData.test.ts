@@ -1,6 +1,10 @@
 /**
  * Tests for useLightsData hook
  *
+ * Tests proxy-native shapes: flat HueLight.on boolean, HueGroup.group_id,
+ * HueGroup.lights array membership, brightness 0-254 to 0-100% conversion,
+ * and data_freshness-based staleness.
+ *
  * @jest-environment jsdom
  */
 
@@ -8,47 +12,82 @@ import { renderHook, waitFor, act } from '@testing-library/react';
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import * as colorUtils from '@/lib/hue/colorUtils';
+import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useAdaptivePolling');
 jest.mock('@/lib/hue/colorUtils');
 
 describe('useLightsData', () => {
-  const mockRoomsData = {
-    rooms: [
-      {
-        id: 'room1',
-        metadata: { name: 'Camera' },
-        children: [{ rid: 'light1', rtype: 'light' }],
-        services: [
-          { rid: 'grouped_light_1', rtype: 'grouped_light' },
-          { rid: 'light1', rtype: 'light' }
-        ]
-      },
-      {
-        id: 'room2',
-        metadata: { name: 'Casa' },
-        children: [{ rid: 'light2', rtype: 'light' }],
-        services: [
-          { rid: 'grouped_light_2', rtype: 'grouped_light' },
-          { rid: 'light2', rtype: 'light' }
-        ]
-      }
-    ]
+  const mockLight: HueLight = {
+    light_id: '1',
+    name: 'Lampada Soggiorno',
+    on: true,
+    brightness: 200,
+    ct_mirek: 300,
+    ct_kelvin: 3333,
+    hue: null,
+    saturation: null,
+    colormode: 'ct',
+    reachable: true,
+    capability_tier: 'ambiance',
+    room_id: '1',
+    room_name: 'Soggiorno',
+    model_id: 'LCT015',
+    light_type: 'Color temperature light',
   };
 
-  const mockLightsData = {
-    lights: [
-      { id: 'light1', on: { on: true }, dimming: { brightness: 80 }, owner: { rid: 'device1' } },
-      { id: 'light2', on: { on: false }, dimming: { brightness: 50 }, owner: { rid: 'device2' } }
-    ]
+  const mockLightOff: HueLight = {
+    light_id: '2',
+    name: 'Lampada Camera',
+    on: false,
+    brightness: 100,
+    ct_mirek: 370,
+    ct_kelvin: 2702,
+    hue: null,
+    saturation: null,
+    colormode: 'ct',
+    reachable: true,
+    capability_tier: 'white',
+    room_id: '2',
+    room_name: 'Camera',
+    model_id: 'LWB010',
+    light_type: 'Dimmable light',
   };
 
-  const mockScenesData = {
-    scenes: [
-      { id: 'scene1', metadata: { name: 'Relax' }, group: { rid: 'room1' } },
-      { id: 'scene2', metadata: { name: 'Energize' }, group: { rid: 'room2' } }
-    ]
+  const mockGroup: HueGroup = {
+    group_id: '1',
+    name: 'Soggiorno',
+    type: 'Room',
+    group_class: 'Living room',
+    lights: ['1'],
+    any_on: true,
+    all_on: true,
+    brightness: 200,
+    color_temp: 300,
+    colormode: 'ct',
+  };
+
+  const mockGroupCasa: HueGroup = {
+    group_id: '0',
+    name: 'Casa',
+    type: 'Room',
+    group_class: 'Other',
+    lights: ['1', '2'],
+    any_on: true,
+    all_on: false,
+    brightness: 150,
+    color_temp: 300,
+    colormode: 'ct',
+  };
+
+  const mockScene: HueScene = {
+    scene_id: 'abc123',
+    name: 'Relax',
+    group_id: '1',
+    group_name: 'Soggiorno',
+    lights: ['1'],
+    type: 'GroupScene',
   };
 
   beforeEach(() => {
@@ -57,43 +96,42 @@ describe('useLightsData', () => {
     // Mock useAdaptivePolling
     jest.mocked(useAdaptivePolling).mockImplementation(({ callback, immediate }) => {
       if (immediate) {
-        // Call immediately on mount
         setTimeout(() => callback(), 0);
       }
     });
 
     // Mock color utilities
-    jest.mocked(colorUtils.supportsColor).mockReturnValue(true);
-    jest.mocked(colorUtils.getCurrentColorHex).mockReturnValue('#FFE4B5');
+    jest.mocked(colorUtils.supportsColor).mockReturnValue(false);
+    jest.mocked(colorUtils.getCurrentColorHex).mockReturnValue(null);
 
-    // Mock fetch globally
+    // Mock fetch globally — proxy-wrapped responses
     global.fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({
+            success: true,
             connected: true,
-            connection_mode: 'local',
-            remote_connected: false
-          })
+            data_freshness: 'LIVE',
+          }),
         }) as any;
       }
       if (url.includes('/api/hue/rooms')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockRoomsData)
+          json: () => Promise.resolve({ success: true, groups: [mockGroup, mockGroupCasa] }),
         }) as any;
       }
       if (url.includes('/api/hue/lights')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockLightsData)
+          json: () => Promise.resolve({ success: true, lights: [mockLight, mockLightOff] }),
         }) as any;
       }
       if (url.includes('/api/hue/scenes')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockScenesData)
+          json: () => Promise.resolve({ success: true, scenes: [mockScene] }),
         }) as any;
       }
       return Promise.reject(new Error('Unknown URL')) as any;
@@ -110,15 +148,27 @@ describe('useLightsData', () => {
     expect(result.current.loading).toBe(true);
     expect(result.current.error).toBe(null);
     expect(result.current.connected).toBe(false);
-    expect(result.current.rooms).toEqual([]);
+    expect(result.current.stale).toBe(false);
+    expect(result.current.groups).toEqual([]);
     expect(result.current.lights).toEqual([]);
     expect(result.current.scenes).toEqual([]);
-    expect(result.current.selectedRoomId).toBe(null);
-    expect(result.current.pairing).toBe(false);
-    expect(result.current.pairingStep).toBe(null);
+    expect(result.current.selectedGroupId).toBe(null);
   });
 
-  it('calls checkConnection on mount', async () => {
+  it('does NOT have pairing state in return object', () => {
+    const { result } = renderHook(() => useLightsData());
+
+    expect((result.current as any).pairing).toBeUndefined();
+    expect((result.current as any).pairingStep).toBeUndefined();
+    expect((result.current as any).discoveredBridges).toBeUndefined();
+    expect((result.current as any).selectedBridge).toBeUndefined();
+    expect((result.current as any).pairingCountdown).toBeUndefined();
+    expect((result.current as any).pairingError).toBeUndefined();
+    expect((result.current as any).connectionMode).toBeUndefined();
+    expect((result.current as any).remoteConnected).toBeUndefined();
+  });
+
+  it('calls checkConnection on mount (fetches /api/hue/status)', async () => {
     renderHook(() => useLightsData());
 
     await waitFor(() => {
@@ -126,162 +176,194 @@ describe('useLightsData', () => {
     });
   });
 
-  it('sets connected state from API response', async () => {
+  it('sets connected=true and stale=false when data_freshness is LIVE', async () => {
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
       expect(result.current.connected).toBe(true);
-      expect(result.current.connectionMode).toBe('local');
-      expect(result.current.remoteConnected).toBe(false);
+      expect(result.current.stale).toBe(false);
       expect(result.current.loading).toBe(false);
     });
   });
 
-  it('fetches rooms, lights, and scenes data', async () => {
+  it('sets stale=true when data_freshness is STALE', async () => {
+    global.fetch = jest.fn((url: string) => {
+      if (url.includes('/api/hue/status')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'STALE' }),
+        }) as any;
+      }
+      return Promise.reject(new Error('Unknown URL')) as any;
+    });
+
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
-      expect(result.current.rooms.length).toBe(2);
+      expect(result.current.connected).toBe(true);
+      expect(result.current.stale).toBe(true);
+    });
+  });
+
+  it('sets connected=false on 503 (Bridge UNREACHABLE)', async () => {
+    global.fetch = jest.fn((url: string) => {
+      if (url.includes('/api/hue/status')) {
+        return Promise.resolve({
+          ok: false,
+          status: 503,
+          json: () => Promise.resolve({}),
+        }) as any;
+      }
+      return Promise.reject(new Error('Unknown URL')) as any;
+    });
+
+    const { result } = renderHook(() => useLightsData());
+
+    await waitFor(() => {
+      expect(result.current.connected).toBe(false);
+      expect(result.current.stale).toBe(false);
+    });
+  });
+
+  it('fetchData sets groups, lights, scenes from wrapped proxy response', async () => {
+    const { result } = renderHook(() => useLightsData());
+
+    await waitFor(() => {
+      expect(result.current.groups.length).toBe(2);
       expect(result.current.lights.length).toBe(2);
-      expect(result.current.scenes.length).toBe(2);
+      expect(result.current.scenes.length).toBe(1);
     });
   });
 
-  it('sorts rooms with Casa first', async () => {
+  it('sorts groups with Casa first, then alphabetical', async () => {
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
-      expect(result.current.rooms[0].metadata.name).toBe('Casa');
-      expect(result.current.rooms[1].metadata.name).toBe('Camera');
+      expect(result.current.groups[0]?.name).toBe('Casa');
+      expect(result.current.groups[1]?.name).toBe('Soggiorno');
     });
   });
 
-  it('auto-selects first room', async () => {
+  it('auto-selects first group (Casa) after sort', async () => {
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
-      expect(result.current.selectedRoomId).toBe('room2'); // Casa is first after sorting
+      // Casa (group_id '0') is sorted first
+      expect(result.current.selectedGroupId).toBe('0');
     });
   });
 
-  it('computes selectedRoom based on selectedRoomId', async () => {
+  it('roomLights filters by group.lights.includes(light.light_id)', async () => {
+    const { result } = renderHook(() => useLightsData());
+
+    // Wait for data to load and Casa to be selected
+    await waitFor(() => {
+      expect(result.current.selectedGroupId).toBe('0');
+    });
+
+    // Casa.lights = ['1', '2'] — both mockLight and mockLightOff should be in roomLights
+    await waitFor(() => {
+      expect(result.current.roomLights.length).toBe(2);
+      const lightIds = result.current.roomLights.map(l => l.light_id);
+      expect(lightIds).toContain('1');
+      expect(lightIds).toContain('2');
+    });
+  });
+
+  it('avgBrightness converts from 0-254 to 0-100%', async () => {
+    // Override to select Soggiorno (group_id '1') — has only light_id '1' with brightness 200
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
-      expect(result.current.selectedRoom?.metadata?.name).toBe('Casa');
+      expect(result.current.groups.length).toBe(2);
+    });
+
+    act(() => {
+      result.current.setSelectedGroupId('1');
+    });
+
+    await waitFor(() => {
+      // light brightness 200 → Math.round(200 / 254 * 100) = 79
+      expect(result.current.avgBrightness).toBe(79);
     });
   });
 
-  it('extracts grouped_light ID from room services', async () => {
+  it('lightsOnCount uses light.on boolean (not light.on?.on)', async () => {
+    const { result } = renderHook(() => useLightsData());
+
+    // Select Soggiorno (group_id '1') — has light '1' which has on: true
+    await waitFor(() => {
+      expect(result.current.groups.length).toBe(2);
+    });
+
+    act(() => {
+      result.current.setSelectedGroupId('1');
+    });
+
+    await waitFor(() => {
+      expect(result.current.lightsOnCount).toBe(1);
+      expect(result.current.lightsOffCount).toBe(0);
+    });
+  });
+
+  it('totalLightsOn counts all on lights across all groups', async () => {
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
-      expect(result.current.selectedRoomGroupedLightId).toBe('grouped_light_2');
+      // mockLight.on = true, mockLightOff.on = false → totalLightsOn = 1
+      expect(result.current.totalLightsOn).toBe(1);
+      expect(result.current.totalLightsOff).toBe(1);
     });
   });
 
-  it('filters roomLights based on selectedRoom children', async () => {
+  it('allLightsOn is true when all effectiveLights are on', async () => {
     const { result } = renderHook(() => useLightsData());
 
+    // Select Soggiorno — only one light (light_id '1') which is on
     await waitFor(() => {
-      expect(result.current.roomLights.length).toBe(1);
-      expect(result.current.roomLights[0].id).toBe('light2');
+      expect(result.current.groups.length).toBe(2);
+    });
+
+    act(() => {
+      result.current.setSelectedGroupId('1');
+    });
+
+    await waitFor(() => {
+      expect(result.current.allLightsOn).toBe(true);
+      expect(result.current.allLightsOff).toBe(false);
     });
   });
 
-  it('filters roomScenes based on selectedRoom group', async () => {
+  it('isRoomOn checks if any effectiveLight.on is true', async () => {
     const { result } = renderHook(() => useLightsData());
 
+    act(() => {
+      result.current.setSelectedGroupId('1');
+    });
+
     await waitFor(() => {
-      expect(result.current.roomScenes.length).toBe(1);
-      expect(result.current.roomScenes[0].id).toBe('scene2');
+      expect(result.current.isRoomOn).toBe(true);
     });
   });
 
-  it('calculates hasColorLights from roomLights', async () => {
+  it('hasColorLights uses supportsColor from colorUtils', async () => {
     jest.mocked(colorUtils.supportsColor).mockReturnValue(true);
-
     const { result } = renderHook(() => useLightsData());
+
+    act(() => {
+      result.current.setSelectedGroupId('1');
+    });
 
     await waitFor(() => {
       expect(result.current.hasColorLights).toBe(true);
     });
   });
 
-  it('calculates lightsOnCount and lightsOffCount', async () => {
-    const { result } = renderHook(() => useLightsData());
-
-    await waitFor(() => {
-      // room2 (Casa) has light2 which is off
-      expect(result.current.lightsOnCount).toBe(0);
-      expect(result.current.lightsOffCount).toBe(1);
-    });
-  });
-
-  it('calculates allLightsOn correctly', async () => {
-    const { result } = renderHook(() => useLightsData());
-
-    await waitFor(() => {
-      expect(result.current.allLightsOn).toBe(false);
-    });
-  });
-
-  it('calculates allLightsOff correctly', async () => {
-    const { result } = renderHook(() => useLightsData());
-
-    await waitFor(() => {
-      expect(result.current.allLightsOff).toBe(true);
-    });
-  });
-
-  it('calculates isRoomOn based on services', async () => {
-    const { result } = renderHook(() => useLightsData());
-
-    await waitFor(() => {
-      // room2 has light2 which is off
-      expect(result.current.isRoomOn).toBe(false);
-    });
-  });
-
-  it('calculates totalLightsOn and totalLightsOff', async () => {
-    const { result } = renderHook(() => useLightsData());
-
-    await waitFor(() => {
-      expect(result.current.totalLightsOn).toBe(1); // light1 is on
-      expect(result.current.totalLightsOff).toBe(1); // light2 is off
-    });
-  });
-
-  it('calculates allHouseLightsOn correctly', async () => {
-    const { result } = renderHook(() => useLightsData());
-
-    await waitFor(() => {
-      expect(result.current.allHouseLightsOn).toBe(false);
-    });
-  });
-
-  it('calculates allHouseLightsOff correctly', async () => {
-    const { result } = renderHook(() => useLightsData());
-
-    await waitFor(() => {
-      expect(result.current.allHouseLightsOff).toBe(false);
-    });
-  });
-
-  it('calculates hasAnyLights correctly', async () => {
+  it('hasAnyLights is true when lights exist', async () => {
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
       expect(result.current.hasAnyLights).toBe(true);
-    });
-  });
-
-  it('calculates avgBrightness for selected room', async () => {
-    const { result } = renderHook(() => useLightsData());
-
-    await waitFor(() => {
-      // room2 has light2 with brightness 50
-      expect(result.current.avgBrightness).toBe(50);
     });
   });
 
@@ -304,35 +386,35 @@ describe('useLightsData', () => {
 
     await waitFor(() => {
       expect(result.current.connected).toBe(false);
-      expect(result.current.connectionMode).toBe('disconnected');
+      expect(result.current.stale).toBe(false);
       expect(result.current.error).toBe('Network error');
     });
   });
 
-  it('handles fetchData error gracefully', async () => {
+  it('handles fetchData error from groups response', async () => {
     global.fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ connected: true, connection_mode: 'local' })
+          json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
         }) as any;
       }
       if (url.includes('/api/hue/rooms')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ error: 'Rooms fetch failed' })
+          json: () => Promise.resolve({ error: 'Rooms fetch failed' }),
         }) as any;
       }
       if (url.includes('/api/hue/lights')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockLightsData)
+          json: () => Promise.resolve({ success: true, lights: [mockLight] }),
         }) as any;
       }
       if (url.includes('/api/hue/scenes')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockScenesData)
+          json: () => Promise.resolve({ success: true, scenes: [mockScene] }),
         }) as any;
       }
       return Promise.reject(new Error('Unknown URL')) as any;
@@ -345,18 +427,18 @@ describe('useLightsData', () => {
     });
   });
 
-  it('handles reconnect flag in fetchData', async () => {
+  it('handles reconnect flag in fetchData response', async () => {
     global.fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ connected: true, connection_mode: 'local' })
+          json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
         }) as any;
       }
       if (url.includes('/api/hue/rooms')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ reconnect: true })
+          json: () => Promise.resolve({ reconnect: true }),
         }) as any;
       }
       return Promise.reject(new Error('Unknown URL')) as any;
@@ -394,76 +476,58 @@ describe('useLightsData', () => {
     });
 
     act(() => {
-      result.current.setSelectedRoomId('room1');
+      result.current.setSelectedGroupId('1');
       result.current.setLocalBrightness(75);
       result.current.setError('Test error');
-      result.current.setPairingError('Pairing error');
       result.current.setRefreshing(true);
       result.current.setLoadingMessage('Testing...');
-      result.current.setPairing(true);
-      result.current.setPairingStep('discovering');
-      result.current.setDiscoveredBridges([{ id: 'bridge1' }]);
-      result.current.setSelectedBridge({ id: 'bridge1' });
-      result.current.setPairingCountdown(25);
     });
 
-    expect(result.current.selectedRoomId).toBe('room1');
+    expect(result.current.selectedGroupId).toBe('1');
     expect(result.current.localBrightness).toBe(75);
     expect(result.current.error).toBe('Test error');
-    expect(result.current.pairingError).toBe('Pairing error');
     expect(result.current.refreshing).toBe(true);
     expect(result.current.loadingMessage).toBe('Testing...');
-    expect(result.current.pairing).toBe(true);
-    expect(result.current.pairingStep).toBe('discovering');
-    expect(result.current.discoveredBridges).toEqual([{ id: 'bridge1' }]);
-    expect(result.current.selectedBridge).toEqual({ id: 'bridge1' });
-    expect(result.current.pairingCountdown).toBe(25);
-  });
-
-  it('cleans up pairing timer on unmount', () => {
-    const { result, unmount } = renderHook(() => useLightsData());
-
-    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
-
-    // Set a timer
-    result.current.pairingTimerRef.current = setInterval(() => {}, 1000);
-
-    unmount();
-
-    expect(clearIntervalSpy).toHaveBeenCalled();
   });
 
   it('returns adaptive classes for light contrast mode', async () => {
-    // Mock to return bright color
     jest.mocked(colorUtils.getCurrentColorHex).mockReturnValue('#FFFF00');
+    jest.mocked(colorUtils.supportsColor).mockReturnValue(true);
+
+    const brightLight: HueLight = {
+      ...mockLight,
+      light_id: '1',
+      on: true,
+      brightness: 229, // ~90%
+      hue: 10922,
+      saturation: 254,
+      colormode: 'hs',
+      capability_tier: 'color',
+    };
 
     global.fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ connected: true, connection_mode: 'local' })
+          json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
         }) as any;
       }
       if (url.includes('/api/hue/rooms')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockRoomsData)
+          json: () => Promise.resolve({ success: true, groups: [mockGroup] }),
         }) as any;
       }
       if (url.includes('/api/hue/lights')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({
-            lights: [
-              { id: 'light2', on: { on: true }, dimming: { brightness: 90 }, owner: { rid: 'device2' } }
-            ]
-          })
+          json: () => Promise.resolve({ success: true, lights: [brightLight] }),
         }) as any;
       }
       if (url.includes('/api/hue/scenes')) {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockScenesData)
+          json: () => Promise.resolve({ success: true, scenes: [] }),
         }) as any;
       }
       return Promise.reject(new Error('Unknown URL')) as any;
@@ -472,17 +536,59 @@ describe('useLightsData', () => {
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
-      // With bright yellow light at 90% brightness, contrastMode should be 'light'
+      // With bright yellow light at ~90% brightness, contrastMode should be 'light'
       expect(result.current.contrastMode).toBe('light');
       expect(result.current.adaptive.heading).toBe('text-slate-900');
     });
   });
 
-  it('returns default adaptive classes when no dynamic style', async () => {
+  it('returns default adaptive classes when no lights are on', async () => {
+    // Use a group where all lights are off
+    const groupAllOff: HueGroup = {
+      group_id: '99',
+      name: 'Dark Room',
+      type: 'Room',
+      group_class: 'Bedroom',
+      lights: ['2'], // mockLightOff
+      any_on: false,
+      all_on: false,
+      brightness: 0,
+      color_temp: null,
+      colormode: null,
+    };
+
+    global.fetch = jest.fn((url: string) => {
+      if (url.includes('/api/hue/status')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
+        }) as any;
+      }
+      if (url.includes('/api/hue/rooms')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, groups: [groupAllOff] }),
+        }) as any;
+      }
+      if (url.includes('/api/hue/lights')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, lights: [mockLightOff] }),
+        }) as any;
+      }
+      if (url.includes('/api/hue/scenes')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, scenes: [] }),
+        }) as any;
+      }
+      return Promise.reject(new Error('Unknown URL')) as any;
+    });
+
     const { result } = renderHook(() => useLightsData());
 
     await waitFor(() => {
-      // room2 lights are off, so no dynamic style
+      // groupAllOff has light_id '2' (on=false) — isRoomOn=false → no dynamic style → default
       expect(result.current.contrastMode).toBe('default');
       expect(result.current.adaptive.heading).toBe('');
     });

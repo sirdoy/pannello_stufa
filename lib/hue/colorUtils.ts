@@ -3,7 +3,12 @@
  * Convert RGB/HSL colors to XY CIE color space for Hue API
  * Based on Philips Hue documentation:
  * https://developers.meethue.com/develop/hue-api/lights-api/#color_gets_more_complicated
+ *
+ * Color detection uses proxy-native fields (capability_tier, hue, saturation)
+ * instead of CLIP v2 nested objects.
  */
+
+import type { HueLight } from '@/types/hueProxy';
 
 export interface XYColor {
   x: number;
@@ -21,13 +26,6 @@ export interface ColorPreset {
   hex: string;
   xy: XYColor;
   icon: string;
-}
-
-interface HueLight {
-  color?: {
-    gamut?: unknown;
-    xy?: XYColor;
-  };
 }
 
 /**
@@ -154,45 +152,42 @@ export const COLOR_PRESETS: ColorPreset[] = [
 ];
 
 /**
- * Check if a light supports color
- * @param light - Hue light object from API
- * @returns True if light supports color
+ * Convert HSL (h: 0-360, s: 0-100, l: 0-100) to hex color string
  */
-export function supportsColor(light: HueLight): boolean {
-  return !!(light?.color?.gamut || light?.color?.xy);
+function hslToHex(h: number, s: number, l: number): string {
+  s /= 100;
+  l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color).toString(16).padStart(2, '0');
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
 }
 
 /**
- * Get current color as hex (approximate)
- * @param light - Hue light object
- * @returns Hex color or null if no color
+ * Check if a light supports color (uses proxy capability_tier field)
+ * @param light - Hue light object from proxy API
+ * @returns True if light supports color
+ */
+export function supportsColor(light: HueLight): boolean {
+  return light.capability_tier === 'color';
+}
+
+/**
+ * Get current color as hex (approximate, using proxy hue/saturation fields)
+ * @param light - Hue light object from proxy API
+ * @returns Hex color or null if not a color-capable light
  */
 export function getCurrentColorHex(light: HueLight): string | null {
-  if (!light?.color?.xy) return null;
-
-  const { x, y } = light.color.xy;
-
-  // Convert XY back to RGB (approximate)
-  const z = 1.0 - x - y;
-  const Y = 1.0; // Assume full brightness
-  const X = (Y / y) * x;
-  const Z = (Y / y) * z;
-
-  // Convert to RGB
-  let r = X * 1.656492 - Y * 0.354851 - Z * 0.255038;
-  let g = -X * 0.707196 + Y * 1.655397 + Z * 0.036152;
-  let b = X * 0.051713 - Y * 0.121364 + Z * 1.011530;
-
-  // Apply reverse gamma correction
-  r = (r <= 0.0031308) ? 12.92 * r : 1.055 * Math.pow(r, 1.0 / 2.4) - 0.055;
-  g = (g <= 0.0031308) ? 12.92 * g : 1.055 * Math.pow(g, 1.0 / 2.4) - 0.055;
-  b = (b <= 0.0031308) ? 12.92 * b : 1.055 * Math.pow(b, 1.0 / 2.4) - 0.055;
-
-  // Clamp to 0-255
-  r = Math.max(0, Math.min(255, Math.round(r * 255)));
-  g = Math.max(0, Math.min(255, Math.round(g * 255)));
-  b = Math.max(0, Math.min(255, Math.round(b * 255)));
-
-  // Convert to hex
-  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+  if (light.capability_tier !== 'color') return null;
+  if (light.hue === null || light.saturation === null) return null;
+  // Convert proxy hue (0-65535) to degrees (0-360)
+  const hueDeg = (light.hue / 65535) * 360;
+  // Convert proxy saturation (0-254) to percentage (0-100)
+  const satPct = (light.saturation / 254) * 100;
+  // Low saturation = warm white (matches current fallback behavior)
+  if (satPct < 8) return '#FFE4B5';
+  return hslToHex(hueDeg, satPct, 50);
 }

@@ -3,20 +3,22 @@
  *
  * Encapsulates all Philips Hue lights state management:
  * - Polling via useAdaptivePolling (60s interval)
- * - Connection checking (local/remote/hybrid modes)
- * - Data fetching (rooms, lights, scenes)
- * - Pairing flow state
+ * - Connection checking via /api/hue/status (data_freshness-based staleness)
+ * - Data fetching (groups, lights, scenes) using proxy-native flat shapes
  * - Derived state computation
  * - Dynamic styling based on room light colors
+ *
+ * Pairing state machine removed — proxy handles Bridge connectivity.
  *
  * This hook guarantees SINGLE polling loop for LightsCard.
  */
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
+import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
 
 /**
  * Adaptive classes for UI based on background contrast
@@ -44,30 +46,21 @@ export interface UseLightsDataReturn {
   loading: boolean;
   error: string | null;
   connected: boolean;
-  connectionMode: 'local' | 'remote' | 'hybrid' | 'disconnected' | null;
-  remoteConnected: boolean;
-  rooms: any[];
-  lights: any[];
-  scenes: any[];
-  selectedRoomId: string | null;
+  stale: boolean;
+  groups: HueGroup[];
+  lights: HueLight[];
+  scenes: HueScene[];
+  selectedGroupId: string | null;
   refreshing: boolean;
   loadingMessage: string;
   localBrightness: number | null;
 
-  // Pairing state
-  pairing: boolean;
-  pairingStep: 'discovering' | 'waitingForButtonPress' | 'pairing' | 'success' | 'noLocalBridge' | 'selectBridge' | null;
-  discoveredBridges: any[];
-  selectedBridge: any;
-  pairingCountdown: number;
-  pairingError: string | null;
-
-  // Derived state (computed from rooms/lights/scenes)
-  selectedRoom: any;
-  selectedRoomGroupedLightId: string | null;
-  roomLights: any[];
-  roomScenes: any[];
-  effectiveLights: any[];
+  // Derived state (computed from groups/lights/scenes)
+  selectedGroup: HueGroup | undefined;
+  selectedGroupId_action: string | null;
+  roomLights: HueLight[];
+  roomScenes: HueScene[];
+  effectiveLights: HueLight[];
   hasColorLights: boolean;
   lightsOnCount: number;
   lightsOffCount: number;
@@ -89,23 +82,14 @@ export interface UseLightsDataReturn {
   adaptive: AdaptiveClasses;
 
   // Actions
-  setSelectedRoomId: (id: string | null) => void;
+  setSelectedGroupId: (id: string | null) => void;
   setLocalBrightness: (val: number | null) => void;
   setError: (err: string | null) => void;
-  setPairingError: (err: string | null) => void;
   setRefreshing: (val: boolean) => void;
   setLoadingMessage: (msg: string) => void;
   checkConnection: () => Promise<void>;
   fetchData: () => Promise<void>;
   handleRefresh: () => Promise<void>;
-
-  // Pairing state setters (needed by commands hook)
-  setPairing: (val: boolean) => void;
-  setPairingStep: (step: UseLightsDataReturn['pairingStep']) => void;
-  setDiscoveredBridges: (bridges: any[]) => void;
-  setSelectedBridge: (bridge: any) => void;
-  setPairingCountdown: React.Dispatch<React.SetStateAction<number>>;
-  pairingTimerRef: React.MutableRefObject<NodeJS.Timeout | null>;
 }
 
 /**
@@ -118,58 +102,40 @@ export function useLightsData(): UseLightsDataReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [connected, setConnected] = useState(false);
-  const [connectionMode, setConnectionMode] = useState<'local' | 'remote' | 'hybrid' | 'disconnected' | null>(null);
-  const [remoteConnected, setRemoteConnected] = useState(false);
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [lights, setLights] = useState<any[]>([]);
-  const [scenes, setScenes] = useState<any[]>([]);
-  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [stale, setStale] = useState(false);
+  const [groups, setGroups] = useState<HueGroup[]>([]);
+  const [lights, setLights] = useState<HueLight[]>([]);
+  const [scenes, setScenes] = useState<HueScene[]>([]);
+  const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
   const [localBrightness, setLocalBrightness] = useState<number | null>(null);
 
-  // Pairing state
-  const [pairing, setPairing] = useState(false);
-  const [pairingStep, setPairingStep] = useState<'discovering' | 'waitingForButtonPress' | 'pairing' | 'success' | 'noLocalBridge' | 'selectBridge' | null>(null);
-  const [discoveredBridges, setDiscoveredBridges] = useState<any[]>([]);
-  const [selectedBridge, setSelectedBridge] = useState<any>(null);
-  const [pairingCountdown, setPairingCountdown] = useState(30);
-  const [pairingError, setPairingError] = useState<string | null>(null);
-
-  // Refs
-  const connectionCheckedRef = useRef(false);
-  const pairingTimerRef = useRef<NodeJS.Timeout | null>(null);
-
   // Check connection on mount
   useEffect(() => {
-    if (connectionCheckedRef.current) return;
-    connectionCheckedRef.current = true;
     checkConnection();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function checkConnection() {
     try {
       setLoading(true);
       setError(null);
-
       const response = await fetch('/api/hue/status');
-      const data = await response.json() as { connected?: boolean; connection_mode?: string; remote_connected?: boolean };
-
-      if (data.connected) {
-        setConnected(true);
-        setConnectionMode((data.connection_mode as 'local' | 'remote' | 'hybrid' | 'disconnected') || 'local');
-        setRemoteConnected(data.remote_connected || false);
-      } else {
+      if (!response.ok) {
+        // 503 = Bridge UNREACHABLE
         setConnected(false);
-        setConnectionMode('disconnected');
-        setRemoteConnected(false);
+        setStale(false);
+        return;
       }
+      const health = await response.json() as { connected?: boolean; data_freshness?: string; success?: boolean };
+      setConnected(health.connected ?? false);
+      setStale(health.data_freshness === 'STALE');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore connessione Hue:', err);
       setConnected(false);
-      setConnectionMode('disconnected');
-      setRemoteConnected(false);
+      setStale(false);
       setError(message);
     } finally {
       setLoading(false);
@@ -179,41 +145,32 @@ export function useLightsData(): UseLightsDataReturn {
   async function fetchData() {
     try {
       setError(null);
-
-      const [roomsRes, lightsRes, scenesRes] = await Promise.all([
+      const [groupsRes, lightsRes, scenesRes] = await Promise.all([
         fetch('/api/hue/rooms'),
         fetch('/api/hue/lights'),
         fetch('/api/hue/scenes'),
       ]);
-
-      const [roomsData, lightsData, scenesData] = await Promise.all([
-        roomsRes.json(),
-        lightsRes.json(),
-        scenesRes.json(),
-      ]) as [
-        { rooms?: any[]; reconnect?: boolean; error?: string },
-        { lights?: any[]; reconnect?: boolean; error?: string },
-        { scenes?: any[]; reconnect?: boolean; error?: string }
-      ];
-
-      if (roomsData.reconnect || lightsData.reconnect || scenesData.reconnect) {
+      const [groupsData, lightsData, scenesData] = await Promise.all([
+        groupsRes.json() as Promise<{ groups?: HueGroup[]; reconnect?: boolean; error?: string; success?: boolean }>,
+        lightsRes.json() as Promise<{ lights?: HueLight[]; reconnect?: boolean; error?: string; success?: boolean }>,
+        scenesRes.json() as Promise<{ scenes?: HueScene[]; reconnect?: boolean; error?: string; success?: boolean }>,
+      ]);
+      if (groupsData.reconnect || lightsData.reconnect || scenesData.reconnect) {
         setConnected(false);
         return;
       }
-
-      if (roomsData.error) throw new Error(roomsData.error);
+      if (groupsData.error) throw new Error(groupsData.error);
       if (lightsData.error) throw new Error(lightsData.error);
       if (scenesData.error) throw new Error(scenesData.error);
-
-      // Sort rooms with 'Casa' first, then alphabetical
-      const sortedRooms = (roomsData.rooms || []).sort((a: any, b: any) => {
-        if (a.metadata?.name === 'Casa') return -1;
-        if (b.metadata?.name === 'Casa') return 1;
-        return (a.metadata?.name || '').localeCompare(b.metadata?.name || '');
+      // Sort groups: 'Casa' first, then alphabetical
+      const sortedGroups = (groupsData.groups ?? []).sort((a, b) => {
+        if (a.name === 'Casa') return -1;
+        if (b.name === 'Casa') return 1;
+        return a.name.localeCompare(b.name);
       });
-      setRooms(sortedRooms);
-      setLights(lightsData.lights || []);
-      setScenes(scenesData.scenes || []);
+      setGroups(sortedGroups);
+      setLights(lightsData.lights ?? []);
+      setScenes(scenesData.scenes ?? []);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore fetch dati Hue:', err);
@@ -238,77 +195,57 @@ export function useLightsData(): UseLightsDataReturn {
     initialDelay: 100,
   });
 
-  // Auto-select first room
+  // Auto-select first group
   useEffect(() => {
-    if (rooms.length > 0 && !selectedRoomId) {
-      setSelectedRoomId(rooms[0].id);
+    if (groups.length > 0 && !selectedGroupId) {
+      setSelectedGroupId(groups[0]?.group_id ?? null);
     }
-  }, [rooms, selectedRoomId]);
-
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-      if (pairingTimerRef.current) {
-        clearInterval(pairingTimerRef.current);
-      }
-    };
-  }, []);
+  }, [groups, selectedGroupId]);
 
   // Derived state computations
-  const selectedRoom = rooms.find(r => r.id === selectedRoomId) || rooms[0];
+  const selectedGroup = groups.find(g => g.group_id === selectedGroupId) ?? groups[0];
 
-  // Extract grouped_light ID from room services
-  const getGroupedLightId = (room: any): string | null => {
-    if (!room?.services) return null;
-    const groupedLight = room.services.find((s: any) => s.rtype === 'grouped_light');
-    return groupedLight?.rid || null;
-  };
+  // selectedGroupId_action = group_id for the action endpoint
+  const selectedGroupId_action = selectedGroup?.group_id ?? null;
 
-  const selectedRoomGroupedLightId = getGroupedLightId(selectedRoom);
-
-  // Use 'children' to get individual lights for this room
-  const roomLights = lights.filter((light: any) =>
-    selectedRoom?.children?.some((c: any) =>
-      c.rid === light.id || // Remote API: light ID in children
-      c.rid === light.owner?.rid // Local API: device ID in children, match via owner
-    )
+  // Room lights: direct membership check via HueGroup.lights (array of light_id strings)
+  const roomLights = lights.filter(light =>
+    selectedGroup?.lights.includes(light.light_id) ?? false
   );
 
-  const roomScenes = scenes.filter((scene: any) =>
-    scene.group?.rid === selectedRoom?.id
+  // Room scenes
+  const roomScenes = scenes.filter(scene =>
+    scene.group_id === selectedGroup?.group_id
   );
 
   // Check if room has any color-capable lights
-  const hasColorLights = roomLights.some((light: any) => supportsColor(light));
+  const hasColorLights = roomLights.some(light => supportsColor(light));
 
-  // Get lights associated with the room via services (more reliable than children)
-  const serviceLights = selectedRoom?.services
-    ?.map((s: any) => lights.find((l: any) => l.id === s.rid))
-    .filter(Boolean) || [];
+  // effectiveLights = roomLights (no more serviceLights fallback — proxy is single-path)
+  const effectiveLights = roomLights;
 
-  // Use serviceLights if roomLights is empty (API inconsistency between children/services)
-  const effectiveLights = roomLights.length > 0 ? roomLights : serviceLights;
-
-  // Calculate lights on/off state for better UX
-  const lightsOnCount = effectiveLights.filter((light: any) => light?.on?.on).length;
+  // Calculate lights on/off state — use light.on (boolean directly, not light.on?.on)
+  const lightsOnCount = effectiveLights.filter(light => light.on).length;
   const lightsOffCount = effectiveLights.length - lightsOnCount;
   const allLightsOn = effectiveLights.length > 0 && lightsOnCount === effectiveLights.length;
   const allLightsOff = effectiveLights.length > 0 && lightsOffCount === effectiveLights.length;
-  const isRoomOn = selectedRoom?.services?.some((s: any) => {
-    const light = lights.find((l: any) => l.id === s.rid);
-    return light?.on?.on;
-  }) || false;
 
-  // Calculate total house lights state for quick control
-  const totalLightsOn = lights.filter((l: any) => l.on?.on).length;
+  // isRoomOn: check if any light in room is on
+  const isRoomOn = effectiveLights.some(light => light.on);
+
+  // Total house stats — use light.on (not light.on?.on)
+  const totalLightsOn = lights.filter(l => l.on).length;
   const totalLightsOff = lights.length - totalLightsOn;
   const allHouseLightsOn = lights.length > 0 && totalLightsOn === lights.length;
   const allHouseLightsOff = lights.length > 0 && totalLightsOff === lights.length;
   const hasAnyLights = lights.length > 0;
-  const avgBrightness = !selectedRoom || effectiveLights.length === 0
+
+  // avgBrightness: compute from individual lights (not group.brightness which is stale)
+  // Convert from 0-254 to 0-100 percent
+  const avgBrightness = effectiveLights.length === 0
     ? 0
     : Math.round(
-        effectiveLights.reduce((sum: number, l: any) => sum + (l.dimming?.brightness || 0), 0) / effectiveLights.length
+        effectiveLights.reduce((sum, l) => sum + Math.round((l.brightness ?? 0) / 254 * 100), 0) / effectiveLights.length
       );
 
   // Dynamic styling computations
@@ -336,23 +273,21 @@ export function useLightsData(): UseLightsDataReturn {
 
   // Calculate colors of ON lights for dynamic styling
   const getRoomLightColors = (): { colors: string[]; avgBrightness: number } => {
-    const onLights = effectiveLights.filter((light: any) => light?.on?.on);
+    const onLights = effectiveLights.filter(light => light.on);
     if (onLights.length === 0) return { colors: [], avgBrightness: 0 };
 
     const colors = onLights
-      .map((light: any) => {
+      .map(light => {
         const hex = getCurrentColorHex(light);
-        // If no color (white/CT only), use warm white
-        return hex || '#FFE4B5';
+        return hex || '#FFE4B5'; // warm white fallback for non-color lights
       })
       .filter(Boolean) as string[];
 
-    // Remove duplicates
     const uniqueColors = Array.from(new Set(colors));
 
-    // Calculate average brightness of ON lights only
+    // Average brightness of ON lights (convert 0-254 to 0-100)
     const onBrightness = Math.round(
-      onLights.reduce((sum: number, l: any) => sum + (l.dimming?.brightness || 100), 0) / onLights.length
+      onLights.reduce((sum, l) => sum + Math.round((l.brightness ?? 0) / 254 * 100), 0) / onLights.length
     );
 
     return { colors: uniqueColors, avgBrightness: onBrightness };
@@ -457,27 +392,18 @@ export function useLightsData(): UseLightsDataReturn {
     loading,
     error,
     connected,
-    connectionMode,
-    remoteConnected,
-    rooms,
+    stale,
+    groups,
     lights,
     scenes,
-    selectedRoomId,
+    selectedGroupId,
     refreshing,
     loadingMessage,
     localBrightness,
 
-    // Pairing state
-    pairing,
-    pairingStep,
-    discoveredBridges,
-    selectedBridge,
-    pairingCountdown,
-    pairingError,
-
     // Derived state
-    selectedRoom,
-    selectedRoomGroupedLightId,
+    selectedGroup,
+    selectedGroupId_action,
     roomLights,
     roomScenes,
     effectiveLights,
@@ -502,22 +428,13 @@ export function useLightsData(): UseLightsDataReturn {
     adaptive,
 
     // Actions
-    setSelectedRoomId,
+    setSelectedGroupId,
     setLocalBrightness,
     setError,
-    setPairingError,
     setRefreshing,
     setLoadingMessage,
     checkConnection,
     fetchData,
     handleRefresh,
-
-    // Pairing state setters
-    setPairing,
-    setPairingStep,
-    setDiscoveredBridges,
-    setSelectedBridge,
-    setPairingCountdown,
-    pairingTimerRef,
   };
 }

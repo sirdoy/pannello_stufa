@@ -10,5 +10,5 @@ export const dynamic = 'force-dynamic';
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getGroups();
-  return success(data as unknown as Record<string, unknown>);
+  return success({ groups: data });
 }, 'Hue/Rooms');

@@ -49,8 +49,6 @@ export {
   stoveOffline,
   maintenanceRequired,
   netatmoReconnect,
-  hueNotConnected,
-  hueNotOnLocalNetwork,
 
   // Redirect
   redirect,
@@ -69,7 +67,6 @@ export {
 
   // Special
   withCronSecret,
-  withHueHandler,
   withIdempotency,
 } from './middleware';
 

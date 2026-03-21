@@ -31,7 +31,6 @@ jest.mock('@/lib/thermorossiProxy');
 jest.mock('@/lib/netatmoProxy');
 jest.mock('@/lib/stoveStateService');
 jest.mock('@/lib/netatmoCalibrationService');
-jest.mock('@/lib/hue/hueRemoteTokenHelper');
 jest.mock('@/lib/openMeteo');
 jest.mock('@/lib/weatherCacheService');
 jest.mock('@/lib/utils/pidController');
@@ -70,7 +69,6 @@ import {
 } from '@/lib/thermorossiProxy';
 import { updateStoveState } from '@/lib/stoveStateService';
 import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
-import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 import { fetchWeatherForecast } from '@/lib/openMeteo';
 import { saveWeatherToCache } from '@/lib/weatherCacheService';
 import { logCronExecution } from '@/lib/cronExecutionLogger';
@@ -93,7 +91,6 @@ const mockLogCronExecution = jest.mocked(logCronExecution);
 const mockLogAnalyticsEvent = jest.mocked(logAnalyticsEvent);
 const mockGetEnvironmentPath = jest.mocked(getEnvironmentPath);
 const mockCalibrateValvesServer = jest.mocked(calibrateValvesServer);
-const mockProactiveTokenRefresh = jest.mocked(proactiveTokenRefresh);
 const mockTriggerSchedulerActionServer = jest.mocked(triggerSchedulerActionServer);
 const mockTriggerMaintenanceAlertServer = jest.mocked(triggerMaintenanceAlertServer);
 const mockTriggerStoveStatusWorkServer = jest.mocked(triggerStoveStatusWorkServer);
@@ -154,7 +151,6 @@ describe('Scheduler Check Route', () => {
 
     // Default fire-and-forget mocks
     mockCalibrateValvesServer.mockResolvedValue({ calibrated: false } as any);
-    mockProactiveTokenRefresh.mockResolvedValue({ refreshed: false } as any);
     mockFetchWeatherForecast.mockResolvedValue({ temperature: 15 } as any);
     mockSaveWeatherToCache.mockResolvedValue(undefined as any);
 
@@ -611,18 +607,6 @@ describe('Scheduler Check Route', () => {
       // calibrateValvesIfNeeded is called as fire-and-forget
       // It checks lastCalibration internally via adminDbGet
       expect(mockCalibrateValvesServer).toHaveBeenCalled();
-    });
-
-    it('calls proactiveTokenRefresh as fire-and-forget', async () => {
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [],
-      });
-
-      const request = createMockRequest();
-      await GET(request);
-
-      expect(mockProactiveTokenRefresh).toHaveBeenCalled();
     });
 
     it('tracks maintenance hours', async () => {

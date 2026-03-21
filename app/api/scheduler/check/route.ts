@@ -40,7 +40,6 @@ import {
 import type { StoveState } from '@/types/thermorossiProxy';
 import { updateStoveState } from '@/lib/stoveStateService';
 import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
-import { proactiveTokenRefresh } from '@/lib/hue/hueRemoteTokenHelper';
 import { fetchWeatherForecast } from '@/lib/openMeteo';
 import { saveWeatherToCache } from '@/lib/weatherCacheService';
 import { PIDController } from '@/lib/utils/pidController';
@@ -846,13 +845,6 @@ export const GET = withCronSecret(async (_request) => {
     if (result.cleaned) {
     }
   }).catch(err => console.error('❌ Errore token cleanup:', err.message));
-
-  // Proactive Hue token refresh (async, don't wait)
-  // Refreshes token if expiring within 24 hours to avoid manual reconnection
-  proactiveTokenRefresh().then((result) => {
-    if (result.refreshed) {
-    }
-  }).catch(err => console.error('❌ Hue token refresh error:', err.message));
 
   // Track maintenance hours
   const maintenanceTrack = await trackUsageHours(currentStatus);

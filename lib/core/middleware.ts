@@ -204,49 +204,6 @@ export function withCronSecret(handler: UnauthHandler, logContext: string | null
 }
 
 // =============================================================================
-// HUE-SPECIFIC MIDDLEWARE
-// =============================================================================
-
-/**
- * Wraps a route handler with Hue-specific error handling
- * Automatically handles HUE_NOT_CONNECTED and NETWORK_TIMEOUT errors
- *
- * @param handler - Route handler function
- * @param logContext - Context for error logging (optional)
- * @returns Wrapped handler
- *
- * @example
- * export const GET = withHueHandler(async (request, context, session) => {
- *   const provider = await HueConnectionStrategy.getProvider();
- *   const lights = await provider.getLights();
- *   return success({ lights: lights.data });
- * }, 'Hue/Lights');
- */
-export function withHueHandler(handler: AuthedHandler, logContext: string | null = null): UnauthHandler {
-  return withAuthAndErrorHandler(async (request: NextRequest, context: RouteContext, session: Session) => {
-    try {
-      return await handler(request, context, session);
-    } catch (err) {
-      const error = err as Error;
-      // Handle not connected errors
-      if (error.message?.includes('HUE_NOT_CONNECTED')) {
-        const { hueNotConnected } = await import('./apiResponse');
-        return hueNotConnected();
-      }
-
-      // Handle network timeout (local API)
-      if (error.message === 'NETWORK_TIMEOUT') {
-        const { hueNotOnLocalNetwork } = await import('./apiResponse');
-        return hueNotOnLocalNetwork();
-      }
-
-      // Re-throw for generic error handling
-      throw err;
-    }
-  }, logContext);
-}
-
-// =============================================================================
 // IDEMPOTENCY MIDDLEWARE
 // =============================================================================
 

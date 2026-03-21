@@ -18,7 +18,6 @@ import {
   stoveOffline,
   maintenanceRequired,
   netatmoReconnect,
-  hueNotConnected,
 } from '../apiResponse';
 import { ApiError, ERROR_CODES } from '../apiErrors';
 
@@ -190,16 +189,6 @@ describe('Device-Specific Errors', () => {
     });
   });
 
-  describe('hueNotConnected', () => {
-    it('should create hue not connected response', async () => {
-      const response = hueNotConnected();
-      const { data, status } = await getResponseData(response);
-
-      expect(status).toBe(401);
-      expect(data.code).toBe(ERROR_CODES.HUE_NOT_CONNECTED);
-      expect(data.reconnect).toBe(true);
-    });
-  });
 });
 
 describe('handleError', () => {
@@ -224,24 +213,6 @@ describe('handleError', () => {
 
     expect(status).toBe(504);
     expect(data.code).toBe(ERROR_CODES.STOVE_TIMEOUT);
-  });
-
-  it('should map NETWORK_TIMEOUT error', async () => {
-    const err = new Error('NETWORK_TIMEOUT');
-    const response = handleError(err);
-    const { data, status } = await getResponseData(response);
-
-    expect(status).toBe(503);
-    expect(data.code).toBe(ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK);
-  });
-
-  it('should map HUE_NOT_CONNECTED error', async () => {
-    const err = new Error('HUE_NOT_CONNECTED: not configured');
-    const response = handleError(err);
-    const { data, status } = await getResponseData(response);
-
-    expect(status).toBe(401);
-    expect(data.code).toBe(ERROR_CODES.HUE_NOT_CONNECTED);
   });
 
   it('should handle generic errors', async () => {

@@ -150,26 +150,6 @@ export function handleError(err: Error | ApiError, context: string | null = null
     );
   }
 
-  // Network timeout
-  if (message === 'NETWORK_TIMEOUT') {
-    return error(
-      'Bridge non raggiungibile',
-      ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK,
-      HTTP_STATUS.SERVICE_UNAVAILABLE,
-      { details: 'Assicurati di essere sulla stessa rete locale del bridge.' }
-    );
-  }
-
-  // Hue not connected
-  if (message.includes('HUE_NOT_CONNECTED')) {
-    return error(
-      'Hue non connesso',
-      ERROR_CODES.HUE_NOT_CONNECTED,
-      HTTP_STATUS.UNAUTHORIZED,
-      { reconnect: true }
-    );
-  }
-
   // Generic server error
   return error(
     err.message || 'Errore interno del server',
@@ -283,32 +263,6 @@ export function maintenanceRequired(): NextResponse {
  */
 export function netatmoReconnect(message: string = 'Token Netatmo scaduto'): NextResponse {
   return error(message, ERROR_CODES.NETATMO_RECONNECT_REQUIRED, HTTP_STATUS.UNAUTHORIZED, { reconnect: true });
-}
-
-/**
- * Hue not connected response
- * @returns NextResponse
- */
-export function hueNotConnected(): NextResponse {
-  return error(
-    'Hue non connesso',
-    ERROR_CODES.HUE_NOT_CONNECTED,
-    HTTP_STATUS.UNAUTHORIZED,
-    { reconnect: true }
-  );
-}
-
-/**
- * Hue not on local network response
- * @returns NextResponse
- */
-export function hueNotOnLocalNetwork(): NextResponse {
-  return error(
-    'Bridge Hue non raggiungibile',
-    ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK,
-    HTTP_STATUS.SERVICE_UNAVAILABLE,
-    { details: 'Assicurati di essere sulla stessa rete locale del bridge.' }
-  );
 }
 
 // =============================================================================

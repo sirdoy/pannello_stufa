@@ -39,7 +39,6 @@ describe('ERROR_CODES', () => {
   it('should have device-specific error codes', () => {
     expect(ERROR_CODES.STOVE_OFFLINE).toBe('STOVE_OFFLINE');
     expect(ERROR_CODES.NETATMO_NOT_CONNECTED).toBe('NETATMO_NOT_CONNECTED');
-    expect(ERROR_CODES.HUE_NOT_CONNECTED).toBe('HUE_NOT_CONNECTED');
   });
 });
 
@@ -170,13 +169,6 @@ describe('ApiError', () => {
       expect(error.details).toEqual({ reconnect: true });
     });
 
-    it('should create hueNotConnected error', () => {
-      const error = ApiError.hueNotConnected();
-
-      expect(error.code).toBe(ERROR_CODES.HUE_NOT_CONNECTED);
-      expect(error.status).toBe(401);
-      expect(error.details).toEqual({ reconnect: true });
-    });
   });
 });
 
@@ -187,20 +179,6 @@ describe('mapLegacyError', () => {
 
     expect(apiError.code).toBe(ERROR_CODES.STOVE_TIMEOUT);
     expect(apiError.status).toBe(504);
-  });
-
-  it('should map HUE_NOT_CONNECTED error', () => {
-    const legacyError = new Error('HUE_NOT_CONNECTED: Bridge not configured');
-    const apiError = mapLegacyError(legacyError);
-
-    expect(apiError.code).toBe(ERROR_CODES.HUE_NOT_CONNECTED);
-  });
-
-  it('should map NETWORK_TIMEOUT error', () => {
-    const legacyError = new Error('NETWORK_TIMEOUT');
-    const apiError = mapLegacyError(legacyError);
-
-    expect(apiError.code).toBe(ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK);
   });
 
   it('should map LINK_BUTTON_NOT_PRESSED error', () => {

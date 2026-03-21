@@ -49,10 +49,8 @@ export type ErrorCode =
   | 'NETATMO_TOKEN_INVALID'
   | 'NETATMO_RECONNECT_REQUIRED'
   // Hue-specific
-  | 'HUE_NOT_CONNECTED'
   | 'HUE_BRIDGE_NOT_FOUND'
   | 'HUE_LINK_BUTTON_NOT_PRESSED'
-  | 'HUE_NOT_ON_LOCAL_NETWORK'
   | 'HUE_ERROR'
   // Fritz!Box-specific
   | 'TR064_NOT_ENABLED'

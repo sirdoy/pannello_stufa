@@ -145,17 +145,6 @@ describe('retryClient', () => {
       expect(mockFetch).toHaveBeenCalledTimes(1);
     });
 
-    it('throws immediately on HUE_NOT_CONNECTED', async () => {
-      mockFetch.mockResolvedValueOnce(
-        new Response(JSON.stringify({ code: ERROR_CODES.HUE_NOT_CONNECTED, error: 'Hue offline' }), {
-          status: 401,
-        })
-      );
-
-      await expect(retryFetch('https://api.example.com/test', {})).rejects.toThrow();
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-    });
-
     it('throws immediately on NETATMO_NOT_CONNECTED', async () => {
       mockFetch.mockResolvedValueOnce(
         new Response(JSON.stringify({ code: ERROR_CODES.NETATMO_NOT_CONNECTED, error: 'Netatmo offline' }), {
@@ -366,10 +355,6 @@ describe('retryClient', () => {
 
     it('correctly classifies MAINTENANCE_REQUIRED as non-transient', () => {
       expect(isTransientError(ERROR_CODES.MAINTENANCE_REQUIRED)).toBe(false);
-    });
-
-    it('correctly classifies HUE_NOT_CONNECTED as non-transient', () => {
-      expect(isTransientError(ERROR_CODES.HUE_NOT_CONNECTED)).toBe(false);
     });
 
     it('correctly classifies NETATMO_NOT_CONNECTED as non-transient', () => {

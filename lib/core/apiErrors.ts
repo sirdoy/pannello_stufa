@@ -74,10 +74,8 @@ export const ERROR_CODES = {
   NETATMO_RECONNECT_REQUIRED: 'NETATMO_RECONNECT_REQUIRED',
 
   // Hue-specific
-  HUE_NOT_CONNECTED: 'HUE_NOT_CONNECTED',
   HUE_BRIDGE_NOT_FOUND: 'HUE_BRIDGE_NOT_FOUND',
   HUE_LINK_BUTTON_NOT_PRESSED: 'HUE_LINK_BUTTON_NOT_PRESSED',
-  HUE_NOT_ON_LOCAL_NETWORK: 'HUE_NOT_ON_LOCAL_NETWORK',
   HUE_ERROR: 'HUE_ERROR',
 
   // Fritz!Box-specific
@@ -141,10 +139,8 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   [ERROR_CODES.NETATMO_RECONNECT_REQUIRED]: 'Riconnessione Netatmo richiesta',
 
   // Hue
-  [ERROR_CODES.HUE_NOT_CONNECTED]: 'Philips Hue non connesso',
   [ERROR_CODES.HUE_BRIDGE_NOT_FOUND]: 'Bridge Hue non trovato',
   [ERROR_CODES.HUE_LINK_BUTTON_NOT_PRESSED]: 'Premi il pulsante sul bridge Hue',
-  [ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK]: 'Non sei sulla rete locale del bridge Hue',
   [ERROR_CODES.HUE_ERROR]: 'Errore Philips Hue',
 
   // Fritz!Box
@@ -293,23 +289,6 @@ export class ApiError extends Error {
     );
   }
 
-  static hueNotConnected(): ApiError {
-    return new ApiError(
-      ERROR_CODES.HUE_NOT_CONNECTED,
-      'Hue non connesso. Connetti localmente o abilita accesso remoto.',
-      HTTP_STATUS.UNAUTHORIZED,
-      { reconnect: true }
-    );
-  }
-
-  static hueNotOnLocalNetwork(): ApiError {
-    return new ApiError(
-      ERROR_CODES.HUE_NOT_ON_LOCAL_NETWORK,
-      'Bridge Hue non raggiungibile. Assicurati di essere sulla stessa rete locale.',
-      HTTP_STATUS.SERVICE_UNAVAILABLE
-    );
-  }
-
   static fritzboxNotConfigured(): ApiError {
     return new ApiError(
       ERROR_CODES.FRITZBOX_NOT_CONFIGURED,
@@ -353,12 +332,6 @@ export function mapLegacyError(error: Error): ApiError {
   }
 
   // Hue errors
-  if (message.includes('HUE_NOT_CONNECTED')) {
-    return ApiError.hueNotConnected();
-  }
-  if (message === 'NETWORK_TIMEOUT') {
-    return ApiError.hueNotOnLocalNetwork();
-  }
   if (message === 'LINK_BUTTON_NOT_PRESSED') {
     return new ApiError(
       ERROR_CODES.HUE_LINK_BUTTON_NOT_PRESSED,

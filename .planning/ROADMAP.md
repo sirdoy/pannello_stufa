@@ -20,7 +20,7 @@
 - ✅ **v11.1 Test Suite & Tech Debt Cleanup** — Phases 92-95 (shipped 2026-03-18)
 - ✅ **v12.0 Data Fetching Simplification & E2E Verification** — Phases 96-98 (shipped 2026-03-19)
 - ✅ **v13.0 Thermorossi Proxy Migration** — Phases 99-105 (shipped 2026-03-20)
-- 🚧 **v14.0 Hue Proxy Migration** — Phases 106-110 (in progress)
+- 🚧 **v14.0 Hue Proxy Migration** — Phases 106-112 (in progress)
 
 ## Phases
 
@@ -73,6 +73,14 @@ See `.planning/milestones/` for full archives.
 
 - [x] **Phase 109: Cleanup** — Old Hue infrastructure deleted (CLIP v2, remote API, connection strategy, OAuth, bridge discovery/pairing, env vars) (completed 2026-03-21)
 - [x] **Phase 110: Fix Full Pages for Proxy** — Gap closure: fix /lights and /lights/scenes full pages for proxy format + colorUtils tests (completed 2026-03-21)
+
+#### Phase 111: Type Completeness & Checkbox Sync
+
+- [x] **Phase 111: Type Completeness & Checkbox Sync** — xy field added to HueLightStateRequest, requirement checkboxes synced (completed 2026-03-21)
+
+#### Phase 112: Debug Panel Hue Fixes
+
+- [ ] **Phase 112: Debug Panel Hue Fixes** — Fix stale scene activation URL, wrong HTTP method for light/room control in debug HueTab
 
 ## Phase Details
 
@@ -173,6 +181,19 @@ Plans:
 Plans:
 - [x] 111-01-PLAN.md — Add xy field to HueLightStateRequest + verify requirements state
 
+### Phase 112: Debug Panel Hue Fixes
+**Goal**: Debug panel HueTab correctly calls proxy endpoints — scene activation uses new group/scene path, light/room control uses PUT method, display labels updated
+**Depends on**: Phase 111
+**Requirements**: CMD-01, CMD-02, CMD-03
+**Gap Closure:** Closes INT-DEBUG-SCENE, INT-DEBUG-METHOD from v14.0 audit
+**Success Criteria** (what must be TRUE):
+  1. Scene activation calls POST `/api/hue/groups/${groupId}/scenes/${sceneId}` (not deleted `/api/hue/scenes/${sceneId}/activate`)
+  2. Light control calls use PUT method (not POST) matching route handler
+  3. Room control calls use PUT method (not POST) matching route handler
+  4. Scene activation form accepts both groupId and sceneId inputs
+  5. Display URL labels reflect actual endpoint paths
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -200,10 +221,11 @@ Plans:
 | 108 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
 | 109 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
 | 110 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
-| 111 | v14.0 | 1/1 | Complete    | 2026-03-21 |
+| 111 | v14.0 | 1/1 | ✓ Complete | 2026-03-21 |
+| 112 | v14.0 | 0/0 | Planned     | — |
 
-**Total:** 18 milestones shipped, 109 phases complete, 391 plans executed. v14.0 in progress (6 phases, 3 gap closure).
+**Total:** 18 milestones shipped, 111 phases complete, 391 plans executed. v14.0 in progress (7 phases, 4 gap closure).
 
 ---
 
-*Roadmap updated: 2026-03-21 — Phase 111 plans created (1 plan, 1 wave)*
+*Roadmap updated: 2026-03-21 — Phase 112 added (debug panel gap closure)*

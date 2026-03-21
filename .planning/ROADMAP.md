@@ -164,7 +164,7 @@ Plans:
 | 106 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 107 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 108 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
-| 109 | 2/2 | Complete   | 2026-03-21 | - |
+| 109 | 2/2 | Complete    | 2026-03-21 | - |
 
 **Total:** 18 milestones shipped, 108 phases complete, 390 plans executed. v14.0 in progress (4 phases planned).
 

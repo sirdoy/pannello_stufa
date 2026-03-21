@@ -195,6 +195,7 @@ export interface HueLightStateRequest {
   ct?: number;                        // 153-500 mirek
   hue?: number;                       // 0-65535
   sat?: number;                       // 0-254
+  xy?: [number, number];              // CIE xy chromaticity, each value in [0, 1]
   effect?: 'none' | 'colorloop';
   alert?: 'none' | 'select' | 'lselect';
 }

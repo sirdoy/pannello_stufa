@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
-status: unknown
-stopped_at: Phase 109 context gathered
-last_updated: "2026-03-21T08:40:12.296Z"
+status: executing
+stopped_at: "Completed 109-01-PLAN.md"
+last_updated: "2026-03-21T09:09:10Z"
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-21)
 
 ## Current Position
 
-Phase: 109 (cleanup) — Ready to plan
-Plan: Not started
+Phase: 109 (cleanup) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -71,6 +71,9 @@ See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
 - [108-02]: LightsBanners reduced to 3 banners (retry error, staleness, connection error) — all pairing banners deleted
 - [108-02]: LightsCard no longer passes onConnect/connectButtonLabel — no pairing flow in proxy model
 - [108-02]: statusBadge simplified to stale check, replaces connectionMode badge map
+- [109-01]: HUE_NOT_CONNECTED and HUE_NOT_ON_LOCAL_NETWORK removed from ERROR_CODES and ErrorCode type — proxy model never throws these
+- [109-01]: remoteApiAvailable replaced with false constant in lights/page.tsx (env var ref removed, dead branch retained)
+- [109-01]: types/api/errors.ts updated alongside apiErrors.ts to keep ErrorCode union consistent with object keys
 
 ### Pending Todos
 
@@ -82,6 +85,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-21T08:40:12.290Z
-Stopped at: Phase 109 context gathered
-Resume file: .planning/phases/109-cleanup/109-CONTEXT.md
+Last session: 2026-03-21T09:09:10Z
+Stopped at: Completed 109-01-PLAN.md
+Resume file: .planning/phases/109-cleanup/109-02-PLAN.md

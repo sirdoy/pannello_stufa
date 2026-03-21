@@ -41,13 +41,13 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 
 ### Cleanup
 
-- [ ] **CLEAN-01**: CLIP v2 local API client deleted (hueApi.ts)
-- [ ] **CLEAN-02**: v1 remote/cloud API client deleted (hueRemoteApi.ts)
-- [ ] **CLEAN-03**: Connection strategy deleted (hueConnectionStrategy.ts)
-- [ ] **CLEAN-04**: Bridge discovery and pairing routes deleted
-- [ ] **CLEAN-05**: OAuth token management deleted (hueRemoteTokenHelper.ts)
-- [ ] **CLEAN-06**: Firebase bridge credentials persistence deleted (hueLocalHelper.ts)
-- [ ] **CLEAN-07**: Hue-specific env vars removed (HUE_CLIENT_SECRET, NEXT_PUBLIC_HUE_CLIENT_ID, NEXT_PUBLIC_HUE_APP_ID)
+- [x] **CLEAN-01**: CLIP v2 local API client deleted (hueApi.ts)
+- [x] **CLEAN-02**: v1 remote/cloud API client deleted (hueRemoteApi.ts)
+- [x] **CLEAN-03**: Connection strategy deleted (hueConnectionStrategy.ts)
+- [x] **CLEAN-04**: Bridge discovery and pairing routes deleted
+- [x] **CLEAN-05**: OAuth token management deleted (hueRemoteTokenHelper.ts)
+- [x] **CLEAN-06**: Firebase bridge credentials persistence deleted (hueLocalHelper.ts)
+- [x] **CLEAN-07**: Hue-specific env vars removed (HUE_CLIENT_SECRET, NEXT_PUBLIC_HUE_CLIENT_ID, NEXT_PUBLIC_HUE_APP_ID)
 
 ## Future Requirements
 
@@ -93,13 +93,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-04 | Phase 108 | Complete |
 | UI-05 | Phase 108 | Complete |
 | UI-06 | Phase 108 | Complete |
-| CLEAN-01 | Phase 109 | Pending |
-| CLEAN-02 | Phase 109 | Pending |
-| CLEAN-03 | Phase 109 | Pending |
-| CLEAN-04 | Phase 109 | Pending |
-| CLEAN-05 | Phase 109 | Pending |
-| CLEAN-06 | Phase 109 | Pending |
-| CLEAN-07 | Phase 109 | Pending |
+| CLEAN-01 | Phase 109 | Complete |
+| CLEAN-02 | Phase 109 | Complete |
+| CLEAN-03 | Phase 109 | Complete |
+| CLEAN-04 | Phase 109 | Complete |
+| CLEAN-05 | Phase 109 | Complete |
+| CLEAN-06 | Phase 109 | Complete |
+| CLEAN-07 | Phase 109 | Complete |
 
 **Coverage:**
 - v14.0 requirements: 27 total

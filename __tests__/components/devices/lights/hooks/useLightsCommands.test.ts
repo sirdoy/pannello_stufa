@@ -1,6 +1,9 @@
 /**
  * Tests for useLightsCommands hook
  *
+ * Tests v1 body format (flat keys), 202 Accepted + suggested_poll_delay_s pattern,
+ * scene activation via POST /groups/{gid}/scenes/{sid}, and absence of pairing handlers.
+ *
  * @jest-environment jsdom
  */
 
@@ -8,6 +11,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import type { UseLightsDataReturn } from '@/app/components/devices/lights/hooks/useLightsData';
+import type { HueGroup, HueCommandResponse } from '@/types/hueProxy';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useRetryableCommand');
@@ -22,21 +26,48 @@ describe('useLightsCommands', () => {
     prefetch: jest.fn(),
   } as any;
 
+  const mockGroups: HueGroup[] = [
+    {
+      group_id: '1',
+      name: 'Soggiorno',
+      type: 'Room',
+      group_class: 'Living room',
+      lights: ['light1'],
+      any_on: true,
+      all_on: true,
+      brightness: 200,
+      color_temp: 300,
+      colormode: 'ct',
+    },
+    {
+      group_id: '2',
+      name: 'Camera',
+      type: 'Room',
+      group_class: 'Bedroom',
+      lights: ['light2'],
+      any_on: false,
+      all_on: false,
+      brightness: 0,
+      color_temp: null,
+      colormode: null,
+    },
+  ];
+
+  const mockCommandResponse: HueCommandResponse = {
+    command: 'set_group_action',
+    status: 'accepted',
+    group_id: '1',
+    suggested_poll_delay_s: 2,
+    poll_endpoint: '/api/hue/rooms/1',
+  };
+
   const mockLightsData: Pick<
     UseLightsDataReturn,
     | 'setRefreshing'
     | 'setLoadingMessage'
     | 'setError'
     | 'fetchData'
-    | 'rooms'
-    | 'setPairing'
-    | 'setPairingStep'
-    | 'setDiscoveredBridges'
-    | 'setSelectedBridge'
-    | 'setPairingCountdown'
-    | 'setPairingError'
-    | 'pairingTimerRef'
-    | 'selectedBridge'
+    | 'groups'
     | 'checkConnection'
     | 'connected'
   > = {
@@ -44,24 +75,7 @@ describe('useLightsCommands', () => {
     setLoadingMessage: jest.fn(),
     setError: jest.fn(),
     fetchData: jest.fn(),
-    rooms: [
-      {
-        id: 'room1',
-        services: [{ rid: 'grouped_light_1', rtype: 'grouped_light' }]
-      },
-      {
-        id: 'room2',
-        services: [{ rid: 'grouped_light_2', rtype: 'grouped_light' }]
-      }
-    ],
-    setPairing: jest.fn(),
-    setPairingStep: jest.fn(),
-    setDiscoveredBridges: jest.fn(),
-    setSelectedBridge: jest.fn(),
-    setPairingCountdown: jest.fn(),
-    setPairingError: jest.fn(),
-    pairingTimerRef: { current: null },
-    selectedBridge: null,
+    groups: mockGroups,
     checkConnection: jest.fn(),
     connected: true,
   };
@@ -90,16 +104,18 @@ describe('useLightsCommands', () => {
       json: jest.fn().mockResolvedValue({}),
     });
 
-    // Mock window.location
-    delete (window as any).location;
-    (window as any).location = { href: '' };
+    // Mock setTimeout to resolve immediately so tests don't need to wait actual delays
+    jest.spyOn(global, 'setTimeout').mockImplementation((fn: (...args: unknown[]) => void) => {
+      fn();
+      return 0 as unknown as NodeJS.Timeout;
+    });
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
   });
 
-  it('returns all command handlers', () => {
+  it('returns room command handlers and retry objects', () => {
     const { result } = renderHook(() =>
       useLightsCommands({
         lightsData: mockLightsData,
@@ -111,17 +127,11 @@ describe('useLightsCommands', () => {
     expect(typeof result.current.handleBrightnessChange).toBe('function');
     expect(typeof result.current.handleSceneActivate).toBe('function');
     expect(typeof result.current.handleAllLightsToggle).toBe('function');
-    expect(typeof result.current.handleRemoteAuth).toBe('function');
-    expect(typeof result.current.handleDisconnectRemote).toBe('function');
-    expect(typeof result.current.handleStartPairing).toBe('function');
-    expect(typeof result.current.handlePairWithBridge).toBe('function');
-    expect(typeof result.current.handleConfirmButtonPressed).toBe('function');
-    expect(typeof result.current.handleSelectBridge).toBe('function');
-    expect(typeof result.current.handleRetryPairing).toBe('function');
-    expect(typeof result.current.handleCancelPairing).toBe('function');
+    expect(result.current.hueRoomCmd).toBeDefined();
+    expect(result.current.hueSceneCmd).toBeDefined();
   });
 
-  it('returns retryable command objects', () => {
+  it('does NOT have pairing handlers in return object', () => {
     const { result } = renderHook(() =>
       useLightsCommands({
         lightsData: mockLightsData,
@@ -129,14 +139,20 @@ describe('useLightsCommands', () => {
       })
     );
 
-    expect(result.current.hueRoomCmd).toBeDefined();
-    expect(result.current.hueSceneCmd).toBeDefined();
+    expect((result.current as any).handleRemoteAuth).toBeUndefined();
+    expect((result.current as any).handleStartPairing).toBeUndefined();
+    expect((result.current as any).handlePairWithBridge).toBeUndefined();
+    expect((result.current as any).handleCancelPairing).toBeUndefined();
+    expect((result.current as any).handleConfirmButtonPressed).toBeUndefined();
+    expect((result.current as any).handleSelectBridge).toBeUndefined();
+    expect((result.current as any).handleRetryPairing).toBeUndefined();
+    expect((result.current as any).handleDisconnectRemote).toBeUndefined();
   });
 
-  it('handleRoomToggle calls execute with correct URL and body', async () => {
+  it('handleRoomToggle sends v1 flat body { on: true } (not { on: { on: true } })', async () => {
     mockExecute.mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue({}),
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
     });
 
     const { result } = renderHook(() =>
@@ -147,24 +163,25 @@ describe('useLightsCommands', () => {
     );
 
     await act(async () => {
-      await result.current.handleRoomToggle('grouped_light_1', true);
+      await result.current.handleRoomToggle('1', true);
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/rooms/grouped_light_1',
+      '/api/hue/rooms/1',
       expect.objectContaining({
         method: 'PUT',
-        body: JSON.stringify({ on: { on: true } }),
+        body: JSON.stringify({ on: true }),  // v1 flat key, NOT { on: { on: true } }
       })
     );
     expect(mockLightsData.fetchData).toHaveBeenCalled();
     expect(mockLightsData.setRefreshing).toHaveBeenCalledWith(false);
   });
 
-  it('handleBrightnessChange calls execute with dimming body', async () => {
+  it('handleRoomToggle calls setTimeout with suggested_poll_delay_s milliseconds', async () => {
+    const responseWithDelay: HueCommandResponse = { ...mockCommandResponse, suggested_poll_delay_s: 3 };
     mockExecute.mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue({}),
+      json: jest.fn().mockResolvedValue(responseWithDelay),
     });
 
     const { result } = renderHook(() =>
@@ -175,23 +192,18 @@ describe('useLightsCommands', () => {
     );
 
     await act(async () => {
-      await result.current.handleBrightnessChange('grouped_light_1', '75');
+      await result.current.handleRoomToggle('1', true);
     });
 
-    expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/rooms/grouped_light_1',
-      expect.objectContaining({
-        method: 'PUT',
-        body: JSON.stringify({ dimming: { brightness: 75 } }),
-      })
-    );
+    // setTimeout should have been called with 3000ms (3s * 1000)
+    expect(global.setTimeout).toHaveBeenCalledWith(expect.any(Function), 3000);
     expect(mockLightsData.fetchData).toHaveBeenCalled();
   });
 
-  it('handleSceneActivate calls execute with activate URL', async () => {
+  it('handleBrightnessChange sends bri=191 for brightness "75" (Math.round(75*254/100))', async () => {
     mockExecute.mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue({}),
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
     });
 
     const { result } = renderHook(() =>
@@ -202,22 +214,57 @@ describe('useLightsCommands', () => {
     );
 
     await act(async () => {
-      await result.current.handleSceneActivate('scene123');
+      await result.current.handleBrightnessChange('1', '75');
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/scenes/scene123/activate',
+      '/api/hue/rooms/1',
       expect.objectContaining({
         method: 'PUT',
+        body: JSON.stringify({ bri: 191 }),  // Math.round(75 * 254 / 100) = 191; v1 flat, NOT { dimming: { brightness: 75 } }
       })
     );
     expect(mockLightsData.fetchData).toHaveBeenCalled();
   });
 
-  it('handleAllLightsToggle calls execute for all rooms', async () => {
+  it('handleSceneActivate calls POST to /api/hue/groups/{groupId}/scenes/{sceneId}', async () => {
+    const sceneResponse: HueCommandResponse = {
+      command: 'activate_scene',
+      status: 'accepted',
+      scene_id: 'scene1',
+      group_id: '1',
+      suggested_poll_delay_s: 2,
+      poll_endpoint: '/api/hue/rooms/1',
+    };
     mockExecute.mockResolvedValue({
       ok: true,
-      json: jest.fn().mockResolvedValue({}),
+      json: jest.fn().mockResolvedValue(sceneResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useLightsCommands({
+        lightsData: mockLightsData,
+        router: mockRouter,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleSceneActivate('scene1', '1');
+    });
+
+    expect(mockExecute).toHaveBeenCalledWith(
+      '/api/hue/groups/1/scenes/scene1',  // POST /groups/{gid}/scenes/{sid}
+      expect.objectContaining({
+        method: 'POST',  // not PUT
+      })
+    );
+    expect(mockLightsData.fetchData).toHaveBeenCalled();
+  });
+
+  it('handleAllLightsToggle iterates groups by group_id (not grouped_light service)', async () => {
+    mockExecute.mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
     });
 
     const { result } = renderHook(() =>
@@ -231,262 +278,28 @@ describe('useLightsCommands', () => {
       await result.current.handleAllLightsToggle(true);
     });
 
-    // Should be called twice (once for each room)
+    // Should be called twice — once for each group (group_id '1' and '2')
     expect(mockExecute).toHaveBeenCalledTimes(2);
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/rooms/grouped_light_1',
+      '/api/hue/rooms/1',
       expect.objectContaining({
-        body: JSON.stringify({ on: { on: true } }),
+        body: JSON.stringify({ on: true }),
       })
     );
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/rooms/grouped_light_2',
+      '/api/hue/rooms/2',
       expect.objectContaining({
-        body: JSON.stringify({ on: { on: true } }),
+        body: JSON.stringify({ on: true }),
       })
     );
     expect(mockLightsData.fetchData).toHaveBeenCalled();
   });
 
-  it('handleRemoteAuth clears errors and triggers redirect', () => {
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: mockLightsData,
-        router: mockRouter,
-      })
-    );
-
-    act(() => {
-      result.current.handleRemoteAuth();
-    });
-
-    // Check that error states were cleared (main functionality)
-    expect(mockLightsData.setPairingError).toHaveBeenCalledWith(null);
-    expect(mockLightsData.setError).toHaveBeenCalledWith(null);
-    // window.location.href assignment happens, but jsdom doesn't navigate
-  });
-
-  it('handleDisconnectRemote calls disconnect endpoint', async () => {
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: mockLightsData,
-        router: mockRouter,
-      })
-    );
-
-    await act(async () => {
-      await result.current.handleDisconnectRemote();
-    });
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/hue/remote/disconnect',
-      expect.objectContaining({
-        method: 'POST',
-      })
-    );
-    expect(mockLightsData.checkConnection).toHaveBeenCalled();
-  });
-
-  it('handleStartPairing fetches bridges and sets step', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({
-        bridges: [{ id: 'bridge1', internalipaddress: '192.168.1.2' }]
-      }),
-    });
-
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: mockLightsData,
-        router: mockRouter,
-      })
-    );
-
-    await act(async () => {
-      await result.current.handleStartPairing();
-    });
-
-    expect(global.fetch).toHaveBeenCalledWith('/api/hue/discover');
-    expect(mockLightsData.setPairing).toHaveBeenCalledWith(true);
-    expect(mockLightsData.setPairingStep).toHaveBeenCalledWith('discovering');
-    expect(mockLightsData.setDiscoveredBridges).toHaveBeenCalledWith([
-      { id: 'bridge1', internalipaddress: '192.168.1.2' }
-    ]);
-    expect(mockLightsData.setSelectedBridge).toHaveBeenCalled();
-    expect(mockLightsData.setPairingStep).toHaveBeenCalledWith('waitingForButtonPress');
-  });
-
-  it('handleStartPairing sets noLocalBridge step when no bridges found', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({
-        bridges: []
-      }),
-    });
-
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: mockLightsData,
-        router: mockRouter,
-      })
-    );
-
-    await act(async () => {
-      await result.current.handleStartPairing();
-    });
-
-    expect(mockLightsData.setPairingStep).toHaveBeenCalledWith('noLocalBridge');
-  });
-
-  it('handlePairWithBridge attempts pairing with bridge', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ success: true }),
-    });
-
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: mockLightsData,
-        router: mockRouter,
-      })
-    );
-
-    const bridge = { id: 'bridge1', internalipaddress: '192.168.1.2' };
-
-    await act(async () => {
-      await result.current.handlePairWithBridge(bridge);
-    });
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/hue/pair',
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({
-          bridgeIp: '192.168.1.2',
-          bridgeId: 'bridge1',
-        }),
-      })
-    );
-    expect(mockLightsData.setPairingStep).toHaveBeenCalledWith('success');
-  });
-
-  it('handlePairWithBridge handles LINK_BUTTON_NOT_PRESSED error', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ error: 'LINK_BUTTON_NOT_PRESSED' }),
-    });
-
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: mockLightsData,
-        router: mockRouter,
-      })
-    );
-
-    const bridge = { id: 'bridge1', internalipaddress: '192.168.1.2' };
-
-    await act(async () => {
-      await result.current.handlePairWithBridge(bridge);
-    });
-
-    expect(mockLightsData.setPairingError).toHaveBeenCalledWith(
-      expect.stringContaining('Pulsante bridge non premuto')
-    );
-  });
-
-  it('handleConfirmButtonPressed calls handlePairWithBridge', async () => {
-    const bridge = { id: 'bridge1', internalipaddress: '192.168.1.2' };
-    const lightsDataWithBridge = { ...mockLightsData, selectedBridge: bridge };
-
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ success: true }),
-    });
-
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: lightsDataWithBridge,
-        router: mockRouter,
-      })
-    );
-
-    await act(async () => {
-      result.current.handleConfirmButtonPressed();
-    });
-
-    // Wait for async operations
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
-    });
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/hue/pair',
-      expect.objectContaining({
-        method: 'POST',
-      })
-    );
-  });
-
-  it('handleSelectBridge sets bridge and step', () => {
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: mockLightsData,
-        router: mockRouter,
-      })
-    );
-
-    const bridge = { id: 'bridge1', internalipaddress: '192.168.1.2' };
-
-    act(() => {
-      result.current.handleSelectBridge(bridge);
-    });
-
-    expect(mockLightsData.setSelectedBridge).toHaveBeenCalledWith(bridge);
-    expect(mockLightsData.setPairingStep).toHaveBeenCalledWith('waitingForButtonPress');
-  });
-
-  it('handleRetryPairing resets pairing error when bridge selected', () => {
-    const bridge = { id: 'bridge1', internalipaddress: '192.168.1.2' };
-    const lightsDataWithBridge = { ...mockLightsData, selectedBridge: bridge };
-
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: lightsDataWithBridge,
-        router: mockRouter,
-      })
-    );
-
-    act(() => {
-      result.current.handleRetryPairing();
-    });
-
-    expect(mockLightsData.setPairingError).toHaveBeenCalledWith(null);
-    expect(mockLightsData.setPairingStep).toHaveBeenCalledWith('waitingForButtonPress');
-  });
-
-  it('handleCancelPairing clears all pairing state', () => {
-    const { result } = renderHook(() =>
-      useLightsCommands({
-        lightsData: mockLightsData,
-        router: mockRouter,
-      })
-    );
-
-    act(() => {
-      result.current.handleCancelPairing();
-    });
-
-    expect(mockLightsData.setPairing).toHaveBeenCalledWith(false);
-    expect(mockLightsData.setPairingStep).toHaveBeenCalledWith(null);
-    expect(mockLightsData.setPairingError).toHaveBeenCalledWith(null);
-    expect(mockLightsData.setSelectedBridge).toHaveBeenCalledWith(null);
-    expect(mockLightsData.setDiscoveredBridges).toHaveBeenCalledWith([]);
-  });
-
-  it('handles errors in command execution', async () => {
+  it('handleRoomToggle sets error "Luce non raggiungibile" on 409', async () => {
     mockExecute.mockResolvedValue({
-      ok: true,
-      json: jest.fn().mockResolvedValue({ error: 'Command failed' }),
+      ok: false,
+      status: 409,
+      json: jest.fn().mockResolvedValue({}),
     });
 
     const { result } = renderHook(() =>
@@ -497,14 +310,36 @@ describe('useLightsCommands', () => {
     );
 
     await act(async () => {
-      await result.current.handleRoomToggle('grouped_light_1', true);
+      await result.current.handleRoomToggle('1', true);
     });
 
-    expect(mockLightsData.setError).toHaveBeenCalledWith('Command failed');
+    expect(mockLightsData.setError).toHaveBeenCalledWith('Luce non raggiungibile');
     expect(mockLightsData.setRefreshing).toHaveBeenCalledWith(false);
   });
 
-  it('handles null response from deduplicated request', async () => {
+  it('handleBrightnessChange sets error "Luce non raggiungibile" on 409', async () => {
+    mockExecute.mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: jest.fn().mockResolvedValue({}),
+    });
+
+    const { result } = renderHook(() =>
+      useLightsCommands({
+        lightsData: mockLightsData,
+        router: mockRouter,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleBrightnessChange('1', '50');
+    });
+
+    expect(mockLightsData.setError).toHaveBeenCalledWith('Luce non raggiungibile');
+    expect(mockLightsData.setRefreshing).toHaveBeenCalledWith(false);
+  });
+
+  it('handles null response from deduplicated request without error', async () => {
     mockExecute.mockResolvedValue(null);
 
     const { result } = renderHook(() =>
@@ -515,11 +350,36 @@ describe('useLightsCommands', () => {
     );
 
     await act(async () => {
-      await result.current.handleRoomToggle('grouped_light_1', true);
+      await result.current.handleRoomToggle('1', true);
     });
 
     // Should not throw error, should not call fetchData, but should clean up
     expect(mockLightsData.fetchData).not.toHaveBeenCalled();
+    // setError(null) is called at start to clear previous errors — should NOT be called with an error message
+    expect(mockLightsData.setError).toHaveBeenCalledWith(null);
+    expect(mockLightsData.setError).toHaveBeenCalledTimes(1); // Only the initial clear, no error set
+    expect(mockLightsData.setRefreshing).toHaveBeenCalledWith(false);
+  });
+
+  it('handleSceneActivate sets error on non-ok non-409 response', async () => {
+    mockExecute.mockResolvedValue({
+      ok: false,
+      status: 500,
+      json: jest.fn().mockResolvedValue({}),
+    });
+
+    const { result } = renderHook(() =>
+      useLightsCommands({
+        lightsData: mockLightsData,
+        router: mockRouter,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleSceneActivate('scene1', '1');
+    });
+
+    expect(mockLightsData.setError).toHaveBeenCalledWith('Comando fallito: 500');
     expect(mockLightsData.setRefreshing).toHaveBeenCalledWith(false);
   });
 });

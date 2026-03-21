@@ -10,7 +10,10 @@
  * - Idempotency key injection
  * - Persistent error toasts
  *
- * Pairing commands don't use retry (discovery/pair are one-shot operations).
+ * Uses v1 body format (flat keys) to match the HA proxy CLIP v1 API.
+ * Commands implement 202 Accepted + suggested_poll_delay_s pattern.
+ *
+ * Pairing handlers removed — proxy handles Bridge connectivity.
  */
 
 'use client';
@@ -18,6 +21,7 @@
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import type { UseLightsDataReturn } from './useLightsData';
+import type { HueCommandResponse } from '@/types/hueProxy';
 
 /**
  * Parameters required by useLightsCommands
@@ -30,15 +34,7 @@ export interface UseLightsCommandsParams {
     | 'setLoadingMessage'
     | 'setError'
     | 'fetchData'
-    | 'rooms'
-    | 'setPairing'
-    | 'setPairingStep'
-    | 'setDiscoveredBridges'
-    | 'setSelectedBridge'
-    | 'setPairingCountdown'
-    | 'setPairingError'
-    | 'pairingTimerRef'
-    | 'selectedBridge'
+    | 'groups'
     | 'checkConnection'
     | 'connected'
   >;
@@ -50,21 +46,10 @@ export interface UseLightsCommandsParams {
  * Command handlers and retryable command objects
  */
 export interface UseLightsCommandsReturn {
-  // Room commands
-  handleRoomToggle: (roomId: string | null | undefined, on: boolean) => Promise<void>;
-  handleBrightnessChange: (roomId: string | null | undefined, brightness: string) => Promise<void>;
-  handleSceneActivate: (sceneId: string) => Promise<void>;
+  handleRoomToggle: (groupId: string | null | undefined, on: boolean) => Promise<void>;
+  handleBrightnessChange: (groupId: string | null | undefined, brightness: string) => Promise<void>;
+  handleSceneActivate: (sceneId: string, groupId: string) => Promise<void>;
   handleAllLightsToggle: (on: boolean) => Promise<void>;
-
-  // Remote/Pairing commands
-  handleRemoteAuth: () => void;
-  handleDisconnectRemote: () => Promise<void>;
-  handleStartPairing: () => Promise<void>;
-  handlePairWithBridge: (bridge: any) => Promise<void>;
-  handleConfirmButtonPressed: () => void;
-  handleSelectBridge: (bridge: any) => void;
-  handleRetryPairing: () => void;
-  handleCancelPairing: () => void;
 
   // Retry command objects (for error banners)
   hueRoomCmd: ReturnType<typeof useRetryableCommand>;
@@ -76,87 +61,40 @@ export interface UseLightsCommandsReturn {
  *
  * Integrates with useRetryableCommand for room/scene commands.
  * Handlers update UI state for immediate feedback.
+ * All commands follow 202 Accepted + suggested_poll_delay_s pattern.
  *
  * @param params - Configuration parameters
  * @returns Command handlers and retryable command objects
  */
 export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCommandsReturn {
-  const { lightsData, router } = params;
+  const { lightsData } = params;
 
   // Retry infrastructure - one hook per command type (React hooks rules)
   const hueRoomCmd = useRetryableCommand({ device: 'hue', action: 'room' });
   const hueSceneCmd = useRetryableCommand({ device: 'hue', action: 'scene' });
 
-  // Room toggle command
-  const handleRoomToggle = async (roomId: string | null | undefined, on: boolean) => {
+  /**
+   * Toggle a room/group on or off
+   * Sends v1 flat body: { on: true } (NOT { on: { on: true } })
+   */
+  const handleRoomToggle = async (groupId: string | null | undefined, on: boolean) => {
     try {
       lightsData.setLoadingMessage(on ? 'Accensione luci...' : 'Spegnimento luci...');
       lightsData.setRefreshing(true);
       lightsData.setError(null);
-
-      const response = await hueRoomCmd.execute(`/api/hue/rooms/${roomId}`, {
+      const response = await hueRoomCmd.execute(`/api/hue/rooms/${groupId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ on: { on } }),
+        body: JSON.stringify({ on }),  // v1 flat: { on: true }, NOT { on: { on: true } }
       });
-
       if (response) {
-        const data = await response.json() as { error?: string };
-        if (data.error) throw new Error(data.error);
-        await lightsData.fetchData();
-      }
-      // If response is null, request was deduplicated (silently blocked)
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      lightsData.setError(message);
-    } finally {
-      lightsData.setRefreshing(false);
-    }
-  };
-
-  // Brightness change command
-  const handleBrightnessChange = async (roomId: string | null | undefined, brightness: string) => {
-    try {
-      lightsData.setLoadingMessage('Modifica luminosità...');
-      lightsData.setRefreshing(true);
-      lightsData.setError(null);
-
-      const response = await hueRoomCmd.execute(`/api/hue/rooms/${roomId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          dimming: { brightness: parseFloat(brightness) }
-        }),
-      });
-
-      if (response) {
-        const data = await response.json() as { error?: string };
-        if (data.error) throw new Error(data.error);
-        await lightsData.fetchData();
-      }
-      // If response is null, request was deduplicated (silently blocked)
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      lightsData.setError(message);
-    } finally {
-      lightsData.setRefreshing(false);
-    }
-  };
-
-  // Scene activation command
-  const handleSceneActivate = async (sceneId: string) => {
-    try {
-      lightsData.setLoadingMessage('Attivazione scena...');
-      lightsData.setRefreshing(true);
-      lightsData.setError(null);
-
-      const response = await hueSceneCmd.execute(`/api/hue/scenes/${sceneId}/activate`, {
-        method: 'PUT',
-      });
-
-      if (response) {
-        const data = await response.json() as { error?: string };
-        if (data.error) throw new Error(data.error);
+        if (!response.ok) {
+          if (response.status === 409) throw new Error('Luce non raggiungibile');
+          throw new Error(`Comando fallito: ${response.status}`);
+        }
+        const data = await response.json() as HueCommandResponse;
+        const delayMs = (data.suggested_poll_delay_s ?? 2) * 1000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await lightsData.fetchData();
       }
       // If response is null, request was deduplicated (silently blocked)
@@ -169,31 +107,93 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
   };
 
   /**
-   * Toggle all lights in the house (all rooms at once)
+   * Change brightness of a room/group
+   * Converts percent (0-100) to bri (0-254)
+   * Sends v1 flat body: { bri: 200 } (NOT { dimming: { brightness: 78 } })
+   */
+  const handleBrightnessChange = async (groupId: string | null | undefined, brightness: string) => {
+    try {
+      lightsData.setLoadingMessage('Modifica luminosita...');
+      lightsData.setRefreshing(true);
+      lightsData.setError(null);
+      // Convert percent (0-100) to bri (0-254)
+      const bri254 = Math.round(parseFloat(brightness) * 254 / 100);
+      const response = await hueRoomCmd.execute(`/api/hue/rooms/${groupId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bri: bri254 }),  // v1 flat: { bri: 200 }, NOT { dimming: { brightness: 78 } }
+      });
+      if (response) {
+        if (!response.ok) {
+          if (response.status === 409) throw new Error('Luce non raggiungibile');
+          throw new Error(`Comando fallito: ${response.status}`);
+        }
+        const data = await response.json() as HueCommandResponse;
+        const delayMs = (data.suggested_poll_delay_s ?? 2) * 1000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+        await lightsData.fetchData();
+      }
+      // If response is null, request was deduplicated (silently blocked)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      lightsData.setError(message);
+    } finally {
+      lightsData.setRefreshing(false);
+    }
+  };
+
+  /**
+   * Activate a scene
+   * POST /api/hue/groups/{groupId}/scenes/{sceneId} — new path from Phase 107
+   */
+  const handleSceneActivate = async (sceneId: string, groupId: string) => {
+    try {
+      lightsData.setLoadingMessage('Attivazione scena...');
+      lightsData.setRefreshing(true);
+      lightsData.setError(null);
+      // POST /api/hue/groups/{groupId}/scenes/{sceneId} — new path from Phase 107
+      const response = await hueSceneCmd.execute(`/api/hue/groups/${groupId}/scenes/${sceneId}`, {
+        method: 'POST',
+      });
+      if (response) {
+        if (!response.ok) {
+          throw new Error(`Comando fallito: ${response.status}`);
+        }
+        const data = await response.json() as HueCommandResponse;
+        const delayMs = (data.suggested_poll_delay_s ?? 2) * 1000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+        await lightsData.fetchData();
+      }
+      // If response is null, request was deduplicated (silently blocked)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      lightsData.setError(message);
+    } finally {
+      lightsData.setRefreshing(false);
+    }
+  };
+
+  /**
+   * Toggle all lights in the house (all groups at once)
+   * Iterates groups by group_id (NOT grouped_light service lookup)
    */
   const handleAllLightsToggle = async (on: boolean) => {
     try {
       lightsData.setLoadingMessage(on ? 'Accensione tutte le luci...' : 'Spegnimento tutte le luci...');
       lightsData.setRefreshing(true);
       lightsData.setError(null);
-
-      // Get all grouped_light IDs from all rooms
-      const groupedLightIds = lightsData.rooms
-        .map((room: any) => room.services?.find((s: any) => s.rtype === 'grouped_light')?.rid)
-        .filter(Boolean);
-
-      // Toggle all rooms in parallel using retry infrastructure
+      // Iterate groups by group_id (NOT grouped_light service lookup)
       await Promise.all(
-        groupedLightIds.map((groupId: string) =>
-          hueRoomCmd.execute(`/api/hue/rooms/${groupId}`, {
+        lightsData.groups.map((group) =>
+          hueRoomCmd.execute(`/api/hue/rooms/${group.group_id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ on: { on } }),
+            body: JSON.stringify({ on }),  // v1 flat
           })
         )
       );
-
-      // Refresh data after all commands
+      // Wait before refresh (use default 2s for multi-group)
+      await new Promise<void>(resolve => setTimeout(resolve, 2000));
       await lightsData.fetchData();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
@@ -203,226 +203,12 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
     }
   };
 
-  /**
-   * Remote API OAuth Flow
-   * Redirects to /api/hue/remote/authorize which handles OAuth
-   */
-  const handleRemoteAuth = () => {
-    lightsData.setPairingError(null);
-    lightsData.setError(null);
-    // Redirect to our authorize endpoint (it will handle OAuth redirect to Philips)
-    window.location.href = '/api/hue/remote/authorize';
-  };
-
-  /**
-   * Disconnect remote access
-   */
-  const handleDisconnectRemote = async () => {
-    try {
-      lightsData.setRefreshing(true);
-      lightsData.setError(null);
-
-      const response = await fetch('/api/hue/remote/disconnect', {
-        method: 'POST',
-      });
-
-      const data = await response.json() as { error?: string };
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      // Refresh connection status
-      await lightsData.checkConnection();
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('Disconnect error:', err);
-      lightsData.setError(message);
-    } finally {
-      lightsData.setRefreshing(false);
-    }
-  };
-
-  /**
-   * Local API Pairing Flow
-   * Step 1: Discover bridges
-   */
-  const handleStartPairing = async () => {
-    try {
-      lightsData.setPairing(true);
-      lightsData.setPairingStep('discovering');
-      lightsData.setPairingError(null);
-      lightsData.setError(null);
-
-      const response = await fetch('/api/hue/discover');
-
-      // Check for HTTP errors before parsing JSON
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = `Errore HTTP ${response.status}`;
-        try {
-          const errorData = JSON.parse(errorText) as { error?: string };
-          errorMessage = errorData.error || errorMessage;
-        } catch {
-          // Could not parse JSON, use status-based message
-          if (response.status === 401) {
-            errorMessage = 'Sessione scaduta. Ricarica la pagina.';
-          }
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json() as { bridges?: any[]; error?: string };
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (!data.bridges || data.bridges.length === 0) {
-        // No local bridges found - offer remote option
-        lightsData.setPairingStep('noLocalBridge');
-        return;
-      }
-
-      lightsData.setDiscoveredBridges(data.bridges);
-
-      // Auto-select if only one bridge, show instructions
-      if (data.bridges.length === 1) {
-        lightsData.setSelectedBridge(data.bridges[0]);
-        lightsData.setPairingStep('waitingForButtonPress');
-      } else {
-        lightsData.setPairingStep('selectBridge');
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('Discovery error:', err);
-      lightsData.setPairingError(message || 'Errore durante la ricerca del bridge');
-      lightsData.setPairing(false);
-    }
-  };
-
-  /**
-   * Step 2: Pair with selected bridge (requires button press)
-   */
-  const handlePairWithBridge = async (bridge: any) => {
-    try {
-      lightsData.setPairingStep('pairing');
-      lightsData.setPairingError(null);
-      lightsData.setPairingCountdown(30);
-
-      // Start countdown timer
-      lightsData.pairingTimerRef.current = setInterval(() => {
-        lightsData.setPairingCountdown((prev: number) => {
-          if (prev <= 1) {
-            if (lightsData.pairingTimerRef.current) clearInterval(lightsData.pairingTimerRef.current);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      // Attempt pairing
-      const response = await fetch('/api/hue/pair', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bridgeIp: bridge.internalipaddress,
-          bridgeId: bridge.id,
-        }),
-      });
-
-      const data = await response.json() as { error?: string; success?: boolean };
-
-      if (lightsData.pairingTimerRef.current) {
-        clearInterval(lightsData.pairingTimerRef.current);
-      }
-
-      if (data.error === 'LINK_BUTTON_NOT_PRESSED') {
-        throw new Error('Pulsante bridge non premuto. Premi il pulsante sul bridge e riprova.');
-      }
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      if (data.success) {
-        lightsData.setPairingStep('success');
-        setTimeout(() => {
-          lightsData.setPairing(false);
-          lightsData.setPairingStep(null);
-          lightsData.checkConnection();
-        }, 2000);
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('Pairing error:', err);
-      lightsData.setPairingError(message);
-      if (lightsData.pairingTimerRef.current) {
-        clearInterval(lightsData.pairingTimerRef.current);
-      }
-    }
-  };
-
-  /**
-   * User confirms they pressed the bridge button - start actual pairing
-   */
-  const handleConfirmButtonPressed = () => {
-    if (lightsData.selectedBridge) {
-      handlePairWithBridge(lightsData.selectedBridge);
-    }
-  };
-
-  /**
-   * Handle bridge selection from multiple bridges
-   */
-  const handleSelectBridge = (bridge: any) => {
-    lightsData.setSelectedBridge(bridge);
-    lightsData.setPairingStep('waitingForButtonPress');
-  };
-
-  /**
-   * Retry pairing
-   */
-  const handleRetryPairing = () => {
-    if (lightsData.selectedBridge) {
-      // Go back to waiting for button press step
-      lightsData.setPairingError(null);
-      lightsData.setPairingStep('waitingForButtonPress');
-    } else {
-      handleStartPairing();
-    }
-  };
-
-  /**
-   * Cancel pairing
-   */
-  const handleCancelPairing = () => {
-    if (lightsData.pairingTimerRef.current) {
-      clearInterval(lightsData.pairingTimerRef.current);
-    }
-    lightsData.setPairing(false);
-    lightsData.setPairingStep(null);
-    lightsData.setPairingError(null);
-    lightsData.setSelectedBridge(null);
-    lightsData.setDiscoveredBridges([]);
-  };
-
   return {
     // Room commands
     handleRoomToggle,
     handleBrightnessChange,
     handleSceneActivate,
     handleAllLightsToggle,
-
-    // Remote/Pairing commands
-    handleRemoteAuth,
-    handleDisconnectRemote,
-    handleStartPairing,
-    handlePairWithBridge,
-    handleConfirmButtonPressed,
-    handleSelectBridge,
-    handleRetryPairing,
-    handleCancelPairing,
 
     // Retry command objects
     hueRoomCmd,

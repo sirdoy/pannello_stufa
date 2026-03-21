@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
 status: unknown
-stopped_at: Completed 111-01-PLAN.md
-last_updated: "2026-03-21T22:25:04.001Z"
+stopped_at: Completed 112-01-PLAN.md
+last_updated: "2026-03-21T23:21:22.539Z"
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 11
-  completed_plans: 11
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 12
+  completed_plans: 12
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-21)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 111 — type-completeness-checkbox-sync
+**Current focus:** Phase 112 — debug-panel-hue-fixes
 
 ## Current Position
 
-Phase: 111
-Plan: Not started
+Phase: 112 (debug-panel-hue-fixes) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: Not started
 | Phase 109-cleanup P02 | 8 | 2 tasks | 2 files |
 | Phase 110 P01 | 15 | 2 tasks | 3 files |
 | Phase 111 P01 | 5 | 1 tasks | 1 files |
+| Phase 112-debug-panel-hue-fixes P01 | 30 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
 - [Phase 110]: lights/page.tsx delegates room/scene/all-house to useLightsData+useLightsCommands hooks; individual light commands remain inline with v1 flat body
 - [Phase 110]: supportsColor null guard added to colorUtils.ts for null/undefined input safety
 - [Phase 111]: xy field added to HueLightStateRequest between sat and effect; HueCommandResponse.requested_state auto-includes xy via Partial<HueLightStateRequest>
+- [Phase 112-debug-panel-hue-fixes]: callPutEndpoint is a direct copy of callPostEndpoint with method PUT — consistent with haPut mirrors haPost pattern
+- [Phase 112-debug-panel-hue-fixes]: [Phase 112]: Both HueTab files (debug and debug/api) updated identically except line 4 import path
 
 ### Pending Todos
 
@@ -93,6 +96,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-21T22:22:54.909Z
-Stopped at: Completed 111-01-PLAN.md
+Last session: 2026-03-21T23:21:22.524Z
+Stopped at: Completed 112-01-PLAN.md
 Resume file: None

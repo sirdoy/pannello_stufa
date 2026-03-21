@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Divider, Text } from '../../../ui';
+import type { HueScene } from '@/types/hueProxy';
 
 /**
  * LightsScenes - Horizontal-scroll scene grid
@@ -14,9 +15,9 @@ import { Button, Divider, Text } from '../../../ui';
  */
 
 export interface LightsScenesProps {
-  roomScenes: any[];
+  roomScenes: HueScene[];
   refreshing: boolean;
-  onSceneActivate: (sceneId: string) => void;
+  onSceneActivate: (sceneId: string, groupId: string) => void;
 }
 
 export default function LightsScenes({
@@ -35,18 +36,18 @@ export default function LightsScenes({
       {/* Scrollable container */}
       <div className="relative">
         <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-          {roomScenes.map((scene: any) => (
+          {roomScenes.map((scene) => (
             <Button
-              key={scene.id}
+              key={scene.scene_id}
               variant="subtle"
-              onClick={() => onSceneActivate(scene.id)}
+              onClick={() => onSceneActivate(scene.scene_id, scene.group_id)}
               disabled={refreshing}
-              aria-label={`Attiva scena ${scene.metadata?.name || 'Scena'}`}
+              aria-label={`Attiva scena ${scene.name}`}
               className="flex-shrink-0 w-32 sm:w-36 !p-4 flex-col !h-auto snap-start"
             >
               <span className="text-3xl mb-2" aria-hidden="true">🎨</span>
               <span className="text-xs font-semibold truncate w-full text-center">
-                {scene.metadata?.name || 'Scena'}
+                {scene.name}
               </span>
             </Button>
           ))}

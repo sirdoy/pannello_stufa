@@ -3,6 +3,7 @@
 import { Button, ControlButton, Heading, Slider, Text } from '../../../ui';
 import { cn } from '@/lib/utils/cn';
 import type { AdaptiveClasses } from '../hooks/useLightsData';
+import type { HueGroup, HueLight } from '@/types/hueProxy';
 
 /**
  * LightsRoomControl - Dynamic-styled room control area
@@ -21,9 +22,9 @@ import type { AdaptiveClasses } from '../hooks/useLightsData';
 
 export interface LightsRoomControlProps {
   // Room state
-  selectedRoom: any;
-  selectedRoomGroupedLightId: string | null;
-  roomLights: any[];
+  selectedGroup: HueGroup | undefined;
+  selectedGroupId: string | null;
+  roomLights: HueLight[];
   isRoomOn: boolean;
 
   // Light counts
@@ -49,14 +50,14 @@ export interface LightsRoomControlProps {
   refreshing: boolean;
 
   // Callbacks
-  onRoomToggle: (roomId: string | null | undefined, on: boolean) => void;
-  onBrightnessChange: (roomId: string | null | undefined, brightness: string) => void;
+  onRoomToggle: (groupId: string | null | undefined, on: boolean) => void;
+  onBrightnessChange: (groupId: string | null | undefined, brightness: string) => void;
   onNavigateToColors: () => void;
 }
 
 export default function LightsRoomControl({
-  selectedRoom,
-  selectedRoomGroupedLightId,
+  selectedGroup,
+  selectedGroupId,
   roomLights,
   isRoomOn,
   lightsOnCount,
@@ -107,7 +108,7 @@ export default function LightsRoomControl({
       {roomLights.length === 1 && (
         <div className="text-center mb-6">
           <Heading level={3} size="sm" variant={adaptive.heading ? 'default' : 'subtle'} className={`uppercase tracking-wider font-display ${adaptive.heading}`}>
-            {selectedRoom.metadata?.name || 'Stanza'}
+            {selectedGroup?.name ?? 'Stanza'}
           </Heading>
         </div>
       )}
@@ -145,8 +146,8 @@ export default function LightsRoomControl({
           <div className="grid grid-cols-2 gap-4">
             <Button
               variant={adaptive.buttonVariant || 'subtle'}
-              onClick={() => onRoomToggle(selectedRoomGroupedLightId, true)}
-              disabled={refreshing || !selectedRoomGroupedLightId}
+              onClick={() => onRoomToggle(selectedGroupId, true)}
+              disabled={refreshing || !selectedGroupId}
               icon="💡"
               size="lg"
               className={`h-16 sm:h-20 font-display ${adaptive.buttonClass}`}
@@ -155,8 +156,8 @@ export default function LightsRoomControl({
             </Button>
             <Button
               variant={adaptive.buttonVariant || 'subtle'}
-              onClick={() => onRoomToggle(selectedRoomGroupedLightId, false)}
-              disabled={refreshing || !selectedRoomGroupedLightId}
+              onClick={() => onRoomToggle(selectedGroupId, false)}
+              disabled={refreshing || !selectedGroupId}
               icon="🌙"
               size="lg"
               className={`h-16 sm:h-20 font-display ${adaptive.buttonClass}`}
@@ -170,8 +171,8 @@ export default function LightsRoomControl({
         {allLightsOff && (
           <Button
             variant={adaptive.buttonVariant || 'ember'}
-            onClick={() => onRoomToggle(selectedRoomGroupedLightId, true)}
-            disabled={refreshing || !selectedRoomGroupedLightId}
+            onClick={() => onRoomToggle(selectedGroupId, true)}
+            disabled={refreshing || !selectedGroupId}
             icon="💡"
             size="lg"
             className={`w-full h-16 sm:h-20 font-display ${
@@ -187,8 +188,8 @@ export default function LightsRoomControl({
         {allLightsOn && (
           <Button
             variant={adaptive.buttonVariant || 'subtle'}
-            onClick={() => onRoomToggle(selectedRoomGroupedLightId, false)}
-            disabled={refreshing || !selectedRoomGroupedLightId}
+            onClick={() => onRoomToggle(selectedGroupId, false)}
+            disabled={refreshing || !selectedGroupId}
             icon="🌙"
             size="lg"
             className={`w-full h-16 sm:h-20 font-display ${adaptive.buttonClass}`}
@@ -234,14 +235,14 @@ export default function LightsRoomControl({
                 // Commit to API on release (Radix onValueCommit)
                 const numValue = Array.isArray(value) ? value[0] : value;
                 if (numValue !== undefined) {
-                  onBrightnessChange(selectedRoomGroupedLightId || undefined, numValue.toString());
+                  onBrightnessChange(selectedGroupId || undefined, numValue.toString());
                 }
                 setLocalBrightness(null);
               }) as any}
               min={1}
               max={100}
               variant="ember"
-              disabled={refreshing || !selectedRoomGroupedLightId}
+              disabled={refreshing || !selectedGroupId}
               aria-label="Luminosita"
               className={cn(
                 'w-full',
@@ -258,9 +259,9 @@ export default function LightsRoomControl({
                 step={5}
                 onChange={(delta: number) => {
                   const newValue = Math.max(1, avgBrightness + delta);
-                  onBrightnessChange(selectedRoomGroupedLightId || undefined, newValue.toString());
+                  onBrightnessChange(selectedGroupId || undefined, newValue.toString());
                 }}
-                disabled={refreshing || avgBrightness <= 1 || !selectedRoomGroupedLightId}
+                disabled={refreshing || avgBrightness <= 1 || !selectedGroupId}
                 className={`flex-1 ${adaptive.buttonClass}`}
               />
               <ControlButton
@@ -270,9 +271,9 @@ export default function LightsRoomControl({
                 step={5}
                 onChange={(delta: number) => {
                   const newValue = Math.min(100, avgBrightness + delta);
-                  onBrightnessChange(selectedRoomGroupedLightId || undefined, newValue.toString());
+                  onBrightnessChange(selectedGroupId || undefined, newValue.toString());
                 }}
-                disabled={refreshing || avgBrightness >= 100 || !selectedRoomGroupedLightId}
+                disabled={refreshing || avgBrightness >= 100 || !selectedGroupId}
                 className={`flex-1 ${adaptive.buttonClass}`}
               />
             </div>

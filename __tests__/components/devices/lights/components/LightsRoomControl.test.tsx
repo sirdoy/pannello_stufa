@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import LightsRoomControl from '@/app/components/devices/lights/components/LightsRoomControl';
 import type { AdaptiveClasses } from '@/app/components/devices/lights/hooks/useLightsData';
+import type { HueGroup, HueLight } from '@/types/hueProxy';
 
 describe('LightsRoomControl', () => {
   const mockOnRoomToggle = jest.fn();
@@ -24,13 +25,37 @@ describe('LightsRoomControl', () => {
     brightnessValue: '',
   };
 
+  const mockGroup: Partial<HueGroup> = {
+    group_id: '1',
+    name: 'Soggiorno',
+    lights: ['1', '2'],
+    any_on: true,
+    all_on: false,
+    brightness: 200,
+  };
+
+  const mockLight1: Partial<HueLight> = {
+    light_id: '1',
+    name: 'Lampada',
+    on: true,
+    brightness: 200,
+    capability_tier: 'ambiance',
+    reachable: true,
+  };
+
+  const mockLight2: Partial<HueLight> = {
+    light_id: '2',
+    name: 'Lampada 2',
+    on: false,
+    brightness: null,
+    capability_tier: 'white',
+    reachable: true,
+  };
+
   const defaultProps = {
-    selectedRoom: { id: 'room1', metadata: { name: 'Living Room' } },
-    selectedRoomGroupedLightId: 'grouped-light-1',
-    roomLights: [
-      { id: 'light1', on: { on: true } },
-      { id: 'light2', on: { on: false } },
-    ],
+    selectedGroup: mockGroup as HueGroup,
+    selectedGroupId: 'grouped-light-1',
+    roomLights: [mockLight1, mockLight2] as HueLight[],
     isRoomOn: true,
     lightsOnCount: 1,
     lightsOffCount: 1,
@@ -58,15 +83,15 @@ describe('LightsRoomControl', () => {
       render(
         <LightsRoomControl
           {...defaultProps}
-          roomLights={[{ id: 'light1', on: { on: true } }]}
+          roomLights={[mockLight1 as HueLight]}
         />
       );
-      expect(screen.getByText('Living Room')).toBeInTheDocument();
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
     });
 
     it('does not show room name when multiple lights', () => {
       render(<LightsRoomControl {...defaultProps} />);
-      expect(screen.queryByText('Living Room')).not.toBeInTheDocument();
+      expect(screen.queryByText('Soggiorno')).not.toBeInTheDocument();
     });
   });
 
@@ -93,7 +118,7 @@ describe('LightsRoomControl', () => {
       render(
         <LightsRoomControl
           {...defaultProps}
-          roomLights={[{ id: 'light1', on: { on: true } }]}
+          roomLights={[mockLight1 as HueLight]}
         />
       );
       expect(screen.queryByText(/accese/i)).not.toBeInTheDocument();
@@ -278,11 +303,11 @@ describe('LightsRoomControl', () => {
         <LightsRoomControl
           {...defaultProps}
           adaptive={adaptive}
-          roomLights={[{ id: 'light1', on: { on: true } }]}
+          roomLights={[mockLight1 as HueLight]}
         />
       );
       // Check heading has adaptive class
-      expect(screen.getByText('Living Room')).toHaveClass('text-white');
+      expect(screen.getByText('Soggiorno')).toHaveClass('text-white');
     });
   });
 
@@ -293,8 +318,8 @@ describe('LightsRoomControl', () => {
       expect(screen.getByRole('button', { name: /spegni tutte/i })).toBeDisabled();
     });
 
-    it('disables buttons when no selectedRoomGroupedLightId', () => {
-      render(<LightsRoomControl {...defaultProps} selectedRoomGroupedLightId={null} />);
+    it('disables buttons when no selectedGroupId', () => {
+      render(<LightsRoomControl {...defaultProps} selectedGroupId={null} />);
       expect(screen.getByRole('button', { name: /accendi tutte/i })).toBeDisabled();
       expect(screen.getByRole('button', { name: /spegni tutte/i })).toBeDisabled();
     });

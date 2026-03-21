@@ -4,11 +4,11 @@ milestone: v14.0
 milestone_name: Hue Proxy Migration
 status: unknown
 stopped_at: Completed 109-02-PLAN.md
-last_updated: "2026-03-21T09:20:10.039Z"
+last_updated: "2026-03-21T21:45:48.041Z"
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 4
-  total_plans: 8
+  total_plans: 10
   completed_plans: 8
 ---
 
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-21)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 109 — cleanup
+**Current focus:** Phase 110 — fix-full-pages-for-proxy
 
 ## Current Position
 
-Phase: 109 (cleanup) — EXECUTING
-Plan: 2 of 2
+Phase: 110 (fix-full-pages-for-proxy) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 

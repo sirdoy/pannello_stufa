@@ -20,7 +20,7 @@
 - ✅ **v11.1 Test Suite & Tech Debt Cleanup** — Phases 92-95 (shipped 2026-03-18)
 - ✅ **v12.0 Data Fetching Simplification & E2E Verification** — Phases 96-98 (shipped 2026-03-19)
 - ✅ **v13.0 Thermorossi Proxy Migration** — Phases 99-105 (shipped 2026-03-20)
-- 🚧 **v14.0 Hue Proxy Migration** — Phases 106-109 (in progress)
+- 🚧 **v14.0 Hue Proxy Migration** — Phases 106-110 (in progress)
 
 ## Phases
 
@@ -72,6 +72,7 @@ See `.planning/milestones/` for full archives.
 #### Phase 109: Cleanup
 
 - [x] **Phase 109: Cleanup** — Old Hue infrastructure deleted (CLIP v2, remote API, connection strategy, OAuth, bridge discovery/pairing, env vars) (completed 2026-03-21)
+- [ ] **Phase 110: Fix Full Pages for Proxy** — Gap closure: fix /lights and /lights/scenes full pages for proxy format + colorUtils tests
 
 ## Phase Details
 
@@ -139,6 +140,23 @@ Plans:
 - [ ] 109-01-PLAN.md — Delete legacy Hue files + routes + clean surviving imports + lib/core dead helpers
 - [ ] 109-02-PLAN.md — Documentation updates (hue-setup.md rewrite + hue.md endpoint cleanup)
 
+### Phase 110: Fix Full Pages for Proxy
+**Goal**: Full `/lights` and `/lights/scenes` pages work correctly with proxy — all commands use v1 body format, response keys match API shape, no calls to deleted routes
+**Depends on**: Phase 109
+**Requirements**: CMD-01, CMD-02, CMD-03, UI-01, UI-02, UI-04, READ-03, CLEAN-04, CLEAN-05, CLEAN-06, CLIENT-02
+**Gap Closure:** Closes INT-01, INT-02, INT-03 from v14.0 audit
+**Success Criteria** (what must be TRUE):
+  1. `/lights` page sends v1 flat body format (`{ on }`, `{ bri: 0-254 }`) not CLIP v2 nested format
+  2. `/lights` page reads `groups` key from rooms API response (not `rooms`)
+  3. No calls to deleted routes (`/api/hue/discover`, `/api/hue/pair`, `/api/hue/disconnect`, `/api/hue/remote/*`, `/api/hue/scenes/create`, `/api/hue/scenes/{id}` PUT/DELETE)
+  4. Scene activation uses POST `/api/hue/groups/{gid}/scenes/{sid}` (new path pattern)
+  5. Dead `remoteApiAvailable = false` conditional branches removed from page.tsx
+  6. colorUtils tests pass with proxy-native `supportsColor` format (no CLIP v2 `color.xy`/`color.gamut`)
+**Plans**: TBD
+
+Plans:
+- [ ] (to be planned)
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -164,9 +182,10 @@ Plans:
 | 106 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 107 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 108 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
-| 109 | 2/2 | Complete    | 2026-03-21 | - |
+| 109 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
+| 110 | v14.0 | 0/0 | Planned | - |
 
-**Total:** 18 milestones shipped, 108 phases complete, 390 plans executed. v14.0 in progress (4 phases planned).
+**Total:** 18 milestones shipped, 109 phases complete, 390 plans executed. v14.0 in progress (5 phases, 1 gap closure).
 
 ---
 

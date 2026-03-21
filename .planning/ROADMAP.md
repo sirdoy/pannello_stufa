@@ -152,11 +152,11 @@ Plans:
   4. Scene activation uses POST `/api/hue/groups/{gid}/scenes/{sid}` (new path pattern)
   5. Dead `remoteApiAvailable = false` conditional branches removed from page.tsx
   6. colorUtils tests pass with proxy-native `supportsColor` format (no CLIP v2 `color.xy`/`color.gamut`)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] (to be planned)
-
+- [ ] 110-01-PLAN.md — Rewrite lights/page.tsx to use proxy hooks + fix colorUtils tests
+- [ ] 110-02-PLAN.md — Fix scenes/page.tsx for proxy types + remove Scene CRUD UI
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |

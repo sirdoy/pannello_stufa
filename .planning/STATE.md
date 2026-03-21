@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
 status: unknown
-stopped_at: Phase 108 context gathered
-last_updated: "2026-03-20T14:33:42.403Z"
+stopped_at: "Completed 108-01-PLAN.md"
+last_updated: "2026-03-21T08:22:00.000Z"
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 6
+  completed_plans: 5
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 107 — control-endpoints
+**Current focus:** Phase 108 — frontend-hooks-rewrite
 
 ## Current Position
 
-Phase: 107 (control-endpoints) — EXECUTING
-Plan: 1 of 2
+Phase: 108 (frontend-hooks-rewrite) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -64,6 +64,10 @@ See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
 - [Phase 107]: 409 CONFLICT inserted before catch-all EXTERNAL_API_ERROR throw in mapResponseError — preserves exact status for unreachable-light errors
 - [Phase 107]: PUT tests for [id] routes belong in [id]/__tests__/ not collection __tests__/ — different route files
 - [Phase 107]: JSDOM parseJson returns empty body for Request objects — use expect.any(Object) for body assertions in Hue PUT/POST tests
+- [108-01]: groups (not rooms) is canonical name in hook + params — aligns with HueGroup type
+- [108-01]: handleSceneActivate takes two args (sceneId, groupId) — caller always has both from scene.group_id
+- [108-01]: handleAllLightsToggle uses 2s fixed delay for multi-group parallel calls (not suggested_poll_delay_s)
+- [108-01]: useLightsCommands tests use jest.spyOn(setTimeout) resolve-immediately pattern to avoid fake timer complexity
 
 ### Pending Todos
 

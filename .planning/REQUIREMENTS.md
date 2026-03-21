@@ -32,12 +32,12 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 
 ### Frontend
 
-- [ ] **UI-01**: useLightsData reads proxy response shapes (flat format, capability_tier)
-- [ ] **UI-02**: useLightsCommands sends v1 body format (on/bri/ct instead of nested objects)
-- [ ] **UI-03**: Brightness conversion 0-100% ↔ 0-254 at client boundary
-- [ ] **UI-04**: Scene activate uses new path pattern (POST /groups/{gid}/scenes/{sid})
-- [ ] **UI-05**: 202 Accepted + suggested_poll_delay_s drives delayed refresh
-- [ ] **UI-06**: data_freshness replaces custom staleness/connection checks
+- [x] **UI-01**: useLightsData reads proxy response shapes (flat format, capability_tier)
+- [x] **UI-02**: useLightsCommands sends v1 body format (on/bri/ct instead of nested objects)
+- [x] **UI-03**: Brightness conversion 0-100% ↔ 0-254 at client boundary
+- [x] **UI-04**: Scene activate uses new path pattern (POST /groups/{gid}/scenes/{sid})
+- [x] **UI-05**: 202 Accepted + suggested_poll_delay_s drives delayed refresh
+- [x] **UI-06**: data_freshness replaces custom staleness/connection checks
 
 ### Cleanup
 
@@ -87,12 +87,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMD-02 | Phase 107 | Complete |
 | CMD-03 | Phase 107 | Complete |
 | CMD-04 | Phase 107 | Complete |
-| UI-01 | Phase 108 | Pending |
-| UI-02 | Phase 108 | Pending |
-| UI-03 | Phase 108 | Pending |
-| UI-04 | Phase 108 | Pending |
-| UI-05 | Phase 108 | Pending |
-| UI-06 | Phase 108 | Pending |
+| UI-01 | Phase 108 | Complete |
+| UI-02 | Phase 108 | Complete |
+| UI-03 | Phase 108 | Complete |
+| UI-04 | Phase 108 | Complete |
+| UI-05 | Phase 108 | Complete |
+| UI-06 | Phase 108 | Complete |
 | CLEAN-01 | Phase 109 | Pending |
 | CLEAN-02 | Phase 109 | Pending |
 | CLEAN-03 | Phase 109 | Pending |

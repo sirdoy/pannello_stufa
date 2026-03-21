@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v14.0 (in progress)
-**Status:** v14.0 Hue Proxy Migration in progress. Phase 110 complete — Full `/lights` and `/lights/scenes` pages rewritten for proxy (v1 body format, correct response keys, no deleted routes). Last phase of v14.0.
+**Version:** v14.0 (complete)
+**Status:** v14.0 Hue Proxy Migration complete. Phase 111 closed final gaps — `xy` field added to `HueLightStateRequest` type, all 27 requirement checkboxes and traceability statuses verified Complete.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -659,4 +659,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-20 after Phase 107 complete — Hue control endpoints (light state, group action, scene activate) via proxy*
+*Last updated: 2026-03-21 after Phase 111 complete — v14.0 Hue Proxy Migration milestone complete (xy type field, checkbox sync, 27/27 requirements)*

@@ -137,8 +137,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 109-01-PLAN.md — Delete legacy Hue files + routes + clean surviving imports + lib/core dead helpers
-- [ ] 109-02-PLAN.md — Documentation updates (hue-setup.md rewrite + hue.md endpoint cleanup)
+- [x] 109-01-PLAN.md — Delete legacy Hue files + routes + clean surviving imports + lib/core dead helpers
+- [x] 109-02-PLAN.md — Documentation updates (hue-setup.md rewrite + hue.md endpoint cleanup)
 
 ### Phase 110: Fix Full Pages for Proxy
 **Goal**: Full `/lights` and `/lights/scenes` pages work correctly with proxy — all commands use v1 body format, response keys match API shape, no calls to deleted routes
@@ -168,7 +168,10 @@ Plans:
   2. READ-03, CMD-03, UI-04 checkboxes are `[x]` in REQUIREMENTS.md
   3. All 27 requirements show status `Complete` in traceability table
   4. Coverage count updated to 27/27 satisfied
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 111-01-PLAN.md — Add xy field to HueLightStateRequest + verify requirements state
 
 ## Progress
 
@@ -196,11 +199,11 @@ Plans:
 | 107 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 108 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
 | 109 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
-| 110 | v14.0 | 2/2 | Complete    | 2026-03-21 |
-| 111 | v14.0 | 0/0 | Planned     | — |
+| 110 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
+| 111 | v14.0 | 0/1 | Planned     | — |
 
-**Total:** 18 milestones shipped, 109 phases complete, 390 plans executed. v14.0 in progress (6 phases, 2 gap closure).
+**Total:** 18 milestones shipped, 109 phases complete, 391 plans executed. v14.0 in progress (6 phases, 3 gap closure).
 
 ---
 
-*Roadmap updated: 2026-03-21 — Phase 109 plans created (2 plans, 2 waves)*
+*Roadmap updated: 2026-03-21 — Phase 111 plans created (1 plan, 1 wave)*

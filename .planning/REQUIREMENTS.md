@@ -10,7 +10,7 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 ### Proxy Client
 
 - [x] **CLIENT-01**: Hue proxy client uses shared haGet/haPost transport (X-API-Key auth)
-- [ ] **CLIENT-02**: TypeScript types for all proxy response interfaces (HueLight, HueGroup, HueScene, HueBridgeHealth, HueHistoryItem)
+- [x] **CLIENT-02**: TypeScript types for all proxy response interfaces (HueLight, HueGroup, HueScene, HueBridgeHealth, HueHistoryItem)
 - [x] **CLIENT-03**: Convenience wrappers for each endpoint (getLights, getGroups, getScenes, getHealth, getHistory)
 
 ### Read Endpoints
@@ -25,15 +25,15 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 
 ### Control Endpoints
 
-- [ ] **CMD-01**: PUT /lights/{light_id}/state via proxy (202 Accepted, v1 body format)
-- [ ] **CMD-02**: PUT /groups/{group_id}/action via proxy (202 Accepted)
+- [x] **CMD-01**: PUT /lights/{light_id}/state via proxy (202 Accepted, v1 body format)
+- [x] **CMD-02**: PUT /groups/{group_id}/action via proxy (202 Accepted)
 - [ ] **CMD-03**: POST /groups/{group_id}/scenes/{scene_id} via proxy (202 Accepted)
 - [x] **CMD-04**: Frontend handles 409 Conflict for unreachable lights
 
 ### Frontend
 
-- [ ] **UI-01**: useLightsData reads proxy response shapes (flat format, capability_tier)
-- [ ] **UI-02**: useLightsCommands sends v1 body format (on/bri/ct instead of nested objects)
+- [x] **UI-01**: useLightsData reads proxy response shapes (flat format, capability_tier)
+- [x] **UI-02**: useLightsCommands sends v1 body format (on/bri/ct instead of nested objects)
 - [x] **UI-03**: Brightness conversion 0-100% ↔ 0-254 at client boundary
 - [ ] **UI-04**: Scene activate uses new path pattern (POST /groups/{gid}/scenes/{sid})
 - [x] **UI-05**: 202 Accepted + suggested_poll_delay_s drives delayed refresh
@@ -44,9 +44,9 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 - [x] **CLEAN-01**: CLIP v2 local API client deleted (hueApi.ts)
 - [x] **CLEAN-02**: v1 remote/cloud API client deleted (hueRemoteApi.ts)
 - [x] **CLEAN-03**: Connection strategy deleted (hueConnectionStrategy.ts)
-- [ ] **CLEAN-04**: Bridge discovery and pairing routes deleted
-- [ ] **CLEAN-05**: OAuth token management deleted (hueRemoteTokenHelper.ts)
-- [ ] **CLEAN-06**: Firebase bridge credentials persistence deleted (hueLocalHelper.ts)
+- [x] **CLEAN-04**: Bridge discovery and pairing routes deleted
+- [x] **CLEAN-05**: OAuth token management deleted (hueRemoteTokenHelper.ts)
+- [x] **CLEAN-06**: Firebase bridge credentials persistence deleted (hueLocalHelper.ts)
 - [x] **CLEAN-07**: Hue-specific env vars removed (HUE_CLIENT_SECRET, NEXT_PUBLIC_HUE_CLIENT_ID, NEXT_PUBLIC_HUE_APP_ID)
 
 ## Future Requirements
@@ -74,7 +74,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | CLIENT-01 | Phase 106 | Complete |
-| CLIENT-02 | Phase 110 | Pending |
+| CLIENT-02 | Phase 110 | Complete |
 | CLIENT-03 | Phase 106 | Complete |
 | READ-01 | Phase 106 | Complete |
 | READ-02 | Phase 106 | Complete |
@@ -83,12 +83,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | READ-05 | Phase 106 | Complete |
 | READ-06 | Phase 106 | Complete |
 | READ-07 | Phase 106 | Complete |
-| CMD-01 | Phase 110 | Pending |
-| CMD-02 | Phase 110 | Pending |
+| CMD-01 | Phase 110 | Complete |
+| CMD-02 | Phase 110 | Complete |
 | CMD-03 | Phase 110 | Pending |
 | CMD-04 | Phase 107 | Complete |
-| UI-01 | Phase 110 | Pending |
-| UI-02 | Phase 110 | Pending |
+| UI-01 | Phase 110 | Complete |
+| UI-02 | Phase 110 | Complete |
 | UI-03 | Phase 108 | Complete |
 | UI-04 | Phase 110 | Pending |
 | UI-05 | Phase 108 | Complete |
@@ -96,9 +96,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLEAN-01 | Phase 109 | Complete |
 | CLEAN-02 | Phase 109 | Complete |
 | CLEAN-03 | Phase 109 | Complete |
-| CLEAN-04 | Phase 110 | Pending |
-| CLEAN-05 | Phase 110 | Pending |
-| CLEAN-06 | Phase 110 | Pending |
+| CLEAN-04 | Phase 110 | Complete |
+| CLEAN-05 | Phase 110 | Complete |
+| CLEAN-06 | Phase 110 | Complete |
 | CLEAN-07 | Phase 109 | Complete |
 
 **Coverage:**

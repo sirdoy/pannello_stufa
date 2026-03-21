@@ -72,7 +72,7 @@ See `.planning/milestones/` for full archives.
 #### Phase 109: Cleanup
 
 - [x] **Phase 109: Cleanup** — Old Hue infrastructure deleted (CLIP v2, remote API, connection strategy, OAuth, bridge discovery/pairing, env vars) (completed 2026-03-21)
-- [ ] **Phase 110: Fix Full Pages for Proxy** — Gap closure: fix /lights and /lights/scenes full pages for proxy format + colorUtils tests
+- [x] **Phase 110: Fix Full Pages for Proxy** — Gap closure: fix /lights and /lights/scenes full pages for proxy format + colorUtils tests (completed 2026-03-21)
 
 ## Phase Details
 
@@ -155,8 +155,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 110-01-PLAN.md — Rewrite lights/page.tsx to use proxy hooks + fix colorUtils tests
-- [ ] 110-02-PLAN.md — Fix scenes/page.tsx for proxy types + remove Scene CRUD UI
+- [x] 110-01-PLAN.md — Rewrite lights/page.tsx to use proxy hooks + fix colorUtils tests
+- [x] 110-02-PLAN.md — Fix scenes/page.tsx for proxy types + remove Scene CRUD UI
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -183,7 +183,7 @@ Plans:
 | 107 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 108 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
 | 109 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
-| 110 | v14.0 | 0/0 | Planned | - |
+| 110 | v14.0 | 2/2 | Complete   | 2026-03-21 |
 
 **Total:** 18 milestones shipped, 109 phases complete, 390 plans executed. v14.0 in progress (5 phases, 1 gap closure).
 

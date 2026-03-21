@@ -16,15 +16,15 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-20)
+See: .planning/PROJECT.md (updated 2026-03-21)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 108 — frontend-hooks-rewrite
+**Current focus:** Phase 109 — cleanup
 
 ## Current Position
 
-Phase: 108 (frontend-hooks-rewrite) — COMPLETE
-Plan: 2 of 2 (DONE)
+Phase: 109 (cleanup) — Ready to plan
+Plan: Not started
 
 ## Performance Metrics
 
@@ -78,11 +78,10 @@ None.
 
 ### Blockers/Concerns
 
-- docs/api/hue.md exists (proxy API reference) — plan-phase should read it before planning Phase 106
-- hue.md lists exact endpoint paths, response shapes, and capability_tier enum values needed for types
+None.
 
 ## Session Continuity
 
-Last session: 2026-03-21T08:45:00.000Z
-Stopped at: Completed Phase 108 (108-02-PLAN.md) — all plans complete
-Resume file: .planning/phases/108-frontend-hooks-rewrite/108-02-SUMMARY.md
+Last session: 2026-03-21
+Stopped at: Phase 108 complete, ready to plan Phase 109
+Resume file: None

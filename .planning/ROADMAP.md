@@ -192,7 +192,10 @@ Plans:
   3. Room control calls use PUT method (not POST) matching route handler
   4. Scene activation form accepts both groupId and sceneId inputs
   5. Display URL labels reflect actual endpoint paths
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 112-01-PLAN.md — Fix HueTab method dispatch + scene URL + tests
 
 ## Progress
 

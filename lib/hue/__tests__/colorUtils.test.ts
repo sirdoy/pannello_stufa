@@ -8,6 +8,7 @@ import {
   supportsColor,
   COLOR_PRESETS,
 } from '../colorUtils';
+import type { HueLight } from '@/types/hueProxy';
 
 describe('colorUtils', () => {
   describe('rgbToXY', () => {
@@ -94,41 +95,34 @@ describe('colorUtils', () => {
   });
 
   describe('supportsColor', () => {
-    it('should return true for light with color.xy property', () => {
-      const light = {
-        color: {
-          xy: { x: 0.5, y: 0.5 },
-        },
-      };
-      expect(supportsColor(light)).toBe(true);
+    const baseLight: HueLight = {
+      light_id: '1', name: 'Test', on: true,
+      brightness: 200, ct_mirek: null, ct_kelvin: null,
+      hue: null, saturation: null, colormode: null,
+      reachable: true, capability_tier: 'white',
+      room_id: null, room_name: null, model_id: null, light_type: null,
+    };
+
+    it('should return true for light with capability_tier color', () => {
+      expect(supportsColor({ ...baseLight, capability_tier: 'color' })).toBe(true);
     });
 
-    it('should return true for light with color.gamut property', () => {
-      const light = {
-        color: {
-          gamut: {
-            red: { x: 0.6915, y: 0.3083 },
-            green: { x: 0.17, y: 0.7 },
-            blue: { x: 0.1532, y: 0.0475 },
-          },
-        },
-      };
-      expect(supportsColor(light)).toBe(true);
+    it('should return true for color light with hue and saturation', () => {
+      expect(supportsColor({
+        ...baseLight,
+        capability_tier: 'color',
+        hue: 32000,
+        saturation: 200,
+        colormode: 'hs',
+      })).toBe(true);
     });
 
-    it('should return false for light without color property', () => {
-      const light = {
-        on: { on: true },
-        dimming: { brightness: 50 },
-      } as any;
-      expect(supportsColor(light)).toBe(false);
+    it('should return false for ambiance light', () => {
+      expect(supportsColor({ ...baseLight, capability_tier: 'ambiance' })).toBe(false);
     });
 
-    it('should return false for light with empty color object', () => {
-      const light = {
-        color: {},
-      };
-      expect(supportsColor(light)).toBe(false);
+    it('should return false for white light', () => {
+      expect(supportsColor({ ...baseLight, capability_tier: 'white' })).toBe(false);
     });
 
     it('should return false for null light', () => {

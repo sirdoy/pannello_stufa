@@ -172,6 +172,7 @@ function hslToHex(h: number, s: number, l: number): string {
  * @returns True if light supports color
  */
 export function supportsColor(light: HueLight): boolean {
+  if (!light) return false;
   return light.capability_tier === 'color';
 }
 

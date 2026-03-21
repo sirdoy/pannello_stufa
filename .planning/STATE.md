@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
-status: unknown
-stopped_at: "Completed 108-01-PLAN.md"
-last_updated: "2026-03-21T08:22:00.000Z"
+status: complete
+stopped_at: "Completed 108-02-PLAN.md"
+last_updated: "2026-03-21T08:45:00.000Z"
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 
 ## Current Position
 
-Phase: 108 (frontend-hooks-rewrite) — EXECUTING
-Plan: 2 of 2
+Phase: 108 (frontend-hooks-rewrite) — COMPLETE
+Plan: 2 of 2 (DONE)
 
 ## Performance Metrics
 
@@ -68,6 +68,9 @@ See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
 - [108-01]: handleSceneActivate takes two args (sceneId, groupId) — caller always has both from scene.group_id
 - [108-01]: handleAllLightsToggle uses 2s fixed delay for multi-group parallel calls (not suggested_poll_delay_s)
 - [108-01]: useLightsCommands tests use jest.spyOn(setTimeout) resolve-immediately pattern to avoid fake timer complexity
+- [108-02]: LightsBanners reduced to 3 banners (retry error, staleness, connection error) — all pairing banners deleted
+- [108-02]: LightsCard no longer passes onConnect/connectButtonLabel — no pairing flow in proxy model
+- [108-02]: statusBadge simplified to stale check, replaces connectionMode badge map
 
 ### Pending Todos
 
@@ -80,6 +83,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T14:33:42.398Z
-Stopped at: Phase 108 context gathered
-Resume file: .planning/phases/108-frontend-hooks-rewrite/108-CONTEXT.md
+Last session: 2026-03-21T08:45:00.000Z
+Stopped at: Completed Phase 108 (108-02-PLAN.md) — all plans complete
+Resume file: .planning/phases/108-frontend-hooks-rewrite/108-02-SUMMARY.md

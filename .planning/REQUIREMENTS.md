@@ -17,7 +17,7 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 
 - [x] **READ-01**: GET /lights migrated with capability_tier, ct_kelvin, room enrichment
 - [x] **READ-02**: GET /lights/{light_id} migrated
-- [ ] **READ-03**: GET /groups migrated with member lights array
+- [x] **READ-03**: GET /groups migrated with member lights array
 - [x] **READ-04**: GET /groups/{group_id} migrated
 - [x] **READ-05**: GET /scenes migrated with group_id filter support
 - [x] **READ-06**: GET /health migrated with data_freshness (LIVE/STALE/UNREACHABLE→503)
@@ -27,7 +27,7 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 
 - [x] **CMD-01**: PUT /lights/{light_id}/state via proxy (202 Accepted, v1 body format)
 - [x] **CMD-02**: PUT /groups/{group_id}/action via proxy (202 Accepted)
-- [ ] **CMD-03**: POST /groups/{group_id}/scenes/{scene_id} via proxy (202 Accepted)
+- [x] **CMD-03**: POST /groups/{group_id}/scenes/{scene_id} via proxy (202 Accepted)
 - [x] **CMD-04**: Frontend handles 409 Conflict for unreachable lights
 
 ### Frontend
@@ -35,7 +35,7 @@ Requirements for Hue Proxy Migration. Each maps to roadmap phases.
 - [x] **UI-01**: useLightsData reads proxy response shapes (flat format, capability_tier)
 - [x] **UI-02**: useLightsCommands sends v1 body format (on/bri/ct instead of nested objects)
 - [x] **UI-03**: Brightness conversion 0-100% ↔ 0-254 at client boundary
-- [ ] **UI-04**: Scene activate uses new path pattern (POST /groups/{gid}/scenes/{sid})
+- [x] **UI-04**: Scene activate uses new path pattern (POST /groups/{gid}/scenes/{sid})
 - [x] **UI-05**: 202 Accepted + suggested_poll_delay_s drives delayed refresh
 - [x] **UI-06**: data_freshness replaces custom staleness/connection checks
 
@@ -78,19 +78,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CLIENT-03 | Phase 106 | Complete |
 | READ-01 | Phase 106 | Complete |
 | READ-02 | Phase 106 | Complete |
-| READ-03 | Phase 110 | Pending |
+| READ-03 | Phase 110 | Complete |
 | READ-04 | Phase 106 | Complete |
 | READ-05 | Phase 106 | Complete |
 | READ-06 | Phase 106 | Complete |
 | READ-07 | Phase 106 | Complete |
 | CMD-01 | Phase 110 | Complete |
 | CMD-02 | Phase 110 | Complete |
-| CMD-03 | Phase 110 | Pending |
+| CMD-03 | Phase 110 | Complete |
 | CMD-04 | Phase 107 | Complete |
 | UI-01 | Phase 110 | Complete |
 | UI-02 | Phase 110 | Complete |
 | UI-03 | Phase 108 | Complete |
-| UI-04 | Phase 110 | Pending |
+| UI-04 | Phase 110 | Complete |
 | UI-05 | Phase 108 | Complete |
 | UI-06 | Phase 108 | Complete |
 | CLEAN-01 | Phase 109 | Complete |
@@ -103,10 +103,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 - v14.0 requirements: 27 total
-- Satisfied: 16
-- Pending (Phase 110 gap closure): 11 (CLIENT-02, READ-03, CMD-01, CMD-02, CMD-03, UI-01, UI-02, UI-04, CLEAN-04, CLEAN-05, CLEAN-06)
+- Satisfied: 27
+- Pending: 0
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-20*
-*Last updated: 2026-03-21 — 9 requirements reset to Pending for Phase 110 gap closure*
+*Last updated: 2026-03-21 — All 27 requirements satisfied, checkboxes synced per audit*

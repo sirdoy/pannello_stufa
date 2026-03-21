@@ -157,6 +157,19 @@ Plans:
 Plans:
 - [x] 110-01-PLAN.md — Rewrite lights/page.tsx to use proxy hooks + fix colorUtils tests
 - [x] 110-02-PLAN.md — Fix scenes/page.tsx for proxy types + remove Scene CRUD UI
+
+### Phase 111: Type Completeness & Checkbox Sync
+**Goal**: Close remaining minor gaps — `xy` field added to `HueLightStateRequest` type, all requirement checkboxes and traceability statuses corrected
+**Depends on**: Phase 110
+**Requirements**: CMD-01, UI-02, READ-03, CMD-03, UI-04
+**Gap Closure:** Closes INT-XY from v14.0 audit + checkbox sync
+**Success Criteria** (what must be TRUE):
+  1. `HueLightStateRequest` in `types/hueProxy.ts` includes `xy?: [number, number]`
+  2. READ-03, CMD-03, UI-04 checkboxes are `[x]` in REQUIREMENTS.md
+  3. All 27 requirements show status `Complete` in traceability table
+  4. Coverage count updated to 27/27 satisfied
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -184,8 +197,9 @@ Plans:
 | 108 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
 | 109 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
 | 110 | v14.0 | 2/2 | Complete    | 2026-03-21 |
+| 111 | v14.0 | 0/0 | Planned     | — |
 
-**Total:** 18 milestones shipped, 109 phases complete, 390 plans executed. v14.0 in progress (5 phases, 1 gap closure).
+**Total:** 18 milestones shipped, 109 phases complete, 390 plans executed. v14.0 in progress (6 phases, 2 gap closure).
 
 ---
 

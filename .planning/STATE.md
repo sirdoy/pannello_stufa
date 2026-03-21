@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v14.0
 milestone_name: Hue Proxy Migration
-status: executing
-stopped_at: "Completed 109-01-PLAN.md"
-last_updated: "2026-03-21T09:09:10Z"
+status: unknown
+stopped_at: Completed 109-02-PLAN.md
+last_updated: "2026-03-21T09:16:29.872Z"
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -45,6 +45,7 @@ Plan: 2 of 2
 | Phase 106 P02 | 15m | 2 tasks | 14 files |
 | Phase 107 P01 | 2m | 1 tasks | 4 files |
 | Phase 107 P02 | 11 | 2 tasks | 6 files |
+| Phase 109-cleanup P02 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,8 @@ See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
 - [109-01]: HUE_NOT_CONNECTED and HUE_NOT_ON_LOCAL_NETWORK removed from ERROR_CODES and ErrorCode type — proxy model never throws these
 - [109-01]: remoteApiAvailable replaced with false constant in lights/page.tsx (env var ref removed, dead branch retained)
 - [109-01]: types/api/errors.ts updated alongside apiErrors.ts to keep ErrorCode union consistent with object keys
+- [Phase 109-cleanup]: docs/setup/hue-setup.md rewritten for proxy-only setup — HA_BASE_URL + HA_API_KEY, no OAuth, no frontend pairing
+- [Phase 109-cleanup]: docs/api/hue.md Quick Reference trimmed to 10 rows — POST/PUT/DELETE planned scene CRUD removed, JWT Bearer replaced with API Key
 
 ### Pending Todos
 
@@ -85,6 +88,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-21T09:09:10Z
-Stopped at: Completed 109-01-PLAN.md
-Resume file: .planning/phases/109-cleanup/109-02-PLAN.md
+Last session: 2026-03-21T09:16:29.866Z
+Stopped at: Completed 109-02-PLAN.md
+Resume file: None

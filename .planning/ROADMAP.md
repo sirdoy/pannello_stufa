@@ -71,7 +71,7 @@ See `.planning/milestones/` for full archives.
 
 #### Phase 109: Cleanup
 
-- [ ] **Phase 109: Cleanup** — Old Hue infrastructure deleted (CLIP v2, remote API, connection strategy, OAuth, bridge discovery/pairing, env vars)
+- [x] **Phase 109: Cleanup** — Old Hue infrastructure deleted (CLIP v2, remote API, connection strategy, OAuth, bridge discovery/pairing, env vars) (completed 2026-03-21)
 
 ## Phase Details
 
@@ -164,7 +164,7 @@ Plans:
 | 106 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 107 | v14.0 | 2/2 | ✓ Complete | 2026-03-20 |
 | 108 | v14.0 | 2/2 | ✓ Complete | 2026-03-21 |
-| 109 | 1/2 | In Progress|  | - |
+| 109 | 2/2 | Complete   | 2026-03-21 | - |
 
 **Total:** 18 milestones shipped, 108 phases complete, 390 plans executed. v14.0 in progress (4 phases planned).
 

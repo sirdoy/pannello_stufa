@@ -10,7 +10,7 @@
 
 import { getStatus } from '@/lib/stove/thermorossiProxy';
 import { getProxyHomestatus } from '@/lib/netatmo/netatmoProxy';
-import { adminDbGet } from '@/lib/firebaseAdmin';
+import { adminDbGet, adminDbSet, adminDbRemove } from '@/lib/firebaseAdmin';
 
 // Stove state categories for mismatch detection
 const ON_STATES = ['working', 'modulating'];
@@ -70,7 +70,7 @@ export async function checkUserStoveHealth(userId: string): Promise<HealthCheck>
   const connectionStatus = determineConnectionStatus(stoveResult);
 
   // Detect state mismatch
-  const stateMismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
+  const stateMismatch = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, userId);
 
   return {
     userId,
@@ -108,7 +108,12 @@ export function determineConnectionStatus(
  * Detect state mismatch between expected and actual stove state
  * Uses both schedule and Netatmo heating demand as signals
  */
-export function detectStateMismatch(stoveResult: any, scheduleResult: any, netatmoResult: any) {
+export async function detectStateMismatch(
+  stoveResult: any,
+  scheduleResult: any,
+  netatmoResult: any,
+  userId: string
+): Promise<{ detected: boolean; expected: string; actual: string; reason: string; [key: string]: unknown } | null> {
   // Can't detect mismatch if stove status unavailable
   if (stoveResult.status !== 'fulfilled') {
     return null;
@@ -141,12 +146,36 @@ export function detectStateMismatch(stoveResult: any, scheduleResult: any, netat
     };
   }
 
-  // Handle STARTING states - grace period (don't flag immediately)
+  // Handle STARTING states - grace period
   if (actualCategory === 'STARTING') {
-    // TODO: Track when stove entered STARTING state to apply grace period
-    // For now, don't flag STARTING as mismatch (allow time to transition)
-    return null;
+    try {
+      const entryTimestamp = await adminDbGet<number>(`health/stoveStarting/${userId}`);
+
+      if (!entryTimestamp) {
+        // First observation: start grace period
+        await adminDbSet(`health/stoveStarting/${userId}`, Date.now());
+        return null;
+      }
+
+      if (Date.now() - entryTimestamp < GRACE_PERIOD_MS) {
+        return null; // Within grace period
+      }
+
+      // Grace period expired — flag as mismatch
+      return {
+        detected: true,
+        expected: expectedState,
+        actual: statusDescription,
+        reason: 'starting_timeout',
+      };
+    } catch (err) {
+      console.error('[detectStateMismatch] Grace period Firebase error:', err);
+      return null; // Fail-safe: don't alert on Firebase errors
+    }
   }
+
+  // Leaving STARTING state — clean up grace period key (fire-and-forget)
+  adminDbRemove(`health/stoveStarting/${userId}`).catch(() => {});
 
   // Compare expected vs actual
   if (expectedState === 'ON' && actualCategory === 'OFF') {

@@ -13,6 +13,11 @@
  * - HTTPS connection (production)
  */
 
+/**
+ * Token lifecycle management is handled server-side via Admin SDK.
+ * See /api/notifications/cleanup + lib/services/tokenCleanupService.ts
+ */
+
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { db } from '@/lib/firebase';
 import { ref, get } from 'firebase/database';
@@ -478,39 +483,3 @@ export async function checkStoredToken() {
   }
 }
 
-/**
- * Cleanup: rimuove token obsoleti (più vecchi di 90 giorni)
- *
- * TODO: Migrare a API route /api/notifications/cleanup
- * Questa funzione richiede write access che deve passare tramite Admin SDK
- */
-/* DISABLED - Requires Admin SDK migration
-export async function cleanupOldTokens(userId) {
-  if (!userId) return;
-
-  try {
-    const tokensRef = ref(db, `users/${userId}/fcmTokens`);
-    const snapshot = await get(tokensRef);
-
-    if (!snapshot.exists()) return;
-
-    const tokensData = snapshot.val();
-    const now = Date.now();
-    const MAX_AGE = 90 * 24 * 60 * 60 * 1000; // 90 giorni
-
-    for (const [tokenKey, tokenData] of Object.entries(tokensData)) {
-      const createdAt = new Date(tokenData.createdAt).getTime();
-
-      if (now - createdAt > MAX_AGE) {
-        // Richiede Admin SDK - chiamare /api/notifications/cleanup
-      }
-    }
-
-  } catch (error) {
-    console.error('❌ Errore cleanup tokens:', error);
-  }
-}
-*/
-
-// Re-export notification action capabilities for client-side feature detection
-export { supportsNotificationActions, getNotificationCapabilities } from './notificationActions';

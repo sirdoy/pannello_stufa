@@ -2,14 +2,15 @@
 gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
-status: ready_to_plan
-stopped_at: Roadmap created — ready to plan Phase 118
-last_updated: "2026-03-22T22:30:00.000Z"
+status: unknown
+stopped_at: Completed 118-01-PLAN.md
+last_updated: "2026-03-22T21:01:01.630Z"
+last_activity: 2026-03-22
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 10
-  completed_plans: 0
+  total_plans: 2
+  completed_plans: 1
 ---
 
 # Project State
@@ -19,16 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 118 — Registry Infrastructure
+**Current focus:** Phase 118 — registry-infrastructure
 
 ## Current Position
 
-Phase: 118 of 124 (Registry Infrastructure)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-03-22 — Roadmap created; 25 requirements mapped to 7 phases (118-124)
-
-Progress: [░░░░░░░░░░] 0% (0/10 v15.0 plans complete)
+Phase: 118 (registry-infrastructure) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -45,6 +42,7 @@ Progress: [░░░░░░░░░░] 0% (0/10 v15.0 plans complete)
 | v14.0 Hue Proxy Migration | 106-112 | 12 | 2 days |
 | v14.1 Tech Debt & Type Safety | 113-117 | 9 | 1 day |
 | v15.0 Rooms & Device Registry | 118-124 | ~10 | In progress |
+| Phase 118 P01 | 143 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -55,6 +53,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [v14.1]: Zero `as any` in production code — all new types must use proper interfaces
 - [v14.0]: All device providers use shared haGet/haPost/haPut transport from lib/api/haClient.ts
 - [v11.0]: New device onboarding path: types → client → routes → hook → card/page
+- [Phase 118]: haDelete transport added to haClient.ts; 204 responses return void without calling response.json()
+- [Phase 118]: PaginatedResponse<T> placed in types/common.ts (shared by registry, rooms, automations — not scoped to registry types)
 
 ### Pending Todos
 
@@ -73,6 +73,6 @@ None.
 
 ## Session Continuity
 
-Last activity: 2026-03-22 — Roadmap created for v15.0
-Stopped at: 7 phases defined (118-124), 25/25 requirements mapped, ready to plan Phase 118
+Last activity: 2026-03-22
+Stopped at: Completed 118-01-PLAN.md
 Resume file: None

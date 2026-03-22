@@ -69,10 +69,10 @@ See `.planning/milestones/` for full archives.
   2. All DeviceType, RegistryDevice, and RegistryHealth TypeScript interfaces are defined and exported
   3. All 8 Device Registry endpoint proxy routes exist under /api/ and return typed responses
   4. TypeScript compiles with zero errors for all new files
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 118-01: registryProxy.ts + TypeScript interfaces
+- [x] 118-01: registryProxy.ts + TypeScript interfaces
 - [ ] 118-02: Next.js API route proxies for all 8 Device Registry endpoints
 
 ### Phase 119: Rooms Infrastructure
@@ -166,7 +166,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-117 | v1.0–v14.1 | 407/407 | Complete | 2026-03-22 |
-| 118. Registry Infrastructure | v15.0 | 0/2 | Not started | - |
+| 118. Registry Infrastructure | v15.0 | 1/2 | In Progress|  |
 | 119. Rooms Infrastructure | v15.0 | 0/2 | Not started | - |
 | 120. Device Types UI | v15.0 | 0/1 | Not started | - |
 | 121. Device Registry UI | v15.0 | 0/2 | Not started | - |

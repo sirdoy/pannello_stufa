@@ -9,8 +9,8 @@ Requirements for Rooms & Device Registry milestone. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFRA-01**: Proxy client per Device Registry API con haGet/haPost transport
-- [ ] **INFRA-02**: TypeScript types per tutte le interfacce Device Registry (DeviceType, RegistryDevice, RegistryHealth)
+- [x] **INFRA-01**: Proxy client per Device Registry API con haGet/haPost transport
+- [x] **INFRA-02**: TypeScript types per tutte le interfacce Device Registry (DeviceType, RegistryDevice, RegistryHealth)
 - [ ] **INFRA-03**: Proxy client per Rooms API con haGet/haPost/haPut/haDelete transport
 - [ ] **INFRA-04**: TypeScript types per tutte le interfacce Rooms (Room, DeviceAssignment, RoomStatus, HouseStatus, RoomsHealth)
 - [ ] **INFRA-05**: Next.js API routes per Device Registry (8 endpoint proxy)
@@ -71,8 +71,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | Phase 118 | Pending |
-| INFRA-02 | Phase 118 | Pending |
+| INFRA-01 | Phase 118 | Complete |
+| INFRA-02 | Phase 118 | Complete |
 | INFRA-03 | Phase 119 | Pending |
 | INFRA-04 | Phase 119 | Pending |
 | INFRA-05 | Phase 118 | Pending |

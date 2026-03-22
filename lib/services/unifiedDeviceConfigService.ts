@@ -28,6 +28,7 @@ import { ref, get } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { DEVICE_CONFIG, DISPLAY_ITEMS, DEFAULT_DEVICE_ORDER } from '@/lib/devices/deviceTypes';
+import type { DeviceTypeId } from '@/lib/devices/deviceTypes';
 import type { DeviceType } from '@/types/firebase';
 
 const CONFIG_VERSION = 3;
@@ -37,13 +38,21 @@ const CONFIG_VERSION = 3;
  */
 type DeviceId = DeviceType | string;
 
+interface DeviceMetadata {
+  name: string;
+  icon: string;
+  color: string;
+}
+
 /**
  * Get device metadata (name, icon, etc.) from registry
  */
-function getDeviceMetadata(deviceId: DeviceId): Record<string, unknown> | null {
-  const deviceConfig = (DEVICE_CONFIG as Record<string, unknown>)[deviceId];
-  const displayItem = (DISPLAY_ITEMS as Record<string, unknown>)[deviceId];
-  return (deviceConfig as Record<string, unknown>) || (displayItem as Record<string, unknown>) || null;
+function getDeviceMetadata(deviceId: DeviceId): DeviceMetadata | null {
+  const deviceConfig = DEVICE_CONFIG[deviceId as DeviceTypeId];
+  const displayItem = DISPLAY_ITEMS[deviceId];
+  if (deviceConfig) return { name: deviceConfig.name, icon: deviceConfig.icon, color: deviceConfig.color };
+  if (displayItem) return { name: displayItem.name, icon: displayItem.icon, color: displayItem.color };
+  return null;
 }
 
 /**
@@ -125,11 +134,11 @@ export async function getUnifiedDeviceConfigAdmin(userId: string): Promise<Devic
   }
 
   try {
-    const existingConfig = await adminDbGet(`users/${userId}/deviceConfig`) as any;
+    const existingConfig = await adminDbGet<DeviceConfigData>(`users/${userId}/deviceConfig`);
 
     if (existingConfig && (existingConfig.version ?? 0) >= CONFIG_VERSION) {
       // Backfill any new devices added to DEFAULT_DEVICE_ORDER after user's config was saved
-      const config = existingConfig as DeviceConfigData;
+      const config = existingConfig;
       const existingIds = new Set(config.devices.map(d => d.id));
       const missing = DEFAULT_DEVICE_ORDER.filter(id => !existingIds.has(id));
       if (missing.length > 0) {
@@ -180,17 +189,25 @@ export async function saveUnifiedDeviceConfigAdmin(userId: string, config: Parti
  * @param {Object|null} existingConfig - Existing config if any
  * @returns {Promise<Object>} Migrated config
  */
-async function migrateFromOldFormat(userId: string, existingConfig: any): Promise<DeviceConfigData> {
+interface LegacyDeviceV2 {
+  id: string;
+  enabled: boolean;
+  dashboardVisible: boolean;
+  dashboardOrder?: number;
+}
+
+async function migrateFromOldFormat(userId: string, existingConfig: DeviceConfigData | Record<string, unknown> | null): Promise<DeviceConfigData> {
   // If we have v2 config, just merge enabled + dashboardVisible into visible
   if (existingConfig && existingConfig.version === 2) {
-    const devices = (existingConfig.devices || []).map((d: any, index: number) => ({
+    const legacyDevices = (existingConfig.devices as LegacyDeviceV2[] | undefined) || [];
+    const devices = legacyDevices.map((d, index) => ({
       id: d.id,
       visible: d.enabled && d.dashboardVisible,
       order: d.dashboardOrder ?? index,
     }));
 
     // Add any missing devices
-    const existingIds = new Set(devices.map((d: any) => d.id));
+    const existingIds = new Set(devices.map((d) => d.id));
     DEFAULT_DEVICE_ORDER.forEach(id => {
       if (!existingIds.has(id)) {
         devices.push({ id, visible: false, order: devices.length });
@@ -205,8 +222,8 @@ async function migrateFromOldFormat(userId: string, existingConfig: any): Promis
   }
 
   // Migrate from v1 (separate Firebase paths)
-  const oldDevicePrefs = (await adminDbGet(`devicePreferences/${userId}`) || {}) as Record<string, any>;
-  const oldDashboardPrefs = (await adminDbGet(`users/${userId}/dashboardPreferences`) as { cardOrder?: Array<{ id: string; visible?: boolean }> } | null) || {};
+  const oldDevicePrefs = (await adminDbGet<Record<string, boolean>>(`devicePreferences/${userId}`) ?? {}) as Record<string, boolean>;
+  const oldDashboardPrefs = (await adminDbGet<{ cardOrder?: Array<{ id: string; visible?: boolean }> }>(`users/${userId}/dashboardPreferences`)) ?? {};
   const oldCardOrder = oldDashboardPrefs.cardOrder || [];
 
   const devices: Array<{ id: string; visible: boolean; order: number }> = [];
@@ -236,7 +253,7 @@ async function migrateFromOldFormat(userId: string, existingConfig: any): Promis
 
     devices.push({
       id: deviceId,
-      visible: (oldDevicePrefs as Record<string, any>)[deviceId] ?? false,
+      visible: oldDevicePrefs[deviceId] ?? false,
       order: devices.length,
     });
     processedIds.add(deviceId);
@@ -270,8 +287,8 @@ export function getEnabledDevicesFromConfig(config: DeviceConfigData): string[] 
   if (!config || !config.devices) return [];
 
   return config.devices
-    .filter((d: any) => d.visible && !isDisplayOnly(d.id))
-    .map((d: any) => d.id);
+    .filter((d) => d.visible && !isDisplayOnly(d.id))
+    .map((d) => d.id);
 }
 
 /**
@@ -288,14 +305,14 @@ export function getVisibleDashboardCards(config: DeviceConfigData): Array<{
   if (!config || !config.devices) return [];
 
   return config.devices
-    .filter((d: any) => d.visible && hasHomepageCard(d.id))
-    .sort((a: any, b: any) => a.order - b.order)
-    .map((d: any) => {
+    .filter((d) => d.visible && hasHomepageCard(d.id))
+    .sort((a, b) => a.order - b.order)
+    .map((d) => {
       const meta = getDeviceMetadata(d.id);
       return {
         id: d.id,
-        label: (meta as any)?.name || d.id,
-        icon: (meta as any)?.icon || '❓',
+        label: meta?.name || d.id,
+        icon: meta?.icon || '❓',
         visible: true,
       };
     });
@@ -322,14 +339,14 @@ export function getAllDevicesForSettings(config: DeviceConfigData): Array<{
   }
 
   return config.devices
-    .sort((a: any, b: any) => a.order - b.order)
-    .map((d: any) => {
+    .sort((a, b) => a.order - b.order)
+    .map((d) => {
       const meta = getDeviceMetadata(d.id);
       return {
         id: d.id,
-        name: (meta as any)?.name || d.id,
-        icon: (meta as any)?.icon || '❓',
-        color: (meta as any)?.color || 'neutral',
+        name: meta?.name || d.id,
+        icon: meta?.icon || '❓',
+        color: meta?.color || 'neutral',
         visible: d.visible,
         order: d.order,
         isDisplayOnly: isDisplayOnly(d.id),

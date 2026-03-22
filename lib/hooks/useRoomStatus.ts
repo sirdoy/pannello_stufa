@@ -15,6 +15,16 @@ import { NETATMO_ROUTES } from '@/lib/routes';
 const MAX_RETRIES = 5;
 const RETRY_DELAY_MS = 3_000;
 
+interface RoomListItem {
+  room_id: string;
+  room_name: string;
+  temperature: number | null;
+  setpoint: number | null;
+  mode: string | null;
+  heating: boolean;
+  endtime: number | null;
+}
+
 export function useRoomStatus(): { rooms: unknown[]; loading: boolean; error: string | null; fetchRooms: () => Promise<void>; refetch: () => Promise<void> } {
   const [rooms, setRooms] = useState<unknown[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -67,7 +77,8 @@ export function useRoomStatus(): { rooms: unknown[]; loading: boolean; error: st
       }
 
       // Transform to room selector format
-      const roomList = (data.rooms as any[] || []).map((room: any) => ({
+      const typedRooms: RoomListItem[] = (data.rooms as RoomListItem[]) || [];
+      const roomList = typedRooms.map((room) => ({
         id: room.room_id,
         name: room.room_name,
         temperature: room.temperature,

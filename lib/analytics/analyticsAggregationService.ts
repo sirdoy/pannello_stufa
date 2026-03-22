@@ -138,7 +138,7 @@ export async function aggregateDailyStats(dateKey: string): Promise<DailyStats> 
     // Try to get average temperature from weather cache (optional)
     let avgTemperature: number | undefined = undefined;
     try {
-      const weatherCache = await adminDbGet(getEnvironmentPath('weather/cache')) as any;
+      const weatherCache = await adminDbGet<{ temperature?: number }>(getEnvironmentPath('weather/cache'));
       if (weatherCache && typeof weatherCache.temperature === 'number') {
         avgTemperature = parseFloat(weatherCache.temperature.toFixed(1));
       }

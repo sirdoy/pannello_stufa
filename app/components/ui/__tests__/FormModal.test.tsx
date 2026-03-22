@@ -357,6 +357,10 @@ describe('FormModal', () => {
   });
 
   describe('Success State', () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
     test('shows success checkmark overlay after successful submit', async () => {
       const user = userEvent.setup();
       mockOnSubmit.mockResolvedValue(undefined);
@@ -426,9 +430,6 @@ describe('FormModal', () => {
   describe('Cancel Behavior', () => {
     test('calls onClose when cancel button is clicked', async () => {
       const user = userEvent.setup();
-
-      // Clear any prior calls from full suite test interference BEFORE render
-      mockOnClose.mockClear();
 
       render(
         <FormModal

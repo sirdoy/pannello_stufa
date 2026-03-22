@@ -28,6 +28,7 @@ export {
 export {
   // Success responses
   success,
+  created,
   noContent,
 
   // Error responses

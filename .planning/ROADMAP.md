@@ -127,10 +127,10 @@ Plans:
   3. Weather forecast route response is typed with an interface — no `as any` in the response handling path
   4. Thermostat and stove page prop casts are eliminated — props flow with proper types from server to client components
   5. `sw.ts` browser API casts use proper interfaces — no `as any` for Push API, Notification API, or Cache API access
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 116-01-PLAN.md — API routes + sw.ts: scheduler adminDbGet<T> generics, source union widening, Netatmo battery typing, weather response types, sw.ts declare global for Badging/PeriodicSync APIs
+- [x] 116-01-PLAN.md — API routes + sw.ts: scheduler adminDbGet<T> generics, source union widening, Netatmo battery typing, weather response types, sw.ts declare global for Badging/PeriodicSync APIs
 - [ ] 116-02-PLAN.md — Page components: thermostat/stove/monitoring/log/settings prop type alignment, export types from child components, canonical ScheduleInterval imports
 
 ### Phase 117: Dead Code & Cleanup
@@ -172,7 +172,7 @@ Phases execute in numeric order: 113 -> 114 -> 115 -> 116 -> 117
 | 113. Known Issues Fix | v14.1 | 1/1 | Complete    | 2026-03-22 |
 | 114. Type Safety lib/ | v14.1 | 2/2 | Complete    | 2026-03-22 |
 | 115. Type Safety app/ Components | v14.1 | 2/2 | Complete    | 2026-03-22 |
-| 116. Type Safety app/ Routes & Pages | v14.1 | 0/2 | Not started | - |
+| 116. Type Safety app/ Routes & Pages | v14.1 | 1/2 | In Progress|  |
 | 117. Dead Code & Cleanup | v14.1 | 0/TBD | Not started | - |
 
 **Total:** 19 milestones shipped, 112 phases complete, 398 plans executed. v14.1 in progress (5 phases planned).

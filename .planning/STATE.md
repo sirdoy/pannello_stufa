@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.1
 milestone_name: Tech Debt & Type Safety
 status: unknown
-stopped_at: Completed 115-02-PLAN.md
-last_updated: "2026-03-22T16:37:18.916Z"
+stopped_at: Completed 116-01-PLAN.md
+last_updated: "2026-03-22T17:11:55.115Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 115 — type-safety-components
+**Current focus:** Phase 116 — type-safety-routes-pages
 
 ## Current Position
 
-Phase: 116
-Plan: Not started
+Phase: 116 (type-safety-routes-pages) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Plan: Not started
 | Phase 114-type-safety-lib P02 | 15 | 2 tasks | 5 files |
 | Phase 115 P01 | 20 | 2 tasks | 10 files |
 | Phase 115 P02 | 10 | 2 tasks | 17 files |
+| Phase 116-type-safety-routes-pages P01 | 8m | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,7 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 115]: WeatherCardWrapper local WeatherData replaced with imported type from WeatherCard after exporting it
 - [Phase 115]: BatteryState exported from BatteryWarning to enable type-safe cross-component use
 - [Phase 115]: LightsRoomControl ControlButton variant: toControlButtonVariant() helper maps outline to subtle
+- [Phase 116-type-safety-routes-pages]: Inline PidConfig/NetatmoCurrentStatus/PidState interfaces near usage in scheduler route; CalibrationDone interface for calibrateValvesIfNeeded; declare global augmentation for Badging API and PeriodicSync in sw.ts
 
 ### Pending Todos
 
@@ -78,6 +80,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T16:31:48.757Z
-Stopped at: Completed 115-02-PLAN.md
+Last session: 2026-03-22T17:11:55.110Z
+Stopped at: Completed 116-01-PLAN.md
 Resume file: None

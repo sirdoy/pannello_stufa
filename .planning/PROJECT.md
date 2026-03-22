@@ -8,6 +8,15 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, lu
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
+## Current Milestone: v14.1 Tech Debt & Type Safety
+
+**Goal:** Eliminare `as any` dai sorgenti, risolvere tutti i known issues, migliorare la leggibilita del codice.
+
+**Target features:**
+- Known issues fix (debug panel, dead code, type mismatches, design system compliance)
+- `as any` elimination across lib/ and app/ (~81 occurrences in 36 files)
+- Dead code & TODO cleanup
+
 ## Current State
 
 **Version:** v14.0 (shipped 2026-03-22)
@@ -524,7 +533,12 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-(No active requirements — next milestone not yet defined)
+**v14.1 Tech Debt & Type Safety:**
+- [ ] Known issues fix (debug panel, dead code, type mismatches, design system compliance)
+- [ ] `as any` elimination in lib/ (16 occurrences, 6 files)
+- [ ] `as any` elimination in app/ components (~35 occurrences)
+- [ ] `as any` elimination in app/ routes & pages (~30 occurrences)
+- [ ] Dead code & TODO cleanup (unused exports, lib/ TODOs)
 
 ### Out of Scope
 
@@ -693,4 +707,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-22 after v14.0 milestone — Hue Proxy Migration complete, all 5 device providers on shared HA proxy*
+*Last updated: 2026-03-22 after v14.1 milestone start — Tech Debt & Type Safety*

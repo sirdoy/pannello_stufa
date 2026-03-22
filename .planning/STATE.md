@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v14.0
-milestone_name: Hue Proxy Migration
-status: complete
-stopped_at: Milestone v14.0 shipped
-last_updated: "2026-03-22T12:00:00.000Z"
+milestone: v14.1
+milestone_name: Tech Debt & Type Safety
+status: requirements
+stopped_at: Defining requirements
+last_updated: "2026-03-22T14:00:00.000Z"
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 12
-  completed_plans: 12
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -19,72 +19,35 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** Defining v14.1 requirements
 
 ## Current Position
 
-Phase: Milestone v14.0 complete
-Plan: N/A — start next milestone with /gsd:new-milestone
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-22 — Milestone v14.1 started
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed (all milestones): 386
-- v13.0 average: 1.6 plans/phase (11 plans / 7 phases)
-- v10.0 (Netatmo proxy, same pattern): 2.0 plans/phase (18 plans / 9 phases)
+- Total plans completed (all milestones): 398
+- v14.0 average: 1.7 plans/phase (12 plans / 7 phases)
 
 **By Milestone (recent):**
 
 | Milestone | Phases | Plans | Duration |
 |-----------|--------|-------|----------|
-| v11.1 Test Suite & Tech Debt | 92-95 | 9 | 1 day |
 | v12.0 Data Fetching & E2E | 96-98 | 4 | 2 days |
 | v13.0 Thermorossi Proxy | 99-105 | 11 | 2 days |
-| Phase 106 P01 | 3 | 2 tasks | 3 files |
-| Phase 106 P02 | 15m | 2 tasks | 14 files |
-| Phase 107 P01 | 2m | 1 tasks | 4 files |
-| Phase 107 P02 | 11 | 2 tasks | 6 files |
-| Phase 109-cleanup P02 | 8 | 2 tasks | 2 files |
-| Phase 110 P01 | 15 | 2 tasks | 3 files |
-| Phase 111 P01 | 5 | 1 tasks | 1 files |
-| Phase 112-debug-panel-hue-fixes P01 | 30 | 2 tasks | 4 files |
+| v14.0 Hue Proxy Migration | 106-112 | 12 | 2 days |
 
 ## Accumulated Context
 
 ### Decisions
 
-See PROJECT.md Key Decisions table for full history. Relevant to v14.0:
-
-- Hue proxy uses same function module pattern as thermorossiProxy.ts and netatmoProxy.ts
-- Proxy uses CLIP v1 (flat format) — not CLIP v2 — simpler, sufficient
-- 202 Accepted + suggested_poll_delay_s convention applies (same as Thermorossi v13.0)
-- Scene CRUD deferred — proxy endpoints marked "planned", not yet available
-- [Phase 106]: on_state and reachable in HueHistoryItem typed as number | null (not boolean) — SQLite stores integers, Pydantic Optional[int]
-- [Phase 106]: getScenes accepts optional groupId string (not URLSearchParams) — single query param, simpler API
-- [106-02]: GET handlers in lights/[id] and rooms/[id] migrated to withAuthAndErrorHandler; PUT handlers kept unchanged for Phase 107
-- [106-02]: rooms/route.ts no longer does Promise.all(rooms+zones); getGroups() returns both from proxy
-- [Phase 107]: haPut is direct copy of haPost with method PUT — no abstraction over method, consistent with codebase pattern
-- [Phase 107]: 409 CONFLICT inserted before catch-all EXTERNAL_API_ERROR throw in mapResponseError — preserves exact status for unreachable-light errors
-- [Phase 107]: PUT tests for [id] routes belong in [id]/__tests__/ not collection __tests__/ — different route files
-- [Phase 107]: JSDOM parseJson returns empty body for Request objects — use expect.any(Object) for body assertions in Hue PUT/POST tests
-- [108-01]: groups (not rooms) is canonical name in hook + params — aligns with HueGroup type
-- [108-01]: handleSceneActivate takes two args (sceneId, groupId) — caller always has both from scene.group_id
-- [108-01]: handleAllLightsToggle uses 2s fixed delay for multi-group parallel calls (not suggested_poll_delay_s)
-- [108-01]: useLightsCommands tests use jest.spyOn(setTimeout) resolve-immediately pattern to avoid fake timer complexity
-- [108-02]: LightsBanners reduced to 3 banners (retry error, staleness, connection error) — all pairing banners deleted
-- [108-02]: LightsCard no longer passes onConnect/connectButtonLabel — no pairing flow in proxy model
-- [108-02]: statusBadge simplified to stale check, replaces connectionMode badge map
-- [109-01]: HUE_NOT_CONNECTED and HUE_NOT_ON_LOCAL_NETWORK removed from ERROR_CODES and ErrorCode type — proxy model never throws these
-- [109-01]: remoteApiAvailable replaced with false constant in lights/page.tsx (env var ref removed, dead branch retained)
-- [109-01]: types/api/errors.ts updated alongside apiErrors.ts to keep ErrorCode union consistent with object keys
-- [Phase 109-cleanup]: docs/setup/hue-setup.md rewritten for proxy-only setup — HA_BASE_URL + HA_API_KEY, no OAuth, no frontend pairing
-- [Phase 109-cleanup]: docs/api/hue.md Quick Reference trimmed to 10 rows — POST/PUT/DELETE planned scene CRUD removed, JWT Bearer replaced with API Key
-- [Phase 110]: lights/page.tsx delegates room/scene/all-house to useLightsData+useLightsCommands hooks; individual light commands remain inline with v1 flat body
-- [Phase 110]: supportsColor null guard added to colorUtils.ts for null/undefined input safety
-- [Phase 111]: xy field added to HueLightStateRequest between sat and effect; HueCommandResponse.requested_state auto-includes xy via Partial<HueLightStateRequest>
-- [Phase 112-debug-panel-hue-fixes]: callPutEndpoint is a direct copy of callPostEndpoint with method PUT — consistent with haPut mirrors haPost pattern
-- [Phase 112-debug-panel-hue-fixes]: [Phase 112]: Both HueTab files (debug and debug/api) updated identically except line 4 import path
+See PROJECT.md Key Decisions table for full history.
 
 ### Pending Todos
 
@@ -96,6 +59,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-21T23:21:22.524Z
-Stopped at: Completed 112-01-PLAN.md
+Last session: 2026-03-22T14:00:00.000Z
+Stopped at: Milestone v14.1 started, defining requirements
 Resume file: None

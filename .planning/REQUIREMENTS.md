@@ -39,7 +39,7 @@ Requirements for Tech Debt & Type Safety milestone. Each maps to roadmap phases.
 - [x] **TYPE-13**: Scheduler route `adminDbGet` calls typed with specific interfaces
 - [x] **TYPE-14**: Netatmo homestatus `modulesFromTopology` typed for battery functions
 - [x] **TYPE-15**: Weather forecast route response typed instead of `as any`
-- [ ] **TYPE-16**: Thermostat/stove page prop casts eliminated
+- [x] **TYPE-16**: Thermostat/stove page prop casts eliminated
 - [x] **TYPE-17**: `sw.ts` browser API casts typed with proper interfaces
 
 ### Dead Code & Cleanup
@@ -91,7 +91,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TYPE-13 | Phase 116 | Complete |
 | TYPE-14 | Phase 116 | Complete |
 | TYPE-15 | Phase 116 | Complete |
-| TYPE-16 | Phase 116 | Pending |
+| TYPE-16 | Phase 116 | Complete |
 | TYPE-17 | Phase 116 | Complete |
 | CLEAN-01 | Phase 117 | Pending |
 | CLEAN-02 | Phase 117 | Pending |

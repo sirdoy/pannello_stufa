@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.1
 milestone_name: Tech Debt & Type Safety
 status: unknown
-stopped_at: Completed 116-01-PLAN.md
-last_updated: "2026-03-22T17:11:55.115Z"
+stopped_at: Completed 116-02-PLAN.md
+last_updated: "2026-03-22T17:13:34.475Z"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -46,6 +46,7 @@ Plan: 2 of 2
 | Phase 115 P01 | 20 | 2 tasks | 10 files |
 | Phase 115 P02 | 10 | 2 tasks | 17 files |
 | Phase 116-type-safety-routes-pages P01 | 8m | 2 tasks | 8 files |
+| Phase 116 P02 | 20 | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,9 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 115]: BatteryState exported from BatteryWarning to enable type-safe cross-component use
 - [Phase 115]: LightsRoomControl ControlButton variant: toControlButtonVariant() helper maps outline to subtle
 - [Phase 116-type-safety-routes-pages]: Inline PidConfig/NetatmoCurrentStatus/PidState interfaces near usage in scheduler route; CalibrationDone interface for calibrateValvesIfNeeded; declare global augmentation for Badging API and PeriodicSync in sw.ts
+- [Phase 116]: DaySchedule alias retained for safe noUncheckedIndexedAccess; WeeklySchedule used at component boundary only
+- [Phase 116]: ModuleData.name made optional in RoomCard.tsx to match NetatmoModule which lacks name field
+- [Phase 116]: NotificationDevice interface fields made explicit; [key:string]:any changed to [key:string]:unknown with runtime fields added
 
 ### Pending Todos
 
@@ -80,6 +84,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T17:11:55.110Z
-Stopped at: Completed 116-01-PLAN.md
+Last session: 2026-03-22T17:13:34.471Z
+Stopped at: Completed 116-02-PLAN.md
 Resume file: None

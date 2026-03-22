@@ -548,8 +548,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ### Active
 
-- [ ] Device Registry proxy client + types
-- [ ] Device Registry API routes (8 endpoints)
+- [x] Device Registry proxy client + types — v15.0 (Phase 118)
+- [x] Device Registry API routes (8 endpoints) — v15.0 (Phase 118)
 - [ ] Device Registry management pages (types + devices)
 - [ ] Rooms proxy client + types
 - [ ] Rooms API routes (11 endpoints)
@@ -726,4 +726,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-22 after v15.0 milestone start — Rooms & Device Registry*
+*Last updated: 2026-03-22 after Phase 118 complete — Registry Infrastructure (proxy + types + 8 API routes)*

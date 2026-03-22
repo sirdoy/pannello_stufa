@@ -9,12 +9,12 @@ Requirements for Tech Debt & Type Safety milestone. Each maps to roadmap phases.
 
 ### Known Issues
 
-- [ ] **ISSUE-01**: Debug panel HueTab `bridgeConnected` field name corrected to `connected`
-- [ ] **ISSUE-02**: Debug panel HueTab `brightness` key corrected to `bri`
-- [ ] **ISSUE-03**: `staleness.cachedAt` always null for stove — dead code removed
-- [ ] **ISSUE-04**: `UseStoveDataReturn.status` typed as `StoveState` union instead of `string`
-- [ ] **ISSUE-05**: CopyableIp uses design system Button instead of plain `<button>`
-- [ ] **ISSUE-06**: FormModal isolation flake diagnosed and fixed
+- [x] **ISSUE-01**: Debug panel HueTab `bridgeConnected` field name corrected to `connected`
+- [x] **ISSUE-02**: Debug panel HueTab `brightness` key corrected to `bri`
+- [x] **ISSUE-03**: `staleness.cachedAt` always null for stove — dead code removed
+- [x] **ISSUE-04**: `UseStoveDataReturn.status` typed as `StoveState` union instead of `string`
+- [x] **ISSUE-05**: CopyableIp uses design system Button instead of plain `<button>`
+- [x] **ISSUE-06**: FormModal isolation flake diagnosed and fixed
 
 ### Type Safety (lib/)
 
@@ -70,12 +70,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ISSUE-01 | Phase 113 | Pending |
-| ISSUE-02 | Phase 113 | Pending |
-| ISSUE-03 | Phase 113 | Pending |
-| ISSUE-04 | Phase 113 | Pending |
-| ISSUE-05 | Phase 113 | Pending |
-| ISSUE-06 | Phase 113 | Pending |
+| ISSUE-01 | Phase 113 | Complete |
+| ISSUE-02 | Phase 113 | Complete |
+| ISSUE-03 | Phase 113 | Complete |
+| ISSUE-04 | Phase 113 | Complete |
+| ISSUE-05 | Phase 113 | Complete |
+| ISSUE-06 | Phase 113 | Complete |
 | TYPE-01 | Phase 114 | Pending |
 | TYPE-02 | Phase 114 | Pending |
 | TYPE-03 | Phase 114 | Pending |

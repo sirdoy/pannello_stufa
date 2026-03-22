@@ -62,7 +62,7 @@ See `.planning/milestones/` for full archives.
 
 **Milestone Goal:** Resolve accumulated known issues from v14.0 audit, eliminate `as any` casts across lib/ and app/, and remove dead code — leaving the codebase with zero known issues, tighter types, and a smaller surface area.
 
-- [ ] **Phase 113: Known Issues Fix** - Correct debug panel field names, remove stale code paths, fix FormModal flake
+- [x] **Phase 113: Known Issues Fix** - Correct debug panel field names, remove stale code paths, fix FormModal flake (completed 2026-03-22)
 - [ ] **Phase 114: Type Safety lib/** - Eliminate `as any` across lib/ layer (admin, network, notifications, rooms, device config, firebase)
 - [ ] **Phase 115: Type Safety app/ Components** - Eliminate `as any` in component icon/spread/variant patterns and fix specific component types
 - [ ] **Phase 116: Type Safety app/ Routes & Pages** - Eliminate `as any` in API routes and page files (scheduler, Netatmo, weather, thermostat/stove, service worker)
@@ -80,10 +80,10 @@ See `.planning/milestones/` for full archives.
   3. `staleness.cachedAt` code path is gone from stove hook — no dead null-check branch exists in the file
   4. CopyableIp renders a design system `Button` component — no raw `<button>` element remains in that file
   5. FormModal test suite passes in isolation without ordering dependencies
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 113-01-PLAN.md — Fix all 6 known issues (HueTab fields, stove staleness, CopyableIp button, FormModal flake)
+- [x] 113-01-PLAN.md — Fix all 6 known issues (HueTab fields, stove staleness, CopyableIp button, FormModal flake)
 
 ### Phase 114: Type Safety lib/
 **Goal**: All `as any` casts in the lib/ layer are replaced with proper typed interfaces — adminDbGet returns typed values, browser APIs have typed wrappers, and service utilities access data without unsafe casts
@@ -157,7 +157,7 @@ Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
 | 106-112 | v14.0 | 12/12 | ✓ Complete | 2026-03-22 |
-| 113. Known Issues Fix | v14.1 | 0/1 | Not started | - |
+| 113. Known Issues Fix | v14.1 | 1/1 | Complete   | 2026-03-22 |
 | 114. Type Safety lib/ | v14.1 | 0/TBD | Not started | - |
 | 115. Type Safety app/ Components | v14.1 | 0/TBD | Not started | - |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 0/TBD | Not started | - |

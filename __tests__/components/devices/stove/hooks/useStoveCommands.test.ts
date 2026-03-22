@@ -106,14 +106,14 @@ describe('useStoveCommands', () => {
     };
 
     // Mock scheduler functions
-    jest.mocked(schedulerApiClient.clearSemiManualMode).mockResolvedValue(undefined);
+    jest.mocked(schedulerApiClient.clearSemiManualMode).mockResolvedValue({ success: true } as any);
     jest.mocked(schedulerService.getNextScheduledAction).mockResolvedValue(null);
 
     // Mock maintenance
-    jest.mocked(maintenanceService.confirmCleaning).mockResolvedValue(undefined);
+    jest.mocked(maintenanceService.confirmCleaning).mockResolvedValue(true);
 
     // Mock global fetch
-    global.fetch = jest.fn().mockResolvedValue({
+    (global as any).fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({}),
     });

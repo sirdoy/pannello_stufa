@@ -53,7 +53,7 @@ describe('StoveAdjustments', () => {
     const user = userEvent.setup();
     render(<StoveAdjustments {...mockProps} fanLevel={3} />);
     const incrementButtons = screen.getAllByLabelText('Incrementa');
-    await user.click(incrementButtons[0]); // First increment is for fan
+    await user.click(incrementButtons[0]!); // First increment is for fan
     expect(mockProps.onFanChange).toHaveBeenCalledWith({ target: { value: '4' } });
   });
 
@@ -61,7 +61,7 @@ describe('StoveAdjustments', () => {
     const user = userEvent.setup();
     render(<StoveAdjustments {...mockProps} fanLevel={3} />);
     const decrementButtons = screen.getAllByLabelText('Decrementa');
-    await user.click(decrementButtons[0]); // First decrement is for fan
+    await user.click(decrementButtons[0]!); // First decrement is for fan
     expect(mockProps.onFanChange).toHaveBeenCalledWith({ target: { value: '2' } });
   });
 
@@ -69,7 +69,7 @@ describe('StoveAdjustments', () => {
     const user = userEvent.setup();
     render(<StoveAdjustments {...mockProps} powerLevel={2} />);
     const incrementButtons = screen.getAllByLabelText('Incrementa');
-    await user.click(incrementButtons[1]); // Second increment is for power
+    await user.click(incrementButtons[1]!); // Second increment is for power
     expect(mockProps.onPowerChange).toHaveBeenCalledWith({ target: { value: '3' } });
   });
 
@@ -77,7 +77,7 @@ describe('StoveAdjustments', () => {
     const user = userEvent.setup();
     render(<StoveAdjustments {...mockProps} powerLevel={2} />);
     const decrementButtons = screen.getAllByLabelText('Decrementa');
-    await user.click(decrementButtons[1]); // Second decrement is for power
+    await user.click(decrementButtons[1]!); // Second decrement is for power
     expect(mockProps.onPowerChange).toHaveBeenCalledWith({ target: { value: '1' } });
   });
 

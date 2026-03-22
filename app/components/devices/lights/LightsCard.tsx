@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
-import type { FooterAction, StatusBadge } from '../../ui/DeviceCard';
+import type { FooterAction, StatusBadge, BannerItem } from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
 import { EmptyState } from '../../ui';
 import { useLightsData } from './hooks/useLightsData';
@@ -67,9 +67,9 @@ export default function LightsCard() {
   }] : [];
 
   // Staleness badge for DeviceCard header
-  const statusBadge: StatusBadge | null = lightsData.stale
+  const statusBadge: StatusBadge | undefined = lightsData.stale
     ? { icon: '⏳', label: 'Stale', color: 'warning' }
-    : null;
+    : undefined;
 
   // Skeleton/loading guard
   if (lightsData.loading) {
@@ -87,7 +87,7 @@ export default function LightsCard() {
       loadingMessage={lightsData.loadingMessage}
       skeletonComponent={lightsData.loading ? <Skeleton.LightsCard /> : null}
       statusBadge={statusBadge}
-      banners={banners}
+      banners={banners as BannerItem[]}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
       footerActions={footerActions}

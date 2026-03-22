@@ -1,4 +1,4 @@
-import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow } from '@/lib/core';
+import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow, HTTP_STATUS } from '@/lib/core';
 import { setPower } from '@/lib/stove/thermorossiProxy';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +17,7 @@ export const POST = withAuthAndErrorHandler(
 
     const data = await setPower(value);
 
-    return success(data as unknown as Record<string, unknown>, null, 202);
+    return success(data as unknown as Record<string, unknown>, null, HTTP_STATUS.ACCEPTED);
   }),
   'Stove/SetPower'
 );

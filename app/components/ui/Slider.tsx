@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils/cn';
 
 type SliderPrimitivePropsBase = React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>;
 
-export type SliderProps = Omit<SliderPrimitivePropsBase, 'value' | 'defaultValue' | 'onValueChange' | 'min' | 'max' | 'step' | 'disabled'> &
+export type SliderProps = Omit<SliderPrimitivePropsBase, 'value' | 'defaultValue' | 'onValueChange' | 'onChange' | 'min' | 'max' | 'step' | 'disabled'> &
   VariantProps<typeof rangeVariants> & {
     /** Current value (number for single, array for range) */
     value?: number | number[];

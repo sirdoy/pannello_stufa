@@ -39,7 +39,7 @@ describe('pidTuningLogService', () => {
       const afterTime = Date.now();
 
       expect(adminDbSet).toHaveBeenCalledTimes(1);
-      const [path, entry] = jest.mocked(adminDbSet).mock.calls[0]!;
+      const [path, entry] = jest.mocked(adminDbSet).mock.calls[0]! as [string, any];
 
       expect(path).toMatch(/^users\/auth0\|test123\/pidAutomation\/tuningLog\/\d+$/);
       expect(entry.timestamp).toBeGreaterThanOrEqual(beforeTime);
@@ -57,7 +57,7 @@ describe('pidTuningLogService', () => {
 
       await logPidTuningEntry(mockUserId, { ...mockEntry, timestamp: customTimestamp });
 
-      const [path, entry] = jest.mocked(adminDbSet).mock.calls[0]!;
+      const [path, entry] = jest.mocked(adminDbSet).mock.calls[0]! as [string, any];
       expect(path).toBe(`users/${mockUserId}/pidAutomation/tuningLog/${customTimestamp}`);
       expect(entry.timestamp).toBe(customTimestamp);
     });
@@ -65,7 +65,7 @@ describe('pidTuningLogService', () => {
     it('should include all required fields in log entry', async () => {
       await logPidTuningEntry(mockUserId, mockEntry);
 
-      const [, entry] = jest.mocked(adminDbSet).mock.calls[0]!;
+      const [, entry] = jest.mocked(adminDbSet).mock.calls[0]! as [string, any];
 
       // Check all required fields from PIDTuningLogEntry interface
       expect(entry).toHaveProperty('timestamp');

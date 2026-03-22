@@ -1,4 +1,4 @@
-import { withAuthAndErrorHandler, withIdempotency, success, parseJson } from '@/lib/core';
+import { withAuthAndErrorHandler, withIdempotency, success, parseJson, HTTP_STATUS } from '@/lib/core';
 import { sendIgnit } from '@/lib/stove/thermorossiProxy';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +16,7 @@ export const POST = withAuthAndErrorHandler(
 
     const data = await sendIgnit();
 
-    return success(data as unknown as Record<string, unknown>, null, 202);
+    return success(data as unknown as Record<string, unknown>, null, HTTP_STATUS.ACCEPTED);
   }),
   'Stove/Ignite'
 );

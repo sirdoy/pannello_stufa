@@ -95,7 +95,7 @@ describe('GET /api/fritzbox/wan', () => {
 
     // Verify the fetch function is fritzboxClient.getWanStatus
     const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
-    mockFritzboxClient.getWanStatus.mockResolvedValue(mockWan);
+    mockFritzboxClient.getWanStatus.mockResolvedValue(mockWan as any);
     await fetchFn?.();
     expect(mockFritzboxClient.getWanStatus).toHaveBeenCalled();
   });

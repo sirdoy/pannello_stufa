@@ -422,6 +422,7 @@ describe('NetworkPage', () => {
         pointCount: 100,
         isEmpty: false,
         isCollecting: false,
+        isLoading: false,
       });
 
       mockedUseNetworkData.mockReturnValue(

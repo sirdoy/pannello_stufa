@@ -148,7 +148,7 @@ describe('cleanupStaleTokens', () => {
       tokenKey: 'staleToken',
       lastActivity: '2025-10-01T00:00:00.000Z',
     });
-    expect(result.deletedTokens[0].ageDays).toBeGreaterThan(90);
+    expect((result.deletedTokens[0] as any)?.ageDays).toBeGreaterThan(90);
 
     // Verify update was called with token path set to null
     expect(mockUpdate).toHaveBeenCalledWith({
@@ -274,10 +274,10 @@ describe('cleanupStaleTokens', () => {
     // Verify audit trail was logged
     expect(mockAdminDbSet).toHaveBeenCalled();
 
-    const auditCall = mockAdminDbSet.mock.calls[0];
+    const auditCall = mockAdminDbSet.mock.calls[0]!;
     expect(auditCall[0]).toMatch(/tokenCleanupHistory/);
 
-    const auditData = auditCall[1];
+    const auditData = auditCall[1] as any;
     expect(auditData).toMatchObject({
       timestamp: Date.now(),
       tokensScanned: 1,

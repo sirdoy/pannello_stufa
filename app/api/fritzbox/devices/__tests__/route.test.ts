@@ -93,7 +93,7 @@ describe('GET /api/fritzbox/devices', () => {
 
     // Verify the fetch function is fritzboxClient.getDevices
     const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
-    mockFritzboxClient.getDevices.mockResolvedValue(mockDevices);
+    mockFritzboxClient.getDevices.mockResolvedValue(mockDevices as any);
     await fetchFn?.();
     expect(mockFritzboxClient.getDevices).toHaveBeenCalled();
   });

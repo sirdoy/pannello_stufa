@@ -34,7 +34,7 @@ export interface FooterAction extends Omit<ButtonProps, 'children'> {
   label: string;
 }
 
-export interface ToastNotification extends Omit<ToastProps, 'children'> {
+export interface ToastNotification extends Omit<ToastProps, 'children' | 'type'> {
   show: boolean;
   /** Toast message — rendered as children */
   message?: string;
@@ -276,9 +276,9 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
       {toast?.show && (
         <Toast
           variant={toast.variant ?? toast.type}
-          onClose={onToastClose}
+          onOpenChange={(open) => { if (!open && onToastClose) onToastClose(); }}
         >
-          {toast.message ?? toast.children}
+          {toast.message}
         </Toast>
       )}
     </>

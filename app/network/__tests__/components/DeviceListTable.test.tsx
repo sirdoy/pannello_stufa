@@ -318,7 +318,7 @@ describe('DeviceListTable', () => {
       const badges = screen.getAllByTestId('category-badge');
 
       // Click first badge (Device A - mobile)
-      fireEvent.click(badges[0]);
+      fireEvent.click(badges[0]!);
 
       // Dropdown should appear
       const dropdown = screen.getByRole('combobox');
@@ -333,7 +333,7 @@ describe('DeviceListTable', () => {
       const badges = screen.getAllByTestId('category-badge');
 
       // Click first badge (Device A - mobile)
-      fireEvent.click(badges[0]);
+      fireEvent.click(badges[0]!);
 
       // Change dropdown value
       const dropdown = screen.getByRole('combobox');

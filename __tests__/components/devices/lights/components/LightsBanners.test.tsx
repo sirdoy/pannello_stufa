@@ -27,12 +27,12 @@ describe('buildLightsBanners', () => {
       });
 
       expect(banners).toHaveLength(1);
-      expect(banners[0]).toMatchObject({
+      expect(banners[0]!).toMatchObject({
         variant: 'error',
         description: 'Room command failed',
       });
-      expect(banners[0].actions).toHaveLength(1);
-      expect(banners[0].actions?.[0].label).toBe('Riprova');
+      expect(banners[0]!.actions).toHaveLength(1);
+      expect(banners[0]!.actions?.[0]!.label).toBe('Riprova');
     });
 
     it('builds banner for hueSceneCmd error', () => {
@@ -43,7 +43,7 @@ describe('buildLightsBanners', () => {
       });
 
       expect(banners).toHaveLength(1);
-      expect(banners[0].description).toBe('Scene command failed');
+      expect(banners[0]!.description).toBe('Scene command failed');
     });
 
     it('retry button calls correct retry function', () => {
@@ -53,7 +53,7 @@ describe('buildLightsBanners', () => {
         hueRoomCmd: { lastError: new Error('Failed'), retry: retryFn },
       });
 
-      banners[0].actions?.[0].onClick();
+      banners[0]!.actions?.[0]!.onClick();
       expect(retryFn).toHaveBeenCalledTimes(1);
     });
   });
@@ -66,12 +66,12 @@ describe('buildLightsBanners', () => {
       });
 
       expect(banners).toHaveLength(1);
-      expect(banners[0]).toMatchObject({
+      expect(banners[0]!).toMatchObject({
         variant: 'warning',
         icon: '⏳',
         title: 'Dati non aggiornati',
       });
-      expect(banners[0].description).toContain('Bridge Hue');
+      expect(banners[0]!.description).toContain('Bridge Hue');
     });
 
     it('does not build staleness banner when stale=false', () => {
@@ -92,7 +92,7 @@ describe('buildLightsBanners', () => {
       });
 
       expect(banners).toHaveLength(1);
-      expect(banners[0]).toMatchObject({
+      expect(banners[0]!).toMatchObject({
         variant: 'error',
         icon: '⚠️',
         title: 'Errore Connessione',
@@ -109,7 +109,7 @@ describe('buildLightsBanners', () => {
         onDismissError: onDismiss,
       });
 
-      banners[0].onDismiss?.();
+      banners[0]!.onDismiss?.();
       expect(onDismiss).toHaveBeenCalledTimes(1);
     });
   });
@@ -125,11 +125,11 @@ describe('buildLightsBanners', () => {
 
       expect(banners).toHaveLength(3);
       // Priority order: retry error, staleness, connection error
-      expect(banners[0].variant).toBe('error');
-      expect(banners[0].description).toBe('Failed');
-      expect(banners[1].variant).toBe('warning');
-      expect(banners[2].variant).toBe('error');
-      expect(banners[2].description).toBe('Connection error');
+      expect(banners[0]!.variant).toBe('error');
+      expect(banners[0]!.description).toBe('Failed');
+      expect(banners[1]!.variant).toBe('warning');
+      expect(banners[2]!.variant).toBe('error');
+      expect(banners[2]!.description).toBe('Connection error');
     });
 
     it('shows staleness banner before connection error', () => {
@@ -140,8 +140,8 @@ describe('buildLightsBanners', () => {
       });
 
       expect(banners).toHaveLength(2);
-      expect(banners[0].variant).toBe('warning');
-      expect(banners[1].variant).toBe('error');
+      expect(banners[0]!.variant).toBe('warning');
+      expect(banners[1]!.variant).toBe('error');
     });
   });
 });

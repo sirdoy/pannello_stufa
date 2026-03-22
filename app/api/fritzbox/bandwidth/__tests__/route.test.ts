@@ -95,7 +95,7 @@ describe('GET /api/fritzbox/bandwidth', () => {
 
     // Verify the fetch function is fritzboxClient.getBandwidth
     const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
-    mockFritzboxClient.getBandwidth.mockResolvedValue(mockBandwidth);
+    mockFritzboxClient.getBandwidth.mockResolvedValue(mockBandwidth as any);
     await fetchFn?.();
     expect(mockFritzboxClient.getBandwidth).toHaveBeenCalled();
   });

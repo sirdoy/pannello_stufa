@@ -97,7 +97,7 @@ describe('useAdaptivePolling', () => {
     expect(callback).toHaveBeenCalledTimes(1);
 
     // Change interval to null (pause)
-    rerender({ interval: null });
+    rerender({ interval: null as unknown as number });
 
     act(() => {
       jest.advanceTimersByTime(5000);

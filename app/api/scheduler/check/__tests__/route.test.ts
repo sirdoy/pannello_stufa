@@ -47,7 +47,9 @@ jest.mock('@/lib/services/tokenCleanupService', () => ({
 }));
 
 // Import route and mocked modules
-import { GET } from '../route';
+// Cast to single-arg form since withCronSecret is mocked to return handler directly
+import { GET as _GET } from '../route';
+const GET = _GET as unknown as (request: Request) => Promise<Response>;
 import { adminDbGet, adminDbSet, adminDbUpdate, getAdminDatabase } from '@/lib/firebaseAdmin';
 import { canIgnite, trackUsageHours } from '@/lib/maintenance/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
@@ -537,7 +539,7 @@ describe('Scheduler Check Route', () => {
   describe('Cron Health Tracking', () => {
     it('saves cronHealth/lastCall timestamp on every invocation', async () => {
       setupSchedulerMocks({
-        mode: { enabled: false },
+        mode: { enabled: false, semiManual: false },
       });
 
       const request = createMockRequest();
@@ -3326,7 +3328,7 @@ describe('Scheduler Check Route', () => {
       mockLogCronExecution.mockRejectedValue(new Error('DB write error'));
 
       setupSchedulerMocks({
-        mode: { enabled: false },
+        mode: { enabled: false, semiManual: false },
       });
 
       const request = createMockRequest();

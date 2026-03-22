@@ -68,8 +68,8 @@ const MockStovePageBanners = jest.mocked(StovePageBanners);
 const MockStovePageHero = jest.mocked(StovePageHero);
 const MockStovePageAdjustments = jest.mocked(StovePageAdjustments);
 
-const createMockStoveData = (overrides = {}) => ({
-  status: 'off',
+const createMockStoveData = (overrides: Record<string, unknown> = {}) => ({
+  status: 'off' as import('@/types/thermorossiProxy').StoveState,
   fanLevel: 3,
   powerLevel: 2,
   loading: false,
@@ -150,10 +150,10 @@ describe('StovePage', () => {
     // Verify component was called with key data props
     const heroProps = MockStovePageHero.mock.calls[0]?.[0];
     expect(heroProps).toBeDefined();
-    expect(heroProps.status).toBe('working');
-    expect(heroProps.fanLevel).toBe(4);
-    expect(heroProps.powerLevel).toBe(3);
-    expect(heroProps.errorCode).toBe(0);
+    expect(heroProps!.status).toBe('working');
+    expect(heroProps!.fanLevel).toBe(4);
+    expect(heroProps!.powerLevel).toBe(3);
+    expect(heroProps!.errorCode).toBe(0);
   });
 
   it('renders StovePageAdjustments only when status includes WORK', () => {
@@ -196,7 +196,7 @@ describe('StovePage', () => {
     expect(heroProps).toBeDefined();
 
     // Trigger onIgnite
-    await heroProps.onIgnite();
+    await heroProps!.onIgnite();
 
     expect(mockCommands.handleIgnite).toHaveBeenCalled();
   });
@@ -218,11 +218,11 @@ describe('StovePage', () => {
     // Verify component was called with key data props
     const bannersProps = MockStovePageBanners.mock.calls[0]?.[0];
     expect(bannersProps).toBeDefined();
-    expect(bannersProps.errorCode).toBe(5);
-    expect(bannersProps.errorDescription).toBe('Test error');
-    expect(bannersProps.needsMaintenance).toBe(true);
-    expect(bannersProps.maintenanceStatus).toEqual({ needsCleaning: true, currentHours: 50 });
-    expect(bannersProps.cleaningInProgress).toBe(false);
-    expect(bannersProps.hasPendingCommands).toBe(false);
+    expect(bannersProps!.errorCode).toBe(5);
+    expect(bannersProps!.errorDescription).toBe('Test error');
+    expect(bannersProps!.needsMaintenance).toBe(true);
+    expect(bannersProps!.maintenanceStatus).toEqual({ needsCleaning: true, currentHours: 50 });
+    expect(bannersProps!.cleaningInProgress).toBe(false);
+    expect(bannersProps!.hasPendingCommands).toBe(false);
   });
 });

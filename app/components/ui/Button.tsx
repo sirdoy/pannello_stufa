@@ -317,8 +317,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 });
 
 export interface ButtonIconProps extends Omit<ButtonProps, 'iconOnly' | 'children'> {
-  /** Icon emoji/character */
-  icon: string;
+  /** Icon emoji/character or React element */
+  icon: React.ReactNode;
   /** Required accessibility label */
   'aria-label': string;
 }

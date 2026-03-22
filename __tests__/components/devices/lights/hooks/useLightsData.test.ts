@@ -105,7 +105,7 @@ describe('useLightsData', () => {
     jest.mocked(colorUtils.getCurrentColorHex).mockReturnValue(null);
 
     // Mock fetch globally — proxy-wrapped responses
-    global.fetch = jest.fn((url: string) => {
+    (global as any).fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
@@ -187,7 +187,7 @@ describe('useLightsData', () => {
   });
 
   it('sets stale=true when data_freshness is STALE', async () => {
-    global.fetch = jest.fn((url: string) => {
+    (global as any).fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
@@ -206,7 +206,7 @@ describe('useLightsData', () => {
   });
 
   it('sets connected=false on 503 (Bridge UNREACHABLE)', async () => {
-    global.fetch = jest.fn((url: string) => {
+    (global as any).fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: false,
@@ -380,7 +380,7 @@ describe('useLightsData', () => {
   });
 
   it('handles checkConnection error gracefully', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+    (global as any).fetch = jest.fn().mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useLightsData());
 
@@ -392,7 +392,7 @@ describe('useLightsData', () => {
   });
 
   it('handles fetchData error from groups response', async () => {
-    global.fetch = jest.fn((url: string) => {
+    (global as any).fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
@@ -428,7 +428,7 @@ describe('useLightsData', () => {
   });
 
   it('handles reconnect flag in fetchData response', async () => {
-    global.fetch = jest.fn((url: string) => {
+    (global as any).fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
@@ -505,7 +505,7 @@ describe('useLightsData', () => {
       capability_tier: 'color',
     };
 
-    global.fetch = jest.fn((url: string) => {
+    (global as any).fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,
@@ -557,7 +557,7 @@ describe('useLightsData', () => {
       colormode: null,
     };
 
-    global.fetch = jest.fn((url: string) => {
+    (global as any).fetch = jest.fn((url: string) => {
       if (url.includes('/api/hue/status')) {
         return Promise.resolve({
           ok: true,

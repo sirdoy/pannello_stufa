@@ -85,7 +85,7 @@ export default function TransitionLink({
 
     // Set custom transition type if provided
     if (transitionType) {
-      setTransitionType(transitionType);
+      setTransitionType(transitionType as Parameters<typeof setTransitionType>[0]);
     }
 
     // Start transition and navigate

@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.1
 milestone_name: Tech Debt & Type Safety
 status: unknown
-stopped_at: Completed 113-01-PLAN.md
-last_updated: "2026-03-22T14:55:51.710Z"
+stopped_at: Completed 114-01-PLAN.md
+last_updated: "2026-03-22T15:19:10.213Z"
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
+  total_plans: 3
+  completed_plans: 2
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 113 — known-issues-fix
+**Current focus:** Phase 114 — type-safety-lib
 
 ## Current Position
 
-Phase: 114
-Plan: Not started
+Phase: 114 (type-safety-lib) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -41,6 +41,7 @@ Plan: Not started
 | v13.0 Thermorossi Proxy | 99-105 | 11 | 2 days |
 | v14.0 Hue Proxy Migration | 106-112 | 12 | 2 days |
 | Phase 113 P01 | 15 | 3 tasks | 5 files |
+| Phase 114-type-safety-lib P01 | 12 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -53,6 +54,8 @@ See PROJECT.md Key Decisions table for full history.
 - Design system barrel unused exports (131) out of scope — intentional public API
 - [Phase 113]: ISSUE-04 StoveState typing was already resolved in prior plan — verified via grep, no code change needed
 - [Phase 113]: CopyableIp Button uses iconOnly prop not ButtonIcon — Lucide JSX icons incompatible with ButtonIcon emoji-only prop
+- [Phase 114-type-safety-lib]: Use FirebaseStoredPreferences alias for types/firebase/notifications.ts to avoid collision with filter's NotificationPreferences
+- [Phase 114-type-safety-lib]: Error type guard pattern: error instanceof Error && 'code' in error — returns undefined when no code, requiring truthiness guard before includes()
 
 ### Pending Todos
 
@@ -64,6 +67,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T14:53:06.595Z
-Stopped at: Completed 113-01-PLAN.md
+Last session: 2026-03-22T15:19:10.208Z
+Stopped at: Completed 114-01-PLAN.md
 Resume file: None

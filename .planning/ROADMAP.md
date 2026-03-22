@@ -177,7 +177,7 @@ Phases execute in numeric order: 113 -> 114 -> 115 -> 116 -> 117
 | 114. Type Safety lib/ | v14.1 | 2/2 | Complete    | 2026-03-22 |
 | 115. Type Safety app/ Components | v14.1 | 2/2 | Complete    | 2026-03-22 |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 2/2 | Complete    | 2026-03-22 |
-| 117. Dead Code & Cleanup | v14.1 | 2/2 | Complete   | 2026-03-22 |
+| 117. Dead Code & Cleanup | v14.1 | 2/2 | Complete    | 2026-03-22 |
 
 **Total:** 19 milestones shipped, 112 phases complete, 398 plans executed. v14.1 in progress (5 phases planned).
 

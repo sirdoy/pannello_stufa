@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.1
 milestone_name: Tech Debt & Type Safety
 status: unknown
-stopped_at: Completed 117-02-PLAN.md
-last_updated: "2026-03-22T18:21:06.894Z"
+stopped_at: Completed 117-01-PLAN.md
+last_updated: "2026-03-22T18:48:01.945Z"
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -48,6 +48,7 @@ Plan: 2 of 2
 | Phase 116-type-safety-routes-pages P01 | 8m | 2 tasks | 8 files |
 | Phase 116 P02 | 20 | 2 tasks | 12 files |
 | Phase 117 P02 | 15 | 1 tasks | 3 files |
+| Phase 117-dead-code-cleanup P01 | 54 | 2 tasks | 32 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 116]: NotificationDevice interface fields made explicit; [key:string]:any changed to [key:string]:unknown with runtime fields added
 - [Phase 117]: notificationService.ts re-exports removed (no external consumers found via grep)
 - [Phase 117]: detectStateMismatch async with userId param; adminDbRemove fire-and-forget for non-STARTING cleanup; Firebase errors return null (fail-safe)
+- [Phase 117-dead-code-cleanup]: De-export pattern: remove export keyword from internally-used symbols, delete entirely if unused anywhere
+- [Phase 117-dead-code-cleanup]: lib/core/index.ts barrel reduced from 18 to 9 re-exports — stove.validators.ts import path fixed to lib/core/requestParser
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T18:21:06.864Z
-Stopped at: Completed 117-02-PLAN.md
+Last session: 2026-03-22T18:48:01.940Z
+Stopped at: Completed 117-01-PLAN.md
 Resume file: None

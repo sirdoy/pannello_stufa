@@ -44,7 +44,7 @@ Requirements for Tech Debt & Type Safety milestone. Each maps to roadmap phases.
 
 ### Dead Code & Cleanup
 
-- [ ] **CLEAN-01**: 48 unused utility exports removed (identified by knip)
+- [x] **CLEAN-01**: 48 unused utility exports removed (identified by knip)
 - [x] **CLEAN-02**: TODO in `notificationService.ts` resolved (migrate cleanup to API route)
 - [x] **CLEAN-03**: TODO in `healthMonitoring.ts` resolved (stove STARTING grace period tracking)
 
@@ -93,7 +93,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TYPE-15 | Phase 116 | Complete |
 | TYPE-16 | Phase 116 | Complete |
 | TYPE-17 | Phase 116 | Complete |
-| CLEAN-01 | Phase 117 | Pending |
+| CLEAN-01 | Phase 117 | Complete |
 | CLEAN-02 | Phase 117 | Complete |
 | CLEAN-03 | Phase 117 | Complete |
 

@@ -59,7 +59,7 @@ export default function TransitionLink({
   ...restProps
 }: TransitionLinkProps) {
   const router = useRouter();
-  const { startTransition, setTransitionType } = usePageTransition() as any;
+  const { startTransition, setTransitionType } = usePageTransition();
 
   const handleClick = async (e: MouseEvent<HTMLAnchorElement>) => {
     // Call custom onClick if provided

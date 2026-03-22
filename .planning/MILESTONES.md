@@ -1,5 +1,37 @@
 # Project Milestones: Pannello Stufa
 
+## v14.1 Tech Debt & Type Safety (Shipped: 2026-03-22)
+
+**Delivered:** Resolved all 6 known issues from v14.0 audit, eliminated every `as any` cast across lib/, app/ components, API routes and pages, removed 50+ unused exports, and resolved 2 outstanding service TODOs — leaving zero known issues, zero unsafe casts in production code, and a smaller export surface area.
+
+**Phases completed:** 113-117 (9 plans total)
+
+**Key accomplishments:**
+
+- Fixed 6 known issues from v14.0 audit: HueTab field names, stove staleness dead code, StoveState union typing, CopyableIp design system Button, FormModal isolation flake
+- Zero `as any` casts in lib/ — generic `adminDbGet<T>()` with typed return, browser API type aliases (`NetworkInformation`, `NotificationWithMaxActions`), `RoomListItem`/`DeviceMetadata` interfaces
+- Zero `as any` casts in app/ components — icon prop widening (`React.ComponentType`), DeviceCard interface restructuring, variant prop unions, WeakSet warning tracker for ControlButton
+- Zero `as any` casts in API routes & pages — scheduler `adminDbGet<T>` generics, sw.ts `declare global` augmentation for Badging/PeriodicSync APIs, page prop type alignment
+- 50+ unused exports removed across 32 files — lib/core barrel pruned from 18→9 re-exports, 14 symbols deleted entirely, 10 de-exported
+- STARTING grace period tracking in `healthMonitoring.ts` + `notificationService.ts` disabled cleanup block removed
+
+**Stats:**
+
+- 9 plans executed across 5 phases
+- 26/26 v14.1 requirements satisfied (100%)
+- 125 files changed (+6,780 insertions, -982 deletions, net +5,798 LOC)
+- 1 day (2026-03-22)
+
+**Git range:** `fix(113-01)` (aedc41c) → `docs(phase-117)` (29ba78f)
+
+**Archives:**
+
+- [Roadmap](milestones/v14.1-ROADMAP.md)
+- [Requirements](milestones/v14.1-REQUIREMENTS.md)
+- [Audit](milestones/v14.1-MILESTONE-AUDIT.md)
+
+---
+
 ## v14.0 Hue Proxy Migration (Shipped: 2026-03-22)
 
 **Delivered:** Complete migration of Philips Hue from direct Bridge API (CLIP v2 local + v1 remote/cloud) to shared HomeAssistant proxy — new typed proxy client via haGet/haPost/haPut, all read and control endpoints migrated with 202 Accepted pattern, frontend hooks rewritten for proxy-native flat format, legacy Hue infrastructure deleted, and audit-driven gap closure fixing full pages, types, and debug panel.
@@ -26,6 +58,7 @@
 **Git range:** `feat(106-01)` (595204d) → `feat(112-01)` (1c440c2)
 
 **Tech debt (info-level):**
+
 - Debug panel HueTab: `bridgeConnected` field mismatch (should be `connected`), `brightness` key (should be `bri`)
 - GET /api/hue/history has no frontend consumer (infrastructure ready for future analytics)
 - SUMMARY frontmatter uses inconsistent `requirements_*` field naming

@@ -242,6 +242,46 @@
 
 ---
 
+## Milestone: v14.1 — Tech Debt & Type Safety
+
+**Shipped:** 2026-03-22
+**Phases:** 5 | **Plans:** 9
+
+### What Was Built
+- All 6 known issues from v14.0 audit resolved (HueTab field names, stove staleness dead code, StoveState typing, CopyableIp design system Button, FormModal isolation flake)
+- Zero `as any` casts in production code: generic `adminDbGet<T>()`, browser API type aliases, icon prop widening, variant unions, sw.ts global augmentations
+- 50+ unused exports removed across 32 files, lib/core barrel pruned from 18→9 re-exports
+- STARTING grace period tracking in healthMonitoring with Firebase RTDB timestamp, notificationService disabled block deleted
+
+### What Worked
+- Layered approach (lib/ → components → routes/pages → cleanup) prevented cascading type errors — each layer was clean before the next started
+- Research phase correctly identified all `as any` occurrences with grep, so plans were accurately scoped
+- Known issues phase first was the right call — fixed debug panel/typing bugs that would have complicated type safety work
+- Dead code cleanup last ensured no unused exports were accidentally created during type safety work
+
+### What Was Inefficient
+- SUMMARY one_liner extraction still broken for some plans — summary-extract returns null or partial fragments. 6th consecutive milestone with this issue.
+- Nyquist validation still skipped across all 5 phases — validation infrastructure exists but is never exercised
+- Some phase CONTEXT.md files were created but never committed (showing as untracked in git status)
+
+### Patterns Established
+- Generic `adminDbGet<T>()` as standard for typed Firebase reads — eliminates `as any` at all call sites with a single API change
+- Browser API type aliases (`NetworkInformation`, `NotificationWithMaxActions`) instead of `declare global` — less intrusive, scoped to usage
+- De-export pattern: remove `export` keyword but keep function if internally used — smaller public API without breaking internals
+- WeakSet for private component state (`_warned` tracking) instead of module-level variables
+
+### Key Lessons
+1. **Type safety is cumulative** — v5.0 (migration), v5.1 (strict), v14.1 (zero `as any`) are 3 distinct quality levels. Each builds on the previous.
+2. **`as any` in test files is acceptable tech debt** — ~309 test file occurrences are legitimate mock patterns. Trying to eliminate these would be diminishing returns.
+3. **Known issues should be fixed before type refactoring** — fixing bugs first prevents type work from being complicated by stale/broken code
+4. **Cleanup milestones in 1 day** — v14.1 (5 phases, 9 plans) completed same day as v14.0 shipped. Cleanup is fast when well-scoped.
+
+### Cost Observations
+- Model mix: balanced profile (sonnet executors, sonnet verifiers)
+- Notable: Entire milestone completed in 1 day (same day as v14.0 shipped) — 5 phases, 9 plans, 125 files changed
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -255,6 +295,7 @@
 | v12.0 | 3 | 4 | Polling unification + E2E smoke tests |
 | v13.0 | 7 | 11 | Thermorossi proxy migration — unified all 4 providers |
 | v14.0 | 7 | 12 | Hue proxy migration — unified all 5 providers, no direct APIs remain |
+| v14.1 | 5 | 9 | Type safety + dead code cleanup — zero `as any` in production code |
 
 ### Cumulative Quality
 
@@ -267,6 +308,7 @@
 | v12.0 | 4,000+ | 18/18 requirements | +2,709 |
 | v13.0 | 4,000+ | 26/26 requirements | +5,130 |
 | v14.0 | 4,000+ | 27/27 requirements | +5,258 |
+| v14.1 | 4,000+ | 26/26 requirements | +5,798 |
 
 ### Top Lessons (Verified Across Milestones)
 

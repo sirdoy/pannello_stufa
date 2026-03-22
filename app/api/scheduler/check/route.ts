@@ -96,7 +96,7 @@ interface CalibrationDone { calibrated: true; timestamp: number; nextCalibration
 async function calibrateValvesIfNeeded(): Promise<CalibrationResult | CalibrationSkipped | CalibrationDone> {
   try {
     const calibrationPath = getEnvironmentPath('netatmo/lastAutoCalibration');
-    const lastCalibration = await adminDbGet(calibrationPath) as number | null;
+    const lastCalibration = await adminDbGet<number>(calibrationPath);
 
     const now = Date.now();
     const TWELVE_HOURS = 12 * 60 * 60 * 1000;
@@ -143,7 +143,7 @@ async function calibrateValvesIfNeeded(): Promise<CalibrationResult | Calibratio
 async function refreshWeatherIfNeeded(): Promise<any> {
   try {
     const lastRefreshPath = getEnvironmentPath('cron/lastWeatherRefresh');
-    const lastRefresh = await adminDbGet(lastRefreshPath) as number | null;
+    const lastRefresh = await adminDbGet<number>(lastRefreshPath);
 
     const now = Date.now();
     const THIRTY_MINUTES = 30 * 60 * 1000;
@@ -159,7 +159,7 @@ async function refreshWeatherIfNeeded(): Promise<any> {
 
     // Read location from Firebase
     const locationPath = getEnvironmentPath('config/location');
-    const location = await adminDbGet(locationPath) as { latitude: number; longitude: number; name?: string } | null;
+    const location = await adminDbGet<{ latitude: number; longitude: number; name?: string }>(locationPath);
 
     if (!location || !location.latitude || !location.longitude) {
       console.warn('⚠️ Weather refresh skipped: location not configured');
@@ -205,7 +205,7 @@ async function refreshWeatherIfNeeded(): Promise<any> {
 async function cleanupTokensIfNeeded(): Promise<any> {
   try {
     const lastCleanupPath = getEnvironmentPath('cron/lastTokenCleanup');
-    const lastCleanup = await adminDbGet(lastCleanupPath) as number | null;
+    const lastCleanup = await adminDbGet<number>(lastCleanupPath);
 
     const now = Date.now();
     const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
@@ -294,7 +294,7 @@ async function sendStoveStatusWorkNotification(currentStatus: string): Promise<v
   try {
     // Check if we already notified recently (30 min cooldown)
     const lastNotifyPath = getEnvironmentPath('scheduler/lastWorkNotification');
-    const lastNotify = await adminDbGet(lastNotifyPath) as number | null;
+    const lastNotify = await adminDbGet<number>(lastNotifyPath);
     const now = Date.now();
     const THIRTY_MINUTES = 30 * 60 * 1000;
 
@@ -330,7 +330,7 @@ async function checkAndNotifyUnexpectedOff(active: any, isOn: boolean, statusFet
   try {
     // Check if we ignited during this schedule interval
     const ignitionTrackPath = getEnvironmentPath('scheduler/lastIgnitionInterval');
-    const lastIgnition = await adminDbGet(ignitionTrackPath) as { interval: string } | null;
+    const lastIgnition = await adminDbGet<{ interval: string }>(ignitionTrackPath);
 
     if (!lastIgnition) return; // No previous ignition tracked
 
@@ -340,7 +340,7 @@ async function checkAndNotifyUnexpectedOff(active: any, isOn: boolean, statusFet
 
     // Check if we already notified for this unexpected off (1 hour cooldown)
     const unexpectedOffPath = getEnvironmentPath('scheduler/lastUnexpectedOffNotification');
-    const lastUnexpectedNotify = await adminDbGet(unexpectedOffPath) as number | null;
+    const lastUnexpectedNotify = await adminDbGet<number>(unexpectedOffPath);
     const now = Date.now();
     const ONE_HOUR = 60 * 60 * 1000;
 
@@ -816,7 +816,7 @@ export const GET = withCronSecret(async (_request) => {
   const currentMinutes = parseInt(hourPart) * 60 + parseInt(minutePart);
 
   // Get active schedule
-  const activeScheduleId = (await adminDbGet('schedules-v2/activeScheduleId') as string | null) || 'default';
+  const activeScheduleId = (await adminDbGet<string>('schedules-v2/activeScheduleId')) || 'default';
   const intervals = await adminDbGet<ScheduleInterval[]>(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`);
 
   if (!intervals) {
@@ -951,7 +951,7 @@ export const GET = withCronSecret(async (_request) => {
 
     // Read PID boost state from Firebase
     const pidBoostPath = getEnvironmentPath('pidAutomation/boost');
-    const pidBoost = await adminDbGet(pidBoostPath) as { active?: boolean; powerLevel?: number } | null;
+    const pidBoost = await adminDbGet<{ active?: boolean; powerLevel?: number }>(pidBoostPath);
     const pidBoostActive = !!(pidBoost?.active && pidBoost?.powerLevel);
 
     // Handle power/fan level changes (from schedule)

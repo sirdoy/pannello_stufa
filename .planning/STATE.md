@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v14.1
 milestone_name: Tech Debt & Type Safety
-status: unknown
-stopped_at: Completed 117-01-PLAN.md
-last_updated: "2026-03-22T18:51:36.243Z"
+status: milestone_complete
+stopped_at: v14.1 milestone archived
+last_updated: "2026-03-22T21:00:00.000Z"
 progress:
   total_phases: 5
   completed_phases: 5
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 117 — dead-code-cleanup
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 117
-Plan: Not started
+Phase: v14.1 complete
+Plan: Milestone archived
 
 ## Performance Metrics
 

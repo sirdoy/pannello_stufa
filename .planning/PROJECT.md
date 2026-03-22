@@ -537,9 +537,24 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **CLEAN-02**: notificationService disabled block removed — v14.1 (Phase 117)
 - ✓ **CLEAN-03**: healthMonitoring STARTING grace period implemented — v14.1 (Phase 117)
 
+## Current Milestone: v15.0 Rooms & Device Registry
+
+**Goal:** Build the Next.js frontend layer for Rooms API and Device Registry API — types, proxy client, API routes, hooks, pages, and components.
+
+**Target features:**
+- Device Registry: type taxonomy CRUD, device registration/management with pagination, health stats
+- Rooms: room CRUD, device-to-room association, per-room and house-wide status aggregation
+- Room-based dashboard view with device status per room
+
 ### Active
 
-(None — planning next milestone)
+- [ ] Device Registry proxy client + types
+- [ ] Device Registry API routes (8 endpoints)
+- [ ] Device Registry management pages (types + devices)
+- [ ] Rooms proxy client + types
+- [ ] Rooms API routes (11 endpoints)
+- [ ] Rooms management page (CRUD + device association)
+- [ ] Room status views (per-room + house status)
 
 ### Out of Scope
 
@@ -711,4 +726,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-22 after v14.1 milestone — Tech Debt & Type Safety*
+*Last updated: 2026-03-22 after v15.0 milestone start — Rooms & Device Registry*

@@ -2,39 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { WeatherCard } from '@/app/components/weather';
+import type { WeatherData } from '@/app/components/weather/WeatherCard';
 import { subscribeToLocation } from '@/lib/services/locationService';
 
 interface Location {
   name: string | null;
   latitude: number | null;
   longitude: number | null;
-}
-
-interface WeatherData {
-  current: {
-    temp: number;
-    feels_like: number;
-    humidity: number;
-    weather: Array<{
-      id: number;
-      main: string;
-      description: string;
-      icon: string;
-    }>;
-  };
-  daily: Array<{
-    dt: number;
-    temp: {
-      min: number;
-      max: number;
-    };
-    weather: Array<{
-      id: number;
-      main: string;
-      description: string;
-      icon: string;
-    }>;
-  }>;
 }
 
 /**
@@ -125,7 +99,7 @@ export default function WeatherCardWrapper() {
 
   return (
     <WeatherCard
-      weatherData={weatherData as any}
+      weatherData={weatherData}
       locationName={location?.name || null}
       isLoading={isLoading}
       error={error}

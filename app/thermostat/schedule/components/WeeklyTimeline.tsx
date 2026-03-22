@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { parseTimelineSlots, DAY_NAMES, formatTimeFromMinutes, ZONE_COLORS, TimelineSlot as ImportedTimelineSlot } from '@/lib/utils/scheduleHelpers';
+import { parseTimelineSlots, DAY_NAMES, formatTimeFromMinutes, ZONE_COLORS, TimelineSlot as ImportedTimelineSlot, NetatmoSchedule } from '@/lib/utils/scheduleHelpers';
 import TimelineSlot from './TimelineSlot';
 import { Text } from '@/app/components/ui';
 
@@ -47,7 +47,7 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
       return Array(7).fill([]);
     }
 
-    const allSlots = parseTimelineSlots(schedule as any);
+    const allSlots = parseTimelineSlots(schedule as unknown as NetatmoSchedule);
 
     // Group by day (0-6)
     const grouped: ImportedTimelineSlot[][] = Array(7).fill(null).map(() => []);

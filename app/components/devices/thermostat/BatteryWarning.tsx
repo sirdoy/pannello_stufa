@@ -2,7 +2,7 @@
 
 import { Banner, Text } from '../../ui';
 
-type BatteryState = 'full' | 'high' | 'medium' | 'low' | 'very_low';
+export type BatteryState = 'full' | 'high' | 'medium' | 'low' | 'very_low';
 type ModuleType = 'NRV' | 'NATherm1' | 'NAPlug' | 'OTH' | 'OTM' | string;
 
 interface Module {

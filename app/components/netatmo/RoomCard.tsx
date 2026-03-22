@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Card, Button, StatusBadge, Heading, Text, Badge } from '@/app/components/ui';
 import { BatteryBadge } from '@/app/components/devices/thermostat/BatteryWarning';
+import type { BatteryState } from '@/app/components/devices/thermostat/BatteryWarning';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
 interface ModuleData {
@@ -433,7 +434,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     {/* Battery badge */}
                     {module.battery_state && (
-                      <>{(BatteryBadge as any)({ batteryState: module.battery_state, showLabel: true })}</>
+                      <BatteryBadge batteryState={module.battery_state as BatteryState} showLabel />
                     )}
                     {/* Show battery OK for non-critical states */}
                     {module.battery_state && !['low', 'very_low'].includes(module.battery_state) && (

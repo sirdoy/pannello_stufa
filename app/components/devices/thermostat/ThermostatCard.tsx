@@ -71,8 +71,8 @@ export default function ThermostatCard() {
 
   // Sync selectedScheduleId with activeSchedule
   useEffect(() => {
-    if (typedActiveSchedule && !selectedScheduleId && (activeSchedule as any).id) {
-      setSelectedScheduleId((activeSchedule as any).id);
+    if (typedActiveSchedule && !selectedScheduleId && typedActiveSchedule.id) {
+      setSelectedScheduleId(typedActiveSchedule.id);
     }
   }, [activeSchedule, selectedScheduleId]);
 
@@ -337,7 +337,7 @@ export default function ThermostatCard() {
       setLoadingMessage('Modifica temperatura...');
       setRefreshing(true);
       setError(null);
-      const response = await netatmoTempCmd.execute((NETATMO_ROUTES as any).setRoomThermpoint, {
+      const response = await netatmoTempCmd.execute(NETATMO_ROUTES.setRoomThermpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

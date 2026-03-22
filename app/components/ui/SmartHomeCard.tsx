@@ -211,7 +211,7 @@ const SmartHomeCard = forwardRef<HTMLDivElement, SmartHomeCardProps>(function Sm
 
         {/* Error state */}
         {error && errorMessage && (
-          <Banner {...({ variant: "error", compact: true, className: "mb-4", children: errorMessage } as any)} />
+          <Banner variant="error" compact className="mb-4">{errorMessage}</Banner>
         )}
 
         {/* Loading overlay */}

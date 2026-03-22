@@ -20,12 +20,12 @@ import { CurrentConditions } from './CurrentConditions';
 import { ForecastRow } from './ForecastRow';
 import { ForecastDaySheet } from './ForecastDaySheet';
 
-interface WeatherCondition {
+export interface WeatherCondition {
   description?: string;
   code?: number;
 }
 
-interface CurrentWeather {
+export interface CurrentWeather {
   temperature: number;
   feelsLike?: number | null;
   humidity?: number | null;
@@ -37,7 +37,7 @@ interface CurrentWeather {
   visibility?: number | null;
 }
 
-interface ForecastDay {
+export interface ForecastDay {
   date: string;
   tempMax: number;
   tempMin: number;
@@ -54,14 +54,14 @@ interface ForecastDay {
   sunset?: string;
 }
 
-interface HourlyData {
+export interface HourlyData {
   times: string[];
   temperatures: number[];
   weatherCodes: number[];
   precipProbabilities: number[];
 }
 
-interface WeatherData {
+export interface WeatherData {
   current: CurrentWeather;
   forecast: ForecastDay[];
   hourly?: HourlyData;

@@ -12,6 +12,8 @@
  * - Notification type to action mapping
  */
 
+type NotificationWithMaxActions = typeof Notification & { maxActions?: number };
+
 /**
  * Action ID constants
  * Used in webpush.notification.actions array and service worker notificationclick handler
@@ -76,7 +78,8 @@ export function supportsNotificationActions(): boolean {
   if (typeof window === 'undefined') return false;
   if (!('Notification' in window)) return false;
   try {
-    return 'maxActions' in Notification && (Notification as any).maxActions > 0;
+    const NotifConstructor = Notification as NotificationWithMaxActions;
+    return 'maxActions' in NotifConstructor && (NotifConstructor.maxActions ?? 0) > 0;
   } catch {
     return false;
   }
@@ -96,7 +99,7 @@ export function getNotificationCapabilities() {
   let maxActions = 0;
   try {
     if ('Notification' in window && 'maxActions' in Notification) {
-      maxActions = (Notification as any).maxActions;
+      maxActions = (Notification as NotificationWithMaxActions).maxActions ?? 0;
     }
   } catch {
     /* ignore */

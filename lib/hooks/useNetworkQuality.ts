@@ -2,6 +2,18 @@
 
 import { useState, useEffect } from 'react';
 
+interface NetworkInformation extends EventTarget {
+  readonly effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
+  addEventListener(type: 'change', listener: EventListenerOrEventListenerObject): void;
+  removeEventListener(type: 'change', listener: EventListenerOrEventListenerObject): void;
+}
+
+declare global {
+  interface Navigator {
+    readonly connection?: NetworkInformation;
+  }
+}
+
 /**
  * Network quality classification based on effective connection type.
  */
@@ -21,7 +33,7 @@ export function useNetworkQuality(): NetworkQuality {
 
   useEffect(() => {
     // Check if Network Information API is available
-    const connection = (navigator as any).connection;
+    const connection = navigator.connection;
     if (!connection) {
       return;
     }
@@ -48,7 +60,7 @@ function getNetworkQuality(): NetworkQuality {
     return 'unknown';
   }
 
-  const connection = (navigator as any).connection;
+  const connection = navigator.connection;
   if (!connection || !connection.effectiveType) {
     return 'unknown';
   }

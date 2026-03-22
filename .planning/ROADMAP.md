@@ -111,10 +111,10 @@ Plans:
   3. Variant prop casts are eliminated — variant props use typed union literals matching CVA definitions
   4. `DeviceCard` banner, action, and toast props align — no structural mismatch requires a cast at usage sites
   5. `TransitionLink` and `ControlButton` internal types are explicit — no `_warned` or return type casts remain
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 115-01-PLAN.md — Foundation types: Button/LoadingOverlay icon widening, DeviceCard interface restructuring, empty spread fixes, ControlButton WeakSet, TransitionLink cast removal
+- [x] 115-01-PLAN.md — Foundation types: Button/LoadingOverlay icon widening, DeviceCard interface restructuring, empty spread fixes, ControlButton WeakSet, TransitionLink cast removal
 - [ ] 115-02-PLAN.md — Consumer fixes: icon cast removals, StoveCard variant typing, LightsCard/RoomControl types, ThermostatCard schedule/routes, WeatherCardWrapper, RoomCard JSX, DataTable label
 
 ### Phase 116: Type Safety app/ Routes & Pages
@@ -167,7 +167,7 @@ Phases execute in numeric order: 113 -> 114 -> 115 -> 116 -> 117
 | 106-112 | v14.0 | 12/12 | ✓ Complete | 2026-03-22 |
 | 113. Known Issues Fix | v14.1 | 1/1 | Complete    | 2026-03-22 |
 | 114. Type Safety lib/ | v14.1 | 2/2 | Complete    | 2026-03-22 |
-| 115. Type Safety app/ Components | v14.1 | 0/2 | Not started | - |
+| 115. Type Safety app/ Components | v14.1 | 1/2 | In Progress|  |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 0/TBD | Not started | - |
 | 117. Dead Code & Cleanup | v14.1 | 0/TBD | Not started | - |
 

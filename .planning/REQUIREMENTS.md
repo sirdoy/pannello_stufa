@@ -27,12 +27,12 @@ Requirements for Tech Debt & Type Safety milestone. Each maps to roadmap phases.
 
 ### Type Safety (app/ components)
 
-- [ ] **TYPE-07**: Component `icon` prop casts (`<X /> as any`) eliminated with proper typing
-- [ ] **TYPE-08**: Component spread patterns (`{...({} as any)}`) eliminated
+- [x] **TYPE-07**: Component `icon` prop casts (`<X /> as any`) eliminated with proper typing
+- [x] **TYPE-08**: Component spread patterns (`{...({} as any)}`) eliminated
 - [ ] **TYPE-09**: `variant` prop casts eliminated with proper union types
-- [ ] **TYPE-10**: `DeviceCard` banner/action/toast prop types aligned
-- [ ] **TYPE-11**: `TransitionLink` `usePageTransition()` return typed
-- [ ] **TYPE-12**: `ControlButton` `_warned` property typed properly
+- [x] **TYPE-10**: `DeviceCard` banner/action/toast prop types aligned
+- [x] **TYPE-11**: `TransitionLink` `usePageTransition()` return typed
+- [x] **TYPE-12**: `ControlButton` `_warned` property typed properly
 
 ### Type Safety (app/ routes & pages)
 
@@ -82,12 +82,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TYPE-04 | Phase 114 | Complete |
 | TYPE-05 | Phase 114 | Complete |
 | TYPE-06 | Phase 114 | Complete |
-| TYPE-07 | Phase 115 | Pending |
-| TYPE-08 | Phase 115 | Pending |
+| TYPE-07 | Phase 115 | Complete |
+| TYPE-08 | Phase 115 | Complete |
 | TYPE-09 | Phase 115 | Pending |
-| TYPE-10 | Phase 115 | Pending |
-| TYPE-11 | Phase 115 | Pending |
-| TYPE-12 | Phase 115 | Pending |
+| TYPE-10 | Phase 115 | Complete |
+| TYPE-11 | Phase 115 | Complete |
+| TYPE-12 | Phase 115 | Complete |
 | TYPE-13 | Phase 116 | Pending |
 | TYPE-14 | Phase 116 | Pending |
 | TYPE-15 | Phase 116 | Pending |

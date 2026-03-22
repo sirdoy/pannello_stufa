@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.1
 milestone_name: Tech Debt & Type Safety
 status: unknown
-stopped_at: Completed 114-02-PLAN.md
-last_updated: "2026-03-22T15:29:35.645Z"
+stopped_at: Completed 115-01-PLAN.md
+last_updated: "2026-03-22T16:22:30.801Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 114 — type-safety-lib
+**Current focus:** Phase 115 — type-safety-components
 
 ## Current Position
 
-Phase: 115
-Plan: Not started
+Phase: 115 (type-safety-components) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -43,6 +43,7 @@ Plan: Not started
 | Phase 113 P01 | 15 | 3 tasks | 5 files |
 | Phase 114-type-safety-lib P01 | 12 | 2 tasks | 2 files |
 | Phase 114-type-safety-lib P02 | 15 | 2 tasks | 5 files |
+| Phase 115 P01 | 20 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -59,6 +60,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 114-type-safety-lib]: Error type guard pattern: error instanceof Error && 'code' in error — returns undefined when no code, requiring truthiness guard before includes()
 - [Phase 114-type-safety-lib]: NotificationWithMaxActions type alias used instead of declare global NotificationConstructor — in-narrowing typed property as unknown
 - [Phase 114-type-safety-lib]: migrateFromOldFormat parameter typed as DeviceConfigData | Record<string, unknown> | null to accept both typed and legacy shapes
+- [Phase 115]: ToastNotification extends Omit<ToastProps,'children'> with legacy message/type fields; render destructures them
+- [Phase 115]: BottomSheet ActionButton variant 'close' changed to 'ghost' (same styling) using satisfies operator
 
 ### Pending Todos
 
@@ -70,6 +73,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T15:26:11.361Z
-Stopped at: Completed 114-02-PLAN.md
+Last session: 2026-03-22T16:22:30.796Z
+Stopped at: Completed 115-01-PLAN.md
 Resume file: None

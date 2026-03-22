@@ -14,7 +14,7 @@ import {
   ERROR_CODES,
   HTTP_STATUS,
 } from '@/lib/core';
-import { getHealthStats } from '@/lib/healthLogger';
+import { getHealthStats } from '@/lib/health/healthLogger';
 
 export const dynamic = 'force-dynamic';
 

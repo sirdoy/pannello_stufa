@@ -9,7 +9,7 @@
  */
 
 import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';
-import { getProxyRoomMeasure } from '@/lib/netatmoProxy';
+import { getProxyRoomMeasure } from '@/lib/netatmo/netatmoProxy';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';

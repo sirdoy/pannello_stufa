@@ -14,7 +14,7 @@
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getProxyHealth } from '@/lib/netatmoProxy';
+import { getProxyHealth } from '@/lib/netatmo/netatmoProxy';
 
 export const dynamic = 'force-dynamic';
 

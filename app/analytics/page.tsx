@@ -13,7 +13,7 @@ import Button from '@/app/components/ui/Button';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import { Skeleton } from '@/app/components/ui';
-import { canTrackAnalytics, getConsentState } from '@/lib/analyticsConsentService';
+import { canTrackAnalytics, getConsentState } from '@/lib/analytics/analyticsConsentService';
 import type { DailyStats, AnalyticsPeriod } from '@/types/analytics';
 
 const UsageChart = dynamic(

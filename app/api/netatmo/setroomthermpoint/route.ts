@@ -7,7 +7,7 @@ import {
   validateEnum,
 } from '@/lib/core';
 import { adminDbPush } from '@/lib/firebaseAdmin';
-import { proxySetRoomThermpoint } from '@/lib/netatmoProxy';
+import { proxySetRoomThermpoint } from '@/lib/netatmo/netatmoProxy';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 import type { NextRequest } from 'next/server';
 

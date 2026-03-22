@@ -6,12 +6,12 @@
  */
 
 import { POST } from '@/app/api/netatmo/camera/monitoring/route';
-import { proxySetCameraMonitoring } from '@/lib/netatmoProxy';
+import { proxySetCameraMonitoring } from '@/lib/netatmo/netatmoProxy';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import type { SetMonitoringResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 jest.mock('@/lib/firebaseAdmin');
 jest.mock('@/lib/core', () => {
   const badRequest = (msg: string) => ({ ok: false, error: msg, status: 400 });

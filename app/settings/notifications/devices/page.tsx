@@ -5,7 +5,7 @@ import { useUser } from '@auth0/nextjs-auth0/client';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import { Card, Button, Heading, Text, Skeleton, EmptyState, Banner } from '@/app/components/ui';
 import DeviceListItem from '@/components/notifications/DeviceListItem';
-import { checkStoredToken } from '@/lib/notificationService';
+import { checkStoredToken } from '@/lib/notifications/notificationService';
 
 interface NotificationDevice {
   tokenKey: string;

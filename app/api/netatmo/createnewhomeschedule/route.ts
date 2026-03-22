@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, success, parseJsonOrThrow, validateRequired } from '@/lib/core';
-import { proxyCreateNewHomeSchedule } from '@/lib/netatmoProxy';
+import { proxyCreateNewHomeSchedule } from '@/lib/netatmo/netatmoProxy';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';

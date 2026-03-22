@@ -6,12 +6,12 @@
  */
 
 import { POST } from '@/app/api/netatmo/switchhomeschedule/route';
-import { proxySwitchHomeSchedule } from '@/lib/netatmoProxy';
+import { proxySwitchHomeSchedule } from '@/lib/netatmo/netatmoProxy';
 import { adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 jest.mock('@/lib/firebaseAdmin');
 jest.mock('@/lib/environmentHelper');
 jest.mock('@/lib/core', () => ({

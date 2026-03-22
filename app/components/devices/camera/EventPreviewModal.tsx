@@ -2,7 +2,7 @@
 
 import { X } from 'lucide-react';
 import { Modal, Text, Button, Card } from '../../ui';
-import { getEventTypeName, getEventIcon } from '@/lib/netatmoCameraApi';
+import { getEventTypeName, getEventIcon } from '@/lib/netatmo/netatmoCameraApi';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import type { CameraEvent } from '@/types/netatmoProxy';
 

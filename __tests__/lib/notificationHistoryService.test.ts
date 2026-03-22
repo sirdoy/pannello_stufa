@@ -4,7 +4,7 @@
  * Validates notification history querying with filters and pagination.
  */
 
-import { getNotificationHistory } from '@/lib/notificationHistoryService';
+import { getNotificationHistory } from '@/lib/notifications/notificationHistoryService';
 import { getAdminFirestore } from '@/lib/firebaseAdmin';
 import { Timestamp } from 'firebase-admin/firestore';
 

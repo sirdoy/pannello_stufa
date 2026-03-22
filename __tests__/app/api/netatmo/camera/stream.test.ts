@@ -6,11 +6,11 @@
  */
 
 import { GET } from '@/app/api/netatmo/camera/stream/route';
-import { getProxyCameraStream } from '@/lib/netatmoProxy';
+import { getProxyCameraStream } from '@/lib/netatmo/netatmoProxy';
 import type { CameraStreamResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 jest.mock('@/lib/core', () => ({
   withAuthAndErrorHandler: (fn: Function) => async (...args: unknown[]) => {
     try {

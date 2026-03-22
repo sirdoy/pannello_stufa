@@ -22,7 +22,7 @@ import { useNetworkData } from '@/app/components/devices/network/hooks/useNetwor
 import { useBandwidthHistory } from './hooks/useBandwidthHistory';
 import { useDeviceHistory } from './hooks/useDeviceHistory';
 import { useBandwidthCorrelation } from './hooks/useBandwidthCorrelation';
-import { canTrackAnalytics, getConsentState } from '@/lib/analyticsConsentService';
+import { canTrackAnalytics, getConsentState } from '@/lib/analytics/analyticsConsentService';
 import WanStatusCard from './components/WanStatusCard';
 import DeviceListTable from './components/DeviceListTable';
 import CorrelationInsight from './components/CorrelationInsight';

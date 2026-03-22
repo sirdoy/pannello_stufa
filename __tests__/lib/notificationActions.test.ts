@@ -6,7 +6,7 @@ import {
   getActionsForNotificationType,
   supportsNotificationActions,
   getNotificationCapabilities,
-} from '@/lib/notificationActions';
+} from '@/lib/notifications/notificationActions';
 
 describe('notificationActions', () => {
   describe('NOTIFICATION_ACTIONS constants', () => {

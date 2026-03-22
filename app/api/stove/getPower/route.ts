@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getPower } from '@/lib/thermorossiProxy';
+import { getPower } from '@/lib/stove/thermorossiProxy';
 
 export const dynamic = 'force-dynamic';
 

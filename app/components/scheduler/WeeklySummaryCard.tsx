@@ -3,8 +3,8 @@
 import Card from '../ui/Card';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
-import { calculateWeeklyStats } from '@/lib/schedulerStats';
-import type { WeeklySchedule } from '@/lib/schedulerService';
+import { calculateWeeklyStats } from '@/lib/scheduler/schedulerStats';
+import type { WeeklySchedule } from '@/lib/scheduler/schedulerService';
 
 export interface WeeklySummaryCardProps {
   schedule: WeeklySchedule;

@@ -23,7 +23,7 @@
  * }
  */
 
-import { getDeliveryStats, shouldSendRateAlert, recordRateAlert } from '@/lib/notificationLogger';
+import { getDeliveryStats, shouldSendRateAlert, recordRateAlert } from '@/lib/notifications/notificationLogger';
 import { sendNotificationToUser, getAdminDatabase } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';

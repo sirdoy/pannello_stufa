@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, success, parseQuery } from '@/lib/core';
-import { getProxyCameraEvents } from '@/lib/netatmoProxy';
+import { getProxyCameraEvents } from '@/lib/netatmo/netatmoProxy';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';

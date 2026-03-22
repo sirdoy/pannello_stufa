@@ -11,7 +11,7 @@
  * - Convenience wrapper endpoints
  */
 
-import { getProxyHomestatus, getProxyHomesdata } from '@/lib/netatmoProxy';
+import { getProxyHomestatus, getProxyHomesdata } from '@/lib/netatmo/netatmoProxy';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
 
 // Mock global fetch

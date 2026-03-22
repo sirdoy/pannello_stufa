@@ -50,7 +50,7 @@ jest.mock('@/lib/firebaseAdmin', () => ({
   adminDbPush: jest.fn(),
 }));
 
-jest.mock('@/lib/netatmoProxy', () => ({
+jest.mock('@/lib/netatmo/netatmoProxy', () => ({
   proxySetRoomThermpoint: jest.fn(),
 }));
 
@@ -63,7 +63,7 @@ jest.mock('@/lib/devices/deviceTypes', () => ({
 // Import after mocks are set up
 import { POST } from '../route';
 import { adminDbPush } from '@/lib/firebaseAdmin';
-import { proxySetRoomThermpoint } from '@/lib/netatmoProxy';
+import { proxySetRoomThermpoint } from '@/lib/netatmo/netatmoProxy';
 
 describe('POST /api/netatmo/setroomthermpoint (co-located)', () => {
   beforeEach(() => {

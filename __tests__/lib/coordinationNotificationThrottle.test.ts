@@ -8,7 +8,7 @@ import {
   getThrottleStatus,
   clearThrottle,
   _internals,
-} from '@/lib/coordinationNotificationThrottle';
+} from '@/lib/notifications/coordinationNotificationThrottle';
 
 describe('coordinationNotificationThrottle', () => {
   beforeEach(() => {

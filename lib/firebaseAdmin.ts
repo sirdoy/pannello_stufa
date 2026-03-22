@@ -14,10 +14,10 @@ import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 import { getMessaging, Messaging } from 'firebase-admin/messaging';
 import { getDatabase, Database } from 'firebase-admin/database';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
-import { logNotification } from './notificationLogger';
-import { filterNotificationByPreferences, getFilterMessage } from './notificationFilter';
+import { logNotification } from './notifications/notificationLogger';
+import { filterNotificationByPreferences, getFilterMessage } from './notifications/notificationFilter';
 import { getDefaultPreferences } from './schemas/notificationPreferences';
-import { getActionsForNotificationType, ACTION_CATEGORIES, type NotificationActionDef } from './notificationActions';
+import { getActionsForNotificationType, ACTION_CATEGORIES, type NotificationActionDef } from './notifications/notificationActions';
 
 // Error codes that indicate token is permanently invalid
 const INVALID_TOKEN_ERRORS = [

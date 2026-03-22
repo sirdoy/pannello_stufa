@@ -11,8 +11,8 @@ import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 import { X } from 'lucide-react';
-import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/schedulerStats';
-import type { ScheduleInterval } from '@/lib/schedulerService';
+import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/scheduler/schedulerStats';
+import type { ScheduleInterval } from '@/lib/scheduler/schedulerService';
 
 const DURATION_PRESETS = [
   { value: 15, label: '15 minuti' },

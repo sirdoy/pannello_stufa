@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow } from '@/lib/core';
-import { setWaterTemp } from '@/lib/thermorossiProxy';
+import { setWaterTemp } from '@/lib/stove/thermorossiProxy';
 
 export const dynamic = 'force-dynamic';
 

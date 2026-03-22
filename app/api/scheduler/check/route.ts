@@ -19,7 +19,7 @@ import {
   success,
 } from '@/lib/core';
 import { adminDbGet, adminDbSet, adminDbUpdate, getAdminDatabase } from '@/lib/firebaseAdmin';
-import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
+import { canIgnite, trackUsageHours } from '@/lib/maintenance/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { logPidTuningEntry, cleanupOldLogs } from '@/lib/services/pidTuningLogService';
 import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
@@ -28,7 +28,7 @@ import {
   triggerStoveUnexpectedOffServer,
   triggerSchedulerActionServer,
   triggerMaintenanceAlertServer,
-} from '@/lib/notificationTriggersServer';
+} from '@/lib/notifications/notificationTriggersServer';
 import {
   getStatus,
   sendIgnit,
@@ -36,16 +36,16 @@ import {
   setPower,
   setFan,
   getHealth,
-} from '@/lib/thermorossiProxy';
+} from '@/lib/stove/thermorossiProxy';
 import type { StoveState } from '@/types/thermorossiProxy';
-import { updateStoveState } from '@/lib/stoveStateService';
-import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
-import { fetchWeatherForecast } from '@/lib/openMeteo';
-import { saveWeatherToCache } from '@/lib/weatherCacheService';
+import { updateStoveState } from '@/lib/stove/stoveStateService';
+import { calibrateValvesServer } from '@/lib/netatmo/netatmoCalibrationService';
+import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
+import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 import { PIDController } from '@/lib/utils/pidController';
 import { logCronExecution } from '@/lib/cronExecutionLogger';
-import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
-import { getProxyHealth } from '@/lib/netatmoProxy';
+import { logAnalyticsEvent } from '@/lib/analytics/analyticsEventLogger';
+import { getProxyHealth } from '@/lib/netatmo/netatmoProxy';
 
 export const dynamic = 'force-dynamic';
 

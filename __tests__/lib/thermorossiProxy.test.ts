@@ -10,7 +10,7 @@
  * - ApiError TIMEOUT on AbortError
  */
 
-import { getStatus, getPower, getFan, getHealth, getHistory, sendIgnit, sendShutdown, setPower, setFan, setWaterTemp } from '@/lib/thermorossiProxy';
+import { getStatus, getPower, getFan, getHealth, getHistory, sendIgnit, sendShutdown, setPower, setFan, setWaterTemp } from '@/lib/stove/thermorossiProxy';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
 
 // Mock global fetch

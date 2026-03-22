@@ -6,16 +6,16 @@
 
 import { renderHook, waitFor } from '@testing-library/react';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
-import * as schedulerService from '@/lib/schedulerService';
-import * as maintenanceService from '@/lib/maintenanceService';
+import * as schedulerService from '@/lib/scheduler/schedulerService';
+import * as maintenanceService from '@/lib/maintenance/maintenanceService';
 import * as errorMonitor from '@/lib/errorMonitor';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 
 // Mock all external dependencies
-jest.mock('@/lib/schedulerService');
-jest.mock('@/lib/maintenanceService');
+jest.mock('@/lib/scheduler/schedulerService');
+jest.mock('@/lib/maintenance/maintenanceService');
 jest.mock('@/lib/errorMonitor');
 jest.mock('@/lib/hooks/useOnlineStatus');
 jest.mock('@/lib/hooks/useBackgroundSync');

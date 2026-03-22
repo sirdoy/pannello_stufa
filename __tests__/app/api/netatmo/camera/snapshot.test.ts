@@ -13,10 +13,10 @@
  */
 
 import { GET } from '@/app/api/netatmo/camera/snapshot/route';
-import { getProxyCameraSnapshot } from '@/lib/netatmoProxy';
+import { getProxyCameraSnapshot } from '@/lib/netatmo/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 
 // Mock next/server NextResponse including the static redirect method
 jest.mock('next/server', () => {

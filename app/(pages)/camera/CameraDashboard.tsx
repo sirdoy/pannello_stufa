@@ -18,7 +18,7 @@ import {
   Skeleton,
   Switch,
 } from '@/app/components/ui';
-import { getCameraTypeName, getEventTypeName, getEventIcon } from '@/lib/netatmoCameraApi';
+import { getCameraTypeName, getEventTypeName, getEventIcon } from '@/lib/netatmo/netatmoCameraApi';
 import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 import type { CameraStatus, CameraEvent, DataFreshness } from '@/types/netatmoProxy';

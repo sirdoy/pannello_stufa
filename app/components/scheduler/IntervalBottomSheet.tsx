@@ -1,11 +1,11 @@
 'use client';
 import { Edit2, Trash2 } from 'lucide-react';
-import { POWER_LABELS, FAN_LABELS } from '@/lib/schedulerStats';
+import { POWER_LABELS, FAN_LABELS } from '@/lib/scheduler/schedulerStats';
 import BottomSheet from '../ui/BottomSheet';
 import ProgressBar from '../ui/ProgressBar';
 import Button from '../ui/Button';
 import Text from '../ui/Text';
-import type { ScheduleInterval } from '@/lib/schedulerService';
+import type { ScheduleInterval } from '@/lib/scheduler/schedulerService';
 
 export interface IntervalBottomSheetProps {
   range: ScheduleInterval | undefined;

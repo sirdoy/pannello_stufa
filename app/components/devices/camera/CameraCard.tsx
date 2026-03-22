@@ -7,7 +7,7 @@ import { CAMERA_ROUTES } from '@/lib/routes';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
 import { Text, Button, Switch } from '../../ui';
-import { getCameraTypeName } from '@/lib/netatmoCameraApi';
+import { getCameraTypeName } from '@/lib/netatmo/netatmoCameraApi';
 import HlsPlayer from './HlsPlayer';
 import type { CameraStatus, DataFreshness } from '@/types/netatmoProxy';
 

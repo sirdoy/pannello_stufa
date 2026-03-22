@@ -5,7 +5,7 @@ import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Text from '@/app/components/ui/Text';
 import Heading from '@/app/components/ui/Heading';
-import { getConsentState, setConsentState } from '@/lib/analyticsConsentService';
+import { getConsentState, setConsentState } from '@/lib/analytics/analyticsConsentService';
 
 /**
  * ConsentBanner Component

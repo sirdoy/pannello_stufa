@@ -13,25 +13,25 @@ jest.mock('@/lib/core', () => {
     success: jest.fn((data: unknown) => NextResponse.json(data, { status: 200 })),
   };
 });
-jest.mock('@/lib/healthDeadManSwitch', () => ({
+jest.mock('@/lib/health/healthDeadManSwitch', () => ({
   updateDeadManSwitch: jest.fn().mockResolvedValue(undefined),
 }));
-jest.mock('@/lib/healthMonitoring', () => ({
+jest.mock('@/lib/health/healthMonitoring', () => ({
   checkUserStoveHealth: jest.fn().mockResolvedValue({
     userId: 'test',
     connectionStatus: 'online',
   }),
 }));
-jest.mock('@/lib/healthLogger', () => ({
+jest.mock('@/lib/health/healthLogger', () => ({
   logHealthCheckRun: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('@/lib/envValidator', () => ({
   validateHealthMonitoringEnv: jest.fn().mockReturnValue({ valid: true, missing: [] }),
 }));
-jest.mock('@/lib/notificationTriggersServer', () => ({
+jest.mock('@/lib/notifications/notificationTriggersServer', () => ({
   triggerHealthMonitoringAlertServer: jest.fn(),
 }));
-jest.mock('@/lib/coordinationNotificationThrottle', () => ({
+jest.mock('@/lib/notifications/coordinationNotificationThrottle', () => ({
   shouldSendCoordinationNotification: jest.fn().mockResolvedValue({ allowed: false }),
   recordNotificationSent: jest.fn(),
 }));

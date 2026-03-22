@@ -24,7 +24,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { logComponentError } from '@/lib/analyticsEventLogger';
+import { logComponentError } from '@/lib/analytics/analyticsEventLogger';
 
 export const dynamic = 'force-dynamic';
 

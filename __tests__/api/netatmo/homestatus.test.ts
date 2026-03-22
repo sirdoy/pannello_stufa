@@ -6,13 +6,13 @@
  */
 
 import { GET } from '@/app/api/netatmo/homestatus/route';
-import { getProxyHomestatus } from '@/lib/netatmoProxy';
+import { getProxyHomestatus } from '@/lib/netatmo/netatmoProxy';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import type { NetatmoProxyHomestatusResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 jest.mock('@/lib/firebaseAdmin');
 jest.mock('@/lib/environmentHelper');
 jest.mock('@/lib/core', () => ({

@@ -1,8 +1,8 @@
 'use client';
 
-import { getDayTotalHours, getPowerGradient } from '@/lib/schedulerStats';
+import { getDayTotalHours, getPowerGradient } from '@/lib/scheduler/schedulerStats';
 import Button from '../ui/Button';
-import type { WeeklySchedule } from '@/lib/schedulerService';
+import type { WeeklySchedule } from '@/lib/scheduler/schedulerService';
 
 const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
 const dayShortNames = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];

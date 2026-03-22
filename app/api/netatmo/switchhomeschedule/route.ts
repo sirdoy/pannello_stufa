@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, success, parseJsonOrThrow, validateRequired } from '@/lib/core';
-import { proxySwitchHomeSchedule } from '@/lib/netatmoProxy';
+import { proxySwitchHomeSchedule } from '@/lib/netatmo/netatmoProxy';
 import { adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import type { NextRequest } from 'next/server';

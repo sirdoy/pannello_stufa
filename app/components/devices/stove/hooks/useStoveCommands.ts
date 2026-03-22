@@ -18,11 +18,11 @@
 'use client';
 
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { getNextScheduledAction } from '@/lib/schedulerService';
-import { clearSemiManualMode } from '@/lib/schedulerApiClient';
+import { getNextScheduledAction } from '@/lib/scheduler/schedulerService';
+import { clearSemiManualMode } from '@/lib/scheduler/schedulerApiClient';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logSchedulerAction } from '@/lib/logService';
-import { confirmCleaning } from '@/lib/maintenanceService';
+import { confirmCleaning } from '@/lib/maintenance/maintenanceService';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import type { UseStoveDataReturn } from './useStoveData';
 import type { ThermorossiCommandResponse } from '@/types/thermorossiProxy';

@@ -6,12 +6,12 @@
  */
 
 import { POST } from '@/app/api/netatmo/setroomthermpoint/route';
-import { proxySetRoomThermpoint } from '@/lib/netatmoProxy';
+import { proxySetRoomThermpoint } from '@/lib/netatmo/netatmoProxy';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import type { ProxyControlResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 jest.mock('@/lib/firebaseAdmin');
 jest.mock('@/lib/devices/deviceTypes', () => ({
   DEVICE_TYPES: { THERMOSTAT: 'thermostat' },

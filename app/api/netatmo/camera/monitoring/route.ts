@@ -5,7 +5,7 @@ import {
   parseJsonOrThrow,
 } from '@/lib/core';
 import { adminDbPush } from '@/lib/firebaseAdmin';
-import { proxySetCameraMonitoring } from '@/lib/netatmoProxy';
+import { proxySetCameraMonitoring } from '@/lib/netatmo/netatmoProxy';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';

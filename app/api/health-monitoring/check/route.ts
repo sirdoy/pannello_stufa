@@ -19,15 +19,15 @@ import {
   success,
 } from '@/lib/core';
 import { raspiClient } from '@/lib/raspi';
-import { updateDeadManSwitch } from '@/lib/healthDeadManSwitch';
-import { checkUserStoveHealth } from '@/lib/healthMonitoring';
-import { logHealthCheckRun } from '@/lib/healthLogger';
+import { updateDeadManSwitch } from '@/lib/health/healthDeadManSwitch';
+import { checkUserStoveHealth } from '@/lib/health/healthMonitoring';
+import { logHealthCheckRun } from '@/lib/health/healthLogger';
 import { validateHealthMonitoringEnv } from '@/lib/envValidator';
-import { triggerHealthMonitoringAlertServer } from '@/lib/notificationTriggersServer';
+import { triggerHealthMonitoringAlertServer } from '@/lib/notifications/notificationTriggersServer';
 import {
   shouldSendCoordinationNotification,
   recordNotificationSent,
-} from '@/lib/coordinationNotificationThrottle';
+} from '@/lib/notifications/coordinationNotificationThrottle';
 
 export const dynamic = 'force-dynamic';
 

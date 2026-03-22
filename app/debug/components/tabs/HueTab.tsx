@@ -218,7 +218,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             onExecute={(values) =>
               callPutEndpoint('controlLight', `/api/hue/lights/${values.lightId}`, {
                 on: values.on === 'true',
-                brightness: values.brightness,
+                bri: Math.round(Number(values.brightness) * 254 / 100),
               })
             }
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/light/{id}')}
@@ -240,7 +240,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             onExecute={(values) =>
               callPutEndpoint('controlRoom', `/api/hue/rooms/${values.roomId}`, {
                 on: values.on === 'true',
-                brightness: values.brightness,
+                bri: Math.round(Number(values.brightness) * 254 / 100),
               })
             }
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/grouped_light/{id}')}

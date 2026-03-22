@@ -12,7 +12,7 @@
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getHealth } from '@/lib/thermorossiProxy';
+import { getHealth } from '@/lib/stove/thermorossiProxy';
 
 export const dynamic = 'force-dynamic';
 

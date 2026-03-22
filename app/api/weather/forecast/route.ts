@@ -1,6 +1,6 @@
 import { withAuthAndErrorHandler, success, badRequest, error, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
-import { getCachedWeather } from '@/lib/weatherCache';
-import { fetchWeatherForecast, fetchAirQuality, interpretWeatherCode } from '@/lib/openMeteo';
+import { getCachedWeather } from '@/lib/weather/weatherCache';
+import { fetchWeatherForecast, fetchAirQuality, interpretWeatherCode } from '@/lib/weather/openMeteo';
 
 export const dynamic = 'force-dynamic';
 

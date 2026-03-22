@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, badRequest, parseQuery } from '@/lib/core';
-import { getProxyCameraSnapshot } from '@/lib/netatmoProxy';
+import { getProxyCameraSnapshot } from '@/lib/netatmo/netatmoProxy';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 

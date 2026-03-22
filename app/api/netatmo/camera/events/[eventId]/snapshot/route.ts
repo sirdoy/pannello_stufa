@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, getPathParam } from '@/lib/core';
-import { getProxyCameraEventSnapshot } from '@/lib/netatmoProxy';
+import { getProxyCameraEventSnapshot } from '@/lib/netatmo/netatmoProxy';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';

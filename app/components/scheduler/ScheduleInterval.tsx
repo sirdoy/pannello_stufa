@@ -1,10 +1,10 @@
-import { POWER_LABELS, FAN_LABELS } from '@/lib/schedulerStats';
+import { POWER_LABELS, FAN_LABELS } from '@/lib/scheduler/schedulerStats';
 import { Edit2, Trash2 } from 'lucide-react';
 import Card from '../ui/Card';
 import ActionButton from '../ui/ActionButton';
 import ProgressBar from '../ui/ProgressBar';
 import Text from '../ui/Text';
-import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/schedulerService';
+import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/scheduler/schedulerService';
 
 export interface ScheduleIntervalProps {
   range: ScheduleIntervalType;

@@ -9,7 +9,7 @@ import NETATMO_CAMERA_API, {
   getEventIcon,
   getSubTypeName,
   getSubTypeIcon,
-} from '@/lib/netatmoCameraApi';
+} from '@/lib/netatmo/netatmoCameraApi';
 
 describe('netatmoCameraApi display helpers', () => {
   describe('getCameraTypeName', () => {

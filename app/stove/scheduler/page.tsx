@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange, type ScheduleInterval as ServiceScheduleInterval } from '@/lib/schedulerService';
-import { saveSchedule as apiSaveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/schedulerApiClient';
+import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange, type ScheduleInterval as ServiceScheduleInterval } from '@/lib/scheduler/schedulerService';
+import { saveSchedule as apiSaveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/scheduler/schedulerApiClient';
 import {
   getAllSchedules,
   createSchedule,
   updateSchedule,
   deleteSchedule,
   setActiveSchedule,
-} from '@/lib/schedulesApiClient';
+} from '@/lib/scheduler/schedulesApiClient';
 import { logSchedulerAction } from '@/lib/logService';
 import { db } from '@/lib/firebase';
 import { ref, onValue } from 'firebase/database';

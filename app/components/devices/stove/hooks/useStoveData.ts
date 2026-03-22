@@ -13,10 +13,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/schedulerService';
+import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/scheduler/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logError, shouldNotify } from '@/lib/errorMonitor';
-import { getMaintenanceStatus } from '@/lib/maintenanceService';
+import { getMaintenanceStatus } from '@/lib/maintenance/maintenanceService';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';

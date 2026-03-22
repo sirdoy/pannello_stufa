@@ -23,7 +23,7 @@
 
 import { NextResponse } from 'next/server';
 import { withAuthAndErrorHandler } from '@/lib/core/middleware';
-import { getDeliveryStats, getLastRateAlertInfo } from '@/lib/notificationLogger';
+import { getDeliveryStats, getLastRateAlertInfo } from '@/lib/notifications/notificationLogger';
 import { adminDbGet } from '@/lib/firebaseAdmin';
 import { subHours, subDays } from 'date-fns';
 

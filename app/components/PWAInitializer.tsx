@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { clearBadge } from '@/lib/pwa/badgeService';
 import { requestPersistentStorage } from '@/lib/pwa/persistentStorage';
-import { onForegroundMessage, initializeNotifications } from '@/lib/notificationService';
+import { onForegroundMessage, initializeNotifications } from '@/lib/notifications/notificationService';
 
 /**
  * PWA Initializer Component

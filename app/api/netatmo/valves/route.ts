@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getProxyValves } from '@/lib/netatmoProxy';
+import { getProxyValves } from '@/lib/netatmo/netatmoProxy';
 
 export const dynamic = 'force-dynamic';
 

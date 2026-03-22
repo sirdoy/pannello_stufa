@@ -20,7 +20,7 @@ import {
   getFCMToken,
   initializeNotifications,
   checkStoredToken,
-} from '@/lib/notificationService';
+} from '@/lib/notifications/notificationService';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';

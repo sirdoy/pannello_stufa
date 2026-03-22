@@ -6,11 +6,11 @@
  */
 
 import { GET } from '@/app/api/netatmo/schedules/route';
-import { getProxyHomesdata } from '@/lib/netatmoProxy';
+import { getProxyHomesdata } from '@/lib/netatmo/netatmoProxy';
 import type { NetatmoProxyHomesdataResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 jest.mock('@/lib/core', () => ({
   withAuthAndErrorHandler: (fn: Function) => fn,
   success: (data: unknown) => ({ ok: true, data }),

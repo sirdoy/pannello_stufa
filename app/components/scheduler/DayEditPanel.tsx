@@ -9,9 +9,9 @@ import Text from '../ui/Text';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
 import IntervalBottomSheet from './IntervalBottomSheet';
-import { getDayTotalHours } from '@/lib/schedulerStats';
+import { getDayTotalHours } from '@/lib/scheduler/schedulerStats';
 import { Copy, Plus } from 'lucide-react';
-import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/schedulerService';
+import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/scheduler/schedulerService';
 
 export interface DayEditPanelProps {
   day: string;

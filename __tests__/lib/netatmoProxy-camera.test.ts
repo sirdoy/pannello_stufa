@@ -17,7 +17,7 @@ import {
   proxySetCameraMonitoring,
   getProxyCameraEvents,
   getProxyCameraEventSnapshot,
-} from '@/lib/netatmoProxy';
+} from '@/lib/netatmo/netatmoProxy';
 
 // Mock global fetch (used by all wrappers — both JSON wrappers via haGet/haPost
 // and the binary wrapper directly)

@@ -23,19 +23,19 @@ jest.mock('@/lib/core', () => {
   };
 });
 jest.mock('@/lib/firebaseAdmin');
-jest.mock('@/lib/maintenanceServiceAdmin');
+jest.mock('@/lib/maintenance/maintenanceServiceAdmin');
 jest.mock('@/lib/environmentHelper');
 jest.mock('@/lib/services/pidTuningLogService');
-jest.mock('@/lib/notificationTriggersServer');
-jest.mock('@/lib/thermorossiProxy');
-jest.mock('@/lib/netatmoProxy');
-jest.mock('@/lib/stoveStateService');
-jest.mock('@/lib/netatmoCalibrationService');
-jest.mock('@/lib/openMeteo');
-jest.mock('@/lib/weatherCacheService');
+jest.mock('@/lib/notifications/notificationTriggersServer');
+jest.mock('@/lib/stove/thermorossiProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
+jest.mock('@/lib/stove/stoveStateService');
+jest.mock('@/lib/netatmo/netatmoCalibrationService');
+jest.mock('@/lib/weather/openMeteo');
+jest.mock('@/lib/weather/weatherCacheService');
 jest.mock('@/lib/utils/pidController');
 jest.mock('@/lib/cronExecutionLogger');
-jest.mock('@/lib/analyticsEventLogger');
+jest.mock('@/lib/analytics/analyticsEventLogger');
 jest.mock('@/lib/services/tokenCleanupService', () => ({
   cleanupStaleTokens: jest.fn().mockResolvedValue({
     cleaned: false,
@@ -50,7 +50,7 @@ jest.mock('@/lib/services/tokenCleanupService', () => ({
 // Import route and mocked modules
 import { GET } from '../route';
 import { adminDbGet, adminDbSet, adminDbUpdate, getAdminDatabase } from '@/lib/firebaseAdmin';
-import { canIgnite, trackUsageHours } from '@/lib/maintenanceServiceAdmin';
+import { canIgnite, trackUsageHours } from '@/lib/maintenance/maintenanceServiceAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { logPidTuningEntry, cleanupOldLogs } from '@/lib/services/pidTuningLogService';
 import {
@@ -58,7 +58,7 @@ import {
   triggerStoveUnexpectedOffServer,
   triggerSchedulerActionServer,
   triggerMaintenanceAlertServer,
-} from '@/lib/notificationTriggersServer';
+} from '@/lib/notifications/notificationTriggersServer';
 import {
   getStatus,
   sendIgnit,
@@ -66,13 +66,13 @@ import {
   setPower,
   setFan,
   getHealth,
-} from '@/lib/thermorossiProxy';
-import { updateStoveState } from '@/lib/stoveStateService';
-import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
-import { fetchWeatherForecast } from '@/lib/openMeteo';
-import { saveWeatherToCache } from '@/lib/weatherCacheService';
+} from '@/lib/stove/thermorossiProxy';
+import { updateStoveState } from '@/lib/stove/stoveStateService';
+import { calibrateValvesServer } from '@/lib/netatmo/netatmoCalibrationService';
+import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
+import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 import { logCronExecution } from '@/lib/cronExecutionLogger';
-import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
+import { logAnalyticsEvent } from '@/lib/analytics/analyticsEventLogger';
 import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
 
 // Create typed mock references

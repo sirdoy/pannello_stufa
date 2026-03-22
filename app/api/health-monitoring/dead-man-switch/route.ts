@@ -11,7 +11,7 @@ import {
   withAuthAndErrorHandler,
   success,
 } from '@/lib/core';
-import { checkDeadManSwitch } from '@/lib/healthDeadManSwitch';
+import { checkDeadManSwitch } from '@/lib/health/healthDeadManSwitch';
 
 export const dynamic = 'force-dynamic';
 

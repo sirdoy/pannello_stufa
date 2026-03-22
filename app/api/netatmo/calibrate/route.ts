@@ -1,6 +1,6 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
 import { adminDbPush } from '@/lib/firebaseAdmin';
-import { proxyCalibrateValves } from '@/lib/netatmoProxy';
+import { proxyCalibrateValves } from '@/lib/netatmo/netatmoProxy';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';

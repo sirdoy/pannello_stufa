@@ -15,7 +15,7 @@ import {
   EmptyState,
   Skeleton,
 } from '@/app/components/ui';
-import { getEventTypeName, getEventIcon } from '@/lib/netatmoCameraApi';
+import { getEventTypeName, getEventIcon } from '@/lib/netatmo/netatmoCameraApi';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 import type { CameraStatus, CameraEvent } from '@/types/netatmoProxy';
 

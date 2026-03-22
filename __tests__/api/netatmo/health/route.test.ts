@@ -5,12 +5,12 @@
  */
 
 import { GET } from '@/app/api/netatmo/health/route';
-import { getProxyHealth } from '@/lib/netatmoProxy';
+import { getProxyHealth } from '@/lib/netatmo/netatmoProxy';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 import type { NetatmoHealthResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 jest.mock('@/lib/core', () => ({
   withAuthAndErrorHandler: (fn: Function) => fn,
   success: (data: unknown) => ({ ok: true, data }),

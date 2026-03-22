@@ -1,7 +1,7 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
-import { getProxyHomestatus } from '@/lib/netatmoProxy';
+import { getProxyHomestatus } from '@/lib/netatmo/netatmoProxy';
 import type { DataFreshness } from '@/types/netatmoProxy';
 
 // Battery classification utilities (pure functions, previously in netatmoApi)

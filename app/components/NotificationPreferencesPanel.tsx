@@ -16,7 +16,7 @@ import {
   updatePreferenceSection,
   DEFAULT_PREFERENCES,
   NOTIFICATION_CATEGORIES_CONFIG,
-} from '@/lib/notificationPreferencesService';
+} from '@/lib/notifications/notificationPreferencesService';
 import Card from './ui/Card';
 import Button from './ui/Button';
 import Banner from './ui/Banner';

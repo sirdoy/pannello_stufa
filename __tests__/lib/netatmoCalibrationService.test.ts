@@ -7,11 +7,11 @@
  * - 401 errors return { calibrated: false, reason: 'auth_error' }
  */
 
-import { calibrateValvesServer } from '@/lib/netatmoCalibrationService';
+import { calibrateValvesServer } from '@/lib/netatmo/netatmoCalibrationService';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 
 // Mock the proxy module
-jest.mock('@/lib/netatmoProxy', () => ({
+jest.mock('@/lib/netatmo/netatmoProxy', () => ({
   proxyCalibrateValves: jest.fn(),
 }));
 
@@ -20,7 +20,7 @@ jest.mock('@/lib/firebaseAdmin', () => ({
   adminDbPush: jest.fn().mockResolvedValue(undefined),
 }));
 
-import { proxyCalibrateValves } from '@/lib/netatmoProxy';
+import { proxyCalibrateValves } from '@/lib/netatmo/netatmoProxy';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 
 const mockProxyCalibrateValves = proxyCalibrateValves as jest.MockedFunction<typeof proxyCalibrateValves>;

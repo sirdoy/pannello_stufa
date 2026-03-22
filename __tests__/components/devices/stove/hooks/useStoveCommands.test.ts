@@ -7,18 +7,18 @@
 import { renderHook, act } from '@testing-library/react';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
 import * as logService from '@/lib/logService';
-import * as schedulerApiClient from '@/lib/schedulerApiClient';
-import * as schedulerService from '@/lib/schedulerService';
-import * as maintenanceService from '@/lib/maintenanceService';
+import * as schedulerApiClient from '@/lib/scheduler/schedulerApiClient';
+import * as schedulerService from '@/lib/scheduler/schedulerService';
+import * as maintenanceService from '@/lib/maintenance/maintenanceService';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import type { UseStoveDataReturn } from '@/app/components/devices/stove/hooks/useStoveData';
 import type { ThermorossiCommandResponse } from '@/types/thermorossiProxy';
 
 // Mock dependencies
 jest.mock('@/lib/logService');
-jest.mock('@/lib/schedulerApiClient');
-jest.mock('@/lib/schedulerService');
-jest.mock('@/lib/maintenanceService');
+jest.mock('@/lib/scheduler/schedulerApiClient');
+jest.mock('@/lib/scheduler/schedulerService');
+jest.mock('@/lib/maintenance/maintenanceService');
 jest.mock('@/lib/hooks/useRetryableCommand');
 
 describe('useStoveCommands', () => {

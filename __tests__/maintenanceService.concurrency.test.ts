@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-import { trackUsageHours } from '../lib/maintenanceService';
+import { trackUsageHours } from '../lib/maintenance/maintenanceService';
 import * as firebase from 'firebase/database';
 
 // Mock Firebase

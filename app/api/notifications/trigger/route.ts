@@ -21,7 +21,7 @@ import {
   parseJsonOrThrow,
   validateRequired,
 } from '@/lib/core';
-import { triggerNotificationServer } from '@/lib/notificationTriggersServer';
+import { triggerNotificationServer } from '@/lib/notifications/notificationTriggersServer';
 
 export const dynamic = 'force-dynamic';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { ScheduleInterval } from '@/lib/schedulerService';
+import type { ScheduleInterval } from '@/lib/scheduler/schedulerService';
 
 export interface TimeBarProps {
   intervals: ScheduleInterval[];

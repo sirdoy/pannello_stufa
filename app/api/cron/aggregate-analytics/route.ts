@@ -14,8 +14,8 @@
  */
 
 import { withCronSecret, success } from '@/lib/core';
-import { aggregateDailyStats, saveDailyStats } from '@/lib/analyticsAggregationService';
-import { cleanupOldAnalyticsEvents } from '@/lib/analyticsEventLogger';
+import { aggregateDailyStats, saveDailyStats } from '@/lib/analytics/analyticsAggregationService';
+import { cleanupOldAnalyticsEvents } from '@/lib/analytics/analyticsEventLogger';
 import { logCronExecution } from '@/lib/cronExecutionLogger';
 
 export const dynamic = 'force-dynamic';

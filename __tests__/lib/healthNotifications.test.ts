@@ -8,7 +8,7 @@ import {
   NOTIFICATION_TYPES,
   NOTIFICATION_CATEGORIES,
   buildNotificationPayload,
-} from '@/lib/notificationTriggers';
+} from '@/lib/notifications/notificationTriggers';
 
 describe('Health Monitoring Notification Types', () => {
   describe('Notification Type Definitions', () => {

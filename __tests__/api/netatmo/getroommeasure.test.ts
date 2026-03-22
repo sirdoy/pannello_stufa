@@ -6,11 +6,11 @@
  */
 
 import { GET } from '@/app/api/netatmo/getroommeasure/route';
-import { getProxyRoomMeasure } from '@/lib/netatmoProxy';
+import { getProxyRoomMeasure } from '@/lib/netatmo/netatmoProxy';
 import type { RoomMeasureResponse } from '@/types/netatmoProxy';
 
 // Mock dependencies
-jest.mock('@/lib/netatmoProxy');
+jest.mock('@/lib/netatmo/netatmoProxy');
 jest.mock('@/lib/core', () => ({
   withAuthAndErrorHandler: (fn: Function) => fn,
   success: (data: unknown) => ({ ok: true, data }),

@@ -1,5 +1,5 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getProxyCameraStatus } from '@/lib/netatmoProxy';
+import { getProxyCameraStatus } from '@/lib/netatmo/netatmoProxy';
 
 export const dynamic = 'force-dynamic';
 

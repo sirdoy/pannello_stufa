@@ -22,7 +22,7 @@ import {
   getNotificationPermission,
   getFCMToken,
   requestNotificationPermission,
-} from '@/lib/notificationService';
+} from '@/lib/notifications/notificationService';
 import Button from './ui/Button';
 import Banner from './ui/Banner';
 import { Text } from './ui';

@@ -1,7 +1,7 @@
 import { withAuthAndErrorHandler, success, notFound } from '@/lib/core';
 import { adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
-import { getProxyHomesdata } from '@/lib/netatmoProxy';
+import { getProxyHomesdata } from '@/lib/netatmo/netatmoProxy';
 
 export const dynamic = 'force-dynamic';
 

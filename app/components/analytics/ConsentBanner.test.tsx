@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ConsentBanner from './ConsentBanner';
-import * as analyticsConsentService from '@/lib/analyticsConsentService';
+import * as analyticsConsentService from '@/lib/analytics/analyticsConsentService';
 
 // Mock analyticsConsentService
-jest.mock('@/lib/analyticsConsentService');
+jest.mock('@/lib/analytics/analyticsConsentService');
 
 describe('ConsentBanner', () => {
   const mockedGetConsentState = jest.mocked(analyticsConsentService.getConsentState);

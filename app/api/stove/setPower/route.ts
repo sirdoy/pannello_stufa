@@ -1,6 +1,6 @@
 import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow } from '@/lib/core';
-import { setPower } from '@/lib/thermorossiProxy';
-import { logAnalyticsEvent } from '@/lib/analyticsEventLogger';
+import { setPower } from '@/lib/stove/thermorossiProxy';
+import { logAnalyticsEvent } from '@/lib/analytics/analyticsEventLogger';
 
 export const dynamic = 'force-dynamic';
 

@@ -255,3 +255,41 @@ export async function haPut<T>(
     return mapCaughtError(error);
   }
 }
+
+/**
+ * Generic DELETE request to the HA proxy.
+ *
+ * @param endpoint - Path relative to HA_API_URL (e.g. '/api/v1/registry/types/custom_sensor')
+ * @param options  - Optional { timeout } in milliseconds (default 15000)
+ * @returns void (204 No Content on success)
+ * @throws ApiError on any failure
+ */
+export async function haDelete(
+  endpoint: string,
+  options: HaRequestOptions = {}
+): Promise<void> {
+  const { baseUrl, apiKey } = getEnvConfig();
+  const { timeout = DEFAULT_TIMEOUT_MS } = options;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
+      method: 'DELETE',
+      headers: { 'X-API-Key': apiKey },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      return await mapResponseError(response);
+    }
+
+    // 204 No Content — no JSON body to parse
+  } catch (error) {
+    clearTimeout(timeoutId);
+    return mapCaughtError(error);
+  }
+}

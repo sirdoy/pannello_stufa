@@ -39,7 +39,7 @@ interface DeviceCategoryBadgeProps {
  * // Interactive badge (click to edit)
  * <DeviceCategoryBadge category="iot" onClick={() => setEditingMac(mac)} />
  */
-export function DeviceCategoryBadge({ category, onClick }: DeviceCategoryBadgeProps) {
+function DeviceCategoryBadge({ category, onClick }: DeviceCategoryBadgeProps) {
   const config = CATEGORY_CONFIG[category] ?? CATEGORY_CONFIG['unknown'];
 
   return (

@@ -260,4 +260,3 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
   );
 }
 
-export default ForecastDaySheet;

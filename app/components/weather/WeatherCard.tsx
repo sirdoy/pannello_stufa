@@ -233,5 +233,3 @@ export function WeatherCard({
   );
 }
 
-// Default export for convenience
-export default WeatherCard;

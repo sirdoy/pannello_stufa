@@ -335,5 +335,3 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
   );
 }
 
-// Default export for convenience
-export default CurrentConditions;

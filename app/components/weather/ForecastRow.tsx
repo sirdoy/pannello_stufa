@@ -61,4 +61,3 @@ export function ForecastRow({ forecast, onDayClick }: ForecastRowProps) {
   );
 }
 
-export default ForecastRow;

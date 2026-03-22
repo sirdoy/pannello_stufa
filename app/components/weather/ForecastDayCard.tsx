@@ -144,4 +144,3 @@ export function ForecastDayCard({
   );
 }
 
-export default ForecastDayCard;

@@ -131,4 +131,3 @@ export function HourlyForecast({ hourly, maxHours = 12 }: HourlyForecastProps) {
   );
 }
 
-export default HourlyForecast;

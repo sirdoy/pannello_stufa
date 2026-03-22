@@ -31,7 +31,7 @@ interface DeviceStatusBadgeProps {
  * // Offline device never connected
  * <DeviceStatusBadge active={false} />
  */
-export function DeviceStatusBadge({ active, lastSeen }: DeviceStatusBadgeProps) {
+function DeviceStatusBadge({ active, lastSeen }: DeviceStatusBadgeProps) {
   // Online state: simple badge
   if (active) {
     return <Badge variant="sage" size="sm">Online</Badge>;

@@ -23,7 +23,7 @@ interface ThermostatTabsProps {
  * - Tabs positioned at top on both mobile and desktop
  * - Default tab: Schedule
  */
-export function ThermostatTabs({
+function ThermostatTabs({
   defaultValue = 'schedule',
   onTabChange,
   scheduleContent,

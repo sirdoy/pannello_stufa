@@ -31,7 +31,7 @@ type StatusFilter = 'all' | 'online' | 'offline';
  * @example
  * <DeviceListTable devices={devices} isStale={false} />
  */
-export function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTableProps) {
+function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTableProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [editingMac, setEditingMac] = useState<string | null>(null);
 

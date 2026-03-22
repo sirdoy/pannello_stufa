@@ -1055,28 +1055,3 @@ const handleChange = (delta) => {
   },
 };
 
-/**
- * Get components by category
- */
-export function getComponentsByCategory(category: string): ComponentDocs {
-  return Object.fromEntries(
-    Object.entries(componentDocs).filter(([, doc]) => doc.category === category)
-  ) as ComponentDocs;
-}
-
-/**
- * Get all categories
- */
-export function getCategories(): string[] {
-  const categories = new Set(Object.values(componentDocs).map((doc) => doc.category));
-  return Array.from(categories);
-}
-
-/**
- * Get component by name
- */
-export function getComponentDoc(name: string): ComponentDoc | undefined {
-  return componentDocs[name];
-}
-
-export default componentDocs;

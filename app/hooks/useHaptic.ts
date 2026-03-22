@@ -64,4 +64,3 @@ export function useHaptic(pattern: HapticPattern = 'short'): UseHapticReturn {
   };
 }
 
-export default useHaptic;

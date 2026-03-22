@@ -36,10 +36,16 @@ import type { NotificationPreferences } from '@/lib/schemas/notificationPreferen
 type TestResult = 'success' | 'error' | 'no_tokens' | 'rate_limited';
 
 interface NotificationDevice {
+  id?: string;
   tokenKey: string;
+  token?: string;
   customName?: string;
   lastUsed?: number;
-  [key: string]: any;
+  platform?: string;
+  isPWA?: boolean;
+  createdAt?: string | number;
+  userAgent?: string;
+  [key: string]: unknown;
 }
 
 export default function NotificationsSettingsPage() {
@@ -169,7 +175,7 @@ export default function NotificationsSettingsPage() {
         // Check if current device token is in the list
         if (currentDeviceToken) {
           const isRegistered = devicesList.some(
-            (d) => (d as any).token === currentDeviceToken
+            (d) => d.token === currentDeviceToken
           );
           setIsCurrentDeviceRegistered(isRegistered);
         }
@@ -502,13 +508,13 @@ export default function NotificationsSettingsPage() {
 
                         <Text size="sm" variant="secondary">
                           Registrato:{' '}
-                          {new Date(device.createdAt).toLocaleString('it-IT', {
+                          {device.createdAt != null ? new Date(device.createdAt).toLocaleString('it-IT', {
                             day: '2-digit',
                             month: 'short',
                             year: 'numeric',
                             hour: '2-digit',
                             minute: '2-digit',
-                          })}
+                          }) : 'N/D'}
                         </Text>
 
                         {device.userAgent && (

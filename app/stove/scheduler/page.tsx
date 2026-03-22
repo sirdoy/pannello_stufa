@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange, type ScheduleInterval as ServiceScheduleInterval } from '@/lib/scheduler/schedulerService';
+import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange, type ScheduleInterval, type WeeklySchedule } from '@/lib/scheduler/schedulerService';
 import { saveSchedule as apiSaveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/scheduler/schedulerApiClient';
 import {
   getAllSchedules,
@@ -29,14 +29,8 @@ const daysOfWeek = [
 
 type DayOfWeek = typeof daysOfWeek[number];
 
-interface ScheduleInterval {
-  start: string;
-  end: string;
-  power?: number;
-  fan?: number;
-}
-
-type WeekSchedule = Record<DayOfWeek, ScheduleInterval[]>;
+/** Internal schedule type with narrow DayOfWeek keys for safe indexed access */
+type DaySchedule = Record<DayOfWeek, ScheduleInterval[]>;
 
 interface ConfirmDialogState {
   isOpen: boolean;
@@ -70,11 +64,11 @@ interface SaveStatus {
 }
 
 export default function WeeklyScheduler() {
-  const [schedule, setSchedule] = useState<WeekSchedule>(() =>
+  const [schedule, setSchedule] = useState<DaySchedule>(() =>
     daysOfWeek.reduce((acc, day) => {
       acc[day] = [];
       return acc;
-    }, {} as WeekSchedule)
+    }, {} as DaySchedule)
   );
   const [schedulerEnabled, setSchedulerEnabled] = useState<boolean>(false);
   const [semiManualMode, setSemiManualModeState] = useState<boolean>(false);
@@ -141,7 +135,7 @@ export default function WeeklyScheduler() {
           // Ordina gli intervalli caricati da Firebase
           acc[day] = sortIntervals(data[day] || []);
           return acc;
-        }, {} as WeekSchedule);
+        }, {} as DaySchedule);
         setSchedule(filledData);
 
         // Auto-select first day with intervals ONLY on initial load
@@ -191,7 +185,7 @@ export default function WeeklyScheduler() {
           const remoteSchedule = daysOfWeek.reduce((acc, day) => {
             acc[day] = sortIntervals(data[day] || []);
             return acc;
-          }, {} as WeekSchedule);
+          }, {} as DaySchedule);
 
           setSchedule(remoteSchedule);
 
@@ -216,7 +210,7 @@ export default function WeeklyScheduler() {
   // Wrapper for saveSchedule that tracks local saves
   const saveSchedule = async (day: DayOfWeek, intervals: ScheduleInterval[]): Promise<void> => {
     setLastLocalSave(Date.now());
-    await apiSaveSchedule(day, intervals as ServiceScheduleInterval[]);
+    await apiSaveSchedule(day, intervals);
   };
 
   const addTimeRange = (day: DayOfWeek): void => {
@@ -660,7 +654,7 @@ export default function WeeklyScheduler() {
       const filledData = daysOfWeek.reduce((acc, day) => {
         acc[day] = sortIntervals(data[day] || []);
         return acc;
-      }, {} as WeekSchedule);
+      }, {} as DaySchedule);
       setSchedule(filledData);
 
       setToast({
@@ -832,7 +826,7 @@ export default function WeeklyScheduler() {
         </Card>
 
         {/* Right: Weekly Stats */}
-        <WeeklySummaryCard schedule={schedule as any} />
+        <WeeklySummaryCard schedule={schedule} />
       </div>
 
       {/* Weekly Timeline - Always Visible */}
@@ -843,7 +837,7 @@ export default function WeeklyScheduler() {
           </Heading>
         </div>
         <WeeklyTimeline
-          schedule={schedule as any}
+          schedule={schedule}
           selectedDay={selectedDay}
           onSelectDay={setSelectedDay as (day: string) => void}
         />
@@ -852,7 +846,7 @@ export default function WeeklyScheduler() {
       {/* Day Edit Panel - Shows selected day */}
       <DayEditPanel
         day={selectedDay}
-        intervals={schedule[selectedDay] as any || []}
+        intervals={schedule[selectedDay] || []}
         onAddInterval={() => addTimeRange(selectedDay)}
         onEditIntervalModal={(index) => handleEditIntervalRequest(selectedDay, index)}
         onDeleteInterval={(index) => handleRemoveIntervalRequest(selectedDay, index)}
@@ -887,7 +881,7 @@ export default function WeeklyScheduler() {
         isOpen={addIntervalModal.isOpen}
         mode={addIntervalModal.mode}
         day={addIntervalModal.day as string}
-        initialInterval={addIntervalModal.initialInterval as any}
+        initialInterval={addIntervalModal.initialInterval}
         suggestedStart={addIntervalModal.suggestedStart}
         onConfirm={handleConfirmAddInterval}
         onCancel={handleCancelAddInterval}

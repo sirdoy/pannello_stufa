@@ -11,14 +11,13 @@ interface NotificationDevice {
   tokenKey: string;
   token: string;
   customName?: string;
-  lastUsed?: number;
+  lastUsed: string | null;
   displayName: string;
   platform: string;
   browser: string;
   os: string;
   tokenPrefix: string;
   status: 'active' | 'stale' | 'unknown';
-  [key: string]: any;
 }
 
 export default function DeviceManagementPage() {
@@ -189,7 +188,7 @@ export default function DeviceManagementPage() {
               style={{ '--stagger-index': index } as React.CSSProperties}
             >
               <DeviceListItem
-                device={device as any}
+                device={device}
                 isCurrentDevice={device.token === currentToken}
                 onUpdate={handleDeviceUpdate}
                 onRemove={handleDeviceRemove}

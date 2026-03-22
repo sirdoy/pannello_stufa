@@ -58,7 +58,7 @@ function getDeviceMetadata(deviceId: DeviceId): DeviceMetadata | null {
 /**
  * Check if device is display-only (no navbar, no hardware)
  */
-export function isDisplayOnly(deviceId: DeviceId): boolean {
+function isDisplayOnly(deviceId: DeviceId): boolean {
   return !!DISPLAY_ITEMS[deviceId];
 }
 
@@ -66,7 +66,7 @@ export function isDisplayOnly(deviceId: DeviceId): boolean {
  * Check if device has a homepage card
  * All devices have homepage cards except those not in CARD_COMPONENTS (sonos for now)
  */
-export function hasHomepageCard(deviceId: DeviceId): boolean {
+function hasHomepageCard(deviceId: DeviceId): boolean {
   // Sonos doesn't have a homepage card yet
   return deviceId !== 'sonos';
 }
@@ -75,7 +75,7 @@ export function hasHomepageCard(deviceId: DeviceId): boolean {
  * Get default device configuration for new users
  * @returns {Object} Default config with all devices
  */
-export function getDefaultDeviceConfig() {
+function getDefaultDeviceConfig() {
   const devices = DEFAULT_DEVICE_ORDER.map((id, index) => ({
     id,
     visible: true,
@@ -100,7 +100,7 @@ interface DeviceConfigData {
  * @param {string} userId - Auth0 user ID
  * @returns {Promise<Object>} Device configuration
  */
-export async function getUnifiedDeviceConfig(userId: string): Promise<DeviceConfigData> {
+async function getUnifiedDeviceConfig(userId: string): Promise<DeviceConfigData> {
   if (!userId) {
     console.warn('getUnifiedDeviceConfig: no userId provided');
     return getDefaultDeviceConfig();

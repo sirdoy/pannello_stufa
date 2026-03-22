@@ -15,7 +15,7 @@ import { z } from 'zod';
  * Represents a time window when notifications should be suppressed.
  * Multiple windows per day are supported (e.g., lunch break + nighttime).
  */
-export const dndWindowSchema = z.object({
+const dndWindowSchema = z.object({
   // Unique ID for React key prop
   id: z.string().uuid(),
 
@@ -54,7 +54,7 @@ export const dndWindowSchema = z.object({
  * Per-notification-type rate limiting configuration.
  * Prevents spam by limiting notifications within a time window.
  */
-export const rateLimitSchema = z.object({
+const rateLimitSchema = z.object({
   // Time window in minutes (1-60)
   windowMinutes: z.number().int().min(1).max(60).default(5),
 

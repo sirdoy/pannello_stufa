@@ -18,9 +18,7 @@
 export {
   HTTP_STATUS,
   ERROR_CODES,
-  ERROR_MESSAGES,
   ApiError,
-  mapLegacyError,
 } from './apiErrors';
 
 // =============================================================================
@@ -30,28 +28,15 @@ export {
 export {
   // Success responses
   success,
-  created,
   noContent,
 
   // Error responses
   error,
-  handleError,
 
   // Common errors
-  unauthorized,
   forbidden,
   notFound,
   badRequest,
-  timeout,
-  serverError,
-
-  // Device-specific
-  stoveOffline,
-  maintenanceRequired,
-  netatmoReconnect,
-
-  // Redirect
-  redirect,
 } from './apiResponse';
 
 // =============================================================================
@@ -81,18 +66,11 @@ export {
 
   // Query parsing
   parseQuery,
-  parseQueryObject,
 
   // Validation
   validateRequired,
   validateEnum,
-  validateRange,
-  validateEmail,
-  validateString,
-  validateArray,
-  validateBoolean,
 
   // Path parameters
   getPathParam,
-  getOptionalPathParam,
 } from './requestParser';

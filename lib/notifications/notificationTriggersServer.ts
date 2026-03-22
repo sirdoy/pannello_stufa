@@ -307,17 +307,6 @@ export async function triggerMaintenanceAlertServer(userId: string, threshold: n
   return triggerNotificationServer(userId, typeId, data);
 }
 
-/**
- * Trigger Netatmo notification
- * @param {string} userId - User ID
- * @param {string} type - 'temperature_low' | 'temperature_high' | 'setpoint_reached' | 'connection_lost'
- * @param {Object} data - { temperature, room, setpoint, message }
- */
-export async function triggerNetatmoAlertServer(userId: string, type: string, data: Record<string, unknown> = {}) {
-  const typeId = `netatmo_${type}`;
-  return triggerNotificationServer(userId, typeId, data);
-}
-
 // Removed unused functions (verified not used in production code):
 // - triggerNotificationToAdmin
 // - triggerStoveErrorServer

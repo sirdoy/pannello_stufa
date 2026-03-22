@@ -20,7 +20,7 @@
  *   });
  */
 
-import { ref, onValue, set, Unsubscribe } from 'firebase/database';
+import { ref, onValue, Unsubscribe } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 
@@ -32,65 +32,11 @@ export interface Location {
   updatedAt: number;
 }
 
-/** Location input */
-export interface LocationInput {
-  latitude: number;
-  longitude: number;
-  name?: string;
-}
-
 /**
  * Get Firebase RTDB path for location data
  * Respects environment (dev vs production)
  */
 const getLocationPath = (): string => getEnvironmentPath('config/location');
-
-/**
- * Read current location from Firebase (once)
- *
- * @returns {Promise<{latitude: number, longitude: number, name: string|null, updatedAt: number}|null>}
- *          Location object or null if not configured
- *
- * @example
- * const location = await getLocation();
- * if (location) {
- * }
- */
-export async function getLocation(): Promise<Location | null> {
-  const locationRef = ref(db, getLocationPath());
-  return new Promise((resolve) => {
-    onValue(locationRef, (snapshot) => {
-      resolve(snapshot.val());
-    }, { onlyOnce: true });
-  });
-}
-
-/**
- * Set app-wide location in Firebase
- * Updates updatedAt timestamp automatically
- *
- * @param {Object} locationData - Location data
- * @param {number} locationData.latitude - Latitude coordinate
- * @param {number} locationData.longitude - Longitude coordinate
- * @param {string} [locationData.name] - Optional location name/address
- * @returns {Promise<void>}
- *
- * @example
- * await setLocation({
- *   latitude: 45.4642,
- *   longitude: 9.1900,
- *   name: 'Milano, IT'
- * });
- */
-export async function setLocation({ latitude, longitude, name }: LocationInput): Promise<void> {
-  const locationRef = ref(db, getLocationPath());
-  await set(locationRef, {
-    latitude,
-    longitude,
-    name: name || null,
-    updatedAt: Date.now(),
-  });
-}
 
 /**
  * Subscribe to real-time location updates

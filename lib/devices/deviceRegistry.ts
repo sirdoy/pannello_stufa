@@ -281,4 +281,3 @@ function getDeviceBadge(deviceId: string, status?: Record<string, unknown>): Dev
   }
 }
 
-export { DEVICE_CONFIG, GLOBAL_SECTIONS };

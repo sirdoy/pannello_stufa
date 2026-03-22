@@ -18,7 +18,7 @@ const DISMISS_DAYS = 30;
  * Check if localStorage is available
  * Returns false in SSR or private browsing mode
  */
-export function canUseLocalStorage(): boolean {
+function canUseLocalStorage(): boolean {
   if (typeof window === 'undefined') {
     return false;
   }
@@ -37,7 +37,7 @@ export function canUseLocalStorage(): boolean {
  * Get current visit count
  * Returns 0 if localStorage unavailable or count not set
  */
-export function getVisitCount(): number {
+function getVisitCount(): number {
   if (!canUseLocalStorage()) {
     return 0;
   }

@@ -4,7 +4,7 @@
  * Validation functions for stove-related API inputs.
  */
 
-import { validateRequired, validateRange, validateEnum } from '@/lib/core';
+import { validateRequired, validateRange, validateEnum } from '@/lib/core/requestParser';
 import type { StovePowerLevel } from '@/types/firebase';
 
 /** Command source type */

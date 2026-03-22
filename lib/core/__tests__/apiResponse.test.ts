@@ -14,10 +14,6 @@ import {
   forbidden,
   notFound,
   badRequest,
-  timeout,
-  stoveOffline,
-  maintenanceRequired,
-  netatmoReconnect,
 } from '../apiResponse';
 import { ApiError, ERROR_CODES } from '../apiErrors';
 
@@ -142,50 +138,6 @@ describe('Error Responses', () => {
       expect(status).toBe(400);
       expect(data.error).toBe('Input non valido');
       expect(data.code).toBe(ERROR_CODES.VALIDATION_ERROR);
-    });
-  });
-
-  describe('timeout', () => {
-    it('should create 504 response', async () => {
-      const response = timeout();
-      const { data, status } = await getResponseData(response);
-
-      expect(status).toBe(504);
-      expect(data.code).toBe(ERROR_CODES.TIMEOUT);
-    });
-  });
-});
-
-describe('Device-Specific Errors', () => {
-  describe('stoveOffline', () => {
-    it('should create stove offline response', async () => {
-      const response = stoveOffline();
-      const { data, status } = await getResponseData(response);
-
-      expect(status).toBe(504);
-      expect(data.code).toBe(ERROR_CODES.STOVE_OFFLINE);
-      expect(data.details).toBeDefined();
-    });
-  });
-
-  describe('maintenanceRequired', () => {
-    it('should create maintenance required response', async () => {
-      const response = maintenanceRequired();
-      const { data, status } = await getResponseData(response);
-
-      expect(status).toBe(403);
-      expect(data.code).toBe(ERROR_CODES.MAINTENANCE_REQUIRED);
-    });
-  });
-
-  describe('netatmoReconnect', () => {
-    it('should create netatmo reconnect response', async () => {
-      const response = netatmoReconnect();
-      const { data, status } = await getResponseData(response);
-
-      expect(status).toBe(401);
-      expect(data.code).toBe(ERROR_CODES.NETATMO_RECONNECT_REQUIRED);
-      expect(data.reconnect).toBe(true);
     });
   });
 

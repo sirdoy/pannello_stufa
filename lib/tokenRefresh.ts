@@ -212,39 +212,3 @@ export async function initializeTokenManagement(userId: string): Promise<{
   }
 }
 
-/**
- * Force token refresh (for manual refresh button or troubleshooting)
- *
- * @param {string} userId - User ID
- * @returns {Promise<{success: boolean, token: string|null, error?: string}>}
- */
-export async function forceTokenRefresh(userId: string): Promise<{
-  success: boolean;
-  token: string | null;
-  error?: string;
-}> {
-  if (typeof window === 'undefined') {
-    return { success: false, token: null, error: 'SSR' };
-  }
-
-  debugLog('Force refresh requested');
-
-  // Temporarily set a very old createdAt to trigger refresh
-  const stored = await loadToken();
-  if (stored) {
-    // Modify stored data to force refresh
-    await saveToken(stored.token, {
-      deviceId: stored.deviceId ?? undefined,
-      deviceInfo: stored.deviceInfo ?? undefined,
-      createdAt: new Date(0).toISOString(), // Very old date
-    });
-  }
-
-  const result = await checkAndRefreshToken(userId);
-
-  return {
-    success: result.refreshed,
-    token: result.token,
-    error: result.error,
-  };
-}

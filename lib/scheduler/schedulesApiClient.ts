@@ -49,23 +49,6 @@ export async function getAllSchedules(): Promise<GetSchedulesResponse> {
 }
 
 /**
- * Get specific schedule by ID
- */
-export async function getScheduleById(scheduleId: string): Promise<Schedule> {
-  const response = await fetch(`/api/schedules/${scheduleId}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to fetch schedule');
-  }
-
-  return response.json();
-}
-
-/**
  * Create new schedule
  */
 export async function createSchedule(name: string, copyFromId: string | null = null): Promise<Schedule> {
@@ -119,24 +102,6 @@ export async function deleteSchedule(scheduleId: string): Promise<{ success: boo
   }
 
   return response.json();
-}
-
-/**
- * Get active schedule ID
- */
-export async function getActiveScheduleId(): Promise<string> {
-  const response = await fetch('/api/schedules/active', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to fetch active schedule ID');
-  }
-
-  const data = await response.json() as { activeScheduleId: string };
-  return data.activeScheduleId;
 }
 
 /**

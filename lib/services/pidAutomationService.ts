@@ -29,7 +29,7 @@ export interface PIDConfig {
 /**
  * Default PID configuration for new users
  */
-export const DEFAULT_PID_CONFIG: PIDConfig = {
+const DEFAULT_PID_CONFIG: PIDConfig = {
   enabled: false,
   targetRoomId: null,
   manualSetpoint: 20, // Manual setpoint temperature (15-25°C)

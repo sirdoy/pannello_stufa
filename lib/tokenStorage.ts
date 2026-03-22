@@ -32,7 +32,7 @@ const TOKEN_ID = 'current';
  * Request persistent storage to prevent eviction
  * @returns true if persistence granted
  */
-export async function requestPersistentStorage(): Promise<boolean> {
+async function requestPersistentStorage(): Promise<boolean> {
   if (typeof navigator === 'undefined') return false;
 
   if (navigator.storage && navigator.storage.persist) {
@@ -50,7 +50,7 @@ export async function requestPersistentStorage(): Promise<boolean> {
 /**
  * Check if storage is persisted
  */
-export async function checkPersistence(): Promise<boolean> {
+async function checkPersistence(): Promise<boolean> {
   if (typeof navigator === 'undefined') return false;
 
   if (navigator.storage && navigator.storage.persisted) {
@@ -165,27 +165,6 @@ export async function updateLastUsed(): Promise<void> {
 }
 
 /**
- * Clear token from all storage
- */
-export async function clearToken(): Promise<void> {
-  if (typeof window === 'undefined') return;
-
-  // Clear IndexedDB
-  try {
-    await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.delete(TOKEN_ID);
-  } catch (e) {
-    console.warn('[tokenStorage] IndexedDB clear failed:', e);
-  }
-
-  // Clear localStorage
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (e) {
-    console.warn('[tokenStorage] localStorage clear failed:', e);
-  }
-}
-
-/**
  * Get token age in days
  * @returns Age in days or null if no token
  */
@@ -196,50 +175,4 @@ export async function getTokenAge(): Promise<number | null> {
   const created = new Date(data.createdAt).getTime();
   const now = Date.now();
   return (now - created) / (1000 * 60 * 60 * 24);
-}
-
-interface StorageStatus {
-  available: boolean;
-  reason?: string;
-  indexedDB?: boolean;
-  localStorage?: boolean;
-  persisted?: boolean;
-  token?: TokenStorageRecord | null;
-  indexedDBError?: string;
-  localStorageError?: string;
-}
-
-/**
- * Check storage health for debugging
- * @returns Storage status
- */
-export async function getStorageStatus(): Promise<StorageStatus> {
-  if (typeof window === 'undefined') {
-    return { available: false, reason: 'SSR' };
-  }
-
-  const status: StorageStatus = {
-    available: true,
-    indexedDB: false,
-    localStorage: false,
-    persisted: await checkPersistence(),
-    token: null,
-  };
-
-  try {
-    const idbRecord = await (db as Dexie & { tokens: Dexie.Table<TokenStorageRecord, string> }).tokens.get(TOKEN_ID);
-    status.indexedDB = !!idbRecord?.token;
-    status.token = idbRecord || null;
-  } catch (e) {
-    status.indexedDBError = (e as Error).message;
-  }
-
-  try {
-    const lsData = localStorage.getItem(STORAGE_KEY);
-    status.localStorage = !!lsData;
-  } catch (e) {
-    status.localStorageError = (e as Error).message;
-  }
-
-  return status;
 }

@@ -257,32 +257,5 @@ export async function updatePreferenceSection(userId: string, section: string, s
   }
 }
 
-/**
- * Check if error notification should be sent based on user preferences
- * @param {string} userId - User ID
- * @param {string} severity - 'info'|'warning'|'error'|'critical'
- * @returns {Promise<boolean>}
- */
-export async function shouldSendErrorNotification(userId: string, severity: string) {
-  if (!userId) return false;
-
-  try {
-    const prefs = await getUserPreferences(userId);
-
-    // Check se errori sono abilitati globalmente
-    if (!prefs.errors?.enabled) {
-      return false;
-    }
-
-    // Check severità specifica
-    const severityKey = severity.toLowerCase();
-    return prefs.errors?.severityLevels?.[severityKey] ?? true;
-
-  } catch (error) {
-    console.error('Error checking error notification preference:', error);
-    return true; // In caso di errore, invia comunque (fail-safe)
-  }
-}
-
-// Removed unused functions: shouldSendSchedulerNotification, shouldSendMaintenanceNotification,
+// Removed unused functions: shouldSendSchedulerNotification, shouldSendMaintenanceNotification, shouldSendErrorNotification
 // resetPreferences, getPreferenceStats - not used in codebase

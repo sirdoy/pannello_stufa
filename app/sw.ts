@@ -15,6 +15,26 @@ declare global {
   }
 }
 
+// Badging API augmentation
+declare global {
+  interface Navigator {
+    setAppBadge?(count?: number): Promise<void>;
+    clearAppBadge?(): Promise<void>;
+  }
+}
+
+// Periodic Background Sync API augmentation
+declare global {
+  interface PeriodicSyncManager {
+    register(tag: string, options?: { minInterval: number }): Promise<void>;
+    unregister(tag: string): Promise<void>;
+    getTags(): Promise<string[]>;
+  }
+  interface ServiceWorkerRegistration {
+    readonly periodicSync?: PeriodicSyncManager;
+  }
+}
+
 declare const self: ServiceWorkerGlobalScope;
 
 const serwist = new Serwist({
@@ -487,9 +507,9 @@ async function updateBadge(count: number): Promise<void> {
 
   try {
     if (count > 0) {
-      await (navigator as any).setAppBadge(count);
+      await navigator.setAppBadge?.(count);
     } else {
-      await (navigator as any).clearAppBadge();
+      await navigator.clearAppBadge?.();
     }
   } catch (error) {
     console.error('[sw.ts] Failed to update badge:', error);
@@ -755,7 +775,7 @@ self.addEventListener('message', async (event) => {
     case 'REGISTER_PERIODIC_SYNC':
       try {
         if ('periodicSync' in self.registration) {
-          await (self.registration as any).periodicSync.register(PERIODIC_SYNC_TAG, {
+          await self.registration.periodicSync?.register(PERIODIC_SYNC_TAG, {
             minInterval: data?.interval || 15 * 60 * 1000, // Default 15 minutes
           });
           event.ports[0]?.postMessage({ success: true });
@@ -776,7 +796,7 @@ self.addEventListener('message', async (event) => {
     case 'UNREGISTER_PERIODIC_SYNC':
       try {
         if ('periodicSync' in self.registration) {
-          await (self.registration as any).periodicSync.unregister(PERIODIC_SYNC_TAG);
+          await self.registration.periodicSync?.unregister(PERIODIC_SYNC_TAG);
           event.ports[0]?.postMessage({ success: true });
         }
       } catch (error) {
@@ -790,7 +810,7 @@ self.addEventListener('message', async (event) => {
     case 'GET_PERIODIC_SYNC_STATUS':
       try {
         if ('periodicSync' in self.registration) {
-          const tags = await (self.registration as any).periodicSync.getTags();
+          const tags = await self.registration.periodicSync?.getTags() ?? [];
           event.ports[0]?.postMessage({
             success: true,
             registered: tags.includes(PERIODIC_SYNC_TAG),

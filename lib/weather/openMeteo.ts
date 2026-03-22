@@ -28,6 +28,7 @@ interface CurrentWeather {
 
 /** Daily weather forecast data */
 interface DailyWeather {
+  time: string[];
   weather_code: number[];
   temperature_2m_max: number[];
   temperature_2m_min: number[];
@@ -41,15 +42,22 @@ interface DailyWeather {
 
 /** Hourly weather forecast data */
 interface HourlyWeather {
+  time: string[];
   temperature_2m: number[];
   weather_code: number[];
   precipitation_probability: number[];
   wind_speed_10m: number[];
 }
 
+/** Current weather units */
+interface CurrentWeatherUnits {
+  [key: string]: string;
+}
+
 /** Complete weather forecast response */
 export interface WeatherForecast {
   current: CurrentWeather;
+  current_units?: CurrentWeatherUnits;
   daily: DailyWeather;
   hourly: HourlyWeather;
   timezone: string;

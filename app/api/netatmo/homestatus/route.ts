@@ -5,14 +5,14 @@ import { getProxyHomestatus } from '@/lib/netatmo/netatmoProxy';
 import type { DataFreshness } from '@/types/netatmoProxy';
 
 // Battery classification utilities (pure functions, previously in netatmoApi)
-function getModulesWithLowBattery(modules: any[]): any[] {
-  return modules.filter(m => m.battery_state === 'low' || m.battery_state === 'very_low');
+function getModulesWithLowBattery(modules: ModuleWithStatus[]): ModuleWithStatus[] {
+  return modules.filter(m => m['battery_state'] === 'low' || m['battery_state'] === 'very_low');
 }
-function hasAnyCriticalBattery(modules: any[]): boolean {
-  return modules.some(m => m.battery_state === 'very_low');
+function hasAnyCriticalBattery(modules: ModuleWithStatus[]): boolean {
+  return modules.some(m => m['battery_state'] === 'very_low');
 }
-function hasAnyLowBattery(modules: any[]): boolean {
-  return modules.some(m => m.battery_state === 'low' || m.battery_state === 'very_low');
+function hasAnyLowBattery(modules: ModuleWithStatus[]): boolean {
+  return modules.some(m => m['battery_state'] === 'low' || m['battery_state'] === 'very_low');
 }
 
 export const dynamic = 'force-dynamic';
@@ -114,9 +114,9 @@ export const GET = withAuthAndErrorHandler(async () => {
   const modulesFromTopology = (topology?.modules ?? []) as ModuleWithStatus[];
 
   // Battery classification using inlined pure utility functions
-  const lowBatteryModules = getModulesWithLowBattery(modulesFromTopology as any);
-  const hasCriticalBattery = hasAnyCriticalBattery(modulesFromTopology as any);
-  const hasLowBattery = hasAnyLowBattery(modulesFromTopology as any);
+  const lowBatteryModules = getModulesWithLowBattery(modulesFromTopology);
+  const hasCriticalBattery = hasAnyCriticalBattery(modulesFromTopology);
+  const hasLowBattery = hasAnyLowBattery(modulesFromTopology);
 
   // Save current status to Firebase (same path as before)
   const statusToSave: Record<string, unknown> = {

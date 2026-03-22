@@ -1,6 +1,7 @@
 import { withAuthAndErrorHandler, success, badRequest, error, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
 import { getCachedWeather } from '@/lib/weather/weatherCache';
 import { fetchWeatherForecast, fetchAirQuality, interpretWeatherCode } from '@/lib/weather/openMeteo';
+import type { WeatherForecast, AirQualityData } from '@/lib/weather/openMeteo';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,17 +75,19 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       }),
     ]);
 
-    const { data, cachedAt, stale } = weatherResult as any;
+    const { data: rawData, cachedAt, stale } = weatherResult;
+    const data = rawData as WeatherForecast;
 
     // Enrich current weather with interpreted code
     const currentCondition = interpretWeatherCode(data.current.weather_code);
 
     // Extract air quality value
-    const airQuality = (airQualityResult as any)?.current?.european_aqi ?? null;
+    const typedAirQuality = airQualityResult as AirQualityData | null;
+    const airQuality = typedAirQuality?.current?.european_aqi ?? null;
 
     // Enrich daily forecast with interpreted codes and extended data
     const dailyForecast = data.daily.time.map((date: string, i: number) => {
-      const code = data.daily.weather_code[i];
+      const code = data.daily.weather_code[i] ?? 0;
       return {
         date,
         tempMax: data.daily.temperature_2m_max[i],

@@ -59,7 +59,7 @@ export const POST = withAuthAndErrorHandler(async (request) => {
 
   // Update target hours
   const updates: Partial<MaintenanceData> = {
-    targetHours: parseFloat(targetHours as any),
+    targetHours,
   };
 
   // Check if current hours >= new threshold

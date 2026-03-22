@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 118-01-PLAN.md
-last_updated: "2026-03-22T21:01:01.630Z"
+stopped_at: Completed 118-02-PLAN.md
+last_updated: "2026-03-22T21:06:09.866Z"
 last_activity: 2026-03-22
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -43,6 +43,7 @@ Plan: 2 of 2
 | v14.1 Tech Debt & Type Safety | 113-117 | 9 | 1 day |
 | v15.0 Rooms & Device Registry | 118-124 | ~10 | In progress |
 | Phase 118 P01 | 143 | 2 tasks | 5 files |
+| Phase 118 P02 | 8 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -55,6 +56,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [v11.0]: New device onboarding path: types → client → routes → hook → card/page
 - [Phase 118]: haDelete transport added to haClient.ts; 204 responses return void without calling response.json()
 - [Phase 118]: PaginatedResponse<T> placed in types/common.ts (shared by registry, rooms, automations — not scoped to registry types)
+- [Phase 118]: created() helper added to lib/core/index.ts export to enable import from @/lib/core
+- [Phase 118]: GET /registry/types and GET /registry/health are public (withErrorHandler); all device routes are protected (withAuthAndErrorHandler)
 
 ### Pending Todos
 
@@ -74,5 +77,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-22
-Stopped at: Completed 118-01-PLAN.md
+Stopped at: Completed 118-02-PLAN.md
 Resume file: None

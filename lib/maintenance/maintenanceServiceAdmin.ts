@@ -4,6 +4,7 @@
  */
 import { adminDbGet, adminDbUpdate, adminDbTransaction } from '@/lib/firebaseAdmin';
 import { shouldSendMaintenanceNotification } from './helpers';
+import type { MaintenanceNotificationData } from './helpers';
 
 const MAINTENANCE_REF = 'maintenance';
 const DEFAULT_TARGET_HOURS = 50;
@@ -24,7 +25,7 @@ interface TrackUsageResult {
   reason?: string;
   elapsedMinutes?: number;
   newCurrentHours?: number;
-  notificationData?: unknown;
+  notificationData?: MaintenanceNotificationData | null;
   error?: string;
 }
 
@@ -93,10 +94,10 @@ export async function trackUsageHours(stoveStatus: string): Promise<TrackUsageRe
         result.lastNotificationLevel = notificationData.notificationLevel;
       }
 
-      return result as MaintenanceData & { _elapsedMinutes: number; _notificationData: unknown };
+      return result as MaintenanceData & { _elapsedMinutes: number; _notificationData: MaintenanceNotificationData | null };
     }) as (currentData: unknown) => unknown);
 
-    const updatedData = transactionResult as MaintenanceData & { _notificationData?: unknown; _elapsedMinutes?: number };
+    const updatedData = transactionResult as MaintenanceData & { _notificationData?: MaintenanceNotificationData | null; _elapsedMinutes?: number };
     const notificationData = updatedData._notificationData || null;
     const elapsedMinutes = updatedData._elapsedMinutes || 0;
 

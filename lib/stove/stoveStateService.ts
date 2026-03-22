@@ -14,7 +14,7 @@ export interface StoveStateUpdate {
   powerLevel?: number | null;
   errorCode?: number;
   errorDescription?: string;
-  source?: 'manual' | 'scheduler' | 'api' | 'init' | 'external_change';
+  source?: 'manual' | 'scheduler' | 'api' | 'init' | 'external_change' | 'pid_automation';
   lastUpdated?: string;
 }
 

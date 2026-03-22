@@ -40,6 +40,8 @@ import {
 import type { StoveState } from '@/types/thermorossiProxy';
 import { updateStoveState } from '@/lib/stove/stoveStateService';
 import { calibrateValvesServer } from '@/lib/netatmo/netatmoCalibrationService';
+import type { CalibrationResult } from '@/lib/netatmo/netatmoCalibrationService';
+import type { SchedulerMode, ScheduleInterval } from '@/lib/scheduler/schedulerService';
 import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
 import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 import { PIDController } from '@/lib/utils/pidController';
@@ -89,7 +91,9 @@ async function sendSchedulerNotification(action: string, details: string = ''): 
   }
 }
 
-async function calibrateValvesIfNeeded(): Promise<any> {
+interface CalibrationSkipped { calibrated: false; reason: string; nextCalibration?: string; error?: string; }
+interface CalibrationDone { calibrated: true; timestamp: number; nextCalibration: string; }
+async function calibrateValvesIfNeeded(): Promise<CalibrationResult | CalibrationSkipped | CalibrationDone> {
   try {
     const calibrationPath = getEnvironmentPath('netatmo/lastAutoCalibration');
     const lastCalibration = await adminDbGet(calibrationPath) as number | null;
@@ -107,7 +111,7 @@ async function calibrateValvesIfNeeded(): Promise<any> {
 
 
     // Call service directly instead of HTTP request
-    const result = await calibrateValvesServer() as any;
+    const result = await calibrateValvesServer();
 
     if (!result.calibrated) {
       console.error('❌ Calibrazione automatica fallita:', result.error || result.reason);
@@ -553,14 +557,26 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
     }
 
     // Read PID config from Firebase
-    const pidConfig = await adminDbGet(`users/${adminUserId}/pidAutomation`) as any;
+    interface PidConfig {
+      enabled: boolean;
+      kp?: number;
+      ki?: number;
+      kd?: number;
+      manualSetpoint?: number;
+      targetRoomId?: string;
+    }
+    const pidConfig = await adminDbGet<PidConfig>(`users/${adminUserId}/pidAutomation`);
     if (!pidConfig || !pidConfig.enabled) {
       await adminDbSet(pidBoostPath, { active: false });
       return { skipped: true, reason: 'pid_disabled' };
     }
 
     // Read Netatmo current status from Firebase cache
-    const netatmoStatus = await adminDbGet('netatmo/currentStatus') as any;
+    interface NetatmoCurrentStatus {
+      rooms: Record<string, { temperature?: number; setpoint?: number; room_id?: string; name?: string; [key: string]: unknown }>;
+      [key: string]: unknown;
+    }
+    const netatmoStatus = await adminDbGet<NetatmoCurrentStatus>('netatmo/currentStatus');
     if (!netatmoStatus || !netatmoStatus.rooms) {
       return { skipped: true, reason: 'no_netatmo_data' };
     }
@@ -571,9 +587,9 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
       return { skipped: true, reason: 'no_target_room' };
     }
 
-    const rooms = Object.values(netatmoStatus.rooms) as any[];
+    const rooms = Object.values(netatmoStatus.rooms);
     // Note: netatmo/currentStatus saves rooms with room_id field, not id
-    const targetRoom = rooms.find((r: any) => String(r.room_id) === String(targetRoomId));
+    const targetRoom = rooms.find((r) => String(r.room_id) === String(targetRoomId));
     if (!targetRoom) {
       return { skipped: true, reason: 'room_not_found' };
     }
@@ -592,7 +608,15 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
 
     // Read PID state from Firebase (integral, prevError, lastRun)
     const pidStatePath = getEnvironmentPath('pidAutomation/state');
-    const pidState = await adminDbGet(pidStatePath) as any;
+    interface PidState {
+      integral?: number;
+      prevError?: number;
+      initialized?: boolean;
+      lastRun?: number;
+      lastCleanup?: number;
+      [key: string]: unknown;
+    }
+    const pidState = await adminDbGet<PidState>(pidStatePath);
 
     // Calculate time delta in minutes
     const now = Date.now();
@@ -645,7 +669,7 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
         integral: newState.integral,
         derivative: newState.prevError, // prevError represents derivative term
         roomId: targetRoomId,
-        roomName: targetRoom.name,
+        roomName: targetRoom.name ?? targetRoomId,
       });
     } catch (logError) {
       // Don't fail PID automation if logging fails
@@ -667,7 +691,7 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
 
       // Apply new power level
       await setPower(targetPower);
-      await updateStoveState({ powerLevel: targetPower, source: 'pid_automation' as any });
+      await updateStoveState({ powerLevel: targetPower, source: 'pid_automation' });
 
       // Analytics: log PID-initiated power change (fire-and-forget, no consent needed)
       logAnalyticsEvent({
@@ -734,7 +758,7 @@ export const GET = withCronSecret(async (_request) => {
   const startTime = Date.now();
 
   // Check if scheduler mode is enabled
-  const modeData = ((await adminDbGet('schedules-v2/mode')) as any) || { enabled: false, semiManual: false };
+  const modeData = (await adminDbGet<SchedulerMode>('schedules-v2/mode')) ?? { enabled: false, semiManual: false } as SchedulerMode;
   const schedulerEnabled = modeData.enabled;
 
   if (!schedulerEnabled) {
@@ -793,7 +817,7 @@ export const GET = withCronSecret(async (_request) => {
 
   // Get active schedule
   const activeScheduleId = (await adminDbGet('schedules-v2/activeScheduleId') as string | null) || 'default';
-  const intervals = (await adminDbGet(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`) as any[] | null);
+  const intervals = await adminDbGet<ScheduleInterval[]>(`schedules-v2/schedules/${activeScheduleId}/slots/${giorno}`);
 
   if (!intervals) {
     const duration = Date.now() - startTime;
@@ -807,9 +831,9 @@ export const GET = withCronSecret(async (_request) => {
     return success({ message: 'Nessuno scheduler', giorno, ora });
   }
 
-  const active = intervals.find(({ start, end }: any) => {
-    const [sh, sm] = start.split(':').map(Number);
-    const [eh, em] = end.split(':').map(Number);
+  const active = intervals.find(({ start, end }) => {
+    const [sh = 0, sm = 0] = start.split(':').map(Number);
+    const [eh = 0, em = 0] = end.split(':').map(Number);
     const startMin = sh * 60 + sm;
     const endMin = eh * 60 + em;
     return currentMinutes >= startMin && currentMinutes < endMin;
@@ -851,7 +875,7 @@ export const GET = withCronSecret(async (_request) => {
   if (maintenanceTrack.tracked) {
 
     if (maintenanceTrack.notificationData) {
-      await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData as any);
+      await sendMaintenanceNotificationIfNeeded(maintenanceTrack.notificationData);
     }
   }
 
@@ -944,7 +968,7 @@ export const GET = withCronSecret(async (_request) => {
     const pidResult = await runPidAutomationIfEnabled(
       currentStatus,
       effectivePower,
-      modeData.semiManual,
+      modeData.semiManual ?? false,
       schedulerEnabled,
       active.power   // scheduledPower — always from schedule
     );

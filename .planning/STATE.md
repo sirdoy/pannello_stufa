@@ -4,7 +4,7 @@ milestone: v14.1
 milestone_name: Tech Debt & Type Safety
 status: unknown
 stopped_at: Completed 113-01-PLAN.md
-last_updated: "2026-03-22T14:53:06.599Z"
+last_updated: "2026-03-22T14:55:51.710Z"
 progress:
   total_phases: 5
   completed_phases: 1
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 
 ## Current Position
 
-Phase: 113 (known-issues-fix) — EXECUTING
-Plan: 1 of 1
+Phase: 114
+Plan: Not started
 
 ## Performance Metrics
 

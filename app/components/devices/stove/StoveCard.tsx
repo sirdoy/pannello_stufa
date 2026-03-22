@@ -108,14 +108,14 @@ export default function StoveCard() {
               </div>
               <div className="flex items-center gap-2">
                 <Badge
-                  variant={statusDisplay.variant as any}
+                  variant={statusDisplay.variant}
                   pulse={statusDisplay.pulse}
                   size="sm"
                 >
                   {statusDisplay.label}
                 </Badge>
                 <HealthIndicator
-                  status={statusDisplay.health as any}
+                  status={statusDisplay.health}
                   size="sm"
                   showIcon={true}
                   label=""

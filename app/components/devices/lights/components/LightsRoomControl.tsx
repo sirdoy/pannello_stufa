@@ -1,9 +1,13 @@
 'use client';
 
 import { Button, ControlButton, Heading, Slider, Text } from '../../../ui';
+import type { VariantProps } from 'class-variance-authority';
+import { controlButtonVariants } from '../../../ui/ControlButton';
 import { cn } from '@/lib/utils/cn';
 import type { AdaptiveClasses } from '../hooks/useLightsData';
 import type { HueGroup, HueLight } from '@/types/hueProxy';
+
+type ControlButtonVariant = NonNullable<VariantProps<typeof controlButtonVariants>['variant']>;
 
 /**
  * LightsRoomControl - Dynamic-styled room control area
@@ -53,6 +57,12 @@ export interface LightsRoomControlProps {
   onRoomToggle: (groupId: string | null | undefined, on: boolean) => void;
   onBrightnessChange: (groupId: string | null | undefined, brightness: string) => void;
   onNavigateToColors: () => void;
+}
+
+/** Map adaptive.buttonVariant to a ControlButton-compatible variant ('outline' falls back to 'subtle') */
+function toControlButtonVariant(v: AdaptiveClasses['buttonVariant']): ControlButtonVariant {
+  if (v === 'outline' || v === null) return 'subtle';
+  return v;
 }
 
 export default function LightsRoomControl({
@@ -224,21 +234,19 @@ export default function LightsRoomControl({
             {/* Slider - Design system component with commit-on-release pattern */}
             <Slider
               value={localBrightness !== null ? localBrightness : avgBrightness}
-              onChange={((value: number | number[]) => {
+              onChange={(value: number | number[]) => {
                 // Update local state during drag for smooth UI
                 const numValue = Array.isArray(value) ? value[0] : value;
-                if (numValue !== undefined) {
-                  setLocalBrightness(numValue);
-                }
-              }) as any}
-              onValueCommit={((value: number | number[]) => {
+                if (numValue !== undefined) setLocalBrightness(numValue);
+              }}
+              onValueCommit={(value: number[]) => {
                 // Commit to API on release (Radix onValueCommit)
-                const numValue = Array.isArray(value) ? value[0] : value;
+                const numValue = value[0];
                 if (numValue !== undefined) {
                   onBrightnessChange(selectedGroupId || undefined, numValue.toString());
                 }
                 setLocalBrightness(null);
-              }) as any}
+              }}
               min={1}
               max={100}
               variant="ember"
@@ -254,7 +262,7 @@ export default function LightsRoomControl({
             <div className="flex items-center gap-2">
               <ControlButton
                 type="decrement"
-                variant={(adaptive.buttonVariant as any) || 'subtle'}
+                variant={toControlButtonVariant(adaptive.buttonVariant)}
                 size="sm"
                 step={5}
                 onChange={(delta: number) => {
@@ -266,7 +274,7 @@ export default function LightsRoomControl({
               />
               <ControlButton
                 type="increment"
-                variant={(adaptive.buttonVariant as any) || 'subtle'}
+                variant={toControlButtonVariant(adaptive.buttonVariant)}
                 size="sm"
                 step={5}
                 onChange={(delta: number) => {

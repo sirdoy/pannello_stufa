@@ -93,7 +93,7 @@ export default function ScheduleSelector({
             variant="ember"
             onClick={handleSwitch}
             loading={switching}
-            icon={(switching ? <RefreshCw className="animate-spin" /> : <Check />) as any}
+            icon={switching ? <RefreshCw className="animate-spin" /> : <Check />}
           >
             Applica
           </Button>

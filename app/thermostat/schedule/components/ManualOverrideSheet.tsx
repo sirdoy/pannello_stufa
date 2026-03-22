@@ -178,7 +178,7 @@ export default function ManualOverrideSheet({
             loading={submitting}
             disabled={!selectedRoomId || submitting}
             className="w-full"
-            icon={<Flame /> as any}
+            icon={<Flame />}
           >
             Applica Override
           </Button>

@@ -288,7 +288,7 @@ export default function HlsPlayer({
       {/* Fullscreen button - only show when not using native controls */}
       {!loading && !error && !showControls && (
         <Button.Icon
-          icon={(isFullscreen ? <Minimize className="w-5 h-5 text-white" /> : <Maximize className="w-5 h-5 text-white" />) as any}
+          icon={isFullscreen ? <Minimize className="w-5 h-5 text-white" /> : <Maximize className="w-5 h-5 text-white" />}
           onClick={toggleFullscreen}
           variant="ghost"
           size="sm"

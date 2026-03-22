@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Skeleton from '../../ui/Skeleton';
 import DeviceCard from '../../ui/DeviceCard';
+import type { FooterAction, StatusBadge } from '../../ui/DeviceCard';
 import RoomSelector from '../../ui/RoomSelector';
 import { EmptyState } from '../../ui';
 import { useLightsData } from './hooks/useLightsData';
@@ -58,15 +59,15 @@ export default function LightsCard() {
     { icon: '🎨', label: 'Scene', value: lightsData.scenes.length },
   ] : [];
 
-  const footerActions = lightsData.selectedGroup ? [{
+  const footerActions: FooterAction[] = lightsData.selectedGroup ? [{
     label: 'Tutte le Stanze e Scene →',
-    variant: 'outline' as any,
+    variant: 'outline',
     size: 'sm',
-    onClick: () => router.push('/lights')
+    onClick: () => router.push('/lights'),
   }] : [];
 
   // Staleness badge for DeviceCard header
-  const statusBadge = lightsData.stale
+  const statusBadge: StatusBadge | null = lightsData.stale
     ? { icon: '⏳', label: 'Stale', color: 'warning' }
     : null;
 
@@ -85,11 +86,11 @@ export default function LightsCard() {
       loading={lightsData.loading || lightsData.refreshing}
       loadingMessage={lightsData.loadingMessage}
       skeletonComponent={lightsData.loading ? <Skeleton.LightsCard /> : null}
-      statusBadge={statusBadge as any}
+      statusBadge={statusBadge}
       banners={banners}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
-      footerActions={footerActions as any}
+      footerActions={footerActions}
     >
       {/* Quick All-House Control */}
       <LightsHouseControl

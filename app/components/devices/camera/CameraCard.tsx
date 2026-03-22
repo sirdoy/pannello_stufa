@@ -356,7 +356,7 @@ export default function CameraCard() {
         {/* Refresh button overlay (only in snapshot mode) */}
         {!isLiveMode && (
           <Button.Icon
-            icon={<RefreshCw className={`w-4 h-4 text-white ${refreshing ? 'animate-spin' : ''}`} /> as any}
+            icon={<RefreshCw className={`w-4 h-4 text-white ${refreshing ? 'animate-spin' : ''}`} />}
             onClick={handleRefresh}
             variant="ghost"
             size="sm"

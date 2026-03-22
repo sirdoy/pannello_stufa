@@ -656,9 +656,12 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
           {/* Rows per page selector */}
           {pageSizeOptions && pageSizeOptions.length > 0 && (
             <div className="flex items-center gap-2">
-              <Text {...({ variant: "secondary", size: "sm", as: "label", htmlFor: "page-size" } as any)}>
+              <label
+                htmlFor="page-size"
+                className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-600"
+              >
                 Rows:
-              </Text>
+              </label>
               <select
                 id="page-size"
                 value={pageSize}

@@ -62,7 +62,7 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
             </div>
           </div>
           <Button.Icon
-            icon={<X className="w-6 h-6" /> as any}
+            icon={<X className="w-6 h-6" />}
             onClick={onClose}
             variant="ghost"
             size="md"

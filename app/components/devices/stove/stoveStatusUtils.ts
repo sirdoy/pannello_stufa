@@ -36,9 +36,9 @@ export interface StoveStatusInfo {
 export interface StoveStatusDisplay {
   label: string;
   icon: string;
-  variant: string;
+  variant: 'ember' | 'sage' | 'ocean' | 'warning' | 'danger' | 'neutral';
   pulse: boolean;
-  health: string;
+  health: 'ok' | 'warning' | 'error' | 'critical';
   animated: boolean;
 }
 

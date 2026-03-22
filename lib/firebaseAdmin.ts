@@ -89,10 +89,10 @@ export function getAdminFirestore(): Firestore {
  * @param path - Database path (es. 'maintenance' o 'users/123/fcmTokens')
  * @returns Data at path or null if not exists
  */
-export async function adminDbGet(path: string): Promise<unknown> {
+export async function adminDbGet<T = unknown>(path: string): Promise<T | null> {
   const db = getAdminDatabase();
   const snapshot = await db.ref(path).once('value');
-  return snapshot.val();
+  return snapshot.val() as T | null;
 }
 
 /**
@@ -491,8 +491,10 @@ export async function sendPushNotification(
         const firstToken = tokenArray[0]!;
         const deviceContext = await lookupDeviceIdForToken(firstToken).catch(() => null);
 
-        const errorCode = (error as any).code;
-        const errorMessage = (error as any).message;
+        const errorCode = error instanceof Error && 'code' in error
+          ? (error as Error & { code: string }).code
+          : undefined;
+        const errorMessage = error instanceof Error ? error.message : String(error);
 
         // Track error with full context (fire-and-forget)
         trackNotificationError({
@@ -506,7 +508,7 @@ export async function sendPushNotification(
         }).catch(console.error);
 
         // Check if token is invalid
-        if (INVALID_TOKEN_ERRORS.includes(errorCode)) {
+        if (errorCode && INVALID_TOKEN_ERRORS.includes(errorCode)) {
           console.warn(`⚠️ Invalid token detected: ${errorCode}`);
           invalidTokens.push(firstToken);
 
@@ -739,7 +741,10 @@ async function verifyFCMToken(token: string): Promise<boolean> {
 
     return true;
   } catch (error: unknown) {
-    console.error('❌ Token invalido:', (error as any).code);
+    const errCode = error instanceof Error && 'code' in error
+      ? (error as Error & { code: string }).code
+      : 'unknown';
+    console.error('❌ Token invalido:', errCode);
     return false;
   }
 }

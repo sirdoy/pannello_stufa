@@ -5,7 +5,7 @@
  * - checkUserStoveHealth returns proper structure
  * - determineConnectionStatus handles all error cases
  * - detectStateMismatch identifies ON vs OFF mismatches
- * - STARTING states have grace period (not flagged as mismatch)
+ * - STARTING states have grace period with Firebase timestamp tracking
  * - Partial API failures don't crash health check
  */
 
@@ -13,16 +13,20 @@ import {
   checkUserStoveHealth,
   determineConnectionStatus,
   detectStateMismatch,
-} from '../../lib/healthMonitoring';
+} from '../../lib/health/healthMonitoring';
 
 // Mock dependencies
-jest.mock('../../lib/thermorossiProxy');
-jest.mock('../../lib/netatmoProxy');
-jest.mock('../../lib/firebaseAdmin');
+jest.mock('../../lib/stove/thermorossiProxy');
+jest.mock('../../lib/netatmo/netatmoProxy');
+jest.mock('../../lib/firebaseAdmin', () => ({
+  adminDbGet: jest.fn().mockResolvedValue(null),
+  adminDbSet: jest.fn().mockResolvedValue(undefined),
+  adminDbRemove: jest.fn().mockResolvedValue(undefined),
+}));
 
-import { getStatus } from '../../lib/thermorossiProxy';
-import { getProxyHomestatus } from '../../lib/netatmoProxy';
-import { adminDbGet } from '../../lib/firebaseAdmin';
+import { getStatus } from '../../lib/stove/thermorossiProxy';
+import { getProxyHomestatus } from '../../lib/netatmo/netatmoProxy';
+import { adminDbGet, adminDbSet, adminDbRemove } from '../../lib/firebaseAdmin';
 
 describe('healthMonitoring', () => {
   beforeEach(() => {
@@ -68,28 +72,28 @@ describe('healthMonitoring', () => {
   });
 
   describe('detectStateMismatch', () => {
-    it('returns null when stove status unavailable', () => {
+    it('returns null when stove status unavailable', async () => {
       const stoveResult = { status: 'rejected', reason: new Error('Timeout') };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
-      expect(detectStateMismatch(stoveResult, scheduleResult, netatmoResult)).toBeNull();
+      expect(await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user')).toBeNull();
     });
 
-    it('returns null when expected state unavailable', () => {
+    it('returns null when expected state unavailable', async () => {
       const stoveResult = { status: 'fulfilled', value: { stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'rejected', reason: new Error('Failed') };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
-      expect(detectStateMismatch(stoveResult, scheduleResult, netatmoResult)).toBeNull();
+      expect(await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user')).toBeNull();
     });
 
-    it('detects mismatch when stove should be ON but is OFF', () => {
+    it('detects mismatch when stove should be ON but is OFF', async () => {
       const stoveResult = { status: 'fulfilled', value: { stove_state: 'standby', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'idle' };
 
-      const mismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
+      const mismatch = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
 
       expect(mismatch).not.toBeNull();
       expect(mismatch!.detected).toBe(true);
@@ -98,12 +102,12 @@ describe('healthMonitoring', () => {
       expect(mismatch!.reason).toBe('should_be_on');
     });
 
-    it('detects mismatch when stove should be OFF but is ON', () => {
+    it('detects mismatch when stove should be OFF but is ON', async () => {
       const stoveResult = { status: 'fulfilled', value: { stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'OFF' };
       const netatmoResult = { status: 'fulfilled', value: 'idle' };
 
-      const mismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
+      const mismatch = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
 
       expect(mismatch).not.toBeNull();
       expect(mismatch!.detected).toBe(true);
@@ -112,16 +116,7 @@ describe('healthMonitoring', () => {
       expect(mismatch!.reason).toBe('should_be_off');
     });
 
-    it('does not flag STARTING state as mismatch (grace period)', () => {
-      const stoveResult = { status: 'fulfilled', value: { stove_state: 'igniting', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
-      const scheduleResult = { status: 'fulfilled', value: 'ON' };
-      const netatmoResult = { status: 'fulfilled', value: 'heating' };
-
-      // STARTING state should not be flagged during grace period
-      expect(detectStateMismatch(stoveResult, scheduleResult, netatmoResult)).toBeNull();
-    });
-
-    it('detects error state as mismatch', () => {
+    it('detects error state as mismatch', async () => {
       const stoveResult = {
         status: 'fulfilled',
         value: { stove_state: 'alarm', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: 5, error_description: 'Temperature sensor failure' },
@@ -129,7 +124,7 @@ describe('healthMonitoring', () => {
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
-      const mismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
+      const mismatch = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
 
       expect(mismatch).not.toBeNull();
       expect(mismatch!.detected).toBe(true);
@@ -137,12 +132,12 @@ describe('healthMonitoring', () => {
       expect(mismatch!.errorDescription).toBe('Temperature sensor failure');
     });
 
-    it('detects coordination issue when Netatmo heating but stove OFF', () => {
+    it('detects coordination issue when Netatmo heating but stove OFF', async () => {
       const stoveResult = { status: 'fulfilled', value: { stove_state: 'standby', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'OFF' }; // Schedule says OFF
       const netatmoResult = { status: 'fulfilled', value: 'heating' }; // But Netatmo heating
 
-      const mismatch = detectStateMismatch(stoveResult, scheduleResult, netatmoResult);
+      const mismatch = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
 
       expect(mismatch).not.toBeNull();
       expect(mismatch!.detected).toBe(true);
@@ -150,28 +145,93 @@ describe('healthMonitoring', () => {
       expect(mismatch!.netatmoDemand).toBe('heating');
     });
 
-    it('returns null when ON states match (working)', () => {
+    it('returns null when ON states match (working)', async () => {
       const stoveResult = { status: 'fulfilled', value: { stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
-      expect(detectStateMismatch(stoveResult, scheduleResult, netatmoResult)).toBeNull();
+      expect(await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user')).toBeNull();
     });
 
-    it('returns null when ON states match (modulating)', () => {
+    it('returns null when ON states match (modulating)', async () => {
       const stoveResult = { status: 'fulfilled', value: { stove_state: 'modulating', power_level: 2, fan_level: 3, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'ON' };
       const netatmoResult = { status: 'fulfilled', value: 'heating' };
 
-      expect(detectStateMismatch(stoveResult, scheduleResult, netatmoResult)).toBeNull();
+      expect(await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user')).toBeNull();
     });
 
-    it('returns null when OFF states match', () => {
+    it('returns null when OFF states match', async () => {
       const stoveResult = { status: 'fulfilled', value: { stove_state: 'standby', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
       const scheduleResult = { status: 'fulfilled', value: 'OFF' };
       const netatmoResult = { status: 'fulfilled', value: 'idle' };
 
-      expect(detectStateMismatch(stoveResult, scheduleResult, netatmoResult)).toBeNull();
+      expect(await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user')).toBeNull();
+    });
+  });
+
+  describe('STARTING grace period', () => {
+    it('writes timestamp on first STARTING observation', async () => {
+      (adminDbGet as jest.Mock).mockResolvedValue(null);
+
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'igniting', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
+      const scheduleResult = { status: 'fulfilled', value: 'ON' };
+      const netatmoResult = { status: 'fulfilled', value: 'heating' };
+
+      const result = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
+
+      expect(adminDbSet).toHaveBeenCalledWith('health/stoveStarting/test-user', expect.any(Number));
+      expect(result).toBeNull();
+    });
+
+    it('returns null within grace period', async () => {
+      const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+      (adminDbGet as jest.Mock).mockResolvedValue(fiveMinutesAgo);
+
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'igniting', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
+      const scheduleResult = { status: 'fulfilled', value: 'ON' };
+      const netatmoResult = { status: 'fulfilled', value: 'heating' };
+
+      const result = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
+
+      expect(result).toBeNull();
+    });
+
+    it('flags starting_timeout after grace period expires', async () => {
+      const twentyMinutesAgo = Date.now() - 20 * 60 * 1000;
+      (adminDbGet as jest.Mock).mockResolvedValue(twentyMinutesAgo);
+
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'igniting', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
+      const scheduleResult = { status: 'fulfilled', value: 'ON' };
+      const netatmoResult = { status: 'fulfilled', value: 'heating' };
+
+      const result = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
+
+      expect(result).not.toBeNull();
+      expect(result!.detected).toBe(true);
+      expect(result!.reason).toBe('starting_timeout');
+    });
+
+    it('cleans up grace period key when leaving STARTING', async () => {
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'working', power_level: 3, fan_level: 4, data_freshness: 'LIVE', error_code: null, error_description: null } };
+      const scheduleResult = { status: 'fulfilled', value: 'ON' };
+      const netatmoResult = { status: 'fulfilled', value: 'heating' };
+
+      await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
+
+      expect(adminDbRemove).toHaveBeenCalledWith('health/stoveStarting/test-user');
+    });
+
+    it('returns null on Firebase error (fail-safe)', async () => {
+      (adminDbGet as jest.Mock).mockRejectedValue(new Error('Firebase connection error'));
+
+      const stoveResult = { status: 'fulfilled', value: { stove_state: 'igniting', power_level: null, fan_level: null, data_freshness: 'LIVE', error_code: null, error_description: null } };
+      const scheduleResult = { status: 'fulfilled', value: 'ON' };
+      const netatmoResult = { status: 'fulfilled', value: 'heating' };
+
+      const result = await detectStateMismatch(stoveResult, scheduleResult, netatmoResult, 'test-user');
+
+      expect(result).toBeNull();
     });
   });
 

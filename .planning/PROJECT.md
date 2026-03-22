@@ -19,8 +19,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v14.0 (shipped 2026-03-22)
-**Status:** All 5 device providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue) migrated to shared HomeAssistant proxy with unified haGet/haPost/haPut transport. No direct device APIs remain.
+**Version:** v14.1 (in progress)
+**Status:** Phase 113 complete — all 6 known v14.0 audit issues resolved (debug panel fields, stove staleness guard, CopyableIp design system, FormModal test isolation). All 5 device providers use shared HA proxy.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -707,4 +707,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-22 after v14.1 milestone start — Tech Debt & Type Safety*
+*Last updated: 2026-03-22 after Phase 113 complete — Known Issues Fix*

@@ -19,8 +19,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v14.1 (in progress)
-**Status:** Phase 116 complete — all `as any` casts eliminated from app/ route files and page components (scheduler adminDbGet generics, Netatmo module typing, weather response interfaces, sw.ts declare global augmentations, page prop type alignment). lib/ + components/ + app/ routes & pages layers fully type-safe. All 5 device providers use shared HA proxy.
+**Version:** v14.1 (complete)
+**Status:** Phase 117 complete — dead code cleanup finished. 50+ unused exports removed via knip, notificationService disabled block deleted, healthMonitoring STARTING grace period implemented with Firebase RTDB tracking. All v14.1 goals achieved: known issues fixed, `as any` eliminated across lib/+components/+routes/pages, dead code removed, service TODOs resolved. All 5 device providers use shared HA proxy.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

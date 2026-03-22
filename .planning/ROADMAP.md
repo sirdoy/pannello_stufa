@@ -95,7 +95,11 @@ Plans:
   3. `Notification.maxActions` has a type guard — accessing it does not require a cast
   4. `useRoomStatus` room data is typed — no `as any[]` cast remains in the hook
   5. `unifiedDeviceConfigService` meta access is typed — no `as any` for meta property access
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 114-01-PLAN.md — Generic adminDbGet + error type guards + preferences mapping (firebaseAdmin.ts)
+- [ ] 114-02-PLAN.md — Browser API augmentations + room typing + device config meta + adminDbGet call sites
 
 ### Phase 115: Type Safety app/ Components
 **Goal**: Component files in app/ have no `as any` casts — icon props, spread patterns, variant props, and specific component internals are all expressible through proper TypeScript types
@@ -158,7 +162,7 @@ Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
 | 106-112 | v14.0 | 12/12 | ✓ Complete | 2026-03-22 |
 | 113. Known Issues Fix | v14.1 | 1/1 | Complete    | 2026-03-22 |
-| 114. Type Safety lib/ | v14.1 | 0/TBD | Not started | - |
+| 114. Type Safety lib/ | v14.1 | 0/2 | Not started | - |
 | 115. Type Safety app/ Components | v14.1 | 0/TBD | Not started | - |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 0/TBD | Not started | - |
 | 117. Dead Code & Cleanup | v14.1 | 0/TBD | Not started | - |
@@ -167,4 +171,4 @@ Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 
 ---
 
-*Roadmap updated: 2026-03-22 — Phase 113 planned (1 plan)*
+*Roadmap updated: 2026-03-22 — Phase 114 planned (2 plans)*

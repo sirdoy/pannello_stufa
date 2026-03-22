@@ -32,7 +32,7 @@ interface TokenWithDevice {
 /**
  * Notification preferences structure
  */
-interface NotificationPreferences {
+export interface NotificationPreferences {
   enabledTypes?: Record<string, boolean>;
   rateLimits?: Record<string, unknown>;
   dndWindows?: DndWindow[];

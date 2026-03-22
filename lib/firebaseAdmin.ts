@@ -16,6 +16,8 @@ import { getDatabase, Database } from 'firebase-admin/database';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import { logNotification } from './notifications/notificationLogger';
 import { filterNotificationByPreferences, getFilterMessage } from './notifications/notificationFilter';
+import type { NotificationPreferences as FilterPreferences } from './notifications/notificationFilter';
+import type { NotificationPreferences as FirebaseStoredPreferences } from '@/types/firebase/notifications';
 import { getDefaultPreferences } from './schemas/notificationPreferences';
 import { getActionsForNotificationType, ACTION_CATEGORIES, type NotificationActionDef } from './notifications/notificationActions';
 
@@ -669,19 +671,30 @@ export async function sendNotificationToUser(userId: string, notification: Notif
 
     // Fetch user notification preferences from RTDB
     // Fail-safe: if preferences unavailable, allow notification (better unwanted than missed critical)
-    let preferences: any;
+    let filterPrefs: FilterPreferences;
     try {
-      const prefs = await adminDbGet(`users/${userId}/settings/notifications`);
+      const prefs = await adminDbGet<FirebaseStoredPreferences>(`users/${userId}/settings/notifications`);
 
       if (prefs) {
-        preferences = prefs;
+        // Map Firebase-stored shape (types.alert, etc.) to filter's shape (enabledTypes)
+        filterPrefs = {
+          enabledTypes: prefs.types
+            ? Object.fromEntries(
+                Object.entries(prefs.types).map(([k, v]) => [k, v])
+              )
+            : undefined,
+          dndWindows: prefs.dndEnabled && prefs.dndStart && prefs.dndEnd
+            ? [{ enabled: true, startTime: prefs.dndStart, endTime: prefs.dndEnd }]
+            : undefined,
+          timezone: prefs.timezone,
+        };
       } else {
         // New user - use defaults
-        preferences = getDefaultPreferences();
+        filterPrefs = getDefaultPreferences();
       }
     } catch (error) {
       console.error('⚠️ Error fetching preferences, allowing notification:', error);
-      preferences = getDefaultPreferences(); // Fail-safe to defaults
+      filterPrefs = getDefaultPreferences(); // Fail-safe to defaults
     }
 
     // Extract notification type from notification object
@@ -692,7 +705,7 @@ export async function sendNotificationToUser(userId: string, notification: Notif
     const filterResult = await filterNotificationByPreferences(
       userId,
       notifType,
-      preferences as any,
+      filterPrefs,
       allTokens
     );
 

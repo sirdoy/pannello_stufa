@@ -80,7 +80,10 @@ See `.planning/milestones/` for full archives.
   3. `staleness.cachedAt` code path is gone from stove hook — no dead null-check branch exists in the file
   4. CopyableIp renders a design system `Button` component — no raw `<button>` element remains in that file
   5. FormModal test suite passes in isolation without ordering dependencies
-**Plans**: TBD
+**Plans:** 1 plan
+
+Plans:
+- [ ] 113-01-PLAN.md — Fix all 6 known issues (HueTab fields, stove staleness, CopyableIp button, FormModal flake)
 
 ### Phase 114: Type Safety lib/
 **Goal**: All `as any` casts in the lib/ layer are replaced with proper typed interfaces — adminDbGet returns typed values, browser APIs have typed wrappers, and service utilities access data without unsafe casts
@@ -154,7 +157,7 @@ Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
 | 106-112 | v14.0 | 12/12 | ✓ Complete | 2026-03-22 |
-| 113. Known Issues Fix | v14.1 | 0/TBD | Not started | - |
+| 113. Known Issues Fix | v14.1 | 0/1 | Not started | - |
 | 114. Type Safety lib/ | v14.1 | 0/TBD | Not started | - |
 | 115. Type Safety app/ Components | v14.1 | 0/TBD | Not started | - |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 0/TBD | Not started | - |
@@ -164,4 +167,4 @@ Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 
 ---
 
-*Roadmap updated: 2026-03-22 — v14.1 Tech Debt & Type Safety roadmap created*
+*Roadmap updated: 2026-03-22 — Phase 113 planned (1 plan)*

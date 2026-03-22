@@ -71,37 +71,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| INFRA-01 | — | Pending |
-| INFRA-02 | — | Pending |
-| INFRA-03 | — | Pending |
-| INFRA-04 | — | Pending |
-| INFRA-05 | — | Pending |
-| INFRA-06 | — | Pending |
-| DTYPE-01 | — | Pending |
-| DTYPE-02 | — | Pending |
-| DTYPE-03 | — | Pending |
-| DREG-01 | — | Pending |
-| DREG-02 | — | Pending |
-| DREG-03 | — | Pending |
-| DREG-04 | — | Pending |
-| DREG-05 | — | Pending |
-| DREG-06 | — | Pending |
-| ROOM-01 | — | Pending |
-| ROOM-02 | — | Pending |
-| ROOM-03 | — | Pending |
-| ROOM-04 | — | Pending |
-| ROOM-05 | — | Pending |
-| ROOM-06 | — | Pending |
-| ROOM-07 | — | Pending |
-| RSTAT-01 | — | Pending |
-| RSTAT-02 | — | Pending |
-| RSTAT-03 | — | Pending |
+| INFRA-01 | Phase 118 | Pending |
+| INFRA-02 | Phase 118 | Pending |
+| INFRA-03 | Phase 119 | Pending |
+| INFRA-04 | Phase 119 | Pending |
+| INFRA-05 | Phase 118 | Pending |
+| INFRA-06 | Phase 119 | Pending |
+| DTYPE-01 | Phase 120 | Pending |
+| DTYPE-02 | Phase 120 | Pending |
+| DTYPE-03 | Phase 120 | Pending |
+| DREG-01 | Phase 121 | Pending |
+| DREG-02 | Phase 121 | Pending |
+| DREG-03 | Phase 121 | Pending |
+| DREG-04 | Phase 121 | Pending |
+| DREG-05 | Phase 121 | Pending |
+| DREG-06 | Phase 121 | Pending |
+| ROOM-01 | Phase 122 | Pending |
+| ROOM-02 | Phase 122 | Pending |
+| ROOM-03 | Phase 122 | Pending |
+| ROOM-04 | Phase 122 | Pending |
+| ROOM-05 | Phase 123 | Pending |
+| ROOM-06 | Phase 123 | Pending |
+| ROOM-07 | Phase 123 | Pending |
+| RSTAT-01 | Phase 124 | Pending |
+| RSTAT-02 | Phase 124 | Pending |
+| RSTAT-03 | Phase 124 | Pending |
 
 **Coverage:**
 - v15.0 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25 ⚠️
+- Mapped to phases: 25
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-22 after initial definition*
+*Last updated: 2026-03-22 — traceability filled after roadmap creation*

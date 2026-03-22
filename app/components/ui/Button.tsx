@@ -202,8 +202,8 @@ export interface ButtonProps
   children?: React.ReactNode;
   /** Loading state (shows spinner) */
   loading?: boolean;
-  /** Icon emoji/character */
-  icon?: string;
+  /** Icon emoji/character or React element */
+  icon?: string | React.ReactNode;
   /** Icon position relative to text */
   iconPosition?: 'left' | 'right';
   /** Enable haptic feedback on click (default: true) */

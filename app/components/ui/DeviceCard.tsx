@@ -5,49 +5,41 @@ import { cn } from '@/lib/utils/cn';
 import SmartHomeCard, { type SmartHomeCardProps } from './SmartHomeCard';
 import Button from './Button';
 import Banner from './Banner';
+import type { BannerProps } from './Banner';
 import Badge from './Badge';
 import LoadingOverlay from './LoadingOverlay';
 import Toast from './Toast';
+import type { ToastProps } from './Toast';
+import type { ButtonProps } from './Button';
 import InfoBox from './InfoBox';
 import HealthIndicator from './HealthIndicator';
 import { Heading, EmptyState, Divider } from './index';
 
-interface StatusBadge {
+export interface StatusBadge {
   label: string;
   color: string;
   icon?: ReactNode;
 }
 
-interface BannerItem {
-  variant: 'info' | 'success' | 'warning' | 'error';
-  icon?: any;
-  title?: string;
-  description?: any;
-  dismissible?: boolean;
-  onDismiss?: () => void;
-  [key: string]: any; // Allow additional Banner props
-}
+export interface BannerItem extends BannerProps {}
 
 interface InfoBoxItem {
-  icon?: ReactNode;
+  icon: string;
   label: string;
-  value: ReactNode;
-  valueColor?: string;
+  value: string | number;
+  variant?: 'neutral' | 'ember' | 'ocean' | 'sage' | 'warning' | 'danger';
 }
 
-interface FooterAction {
+export interface FooterAction extends Omit<ButtonProps, 'children'> {
   label: string;
-  variant?: 'ember' | 'ocean' | 'sage' | 'danger' | 'subtle' | 'ghost' | 'success' | 'outline';
-  size?: 'sm' | 'md' | 'lg';
-  onClick?: () => void;
-  [key: string]: any;
 }
 
-interface ToastNotification {
+export interface ToastNotification extends Omit<ToastProps, 'children'> {
   show: boolean;
+  /** Toast message — rendered as children */
   message?: string;
+  /** Legacy type field — maps to variant */
   type?: 'success' | 'error' | 'info' | 'warning';
-  [key: string]: any; // Allow additional Toast props
 }
 
 /**
@@ -229,7 +221,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
       {/* Banners (legacy support) */}
       {banners.map((banner, index) => (
         <div key={index} className="mb-4">
-          <Banner {...(banner as any)} />
+          <Banner {...banner} />
         </div>
       ))}
 
@@ -246,7 +238,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
             {infoBoxes.map((box, index) => (
               <InfoBox
                 key={index}
-                {...(box as any)}
+                {...box}
               />
             ))}
           </div>
@@ -259,7 +251,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
           {footerActions.map((action, index) => (
             <Button
               key={index}
-              {...(action as any)}
+              {...action}
               className="w-full"
             >
               {action.label}
@@ -272,7 +264,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
       <LoadingOverlay
         show={isLoadingState}
         message={loadingMessage}
-        icon={icon as any}
+        icon={icon}
       />
     </SmartHomeCard>
   );
@@ -282,7 +274,12 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
       {cardContent}
       {/* Toast Notification - rendered outside SmartHomeCard */}
       {toast?.show && (
-        <Toast {...(toast as any)} onClose={onToastClose} />
+        <Toast
+          variant={toast.variant ?? toast.type}
+          onClose={onToastClose}
+        >
+          {toast.message ?? toast.children}
+        </Toast>
       )}
     </>
   );

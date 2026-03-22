@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import { useEffect } from 'react';
 // @ts-expect-error - react-dom types are available but strict mode check fails
 import { createPortal } from 'react-dom';
@@ -11,7 +12,8 @@ import Text from './Text';
 export interface LoadingOverlayProps {
   show?: boolean;
   message?: string;
-  icon?: string;
+  /** Emoji or React element icon */
+  icon?: string | React.ReactNode;
   liquid?: boolean; // Legacy prop - ignored
 }
 
@@ -25,7 +27,7 @@ export interface LoadingOverlayProps {
  * @param {Object} props
  * @param {boolean} props.show - Show overlay
  * @param {string} props.message - Loading message
- * @param {string} props.icon - Emoji icon
+ * @param {string | React.ReactNode} props.icon - Emoji or React element icon
  */
 export default function LoadingOverlay({
   show = false,

@@ -29,7 +29,7 @@ Requirements for Tech Debt & Type Safety milestone. Each maps to roadmap phases.
 
 - [x] **TYPE-07**: Component `icon` prop casts (`<X /> as any`) eliminated with proper typing
 - [x] **TYPE-08**: Component spread patterns (`{...({} as any)}`) eliminated
-- [ ] **TYPE-09**: `variant` prop casts eliminated with proper union types
+- [x] **TYPE-09**: `variant` prop casts eliminated with proper union types
 - [x] **TYPE-10**: `DeviceCard` banner/action/toast prop types aligned
 - [x] **TYPE-11**: `TransitionLink` `usePageTransition()` return typed
 - [x] **TYPE-12**: `ControlButton` `_warned` property typed properly
@@ -84,7 +84,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TYPE-06 | Phase 114 | Complete |
 | TYPE-07 | Phase 115 | Complete |
 | TYPE-08 | Phase 115 | Complete |
-| TYPE-09 | Phase 115 | Pending |
+| TYPE-09 | Phase 115 | Complete |
 | TYPE-10 | Phase 115 | Complete |
 | TYPE-11 | Phase 115 | Complete |
 | TYPE-12 | Phase 115 | Complete |

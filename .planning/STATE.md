@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.1
 milestone_name: Tech Debt & Type Safety
 status: unknown
-stopped_at: Completed 115-01-PLAN.md
-last_updated: "2026-03-22T16:22:30.801Z"
+stopped_at: Completed 115-02-PLAN.md
+last_updated: "2026-03-22T16:31:48.761Z"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
 ---
 
 # Project State
@@ -44,6 +44,7 @@ Plan: 2 of 2
 | Phase 114-type-safety-lib P01 | 12 | 2 tasks | 2 files |
 | Phase 114-type-safety-lib P02 | 15 | 2 tasks | 5 files |
 | Phase 115 P01 | 20 | 2 tasks | 10 files |
+| Phase 115 P02 | 10 | 2 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,10 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 114-type-safety-lib]: migrateFromOldFormat parameter typed as DeviceConfigData | Record<string, unknown> | null to accept both typed and legacy shapes
 - [Phase 115]: ToastNotification extends Omit<ToastProps,'children'> with legacy message/type fields; render destructures them
 - [Phase 115]: BottomSheet ActionButton variant 'close' changed to 'ghost' (same styling) using satisfies operator
+- [Phase 115]: StoveStatusDisplay variant/health narrowed to typed unions in stoveStatusUtils (source), not StoveCard (consumer)
+- [Phase 115]: WeatherCardWrapper local WeatherData replaced with imported type from WeatherCard after exporting it
+- [Phase 115]: BatteryState exported from BatteryWarning to enable type-safe cross-component use
+- [Phase 115]: LightsRoomControl ControlButton variant: toControlButtonVariant() helper maps outline to subtle
 
 ### Pending Todos
 
@@ -73,6 +78,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T16:22:30.796Z
-Stopped at: Completed 115-01-PLAN.md
+Last session: 2026-03-22T16:31:48.757Z
+Stopped at: Completed 115-02-PLAN.md
 Resume file: None

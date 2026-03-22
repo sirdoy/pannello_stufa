@@ -123,10 +123,11 @@ export default function StoveStatus({
         </div>
 
         {/* Staleness Indicator */}
+        {/* last_poll_at populated by proxy when available — see useStoveData.ts */}
         {staleness?.cachedAt && (
           <div className="mt-4 text-center">
             <Text variant="tertiary" size="sm">
-              Ultimo aggiornamento: {formatDistanceToNow(staleness.cachedAt instanceof Date ? staleness.cachedAt : new Date(staleness.cachedAt), { addSuffix: true, locale: it })}
+              Ultimo aggiornamento: {formatDistanceToNow(new Date(staleness.cachedAt), { addSuffix: true, locale: it })}
             </Text>
           </div>
         )}

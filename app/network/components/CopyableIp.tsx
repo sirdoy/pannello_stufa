@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
+import { Button } from '@/app/components/ui/Button';
 
 interface CopyableIpProps {
   ip: string;
@@ -29,17 +30,19 @@ export default function CopyableIp({ ip }: CopyableIpProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="font-mono text-slate-100">{ip}</span>
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
+        iconOnly
         onClick={handleCopy}
         aria-label={copied ? 'IP copiato' : 'Copia IP'}
-        className="min-h-[44px] min-w-[44px] px-4 py-2.5 text-sm bg-transparent text-slate-300 hover:bg-white/[0.06] hover:text-slate-100 rounded-xl transition-all duration-[var(--duration-smooth)] flex items-center justify-center"
       >
         {copied ? (
           <Check className="w-4 h-4 text-sage-400" />
         ) : (
           <Copy className="w-4 h-4" />
         )}
-      </button>
+      </Button>
     </div>
   );
 }

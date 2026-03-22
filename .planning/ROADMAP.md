@@ -21,6 +21,7 @@
 - ✅ **v12.0 Data Fetching Simplification & E2E Verification** — Phases 96-98 (shipped 2026-03-19)
 - ✅ **v13.0 Thermorossi Proxy Migration** — Phases 99-105 (shipped 2026-03-20)
 - ✅ **v14.0 Hue Proxy Migration** — Phases 106-112 (shipped 2026-03-22)
+- 🚧 **v14.1 Tech Debt & Type Safety** — Phases 113-117 (in progress)
 
 ## Phases
 
@@ -57,7 +58,80 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+### 🚧 v14.1 Tech Debt & Type Safety (In Progress)
+
+**Milestone Goal:** Resolve accumulated known issues from v14.0 audit, eliminate `as any` casts across lib/ and app/, and remove dead code — leaving the codebase with zero known issues, tighter types, and a smaller surface area.
+
+- [ ] **Phase 113: Known Issues Fix** - Correct debug panel field names, remove stale code paths, fix FormModal flake
+- [ ] **Phase 114: Type Safety lib/** - Eliminate `as any` across lib/ layer (admin, network, notifications, rooms, device config, firebase)
+- [ ] **Phase 115: Type Safety app/ Components** - Eliminate `as any` in component icon/spread/variant patterns and fix specific component types
+- [ ] **Phase 116: Type Safety app/ Routes & Pages** - Eliminate `as any` in API routes and page files (scheduler, Netatmo, weather, thermostat/stove, service worker)
+- [ ] **Phase 117: Dead Code & Cleanup** - Remove 48 unused utility exports, resolve 2 outstanding TODOs
+
+## Phase Details
+
+### Phase 113: Known Issues Fix
+**Goal**: All known issues from the v14.0 audit are resolved — debug panel fields are accurate, stale stove code is removed, stove status is correctly typed, UI uses design system components, and FormModal is isolation-stable
+**Depends on**: Phase 112 (v14.0 complete)
+**Requirements**: ISSUE-01, ISSUE-02, ISSUE-03, ISSUE-04, ISSUE-05, ISSUE-06
+**Success Criteria** (what must be TRUE):
+  1. Debug panel HueTab displays correct field names (`connected`, `bri`) matching actual proxy response shape
+  2. `UseStoveDataReturn.status` is typed as `StoveState` union — TypeScript rejects plain `string` assignments at call sites
+  3. `staleness.cachedAt` code path is gone from stove hook — no dead null-check branch exists in the file
+  4. CopyableIp renders a design system `Button` component — no raw `<button>` element remains in that file
+  5. FormModal test suite passes in isolation without ordering dependencies
+**Plans**: TBD
+
+### Phase 114: Type Safety lib/
+**Goal**: All `as any` casts in the lib/ layer are replaced with proper typed interfaces — adminDbGet returns typed values, browser APIs have typed wrappers, and service utilities access data without unsafe casts
+**Depends on**: Phase 113
+**Requirements**: TYPE-01, TYPE-02, TYPE-03, TYPE-04, TYPE-05, TYPE-06
+**Success Criteria** (what must be TRUE):
+  1. `adminDbGet()` calls return typed values — TypeScript infers the correct type at call sites without manual casts
+  2. `navigator.connection` accesses are guarded by a typed Network Information API interface — no `as any` remains
+  3. `Notification.maxActions` has a type guard — accessing it does not require a cast
+  4. `useRoomStatus` room data is typed — no `as any[]` cast remains in the hook
+  5. `unifiedDeviceConfigService` meta access is typed — no `as any` for meta property access
+**Plans**: TBD
+
+### Phase 115: Type Safety app/ Components
+**Goal**: Component files in app/ have no `as any` casts — icon props, spread patterns, variant props, and specific component internals are all expressible through proper TypeScript types
+**Depends on**: Phase 114
+**Requirements**: TYPE-07, TYPE-08, TYPE-09, TYPE-10, TYPE-11, TYPE-12
+**Success Criteria** (what must be TRUE):
+  1. Icon props (`<X /> as any`) are eliminated — icon components accept a typed prop (e.g., `React.ComponentType`) without casting
+  2. Component spread patterns (`{...({} as any)}`) are eliminated — spreads use typed objects
+  3. Variant prop casts are eliminated — variant props use typed union literals matching CVA definitions
+  4. `DeviceCard` banner, action, and toast props align — no structural mismatch requires a cast at usage sites
+  5. `TransitionLink` and `ControlButton` internal types are explicit — no `_warned` or return type casts remain
+**Plans**: TBD
+
+### Phase 116: Type Safety app/ Routes & Pages
+**Goal**: API route files and page components in app/ have no `as any` casts — scheduler, Netatmo, weather, thermostat/stove, and service worker files are fully typed
+**Depends on**: Phase 115
+**Requirements**: TYPE-13, TYPE-14, TYPE-15, TYPE-16, TYPE-17
+**Success Criteria** (what must be TRUE):
+  1. Scheduler route `adminDbGet` calls have specific return interfaces — no `as any` casts remain in that file
+  2. Netatmo homestatus `modulesFromTopology` is typed — battery functions receive typed module objects
+  3. Weather forecast route response is typed with an interface — no `as any` in the response handling path
+  4. Thermostat and stove page prop casts are eliminated — props flow with proper types from server to client components
+  5. `sw.ts` browser API casts use proper interfaces — no `as any` for Push API, Notification API, or Cache API access
+**Plans**: TBD
+
+### Phase 117: Dead Code & Cleanup
+**Goal**: The 48 unused utility exports identified by knip are removed, and two outstanding service TODOs are resolved with proper implementations
+**Depends on**: Phase 116
+**Requirements**: CLEAN-01, CLEAN-02, CLEAN-03
+**Success Criteria** (what must be TRUE):
+  1. `knip` reports zero unused exports in utility files (the 48 identified exports are gone)
+  2. `notificationService.ts` TODO is resolved — cleanup logic runs in an API route, not inline in the service
+  3. `healthMonitoring.ts` TODO is resolved — stove STARTING state has grace period tracking before triggering alerts
+**Plans**: TBD
+
 ## Progress
+
+**Execution Order:**
+Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -80,9 +154,14 @@ See `.planning/milestones/` for full archives.
 | 96-98 | v12.0 | 4/4 | ✓ Complete | 2026-03-19 |
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
 | 106-112 | v14.0 | 12/12 | ✓ Complete | 2026-03-22 |
+| 113. Known Issues Fix | v14.1 | 0/TBD | Not started | - |
+| 114. Type Safety lib/ | v14.1 | 0/TBD | Not started | - |
+| 115. Type Safety app/ Components | v14.1 | 0/TBD | Not started | - |
+| 116. Type Safety app/ Routes & Pages | v14.1 | 0/TBD | Not started | - |
+| 117. Dead Code & Cleanup | v14.1 | 0/TBD | Not started | - |
 
-**Total:** 19 milestones shipped, 112 phases complete, 398 plans executed.
+**Total:** 19 milestones shipped, 112 phases complete, 398 plans executed. v14.1 in progress (5 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-22 — v14.0 Hue Proxy Migration shipped*
+*Roadmap updated: 2026-03-22 — v14.1 Tech Debt & Type Safety roadmap created*

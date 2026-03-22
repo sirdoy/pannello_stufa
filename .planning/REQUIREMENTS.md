@@ -70,38 +70,38 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ISSUE-01 | — | Pending |
-| ISSUE-02 | — | Pending |
-| ISSUE-03 | — | Pending |
-| ISSUE-04 | — | Pending |
-| ISSUE-05 | — | Pending |
-| ISSUE-06 | — | Pending |
-| TYPE-01 | — | Pending |
-| TYPE-02 | — | Pending |
-| TYPE-03 | — | Pending |
-| TYPE-04 | — | Pending |
-| TYPE-05 | — | Pending |
-| TYPE-06 | — | Pending |
-| TYPE-07 | — | Pending |
-| TYPE-08 | — | Pending |
-| TYPE-09 | — | Pending |
-| TYPE-10 | — | Pending |
-| TYPE-11 | — | Pending |
-| TYPE-12 | — | Pending |
-| TYPE-13 | — | Pending |
-| TYPE-14 | — | Pending |
-| TYPE-15 | — | Pending |
-| TYPE-16 | — | Pending |
-| TYPE-17 | — | Pending |
-| CLEAN-01 | — | Pending |
-| CLEAN-02 | — | Pending |
-| CLEAN-03 | — | Pending |
+| ISSUE-01 | Phase 113 | Pending |
+| ISSUE-02 | Phase 113 | Pending |
+| ISSUE-03 | Phase 113 | Pending |
+| ISSUE-04 | Phase 113 | Pending |
+| ISSUE-05 | Phase 113 | Pending |
+| ISSUE-06 | Phase 113 | Pending |
+| TYPE-01 | Phase 114 | Pending |
+| TYPE-02 | Phase 114 | Pending |
+| TYPE-03 | Phase 114 | Pending |
+| TYPE-04 | Phase 114 | Pending |
+| TYPE-05 | Phase 114 | Pending |
+| TYPE-06 | Phase 114 | Pending |
+| TYPE-07 | Phase 115 | Pending |
+| TYPE-08 | Phase 115 | Pending |
+| TYPE-09 | Phase 115 | Pending |
+| TYPE-10 | Phase 115 | Pending |
+| TYPE-11 | Phase 115 | Pending |
+| TYPE-12 | Phase 115 | Pending |
+| TYPE-13 | Phase 116 | Pending |
+| TYPE-14 | Phase 116 | Pending |
+| TYPE-15 | Phase 116 | Pending |
+| TYPE-16 | Phase 116 | Pending |
+| TYPE-17 | Phase 116 | Pending |
+| CLEAN-01 | Phase 117 | Pending |
+| CLEAN-02 | Phase 117 | Pending |
+| CLEAN-03 | Phase 117 | Pending |
 
 **Coverage:**
 - v14.1 requirements: 26 total
-- Mapped to phases: 0
-- Unmapped: 26 ⚠️
+- Mapped to phases: 26
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-22*
-*Last updated: 2026-03-22 after initial definition*
+*Last updated: 2026-03-22 — traceability filled by roadmap creation*

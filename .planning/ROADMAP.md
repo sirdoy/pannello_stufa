@@ -69,7 +69,7 @@ See `.planning/milestones/` for full archives.
   2. All DeviceType, RegistryDevice, and RegistryHealth TypeScript interfaces are defined and exported
   3. All 8 Device Registry endpoint proxy routes exist under /api/ and return typed responses
   4. TypeScript compiles with zero errors for all new files
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 118-01: registryProxy.ts + TypeScript interfaces

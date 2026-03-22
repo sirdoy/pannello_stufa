@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v14.1
 milestone_name: Tech Debt & Type Safety
 status: unknown
-stopped_at: Completed 114-01-PLAN.md
-last_updated: "2026-03-22T15:19:10.213Z"
+stopped_at: Completed 114-02-PLAN.md
+last_updated: "2026-03-22T15:26:11.365Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -42,6 +42,7 @@ Plan: 2 of 2
 | v14.0 Hue Proxy Migration | 106-112 | 12 | 2 days |
 | Phase 113 P01 | 15 | 3 tasks | 5 files |
 | Phase 114-type-safety-lib P01 | 12 | 2 tasks | 2 files |
+| Phase 114-type-safety-lib P02 | 15 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -56,6 +57,8 @@ See PROJECT.md Key Decisions table for full history.
 - [Phase 113]: CopyableIp Button uses iconOnly prop not ButtonIcon — Lucide JSX icons incompatible with ButtonIcon emoji-only prop
 - [Phase 114-type-safety-lib]: Use FirebaseStoredPreferences alias for types/firebase/notifications.ts to avoid collision with filter's NotificationPreferences
 - [Phase 114-type-safety-lib]: Error type guard pattern: error instanceof Error && 'code' in error — returns undefined when no code, requiring truthiness guard before includes()
+- [Phase 114-type-safety-lib]: NotificationWithMaxActions type alias used instead of declare global NotificationConstructor — in-narrowing typed property as unknown
+- [Phase 114-type-safety-lib]: migrateFromOldFormat parameter typed as DeviceConfigData | Record<string, unknown> | null to accept both typed and legacy shapes
 
 ### Pending Todos
 
@@ -67,6 +70,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-22T15:19:10.208Z
-Stopped at: Completed 114-01-PLAN.md
+Last session: 2026-03-22T15:26:11.361Z
+Stopped at: Completed 114-02-PLAN.md
 Resume file: None

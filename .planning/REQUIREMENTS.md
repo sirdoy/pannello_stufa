@@ -19,10 +19,10 @@ Requirements for Tech Debt & Type Safety milestone. Each maps to roadmap phases.
 ### Type Safety (lib/)
 
 - [x] **TYPE-01**: `adminDbGet()` calls return typed values instead of `as any` casts
-- [ ] **TYPE-02**: `navigator.connection` typed with Network Information API interface
-- [ ] **TYPE-03**: `Notification.maxActions` typed with proper type guard
-- [ ] **TYPE-04**: `useRoomStatus` room data typed instead of `as any[]`
-- [ ] **TYPE-05**: `unifiedDeviceConfigService` meta access typed instead of `as any`
+- [x] **TYPE-02**: `navigator.connection` typed with Network Information API interface
+- [x] **TYPE-03**: `Notification.maxActions` typed with proper type guard
+- [x] **TYPE-04**: `useRoomStatus` room data typed instead of `as any[]`
+- [x] **TYPE-05**: `unifiedDeviceConfigService` meta access typed instead of `as any`
 - [x] **TYPE-06**: `firebaseAdmin.ts` error/preferences casts typed properly
 
 ### Type Safety (app/ components)
@@ -77,10 +77,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ISSUE-05 | Phase 113 | Complete |
 | ISSUE-06 | Phase 113 | Complete |
 | TYPE-01 | Phase 114 | Complete |
-| TYPE-02 | Phase 114 | Pending |
-| TYPE-03 | Phase 114 | Pending |
-| TYPE-04 | Phase 114 | Pending |
-| TYPE-05 | Phase 114 | Pending |
+| TYPE-02 | Phase 114 | Complete |
+| TYPE-03 | Phase 114 | Complete |
+| TYPE-04 | Phase 114 | Complete |
+| TYPE-05 | Phase 114 | Complete |
 | TYPE-06 | Phase 114 | Complete |
 | TYPE-07 | Phase 115 | Pending |
 | TYPE-08 | Phase 115 | Pending |

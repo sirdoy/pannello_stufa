@@ -63,7 +63,7 @@ See `.planning/milestones/` for full archives.
 **Milestone Goal:** Resolve accumulated known issues from v14.0 audit, eliminate `as any` casts across lib/ and app/, and remove dead code — leaving the codebase with zero known issues, tighter types, and a smaller surface area.
 
 - [x] **Phase 113: Known Issues Fix** - Correct debug panel field names, remove stale code paths, fix FormModal flake (completed 2026-03-22)
-- [ ] **Phase 114: Type Safety lib/** - Eliminate `as any` across lib/ layer (admin, network, notifications, rooms, device config, firebase)
+- [x] **Phase 114: Type Safety lib/** - Eliminate `as any` across lib/ layer (admin, network, notifications, rooms, device config, firebase) (completed 2026-03-22)
 - [ ] **Phase 115: Type Safety app/ Components** - Eliminate `as any` in component icon/spread/variant patterns and fix specific component types
 - [ ] **Phase 116: Type Safety app/ Routes & Pages** - Eliminate `as any` in API routes and page files (scheduler, Netatmo, weather, thermostat/stove, service worker)
 - [ ] **Phase 117: Dead Code & Cleanup** - Remove 48 unused utility exports, resolve 2 outstanding TODOs
@@ -95,11 +95,11 @@ Plans:
   3. `Notification.maxActions` has a type guard — accessing it does not require a cast
   4. `useRoomStatus` room data is typed — no `as any[]` cast remains in the hook
   5. `unifiedDeviceConfigService` meta access is typed — no `as any` for meta property access
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 114-01-PLAN.md — Generic adminDbGet + error type guards + preferences mapping (firebaseAdmin.ts)
-- [ ] 114-02-PLAN.md — Browser API augmentations + room typing + device config meta + adminDbGet call sites
+- [x] 114-02-PLAN.md — Browser API augmentations + room typing + device config meta + adminDbGet call sites
 
 ### Phase 115: Type Safety app/ Components
 **Goal**: Component files in app/ have no `as any` casts — icon props, spread patterns, variant props, and specific component internals are all expressible through proper TypeScript types
@@ -162,7 +162,7 @@ Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 | 99-105 | v13.0 | 11/11 | ✓ Complete | 2026-03-20 |
 | 106-112 | v14.0 | 12/12 | ✓ Complete | 2026-03-22 |
 | 113. Known Issues Fix | v14.1 | 1/1 | Complete    | 2026-03-22 |
-| 114. Type Safety lib/ | v14.1 | 1/2 | In Progress|  |
+| 114. Type Safety lib/ | v14.1 | 2/2 | Complete   | 2026-03-22 |
 | 115. Type Safety app/ Components | v14.1 | 0/TBD | Not started | - |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 0/TBD | Not started | - |
 | 117. Dead Code & Cleanup | v14.1 | 0/TBD | Not started | - |

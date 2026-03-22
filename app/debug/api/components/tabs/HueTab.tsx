@@ -40,8 +40,8 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
       setGetResponses((prev) => ({ ...prev, [name]: data }));
 
       // Check bridge status
-      if (name === 'status' && data.bridgeConnected !== undefined) {
-        setBridgeStatus(data.bridgeConnected ? 'connected' : 'disconnected');
+      if (name === 'status' && data.connected !== undefined) {
+        setBridgeStatus(data.connected ? 'connected' : 'disconnected');
       }
     } catch (error) {
       setGetResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
@@ -210,7 +210,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             params={[
               { name: 'lightId', label: 'Light ID', type: 'text', defaultValue: '' },
               { name: 'on', label: 'On/Off', type: 'select', options: ['true', 'false'], defaultValue: 'true' },
-              { name: 'brightness', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: '50' },
+              { name: 'bri', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: '50' },
             ]}
             response={postResponses.controlLight}
             loading={loadingPost.controlLight ?? false}
@@ -218,7 +218,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             onExecute={(values) =>
               callPutEndpoint('controlLight', `/api/hue/lights/${values.lightId}`, {
                 on: values.on === 'true',
-                bri: Math.round(Number(values.brightness) * 254 / 100),
+                bri: Math.round(Number(values.bri) * 254 / 100),
               })
             }
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/light/{id}')}
@@ -232,7 +232,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             params={[
               { name: 'roomId', label: 'Room ID', type: 'text', defaultValue: '' },
               { name: 'on', label: 'On/Off', type: 'select', options: ['true', 'false'], defaultValue: 'true' },
-              { name: 'brightness', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: '50' },
+              { name: 'bri', label: 'Brightness (0-100)', type: 'number', min: 0, max: 100, defaultValue: '50' },
             ]}
             response={postResponses.controlRoom}
             loading={loadingPost.controlRoom ?? false}
@@ -240,7 +240,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             onExecute={(values) =>
               callPutEndpoint('controlRoom', `/api/hue/rooms/${values.roomId}`, {
                 on: values.on === 'true',
-                bri: Math.round(Number(values.brightness) * 254 / 100),
+                bri: Math.round(Number(values.bri) * 254 / 100),
               })
             }
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/grouped_light/{id}')}

@@ -141,11 +141,11 @@ Plans:
   1. `knip` reports zero unused exports in utility files (the 121 in-scope exports are gone)
   2. `notificationService.ts` TODO is resolved — cleanup logic runs in an API route, not inline in the service
   3. `healthMonitoring.ts` TODO is resolved — stove STARTING state has grace period tracking before triggering alerts
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 - [ ] 117-01-PLAN.md — Remove unused exports from lib/ utilities and app/ files (knip cleanup)
-- [ ] 117-02-PLAN.md — Delete notificationService disabled block + implement STARTING grace period tracking
+- [x] 117-02-PLAN.md — Delete notificationService disabled block + implement STARTING grace period tracking
 
 ## Progress
 
@@ -177,7 +177,7 @@ Phases execute in numeric order: 113 -> 114 -> 115 -> 116 -> 117
 | 114. Type Safety lib/ | v14.1 | 2/2 | Complete    | 2026-03-22 |
 | 115. Type Safety app/ Components | v14.1 | 2/2 | Complete    | 2026-03-22 |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 2/2 | Complete    | 2026-03-22 |
-| 117. Dead Code & Cleanup | v14.1 | 0/2 | Not started | - |
+| 117. Dead Code & Cleanup | v14.1 | 1/2 | In Progress|  |
 
 **Total:** 19 milestones shipped, 112 phases complete, 398 plans executed. v14.1 in progress (5 phases planned).
 

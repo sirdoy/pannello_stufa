@@ -5,7 +5,7 @@ import { Banner, Text } from '../../ui';
 export type BatteryState = 'full' | 'high' | 'medium' | 'low' | 'very_low';
 type ModuleType = 'NRV' | 'NATherm1' | 'NAPlug' | 'OTH' | 'OTM' | string;
 
-interface Module {
+export interface Module {
   id: string;
   name?: string;
   type: ModuleType;

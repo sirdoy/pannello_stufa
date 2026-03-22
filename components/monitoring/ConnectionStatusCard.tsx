@@ -7,7 +7,7 @@ import Text from '@/app/components/ui/Text';
 import StatusBadge from '@/app/components/ui/StatusBadge';
 import Button from '@/app/components/ui/Button';
 
-interface ConnectionStats {
+export interface ConnectionStats {
   totalRuns: number;
   totalChecks: number;
   successfulChecks: number;

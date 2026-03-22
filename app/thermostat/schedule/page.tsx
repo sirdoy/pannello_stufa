@@ -81,7 +81,7 @@ function ScheduleContent() {
             variant="subtle"
             size="sm"
             onClick={refetch}
-            icon={<RefreshCw size={16} /> as any}
+            icon={<RefreshCw size={16} />}
           >
             Aggiorna
           </Button>
@@ -106,12 +106,12 @@ function ScheduleContent() {
           </Heading>
           {activeSchedule && (
             <Text variant="tertiary" size="sm">
-              {(activeSchedule as Schedule).name}
+              {activeSchedule.name}
             </Text>
           )}
         </div>
 
-        <WeeklyTimeline schedule={activeSchedule as any} />
+        <WeeklyTimeline schedule={activeSchedule} />
       </Card>
 
       {/* Active overrides section */}

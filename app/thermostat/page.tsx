@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text, Grid, InfoBox, PageLayout } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
+import type { Module } from '@/app/components/devices/thermostat/BatteryWarning';
 import ThermostatTabs from './components/ThermostatTabs';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { Calendar, Clock } from 'lucide-react';
@@ -442,7 +443,7 @@ function NetatmoContent() {
       {(status?.hasLowBattery || status?.hasCriticalBattery) && (
         <div className="mb-6">
           <BatteryWarning
-            lowBatteryModules={(status?.lowBatteryModules || []) as any}
+            lowBatteryModules={(status?.lowBatteryModules || []) as Module[]}
             hasCriticalBattery={status?.hasCriticalBattery || false}
           />
         </div>
@@ -543,7 +544,7 @@ function NetatmoContent() {
               {/* Module Battery Status List */}
               {modulesWithBattery && modulesWithBattery.length > 0 && (
                 <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
-                  <ModuleBatteryList modules={modulesWithBattery as any} />
+                  <ModuleBatteryList modules={modulesWithBattery as Module[]} />
                 </div>
               )}
 
@@ -567,7 +568,7 @@ function NetatmoContent() {
               {sortedRooms.map(room => (
                 <RoomCard
                   key={room.id}
-                  room={room as any}
+                  room={room}
                   homeId={topology?.home_id}
                   onRefresh={fetchStatus}
                 />

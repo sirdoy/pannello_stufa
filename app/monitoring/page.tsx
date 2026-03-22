@@ -7,20 +7,14 @@ import ConnectionStatusCard from '@/components/monitoring/ConnectionStatusCard';
 import DeadManSwitchPanel from '@/components/monitoring/DeadManSwitchPanel';
 import MonitoringTimeline from '@/components/monitoring/MonitoringTimeline';
 import { ArrowLeft, Activity } from 'lucide-react';
-
-interface StatsData {
-  [key: string]: any;
-}
-
-interface DMSStatus {
-  [key: string]: any;
-}
+import type { ConnectionStats } from '@/components/monitoring/ConnectionStatusCard';
+import type { DeadManSwitchStatus } from '@/components/monitoring/DeadManSwitchPanel';
 
 export default function MonitoringPage() {
   const router = useRouter();
-  const [stats, setStats] = useState<StatsData | null>(null);
+  const [stats, setStats] = useState<ConnectionStats | null>(null);
   const [statsError, setStatsError] = useState<string | null>(null);
-  const [dmsStatus, setDmsStatus] = useState<DMSStatus | null>(null);
+  const [dmsStatus, setDmsStatus] = useState<DeadManSwitchStatus | null>(null);
   const [dmsError, setDmsError] = useState<string | null>(null);
 
   // Refs for retry functions (avoids re-creating on each render)
@@ -115,8 +109,8 @@ export default function MonitoringPage() {
       {/* Status cards section */}
       <Section spacing="none" as="div">
         <Grid cols={2} gap="md" className="md:grid-cols-2">
-          <ConnectionStatusCard stats={stats as any} error={statsError} onRetry={handleStatsRetry} />
-          <DeadManSwitchPanel status={dmsStatus as any} error={dmsError} onRetry={handleDMSRetry} />
+          <ConnectionStatusCard stats={stats} error={statsError} onRetry={handleStatsRetry} />
+          <DeadManSwitchPanel status={dmsStatus} error={dmsError} onRetry={handleDMSRetry} />
         </Grid>
       </Section>
 

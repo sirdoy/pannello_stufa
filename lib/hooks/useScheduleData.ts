@@ -41,6 +41,9 @@ const RETRY_DELAY_MS = 3_000;
 
 interface Schedule {
   selected?: boolean;
+  name?: string;
+  timetable?: unknown;
+  zones?: Array<{ type: number; [key: string]: unknown }>;
   [key: string]: unknown;
 }
 

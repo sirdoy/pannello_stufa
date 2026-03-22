@@ -20,7 +20,7 @@ interface LogEntryData {
   action: string;
   device?: string;
   timestamp: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 type DeviceFilter = 'all' | 'stove' | 'thermostat' | 'lights' | 'sonos';
@@ -43,8 +43,8 @@ export default function LogPage() {
       }
 
       const entries = Object.entries(data)
-        .map(([id, entry]) => ({ id, ...(entry as Record<string, any>) } as any))
-        .sort((a: any, b: any) => b.timestamp - a.timestamp);
+        .map(([id, entry]) => ({ id, ...(entry as Record<string, unknown>) } as LogEntryData))
+        .sort((a: LogEntryData, b: LogEntryData) => b.timestamp - a.timestamp);
 
       setLog(entries);
       setLoading(false);

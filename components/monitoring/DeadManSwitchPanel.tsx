@@ -9,13 +9,13 @@ import Text from '@/app/components/ui/Text';
 import StatusBadge from '@/app/components/ui/StatusBadge';
 import Button from '@/app/components/ui/Button';
 
-interface HealthyStatus {
+export interface HealthyStatus {
   stale: false;
   elapsed: number;
   lastCheck: string;
 }
 
-interface StaleStatus {
+export interface StaleStatus {
   stale: true;
   reason: 'never_run' | 'timeout' | 'error';
   elapsed?: number;
@@ -23,7 +23,7 @@ interface StaleStatus {
   error?: string;
 }
 
-type DeadManSwitchStatus = HealthyStatus | StaleStatus;
+export type DeadManSwitchStatus = HealthyStatus | StaleStatus;
 
 interface DeadManSwitchPanelProps {
   status: DeadManSwitchStatus | null;

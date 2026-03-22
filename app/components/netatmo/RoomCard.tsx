@@ -8,7 +8,7 @@ import { NETATMO_ROUTES } from '@/lib/routes';
 
 interface ModuleData {
   id: string;
-  name: string;
+  name?: string;
   type: string;
   battery_state?: string;
   reachable?: boolean;

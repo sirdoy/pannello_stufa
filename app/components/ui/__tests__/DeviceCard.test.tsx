@@ -5,6 +5,7 @@
  * Tests backwards compatibility with legacy props, new API props,
  * integration with SmartHomeCard, Badge, HealthIndicator, context menu, and accessibility.
  */
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
@@ -23,10 +24,10 @@ jest.mock('../LoadingOverlay', () => {
 });
 
 jest.mock('../Toast', () => {
-  return function MockToast({ message, type, onClose }: { message: string; type: string; onClose: () => void }) {
+  return function MockToast({ children, variant, onClose }: { children?: React.ReactNode; variant?: string; onClose: () => void }) {
     return (
-      <div data-testid="toast" data-type={type}>
-        {message}
+      <div data-testid="toast" data-type={variant}>
+        {children}
         <button onClick={onClose}>Close</button>
       </div>
     );

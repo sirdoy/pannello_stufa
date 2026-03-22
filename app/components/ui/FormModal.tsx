@@ -84,7 +84,7 @@ export interface FormModalProps {
 function ErrorSummary({ errors }: { errors: Record<string, any> }) {
   const errorList = Object.entries(errors).map(([field, error]) => ({
     field,
-    message: (error as any)?.message || 'Invalid value',
+    message: error instanceof Error ? error.message : 'Invalid value',
   }));
 
   if (errorList.length === 0) return null;
@@ -299,7 +299,10 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
 
   return (
     <Modal
-      {...({ ref, isOpen, size, className: cn('relative', className), ...props } as any)}
+      isOpen={isOpen}
+      size={size}
+      className={cn('relative', className)}
+      {...props}
     >
       <Modal.Header>
         <Modal.Title>{title}</Modal.Title>

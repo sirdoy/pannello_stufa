@@ -58,7 +58,6 @@ export default function Panel({
     <Card
       variant={resolvedVariant}
       className={`overflow-hidden ${className}`}
-      {...({} as any)}
     >
       {/* Header (se presente title o headerAction) */}
       {(title || headerAction) && (

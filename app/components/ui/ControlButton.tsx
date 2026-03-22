@@ -114,6 +114,9 @@ export interface ControlButtonProps
   onClick?: () => void;
 }
 
+/** Tracks functions that have already received the deprecation warning */
+const warnedFns = new WeakSet<(...args: unknown[]) => void>();
+
 /**
  * ControlButton Component - Ember Noir Design System
  *
@@ -138,11 +141,11 @@ const ControlButton = forwardRef<HTMLButtonElement, ControlButtonProps>(function
   const handlePress = () => {
     if (onClick) {
       // Legacy support - log deprecation warning in dev
-      if (process.env.NODE_ENV === 'development' && !(handlePress as any)._warned) {
+      if (process.env.NODE_ENV === 'development' && !warnedFns.has(handlePress)) {
+        warnedFns.add(handlePress);
         console.warn(
           '[ControlButton] onClick prop is deprecated. Use onChange(delta) instead.'
         );
-        (handlePress as any)._warned = true;
       }
       onClick();
     } else if (onChange) {

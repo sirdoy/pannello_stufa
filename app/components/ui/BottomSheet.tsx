@@ -3,7 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 // @ts-expect-error - react-dom types are available but strict mode check fails
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import ActionButton from './ActionButton';
+import ActionButton, { type ActionButtonProps } from './ActionButton';
 import Heading from './Heading';
 
 /**
@@ -137,7 +137,7 @@ export default function BottomSheet({
               {/* Close Button */}
               {showCloseButton && (
                 <ActionButton
-                  {...({ icon: <X />, variant: "close", size: "md", onClick: onClose, ariaLabel: "Chiudi" } as any)}
+                  {...({ icon: <X />, variant: 'ghost', size: 'md', onClick: onClose, ariaLabel: 'Chiudi' } satisfies ActionButtonProps)}
                 />
               )}
             </div>

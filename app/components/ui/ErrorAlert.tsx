@@ -98,7 +98,6 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
       dismissKey=""
       compact={false}
       className={className}
-      {...({} as any)}
     />
   );
 }

@@ -108,7 +108,6 @@ export default function ConfirmDialog({
         variant="elevated"
         className="max-w-md w-full p-6 animate-scaleIn"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
-        {...({} as any)}
       >
         <div className="text-center mb-6">
           <div className="text-5xl mb-4">{icon}</div>

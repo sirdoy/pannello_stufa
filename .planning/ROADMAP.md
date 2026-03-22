@@ -66,7 +66,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 114: Type Safety lib/** - Eliminate `as any` across lib/ layer (admin, network, notifications, rooms, device config, firebase) (completed 2026-03-22)
 - [x] **Phase 115: Type Safety app/ Components** - Eliminate `as any` in component icon/spread/variant patterns and fix specific component types (completed 2026-03-22)
 - [x] **Phase 116: Type Safety app/ Routes & Pages** - Eliminate `as any` in API routes and page files (scheduler, Netatmo, weather, thermostat/stove, service worker) (completed 2026-03-22)
-- [ ] **Phase 117: Dead Code & Cleanup** - Remove 48 unused utility exports, resolve 2 outstanding TODOs
+- [ ] **Phase 117: Dead Code & Cleanup** - Remove 121 in-scope unused exports, resolve 2 outstanding TODOs
 
 ## Phase Details
 
@@ -134,14 +134,18 @@ Plans:
 - [x] 116-02-PLAN.md — Page components: thermostat/stove/monitoring/log/settings prop type alignment, export types from child components, canonical ScheduleInterval imports
 
 ### Phase 117: Dead Code & Cleanup
-**Goal**: The 48 unused utility exports identified by knip are removed, and two outstanding service TODOs are resolved with proper implementations
+**Goal**: The 121 in-scope unused exports identified by knip are removed, and two outstanding service TODOs are resolved with proper implementations
 **Depends on**: Phase 116
 **Requirements**: CLEAN-01, CLEAN-02, CLEAN-03
 **Success Criteria** (what must be TRUE):
-  1. `knip` reports zero unused exports in utility files (the 48 identified exports are gone)
+  1. `knip` reports zero unused exports in utility files (the 121 in-scope exports are gone)
   2. `notificationService.ts` TODO is resolved — cleanup logic runs in an API route, not inline in the service
   3. `healthMonitoring.ts` TODO is resolved — stove STARTING state has grace period tracking before triggering alerts
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 117-01-PLAN.md — Remove unused exports from lib/ utilities and app/ files (knip cleanup)
+- [ ] 117-02-PLAN.md — Delete notificationService disabled block + implement STARTING grace period tracking
 
 ## Progress
 
@@ -173,10 +177,10 @@ Phases execute in numeric order: 113 -> 114 -> 115 -> 116 -> 117
 | 114. Type Safety lib/ | v14.1 | 2/2 | Complete    | 2026-03-22 |
 | 115. Type Safety app/ Components | v14.1 | 2/2 | Complete    | 2026-03-22 |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 2/2 | Complete    | 2026-03-22 |
-| 117. Dead Code & Cleanup | v14.1 | 0/TBD | Not started | - |
+| 117. Dead Code & Cleanup | v14.1 | 0/2 | Not started | - |
 
 **Total:** 19 milestones shipped, 112 phases complete, 398 plans executed. v14.1 in progress (5 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-22 — Phase 116 planned (2 plans)*
+*Roadmap updated: 2026-03-22 — Phase 117 planned (2 plans)*

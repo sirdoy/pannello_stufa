@@ -46,7 +46,6 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
 
   const fetchAllGetEndpoints = () => {
     fetchGetEndpoint('notificationStats', '/api/notifications/stats');
-    fetchGetEndpoint('healthMonitoringStats', '/api/health-monitoring/stats');
   };
 
   const callPostEndpoint = async (name: string, url: string, body: any) => {
@@ -155,16 +154,6 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
             isCopied={copiedUrl === '/api/notifications/stats'}
           />
 
-          <EndpointCard
-            name="Health Monitoring Stats"
-            url="/api/health-monitoring/stats"
-            response={getResponses.healthMonitoringStats}
-            loading={loadingGet.healthMonitoringStats ?? false}
-            timing={timings.healthMonitoringStats}
-            onRefresh={() => fetchGetEndpoint('healthMonitoringStats', '/api/health-monitoring/stats')}
-            onCopyUrl={() => copyUrlToClipboard('/api/health-monitoring/stats')}
-            isCopied={copiedUrl === '/api/health-monitoring/stats'}
-          />
         </div>
       </div>
 

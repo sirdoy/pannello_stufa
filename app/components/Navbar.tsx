@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNavigationStructureWithPreferences } from '@/lib/devices/deviceRegistry';
-import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown, Activity, Lightbulb } from 'lucide-react';
+import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown, Lightbulb } from 'lucide-react';
 import {
   DropdownContainer,
   DropdownItem,
@@ -173,7 +173,6 @@ export default function Navbar() {
     if (path.includes('scheduler')) return <Calendar className="w-5 h-5" />;
     if (path.includes('errors')) return <AlertCircle className="w-5 h-5" />;
     if (path.includes('log')) return <Clock className="w-5 h-5" />;
-    if (path.includes('monitoring')) return <Activity className="w-5 h-5" />;
     return null;
   };
 

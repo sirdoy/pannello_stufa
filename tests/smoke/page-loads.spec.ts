@@ -89,17 +89,6 @@ test.describe('Page Loads', () => {
   });
 
   test.describe('Support Pages', () => {
-    test('/analytics loads', async ({ page }) => {
-      // E2E-07: Analytics dashboard loads
-      const { errors, cleanup } = collectConsoleErrors(page);
-      await page.goto('/analytics');
-      await expect(page.getByRole('heading', { name: 'Analytics', level: 1 })).toBeVisible({
-        timeout: 10000,
-      });
-      cleanup();
-      expect(errors, `Console errors on /analytics: ${errors.join(', ')}`).toHaveLength(0);
-    });
-
     test('/settings loads', async ({ page }) => {
       // E2E-08: Settings page loads
       const { errors, cleanup } = collectConsoleErrors(page);

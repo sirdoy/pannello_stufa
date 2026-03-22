@@ -35,7 +35,6 @@ jest.mock('@/lib/weather/openMeteo');
 jest.mock('@/lib/weather/weatherCacheService');
 jest.mock('@/lib/utils/pidController');
 jest.mock('@/lib/cronExecutionLogger');
-jest.mock('@/lib/analytics/analyticsEventLogger');
 jest.mock('@/lib/services/tokenCleanupService', () => ({
   cleanupStaleTokens: jest.fn().mockResolvedValue({
     cleaned: false,
@@ -72,7 +71,6 @@ import { calibrateValvesServer } from '@/lib/netatmo/netatmoCalibrationService';
 import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
 import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 import { logCronExecution } from '@/lib/cronExecutionLogger';
-import { logAnalyticsEvent } from '@/lib/analytics/analyticsEventLogger';
 import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
 
 // Create typed mock references
@@ -88,7 +86,6 @@ const mockGetHealth = jest.mocked(getHealth);
 const mockCanIgnite = jest.mocked(canIgnite);
 const mockTrackUsageHours = jest.mocked(trackUsageHours);
 const mockLogCronExecution = jest.mocked(logCronExecution);
-const mockLogAnalyticsEvent = jest.mocked(logAnalyticsEvent);
 const mockGetEnvironmentPath = jest.mocked(getEnvironmentPath);
 const mockCalibrateValvesServer = jest.mocked(calibrateValvesServer);
 const mockTriggerSchedulerActionServer = jest.mocked(triggerSchedulerActionServer);
@@ -123,9 +120,6 @@ describe('Scheduler Check Route', () => {
 
     // Mock logCronExecution as fire-and-forget
     mockLogCronExecution.mockResolvedValue(undefined as any);
-
-    // Mock logAnalyticsEvent as fire-and-forget
-    mockLogAnalyticsEvent.mockResolvedValue(undefined as any);
 
     // Default stove data mocks (happy path)
     mockGetStatus.mockResolvedValue({
@@ -962,15 +956,6 @@ describe('Scheduler Check Route', () => {
       const request = createMockRequest();
       await GET(request);
 
-      // Verify analytics event logged
-      expect(mockLogAnalyticsEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: 'stove_ignite',
-          source: 'scheduler',
-          powerLevel: 4,
-        })
-      );
-
       jest.useRealTimers();
     });
   });
@@ -1078,14 +1063,6 @@ describe('Scheduler Check Route', () => {
 
       const request = createMockRequest();
       await GET(request);
-
-      // Verify analytics event logged
-      expect(mockLogAnalyticsEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: 'stove_shutdown',
-          source: 'scheduler',
-        })
-      );
 
       jest.useRealTimers();
     });
@@ -2917,15 +2894,6 @@ describe('Scheduler Check Route', () => {
         })
       );
 
-      // Verify analytics logged
-      expect(mockLogAnalyticsEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          eventType: 'power_change',
-          powerLevel: 3,
-          source: 'automation',
-        })
-      );
-
       jest.useRealTimers();
     });
 
@@ -3375,34 +3343,4 @@ describe('Scheduler Check Route', () => {
     });
   });
 
-  describe('Additional Coverage - logAnalyticsEvent Power Change Handler', () => {
-    it('handles logAnalyticsEvent exception during power change', async () => {
-      mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
-      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: null });
-      mockLogAnalyticsEvent.mockRejectedValue(new Error('Analytics service down'));
-
-      const mockUpdateStoveState = jest.mocked(updateStoveState);
-      mockUpdateStoveState.mockResolvedValue(undefined as any);
-
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2025-02-12T18:00:00.000Z'));
-
-      setupSchedulerMocks({
-        mode: { enabled: true, semiManual: false },
-        intervals: [{ start: '18:00', end: '22:00', power: 4, fan: 3 }],
-      });
-
-      const request = createMockRequest();
-      const response = await GET(request);
-      await flushPromises();
-
-      // Route should still return 200 (analytics is fire-and-forget)
-      expect(response.status).toBe(200);
-
-      // Verify power was set despite analytics failure
-      expect(mockSetPower).toHaveBeenCalledWith(4);
-
-      jest.useRealTimers();
-    });
-  });
 });

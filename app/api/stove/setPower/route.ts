@@ -1,6 +1,5 @@
 import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow } from '@/lib/core';
 import { setPower } from '@/lib/stove/thermorossiProxy';
-import { logAnalyticsEvent } from '@/lib/analytics/analyticsEventLogger';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,15 +16,6 @@ export const POST = withAuthAndErrorHandler(
     const value = body['value'] as number;
 
     const data = await setPower(value);
-
-    // Analytics: log power change event (fire-and-forget, consent-gated)
-    const consent = request.headers.get('x-analytics-consent');
-    if (consent === 'granted') {
-      logAnalyticsEvent({
-        eventType: 'power_change',
-        powerLevel: value,
-      }).catch(() => {}); // Fire-and-forget
-    }
 
     return success(data as unknown as Record<string, unknown>, null, 202);
   }),

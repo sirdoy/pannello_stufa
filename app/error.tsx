@@ -7,9 +7,7 @@
  * Displays Ember Noir fallback UI with retry button.
  *
  * IMPORTANT:
- * - Logs errors to /api/analytics/error via fire-and-forget fetch
  * - Does NOT catch ValidationError (component boundaries check instanceof)
- * - Error logging is operational, not analytics tracking (no consent check)
  *
  * Reference: https://nextjs.org/docs/app/api-reference/file-conventions/error
  */
@@ -24,19 +22,7 @@ interface ErrorProps {
 
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // Log error to analytics API (fire-and-forget)
-    fetch('/api/analytics/error', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        component: 'global',
-        message: error.message,
-        stack: error.stack,
-        digest: error.digest,
-      }),
-    }).catch(() => {
-      // Suppress fetch errors (fire-and-forget)
-    });
+    console.error('Global error:', error);
   }, [error]);
 
   return (

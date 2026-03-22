@@ -7,10 +7,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import DeviceCardErrorBoundary from '@/app/components/ErrorBoundary/DeviceCardErrorBoundary';
 import { ValidationError } from '@/lib/errors';
 
-// Mock fetch globally
-const mockFetch = jest.fn();
-global.fetch = mockFetch;
-
 // Mock UI components
 jest.mock('@/app/components/ui', () => ({
   Card: ({ children, className }: { children: React.ReactNode; className?: string }) => (
@@ -51,10 +47,6 @@ describe('DeviceCardErrorBoundary', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockFetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ success: true }),
-    } as Response);
   });
 
   // Test component that throws an error
@@ -129,45 +121,19 @@ describe('DeviceCardErrorBoundary', () => {
     );
   });
 
-  it('calls fetch to /api/analytics/error when error is caught (fire-and-forget logging)', async () => {
+  it('logs error to console when error is caught', async () => {
     render(
       <DeviceCardErrorBoundary deviceName="Stufa" deviceIcon="🔥">
         <BrokenComponent />
       </DeviceCardErrorBoundary>
     );
 
+    // Should show error fallback UI
+    expect(screen.getByTestId('heading')).toHaveTextContent('Errore: Stufa');
+
+    // console.error should have been called (mocked in beforeAll)
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      '/api/analytics/error',
-      expect.objectContaining({
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-    );
-  });
-
-  it('fetch body includes device name and error message', async () => {
-    render(
-      <DeviceCardErrorBoundary deviceName="Stufa" deviceIcon="🔥">
-        <BrokenComponent />
-      </DeviceCardErrorBoundary>
-    );
-
-    await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-    });
-
-    const fetchCall = mockFetch.mock.calls[0];
-    const body = JSON.parse(fetchCall[1].body);
-
-    expect(body).toEqual({
-      device: 'Stufa',
-      component: 'DeviceCard',
-      message: 'Component crashed',
-      stack: expect.any(String),
+      expect(console.error).toHaveBeenCalled();
     });
   });
 
@@ -200,25 +166,5 @@ describe('DeviceCardErrorBoundary', () => {
     await waitFor(() => {
       expect(screen.getByTestId('working-component')).toBeInTheDocument();
     });
-  });
-
-  it('handles fetch failure gracefully (fire-and-forget)', async () => {
-    mockFetch.mockRejectedValue(new Error('Network error'));
-
-    render(
-      <DeviceCardErrorBoundary deviceName="Stufa" deviceIcon="🔥">
-        <BrokenComponent />
-      </DeviceCardErrorBoundary>
-    );
-
-    // Should still show error fallback despite fetch failure
-    expect(screen.getByTestId('heading')).toHaveTextContent('Errore: Stufa');
-
-    // Fetch was attempted
-    await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-    });
-
-    // No error thrown (fire-and-forget)
   });
 });

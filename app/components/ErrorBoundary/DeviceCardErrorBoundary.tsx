@@ -21,22 +21,9 @@ export default function DeviceCardErrorBoundary({
       throw error;
     }
 
-    // For all other errors: log to analytics via fire-and-forget
+    // For all other errors: log to console
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorStack = error instanceof Error ? error.stack : undefined;
-
-    fetch('/api/analytics/error', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        device: deviceName,
-        component: 'DeviceCard',
-        message: errorMessage,
-        stack: errorStack,
-      }),
-    }).catch(() => {
-      // Fire-and-forget: ignore fetch failures
-    });
+    console.error(`DeviceCard error [${deviceName}]:`, errorMessage);
   };
 
   return (

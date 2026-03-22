@@ -14,15 +14,14 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { PageLayout, Skeleton, Button, Heading, Card, Text } from '@/app/components/ui';
+import { PageLayout, Skeleton, Button, Heading } from '@/app/components/ui';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 import { useBandwidthHistory } from './hooks/useBandwidthHistory';
 import { useDeviceHistory } from './hooks/useDeviceHistory';
 import { useBandwidthCorrelation } from './hooks/useBandwidthCorrelation';
-import { canTrackAnalytics, getConsentState } from '@/lib/analytics/analyticsConsentService';
 import WanStatusCard from './components/WanStatusCard';
 import DeviceListTable from './components/DeviceListTable';
 import CorrelationInsight from './components/CorrelationInsight';
@@ -63,18 +62,10 @@ export default function NetworkPage() {
 
   const handleBack = () => router.push('/');
 
-  // Consent state (SSR-safe pattern)
-  const [hasConsent, setHasConsent] = useState(false);
-  useEffect(() => {
-    setHasConsent(canTrackAnalytics());
-  }, []);
-
   // Stove power level polling (lightweight, independent)
   const stovePowerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!hasConsent) return; // Don't poll stove if no analytics consent
-
     const fetchPower = async () => {
       try {
         const res = await fetch(STOVE_ROUTES.getPower);
@@ -93,7 +84,7 @@ export default function NetworkPage() {
     // Poll every 30s (aligned with network data polling)
     const interval = setInterval(fetchPower, 30000);
     return () => clearInterval(interval);
-  }, [hasConsent]);
+  }, []);
 
   // Handle category override - calls API and updates UI optimistically
   const handleCategoryChange = async (mac: string, category: DeviceCategory) => {
@@ -121,16 +112,16 @@ export default function NetworkPage() {
     }
   }, [networkData.bandwidth]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Wire bandwidth + stove power → correlation hook (only with consent)
+  // Wire bandwidth + stove power → correlation hook
   useEffect(() => {
-    if (!hasConsent || !networkData.bandwidth) return;
+    if (!networkData.bandwidth) return;
 
     correlation.addDataPoint(
       networkData.bandwidth.download,
       stovePowerRef.current,
       networkData.bandwidth.timestamp
     );
-  }, [networkData.bandwidth, hasConsent]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [networkData.bandwidth]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Loading skeleton guard - only on initial load (no cached data)
   if (networkData.loading && !networkData.wan && networkData.devices.length === 0) {
@@ -188,30 +179,17 @@ export default function NetworkPage() {
           pointCount={bandwidthHistory.pointCount}
         />
 
-        {/* Bandwidth-Stove Correlation (Phase 67, consent-gated) */}
-        {hasConsent && (
-          <>
-            <BandwidthCorrelationChart
-              data={correlation.chartData}
-              status={correlation.status}
-              pointCount={correlation.pointCount}
-              minPoints={correlation.minPoints}
-            />
-            <CorrelationInsight
-              insight={correlation.insight}
-              status={correlation.status}
-            />
-          </>
-        )}
-
-        {/* Consent denied state (only if user explicitly denied) */}
-        {!hasConsent && getConsentState() === 'denied' && (
-          <Card variant="glass" padding={true} className="text-center">
-            <Text variant="secondary" size="sm">
-              Correlazione banda-stufa disponibile con il consenso analytics
-            </Text>
-          </Card>
-        )}
+        {/* Bandwidth-Stove Correlation (Phase 67) */}
+        <BandwidthCorrelationChart
+          data={correlation.chartData}
+          status={correlation.status}
+          pointCount={correlation.pointCount}
+          minPoints={correlation.minPoints}
+        />
+        <CorrelationInsight
+          insight={correlation.insight}
+          status={correlation.status}
+        />
 
         {/* Device History Timeline - below bandwidth chart */}
         <DeviceHistoryTimeline

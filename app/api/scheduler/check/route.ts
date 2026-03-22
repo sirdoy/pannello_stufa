@@ -46,7 +46,6 @@ import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
 import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 import { PIDController } from '@/lib/utils/pidController';
 import { logCronExecution } from '@/lib/cronExecutionLogger';
-import { logAnalyticsEvent } from '@/lib/analytics/analyticsEventLogger';
 import { getProxyHealth } from '@/lib/netatmo/netatmoProxy';
 
 export const dynamic = 'force-dynamic';
@@ -445,13 +444,6 @@ async function handleIgnition(active: any, ora: string): Promise<any> {
       source: 'scheduler',
     });
 
-    // Analytics: log scheduler-initiated ignite event (fire-and-forget, no consent needed)
-    logAnalyticsEvent({
-      eventType: 'stove_ignite',
-      powerLevel: active.power,
-      source: 'scheduler',
-    }).catch(() => {});
-
     await sendSchedulerNotification('IGNITE', `Stufa accesa automaticamente alle ${ora} (P${active.power}, V${active.fan})`);
 
     return { success: true };
@@ -471,12 +463,6 @@ async function handleShutdown(ora: string): Promise<any> {
       source: 'scheduler',
     });
 
-    // Analytics: log scheduler-initiated shutdown event (fire-and-forget, no consent needed)
-    logAnalyticsEvent({
-      eventType: 'stove_shutdown',
-      source: 'scheduler',
-    }).catch(() => {});
-
     await sendSchedulerNotification('SHUTDOWN', `Stufa spenta automaticamente alle ${ora}`);
 
     return { success: true };
@@ -494,13 +480,6 @@ async function handleLevelChanges(active: any, currentPowerLevel: number, curren
     try {
       await setPower(active.power);
       await updateStoveState({ powerLevel: active.power, source: 'scheduler' });
-
-      // Analytics: log scheduler-initiated power change (fire-and-forget, no consent needed)
-      logAnalyticsEvent({
-        eventType: 'power_change',
-        powerLevel: active.power,
-        source: 'scheduler',
-      }).catch(() => {});
 
       changeApplied = true;
     } catch (error) {
@@ -692,13 +671,6 @@ async function runPidAutomationIfEnabled(currentStatus: string, currentPowerLeve
       // Apply new power level
       await setPower(targetPower);
       await updateStoveState({ powerLevel: targetPower, source: 'pid_automation' });
-
-      // Analytics: log PID-initiated power change (fire-and-forget, no consent needed)
-      logAnalyticsEvent({
-        eventType: 'power_change',
-        powerLevel: targetPower,
-        source: 'automation',
-      }).catch(() => {});
 
       // Save boost state: PID is overriding scheduled power
       await adminDbSet(pidBoostPath, {

@@ -58,7 +58,7 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
-### 🚧 v14.1 Tech Debt & Type Safety (In Progress)
+### v14.1 Tech Debt & Type Safety (In Progress)
 
 **Milestone Goal:** Resolve accumulated known issues from v14.0 audit, eliminate `as any` casts across lib/ and app/, and remove dead code — leaving the codebase with zero known issues, tighter types, and a smaller surface area.
 
@@ -111,7 +111,11 @@ Plans:
   3. Variant prop casts are eliminated — variant props use typed union literals matching CVA definitions
   4. `DeviceCard` banner, action, and toast props align — no structural mismatch requires a cast at usage sites
   5. `TransitionLink` and `ControlButton` internal types are explicit — no `_warned` or return type casts remain
-**Plans**: TBD
+**Plans:** 2 plans
+
+Plans:
+- [ ] 115-01-PLAN.md — Foundation types: Button/LoadingOverlay icon widening, DeviceCard interface restructuring, empty spread fixes, ControlButton WeakSet, TransitionLink cast removal
+- [ ] 115-02-PLAN.md — Consumer fixes: icon cast removals, StoveCard variant typing, LightsCard/RoomControl types, ThermostatCard schedule/routes, WeatherCardWrapper, RoomCard JSX, DataTable label
 
 ### Phase 116: Type Safety app/ Routes & Pages
 **Goal**: API route files and page components in app/ have no `as any` casts — scheduler, Netatmo, weather, thermostat/stove, and service worker files are fully typed
@@ -138,7 +142,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
+Phases execute in numeric order: 113 -> 114 -> 115 -> 116 -> 117
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -163,7 +167,7 @@ Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 | 106-112 | v14.0 | 12/12 | ✓ Complete | 2026-03-22 |
 | 113. Known Issues Fix | v14.1 | 1/1 | Complete    | 2026-03-22 |
 | 114. Type Safety lib/ | v14.1 | 2/2 | Complete    | 2026-03-22 |
-| 115. Type Safety app/ Components | v14.1 | 0/TBD | Not started | - |
+| 115. Type Safety app/ Components | v14.1 | 0/2 | Not started | - |
 | 116. Type Safety app/ Routes & Pages | v14.1 | 0/TBD | Not started | - |
 | 117. Dead Code & Cleanup | v14.1 | 0/TBD | Not started | - |
 
@@ -171,4 +175,4 @@ Phases execute in numeric order: 113 → 114 → 115 → 116 → 117
 
 ---
 
-*Roadmap updated: 2026-03-22 — Phase 114 planned (2 plans)*
+*Roadmap updated: 2026-03-22 — Phase 115 planned (2 plans)*

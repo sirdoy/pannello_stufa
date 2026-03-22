@@ -20,7 +20,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v14.1 (in progress)
-**Status:** Phase 114 complete — all `as any` casts eliminated from lib/ layer (adminDbGet generic, browser API augmentations, typed room data, typed device metadata, error type guards). All 5 device providers use shared HA proxy.
+**Status:** Phase 115 complete — all `as any` casts eliminated from app/ component files (icon props widened to ReactNode, DeviceCard typed interfaces, variant unions, ControlButton WeakSet, TransitionLink). lib/ + components/ layers fully type-safe. All 5 device providers use shared HA proxy.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -707,4 +707,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-22 after Phase 114 complete — Type Safety lib/*
+*Last updated: 2026-03-22 after Phase 115 complete — Type Safety app/ Components*

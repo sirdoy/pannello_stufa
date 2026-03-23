@@ -286,6 +286,18 @@ export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
     icon: '📊',
     route: '/monitoring',
   },
+  REGISTRO: {
+    id: 'registry',
+    name: 'Registro',
+    icon: '📋',
+    route: '/registry/types',
+  },
+  STANZE: {
+    id: 'rooms',
+    name: 'Stanze',
+    icon: '🏠',
+    route: '/rooms',
+  },
 };
 
 /** Settings menu item configuration */

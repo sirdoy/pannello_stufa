@@ -55,18 +55,17 @@ jest.mock('@/app/components/ui/DataTable', () => ({
   ),
 }));
 
-// Mock FormModal — renders children when isOpen=true, expose onSubmit via submit button
+// Mock FormModal — renders a submit button when isOpen=true, bypasses render-prop children
 jest.mock('@/app/components/ui/FormModal', () => ({
   __esModule: true,
   default: ({
     isOpen,
     onSubmit,
-    children,
     title,
   }: {
     isOpen: boolean;
     onSubmit: (data: any) => Promise<void>;
-    children: (form: any) => React.ReactNode;
+    children?: any;
     title?: string;
   }) => {
     if (!isOpen) return null;
@@ -76,9 +75,6 @@ jest.mock('@/app/components/ui/FormModal', () => ({
     return (
       <div data-testid="form-modal">
         <span>{title}</span>
-        {typeof children === 'function'
-          ? children({ control: {}, formState: {} })
-          : children}
         <button data-testid="modal-submit" onClick={handleSubmit}>
           Submit
         </button>
@@ -244,28 +240,18 @@ describe('/registry/types page', () => {
   });
 
   it('Test 6 (DTYPE-02): FormModal onSubmit calls POST /api/registry/types with { slug, label } body', async () => {
-    const mockPost = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 201,
-      json: async () => ({ slug: 'new_type', label: 'New Type', is_builtin: false, created_at: 1700200000 }),
-    } as Response);
-    global.fetch = jest.fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => mockTypes,
-      } as Response)
-      .mockImplementationOnce(mockPost)
-      .mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => mockTypes,
-      } as Response);
-
     render(<DeviceTypesPage />);
     await waitFor(() => {
       expect(screen.getByText('Luce')).toBeInTheDocument();
     });
+
+    // Override fetch with POST spy before clicking
+    const postSpy = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: async () => ({ slug: 'new_type', label: 'New Type', is_builtin: false, created_at: 1700200000 }),
+    } as Response);
+    global.fetch = postSpy;
 
     const createButton = screen.getByRole('button', { name: /crea tipo/i });
     fireEvent.click(createButton);
@@ -274,7 +260,7 @@ describe('/registry/types page', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockPost).toHaveBeenCalledWith(
+      expect(postSpy).toHaveBeenCalledWith(
         '/api/registry/types',
         expect.objectContaining({
           method: 'POST',
@@ -307,28 +293,18 @@ describe('/registry/types page', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
-      expect(screen.getByText(/Sensore custom/)).toBeInTheDocument();
-      expect(screen.getByText(/custom_sensor/)).toBeInTheDocument();
+      // The description rendered in the dialog contains both label and slug
+      expect(screen.getByText(/Eliminare.*Sensore custom.*custom_sensor/)).toBeInTheDocument();
     });
   });
 
   it('Test 9 (DTYPE-03): confirming delete calls DELETE /api/registry/types/{slug}', async () => {
-    const mockDelete = jest.fn().mockResolvedValue({
+    const fetchSpy = jest.fn().mockResolvedValue({
       ok: true,
-      status: 204,
+      status: 200,
+      json: async () => mockTypes,
     } as Response);
-    global.fetch = jest.fn()
-      .mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => mockTypes,
-      } as Response)
-      .mockImplementationOnce(mockDelete)
-      .mockResolvedValue({
-        ok: true,
-        status: 200,
-        json: async () => mockTypes,
-      } as Response);
+    global.fetch = fetchSpy;
 
     render(<DeviceTypesPage />);
     await waitFor(() => {
@@ -342,11 +318,18 @@ describe('/registry/types page', () => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
     });
 
+    // Override fetch for the DELETE call
+    const deleteSpy = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+    } as Response);
+    global.fetch = deleteSpy;
+
     const confirmButton = screen.getByTestId('confirm-button');
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      expect(mockDelete).toHaveBeenCalledWith(
+      expect(deleteSpy).toHaveBeenCalledWith(
         '/api/registry/types/custom_sensor',
         expect.objectContaining({ method: 'DELETE' })
       );

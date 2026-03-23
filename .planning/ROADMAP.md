@@ -84,7 +84,7 @@ Plans:
   2. All Room, DeviceAssignment, RoomStatus, HouseStatus, and RoomsHealth TypeScript interfaces are defined and exported
   3. All 11 Rooms endpoint proxy routes exist under /api/ and return typed responses
   4. TypeScript compiles with zero errors for all new files
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 119-01: roomsProxy.ts + TypeScript interfaces
@@ -99,7 +99,7 @@ Plans:
   2. User can fill a form and submit to create a new custom device type with slug and label
   3. User can delete a custom device type after a confirmation dialog; built-in types show no delete option
   4. Creating or deleting a type refreshes the list without a full page reload
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 120-01: useDeviceTypes hook + Device Types page with create/delete UI
@@ -115,7 +115,7 @@ Plans:
   4. User can edit a device's name and type inline or via modal, and see the updated values reflected
   5. User can unregister a device after a confirmation dialog, and the device disappears from the list
   6. Registry health stats (type count, device count) are visible on the page
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 121-01: useRegistryDevices hook + Device Registry page (list, filter, health stats)
@@ -130,7 +130,7 @@ Plans:
   2. User can create a new room by entering a name and optional description, and it appears in the list
   3. User can edit a room's name and description via an inline form or modal, and see updated values
   4. User can delete a room after a confirmation dialog; the room disappears from the list
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 122-01: useRooms hook + Rooms management page with create/edit/delete UI
@@ -143,7 +143,7 @@ Plans:
   1. User can open a room and see all devices currently assigned to it
   2. User can assign a device (from the registered device list) to a room via a select or modal; if the device was in another room, it moves automatically
   3. User can remove a device from a room, and it no longer appears in that room's device list
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 123-01: Room detail view with device assignment and removal UI
@@ -156,7 +156,7 @@ Plans:
   1. User can select a room and see aggregated status for all devices in that room (online/offline, last-seen)
   2. User can see a whole-house view showing all rooms with their device statuses in one page
   3. Rooms health stats (room count, device count, orphan count) are visible on the status page
-**Plans**: TBD
+**Plans:** 2 plans
 
 Plans:
 - [ ] 124-01: useRoomStatus + useHouseStatus hooks + Room Status page with health stats
@@ -166,7 +166,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-117 | v1.0–v14.1 | 407/407 | Complete | 2026-03-22 |
-| 118. Registry Infrastructure | v15.0 | 2/2 | Complete   | 2026-03-22 |
+| 118. Registry Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-22 |
 | 119. Rooms Infrastructure | v15.0 | 0/2 | Not started | - |
 | 120. Device Types UI | v15.0 | 0/1 | Not started | - |
 | 121. Device Registry UI | v15.0 | 0/2 | Not started | - |

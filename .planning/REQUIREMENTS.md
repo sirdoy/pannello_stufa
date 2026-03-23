@@ -130,13 +130,73 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | — |
+| SONOS-01 | Phase 126 | Pending |
+| SONOS-02 | Phase 126 | Pending |
+| SONOS-03 | Phase 126 | Pending |
+| SONOS-04 | Phase 126 | Pending |
+| SONOS-05 | Phase 126 | Pending |
+| SONOS-06 | Phase 126 | Pending |
+| SONOS-07 | Phase 127 | Pending |
+| SONOS-08 | Phase 127 | Pending |
+| SONOS-09 | Phase 127 | Pending |
+| SONOS-10 | Phase 127 | Pending |
+| SONOS-11 | Phase 127 | Pending |
+| SONOS-12 | Phase 127 | Pending |
+| SONOS-13 | Phase 127 | Pending |
+| SONOS-14 | Phase 127 | Pending |
+| SONOS-15 | Phase 127 | Pending |
+| SONOS-16 | Phase 127 | Pending |
+| SONOS-17 | Phase 127 | Pending |
+| SONOS-18 | Phase 128 | Pending |
+| SONOS-19 | Phase 128 | Pending |
+| SONOS-20 | Phase 128 | Pending |
+| SONOS-21 | Phase 128 | Pending |
+| SONOS-22 | Phase 128 | Pending |
+| SONOS-23 | Phase 128 | Pending |
+| SONOS-24 | Phase 128 | Pending |
+| SONOS-25 | Phase 128 | Pending |
+| SONOS-26 | Phase 128 | Pending |
+| SONOS-27 | Phase 128 | Pending |
+| SONOS-28 | Phase 128 | Pending |
+| SONOS-29 | Phase 128 | Pending |
+| SONOS-30 | Phase 128 | Pending |
+| SONOS-31 | Phase 129 | Pending |
+| SONOS-32 | Phase 129 | Pending |
+| SONOS-33 | Phase 129 | Pending |
+| SONOS-34 | Phase 129 | Pending |
+| DIRIG-01 | Phase 130 | Pending |
+| DIRIG-02 | Phase 130 | Pending |
+| DIRIG-03 | Phase 130 | Pending |
+| DIRIG-04 | Phase 130 | Pending |
+| DIRIG-05 | Phase 130 | Pending |
+| DIRIG-06 | Phase 130 | Pending |
+| DIRIG-07 | Phase 130 | Pending |
+| DIRIG-08 | Phase 131 | Pending |
+| DIRIG-09 | Phase 131 | Pending |
+| DIRIG-10 | Phase 131 | Pending |
+| DIRIG-11 | Phase 131 | Pending |
+| FRITZ-01 | Phase 132 | Pending |
+| FRITZ-02 | Phase 132 | Pending |
+| FRITZ-03 | Phase 132 | Pending |
+| FRITZ-04 | Phase 132 | Pending |
+| FRITZ-05 | Phase 132 | Pending |
+| FRITZ-06 | Phase 132 | Pending |
+| FRITZ-07 | Phase 132 | Pending |
+| FRITZ-08 | Phase 133 | Pending |
+| FRITZ-09 | Phase 133 | Pending |
+| FRITZ-10 | Phase 133 | Pending |
+| FRITZ-11 | Phase 133 | Pending |
+| FRITZ-12 | Phase 133 | Pending |
+| FRITZ-13 | Phase 134 | Pending |
+| FRITZ-14 | Phase 134 | Pending |
+| FRITZ-15 | Phase 134 | Pending |
+| FRITZ-16 | Phase 134 | Pending |
 
 **Coverage:**
 - v16.0 requirements: 50 total
-- Mapped to phases: 0
-- Unmapped: 50
+- Mapped to phases: 50
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 after initial definition*
+*Last updated: 2026-03-23 — traceability populated after roadmap creation*

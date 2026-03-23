@@ -23,6 +23,7 @@
 - ✅ **v14.0 Hue Proxy Migration** — Phases 106-112 (shipped 2026-03-22)
 - ✅ **v14.1 Tech Debt & Type Safety** — Phases 113-117 (shipped 2026-03-22)
 - ✅ **v15.0 Rooms & Device Registry** — Phases 118-125 (shipped 2026-03-23)
+- 🚧 **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato** — Phases 126-134 (in progress)
 
 ## Phases
 
@@ -58,15 +59,174 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
+### 🚧 v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato (In Progress)
+
+**Milestone Goal:** Integrate Sonos and DIRIGERA as new providers, complete advanced Fritz!Box endpoints — bringing documented API coverage from 56% to ~95%.
+
+- [ ] **Phase 126: Sonos Infrastructure** - Proxy client, TypeScript types, discovery routes (health, devices, device detail, zones)
+- [ ] **Phase 127: Sonos Transport Controls** - Playback state/control routes (play/pause/stop/next/prev), volume routes (get/set per speaker and zone), seek
+- [ ] **Phase 128: Sonos Extended Controls** - EQ, play mode, queue, home theater, source switch, grouping, sleep timer, history routes
+- [ ] **Phase 129: Sonos Frontend** - SonosCard dashboard card, /sonos page, device registry integration, navigation menu entry
+- [ ] **Phase 130: DIRIGERA Infrastructure** - Proxy client, TypeScript types, health route, all sensor routes (contact, motion, summary)
+- [ ] **Phase 131: DIRIGERA Frontend** - DirigeraCard dashboard card, /dirigera page, device registry integration, navigation menu entry
+- [ ] **Phase 132: Fritz!Box System & Network Services** - System info, WiFi clients/networks, DHCP reservations, port forwarding, UPnP, mesh topology routes
+- [ ] **Phase 133: Fritz!Box History & Budget** - Hourly/daily/auto bandwidth history routes, daily device count, budget stats route
+- [ ] **Phase 134: Fritz!Box Frontend** - System info section, WiFi clients tab, network services section, history charts with toggle in /network page
+
+## Phase Details
+
+### Phase 126: Sonos Infrastructure
+**Goal**: The application can discover and inspect the Sonos system via typed proxy API
+**Depends on**: Phase 125 (existing shared haGet/haPost transport)
+**Requirements**: SONOS-01, SONOS-02, SONOS-03, SONOS-04, SONOS-05, SONOS-06
+**Success Criteria** (what must be TRUE):
+  1. sonosProxy.ts function module exists with typed wrappers using haGet transport and X-API-Key auth
+  2. All Sonos TypeScript interfaces are defined (health, device, zone, playback, volume, EQ, queue, history)
+  3. GET /api/sonos/health returns speaker connectivity, data freshness, device count
+  4. GET /api/sonos/devices and /api/sonos/devices/{uid} return speaker list and individual speaker detail
+  5. GET /api/sonos/zones returns zone groups with coordinator and members
+**Plans**: TBD
+
+Plans:
+- [ ] 126-01: sonosProxy.ts + TypeScript types + read routes (health, devices, device detail, zones)
+
+### Phase 127: Sonos Transport Controls
+**Goal**: Users can control Sonos playback and volume from the application
+**Depends on**: Phase 126
+**Requirements**: SONOS-07, SONOS-08, SONOS-09, SONOS-10, SONOS-11, SONOS-12, SONOS-13, SONOS-14, SONOS-15, SONOS-16, SONOS-17
+**Success Criteria** (what must be TRUE):
+  1. GET /api/sonos/zones/{group_id}/playback returns current playback state for a zone
+  2. GET /api/sonos/speakers/{uid}/volume returns volume and mute state for a speaker
+  3. POST routes for play/pause/stop/next/previous return 202 Accepted with suggested_poll_delay_s
+  4. PUT /api/sonos/speakers/{uid}/volume and PUT /api/sonos/zones/{group_id}/volume set volume (0-100)
+  5. PUT /api/sonos/zones/{group_id}/seek positions the track at the given HH:MM:SS timestamp
+**Plans**: TBD
+
+Plans:
+- [ ] 127-01: Playback/volume read routes + command wrappers (play/pause/stop/next/prev/volume/mute/seek)
+
+### Phase 128: Sonos Extended Controls
+**Goal**: Users can access EQ, play modes, queue, home theater, grouping, sleep timer, and history for Sonos
+**Depends on**: Phase 127
+**Requirements**: SONOS-18, SONOS-19, SONOS-20, SONOS-21, SONOS-22, SONOS-23, SONOS-24, SONOS-25, SONOS-26, SONOS-27, SONOS-28, SONOS-29, SONOS-30
+**Success Criteria** (what must be TRUE):
+  1. EQ routes (GET/PUT /api/sonos/speakers/{uid}/eq) return and accept bass, treble, loudness settings
+  2. Play mode routes (GET/PUT /api/sonos/zones/{group_id}/play-mode) return and set shuffle/repeat/crossfade
+  3. GET /api/sonos/zones/{group_id}/queue returns paginated playback queue
+  4. Home theater routes (GET/PUT), source switch (POST), and grouping routes (join/unjoin) are reachable and return 202 Accepted for mutations
+  5. Sleep timer routes (GET/PUT) and GET /api/sonos/history with auto-granularity are reachable
+**Plans**: TBD
+
+Plans:
+- [ ] 128-01: Extended read routes (EQ, play-mode, queue, home-theater, sleep-timer, history)
+- [ ] 128-02: Extended command routes (set-EQ, set-play-mode, set-home-theater, source, join, unjoin, set-sleep-timer)
+
+### Phase 129: Sonos Frontend
+**Goal**: Sonos is visible on the dashboard and has a dedicated control page accessible from the navigation menu
+**Depends on**: Phase 128
+**Requirements**: SONOS-31, SONOS-32, SONOS-33, SONOS-34
+**Success Criteria** (what must be TRUE):
+  1. SonosCard appears on the dashboard showing now-playing track, zone status, and speaker count
+  2. /sonos page lists all zones with playback controls and per-speaker volume sliders
+  3. Sonos speakers can be registered in the Device Registry (DIRIGERA provider type available)
+  4. Navigation menu has a Sonos entry that routes to /sonos
+**Plans**: TBD
+
+Plans:
+- [ ] 129-01: SonosCard + /sonos page + device registry integration + nav menu entry
+
+### Phase 130: DIRIGERA Infrastructure
+**Goal**: The application can query DIRIGERA hub health and enumerate all sensors via typed proxy API
+**Depends on**: Phase 125 (existing shared transport)
+**Requirements**: DIRIG-01, DIRIG-02, DIRIG-03, DIRIG-04, DIRIG-05, DIRIG-06, DIRIG-07
+**Success Criteria** (what must be TRUE):
+  1. dirigeraProxy.ts function module exists with typed wrappers using haGet transport and X-API-Key auth
+  2. All DIRIGERA TypeScript interfaces are defined (health, sensor, contact, motion, summary)
+  3. GET /api/dirigera/health returns hub connection status, firmware, and connected sensor count
+  4. GET /api/dirigera/sensors returns all sensors; /sensors/contact and /sensors/motion return filtered subsets with data_freshness
+  5. GET /api/dirigera/sensors/summary returns fleet totals (total, open, offline, low battery)
+**Plans**: TBD
+
+Plans:
+- [ ] 130-01: dirigeraProxy.ts + TypeScript types + all sensor routes (health, sensors, contact, motion, summary)
+
+### Phase 131: DIRIGERA Frontend
+**Goal**: Sensor status is visible on the dashboard and has a dedicated page accessible from the navigation menu
+**Depends on**: Phase 130
+**Requirements**: DIRIG-08, DIRIG-09, DIRIG-10, DIRIG-11
+**Success Criteria** (what must be TRUE):
+  1. DirigeraCard appears on the dashboard showing sensor summary (total, open contacts, offline, low battery counts)
+  2. /dirigera page lists all sensors with real-time state and a filter control for contact vs. motion type
+  3. DIRIGERA sensors can be registered in the Device Registry
+  4. Navigation menu has a DIRIGERA entry that routes to /dirigera
+**Plans**: TBD
+
+Plans:
+- [ ] 131-01: DirigeraCard + /dirigera page + device registry integration + nav menu entry
+
+### Phase 132: Fritz!Box System & Network Services
+**Goal**: The application exposes Fritz!Box system info, WiFi client data, and network service details via new API routes
+**Depends on**: Phase 125 (existing Fritz!Box infrastructure at phases 61-67)
+**Requirements**: FRITZ-01, FRITZ-02, FRITZ-03, FRITZ-04, FRITZ-05, FRITZ-06, FRITZ-07
+**Success Criteria** (what must be TRUE):
+  1. GET /api/fritzbox/system returns router model, firmware version, uptime, and CPU load
+  2. GET /api/fritzbox/wifi/clients returns WiFi clients with signal strength, band, and connection speed (filterable by band)
+  3. GET /api/fritzbox/wifi/networks returns configured WiFi networks with enabled/disabled status
+  4. GET /api/fritzbox/network/dhcp/reservations and /network/port-forwarding return static leases and active port rules
+  5. GET /api/fritzbox/network/upnp and /network/mesh return UPnP port mappings and mesh node topology
+**Plans**: TBD
+
+Plans:
+- [ ] 132-01: System route + WiFi clients/networks routes
+- [ ] 132-02: DHCP reservations + port forwarding + UPnP + mesh routes
+
+### Phase 133: Fritz!Box History & Budget
+**Goal**: The application can retrieve multi-resolution bandwidth history and data budget statistics from Fritz!Box
+**Depends on**: Phase 132
+**Requirements**: FRITZ-08, FRITZ-09, FRITZ-10, FRITZ-11, FRITZ-12
+**Success Criteria** (what must be TRUE):
+  1. GET /api/fritzbox/history/bandwidth/hourly returns bandwidth aggregated by hour
+  2. GET /api/fritzbox/history/bandwidth/daily returns bandwidth aggregated by day
+  3. GET /api/fritzbox/history/devices/daily returns daily device count history
+  4. GET /api/fritzbox/history/bandwidth/auto switches granularity automatically (hour vs. day) based on time range
+  5. GET /api/fritzbox/budget-stats returns data budget consumption statistics
+**Plans**: TBD
+
+Plans:
+- [ ] 133-01: History tier routes (hourly, daily, devices/daily, auto) + budget-stats route
+
+### Phase 134: Fritz!Box Frontend
+**Goal**: The /network page displays Fritz!Box system info, WiFi clients, network services, and multi-resolution bandwidth charts
+**Depends on**: Phase 133
+**Requirements**: FRITZ-13, FRITZ-14, FRITZ-15, FRITZ-16
+**Success Criteria** (what must be TRUE):
+  1. /network page shows a system info section with router model, firmware version, and uptime
+  2. /network page has a WiFi clients tab listing connected devices with signal strength bars and band labels
+  3. /network page shows a network services section with DHCP reservations, port forwarding rules, UPnP mappings, and mesh topology
+  4. /network page bandwidth charts have a hourly/daily toggle that switches the displayed history tier
+**Plans**: TBD
+
+Plans:
+- [ ] 134-01: System info section + WiFi clients tab + network services section + history charts toggle
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
+| 126 | v16.0 | 0/TBD | Not started | - |
+| 127 | v16.0 | 0/TBD | Not started | - |
+| 128 | v16.0 | 0/TBD | Not started | - |
+| 129 | v16.0 | 0/TBD | Not started | - |
+| 130 | v16.0 | 0/TBD | Not started | - |
+| 131 | v16.0 | 0/TBD | Not started | - |
+| 132 | v16.0 | 0/TBD | Not started | - |
+| 133 | v16.0 | 0/TBD | Not started | - |
+| 134 | v16.0 | 0/TBD | Not started | - |
 
-**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed.
+**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (9 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-23 — v15.0 milestone archived*
+*Roadmap updated: 2026-03-23 — v16.0 roadmap created (phases 126-134)*

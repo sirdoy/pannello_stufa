@@ -133,7 +133,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 122-01: useRooms hook + Rooms management page with create/edit/delete UI
+- [ ] 122-01-PLAN.md — useRooms + useRoomsHealth hooks, DataTable listing, loading/error/empty states, health stats
+- [ ] 122-02-PLAN.md — Create, edit, delete room actions with FormModal, ConfirmationDialog, Zod validation
 
 ### Phase 123: Room Device Assignment
 **Goal**: Users can view devices within a room and assign or remove devices to organize their smart home
@@ -165,12 +166,12 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1-117 | v1.0–v14.1 | 407/407 | Complete | 2026-03-22 |
+| 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118. Registry Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-22 |
 | 119. Rooms Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
 | 121. Device Registry UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 122. Room Management UI | v15.0 | 0/1 | Not started | - |
+| 122. Room Management UI | v15.0 | 0/2 | Not started | - |
 | 123. Room Device Assignment | v15.0 | 0/1 | Not started | - |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |
 
@@ -178,4 +179,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-22 — v15.0 Rooms & Device Registry started*
+*Roadmap updated: 2026-03-23 — Phase 122 plans created*

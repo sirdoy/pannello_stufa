@@ -85,10 +85,11 @@ See `.planning/milestones/` for full archives.
   3. GET /api/sonos/health returns speaker connectivity, data freshness, device count
   4. GET /api/sonos/devices and /api/sonos/devices/{uid} return speaker list and individual speaker detail
   5. GET /api/sonos/zones returns zone groups with coordinator and members
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 126-01: sonosProxy.ts + TypeScript types + read routes (health, devices, device detail, zones)
+- [ ] 126-01-PLAN.md — Sonos TypeScript types + sonosProxy.ts function module + unit tests
+- [ ] 126-02-PLAN.md — 4 Sonos API routes (health, devices, devices/[uid], zones)
 
 ### Phase 127: Sonos Transport Controls
 **Goal**: Users can control Sonos playback and volume from the application
@@ -100,7 +101,7 @@ Plans:
   3. POST routes for play/pause/stop/next/previous return 202 Accepted with suggested_poll_delay_s
   4. PUT /api/sonos/speakers/{uid}/volume and PUT /api/sonos/zones/{group_id}/volume set volume (0-100)
   5. PUT /api/sonos/zones/{group_id}/seek positions the track at the given HH:MM:SS timestamp
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 127-01: Playback/volume read routes + command wrappers (play/pause/stop/next/prev/volume/mute/seek)
@@ -115,7 +116,7 @@ Plans:
   3. GET /api/sonos/zones/{group_id}/queue returns paginated playback queue
   4. Home theater routes (GET/PUT), source switch (POST), and grouping routes (join/unjoin) are reachable and return 202 Accepted for mutations
   5. Sleep timer routes (GET/PUT) and GET /api/sonos/history with auto-granularity are reachable
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 128-01: Extended read routes (EQ, play-mode, queue, home-theater, sleep-timer, history)
@@ -130,7 +131,7 @@ Plans:
   2. /sonos page lists all zones with playback controls and per-speaker volume sliders
   3. Sonos speakers can be registered in the Device Registry (DIRIGERA provider type available)
   4. Navigation menu has a Sonos entry that routes to /sonos
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 129-01: SonosCard + /sonos page + device registry integration + nav menu entry
@@ -145,7 +146,7 @@ Plans:
   3. GET /api/dirigera/health returns hub connection status, firmware, and connected sensor count
   4. GET /api/dirigera/sensors returns all sensors; /sensors/contact and /sensors/motion return filtered subsets with data_freshness
   5. GET /api/dirigera/sensors/summary returns fleet totals (total, open, offline, low battery)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 130-01: dirigeraProxy.ts + TypeScript types + all sensor routes (health, sensors, contact, motion, summary)
@@ -159,7 +160,7 @@ Plans:
   2. /dirigera page lists all sensors with real-time state and a filter control for contact vs. motion type
   3. DIRIGERA sensors can be registered in the Device Registry
   4. Navigation menu has a DIRIGERA entry that routes to /dirigera
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 131-01: DirigeraCard + /dirigera page + device registry integration + nav menu entry
@@ -174,7 +175,7 @@ Plans:
   3. GET /api/fritzbox/wifi/networks returns configured WiFi networks with enabled/disabled status
   4. GET /api/fritzbox/network/dhcp/reservations and /network/port-forwarding return static leases and active port rules
   5. GET /api/fritzbox/network/upnp and /network/mesh return UPnP port mappings and mesh node topology
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 132-01: System route + WiFi clients/networks routes
@@ -190,7 +191,7 @@ Plans:
   3. GET /api/fritzbox/history/devices/daily returns daily device count history
   4. GET /api/fritzbox/history/bandwidth/auto switches granularity automatically (hour vs. day) based on time range
   5. GET /api/fritzbox/budget-stats returns data budget consumption statistics
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 133-01: History tier routes (hourly, daily, devices/daily, auto) + budget-stats route
@@ -204,7 +205,7 @@ Plans:
   2. /network page has a WiFi clients tab listing connected devices with signal strength bars and band labels
   3. /network page shows a network services section with DHCP reservations, port forwarding rules, UPnP mappings, and mesh topology
   4. /network page bandwidth charts have a hourly/daily toggle that switches the displayed history tier
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
 - [ ] 134-01: System info section + WiFi clients tab + network services section + history charts toggle
@@ -215,7 +216,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
-| 126 | v16.0 | 0/TBD | Not started | - |
+| 126 | v16.0 | 0/2 | Planned | - |
 | 127 | v16.0 | 0/TBD | Not started | - |
 | 128 | v16.0 | 0/TBD | Not started | - |
 | 129 | v16.0 | 0/TBD | Not started | - |

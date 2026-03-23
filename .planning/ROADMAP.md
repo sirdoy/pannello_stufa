@@ -54,7 +54,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 119: Rooms Infrastructure** - Proxy client, TypeScript types, and API routes for Rooms (completed 2026-03-23)
 - [x] **Phase 120: Device Types UI** - Page to view, create, and delete device types (completed 2026-03-23)
 - [x] **Phase 121: Device Registry UI** - Page to view, filter, register, update, and unregister devices (completed 2026-03-23)
-- [ ] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms
+- [x] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms (completed 2026-03-23)
 - [ ] **Phase 123: Room Device Assignment** - UI to view, assign, and remove devices within rooms
 - [ ] **Phase 124: Room Status Views** - Per-room status, whole-house status, and health stats
 
@@ -130,11 +130,11 @@ Plans:
   2. User can create a new room by entering a name and optional description, and it appears in the list
   3. User can edit a room's name and description via an inline form or modal, and see updated values
   4. User can delete a room after a confirmation dialog; the room disappears from the list
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 122-01-PLAN.md — useRooms + useRoomsHealth hooks, DataTable listing, loading/error/empty states, health stats
-- [ ] 122-02-PLAN.md — Create, edit, delete room actions with FormModal, ConfirmationDialog, Zod validation
+- [x] 122-02-PLAN.md — Create, edit, delete room actions with FormModal, ConfirmationDialog, Zod validation
 
 ### Phase 123: Room Device Assignment
 **Goal**: Users can view devices within a room and assign or remove devices to organize their smart home
@@ -171,7 +171,7 @@ Plans:
 | 119. Rooms Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
 | 121. Device Registry UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 122. Room Management UI | v15.0 | 1/2 | In Progress|  |
+| 122. Room Management UI | v15.0 | 2/2 | Complete   | 2026-03-23 |
 | 123. Room Device Assignment | v15.0 | 0/1 | Not started | - |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |
 

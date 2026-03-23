@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 122-01-PLAN.md
-last_updated: "2026-03-23T15:28:44.705Z"
+stopped_at: Completed 122-02-PLAN.md
+last_updated: "2026-03-23T15:36:51.751Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -50,6 +50,7 @@ Plan: 2 of 2
 | Phase 121 P01 | 12 | 2 tasks | 2 files |
 | Phase 121 P02 | 17 | 2 tasks | 2 files |
 | Phase 122 P01 | 192 | 2 tasks | 2 files |
+| Phase 122 P02 | 356 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 121]: useDeviceTypesForSelect added as inline hook for type dropdown — non-critical (errors silently ignored)
 - [Phase 122]: useRooms sorts rooms by Italian locale (localeCompare 'it') with no pagination per D-05/D-06
 - [Phase 122]: useRoomsHealth errors silently — health display is non-critical
+- [Phase 122]: FormModal render-prop typed with Control<RoomFormData> to satisfy noImplicitAny
+- [Phase 122]: Tests targeting rows by data-testid (row-1) not getAllByRole index[0] due to Italian locale sort
 
 ### Pending Todos
 
@@ -94,5 +97,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Completed 122-01-PLAN.md
+Stopped at: Completed 122-02-PLAN.md
 Resume file: None

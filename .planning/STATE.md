@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 121-01-PLAN.md
-last_updated: "2026-03-23T14:21:05.984Z"
+stopped_at: Completed 121-02-PLAN.md
+last_updated: "2026-03-23T14:40:40.175Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -48,6 +48,7 @@ Plan: 2 of 2
 | Phase 119 P02 | 5 | 2 tasks | 7 files |
 | Phase 120-device-types-ui P01 | 15 | 2 tasks | 2 files |
 | Phase 121 P01 | 12 | 2 tasks | 2 files |
+| Phase 121 P02 | 17 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 120-01]: Badge variant usage for device types: ocean=built-in, neutral=custom; sort order: built-in first, then alphabetical it-IT
 - [Phase 121-01]: Test 6 (Tutti filter) uses cumulative call counting instead of mockClear() to avoid timing issues with in-flight fetches
 - [Phase 121-01]: Health stats rendered inline in Card header (per D-11), not as separate Card component
+- [Phase 121]: FormModal mock catches onSubmit errors silently to simulate real FormModal behavior — throw-to-keep-modal-open pattern verified in tests
+- [Phase 121]: useDeviceTypesForSelect added as inline hook for type dropdown — non-critical (errors silently ignored)
 
 ### Pending Todos
 
@@ -88,5 +91,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Completed 121-01-PLAN.md
+Stopped at: Completed 121-02-PLAN.md
 Resume file: None

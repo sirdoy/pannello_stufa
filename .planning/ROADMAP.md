@@ -53,7 +53,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 118: Registry Infrastructure** - Proxy client, TypeScript types, and API routes for Device Registry (completed 2026-03-22)
 - [x] **Phase 119: Rooms Infrastructure** - Proxy client, TypeScript types, and API routes for Rooms (completed 2026-03-23)
 - [x] **Phase 120: Device Types UI** - Page to view, create, and delete device types (completed 2026-03-23)
-- [ ] **Phase 121: Device Registry UI** - Page to view, filter, register, update, and unregister devices
+- [x] **Phase 121: Device Registry UI** - Page to view, filter, register, update, and unregister devices (completed 2026-03-23)
 - [ ] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms
 - [ ] **Phase 123: Room Device Assignment** - UI to view, assign, and remove devices within rooms
 - [ ] **Phase 124: Room Status Views** - Per-room status, whole-house status, and health stats
@@ -115,11 +115,11 @@ Plans:
   4. User can edit a device's name and type inline or via modal, and see the updated values reflected
   5. User can unregister a device after a confirmation dialog, and the device disappears from the list
   6. Registry health stats (type count, device count) are visible on the page
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 121-01: useRegistryDevices hook + Device Registry page (list, filter, health stats)
-- [ ] 121-02: Register, update, and unregister device actions (forms + confirmation)
+- [x] 121-02: Register, update, and unregister device actions (forms + confirmation)
 
 ### Phase 122: Room Management UI
 **Goal**: Users can create, rename, and delete rooms from a dedicated rooms management page
@@ -169,7 +169,7 @@ Plans:
 | 118. Registry Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-22 |
 | 119. Rooms Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
-| 121. Device Registry UI | v15.0 | 1/2 | In Progress|  |
+| 121. Device Registry UI | v15.0 | 2/2 | Complete   | 2026-03-23 |
 | 122. Room Management UI | v15.0 | 0/1 | Not started | - |
 | 123. Room Device Assignment | v15.0 | 0/1 | Not started | - |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |

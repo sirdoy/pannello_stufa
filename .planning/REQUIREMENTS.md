@@ -26,9 +26,9 @@ Requirements for Rooms & Device Registry milestone. Each maps to roadmap phases.
 
 - [x] **DREG-01**: User can view paginated list of registered devices
 - [x] **DREG-02**: User can filter device list by provider
-- [ ] **DREG-03**: User can register a new device (provider, device_id, name, type)
-- [ ] **DREG-04**: User can update device name and type
-- [ ] **DREG-05**: User can unregister a device with confirmation
+- [x] **DREG-03**: User can register a new device (provider, device_id, name, type)
+- [x] **DREG-04**: User can update device name and type
+- [x] **DREG-05**: User can unregister a device with confirmation
 - [x] **DREG-06**: User can view registry health stats (type count, device count)
 
 ### Room Management
@@ -82,9 +82,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DTYPE-03 | Phase 120 | Complete |
 | DREG-01 | Phase 121 | Complete |
 | DREG-02 | Phase 121 | Complete |
-| DREG-03 | Phase 121 | Pending |
-| DREG-04 | Phase 121 | Pending |
-| DREG-05 | Phase 121 | Pending |
+| DREG-03 | Phase 121 | Complete |
+| DREG-04 | Phase 121 | Complete |
+| DREG-05 | Phase 121 | Complete |
 | DREG-06 | Phase 121 | Complete |
 | ROOM-01 | Phase 122 | Pending |
 | ROOM-02 | Phase 122 | Pending |

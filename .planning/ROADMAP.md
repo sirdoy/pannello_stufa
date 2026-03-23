@@ -158,10 +158,10 @@ Plans:
   1. User can select a room and see aggregated status for all devices in that room (online/offline, last-seen)
   2. User can see a whole-house view showing all rooms with their device statuses in one page
   3. Rooms health stats (room count, device count, orphan count) are visible on the status page
-**Plans:** 2 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] 124-01: useRoomStatus + useHouseStatus hooks + Room Status page with health stats
+- [ ] 124-01-PLAN.md — Room status page with useHouseStatus + useRoomsHealth hooks, whole-house stats, per-room cards, provider-specific data rendering, Stato nav button
 
 ## Progress
 
@@ -180,4 +180,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-23 — Phase 123 plans created*
+*Roadmap updated: 2026-03-23 — Phase 124 plans created*

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 118-02-PLAN.md
-last_updated: "2026-03-22T21:06:09.866Z"
-last_activity: 2026-03-22
+stopped_at: Completed 119-01-PLAN.md
+last_updated: "2026-03-23T08:55:08.076Z"
+last_activity: 2026-03-23
 progress:
   total_phases: 7
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 4
+  completed_plans: 3
 ---
 
 # Project State
@@ -20,11 +20,11 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 118 — registry-infrastructure
+**Current focus:** Phase 119 — rooms-infrastructure
 
 ## Current Position
 
-Phase: 118 (registry-infrastructure) — EXECUTING
+Phase: 119 (rooms-infrastructure) — EXECUTING
 Plan: 2 of 2
 
 ## Performance Metrics
@@ -44,6 +44,7 @@ Plan: 2 of 2
 | v15.0 Rooms & Device Registry | 118-124 | ~10 | In progress |
 | Phase 118 P01 | 143 | 2 tasks | 5 files |
 | Phase 118 P02 | 8 | 2 tasks | 6 files |
+| Phase 119 P01 | 2 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -58,6 +59,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 118]: PaginatedResponse<T> placed in types/common.ts (shared by registry, rooms, automations — not scoped to registry types)
 - [Phase 118]: created() helper added to lib/core/index.ts export to enable import from @/lib/core
 - [Phase 118]: GET /registry/types and GET /registry/health are public (withErrorHandler); all device routes are protected (withAuthAndErrorHandler)
+- [Phase 119-01]: getRoomDevices returns RegistryDevice[] from @/types/registry — API returns full registry rows, no rooms-specific shape needed
+- [Phase 119-01]: DeviceStatus.data typed as union of 6 provider status interfaces | null matching API spec discriminated union exactly
 
 ### Pending Todos
 
@@ -76,6 +79,6 @@ None.
 
 ## Session Continuity
 
-Last activity: 2026-03-22
-Stopped at: Completed 118-02-PLAN.md
+Last activity: 2026-03-23
+Stopped at: Completed 119-01-PLAN.md
 Resume file: None

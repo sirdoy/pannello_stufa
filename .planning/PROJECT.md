@@ -20,7 +20,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v15.0 (shipped 2026-03-23)
-**Status:** Starting v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — defining requirements.
+**Status:** Executing v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — Phase 126 complete (Sonos infrastructure: proxy client + types + 4 API routes).
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -777,4 +777,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-23 after v16.0 milestone started*
+*Last updated: 2026-03-23 after Phase 126 (Sonos Infrastructure) complete*

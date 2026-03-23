@@ -51,7 +51,7 @@ See `.planning/milestones/` for full archives.
 #### Phase Summary
 
 - [x] **Phase 118: Registry Infrastructure** - Proxy client, TypeScript types, and API routes for Device Registry (completed 2026-03-22)
-- [ ] **Phase 119: Rooms Infrastructure** - Proxy client, TypeScript types, and API routes for Rooms
+- [x] **Phase 119: Rooms Infrastructure** - Proxy client, TypeScript types, and API routes for Rooms (completed 2026-03-23)
 - [ ] **Phase 120: Device Types UI** - Page to view, create, and delete device types
 - [ ] **Phase 121: Device Registry UI** - Page to view, filter, register, update, and unregister devices
 - [ ] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms
@@ -84,11 +84,11 @@ Plans:
   2. All Room, DeviceAssignment, RoomStatus, HouseStatus, and RoomsHealth TypeScript interfaces are defined and exported
   3. All 11 Rooms endpoint proxy routes exist under /api/ and return typed responses
   4. TypeScript compiles with zero errors for all new files
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 119-01: roomsProxy.ts + TypeScript interfaces
-- [ ] 119-02: Next.js API route proxies for all 11 Rooms endpoints
+- [x] 119-02: Next.js API route proxies for all 11 Rooms endpoints
 
 ### Phase 120: Device Types UI
 **Goal**: Users can view and manage device type definitions (built-in and custom) from a dedicated page
@@ -167,7 +167,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-117 | v1.0–v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118. Registry Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-22 |
-| 119. Rooms Infrastructure | v15.0 | 1/2 | In Progress|  |
+| 119. Rooms Infrastructure | v15.0 | 2/2 | Complete   | 2026-03-23 |
 | 120. Device Types UI | v15.0 | 0/1 | Not started | - |
 | 121. Device Registry UI | v15.0 | 0/2 | Not started | - |
 | 122. Room Management UI | v15.0 | 0/1 | Not started | - |

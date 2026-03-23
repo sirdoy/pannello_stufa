@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 119-01-PLAN.md
-last_updated: "2026-03-23T08:55:08.076Z"
+stopped_at: Completed 119-02-PLAN.md
+last_updated: "2026-03-23T09:03:30.782Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -45,6 +45,7 @@ Plan: 2 of 2
 | Phase 118 P01 | 143 | 2 tasks | 5 files |
 | Phase 118 P02 | 8 | 2 tasks | 6 files |
 | Phase 119 P01 | 2 | 2 tasks | 3 files |
+| Phase 119 P02 | 5 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,7 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 118]: GET /registry/types and GET /registry/health are public (withErrorHandler); all device routes are protected (withAuthAndErrorHandler)
 - [Phase 119-01]: getRoomDevices returns RegistryDevice[] from @/types/registry — API returns full registry rows, no rooms-specific shape needed
 - [Phase 119-01]: DeviceStatus.data typed as union of 6 provider status interfaces | null matching API spec discriminated union exactly
+- [Phase 119]: POST /rooms/{id}/devices uses success() (200) not created() (201) — device assignment is a relational operation, not resource creation
 
 ### Pending Todos
 
@@ -80,5 +82,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Completed 119-01-PLAN.md
+Stopped at: Completed 119-02-PLAN.md
 Resume file: None

@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v15.0 (in progress, shipped through Phase 120)
-**Status:** v15.0 Rooms & Device Registry milestone in progress. Phase 120 complete — Device Types UI page at /registry/types with CRUD management (list, create, delete) using DataTable, FormModal, ConfirmationDialog. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
+**Version:** v15.0 (in progress, shipped through Phase 121)
+**Status:** v15.0 Rooms & Device Registry milestone in progress. Phase 121 complete — Device Registry UI page at /registry/devices with full CRUD (paginated list, provider filter, health stats, register/update/unregister). All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -726,4 +726,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-23 after Phase 120 complete — Device Types UI (CRUD page at /registry/types)*
+*Last updated: 2026-03-23 after Phase 121 complete — Device Registry UI (paginated CRUD page at /registry/devices)*

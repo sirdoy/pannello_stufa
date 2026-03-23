@@ -231,8 +231,11 @@ export default function RoomsPage() {
           </div>
         )}
 
-        {/* Toolbar: create button (per D-08) */}
-        <div className="flex items-center justify-end mb-4">
+        {/* Toolbar: stato + create buttons (per D-08, D-05) */}
+        <div className="flex items-center justify-end gap-2 mb-4">
+          <Button variant="ghost" size="sm" onClick={() => router.push('/rooms/status')}>
+            Stato
+          </Button>
           <Button variant="ember" size="sm" onClick={() => setShowCreate(true)}>
             Crea stanza
           </Button>

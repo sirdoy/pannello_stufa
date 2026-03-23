@@ -620,8 +620,22 @@ describe('RoomsPage', () => {
     });
   });
 
+  // D-05: Stato navigation button
+  it('Test 18 (D-05): navigates to /rooms/status when Stato button is clicked', async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => [],
+    });
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.queryByTestId('skeleton')).not.toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Stato'));
+    expect(mockPush).toHaveBeenCalledWith('/rooms/status');
+  });
+
   // D-31: Dispositivi navigation button
-  it('Test 18 (D-31): "Dispositivi" button navigates to /rooms/{room_id}', async () => {
+  it('Test 19 (D-31): "Dispositivi" button navigates to /rooms/{room_id}', async () => {
     render(<RoomsPage />);
     await waitFor(() => {
       expect(screen.getByText('Soggiorno')).toBeInTheDocument();

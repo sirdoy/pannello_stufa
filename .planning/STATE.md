@@ -4,7 +4,7 @@ milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
 stopped_at: Completed 119-02-PLAN.md
-last_updated: "2026-03-23T09:03:30.782Z"
+last_updated: "2026-03-23T09:06:50.598Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-03-22)
 
 ## Current Position
 
-Phase: 119 (rooms-infrastructure) — EXECUTING
-Plan: 2 of 2
+Phase: 120
+Plan: Not started
 
 ## Performance Metrics
 

@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { z } from 'zod';
+import { Controller } from 'react-hook-form';
 import type { ColumnDef } from '@tanstack/react-table';
-import type { RegistryDevice, RegistryHealthResponse } from '@/types/registry';
+import type { RegistryDevice, RegistryHealthResponse, DeviceCreate, DeviceUpdate, DeviceType } from '@/types/registry';
 import type { PaginatedResponse } from '@/types/common';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import DataTable from '@/app/components/ui/DataTable';
@@ -12,6 +14,9 @@ import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Card from '@/app/components/ui/Card';
 import Select from '@/app/components/ui/Select';
+import Input from '@/app/components/ui/Input';
+import FormModal from '@/app/components/ui/FormModal';
+import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
 import { Text } from '@/app/components/ui';
 import { useToast } from '@/app/hooks/useToast';
 
@@ -22,6 +27,19 @@ const providerOptions = [
   { value: '', label: 'Tutti' },
   ...PROVIDERS.map((p) => ({ value: p, label: p })),
 ];
+
+// --- Zod schemas (per D-16) ---
+const registerSchema = z.object({
+  provider_name: z.string().min(1, 'Provider obbligatorio').max(64),
+  device_id: z.string().min(1, 'ID dispositivo obbligatorio').max(256),
+  custom_name: z.string().min(1, 'Nome obbligatorio').max(128),
+  device_type_slug: z.string().min(1, 'Tipo obbligatorio').max(64),
+});
+
+const updateSchema = z.object({
+  custom_name: z.string().min(1, 'Nome obbligatorio').max(128),
+  device_type_slug: z.string().min(1, 'Tipo obbligatorio').max(64),
+});
 
 // --- Provider badge variant helper (per D-05) ---
 function getProviderBadgeVariant(provider: string): 'ocean' | 'ember' | 'neutral' {
@@ -117,6 +135,20 @@ function useRegistryHealth() {
   return { health, loading, refetch };
 }
 
+// --- useDeviceTypesForSelect hook (per D-32) ---
+function useDeviceTypesForSelect() {
+  const [types, setTypes] = useState<DeviceType[]>([]);
+  const refetch = useCallback(async () => {
+    try {
+      const res = await fetch('/api/registry/types');
+      if (!res.ok) return;
+      setTypes((await res.json()) as DeviceType[]);
+    } catch { /* non-critical */ }
+  }, []);
+  useEffect(() => { void refetch(); }, [refetch]);
+  return { types };
+}
+
 // --- DeviceRegistryPage component ---
 export default function DeviceRegistryPage() {
   const [showRegister, setShowRegister] = useState(false);
@@ -127,19 +159,75 @@ export default function DeviceRegistryPage() {
     totalCount,
     loading,
     error,
+    refetch,
     page,
     setPage,
     provider,
     setProvider,
   } = useRegistryDevices();
-  const { health } = useRegistryHealth();
-  const { error: toastError } = useToast();
+  const { health, refetch: healthRefetch } = useRegistryHealth();
+  const { types: deviceTypes } = useDeviceTypesForSelect();
+  const { success: toastSuccess, error: toastError } = useToast();
 
-  // Suppress unused variable warnings — these will be wired in plan 02
-  void showRegister;
-  void deviceToEdit;
-  void deviceToDelete;
-  void toastError;
+  // --- Mutation handlers ---
+
+  // handleRegister (per D-17, D-18, D-19)
+  const handleRegister = useCallback(async (data: DeviceCreate) => {
+    const res = await fetch('/api/registry/devices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.status === 409) throw new Error('Dispositivo già registrato per questo provider');
+    if (res.status === 422) throw new Error('Tipo dispositivo sconosciuto');
+    if (!res.ok) throw new Error('Errore durante la registrazione');
+    toastSuccess('Dispositivo registrato');
+    await refetch();
+    await healthRefetch();
+  }, [refetch, healthRefetch, toastSuccess]);
+
+  // handleUpdate (per D-23, D-24)
+  const handleUpdate = useCallback(async (data: DeviceUpdate) => {
+    if (!deviceToEdit) return;
+    const res = await fetch(`/api/registry/devices/${deviceToEdit.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (res.status === 404) {
+      toastError('Dispositivo non trovato');
+      setDeviceToEdit(null);
+      await refetch();
+      return;
+    }
+    if (!res.ok) throw new Error('Errore durante la modifica');
+    toastSuccess('Dispositivo aggiornato');
+    await refetch();
+  }, [deviceToEdit, refetch, toastSuccess, toastError]);
+
+  // handleUnregister (per D-27, D-28)
+  const handleUnregister = useCallback(async () => {
+    if (!deviceToDelete) return;
+    const res = await fetch(`/api/registry/devices/${deviceToDelete.id}`, {
+      method: 'DELETE',
+    });
+    if (res.status === 404) {
+      toastError('Dispositivo già rimosso');
+      setDeviceToDelete(null);
+      await refetch();
+      await healthRefetch();
+      return;
+    }
+    if (!res.ok) {
+      toastError('Errore durante la rimozione');
+      setDeviceToDelete(null);
+      return;
+    }
+    toastSuccess('Dispositivo rimosso');
+    setDeviceToDelete(null);
+    await refetch();
+    await healthRefetch();
+  }, [deviceToDelete, refetch, healthRefetch, toastSuccess, toastError]);
 
   // DataTable column definitions (per D-04)
   const columns: ColumnDef<RegistryDevice>[] = [
@@ -284,8 +372,77 @@ export default function DeviceRegistryPage() {
               </div>
             </div>
           )}
+
+          {/* Register FormModal (per D-14, D-15) */}
+          <FormModal
+            isOpen={showRegister}
+            onClose={() => setShowRegister(false)}
+            onSubmit={handleRegister}
+            title="Registra dispositivo"
+            defaultValues={{ provider_name: '', device_id: '', custom_name: '', device_type_slug: '' }}
+            validationSchema={registerSchema}
+            submitLabel="Registra"
+            cancelLabel="Annulla"
+          >
+            {({ control }) => (
+              <>
+                <Controller name="provider_name" control={control} render={({ field, fieldState }) => (
+                  <Select label="Provider" options={PROVIDERS.map(p => ({ value: p, label: p }))} value={field.value} onChange={(e) => field.onChange(String(e.target.value))} />
+                )} />
+                <Controller name="device_id" control={control} render={({ field, fieldState }) => (
+                  <Input label="ID dispositivo" {...field} error={fieldState.error?.message} placeholder="es. 5" />
+                )} />
+                <Controller name="custom_name" control={control} render={({ field, fieldState }) => (
+                  <Input label="Nome" {...field} error={fieldState.error?.message} placeholder="es. Lampada Soggiorno" />
+                )} />
+                <Controller name="device_type_slug" control={control} render={({ field, fieldState }) => (
+                  <Select label="Tipo" options={deviceTypes.map(t => ({ value: t.slug, label: t.label }))} value={field.value} onChange={(e) => field.onChange(String(e.target.value))} />
+                )} />
+              </>
+            )}
+          </FormModal>
+
+          {/* Update FormModal (per D-20, D-21, D-22) */}
+          <FormModal
+            isOpen={deviceToEdit !== null}
+            onClose={() => setDeviceToEdit(null)}
+            onSubmit={handleUpdate}
+            title="Modifica dispositivo"
+            defaultValues={deviceToEdit ? { custom_name: deviceToEdit.custom_name, device_type_slug: deviceToEdit.device_type_slug } : { custom_name: '', device_type_slug: '' }}
+            validationSchema={updateSchema}
+            submitLabel="Salva"
+            cancelLabel="Annulla"
+          >
+            {({ control }) => (
+              <>
+                {/* Read-only context (per D-22) */}
+                <div className="text-sm text-slate-400 mb-2">
+                  <p>Provider: <strong className="text-slate-200">{deviceToEdit?.provider_name}</strong></p>
+                  <p>ID: <strong className="text-slate-200">{deviceToEdit?.device_id}</strong></p>
+                </div>
+                <Controller name="custom_name" control={control} render={({ field, fieldState }) => (
+                  <Input label="Nome" {...field} error={fieldState.error?.message} />
+                )} />
+                <Controller name="device_type_slug" control={control} render={({ field, fieldState }) => (
+                  <Select label="Tipo" options={deviceTypes.map(t => ({ value: t.slug, label: t.label }))} value={field.value} onChange={(e) => field.onChange(String(e.target.value))} />
+                )} />
+              </>
+            )}
+          </FormModal>
         </Card>
       )}
+
+      {/* Unregister ConfirmationDialog (per D-25, D-26) */}
+      <ConfirmationDialog
+        isOpen={deviceToDelete !== null}
+        onClose={() => setDeviceToDelete(null)}
+        onConfirm={handleUnregister}
+        title="Rimuovi dispositivo"
+        description={`Rimuovere "${deviceToDelete?.custom_name}" (${deviceToDelete?.provider_name})?`}
+        confirmLabel="Rimuovi"
+        cancelLabel="Annulla"
+        variant="danger"
+      />
     </SettingsLayout>
   );
 }

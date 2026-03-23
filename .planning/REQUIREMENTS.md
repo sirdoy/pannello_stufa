@@ -11,10 +11,10 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 - [x] **SONOS-01**: Proxy client per Sonos API con haGet/haPost/haPut transport (X-API-Key auth)
 - [x] **SONOS-02**: TypeScript types per tutti i response interfaces Sonos (health, device, zone, playback, volume, EQ, queue, history)
-- [ ] **SONOS-03**: GET /sonos/health — speaker connectivity, data freshness, device count
-- [ ] **SONOS-04**: GET /sonos/devices — lista speaker con identity e topology
-- [ ] **SONOS-05**: GET /sonos/devices/{uid} — dettaglio speaker con audio state on-demand
-- [ ] **SONOS-06**: GET /sonos/zones — zone groups con coordinator e members
+- [x] **SONOS-03**: GET /sonos/health — speaker connectivity, data freshness, device count
+- [x] **SONOS-04**: GET /sonos/devices — lista speaker con identity e topology
+- [x] **SONOS-05**: GET /sonos/devices/{uid} — dettaglio speaker con audio state on-demand
+- [x] **SONOS-06**: GET /sonos/zones — zone groups con coordinator e members
 
 ### Sonos Monitoring & Transport
 
@@ -132,10 +132,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | SONOS-01 | Phase 126 | Complete |
 | SONOS-02 | Phase 126 | Complete |
-| SONOS-03 | Phase 126 | Pending |
-| SONOS-04 | Phase 126 | Pending |
-| SONOS-05 | Phase 126 | Pending |
-| SONOS-06 | Phase 126 | Pending |
+| SONOS-03 | Phase 126 | Complete |
+| SONOS-04 | Phase 126 | Complete |
+| SONOS-05 | Phase 126 | Complete |
+| SONOS-06 | Phase 126 | Complete |
 | SONOS-07 | Phase 127 | Pending |
 | SONOS-08 | Phase 127 | Pending |
 | SONOS-09 | Phase 127 | Pending |

@@ -2,7 +2,7 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, e monitoraggio server Raspberry Pi — tutti i dispositivi collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth). Include sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, e monitoraggio server Raspberry Pi — tutti i dispositivi collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth). Include Device Registry per gestione tipi e dispositivi registrati, sistema Rooms per organizzare dispositivi in stanze con stato aggregato per stanza e panoramica whole-house. Sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v15.0 (complete, shipped through Phase 125)
-**Status:** v15.0 Rooms & Device Registry milestone complete. Phase 125 complete — Navigation menu links added for Registry (/registry/types) and Rooms (/rooms) pages via GLOBAL_SECTIONS with Lucide icons. All v15.0 pages now reachable from the app hamburger menu. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
+**Version:** v15.0 (shipped 2026-03-23)
+**Status:** v15.0 Rooms & Device Registry milestone complete — 8 phases, 13 plans, 25/25 requirements. Device Registry (types + devices CRUD), Rooms (CRUD + device assignment + whole-house status), navigation menu entries. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -537,24 +537,40 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **CLEAN-02**: notificationService disabled block removed — v14.1 (Phase 117)
 - ✓ **CLEAN-03**: healthMonitoring STARTING grace period implemented — v14.1 (Phase 117)
 
-## Current Milestone: v15.0 Rooms & Device Registry
+**v15.0 Rooms & Device Registry (Shipped 2026-03-23):**
 
-**Goal:** Build the Next.js frontend layer for Rooms API and Device Registry API — types, proxy client, API routes, hooks, pages, and components.
+**Device Registry Infrastructure:**
+- ✓ **INFRA-01**: Proxy client per Device Registry API con haGet/haPost transport — v15.0 (Phase 118)
+- ✓ **INFRA-02**: TypeScript types per DeviceType, RegistryDevice, RegistryHealth — v15.0 (Phase 118)
+- ✓ **INFRA-05**: Next.js API routes per Device Registry (8 endpoint proxy) — v15.0 (Phase 118)
 
-**Target features:**
-- Device Registry: type taxonomy CRUD, device registration/management with pagination, health stats
-- Rooms: room CRUD, device-to-room association, per-room and house-wide status aggregation
-- Room-based dashboard view with device status per room
+**Rooms Infrastructure:**
+- ✓ **INFRA-03**: Proxy client per Rooms API con haGet/haPost/haPut/haDelete transport — v15.0 (Phase 119)
+- ✓ **INFRA-04**: TypeScript types per Room, DeviceAssignment, RoomStatus, HouseStatus, RoomsHealth — v15.0 (Phase 119)
+- ✓ **INFRA-06**: Next.js API routes per Rooms (11 endpoint proxy) — v15.0 (Phase 119)
 
-### Active
+**Device Types & Registry UI:**
+- ✓ **DTYPE-01**: View list of all device types (built-in + custom) — v15.0 (Phase 120)
+- ✓ **DTYPE-02**: Create custom device type with slug and label — v15.0 (Phase 120)
+- ✓ **DTYPE-03**: Delete custom device type (built-in protected) — v15.0 (Phase 120)
+- ✓ **DREG-01**: Paginated list of registered devices — v15.0 (Phase 121)
+- ✓ **DREG-02**: Filter device list by provider — v15.0 (Phase 121)
+- ✓ **DREG-03**: Register new device (provider, device_id, name, type) — v15.0 (Phase 121)
+- ✓ **DREG-04**: Update device name and type — v15.0 (Phase 121)
+- ✓ **DREG-05**: Unregister device with confirmation — v15.0 (Phase 121)
+- ✓ **DREG-06**: Registry health stats — v15.0 (Phase 121)
 
-- [x] Device Registry proxy client + types — v15.0 (Phase 118)
-- [x] Device Registry API routes (8 endpoints) — v15.0 (Phase 118)
-- [ ] Device Registry management pages (types + devices)
-- [x] Rooms proxy client + types — v15.0 (Phase 119)
-- [x] Rooms API routes (11 endpoints) — v15.0 (Phase 119)
-- [ ] Rooms management page (CRUD + device association)
-- [x] Room status views (per-room + house status) — v15.0 (Phase 124)
+**Room Management & Status:**
+- ✓ **ROOM-01**: View rooms with device counts — v15.0 (Phase 122)
+- ✓ **ROOM-02**: Create room with name and description — v15.0 (Phase 122)
+- ✓ **ROOM-03**: Edit room name and description — v15.0 (Phase 122)
+- ✓ **ROOM-04**: Delete room with confirmation — v15.0 (Phase 122)
+- ✓ **ROOM-05**: View devices assigned to a room — v15.0 (Phase 123)
+- ✓ **ROOM-06**: Assign device to room (implicit move) — v15.0 (Phase 123)
+- ✓ **ROOM-07**: Remove device from room — v15.0 (Phase 123)
+- ✓ **RSTAT-01**: Aggregated device status per room — v15.0 (Phase 124)
+- ✓ **RSTAT-02**: Whole-house status (all rooms) — v15.0 (Phase 124)
+- ✓ **RSTAT-03**: Rooms health stats — v15.0 (Phase 124)
 
 ### Out of Scope
 
@@ -589,20 +605,21 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Self-hosted Outfit + Space Grotesk fonts via next/font
 - Web Vitals pipeline (useReportWebVitals → sendBeacon → Firebase RTDB → dashboard)
 - Suspense streaming con loading.tsx skeleton shell + per-card boundaries
-- ~103,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
-- 560+ TypeScript source files, 4,000+ tests passing
+- ~108,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- 590+ TypeScript source files, 4,000+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination (stove, thermostat, Raspberry Pi)
 - GDPR-compliant analytics con consent banner
 - Playwright E2E smoke tests for all 9 app pages
 - All device polling unified at 60s via useAdaptivePolling (no Firebase RTDB real-time listener)
-- 20 milestones shipped, 117 phases, 407 plans executed
+- Device Registry + Rooms frontend with typed proxy clients and 19 API route proxies
+- 21 milestones shipped, 125 phases, 420 plans executed
 
-**v14.1 Milestone (2026-03-22):**
-- 5 phases executed (9 plans)
-- 26/26 requirements satisfied (100%)
-- 125 files changed (+6,780 insertions, -982 deletions, net +5,798 LOC)
-- 1 day from start to completion
-- Zero `as any` in production code, zero known issues, 50+ dead exports removed
+**v15.0 Milestone (2026-03-23):**
+- 8 phases executed (13 plans)
+- 25/25 requirements satisfied (100%)
+- 36 code files changed (+5,481 insertions, -64 deletions, net +5,417 LOC)
+- 2 days from start to completion
+- Full CRUD for device types, devices, rooms, device assignment, room status views
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -714,6 +731,14 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | declare global for sw.ts APIs | Badging API and PeriodicSync not in standard TypeScript lib | ✓ Good — Service worker fully typed (v14.1) |
 | De-export pattern for dead code | Remove `export` keyword but keep function if internally used | ✓ Good — Smaller public API without breaking internals (v14.1) |
 | STARTING grace period in healthMonitoring | Firebase RTDB tracks stove_starting_since timestamp, 5-min grace | ✓ Good — No false alerts during normal startup (v14.1) |
+| haDelete transport for Rooms API | DELETE method added to haClient.ts, 204 returns void | ✓ Good — Clean resource deletion without JSON parse (v15.0) |
+| PaginatedResponse<T> in types/common.ts | Shared by registry, rooms, automations — not scoped to one module | ✓ Good — Reusable pagination type (v15.0) |
+| Public GET vs protected mutations | GET /registry/types and /registry/health public; device CRUD protected | ✓ Good — Read-only data accessible, mutations auth-gated (v15.0) |
+| FormModal render-prop with Control<T> | Typed render-prop for react-hook-form Controller in modals | ✓ Good — noImplicitAny satisfied, reusable pattern (v15.0) |
+| Italian locale sort (localeCompare 'it') | All list pages sort with it-IT locale | ✓ Good — Consistent Italian ordering (v15.0) |
+| Inline hooks for select dropdowns | useDeviceTypesForSelect, useRegistryDevicesForSelect as inline hooks | ✓ Good — Non-critical, errors silently ignored (v15.0) |
+| Manual refresh only for status page | No polling — Aggiorna button triggers refetch (D-20 spec) | ✓ Good — No unnecessary API load for status views (v15.0) |
+| Gap closure phase for navigation | Audit caught missing nav menu entry for v15.0 pages | ✓ Good — All pages reachable from hamburger menu (v15.0) |
 | Scene CRUD deferred | Proxy endpoints marked "planned" but not yet available | — Pending — Revisit when proxy team implements |
 
 ## Constraints
@@ -726,4 +751,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-23 after Phase 124 complete — Room Status Views (whole-house overview, per-room cards, provider-specific data, health stats)*
+*Last updated: 2026-03-23 after v15.0 milestone*

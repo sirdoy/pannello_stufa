@@ -282,6 +282,52 @@
 
 ---
 
+## Milestone: v15.0 — Rooms & Device Registry
+
+**Shipped:** 2026-03-23
+**Phases:** 8 | **Plans:** 13
+
+### What Was Built
+- Device Registry typed proxy client (registryProxy.ts) + 8 API route proxies with public GET / protected mutation auth tiers
+- Rooms typed proxy client (roomsProxy.ts) + 11 API route proxies with haDelete transport for resource deletion
+- Device Types CRUD page (/registry/types) with Zod validation, built-in protection, Italian locale sorting
+- Device Registry page (/registry/devices) with paginated list, provider filter, register/update/unregister, health stats
+- Room Management page (/rooms) with create/edit/delete, device assignment/removal workflows
+- Whole-house status page (/rooms/status) with per-room cards, provider-specific live metrics, manual refresh
+- Navigation menu links (Registro + Stanze) wired into GLOBAL_SECTIONS
+
+### What Worked
+- Established patterns made proxy clients fast — registryProxy and roomsProxy followed exact same function module pattern as previous providers
+- haDelete transport was a clean single-method addition to haClient.ts — no refactoring needed
+- FormModal + ConfirmationDialog + DataTable reuse across all CRUD pages — same component pattern worked for types, devices, rooms
+- Milestone audit caught missing nav menu entry — gap closure Phase 125 fixed it in 1 plan
+- Italian locale sorting (localeCompare 'it') applied consistently across all list pages from the start
+
+### What Was Inefficient
+- SUMMARY one_liner field still inconsistently populated — 7th consecutive milestone with this issue
+- Nyquist validation 0/8 phases compliant — all have VALIDATION.md but in draft status
+- Some inline hooks (useDeviceTypesForSelect, useRegistryDevicesForSelect) duplicate fetching logic — could be shared
+- Phase 124 renders null for unavailable device data — could show a more informative placeholder
+
+### Patterns Established
+- haDelete as 4th transport method (haGet/haPost/haPut/haDelete) — complete REST verb coverage
+- PaginatedResponse<T> in types/common.ts — shared pagination type reusable across all paginated APIs
+- FormModal render-prop with Control<T> for typed react-hook-form integration
+- Badge variant convention: ocean = built-in, neutral = custom for taxonomy items
+- Manual refresh (no polling) for status pages — Aggiorna button triggers refetch only
+
+### Key Lessons
+1. **UI CRUD pages follow a repeatable template** — DataTable + FormModal + ConfirmationDialog + custom hook is the standard pattern for entity management
+2. **Gap closure is converging to 1 phase** — v10.0 needed 4, v13.0 needed 2, v14.0 needed 3, v15.0 needed 1. Execution quality is improving.
+3. **Proxy client is now a 15-minute task** — function module pattern so well-established that client creation is near-mechanical
+4. **Navigation is easy to forget** — pages existed but weren't reachable from the menu. Audit is essential for catching UX completeness gaps.
+
+### Cost Observations
+- Model mix: balanced profile (sonnet executors, sonnet verifiers)
+- Notable: 8 phases in 2 days — first greenfield UI milestone (not migration), same pace as previous milestones
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -296,6 +342,7 @@
 | v13.0 | 7 | 11 | Thermorossi proxy migration — unified all 4 providers |
 | v14.0 | 7 | 12 | Hue proxy migration — unified all 5 providers, no direct APIs remain |
 | v14.1 | 5 | 9 | Type safety + dead code cleanup — zero `as any` in production code |
+| v15.0 | 8 | 13 | Rooms & Device Registry — first greenfield UI milestone |
 
 ### Cumulative Quality
 
@@ -309,6 +356,7 @@
 | v13.0 | 4,000+ | 26/26 requirements | +5,130 |
 | v14.0 | 4,000+ | 27/27 requirements | +5,258 |
 | v14.1 | 4,000+ | 26/26 requirements | +5,798 |
+| v15.0 | 4,000+ | 25/25 requirements | +5,417 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -321,3 +369,5 @@
 7. **Proxy migration speed improves with pattern maturity** — v10.0 (9 phases) → v13.0 (5+2 phases) → v14.0 (4+3 phases), all completing in 2 days (verified v10.0-v14.0)
 8. **SUMMARY frontmatter quality is a persistent tooling gap** — one_liner and requirements-completed consistently empty across v11.0-v14.0, needs executor-level fix
 9. **Full pages and debug panels are migration blind spots** — hooks/routes get migrated first, but full pages and debug tools use legacy patterns that audit must catch (verified v14.0)
+10. **UI CRUD pages are a repeatable template** — DataTable + FormModal + ConfirmationDialog + custom hook is the standard entity management pattern (verified v15.0)
+11. **Gap closure is converging** — from 4 phases (v10.0) to 1 phase (v15.0), showing improving execution quality over time

@@ -1,5 +1,37 @@
 # Project Milestones: Pannello Stufa
 
+## v15.0 Rooms & Device Registry (Shipped: 2026-03-23)
+
+**Delivered:** Complete frontend layer for Device Registry and Rooms APIs — typed proxy clients, 19 API route proxies, full CRUD pages for device types/devices/rooms, device-to-room assignment, and whole-house status aggregation with provider-specific live metrics.
+
+**Phases completed:** 118-125 (8 phases, 13 plans)
+
+**Key accomplishments:**
+
+- Device Registry and Rooms typed proxy clients with haGet/haPost/haPut/haDelete transport (19 API route proxies total)
+- Device Types CRUD page at /registry/types with Zod validation, built-in type protection, Italian locale sorting
+- Device Registry page with paginated list, provider filtering, register/update/unregister actions, health stats
+- Room management page with create/edit/delete and device assignment/removal workflows
+- Whole-house status page at /rooms/status with per-room cards showing provider-specific live device metrics
+- Navigation menu wiring (Registro + Stanze sections) for all v15.0 pages via GLOBAL_SECTIONS
+
+**Stats:**
+
+- 13 plans executed across 8 phases
+- 25/25 v15.0 requirements satisfied (100%)
+- 36 code files changed (+5,481 insertions, -64 deletions, net +5,417 LOC)
+- 2 days (2026-03-22 → 2026-03-23)
+
+**Git range:** `feat(118-01)` (6900ee92) → `fix(registry)` (3ab2b5e0)
+
+**Archives:**
+
+- [Roadmap](milestones/v15.0-ROADMAP.md)
+- [Requirements](milestones/v15.0-REQUIREMENTS.md)
+- [Milestone Audit](milestones/v15.0-MILESTONE-AUDIT.md)
+
+---
+
 ## v14.1 Tech Debt & Type Safety (Shipped: 2026-03-22)
 
 **Delivered:** Resolved all 6 known issues from v14.0 audit, eliminated every `as any` cast across lib/, app/ components, API routes and pages, removed 50+ unused exports, and resolved 2 outstanding service TODOs — leaving zero known issues, zero unsafe casts in production code, and a smaller export surface area.

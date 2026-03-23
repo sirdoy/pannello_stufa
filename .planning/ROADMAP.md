@@ -22,9 +22,23 @@
 - ✅ **v13.0 Thermorossi Proxy Migration** — Phases 99-105 (shipped 2026-03-20)
 - ✅ **v14.0 Hue Proxy Migration** — Phases 106-112 (shipped 2026-03-22)
 - ✅ **v14.1 Tech Debt & Type Safety** — Phases 113-117 (shipped 2026-03-22)
-- 🚧 **v15.0 Rooms & Device Registry** — Phases 118-124 (in progress)
+- ✅ **v15.0 Rooms & Device Registry** — Phases 118-125 (shipped 2026-03-23)
 
 ## Phases
+
+<details>
+<summary>✅ v15.0 Rooms & Device Registry (Phases 118-125) — SHIPPED 2026-03-23</summary>
+
+- [x] Phase 118: Registry Infrastructure (2/2 plans) — completed 2026-03-22
+- [x] Phase 119: Rooms Infrastructure (2/2 plans) — completed 2026-03-23
+- [x] Phase 120: Device Types UI (1/1 plan) — completed 2026-03-23
+- [x] Phase 121: Device Registry UI (2/2 plans) — completed 2026-03-23
+- [x] Phase 122: Room Management UI (2/2 plans) — completed 2026-03-23
+- [x] Phase 123: Room Device Assignment (2/2 plans) — completed 2026-03-23
+- [x] Phase 124: Room Status Views (1/1 plan) — completed 2026-03-23
+- [x] Phase 125: Navigation Menu Links (1/1 plan) — completed 2026-03-23
+
+</details>
 
 <details>
 <summary>✅ v14.1 Tech Debt & Type Safety (Phases 113-117) — SHIPPED 2026-03-22</summary>
@@ -44,156 +58,15 @@ See `.planning/milestones/` for full archives.
 
 </details>
 
-### 🚧 v15.0 Rooms & Device Registry (In Progress)
-
-**Milestone Goal:** Users can manage a persistent device registry (types and registered devices per provider) and organize devices into rooms, with aggregated status views per room and whole-house.
-
-#### Phase Summary
-
-- [x] **Phase 118: Registry Infrastructure** - Proxy client, TypeScript types, and API routes for Device Registry (completed 2026-03-22)
-- [x] **Phase 119: Rooms Infrastructure** - Proxy client, TypeScript types, and API routes for Rooms (completed 2026-03-23)
-- [x] **Phase 120: Device Types UI** - Page to view, create, and delete device types (completed 2026-03-23)
-- [x] **Phase 121: Device Registry UI** - Page to view, filter, register, update, and unregister devices (completed 2026-03-23)
-- [x] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms (completed 2026-03-23)
-- [x] **Phase 123: Room Device Assignment** - UI to view, assign, and remove devices within rooms (completed 2026-03-23)
-- [x] **Phase 124: Room Status Views** - Per-room status, whole-house status, and health stats (completed 2026-03-23)
-- [x] **Phase 125: Navigation Menu Links** - Add Registry and Rooms sections to app navigation menu (gap closure) (completed 2026-03-23)
-
-## Phase Details
-
-### Phase 118: Registry Infrastructure
-**Goal**: The Device Registry backend is fully accessible from Next.js via typed proxy functions and API routes
-**Depends on**: Phase 117 (shared haGet/haPost transport already in lib/api/haClient.ts)
-**Requirements**: INFRA-01, INFRA-02, INFRA-05
-**Success Criteria** (what must be TRUE):
-  1. A typed proxy module exists for the Device Registry API using haGet/haPost transport with X-API-Key auth
-  2. All DeviceType, RegistryDevice, and RegistryHealth TypeScript interfaces are defined and exported
-  3. All 8 Device Registry endpoint proxy routes exist under /api/ and return typed responses
-  4. TypeScript compiles with zero errors for all new files
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 118-01: registryProxy.ts + TypeScript interfaces
-- [x] 118-02: Next.js API route proxies for all 8 Device Registry endpoints
-
-### Phase 119: Rooms Infrastructure
-**Goal**: The Rooms backend is fully accessible from Next.js via typed proxy functions and API routes
-**Depends on**: Phase 118 (established Registry infra pattern to follow)
-**Requirements**: INFRA-03, INFRA-04, INFRA-06
-**Success Criteria** (what must be TRUE):
-  1. A typed proxy module exists for the Rooms API using haGet/haPost/haPut/haDelete transport
-  2. All Room, DeviceAssignment, RoomStatus, HouseStatus, and RoomsHealth TypeScript interfaces are defined and exported
-  3. All 11 Rooms endpoint proxy routes exist under /api/ and return typed responses
-  4. TypeScript compiles with zero errors for all new files
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 119-01: roomsProxy.ts + TypeScript interfaces
-- [x] 119-02: Next.js API route proxies for all 11 Rooms endpoints
-
-### Phase 120: Device Types UI
-**Goal**: Users can view and manage device type definitions (built-in and custom) from a dedicated page
-**Depends on**: Phase 118 (Registry API routes required)
-**Requirements**: DTYPE-01, DTYPE-02, DTYPE-03
-**Success Criteria** (what must be TRUE):
-  1. User can navigate to a Device Types page and see all built-in and custom types listed
-  2. User can fill a form and submit to create a new custom device type with slug and label
-  3. User can delete a custom device type after a confirmation dialog; built-in types show no delete option
-  4. Creating or deleting a type refreshes the list without a full page reload
-**Plans:** 1/1 plans complete
-
-Plans:
-- [x] 120-01-PLAN.md — Device Types page with useDeviceTypes hook, DataTable list, FormModal create, ConfirmationDialog delete + unit tests
-
-### Phase 121: Device Registry UI
-**Goal**: Users can see all registered devices and perform full CRUD operations from a dedicated page
-**Depends on**: Phase 120 (device type list needed for register/update forms)
-**Requirements**: DREG-01, DREG-02, DREG-03, DREG-04, DREG-05, DREG-06
-**Success Criteria** (what must be TRUE):
-  1. User can see a paginated table of all registered devices with provider, name, type, and device_id columns
-  2. User can filter the device list by provider and see only matching devices
-  3. User can open a register form, fill provider/device_id/name/type, and submit to add a new device
-  4. User can edit a device's name and type inline or via modal, and see the updated values reflected
-  5. User can unregister a device after a confirmation dialog, and the device disappears from the list
-  6. Registry health stats (type count, device count) are visible on the page
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 121-01: useRegistryDevices hook + Device Registry page (list, filter, health stats)
-- [x] 121-02: Register, update, and unregister device actions (forms + confirmation)
-
-### Phase 122: Room Management UI
-**Goal**: Users can create, rename, and delete rooms from a dedicated rooms management page
-**Depends on**: Phase 119 (Rooms API routes required)
-**Requirements**: ROOM-01, ROOM-02, ROOM-03, ROOM-04
-**Success Criteria** (what must be TRUE):
-  1. User can navigate to a Rooms page and see all rooms listed with their device counts
-  2. User can create a new room by entering a name and optional description, and it appears in the list
-  3. User can edit a room's name and description via an inline form or modal, and see updated values
-  4. User can delete a room after a confirmation dialog; the room disappears from the list
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 122-01-PLAN.md — useRooms + useRoomsHealth hooks, DataTable listing, loading/error/empty states, health stats
-- [x] 122-02-PLAN.md — Create, edit, delete room actions with FormModal, ConfirmationDialog, Zod validation
-
-### Phase 123: Room Device Assignment
-**Goal**: Users can view devices within a room and assign or remove devices to organize their smart home
-**Depends on**: Phase 122 (rooms must exist) and Phase 121 (registered devices must exist)
-**Requirements**: ROOM-05, ROOM-06, ROOM-07
-**Success Criteria** (what must be TRUE):
-  1. User can open a room and see all devices currently assigned to it
-  2. User can assign a device (from the registered device list) to a room via a select or modal; if the device was in another room, it moves automatically
-  3. User can remove a device from a room, and it no longer appears in that room's device list
-**Plans:** 2/2 plans complete
-
-Plans:
-- [x] 123-01-PLAN.md — Room detail page with useRoom + useRoomDevices hooks, DataTable, loading/error/empty states + "Dispositivi" button on rooms list
-- [x] 123-02-PLAN.md — Assign device (FormModal + Select) and remove device (ConfirmationDialog) actions
-
-### Phase 124: Room Status Views
-**Goal**: Users can see aggregated live device status per room and a whole-house overview from a single view
-**Depends on**: Phase 123 (rooms must have devices assigned to show meaningful status)
-**Requirements**: RSTAT-01, RSTAT-02, RSTAT-03
-**Success Criteria** (what must be TRUE):
-  1. User can select a room and see aggregated status for all devices in that room (online/offline, last-seen)
-  2. User can see a whole-house view showing all rooms with their device statuses in one page
-  3. Rooms health stats (room count, device count, orphan count) are visible on the status page
-**Plans:** 1/1 plans complete
-
-Plans:
-- [x] 124-01-PLAN.md — Room status page with useHouseStatus + useRoomsHealth hooks, whole-house stats, per-room cards, provider-specific data rendering, Stato nav button
-
-### Phase 125: Navigation Menu Links
-**Goal**: Le sezioni Registry e Rooms sono raggiungibili dal menu di navigazione dell'app
-**Depends on**: Phase 124 (all v15.0 pages must exist)
-**Requirements**: — (gap closure: tech debt from audit)
-**Gap Closure:** Closes tech debt from v15.0 audit — no navbar entry point for v15.0 pages
-**Success Criteria** (what must be TRUE):
-  1. User can reach /registry/types and /registry/devices from the app navigation menu
-  2. User can reach /rooms and /rooms/status from the app navigation menu
-  3. Navigation items follow existing menu structure and Ember Noir design
-**Plans:** 1/1 plans complete
-
-Plans:
-- [x] 125-01-PLAN.md — Add Registro and Stanze sections to GLOBAL_SECTIONS in deviceTypes.ts + navbar rendering
-
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
-| 118. Registry Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-22 |
-| 119. Rooms Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
-| 121. Device Registry UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 122. Room Management UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 123. Room Device Assignment | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 124. Room Status Views | v15.0 | 1/1 | Complete    | 2026-03-23 |
-| 125. Navigation Menu Links | v15.0 | 1/1 | Complete    | 2026-03-23 |
+| 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
 
-**Total:** 20 milestones shipped + 1 in progress, 118 phases (117 complete + 1 pending), 407 plans executed.
+**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed.
 
 ---
 
-*Roadmap updated: 2026-03-23 — Phase 125 added (gap closure from audit)*
+*Roadmap updated: 2026-03-23 — v15.0 milestone archived*

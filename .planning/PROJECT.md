@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v15.0 (complete, shipped through Phase 124)
-**Status:** v15.0 Rooms & Device Registry milestone complete. Phase 124 complete — Room Status Views at /rooms/status with whole-house overview (total/available/unavailable devices), per-room cards with provider-specific data rendering (6 device types), health stats (room/device/orphan counts), manual refresh. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
+**Version:** v15.0 (complete, shipped through Phase 125)
+**Status:** v15.0 Rooms & Device Registry milestone complete. Phase 125 complete — Navigation menu links added for Registry (/registry/types) and Rooms (/rooms) pages via GLOBAL_SECTIONS with Lucide icons. All v15.0 pages now reachable from the app hamburger menu. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

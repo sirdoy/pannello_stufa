@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 121-02-PLAN.md
-last_updated: "2026-03-23T14:45:03.258Z"
+stopped_at: Completed 122-01-PLAN.md
+last_updated: "2026-03-23T15:28:44.705Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 121 — Device Registry UI
+**Current focus:** Phase 122 — room-management-ui
 
 ## Current Position
 
-Phase: 122
-Plan: Not started
+Phase: 122 (room-management-ui) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -49,6 +49,7 @@ Plan: Not started
 | Phase 120-device-types-ui P01 | 15 | 2 tasks | 2 files |
 | Phase 121 P01 | 12 | 2 tasks | 2 files |
 | Phase 121 P02 | 17 | 2 tasks | 2 files |
+| Phase 122 P01 | 192 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 121-01]: Health stats rendered inline in Card header (per D-11), not as separate Card component
 - [Phase 121]: FormModal mock catches onSubmit errors silently to simulate real FormModal behavior — throw-to-keep-modal-open pattern verified in tests
 - [Phase 121]: useDeviceTypesForSelect added as inline hook for type dropdown — non-critical (errors silently ignored)
+- [Phase 122]: useRooms sorts rooms by Italian locale (localeCompare 'it') with no pagination per D-05/D-06
+- [Phase 122]: useRoomsHealth errors silently — health display is non-critical
 
 ### Pending Todos
 
@@ -91,5 +94,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Completed 121-02-PLAN.md
+Stopped at: Completed 122-01-PLAN.md
 Resume file: None

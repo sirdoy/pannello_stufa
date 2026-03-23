@@ -130,10 +130,10 @@ Plans:
   2. User can create a new room by entering a name and optional description, and it appears in the list
   3. User can edit a room's name and description via an inline form or modal, and see updated values
   4. User can delete a room after a confirmation dialog; the room disappears from the list
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 122-01-PLAN.md — useRooms + useRoomsHealth hooks, DataTable listing, loading/error/empty states, health stats
+- [x] 122-01-PLAN.md — useRooms + useRoomsHealth hooks, DataTable listing, loading/error/empty states, health stats
 - [ ] 122-02-PLAN.md — Create, edit, delete room actions with FormModal, ConfirmationDialog, Zod validation
 
 ### Phase 123: Room Device Assignment
@@ -171,7 +171,7 @@ Plans:
 | 119. Rooms Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
 | 121. Device Registry UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 122. Room Management UI | v15.0 | 0/2 | Not started | - |
+| 122. Room Management UI | v15.0 | 1/2 | In Progress|  |
 | 123. Room Device Assignment | v15.0 | 0/1 | Not started | - |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |
 

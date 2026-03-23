@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { withErrorHandler, withAuthAndErrorHandler, success } from '@/lib/core';
 import { roomsProxy } from '@/lib/rooms';
 
@@ -6,12 +7,13 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/rooms/[room_id]/devices
  * Returns devices assigned to a room. Public — no auth required.
+ * Returns raw array — success() would spread array into object.
  */
 export const GET = withErrorHandler(async (_request, context) => {
   const params = await context.params;
   const room_id = params['room_id'] ?? '';
   const data = await roomsProxy.getRoomDevices(Number(room_id));
-  return success(data as unknown as Record<string, unknown>);
+  return NextResponse.json(data);
 }, 'Rooms/Devices');
 
 /**

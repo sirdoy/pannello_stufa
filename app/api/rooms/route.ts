@@ -1,4 +1,5 @@
-import { withErrorHandler, withAuthAndErrorHandler, success, created } from '@/lib/core';
+import { NextResponse } from 'next/server';
+import { withErrorHandler, withAuthAndErrorHandler, created } from '@/lib/core';
 import { roomsProxy } from '@/lib/rooms';
 import type { RoomCreate } from '@/types/rooms';
 
@@ -7,10 +8,11 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/rooms
  * Returns all rooms. Public — no auth required.
+ * Returns raw array — success() would spread array into object.
  */
 export const GET = withErrorHandler(async () => {
   const data = await roomsProxy.getRooms();
-  return success(data as unknown as Record<string, unknown>);
+  return NextResponse.json(data);
 }, 'Rooms');
 
 /**

@@ -167,6 +167,13 @@ export default function Navbar() {
 
   const isActive = (path: string) => pathname === path;
 
+  // Prefix-based active check for global sections (Registro, Stanze, etc.)
+  // Derives prefix from first path segment: /registry/types → /registry
+  const isGlobalActive = (route: string) => {
+    const prefix = '/' + route.split('/')[1];
+    return pathname === prefix || pathname.startsWith(prefix + '/');
+  };
+
   // Icon mapping for quick navigation
   const getIconForPath = (path: string) => {
     if (path === '/') return <Home className="w-5 h-5" />;
@@ -315,7 +322,7 @@ export default function Navbar() {
                   href={item.route}
                   className={`
                     ${navItemBase}
-                    ${isActive(item.route) ? navItemActive : navItemInactive}
+                    ${isGlobalActive(item.route) ? navItemActive : navItemInactive}
                   `.trim().replace(/\s+/g, ' ')}
                 >
                   {getIconForPath(item.route)}
@@ -326,7 +333,7 @@ export default function Navbar() {
                     h-0.5 rounded-full
                     bg-gradient-to-r from-ember-500 to-flame-500
                     transition-all duration-300
-                    ${isActive(item.route) ? 'w-3/4 opacity-100' : 'w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-50'}
+                    ${isGlobalActive(item.route) ? 'w-3/4 opacity-100' : 'w-0 opacity-0 group-hover:w-1/2 group-hover:opacity-50'}
                   `} />
                 </Link>
               ))}
@@ -555,16 +562,40 @@ export default function Navbar() {
                   title=""
                   hasBorder={true}
                 >
-                  {navStructure.global.map((item, idx) => (
-                    <MenuItem
-                      key={item.route}
-                      href={item.route}
-                      icon={getIconForPath(item.route)}
-                      label={item.label}
-                      isActive={isActive(item.route)}
-                      animationDelay={idx * 50}
-                    />
-                  ))}
+                  {navStructure.global.map((item, idx) => {
+                    // Render sub-items if present
+                    if (item.items && item.items.length > 0) {
+                      return (
+                        <div key={item.route} className="space-y-1">
+                          <div className="px-3 py-2 text-sm font-semibold text-slate-400 [html:not(.dark)_&]:text-slate-600 flex items-center gap-2">
+                            <span className="text-base">{item.icon}</span>
+                            <span>{item.label}</span>
+                          </div>
+                          {item.items.map((subitem, subIdx) => (
+                            <MenuItem
+                              key={subitem.route}
+                              href={subitem.route}
+                              icon={getIconForPath(subitem.route)}
+                              label={subitem.label}
+                              isActive={isActive(subitem.route)}
+                              animationDelay={(idx + subIdx) * 50}
+                              className="ml-4"
+                            />
+                          ))}
+                        </div>
+                      );
+                    }
+                    return (
+                      <MenuItem
+                        key={item.route}
+                        href={item.route}
+                        icon={getIconForPath(item.route)}
+                        label={item.label}
+                        isActive={isGlobalActive(item.route)}
+                        animationDelay={idx * 50}
+                      />
+                    );
+                  })}
                 </MenuSection>
               )}
 

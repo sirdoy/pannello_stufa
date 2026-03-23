@@ -1,9 +1,8 @@
 /**
  * Tests for /registry/types page
  *
- * Validates DTYPE-01 (list, loading, error, badges),
- * DTYPE-02 (create modal, POST call), DTYPE-03 (no delete on built-in,
- * confirm dialog, DELETE call).
+ * Validates: list rendering, create modal, edit modal, delete confirmation.
+ * All types are treated equally (no built-in/custom distinction).
  */
 
 import React from 'react';
@@ -12,9 +11,8 @@ import DeviceTypesPage from '../page';
 import type { DeviceType } from '@/types/registry';
 
 // Mock next/navigation
-const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockPush, back: jest.fn() }),
+  useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
 }));
 
 // Mock SettingsLayout
@@ -28,7 +26,7 @@ jest.mock('@/app/components/SettingsLayout', () => ({
   ),
 }));
 
-// Mock DataTable — renders data items mapping label and slug
+// Mock DataTable — renders data items via column definitions
 jest.mock('@/app/components/ui/DataTable', () => ({
   __esModule: true,
   default: ({ data, columns }: { data: DeviceType[]; columns: any[] }) => (
@@ -37,8 +35,7 @@ jest.mock('@/app/components/ui/DataTable', () => ({
         <div key={item.slug} data-testid={`row-${item.slug}`}>
           {columns.map((col: any) => {
             if (col.id === 'actions') {
-              const cellContent = col.cell?.({ row: { original: item } });
-              return <div key="actions">{cellContent}</div>;
+              return <div key="actions">{col.cell?.({ row: { original: item } })}</div>;
             }
             if (col.cell) {
               return <div key={col.accessorKey}>{col.cell({ row: { original: item } })}</div>;
@@ -55,115 +52,77 @@ jest.mock('@/app/components/ui/DataTable', () => ({
   ),
 }));
 
-// Mock FormModal — renders a submit button when isOpen=true, bypasses render-prop children
+// Mock FormModal — captures title and renders submit button
+let lastFormModalProps: any = null;
 jest.mock('@/app/components/ui/FormModal', () => ({
   __esModule: true,
-  default: ({
-    isOpen,
-    onSubmit,
-    title,
-  }: {
-    isOpen: boolean;
-    onSubmit: (data: any) => Promise<void>;
-    children?: any;
-    title?: string;
-  }) => {
-    if (!isOpen) return null;
+  default: (props: any) => {
+    lastFormModalProps = props;
+    if (!props.isOpen) return null;
     const handleSubmit = () => {
-      void onSubmit({ slug: 'new_type', label: 'New Type' });
+      if (props.title === 'Crea tipo dispositivo') {
+        void props.onSubmit({ slug: 'new_type', label: 'New Type' });
+      } else if (props.title === 'Modifica tipo') {
+        void props.onSubmit({ label: 'Updated Label' });
+      }
     };
     return (
       <div data-testid="form-modal">
-        <span>{title}</span>
-        <button data-testid="modal-submit" onClick={handleSubmit}>
-          Submit
-        </button>
+        <span>{props.title}</span>
+        <button data-testid="modal-submit" onClick={handleSubmit}>Submit</button>
       </div>
     );
   },
 }));
 
-// Mock ConfirmationDialog — renders description when isOpen=true, expose onConfirm via button
+// Mock ConfirmationDialog
 jest.mock('@/app/components/ui/ConfirmationDialog', () => ({
   __esModule: true,
-  default: ({
-    isOpen,
-    onConfirm,
-    description,
-    title,
-  }: {
-    isOpen: boolean;
-    onConfirm?: () => void | Promise<void>;
-    description?: string;
-    title?: string;
-  }) => {
+  default: ({ isOpen, onConfirm, description, title }: any) => {
     if (!isOpen) return null;
     return (
       <div data-testid="confirmation-dialog">
         <span>{title}</span>
         <span>{description}</span>
-        <button data-testid="confirm-button" onClick={() => onConfirm?.()}>
-          Confirm
-        </button>
+        <button data-testid="confirm-button" onClick={() => onConfirm?.()}>Confirm</button>
       </div>
     );
   },
 }));
 
-// Mock Badge
-jest.mock('@/app/components/ui/Badge', () => ({
-  __esModule: true,
-  default: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
-}));
-
-// Mock Banner
 jest.mock('@/app/components/ui/Banner', () => ({
   __esModule: true,
-  default: ({ children }: { children?: React.ReactNode }) => (
-    <div data-testid="banner">{children}</div>
-  ),
+  default: ({ children }: { children?: React.ReactNode }) => <div data-testid="banner">{children}</div>,
 }));
 
-// Mock Skeleton
 jest.mock('@/app/components/ui/Skeleton', () => ({
   __esModule: true,
-  default: ({ className }: { className?: string }) => (
-    <div data-testid="skeleton" className={className} />
+  default: ({ className }: { className?: string }) => <div data-testid="skeleton" className={className} />,
+}));
+
+jest.mock('@/app/components/ui/Button', () => ({
+  __esModule: true,
+  default: ({ children, onClick }: { children?: React.ReactNode; onClick?: () => void }) => (
+    <button onClick={onClick}>{children}</button>
   ),
 }));
 
-// Mock Button
-jest.mock('@/app/components/ui/Button', () => ({
-  __esModule: true,
-  default: ({
-    children,
-    onClick,
-  }: {
-    children?: React.ReactNode;
-    onClick?: () => void;
-  }) => <button onClick={onClick}>{children}</button>,
-}));
-
-// Mock Card
 jest.mock('@/app/components/ui/Card', () => ({
   __esModule: true,
   default: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
 }));
 
-// Mock ui barrel exports (Heading and Text)
 jest.mock('@/app/components/ui', () => ({
   Heading: ({ children }: { children?: React.ReactNode }) => <h2>{children}</h2>,
   Text: ({ children }: { children?: React.ReactNode }) => <p>{children}</p>,
 }));
 
-// Mock useToast
 const mockToastSuccess = jest.fn();
 const mockToastError = jest.fn();
 jest.mock('@/app/hooks/useToast', () => ({
   useToast: () => ({ success: mockToastSuccess, error: mockToastError }),
 }));
 
-// Mock Input
 jest.mock('@/app/components/ui/Input', () => ({
   __esModule: true,
   default: (props: any) => <input {...props} />,
@@ -175,7 +134,6 @@ const mockTypes: DeviceType[] = [
   { slug: 'custom_sensor', label: 'Sensore custom', is_builtin: false, created_at: 1700100000 },
 ];
 
-// Helper: mock a successful fetch returning types
 function mockFetchSuccess(data: DeviceType[] = mockTypes) {
   global.fetch = jest.fn().mockResolvedValue({
     ok: true,
@@ -190,8 +148,8 @@ describe('/registry/types page', () => {
     mockFetchSuccess();
   });
 
-  // DTYPE-01: List rendering
-  it('Test 1 (DTYPE-01): renders DataTable with type data when fetch resolves', async () => {
+  // List rendering
+  it('renders DataTable with type data', async () => {
     render(<DeviceTypesPage />);
     await waitFor(() => {
       expect(screen.getByText('Luce')).toBeInTheDocument();
@@ -199,20 +157,17 @@ describe('/registry/types page', () => {
     });
   });
 
-  it('Test 2 (DTYPE-01): renders Skeleton placeholder while loading', async () => {
-    // Delay fetch to keep loading state visible
+  it('renders Skeleton while loading', async () => {
     global.fetch = jest.fn().mockImplementation(
       () => new Promise(resolve => setTimeout(() => resolve({
-        ok: true,
-        status: 200,
-        json: async () => mockTypes,
+        ok: true, status: 200, json: async () => mockTypes,
       } as Response), 200))
     );
     render(<DeviceTypesPage />);
     expect(screen.getByTestId('skeleton')).toBeInTheDocument();
   });
 
-  it('Test 3 (DTYPE-01): renders Banner with error message when fetch rejects', async () => {
+  it('renders Banner on fetch error', async () => {
     global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
     render(<DeviceTypesPage />);
     await waitFor(() => {
@@ -220,119 +175,115 @@ describe('/registry/types page', () => {
     });
   });
 
-  it('Test 4 (DTYPE-01): built-in types show "Built-in" badge text, custom types show "Custom"', async () => {
-    render(<DeviceTypesPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Built-in')).toBeInTheDocument();
-      expect(screen.getByText('Custom')).toBeInTheDocument();
-    });
-  });
-
-  // DTYPE-02: Create flow
-  it('Test 5 (DTYPE-02): clicking "Crea tipo" button opens FormModal (isOpen becomes true)', async () => {
+  // Built-in types have no actions, custom types have Modifica + Elimina
+  it('renders Modifica and Elimina only for custom types (not built-in)', async () => {
     render(<DeviceTypesPage />);
     await waitFor(() => {
       expect(screen.getByText('Luce')).toBeInTheDocument();
     });
-    const createButton = screen.getByRole('button', { name: /crea tipo/i });
-    fireEvent.click(createButton);
+    const modificaButtons = screen.getAllByRole('button', { name: /modifica/i });
+    const eliminaButtons = screen.getAllByRole('button', { name: /elimina/i });
+    // Only 1 custom type has actions
+    expect(modificaButtons).toHaveLength(1);
+    expect(eliminaButtons).toHaveLength(1);
+  });
+
+  // Create flow
+  it('clicking "Crea tipo" opens FormModal', async () => {
+    render(<DeviceTypesPage />);
+    await waitFor(() => { expect(screen.getByText('Luce')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByRole('button', { name: /crea tipo/i }));
     expect(screen.getByTestId('form-modal')).toBeInTheDocument();
+    expect(screen.getByText('Crea tipo dispositivo')).toBeInTheDocument();
   });
 
-  it('Test 6 (DTYPE-02): FormModal onSubmit calls POST /api/registry/types with { slug, label } body', async () => {
+  it('create FormModal calls POST /api/registry/types', async () => {
     render(<DeviceTypesPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Luce')).toBeInTheDocument();
-    });
+    await waitFor(() => { expect(screen.getByText('Luce')).toBeInTheDocument(); });
 
-    // Override fetch with POST spy before clicking
     const postSpy = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 201,
+      ok: true, status: 201,
       json: async () => ({ slug: 'new_type', label: 'New Type', is_builtin: false, created_at: 1700200000 }),
     } as Response);
     global.fetch = postSpy;
 
-    const createButton = screen.getByRole('button', { name: /crea tipo/i });
-    fireEvent.click(createButton);
-
-    const submitButton = screen.getByTestId('modal-submit');
-    fireEvent.click(submitButton);
+    fireEvent.click(screen.getByRole('button', { name: /crea tipo/i }));
+    fireEvent.click(screen.getByTestId('modal-submit'));
 
     await waitFor(() => {
-      expect(postSpy).toHaveBeenCalledWith(
-        '/api/registry/types',
-        expect.objectContaining({
-          method: 'POST',
-          body: JSON.stringify({ slug: 'new_type', label: 'New Type' }),
-        })
-      );
+      expect(postSpy).toHaveBeenCalledWith('/api/registry/types', expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ slug: 'new_type', label: 'New Type' }),
+      }));
     });
   });
 
-  // DTYPE-03: Delete flow
-  it('Test 7 (DTYPE-03): delete button "Elimina" is NOT rendered for built-in types (is_builtin=true)', async () => {
+  // Edit flow (only custom types)
+  it('clicking "Modifica" opens edit FormModal', async () => {
     render(<DeviceTypesPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Luce')).toBeInTheDocument();
-    });
-    // "Elimina" button(s) should only appear for custom_sensor, not light
-    const eliminaButtons = screen.queryAllByRole('button', { name: /elimina/i });
-    // There should be exactly 1 (for custom type only)
-    expect(eliminaButtons).toHaveLength(1);
+    await waitFor(() => { expect(screen.getByText('Sensore custom')).toBeInTheDocument(); });
+    const modificaButton = screen.getByRole('button', { name: /modifica/i });
+    fireEvent.click(modificaButton);
+    expect(screen.getByTestId('form-modal')).toBeInTheDocument();
+    expect(screen.getByText('Modifica tipo')).toBeInTheDocument();
   });
 
-  it('Test 8 (DTYPE-03): clicking "Elimina" opens ConfirmationDialog with type label and slug in description', async () => {
+  it('edit submits DELETE + POST for the custom type', async () => {
     render(<DeviceTypesPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Sensore custom')).toBeInTheDocument();
-    });
+    await waitFor(() => { expect(screen.getByText('Sensore custom')).toBeInTheDocument(); });
 
+    const modificaButton = screen.getByRole('button', { name: /modifica/i });
+    fireEvent.click(modificaButton);
+
+    const fetchSpy = jest.fn().mockResolvedValue({
+      ok: true, status: 200, json: async () => mockTypes,
+    } as Response);
+    global.fetch = fetchSpy;
+
+    fireEvent.click(screen.getByTestId('modal-submit'));
+
+    await waitFor(() => {
+      // First call: DELETE old type
+      expect(fetchSpy).toHaveBeenCalledWith('/api/registry/types/custom_sensor', expect.objectContaining({ method: 'DELETE' }));
+      // Second call: POST new type with updated label
+      expect(fetchSpy).toHaveBeenCalledWith('/api/registry/types', expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ slug: 'custom_sensor', label: 'Updated Label' }),
+      }));
+    });
+  });
+
+  // Delete flow
+  it('clicking "Elimina" opens ConfirmationDialog with type info', async () => {
+    render(<DeviceTypesPage />);
+    await waitFor(() => { expect(screen.getByText('Sensore custom')).toBeInTheDocument(); });
     const eliminaButton = screen.getByRole('button', { name: /elimina/i });
     fireEvent.click(eliminaButton);
-
     await waitFor(() => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
-      // The description rendered in the dialog contains both label and slug
       expect(screen.getByText(/Eliminare.*Sensore custom.*custom_sensor/)).toBeInTheDocument();
     });
   });
 
-  it('Test 9 (DTYPE-03): confirming delete calls DELETE /api/registry/types/{slug}', async () => {
+  it('confirming delete calls DELETE /api/registry/types/{slug}', async () => {
     const fetchSpy = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => mockTypes,
+      ok: true, status: 200, json: async () => mockTypes,
     } as Response);
     global.fetch = fetchSpy;
 
     render(<DeviceTypesPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Sensore custom')).toBeInTheDocument();
-    });
+    await waitFor(() => { expect(screen.getByText('Sensore custom')).toBeInTheDocument(); });
 
     const eliminaButton = screen.getByRole('button', { name: /elimina/i });
     fireEvent.click(eliminaButton);
+    await waitFor(() => { expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument(); });
 
-    await waitFor(() => {
-      expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
-    });
-
-    // Override fetch for the DELETE call
-    const deleteSpy = jest.fn().mockResolvedValue({
-      ok: true,
-      status: 204,
-    } as Response);
+    const deleteSpy = jest.fn().mockResolvedValue({ ok: true, status: 204 } as Response);
     global.fetch = deleteSpy;
 
-    const confirmButton = screen.getByTestId('confirm-button');
-    fireEvent.click(confirmButton);
-
+    fireEvent.click(screen.getByTestId('confirm-button'));
     await waitFor(() => {
-      expect(deleteSpy).toHaveBeenCalledWith(
-        '/api/registry/types/custom_sensor',
-        expect.objectContaining({ method: 'DELETE' })
-      );
+      expect(deleteSpy).toHaveBeenCalledWith('/api/registry/types/custom_sensor', expect.objectContaining({ method: 'DELETE' }));
     });
   });
 });

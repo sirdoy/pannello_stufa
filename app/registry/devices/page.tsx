@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { z } from 'zod';
-import { Controller } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { RegistryDevice, RegistryHealthResponse, DeviceCreate, DeviceUpdate, DeviceType } from '@/types/registry';
 import type { PaginatedResponse } from '@/types/common';
@@ -23,8 +23,9 @@ import { useToast } from '@/app/hooks/useToast';
 // --- Constants ---
 const PAGE_SIZE = 20;
 const PROVIDERS = ['hue', 'netatmo', 'thermorossi', 'dirigera', 'raspi', 'fritzbox'];
+const PROVIDER_ALL = 'all';
 const providerOptions = [
-  { value: '', label: 'Tutti' },
+  { value: PROVIDER_ALL, label: 'Tutti' },
   ...PROVIDERS.map((p) => ({ value: p, label: p })),
 ];
 
@@ -55,7 +56,7 @@ function useRegistryDevices() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
-  const [provider, setProvider] = useState('');
+  const [provider, setProvider] = useState(PROVIDER_ALL);
 
   const refetch = useCallback(async () => {
     setLoading(true);
@@ -64,7 +65,7 @@ function useRegistryDevices() {
       const params = new URLSearchParams();
       params.set('limit', String(PAGE_SIZE));
       params.set('offset', String(page * PAGE_SIZE));
-      if (provider !== '') {
+      if (provider !== PROVIDER_ALL) {
         params.set('provider_name', provider);
       }
       const res = await fetch(`/api/registry/devices?${params.toString()}`);
@@ -135,6 +136,131 @@ function useRegistryHealth() {
   return { health, loading, refetch };
 }
 
+// --- Provider device ID → name mapping per endpoint ---
+interface ProviderDevice {
+  device_id: string;
+  name: string;
+}
+
+async function fetchProviderDevices(provider: string): Promise<ProviderDevice[]> {
+  try {
+    switch (provider) {
+      case 'hue': {
+        const res = await fetch('/api/hue/lights');
+        if (!res.ok) return [];
+        const json = (await res.json()) as { lights: { light_id: string; name: string }[] };
+        return (json.lights ?? []).map(l => ({ device_id: l.light_id, name: l.name }));
+      }
+      case 'netatmo': {
+        const res = await fetch('/api/netatmo/homesdata');
+        if (!res.ok) return [];
+        const json = (await res.json()) as { success: boolean; modules: { id: string; name: string }[] };
+        return (json.modules ?? []).map(m => ({ device_id: m.id, name: m.name }));
+      }
+      case 'fritzbox': {
+        const res = await fetch('/api/fritzbox/devices');
+        if (!res.ok) return [];
+        const json = (await res.json()) as { success: boolean; devices: { mac: string; name: string; ip: string }[] };
+        return (json.devices ?? [])
+          .map(d => ({ device_id: d.mac || d.ip, name: d.name || d.mac || d.ip }))
+          .filter(d => d.device_id);
+      }
+      case 'thermorossi':
+        return [{ device_id: 'stove-1', name: 'Stufa Thermorossi' }];
+      case 'raspi':
+        return [{ device_id: 'raspi-1', name: 'Raspberry Pi' }];
+      default:
+        return [];
+    }
+  } catch {
+    return [];
+  }
+}
+
+/** Fetches available device IDs from the selected provider */
+function useProviderDevices(provider: string) {
+  const [devices, setDevices] = useState<ProviderDevice[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!provider || provider === PROVIDER_ALL) {
+      setDevices([]);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    void fetchProviderDevices(provider).then(result => {
+      if (!cancelled) {
+        setDevices(result);
+        setLoading(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [provider]);
+
+  return { devices, loading };
+}
+
+// --- useRegisteredDeviceIds: fetches all registered device_ids grouped by provider ---
+function useRegisteredDeviceIds() {
+  const [byProvider, setByProvider] = useState<Record<string, Set<string>>>({});
+  const [loaded, setLoaded] = useState(false);
+
+  const refetch = useCallback(async () => {
+    try {
+      // Fetch all registered devices (no pagination limit)
+      const res = await fetch('/api/registry/devices?limit=1000');
+      if (!res.ok) return;
+      const data = (await res.json()) as PaginatedResponse<RegistryDevice>;
+      const map: Record<string, Set<string>> = {};
+      for (const d of data.items) {
+        if (!map[d.provider_name]) map[d.provider_name] = new Set();
+        map[d.provider_name].add(d.device_id);
+      }
+      setByProvider(map);
+    } catch { /* non-critical */ }
+    setLoaded(true);
+  }, []);
+
+  useEffect(() => { void refetch(); }, [refetch]);
+
+  return { byProvider, loaded, refetch };
+}
+
+// --- Preload all provider devices to determine which providers still have unregistered devices ---
+function useAvailableProviders(registeredByProvider: Record<string, Set<string>>, registeredLoaded: boolean) {
+  const [availableProviders, setAvailableProviders] = useState<string[]>(PROVIDERS);
+  const [allRegistered, setAllRegistered] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!registeredLoaded) return;
+    let cancelled = false;
+    setLoading(true);
+
+    void (async () => {
+      const available: string[] = [];
+      for (const provider of PROVIDERS) {
+        const allDevices = await fetchProviderDevices(provider);
+        const registered = registeredByProvider[provider] ?? new Set();
+        const unregistered = allDevices.filter(d => !registered.has(d.device_id));
+        if (unregistered.length > 0) {
+          available.push(provider);
+        }
+      }
+      if (!cancelled) {
+        setAvailableProviders(available);
+        setAllRegistered(available.length === 0);
+        setLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [registeredByProvider, registeredLoaded]);
+
+  return { availableProviders, allRegistered, loading };
+}
+
 // --- useDeviceTypesForSelect hook (per D-32) ---
 function useDeviceTypesForSelect() {
   const [types, setTypes] = useState<DeviceType[]>([]);
@@ -147,6 +273,88 @@ function useDeviceTypesForSelect() {
   }, []);
   useEffect(() => { void refetch(); }, [refetch]);
   return { types };
+}
+
+// --- RegisterFormFields: watches provider, fetches available devices ---
+function RegisterFormFields({ control, setValue, deviceTypes, availableProviders, registeredByProvider }: {
+  control: any;
+  setValue: any;
+  deviceTypes: DeviceType[];
+  availableProviders: string[];
+  registeredByProvider: Record<string, Set<string>>;
+}) {
+  const selectedProvider = useWatch({ control, name: 'provider_name' }) as string;
+  const { devices: providerDevices, loading: devicesLoading } = useProviderDevices(selectedProvider);
+
+  // Filter out already-registered devices
+  const registered = registeredByProvider[selectedProvider] ?? new Set();
+  const unregisteredDevices = providerDevices.filter(d => !registered.has(d.device_id));
+
+  // Build options for device_id Select
+  const deviceIdOptions = unregisteredDevices.map(d => ({
+    value: d.device_id,
+    label: `${d.name} (${d.device_id})`,
+  }));
+
+  // Show Select only when devices are loaded and available
+  const showDeviceSelect = deviceIdOptions.length > 0 && !devicesLoading;
+
+  return (
+    <>
+      <Controller name="provider_name" control={control} render={({ field }) => (
+        <Select
+          label="Provider"
+          options={availableProviders.map(p => ({ value: p, label: p }))}
+          value={field.value}
+          onChange={(e) => {
+            const newProvider = String(e.target.value);
+            field.onChange(newProvider);
+            // Reset dependent fields when provider changes
+            setValue('device_id', '', { shouldValidate: false });
+            setValue('custom_name', '', { shouldValidate: false });
+          }}
+        />
+      )} />
+
+      {showDeviceSelect ? (
+        <Controller name="device_id" control={control} render={({ field }) => (
+          <Select
+            label="Dispositivo"
+            placeholder="Seleziona dispositivo..."
+            options={deviceIdOptions}
+            value={field.value}
+            onChange={(e) => {
+              const id = String(e.target.value);
+              field.onChange(id);
+              // Auto-fill custom_name from provider device name
+              const match = providerDevices.find(d => d.device_id === id);
+              if (match) {
+                setValue('custom_name', match.name);
+              }
+            }}
+          />
+        )} />
+      ) : (
+        <Controller name="device_id" control={control} render={({ field, fieldState }) => (
+          <Input
+            label={devicesLoading ? 'ID dispositivo (caricamento...)' : 'ID dispositivo'}
+            {...field}
+            error={fieldState.error?.message}
+            placeholder={selectedProvider ? 'es. 5' : 'Seleziona prima un provider'}
+            disabled={!selectedProvider || devicesLoading}
+          />
+        )} />
+      )}
+
+      <Controller name="custom_name" control={control} render={({ field, fieldState }) => (
+        <Input label="Nome" {...field} error={fieldState.error?.message} placeholder="es. Lampada Soggiorno" />
+      )} />
+
+      <Controller name="device_type_slug" control={control} render={({ field }) => (
+        <Select label="Tipo" options={deviceTypes.map(t => ({ value: t.slug, label: t.label }))} value={field.value} onChange={(e) => field.onChange(String(e.target.value))} />
+      )} />
+    </>
+  );
 }
 
 // --- DeviceRegistryPage component ---
@@ -167,6 +375,8 @@ export default function DeviceRegistryPage() {
   } = useRegistryDevices();
   const { health, refetch: healthRefetch } = useRegistryHealth();
   const { types: deviceTypes } = useDeviceTypesForSelect();
+  const { byProvider: registeredByProvider, loaded: registeredLoaded, refetch: registeredRefetch } = useRegisteredDeviceIds();
+  const { availableProviders, allRegistered } = useAvailableProviders(registeredByProvider, registeredLoaded);
   const { success: toastSuccess, error: toastError } = useToast();
 
   // --- Mutation handlers ---
@@ -184,7 +394,8 @@ export default function DeviceRegistryPage() {
     toastSuccess('Dispositivo registrato');
     await refetch();
     await healthRefetch();
-  }, [refetch, healthRefetch, toastSuccess]);
+    await registeredRefetch();
+  }, [refetch, healthRefetch, registeredRefetch, toastSuccess]);
 
   // handleUpdate (per D-23, D-24)
   const handleUpdate = useCallback(async (data: DeviceUpdate) => {
@@ -227,7 +438,8 @@ export default function DeviceRegistryPage() {
     setDeviceToDelete(null);
     await refetch();
     await healthRefetch();
-  }, [deviceToDelete, refetch, healthRefetch, toastSuccess, toastError]);
+    await registeredRefetch();
+  }, [deviceToDelete, refetch, healthRefetch, registeredRefetch, toastSuccess, toastError]);
 
   // DataTable column definitions (per D-04)
   const columns: ColumnDef<RegistryDevice>[] = [
@@ -324,23 +536,27 @@ export default function DeviceRegistryPage() {
               value={provider}
               onChange={(e) => setProvider(String(e.target.value))}
             />
-            <Button variant="ember" size="sm" onClick={() => setShowRegister(true)}>
-              Registra dispositivo
-            </Button>
+            {!allRegistered && (
+              <Button variant="ember" size="sm" onClick={() => setShowRegister(true)}>
+                Registra dispositivo
+              </Button>
+            )}
           </div>
 
           {/* Empty state (per D-35) */}
           {devices.length === 0 ? (
             <div className="text-center py-8 text-slate-400">
               <p>Nessun dispositivo registrato</p>
-              <Button
-                variant="ember"
-                size="sm"
-                className="mt-4"
-                onClick={() => setShowRegister(true)}
-              >
-                Registra dispositivo
-              </Button>
+              {!allRegistered && (
+                <Button
+                  variant="ember"
+                  size="sm"
+                  className="mt-4"
+                  onClick={() => setShowRegister(true)}
+                >
+                  Registra dispositivo
+                </Button>
+              )}
             </div>
           ) : (
             <DataTable columns={columns} data={devices} variant="compact" />
@@ -384,21 +600,14 @@ export default function DeviceRegistryPage() {
             submitLabel="Registra"
             cancelLabel="Annulla"
           >
-            {({ control }) => (
-              <>
-                <Controller name="provider_name" control={control} render={({ field, fieldState }) => (
-                  <Select label="Provider" options={PROVIDERS.map(p => ({ value: p, label: p }))} value={field.value} onChange={(e) => field.onChange(String(e.target.value))} />
-                )} />
-                <Controller name="device_id" control={control} render={({ field, fieldState }) => (
-                  <Input label="ID dispositivo" {...field} error={fieldState.error?.message} placeholder="es. 5" />
-                )} />
-                <Controller name="custom_name" control={control} render={({ field, fieldState }) => (
-                  <Input label="Nome" {...field} error={fieldState.error?.message} placeholder="es. Lampada Soggiorno" />
-                )} />
-                <Controller name="device_type_slug" control={control} render={({ field, fieldState }) => (
-                  <Select label="Tipo" options={deviceTypes.map(t => ({ value: t.slug, label: t.label }))} value={field.value} onChange={(e) => field.onChange(String(e.target.value))} />
-                )} />
-              </>
+            {({ control, setValue }) => (
+              <RegisterFormFields
+                control={control}
+                setValue={setValue}
+                deviceTypes={deviceTypes}
+                availableProviders={availableProviders}
+                registeredByProvider={registeredByProvider}
+              />
             )}
           </FormModal>
 

@@ -300,60 +300,63 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   return (
     <Modal
       isOpen={isOpen}
+      onClose={handleClose}
       size={size}
-      className={cn('relative', className)}
+      className={className}
       {...props}
     >
-      <Modal.Header>
-        <Modal.Title>{title}</Modal.Title>
-        <Modal.Close disabled={isLoading} />
-      </Modal.Header>
+      <div className="relative">
+        <Modal.Header>
+          <Modal.Title>{title}</Modal.Title>
+          <Modal.Close disabled={isLoading} />
+        </Modal.Header>
 
-      {description && (
-        <Modal.Description className="mb-4">
-          {description}
-        </Modal.Description>
-      )}
+        {description && (
+          <Modal.Description className="mb-4">
+            {description}
+          </Modal.Description>
+        )}
 
-      {/* Error summary at top - only show after first submit attempt */}
-      {hasSubmitted && Object.keys(errors).length > 0 && (
-        <ErrorSummary errors={errors} />
-      )}
+        {/* Error summary at top - only show after first submit attempt */}
+        {hasSubmitted && Object.keys(errors).length > 0 && (
+          <ErrorSummary errors={errors} />
+        )}
 
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit(onFormSubmit, onFormError)}
-        noValidate
-      >
-        {/* Form fields via render prop */}
-        <fieldset disabled={isLoading} className="space-y-4">
-          {typeof children === 'function' ? children(formContext) : children}
-        </fieldset>
+        <form
+          ref={formRef}
+          onSubmit={handleSubmit(onFormSubmit, onFormError)}
+          noValidate
+        >
+          {/* Form fields via render prop */}
+          <fieldset disabled={isLoading} className="space-y-4">
+            {typeof children === 'function' ? children(formContext) : children}
+          </fieldset>
 
-        <Modal.Footer>
-          <Button
-            type="button"
-            variant="subtle"
-            onClick={handleCancelClick}
-            disabled={isLoading}
-          >
-            {cancelLabel}
-          </Button>
-          <Button
-            type="submit"
-            variant="ember"
-            loading={isLoading}
-            disabled={isLoading}
-          >
-            {isLoading ? 'Saving...' : submitLabel}
-          </Button>
-        </Modal.Footer>
-      </form>
+          <Modal.Footer>
+            <Button
+              type="button"
+              variant="subtle"
+              onClick={handleCancelClick}
+              disabled={isLoading}
+            >
+              {cancelLabel}
+            </Button>
+            <Button
+              type="submit"
+              variant="ember"
+              loading={isLoading}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Saving...' : submitLabel}
+            </Button>
+          </Modal.Footer>
+        </form>
 
-      {/* Success overlay */}
-      {formState === 'success' && (
-        <SuccessOverlay message={successMessage} />
-      )}
+        {/* Success overlay */}
+        {formState === 'success' && (
+          <SuccessOverlay message={successMessage} />
+        )}
+      </div>
     </Modal>
   );
 });

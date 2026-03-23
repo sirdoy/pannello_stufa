@@ -273,6 +273,7 @@ interface GlobalSection {
   name: string;
   icon: string;
   route: string;
+  items?: { label: string; route: string }[];
 }
 
 /**
@@ -291,12 +292,20 @@ export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
     name: 'Registro',
     icon: '📋',
     route: '/registry/types',
+    items: [
+      { label: 'Tipi dispositivo', route: '/registry/types' },
+      { label: 'Dispositivi', route: '/registry/devices' },
+    ],
   },
   STANZE: {
     id: 'rooms',
     name: 'Stanze',
     icon: '🏠',
     route: '/rooms',
+    items: [
+      { label: 'Gestione stanze', route: '/rooms' },
+      { label: 'Stato stanze', route: '/rooms/status' },
+    ],
   },
 };
 

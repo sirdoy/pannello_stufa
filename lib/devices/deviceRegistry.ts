@@ -11,6 +11,7 @@ interface NavItem {
   label: string;
   route: string;
   icon?: string;
+  items?: { label: string; route: string }[];
 }
 
 /** Device navigation structure */
@@ -143,6 +144,7 @@ function getGlobalNavItems(): NavItem[] {
     label: section.name,
     route: section.route,
     icon: section.icon,
+    ...(section.items ? { items: section.items } : {}),
   }));
 }
 

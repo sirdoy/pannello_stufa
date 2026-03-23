@@ -10,7 +10,6 @@ import DataTable from '@/app/components/ui/DataTable';
 import FormModal from '@/app/components/ui/FormModal';
 import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
 import Button from '@/app/components/ui/Button';
-import Badge from '@/app/components/ui/Badge';
 import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Card from '@/app/components/ui/Card';
@@ -18,7 +17,7 @@ import Input from '@/app/components/ui/Input';
 import { Heading, Text } from '@/app/components/ui';
 import { useToast } from '@/app/hooks/useToast';
 
-// --- Zod schema for device type creation (per D-09, D-10) ---
+// --- Zod schemas ---
 const deviceTypeSchema = z.object({
   slug: z
     .string()
@@ -31,7 +30,14 @@ const deviceTypeSchema = z.object({
     .max(128, 'Max 128 caratteri'),
 });
 
-// --- useDeviceTypes hook (per D-17, D-18, D-19) ---
+const editLabelSchema = z.object({
+  label: z
+    .string()
+    .min(1, 'Etichetta obbligatoria')
+    .max(128, 'Max 128 caratteri'),
+});
+
+// --- useDeviceTypes hook ---
 function useDeviceTypes() {
   const [types, setTypes] = useState<DeviceType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,12 +50,9 @@ function useDeviceTypes() {
       const res = await fetch('/api/registry/types');
       if (!res.ok) throw new Error('Errore nel caricamento dei tipi');
       const data = (await res.json()) as DeviceType[];
-      // Sort: built-in first, then alphabetical by label with Italian locale (per D-07)
-      const sorted = [...data].sort((a, b) => {
-        if (a.is_builtin && !b.is_builtin) return -1;
-        if (!a.is_builtin && b.is_builtin) return 1;
-        return a.label.localeCompare(b.label, 'it');
-      });
+      const sorted = [...data].sort((a, b) =>
+        a.label.localeCompare(b.label, 'it')
+      );
       setTypes(sorted);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore sconosciuto');
@@ -68,11 +71,11 @@ function useDeviceTypes() {
 // --- DeviceTypesPage component ---
 export default function DeviceTypesPage() {
   const [showCreate, setShowCreate] = useState(false);
+  const [typeToEdit, setTypeToEdit] = useState<DeviceType | null>(null);
   const [typeToDelete, setTypeToDelete] = useState<DeviceType | null>(null);
   const { types, loading, error, refetch } = useDeviceTypes();
   const { success: toastSuccess, error: toastError } = useToast();
 
-  // DataTable column definitions (per D-04, D-05, D-13)
   const columns: ColumnDef<DeviceType>[] = [
     {
       accessorKey: 'label',
@@ -87,21 +90,6 @@ export default function DeviceTypesPage() {
       ),
     },
     {
-      accessorKey: 'is_builtin',
-      header: 'Tipo',
-      cell: ({ row }) =>
-        row.original.is_builtin ? (
-          <Badge variant="ocean" size="sm">
-            Built-in
-          </Badge>
-        ) : (
-          <Badge variant="neutral" size="sm">
-            Custom
-          </Badge>
-        ),
-      enableSorting: false,
-    },
-    {
       accessorKey: 'created_at',
       header: 'Creato',
       cell: ({ row }) =>
@@ -112,33 +100,64 @@ export default function DeviceTypesPage() {
       id: 'actions',
       header: '',
       cell: ({ row }) =>
-        !row.original.is_builtin ? (
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => setTypeToDelete(row.original)}
-          >
-            Elimina
-          </Button>
-        ) : null,
+        row.original.is_builtin ? null : (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setTypeToEdit(row.original)}
+            >
+              Modifica
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => setTypeToDelete(row.original)}
+            >
+              Elimina
+            </Button>
+          </div>
+        ),
       enableSorting: false,
     },
   ];
 
-  // Handle create: POST /api/registry/types, throw on 409 to keep modal open (per D-08, D-09, D-11, D-12, D-20)
+  // Handle create: POST /api/registry/types
   const handleCreate = async (data: DeviceTypeCreate) => {
     const res = await fetch('/api/registry/types', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
-    if (res.status === 409) throw new Error('Slug gia esistente');
+    if (res.status === 409) throw new Error('Slug già esistente');
     if (!res.ok) throw new Error('Errore durante la creazione');
     toastSuccess('Tipo creato con successo');
     await refetch();
   };
 
-  // Handle delete: DELETE /api/registry/types/{slug}, toast on 409 (per D-14, D-15, D-16, D-20)
+  // Handle edit: DELETE old + POST new (backend has no PUT for types)
+  const handleEdit = async (data: { label: string }) => {
+    if (!typeToEdit) return;
+    // If label hasn't changed, skip
+    if (data.label === typeToEdit.label) return;
+    // Delete old type, then recreate with new label
+    const delRes = await fetch(`/api/registry/types/${typeToEdit.slug}`, {
+      method: 'DELETE',
+    });
+    if (!delRes.ok && delRes.status !== 404) {
+      throw new Error('Errore durante la modifica');
+    }
+    const createRes = await fetch('/api/registry/types', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug: typeToEdit.slug, label: data.label }),
+    });
+    if (!createRes.ok) throw new Error('Errore durante la modifica');
+    toastSuccess('Tipo aggiornato');
+    await refetch();
+  };
+
+  // Handle delete: DELETE /api/registry/types/{slug}
   const handleDelete = async () => {
     if (!typeToDelete) return;
     const res = await fetch(`/api/registry/types/${typeToDelete.slug}`, {
@@ -183,6 +202,7 @@ export default function DeviceTypesPage() {
         </Card>
       )}
 
+      {/* Create modal */}
       <FormModal
         isOpen={showCreate}
         onClose={() => setShowCreate(false)}
@@ -226,6 +246,40 @@ export default function DeviceTypesPage() {
         )}
       </FormModal>
 
+      {/* Edit modal */}
+      <FormModal
+        isOpen={typeToEdit !== null}
+        onClose={() => setTypeToEdit(null)}
+        onSubmit={handleEdit}
+        title="Modifica tipo"
+        defaultValues={typeToEdit ? { label: typeToEdit.label } : { label: '' }}
+        validationSchema={editLabelSchema}
+        submitLabel="Salva"
+        cancelLabel="Annulla"
+        successMessage="Tipo aggiornato!"
+      >
+        {({ control }) => (
+          <>
+            <div className="text-sm text-slate-400 mb-2">
+              <p>Slug: <strong className="text-slate-200">{typeToEdit?.slug}</strong></p>
+            </div>
+            <Controller
+              name="label"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  label="Etichetta"
+                  data-field="label"
+                  {...field}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+          </>
+        )}
+      </FormModal>
+
+      {/* Delete confirmation */}
       <ConfirmationDialog
         isOpen={typeToDelete !== null}
         onClose={() => setTypeToDelete(null)}

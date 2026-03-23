@@ -88,7 +88,7 @@ See `.planning/milestones/` for full archives.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 126-01-PLAN.md — Sonos TypeScript types + sonosProxy.ts function module + unit tests
+- [x] 126-01-PLAN.md — Sonos TypeScript types + sonosProxy.ts function module + unit tests
 - [ ] 126-02-PLAN.md — 4 Sonos API routes (health, devices, devices/[uid], zones)
 
 ### Phase 127: Sonos Transport Controls
@@ -216,7 +216,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
-| 126 | v16.0 | 0/2 | Planned | - |
+| 126 | v16.0 | 1/2 | In Progress|  |
 | 127 | v16.0 | 0/TBD | Not started | - |
 | 128 | v16.0 | 0/TBD | Not started | - |
 | 129 | v16.0 | 0/TBD | Not started | - |

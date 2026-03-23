@@ -9,8 +9,8 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 ### Sonos Infrastructure
 
-- [ ] **SONOS-01**: Proxy client per Sonos API con haGet/haPost/haPut transport (X-API-Key auth)
-- [ ] **SONOS-02**: TypeScript types per tutti i response interfaces Sonos (health, device, zone, playback, volume, EQ, queue, history)
+- [x] **SONOS-01**: Proxy client per Sonos API con haGet/haPost/haPut transport (X-API-Key auth)
+- [x] **SONOS-02**: TypeScript types per tutti i response interfaces Sonos (health, device, zone, playback, volume, EQ, queue, history)
 - [ ] **SONOS-03**: GET /sonos/health — speaker connectivity, data freshness, device count
 - [ ] **SONOS-04**: GET /sonos/devices — lista speaker con identity e topology
 - [ ] **SONOS-05**: GET /sonos/devices/{uid} — dettaglio speaker con audio state on-demand
@@ -130,8 +130,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SONOS-01 | Phase 126 | Pending |
-| SONOS-02 | Phase 126 | Pending |
+| SONOS-01 | Phase 126 | Complete |
+| SONOS-02 | Phase 126 | Complete |
 | SONOS-03 | Phase 126 | Pending |
 | SONOS-04 | Phase 126 | Pending |
 | SONOS-05 | Phase 126 | Pending |

@@ -147,7 +147,8 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 123-01: Room detail view with device assignment and removal UI
+- [ ] 123-01-PLAN.md — Room detail page with useRoom + useRoomDevices hooks, DataTable, loading/error/empty states + "Dispositivi" button on rooms list
+- [ ] 123-02-PLAN.md — Assign device (FormModal + Select) and remove device (ConfirmationDialog) actions
 
 ### Phase 124: Room Status Views
 **Goal**: Users can see aggregated live device status per room and a whole-house overview from a single view
@@ -172,11 +173,11 @@ Plans:
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
 | 121. Device Registry UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 122. Room Management UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 123. Room Device Assignment | v15.0 | 0/1 | Not started | - |
+| 123. Room Device Assignment | v15.0 | 0/2 | Not started | - |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |
 
 **Total:** 20 milestones shipped + 1 in progress, 117 phases complete, 407 plans executed.
 
 ---
 
-*Roadmap updated: 2026-03-23 — Phase 122 plans created*
+*Roadmap updated: 2026-03-23 — Phase 123 plans created*

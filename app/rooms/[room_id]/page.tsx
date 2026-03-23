@@ -2,9 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import { z } from 'zod';
+import { Controller } from 'react-hook-form';
+import type { Control } from 'react-hook-form';
 import type { ColumnDef } from '@tanstack/react-table';
-import type { Room } from '@/types/rooms';
+import type { Room, DeviceAssignment } from '@/types/rooms';
 import type { RegistryDevice } from '@/types/registry';
+import type { PaginatedResponse } from '@/types/common';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import DataTable from '@/app/components/ui/DataTable';
 import Button from '@/app/components/ui/Button';
@@ -12,8 +16,17 @@ import Badge from '@/app/components/ui/Badge';
 import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Card from '@/app/components/ui/Card';
+import FormModal from '@/app/components/ui/FormModal';
+import Select from '@/app/components/ui/Select';
+import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
 import { Text } from '@/app/components/ui';
 import { useToast } from '@/app/hooks/useToast';
+
+// --- Zod schema for assign form ---
+const assignSchema = z.object({
+  device_registry_id: z.number().int().positive('Seleziona un dispositivo'),
+});
+type AssignFormData = z.infer<typeof assignSchema>;
 
 // --- useRoom hook ---
 function useRoom(roomId: number) {
@@ -70,6 +83,21 @@ function useRoomDevices(roomId: number) {
   return { devices, loading, error, refetch };
 }
 
+// --- useRegistryDevicesForSelect hook ---
+function useRegistryDevicesForSelect() {
+  const [allDevices, setAllDevices] = useState<RegistryDevice[]>([]);
+  const refetch = useCallback(async () => {
+    try {
+      const res = await fetch('/api/registry/devices?limit=1000');
+      if (!res.ok) return;
+      const data = (await res.json()) as PaginatedResponse<RegistryDevice>;
+      setAllDevices(data.items);
+    } catch { /* non-critical */ }
+  }, []);
+  useEffect(() => { void refetch(); }, [refetch]);
+  return { allDevices, refetch };
+}
+
 // --- Provider badge variant helper (per D-09) ---
 function getProviderBadgeVariant(provider: string): 'ocean' | 'ember' | 'neutral' {
   if (provider === 'hue') return 'ocean';
@@ -84,21 +112,70 @@ export default function RoomDetailPage() {
 
   const roomData = useRoom(roomId);
   const devicesData = useRoomDevices(roomId);
+  const { allDevices, refetch: refetchAllDevices } = useRegistryDevicesForSelect();
   const { success: toastSuccess, error: toastError } = useToast();
 
-  // State for Plan 02 compatibility
   const [showAssign, setShowAssign] = useState(false);
   const [deviceToRemove, setDeviceToRemove] = useState<RegistryDevice | null>(null);
 
   const { room } = roomData;
-  const { devices } = devicesData;
-
-  // Silence unused variable warnings — these will be used in Plan 02
-  void toastSuccess;
-  void toastError;
-  void deviceToRemove;
+  const { devices, refetch } = devicesData;
 
   const isLoading = roomData.loading || devicesData.loading;
+
+  // Compute Select options: filter out already-assigned devices, sort by Italian locale
+  const assignedIds = new Set(devices.map((d) => d.id));
+  const selectOptions = allDevices
+    .filter((d) => !assignedIds.has(d.id))
+    .sort((a, b) => a.custom_name.localeCompare(b.custom_name, 'it'))
+    .map((d) => ({ value: d.id, label: `${d.custom_name} (${d.provider_name})` }));
+
+  const handleAssign = async (data: AssignFormData) => {
+    const res = await fetch(`/api/rooms/${roomId}/devices`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ device_registry_id: data.device_registry_id }),
+    });
+    if (res.status === 404) {
+      toastError('Dispositivo o stanza non trovata');
+      setShowAssign(false);
+      await refetch();
+      await refetchAllDevices();
+      return; // do NOT throw — modal should close per D-16
+    }
+    if (!res.ok) throw new Error("Errore durante l'assegnazione");
+    const assignment = (await res.json()) as DeviceAssignment;
+    const msg = assignment.previous_room_id !== null
+      ? 'Dispositivo assegnato (spostato da altra stanza)'
+      : 'Dispositivo assegnato';
+    toastSuccess(msg);
+    setShowAssign(false);
+    await refetch();
+    await refetchAllDevices();
+  };
+
+  const handleRemove = async () => {
+    if (!deviceToRemove) return;
+    const res = await fetch(`/api/rooms/${roomId}/devices/${deviceToRemove.id}`, {
+      method: 'DELETE',
+    });
+    if (res.status === 404) {
+      toastError('Dispositivo gia rimosso');
+      setDeviceToRemove(null);
+      await refetch();
+      await refetchAllDevices();
+      return;
+    }
+    if (!res.ok) {
+      toastError('Errore durante la rimozione');
+      setDeviceToRemove(null);
+      return;
+    }
+    toastSuccess('Dispositivo rimosso dalla stanza');
+    setDeviceToRemove(null);
+    await refetch();
+    await refetchAllDevices();
+  };
 
   const columns: ColumnDef<RegistryDevice>[] = [
     {
@@ -177,6 +254,44 @@ export default function RoomDetailPage() {
           <DataTable data={devices} columns={columns} />
         )}
       </Card>
+
+      <FormModal
+        isOpen={showAssign}
+        onClose={() => setShowAssign(false)}
+        onSubmit={handleAssign}
+        title="Assegna dispositivo"
+        defaultValues={{ device_registry_id: 0 }}
+        validationSchema={assignSchema}
+        submitLabel="Assegna"
+        cancelLabel="Annulla"
+      >
+        {({ control }: { control: Control<AssignFormData> }) => (
+          <Controller
+            name="device_registry_id"
+            control={control}
+            render={({ field }) => (
+              <Select
+                label="Dispositivo"
+                placeholder="Seleziona un dispositivo..."
+                options={selectOptions}
+                value={field.value || undefined}
+                onChange={(e) => field.onChange(Number(e.target.value))}
+              />
+            )}
+          />
+        )}
+      </FormModal>
+
+      <ConfirmationDialog
+        isOpen={deviceToRemove !== null}
+        onClose={() => setDeviceToRemove(null)}
+        onConfirm={handleRemove}
+        title="Rimuovi dispositivo"
+        description={`Rimuovere "${deviceToRemove?.custom_name}" (${deviceToRemove?.provider_name}) dalla stanza?`}
+        confirmLabel="Rimuovi"
+        cancelLabel="Annulla"
+        variant="danger"
+      />
     </SettingsLayout>
   );
 }

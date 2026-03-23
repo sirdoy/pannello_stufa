@@ -99,10 +99,10 @@ Plans:
   2. User can fill a form and submit to create a new custom device type with slug and label
   3. User can delete a custom device type after a confirmation dialog; built-in types show no delete option
   4. Creating or deleting a type refreshes the list without a full page reload
-**Plans:** 2 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] 120-01: useDeviceTypes hook + Device Types page with create/delete UI
+- [ ] 120-01-PLAN.md — Device Types page with useDeviceTypes hook, DataTable list, FormModal create, ConfirmationDialog delete + unit tests
 
 ### Phase 121: Device Registry UI
 **Goal**: Users can see all registered devices and perform full CRUD operations from a dedicated page

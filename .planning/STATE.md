@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 122-02-PLAN.md
-last_updated: "2026-03-23T15:39:40.087Z"
+stopped_at: Completed 123-01-PLAN.md
+last_updated: "2026-03-23T17:05:49.528Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 11
+  completed_plans: 10
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 122 — room-management-ui
+**Current focus:** Phase 123 — room-device-assignment
 
 ## Current Position
 
-Phase: 123
-Plan: Not started
+Phase: 123 (room-device-assignment) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: Not started
 | Phase 121 P02 | 17 | 2 tasks | 2 files |
 | Phase 122 P01 | 192 | 2 tasks | 2 files |
 | Phase 122 P02 | 356 | 2 tasks | 2 files |
+| Phase 123 P01 | 15 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 122]: useRoomsHealth errors silently — health display is non-critical
 - [Phase 122]: FormModal render-prop typed with Control<RoomFormData> to satisfy noImplicitAny
 - [Phase 122]: Tests targeting rows by data-testid (row-1) not getAllByRole index[0] due to Italian locale sort
+- [Phase 123]: useRoom and useRoomDevices implemented as inline hooks matching rooms page pattern
+- [Phase 123]: Dispositivi button inserted before Modifica/Elimina at index 0 in actions column
 
 ### Pending Todos
 
@@ -97,5 +100,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Completed 122-02-PLAN.md
+Stopped at: Completed 123-01-PLAN.md
 Resume file: None

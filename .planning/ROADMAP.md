@@ -144,10 +144,10 @@ Plans:
   1. User can open a room and see all devices currently assigned to it
   2. User can assign a device (from the registered device list) to a room via a select or modal; if the device was in another room, it moves automatically
   3. User can remove a device from a room, and it no longer appears in that room's device list
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 123-01-PLAN.md — Room detail page with useRoom + useRoomDevices hooks, DataTable, loading/error/empty states + "Dispositivi" button on rooms list
+- [x] 123-01-PLAN.md — Room detail page with useRoom + useRoomDevices hooks, DataTable, loading/error/empty states + "Dispositivi" button on rooms list
 - [ ] 123-02-PLAN.md — Assign device (FormModal + Select) and remove device (ConfirmationDialog) actions
 
 ### Phase 124: Room Status Views
@@ -173,7 +173,7 @@ Plans:
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
 | 121. Device Registry UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 122. Room Management UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 123. Room Device Assignment | v15.0 | 0/2 | Not started | - |
+| 123. Room Device Assignment | v15.0 | 1/2 | In Progress|  |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |
 
 **Total:** 20 milestones shipped + 1 in progress, 117 phases complete, 407 plans executed.

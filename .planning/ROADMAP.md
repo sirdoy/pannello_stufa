@@ -115,10 +115,10 @@ Plans:
   4. User can edit a device's name and type inline or via modal, and see the updated values reflected
   5. User can unregister a device after a confirmation dialog, and the device disappears from the list
   6. Registry health stats (type count, device count) are visible on the page
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
-- [ ] 121-01: useRegistryDevices hook + Device Registry page (list, filter, health stats)
+- [x] 121-01: useRegistryDevices hook + Device Registry page (list, filter, health stats)
 - [ ] 121-02: Register, update, and unregister device actions (forms + confirmation)
 
 ### Phase 122: Room Management UI
@@ -169,7 +169,7 @@ Plans:
 | 118. Registry Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-22 |
 | 119. Rooms Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
-| 121. Device Registry UI | v15.0 | 0/2 | Not started | - |
+| 121. Device Registry UI | v15.0 | 1/2 | In Progress|  |
 | 122. Room Management UI | v15.0 | 0/1 | Not started | - |
 | 123. Room Device Assignment | v15.0 | 0/1 | Not started | - |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |

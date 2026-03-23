@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 123-01-PLAN.md
-last_updated: "2026-03-23T17:05:49.528Z"
+stopped_at: Completed 123-02-PLAN.md
+last_updated: "2026-03-23T17:11:03.881Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Project State
@@ -52,6 +52,7 @@ Plan: 2 of 2
 | Phase 122 P01 | 192 | 2 tasks | 2 files |
 | Phase 122 P02 | 356 | 2 tasks | 2 files |
 | Phase 123 P01 | 15 | 2 tasks | 4 files |
+| Phase 123 P02 | 4 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 122]: Tests targeting rows by data-testid (row-1) not getAllByRole index[0] due to Italian locale sort
 - [Phase 123]: useRoom and useRoomDevices implemented as inline hooks matching rooms page pattern
 - [Phase 123]: Dispositivi button inserted before Modifica/Elimina at index 0 in actions column
+- [Phase 123]: handleAssign 404 calls toastError + closes modal without throwing
+- [Phase 123]: useRegistryDevicesForSelect as inline hook, errors silently (non-critical)
 
 ### Pending Todos
 
@@ -100,5 +103,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Completed 123-01-PLAN.md
+Stopped at: Completed 123-02-PLAN.md
 Resume file: None

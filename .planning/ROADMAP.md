@@ -55,7 +55,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 120: Device Types UI** - Page to view, create, and delete device types (completed 2026-03-23)
 - [x] **Phase 121: Device Registry UI** - Page to view, filter, register, update, and unregister devices (completed 2026-03-23)
 - [x] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms (completed 2026-03-23)
-- [ ] **Phase 123: Room Device Assignment** - UI to view, assign, and remove devices within rooms
+- [x] **Phase 123: Room Device Assignment** - UI to view, assign, and remove devices within rooms (completed 2026-03-23)
 - [ ] **Phase 124: Room Status Views** - Per-room status, whole-house status, and health stats
 
 ## Phase Details
@@ -144,11 +144,11 @@ Plans:
   1. User can open a room and see all devices currently assigned to it
   2. User can assign a device (from the registered device list) to a room via a select or modal; if the device was in another room, it moves automatically
   3. User can remove a device from a room, and it no longer appears in that room's device list
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [x] 123-01-PLAN.md — Room detail page with useRoom + useRoomDevices hooks, DataTable, loading/error/empty states + "Dispositivi" button on rooms list
-- [ ] 123-02-PLAN.md — Assign device (FormModal + Select) and remove device (ConfirmationDialog) actions
+- [x] 123-02-PLAN.md — Assign device (FormModal + Select) and remove device (ConfirmationDialog) actions
 
 ### Phase 124: Room Status Views
 **Goal**: Users can see aggregated live device status per room and a whole-house overview from a single view
@@ -173,7 +173,7 @@ Plans:
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
 | 121. Device Registry UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 122. Room Management UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 123. Room Device Assignment | v15.0 | 1/2 | In Progress|  |
+| 123. Room Device Assignment | v15.0 | 2/2 | Complete   | 2026-03-23 |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |
 
 **Total:** 20 milestones shipped + 1 in progress, 117 phases complete, 407 plans executed.

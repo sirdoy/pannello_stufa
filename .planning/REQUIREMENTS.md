@@ -38,8 +38,8 @@ Requirements for Rooms & Device Registry milestone. Each maps to roadmap phases.
 - [x] **ROOM-03**: User can edit room name and description
 - [x] **ROOM-04**: User can delete a room with confirmation
 - [x] **ROOM-05**: User can view devices assigned to a room
-- [ ] **ROOM-06**: User can assign a device to a room (implicit move from previous room)
-- [ ] **ROOM-07**: User can remove a device from a room
+- [x] **ROOM-06**: User can assign a device to a room (implicit move from previous room)
+- [x] **ROOM-07**: User can remove a device from a room
 
 ### Room Status
 
@@ -91,8 +91,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ROOM-03 | Phase 122 | Complete |
 | ROOM-04 | Phase 122 | Complete |
 | ROOM-05 | Phase 123 | Complete |
-| ROOM-06 | Phase 123 | Pending |
-| ROOM-07 | Phase 123 | Pending |
+| ROOM-06 | Phase 123 | Complete |
+| ROOM-07 | Phase 123 | Complete |
 | RSTAT-01 | Phase 124 | Pending |
 | RSTAT-02 | Phase 124 | Pending |
 | RSTAT-03 | Phase 124 | Pending |

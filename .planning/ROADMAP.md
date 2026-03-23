@@ -57,6 +57,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms (completed 2026-03-23)
 - [x] **Phase 123: Room Device Assignment** - UI to view, assign, and remove devices within rooms (completed 2026-03-23)
 - [x] **Phase 124: Room Status Views** - Per-room status, whole-house status, and health stats (completed 2026-03-23)
+- [ ] **Phase 125: Navigation Menu Links** - Add Registry and Rooms sections to app navigation menu (gap closure)
 
 ## Phase Details
 
@@ -163,6 +164,20 @@ Plans:
 Plans:
 - [x] 124-01-PLAN.md — Room status page with useHouseStatus + useRoomsHealth hooks, whole-house stats, per-room cards, provider-specific data rendering, Stato nav button
 
+### Phase 125: Navigation Menu Links
+**Goal**: Le sezioni Registry e Rooms sono raggiungibili dal menu di navigazione dell'app
+**Depends on**: Phase 124 (all v15.0 pages must exist)
+**Requirements**: — (gap closure: tech debt from audit)
+**Gap Closure:** Closes tech debt from v15.0 audit — no navbar entry point for v15.0 pages
+**Success Criteria** (what must be TRUE):
+  1. User can reach /registry/types and /registry/devices from the app navigation menu
+  2. User can reach /rooms and /rooms/status from the app navigation menu
+  3. Navigation items follow existing menu structure and Ember Noir design
+**Plans:** 0/1 plans (pending)
+
+Plans:
+- [ ] 125-01-PLAN.md — Add Registro and Stanze sections to GLOBAL_SECTIONS in deviceTypes.ts + navbar rendering
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -175,9 +190,10 @@ Plans:
 | 122. Room Management UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 123. Room Device Assignment | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 124. Room Status Views | v15.0 | 1/1 | Complete    | 2026-03-23 |
+| 125. Navigation Menu Links | v15.0 | 0/1 | Pending    | — |
 
-**Total:** 20 milestones shipped + 1 in progress, 117 phases complete, 407 plans executed.
+**Total:** 20 milestones shipped + 1 in progress, 118 phases (117 complete + 1 pending), 407 plans executed.
 
 ---
 
-*Roadmap updated: 2026-03-23 — Phase 124 plans created*
+*Roadmap updated: 2026-03-23 — Phase 125 added (gap closure from audit)*

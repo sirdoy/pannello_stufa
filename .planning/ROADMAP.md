@@ -190,7 +190,7 @@ Plans:
 | 122. Room Management UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 123. Room Device Assignment | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 124. Room Status Views | v15.0 | 1/1 | Complete    | 2026-03-23 |
-| 125. Navigation Menu Links | v15.0 | 1/1 | Complete   | 2026-03-23 |
+| 125. Navigation Menu Links | v15.0 | 1/1 | Complete    | 2026-03-23 |
 
 **Total:** 20 milestones shipped + 1 in progress, 118 phases (117 complete + 1 pending), 407 plans executed.
 

@@ -1960,6 +1960,22 @@ History has no error conditions beyond authentication.
 
 ---
 
+## Frontend Component Suggestions
+
+| Endpoint Group | Component | Data Mapping | Usage Hint |
+|----------------|-----------|--------------|------------|
+| Health | StatusBadge + StatCards | `status` -> badge color; `speaker_count`, `group_count`, `last_poll_at` -> stat cards | Green if all speakers reachable; show last_poll_at as relative time |
+| Discovery: Speakers | Table | `speakers[]` -> rows; columns: name, model, ip, zone, is_coordinator (Badge), state (StatusBadge) | Sortable by zone; highlight coordinator with distinct badge |
+| Discovery: Groups and Playback | CardGrid + DataCard | Groups: one card per zone showing name, speaker_count, coordinator. Playback: now-playing card with track, artist, album, album_art image, position/duration | Show album art prominently in playback card; use ProgressBar for track position |
+| Volume Controls | Slider + Toggle | volume -> Slider (0-100) per speaker and per zone. Mute -> Toggle per speaker | Show speaker name next to each slider; group zone sliders together |
+| Transport Controls | Button group | play, pause, stop, previous, next -> icon buttons in a horizontal group | Disable buttons based on current transport state (e.g., disable pause when stopped) |
+| Seek | Slider | position -> Slider (0 to duration). Display current position / total duration as formatted time (mm:ss) | Update slider position in real-time during playback |
+| Extended Controls (EQ, Play Mode, Queue, Home Theater, Sleep Timer) | Slider + Select + List + DataCard + CountdownTimer | EQ: bass/treble/loudness -> Sliders (-10 to +10). Play mode: shuffle (Toggle), repeat (Select: off/one/all). Queue: `tracks[]` -> List. Home theater: DataCard with surround config. Sleep timer: CountdownTimer with remaining | Group EQ sliders in a panel; queue list should support drag-to-reorder |
+| Grouping | Select | Add/remove speakers from zone -> multi-Select with available speakers | Show current zone members; allow add/remove with immediate feedback |
+| Historical Data | LineChart + Select | `data_points[]` -> time series. Type selector: volume, playback | API returns auto-granularity data -- chart must handle variable time intervals (raw within 48h, hourly within 30d, daily beyond 30d). Add type filter Select |
+
+---
+
 ## Next.js Fetch Snippets
 
 All snippets use the `X-API-Key` header for server-to-server authentication from a Next.js backend.

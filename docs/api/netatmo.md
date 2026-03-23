@@ -8,6 +8,34 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 
 ---
 
+## Quick Reference
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| `GET` | `/api/v1/netatmo/health` | OAuth2 token health and provider status | Required |
+| `GET` | `/api/v1/netatmo/homesdata` | Home configuration data (rooms, modules, schedules) | Required |
+| `GET` | `/api/v1/netatmo/homestatus` | Live home status (temperatures, battery, reachability) | Required |
+| `GET` | `/api/v1/netatmo/getthermstate` | Current thermostat state and active schedule | Required |
+| `GET` | `/api/v1/netatmo/getroommeasure` | Historical temperature/setpoint measures for a room | Required |
+| `GET` | `/api/v1/netatmo/gethomedata` | Full home snapshot (deprecated alias for homesdata+homestatus) | Required |
+| `POST` | `/api/v1/netatmo/setroomthermpoint` | Set manual temperature setpoint for a room | Required |
+| `POST` | `/api/v1/netatmo/setthermmode` | Set home thermostat mode (schedule/away/hg/manual) | Required |
+| `POST` | `/api/v1/netatmo/switchhomeschedule` | Switch active heating schedule | Required |
+| `POST` | `/api/v1/netatmo/synchomeschedule` | Sync a schedule definition to the Netatmo cloud | Required |
+| `POST` | `/api/v1/netatmo/createnewhomeschedule` | Create a new heating schedule | Required |
+| `GET` | `/api/v1/netatmo/valves` | NRV valve status and calibration state | Required |
+| `POST` | `/api/v1/netatmo/valves/calibrate` | Trigger calibration for all valves in a home | Required |
+| `POST` | `/api/v1/netatmo/valves/{module_id}/calibrate` | Trigger calibration for a single valve | Required |
+| `GET` | `/api/v1/netatmo/camera/events` | Paginated security camera event log | Required |
+| `GET` | `/api/v1/netatmo/camera/events/{event_id}/snapshot` | Snapshot image URL for a specific event | Required |
+| `GET` | `/api/v1/netatmo/camera/status` | Camera connection status and capabilities | Required |
+| `GET` | `/api/v1/netatmo/camera/{camera_id}/stream` | Live RTSP stream URL for a camera | Required |
+| `GET` | `/api/v1/netatmo/camera/{camera_id}/snapshot` | Latest snapshot URL for a camera | Required |
+| `POST` | `/api/v1/netatmo/camera/{camera_id}/monitoring` | Enable or disable camera monitoring | Required |
+| `POST` | `/api/v1/netatmo/renamehome` | Rename a home | Required |
+
+---
+
 ## Table of Contents
 
 - [Health & Status](#health--status)
@@ -1531,3 +1559,16 @@ curl -s YOUR_BASE_URL/api/v1/netatmo/camera/events/EVENT_ID/snapshot \
 | 401 | Missing or invalid authentication | `{"detail": "Not authenticated"}` |
 | 404 | event_id not found in DB, or snapshot_blob IS NULL (not cached) | `{"detail": "Event 'abc123' not found"}` |
 | 503 | Provider not initialized or DOWN | `{"detail": "Netatmo provider is currently unavailable"}` |
+
+---
+
+## Frontend Component Suggestions
+
+| Endpoint Group | Component | Data Mapping | Usage Hint |
+|----------------|-----------|--------------|------------|
+| Health and Status | StatusBadge + StatCards | `status` -> badge color; `thermostat_count`, `valve_count`, `camera_status` -> stat cards | Green if all devices reachable, yellow if partial, red if down |
+| Read: Thermostat and Rooms | DataCard + Table | Thermostat: `setpoint`, `measured_temp`, `heating_status` -> labeled card. Rooms: `rooms[]` -> table with name, current_temp, setpoint, heating (Badge) | Use temperature-colored values (blue < 18, green 18-22, red > 22) |
+| Read: Schedules and Valves | Table + List | Schedules: `schedules[]` -> table with name, active (Badge). Valves: `valves[]` -> table with name, room, open_percent (ProgressBar), battery (ProgressBar) | Highlight active schedule row; show valve open percent as visual bar |
+| Read: Camera | Card + List | Camera: snapshot image + status badge. Events: `events[]` -> chronological list with type, timestamp, thumbnail | Show latest snapshot prominently; event list below with type icons |
+| Control Endpoints | Form (Toggle, Select, Slider) | Heating mode -> Toggle (on/off). Schedule -> Select (dropdown from schedules list). Setpoint -> Slider (range 5-30 C, step 0.5). Valve calibration -> Button with StatusBadge for calibration state | Slider for temperature setpoint; show current measured temp next to setpoint for context |
+| Historical Data | LineChart | `data_points[]` -> time series; x-axis: timestamp, y-axis: temperature/humidity/CO2 | API returns auto-granularity data -- chart must handle variable time intervals. Add metric selector (temperature, humidity, CO2, noise) |

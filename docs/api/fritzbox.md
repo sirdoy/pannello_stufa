@@ -8,6 +8,35 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 
 ---
 
+## Quick Reference
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| `GET` | `/api/v1/fritzbox/devices` | Paginated list of connected devices | Required |
+| `GET` | `/api/v1/fritzbox/bandwidth` | Current WAN upload/download bandwidth | Required |
+| `GET` | `/api/v1/fritzbox/wan` | WAN connection status and IP info | Required |
+| `GET` | `/api/v1/fritzbox/system` | Router uptime, firmware, CPU load | Required |
+| `GET` | `/api/v1/fritzbox/wifi/clients` | Active WiFi clients with signal and band | Required |
+| `GET` | `/api/v1/fritzbox/wifi/networks` | Configured WiFi networks and enabled state | Required |
+| `GET` | `/api/v1/fritzbox/network/dhcp/reservations` | Static DHCP leases | Required |
+| `GET` | `/api/v1/fritzbox/network/port-forwarding` | Active port forwarding rules | Required |
+| `GET` | `/api/v1/fritzbox/network/upnp` | UPnP status and port mappings | Required |
+| `GET` | `/api/v1/fritzbox/network/mesh` | Mesh topology nodes and links | Required |
+| `GET` | `/api/v1/fritzbox/telephony/dect` | Registered DECT handsets | Required |
+| `GET` | `/api/v1/fritzbox/telephony/calls` | Paginated call history | Required |
+| `GET` | `/api/v1/fritzbox/telephony/tam` | Telephone answering machine status | Required |
+| `GET` | `/api/v1/fritzbox/history/bandwidth` | Raw bandwidth history (auto-granularity) | Required |
+| `GET` | `/api/v1/fritzbox/history/devices` | Raw device presence history | Required |
+| `GET` | `/api/v1/fritzbox/history/device-events` | Device join/leave event log | Required |
+| `GET` | `/api/v1/fritzbox/history/bandwidth/hourly` | Hourly aggregated bandwidth | Required |
+| `GET` | `/api/v1/fritzbox/history/bandwidth/daily` | Daily aggregated bandwidth | Required |
+| `GET` | `/api/v1/fritzbox/history/devices/daily` | Daily device count history | Required |
+| `GET` | `/api/v1/fritzbox/history/bandwidth/auto` | Auto-granularity bandwidth (hour/day switch) | Required |
+| `GET` | `/api/v1/fritzbox/service-discovery` | TR-064 service descriptor debug dump | Required |
+| `GET` | `/api/v1/fritzbox/budget-stats` | Data volume budget statistics | Required |
+
+---
+
 ## Table of Contents
 
 - [Real-time Data](#real-time-data)
@@ -1313,3 +1342,18 @@ interface BudgetStats {
 curl YOUR_BASE_URL/api/v1/fritzbox/budget-stats \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
+
+---
+
+## Frontend Component Suggestions
+
+| Endpoint Group | Component | Data Mapping | Usage Hint |
+|----------------|-----------|--------------|------------|
+| Health | StatusBadge + StatCards | `status` -> badge color; `uptime`, `model`, `firmware` -> stat cards | Show green/yellow/red badge; display model and firmware version as info cards |
+| Bandwidth | StatCards | `downstream_kbps`, `upstream_kbps`, `max_downstream`, `max_upstream` -> metric cards | Show current vs max throughput; use ProgressBar for utilization percentage |
+| Connected Devices | Table | `devices[]` -> rows; columns: name, ip, mac, connection_type, online (StatusBadge) | Sortable by name and connection type; use Badge for online/offline state |
+| WAN Status | DataCard | `external_ip`, `connection_status`, `uptime`, `dns_servers` -> labeled fields | Single card with key WAN metrics; StatusBadge for connection_status |
+| WiFi | Table + Toggle | `wifi_networks[]` -> rows; columns: ssid, band, channel, device_count, enabled (Toggle) | Table for network list; Toggle to enable/disable per-band |
+| Network Services and Telephony | Table | `port_mappings[]`, `call_log[]` -> rows | Separate tables for port forwards and call log; call log sorted by date descending |
+| Historical Data | LineChart or AreaChart | `data_points[]` -> time series; x-axis: timestamp, y-axis: value (bandwidth, device count) | API returns auto-granularity data -- chart component must handle variable time intervals (raw within 48h, hourly within 30d, daily beyond) |
+| Debug | DataCard | `service_discovery`, `budget_stats` -> labeled fields | Developer-only view; render raw JSON as formatted key-value pairs |

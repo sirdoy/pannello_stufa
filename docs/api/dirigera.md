@@ -591,3 +591,23 @@ curl -s "YOUR_BASE_URL/api/v1/dirigera/telemetry?sensor_id=YOUR_SENSOR_ID&start=
 | Status | Condition |
 |--------|-----------|
 | 401 | Missing or invalid authentication |
+
+---
+
+## Frontend Component Suggestions
+
+**Health**
+- **StatusBadge** -- map `status` to color (healthy -> green, degraded -> yellow, unreachable -> red). Per D-12.
+- **StatCards** -- display `device_count`, `last_poll_at`, `firmware_version` as individual metric cards. Per D-12.
+
+**Sensors** (devices list, device detail, events, event detail, recent events)
+- **Table** -- map `devices[]` to rows; columns: name, device_type, room, battery_level (ProgressBar), last_seen. Sortable by room and type. Per D-10.
+- **DataCard** -- single device detail showing all attributes as labeled fields: temperature, humidity, battery, firmware. Per D-11.
+- **List** -- recent events as a chronological feed; each item shows event_type, device_name, timestamp, value. Per D-10.
+
+**History** (temperature/humidity over time)
+- **LineChart** -- x-axis: timestamp, y-axis: temperature or humidity value. Use time range selector (24h, 7d, 30d). API returns auto-granularity data -- chart must handle variable time intervals. Per D-13.
+
+**Statistics / Open-Close Counts**
+- **AreaChart** -- cumulative open/close count over time. Per D-13.
+- **StatCards** -- display total_open, total_close, daily_average as metric cards. Per D-12.

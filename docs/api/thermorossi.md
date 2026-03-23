@@ -563,6 +563,24 @@ The proxy maps WiNet's integer `Status` field to semantic string values. The PWA
 
 ---
 
+## Frontend Component Suggestions
+
+**Health and Status**
+- **StatusBadge** -- map `status` to color (healthy -> green, degraded -> yellow, unreachable -> red). Per D-12.
+- **StatCards** -- display `pellet_level`, `exhaust_temp`, `room_temp`, `flame_power` as metric cards with threshold coloring. Per D-12.
+
+**Read: Current State**
+- **DataCard** -- display all stove parameters as labeled fields: power_state (Badge), fan_speed, target_temp, mode, pellet_level, flame_power. Per D-11.
+- **StatCards** -- temperature readings (room_temp, exhaust_temp, water_temp) as individual cards. Per D-12.
+
+**Control Endpoints** (power, fan, temperature, mode)
+- **Toggle** -- power on/off. IMPORTANT: show ConfirmDialog before toggling power state -- display current state and require explicit confirmation (safety gate for pellet stove control). Per D-14.
+- **Slider** -- target temperature (range and step from API constraints). Show current measured temperature next to slider for context. Per D-14.
+- **Select** -- operating mode dropdown (from available modes list). Per D-14.
+- **Slider** -- fan speed (range from API constraints). Per D-14.
+
+---
+
 ## Field Verification Status
 
 > Last checked: 2026-03-18

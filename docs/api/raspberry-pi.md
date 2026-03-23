@@ -267,3 +267,15 @@ console.log(`CPU: ${data.cpu_temperature}°C, Uptime: ${Math.floor(data.uptime_s
 - `cpu_temperature` reads from `cpu_thermal` or `cpu-thermal` sensor via `psutil.sensors_temperatures()`. Returns `null` on platforms where the sensor is unavailable (e.g. macOS, containers).
 - `network` reports the most active non-loopback interface by total `bytes_sent`. On Raspberry Pi this is typically `wlan0` (WiFi) or `eth0` (Ethernet).
 - `bytes_sent` and `bytes_recv` are cumulative counters since boot — compute deltas between polls for rate calculation.
+
+---
+
+## Frontend Component Suggestions
+
+**Health**
+- **StatusBadge** -- map `status` to color (healthy -> green, degraded -> yellow, unreachable -> red). Per D-12.
+
+**System Metrics** (system info, CPU, memory, storage)
+- **StatCards** -- display cpu_percent, memory_percent, cpu_temperature as individual metric cards with threshold coloring (green < 70%, amber 70-90%, red > 90%). Per D-12.
+- **ProgressBar** -- storage usage per mount point showing used/total with percentage. Per D-12.
+- **DataCard** -- system info (hostname, os_version, uptime formatted as days/hours, python_version) as labeled fields. Per D-11.

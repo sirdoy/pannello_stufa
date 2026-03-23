@@ -4,7 +4,7 @@
 
 Philips Hue lighting API covering Bridge health, light and group state, scene management, light control, and history -- 10 endpoints. Read endpoints serve from local cache populated by 30-second background polling of the Hue Bridge v1 (CLIP v1). Control endpoints proxy directly to the Bridge.
 
-All endpoints require authentication via API Key (`X-API-Key` header). See [Authentication](./README.md#authentication) for details.
+All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key` header). See [Authentication](./README.md#authentication) for details.
 
 ---
 
@@ -37,6 +37,7 @@ All endpoints require authentication via API Key (`X-API-Key` header). See [Auth
 - [Scenes](#scenes)
   - [GET /scenes](#get-scenes)
   - [POST /groups/{group_id}/scenes/{scene_id}](#post-groupsgroup_idscenessscene_id)
+
 - [Control Endpoints](#control-endpoints)
   - [Polling After Commands](#polling-after-commands)
   - [PUT /lights/{light_id}/state](#put-lightslight_idstate)
@@ -56,7 +57,7 @@ All endpoints require authentication via API Key (`X-API-Key` header). See [Auth
 
 Returns Hue Bridge connectivity status, firmware version, light count, and cache freshness. Never calls the Bridge directly -- reads from in-memory cache only.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **`data_freshness` values:**
 
@@ -118,7 +119,7 @@ All read endpoints serve from the in-memory cache populated by 30-second backgro
 
 Returns all Hue lights with state, capability tier, derived `ct_kelvin`, and room enrichment.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Response (200):**
 
@@ -209,7 +210,7 @@ curl YOUR_BASE_URL/api/v1/hue/lights \
 
 Returns the current state of a single Hue light by its Bridge-assigned string ID.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Path Parameters:**
 
@@ -239,7 +240,7 @@ curl YOUR_BASE_URL/api/v1/hue/lights/1 \
 
 Returns all Hue groups (rooms, zones) with member light IDs and current action state.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Response (200):**
 
@@ -307,7 +308,7 @@ curl YOUR_BASE_URL/api/v1/hue/groups \
 
 Returns a single Hue group by its Bridge-assigned string ID.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Path Parameters:**
 
@@ -339,7 +340,7 @@ curl YOUR_BASE_URL/api/v1/hue/groups/1 \
 
 Returns all Hue scenes from cache, optionally filtered to a single group. Scene cache refreshes every 5 minutes (not just startup) to catch scenes deleted via the Hue app.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Query Parameters:**
 
@@ -406,7 +407,7 @@ curl "YOUR_BASE_URL/api/v1/hue/scenes?group_id=1" \
 
 Activates a scene for a group on the Bridge. The path pattern is non-obvious: the `scene_id` is embedded under the group path, not under `/scenes/`. Scene ownership is validated from cache before forwarding to the Bridge.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Path Parameters:**
 
@@ -464,7 +465,7 @@ After sending a command, wait `suggested_poll_delay_s` seconds then poll the `po
 
 Controls a single Hue light: on/off, brightness, color temperature, hue/saturation, effects, or alerts. Checks Bridge reachability (503) and per-light reachability (409) before forwarding.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Path Parameters:**
 
@@ -585,7 +586,7 @@ curl -X PUT YOUR_BASE_URL/api/v1/hue/lights/5/state \
 
 Applies on/off, brightness, color temperature, or color to all lights in a group simultaneously. Does NOT check per-light reachability -- the Bridge applies the command to all reachable group members and silently ignores unreachable ones.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Path Parameters:**
 
@@ -647,7 +648,7 @@ curl -X PUT YOUR_BASE_URL/api/v1/hue/groups/1/action \
 
 Returns paginated Hue light state history with automatic granularity selection. Granularity is resolved from the requested time window -- no manual `scale` parameter needed.
 
-**Authentication:** Required (API Key)
+**Authentication:** Required (JWT Bearer or API Key)
 
 **Query Parameters:**
 
@@ -828,7 +829,7 @@ History has no error conditions beyond authentication -- 503 is not returned by 
 
 ## Bridge Setup Guide
 
-> **Authoritative guide:** For the complete step-by-step provisioning procedure, see [Hue Setup Guide](../setup/hue-setup.md). The section below is a quick reference.
+> **Authoritative guide:** For the complete step-by-step provisioning procedure, see [docs/HUE_SETUP.md](../HUE_SETUP.md). The section below is a quick reference.
 
 ### Prerequisites
 
@@ -911,6 +912,18 @@ Expected response when working correctly:
 - Repeating the provisioning process creates a new username -- old ones remain valid
 - Multiple usernames can coexist; update `.secrets.toml` with the newest one
 - If `GET /health` returns 503, check logs: `sudo journalctl -u homeassistant.service -n 50`
+
+---
+
+## Frontend Component Suggestions
+
+| Endpoint Group | Component | Data Mapping | Usage Hint |
+|----------------|-----------|--------------|------------|
+| Health | StatusBadge + StatCards | `status` -> badge color; `light_count`, `group_count`, `last_poll_at` -> stat cards | Show `data_freshness` as color indicator: green if fresh, yellow if stale |
+| Read: Lights | Table | `lights[]` -> rows; columns: name, type, on (Badge), brightness, color_temp, reachable (StatusBadge) | Sortable by room grouping; use green/gray Badge for on/off state |
+| Read: Groups and Scenes | CardGrid + List | Groups: one card per group showing name, light_count, all_on/any_on badges. Scenes: list with name and activate button | CardGrid for room/zone groups; scene list within each group card |
+| Control: Lights and Groups | Toggle + Slider | on/off -> Toggle. Brightness -> Slider (0-254). Color temperature -> Slider (153-500 mirek). IMPORTANT: show current light state before allowing toggle; poll after sending command to confirm state change took effect. Per D-14 | Confirm state change visually -- re-fetch light state 1s after command |
+| Historical Data | LineChart | `data_points[]` -> time series; x-axis: timestamp, y-axis: metric value | API returns auto-granularity data -- chart must handle variable time intervals. Use pagination controls for large datasets |
 
 ---
 

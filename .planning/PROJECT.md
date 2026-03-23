@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v15.0 (in progress, shipped through Phase 123)
-**Status:** v15.0 Rooms & Device Registry milestone in progress. Phase 123 complete — Room Device Assignment UI at /rooms/{id} with device list DataTable, assign via FormModal+Select, remove via ConfirmationDialog, implicit device moves between rooms. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
+**Version:** v15.0 (complete, shipped through Phase 124)
+**Status:** v15.0 Rooms & Device Registry milestone complete. Phase 124 complete — Room Status Views at /rooms/status with whole-house overview (total/available/unavailable devices), per-room cards with provider-specific data rendering (6 device types), health stats (room/device/orphan counts), manual refresh. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -554,7 +554,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - [x] Rooms proxy client + types — v15.0 (Phase 119)
 - [x] Rooms API routes (11 endpoints) — v15.0 (Phase 119)
 - [ ] Rooms management page (CRUD + device association)
-- [ ] Room status views (per-room + house status)
+- [x] Room status views (per-room + house status) — v15.0 (Phase 124)
 
 ### Out of Scope
 
@@ -726,4 +726,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-23 after Phase 123 complete — Room Device Assignment (view, assign, remove devices within rooms)*
+*Last updated: 2026-03-23 after Phase 124 complete — Room Status Views (whole-house overview, per-room cards, provider-specific data, health stats)*

@@ -57,7 +57,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms (completed 2026-03-23)
 - [x] **Phase 123: Room Device Assignment** - UI to view, assign, and remove devices within rooms (completed 2026-03-23)
 - [x] **Phase 124: Room Status Views** - Per-room status, whole-house status, and health stats (completed 2026-03-23)
-- [ ] **Phase 125: Navigation Menu Links** - Add Registry and Rooms sections to app navigation menu (gap closure)
+- [x] **Phase 125: Navigation Menu Links** - Add Registry and Rooms sections to app navigation menu (gap closure) (completed 2026-03-23)
 
 ## Phase Details
 
@@ -173,10 +173,10 @@ Plans:
   1. User can reach /registry/types and /registry/devices from the app navigation menu
   2. User can reach /rooms and /rooms/status from the app navigation menu
   3. Navigation items follow existing menu structure and Ember Noir design
-**Plans:** 0/1 plans (pending)
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 125-01-PLAN.md — Add Registro and Stanze sections to GLOBAL_SECTIONS in deviceTypes.ts + navbar rendering
+- [x] 125-01-PLAN.md — Add Registro and Stanze sections to GLOBAL_SECTIONS in deviceTypes.ts + navbar rendering
 
 ## Progress
 
@@ -190,7 +190,7 @@ Plans:
 | 122. Room Management UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 123. Room Device Assignment | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 124. Room Status Views | v15.0 | 1/1 | Complete    | 2026-03-23 |
-| 125. Navigation Menu Links | v15.0 | 0/1 | Pending    | — |
+| 125. Navigation Menu Links | v15.0 | 1/1 | Complete   | 2026-03-23 |
 
 **Total:** 20 milestones shipped + 1 in progress, 118 phases (117 complete + 1 pending), 407 plans executed.
 

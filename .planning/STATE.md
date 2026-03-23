@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v15.0
-milestone_name: Rooms & Device Registry
-status: complete
-stopped_at: Milestone v15.0 archived
+milestone: v16.0
+milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
+status: defining_requirements
+stopped_at: Defining requirements
 last_updated: "2026-03-23"
 last_activity: 2026-03-23
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 13
-  completed_plans: 13
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -20,12 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** Defining requirements for v16.0
 
 ## Current Position
 
-Milestone: v15.0 complete (shipped 2026-03-23)
-Next: `/gsd:new-milestone`
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-23 — Milestone v16.0 started
 
 ## Performance Metrics
 
@@ -66,5 +68,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Milestone v15.0 archived
+Stopped at: Defining requirements
 Resume file: None

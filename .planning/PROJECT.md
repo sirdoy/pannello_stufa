@@ -8,10 +8,19 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, lu
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
+## Current Milestone: v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato
+
+**Goal:** Integrare Sonos e DIRIGERA come nuovi provider, completare gli endpoint Fritz!Box avanzati (WiFi, network, history tiers) — portando la copertura API documentata da 56% a ~95%.
+
+**Target features:**
+- Sonos integration (28 endpoint: discovery, transport, volume, seek, extended controls, history)
+- DIRIGERA integration (8 endpoint: health, sensori contatto/movimento, summary, history, stats, telemetry)
+- Fritz!Box advanced (9 endpoint: system, WiFi clients/networks, DHCP, port forwarding, UPnP, mesh, history tiers, budget stats — escluso telephony)
+
 ## Current State
 
 **Version:** v15.0 (shipped 2026-03-23)
-**Status:** v15.0 Rooms & Device Registry milestone complete — 8 phases, 13 plans, 25/25 requirements. Device Registry (types + devices CRUD), Rooms (CRUD + device assignment + whole-house status), navigation menu entries. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
+**Status:** Starting v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — defining requirements.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -750,5 +759,22 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Deployment**: Vercel (current hosting platform)
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd:transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd:complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-03-23 after v15.0 milestone*
+*Last updated: 2026-03-23 after v16.0 milestone started*

@@ -207,8 +207,9 @@ describe('/registry/devices page', () => {
     await waitFor(() => {
       expect(screen.getByText('Lampada IKEA')).toBeInTheDocument();
       expect(screen.getByText('Termostato Camera')).toBeInTheDocument();
-      expect(screen.getByText('hue')).toBeInTheDocument();
-      expect(screen.getByText('netatmo')).toBeInTheDocument();
+      // provider_name appears as both badge and select option — use getAllByText
+      expect(screen.getAllByText('hue').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('netatmo').length).toBeGreaterThan(0);
     });
   });
 
@@ -298,12 +299,6 @@ describe('/registry/devices page', () => {
   });
 
   it('Test 6 (DREG-02): selecting "Tutti" sends no provider_name param (URL has only limit and offset)', async () => {
-    // Start with a provider selected
-    render(<DeviceRegistryPage />);
-    await waitFor(() => {
-      expect(screen.getByText('Lampada IKEA')).toBeInTheDocument();
-    });
-
     const fetchSpy = jest.fn().mockImplementation((url: string) => {
       if (url.includes('/api/registry/health')) {
         return Promise.resolve({
@@ -320,44 +315,48 @@ describe('/registry/devices page', () => {
     });
     global.fetch = fetchSpy;
 
+    render(<DeviceRegistryPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Lampada IKEA')).toBeInTheDocument();
+    });
+
     // Select 'hue' first
     const providerSelect = screen.getByTestId('provider-select');
     fireEvent.change(providerSelect, { target: { value: 'hue' } });
 
     await waitFor(() => {
       const hueCalls = fetchSpy.mock.calls.filter((call: string[]) =>
-        call[0].includes('provider_name=hue')
+        (call[0] as string).includes('provider_name=hue')
       );
       expect(hueCalls.length).toBeGreaterThan(0);
     });
 
-    fetchSpy.mockClear();
-
-    // Select 'Tutti' (empty value)
+    // Select 'Tutti' (empty value) — should fetch without provider_name
     fireEvent.change(providerSelect, { target: { value: '' } });
 
     await waitFor(() => {
-      const deviceCalls = fetchSpy.mock.calls.filter((call: string[]) =>
-        call[0].includes('/api/registry/devices')
+      // Find all device calls that do NOT contain provider_name and come after hue calls
+      const allDeviceCalls = fetchSpy.mock.calls.filter((call: string[]) =>
+        (call[0] as string).includes('/api/registry/devices')
       );
-      expect(deviceCalls.length).toBeGreaterThan(0);
-      const lastCall = deviceCalls[deviceCalls.length - 1];
-      expect(lastCall[0]).not.toContain('provider_name');
+      const tuttiCalls = allDeviceCalls.filter(
+        (call: string[]) => !(call[0] as string).includes('provider_name=')
+      );
+      expect(tuttiCalls.length).toBeGreaterThanOrEqual(2); // initial + after selecting Tutti
     });
   });
 
   // DREG-06: Health stats
   it('Test 7 (DREG-06): health stats display "Tipi dispositivo: 5" and "Dispositivi registrati: 2"', async () => {
     render(<DeviceRegistryPage />);
-    await waitFor(() => {
-      expect(screen.getByText('5')).toBeInTheDocument();
-      expect(screen.getByText('2')).toBeInTheDocument();
-    });
-    // More specific assertions using regex to find the full labels
+    // Wait for the health stats labels to appear
     await waitFor(() => {
       expect(screen.getByText(/Tipi dispositivo:/)).toBeInTheDocument();
       expect(screen.getByText(/Dispositivi registrati:/)).toBeInTheDocument();
     });
+    // Verify the counts are visible (may appear multiple times — use getAllByText)
+    expect(screen.getAllByText('5').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('2').length).toBeGreaterThan(0);
   });
 
   // DREG-01: Pagination

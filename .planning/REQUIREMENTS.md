@@ -43,9 +43,9 @@ Requirements for Rooms & Device Registry milestone. Each maps to roadmap phases.
 
 ### Room Status
 
-- [ ] **RSTAT-01**: User can view aggregated device status for a single room
-- [ ] **RSTAT-02**: User can view whole-house status (all rooms with device status)
-- [ ] **RSTAT-03**: User can view rooms health stats (room count, device count, orphan count)
+- [x] **RSTAT-01**: User can view aggregated device status for a single room
+- [x] **RSTAT-02**: User can view whole-house status (all rooms with device status)
+- [x] **RSTAT-03**: User can view rooms health stats (room count, device count, orphan count)
 
 ## Future Requirements
 
@@ -93,9 +93,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ROOM-05 | Phase 123 | Complete |
 | ROOM-06 | Phase 123 | Complete |
 | ROOM-07 | Phase 123 | Complete |
-| RSTAT-01 | Phase 124 | Pending |
-| RSTAT-02 | Phase 124 | Pending |
-| RSTAT-03 | Phase 124 | Pending |
+| RSTAT-01 | Phase 124 | Complete |
+| RSTAT-02 | Phase 124 | Complete |
+| RSTAT-03 | Phase 124 | Complete |
 
 **Coverage:**
 - v15.0 requirements: 25 total

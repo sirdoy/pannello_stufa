@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 123-02-PLAN.md
-last_updated: "2026-03-23T17:13:52.076Z"
+stopped_at: Completed 124-01-PLAN.md
+last_updated: "2026-03-23T19:39:40.245Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
-  completed_phases: 6
-  total_plans: 11
-  completed_plans: 11
+  completed_phases: 7
+  total_plans: 12
+  completed_plans: 12
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 123 — room-device-assignment
+**Current focus:** Phase 124 — room-status-views
 
 ## Current Position
 
-Phase: 124
-Plan: Not started
+Phase: 124 (room-status-views) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Plan: Not started
 | Phase 122 P02 | 356 | 2 tasks | 2 files |
 | Phase 123 P01 | 15 | 2 tasks | 4 files |
 | Phase 123 P02 | 4 | 2 tasks | 2 files |
+| Phase 124-room-status-views P01 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 123]: Dispositivi button inserted before Modifica/Elimina at index 0 in actions column
 - [Phase 123]: handleAssign 404 calls toastError + closes modal without throwing
 - [Phase 123]: useRegistryDevicesForSelect as inline hook, errors silently (non-critical)
+- [Phase 124-room-status-views]: renderDeviceData returns null for unavailable devices (data: null) — only status badge shown, no data row
+- [Phase 124-room-status-views]: Status page uses no polling — Aggiorna button triggers manual refetch only (D-20 per spec)
 
 ### Pending Todos
 
@@ -103,5 +106,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Completed 123-02-PLAN.md
+Stopped at: Completed 124-01-PLAN.md
 Resume file: None

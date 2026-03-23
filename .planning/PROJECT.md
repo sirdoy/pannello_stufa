@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v14.1 (shipped 2026-03-22)
-**Status:** Milestone complete. Zero known issues, zero `as any` casts in production code, 50+ unused exports removed, service TODOs resolved. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
+**Version:** v15.0 (in progress, shipped through Phase 120)
+**Status:** v15.0 Rooms & Device Registry milestone in progress. Phase 120 complete — Device Types UI page at /registry/types with CRUD management (list, create, delete) using DataTable, FormModal, ConfirmationDialog. All 5 device providers use shared HA proxy. Codebase at peak type safety: strict + noUncheckedIndexedAccess + zero unsafe casts.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -726,4 +726,4 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - **Privacy**: GDPR-compliant analytics (consent-first, no third-party tracking)
 
 ---
-*Last updated: 2026-03-23 after Phase 119 complete — Rooms Infrastructure (proxy + types + 11 API routes)*
+*Last updated: 2026-03-23 after Phase 120 complete — Device Types UI (CRUD page at /registry/types)*

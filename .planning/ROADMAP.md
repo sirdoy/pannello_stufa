@@ -171,7 +171,7 @@ Plans:
 | 119. Rooms Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 120. Device Types UI | v15.0 | 1/1 | Complete    | 2026-03-23 |
 | 121. Device Registry UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 122. Room Management UI | v15.0 | 2/2 | Complete   | 2026-03-23 |
+| 122. Room Management UI | v15.0 | 2/2 | Complete    | 2026-03-23 |
 | 123. Room Device Assignment | v15.0 | 0/1 | Not started | - |
 | 124. Room Status Views | v15.0 | 0/1 | Not started | - |
 

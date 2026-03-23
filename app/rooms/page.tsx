@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { Controller, type Control } from 'react-hook-form';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -80,6 +81,7 @@ function useRoomsHealth() {
 
 // --- RoomsPage component ---
 export default function RoomsPage() {
+  const router = useRouter();
   const { rooms, loading, error, refetch } = useRooms();
   const { health, refetch: healthRefetch } = useRoomsHealth();
   const { success: toastSuccess, error: toastError } = useToast();
@@ -193,6 +195,9 @@ export default function RoomsPage() {
       header: '',
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" onClick={() => router.push(`/rooms/${row.original.id}`)}>
+            Dispositivi
+          </Button>
           <Button variant="ghost" size="sm" onClick={() => setRoomToEdit(row.original)}>
             Modifica
           </Button>

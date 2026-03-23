@@ -423,10 +423,10 @@ describe('RoomsPage', () => {
     });
 
     // Click Modifica on Soggiorno row (id=1) — sorted by locale, Soggiorno is second after Camera
-    // Use getAllByRole and find the one in the Soggiorno row
+    // Button order: [0]=Dispositivi, [1]=Modifica, [2]=Elimina
     const soggiornoRow = screen.getByTestId('row-1');
-    const editButton = soggiornoRow.querySelector('button');
-    expect(editButton).not.toBeNull();
+    const editButton = soggiornoRow.querySelectorAll('button')[1];
+    expect(editButton).not.toBeUndefined();
     fireEvent.click(editButton!);
 
     await waitFor(() => {
@@ -533,8 +533,9 @@ describe('RoomsPage', () => {
     });
 
     // Click Elimina on Soggiorno row (id=1) which has device_count=3
+    // Button order: [0]=Dispositivi, [1]=Modifica, [2]=Elimina
     const soggiornoRow = screen.getByTestId('row-1');
-    const deleteButton = soggiornoRow.querySelectorAll('button')[1];
+    const deleteButton = soggiornoRow.querySelectorAll('button')[2];
     expect(deleteButton).not.toBeUndefined();
     fireEvent.click(deleteButton!);
 
@@ -553,8 +554,9 @@ describe('RoomsPage', () => {
     });
 
     // Click Elimina on Soggiorno row (id=1)
+    // Button order: [0]=Dispositivi, [1]=Modifica, [2]=Elimina
     const soggiornoRow = screen.getByTestId('row-1');
-    const deleteButton = soggiornoRow.querySelectorAll('button')[1];
+    const deleteButton = soggiornoRow.querySelectorAll('button')[2];
     expect(deleteButton).not.toBeUndefined();
     fireEvent.click(deleteButton!);
 
@@ -616,5 +618,18 @@ describe('RoomsPage', () => {
     await waitFor(() => {
       expect(mockToastError).toHaveBeenCalled();
     });
+  });
+
+  // D-31: Dispositivi navigation button
+  it('Test 18 (D-31): "Dispositivi" button navigates to /rooms/{room_id}', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+    const soggiornoRow = screen.getByTestId('row-1');
+    const dispositiviButton = soggiornoRow.querySelectorAll('button')[0];
+    expect(dispositiviButton).not.toBeUndefined();
+    fireEvent.click(dispositiviButton!);
+    expect(mockPush).toHaveBeenCalledWith('/rooms/1');
   });
 });

@@ -409,7 +409,7 @@ describe('RoomsPage', () => {
     });
 
     const editButtons = screen.getAllByRole('button', { name: /modifica/i });
-    fireEvent.click(editButtons[0]);
+    fireEvent.click(editButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
@@ -422,9 +422,12 @@ describe('RoomsPage', () => {
       expect(screen.getByText('Soggiorno')).toBeInTheDocument();
     });
 
-    // Click Modifica on first row (room id=1 — Soggiorno)
-    const editButtons = screen.getAllByRole('button', { name: /modifica/i });
-    fireEvent.click(editButtons[0]);
+    // Click Modifica on Soggiorno row (id=1) — sorted by locale, Soggiorno is second after Camera
+    // Use getAllByRole and find the one in the Soggiorno row
+    const soggiornoRow = screen.getByTestId('row-1');
+    const editButton = soggiornoRow.querySelector('button');
+    expect(editButton).not.toBeNull();
+    fireEvent.click(editButton!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
@@ -466,7 +469,7 @@ describe('RoomsPage', () => {
     });
 
     const editButtons = screen.getAllByRole('button', { name: /modifica/i });
-    fireEvent.click(editButtons[0]);
+    fireEvent.click(editButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
@@ -497,7 +500,7 @@ describe('RoomsPage', () => {
     });
 
     const editButtons = screen.getAllByRole('button', { name: /modifica/i });
-    fireEvent.click(editButtons[0]);
+    fireEvent.click(editButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
@@ -529,8 +532,11 @@ describe('RoomsPage', () => {
       expect(screen.getByText('Soggiorno')).toBeInTheDocument();
     });
 
-    const deleteButtons = screen.getAllByRole('button', { name: /elimina/i });
-    fireEvent.click(deleteButtons[0]);
+    // Click Elimina on Soggiorno row (id=1) which has device_count=3
+    const soggiornoRow = screen.getByTestId('row-1');
+    const deleteButton = soggiornoRow.querySelectorAll('button')[1];
+    expect(deleteButton).not.toBeUndefined();
+    fireEvent.click(deleteButton!);
 
     await waitFor(() => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
@@ -546,9 +552,11 @@ describe('RoomsPage', () => {
       expect(screen.getByText('Soggiorno')).toBeInTheDocument();
     });
 
-    // Click Elimina on first row (room id=1 — Soggiorno)
-    const deleteButtons = screen.getAllByRole('button', { name: /elimina/i });
-    fireEvent.click(deleteButtons[0]);
+    // Click Elimina on Soggiorno row (id=1)
+    const soggiornoRow = screen.getByTestId('row-1');
+    const deleteButton = soggiornoRow.querySelectorAll('button')[1];
+    expect(deleteButton).not.toBeUndefined();
+    fireEvent.click(deleteButton!);
 
     await waitFor(() => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
@@ -586,7 +594,7 @@ describe('RoomsPage', () => {
     });
 
     const deleteButtons = screen.getAllByRole('button', { name: /elimina/i });
-    fireEvent.click(deleteButtons[0]);
+    fireEvent.click(deleteButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();

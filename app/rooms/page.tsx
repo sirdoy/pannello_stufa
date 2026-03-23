@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { z } from 'zod';
+import { Controller, type Control } from 'react-hook-form';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { Room, RoomsHealthResponse } from '@/types/rooms';
 import SettingsLayout from '@/app/components/SettingsLayout';
@@ -10,8 +12,18 @@ import Badge from '@/app/components/ui/Badge';
 import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Card from '@/app/components/ui/Card';
+import Input from '@/app/components/ui/Input';
+import FormModal from '@/app/components/ui/FormModal';
+import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
 import { Text } from '@/app/components/ui';
 import { useToast } from '@/app/hooks/useToast';
+
+// Zod schema for room form (per D-10)
+const roomSchema = z.object({
+  name: z.string().min(1, 'Nome obbligatorio').max(100, 'Max 100 caratteri'),
+  description: z.string().max(500, 'Max 500 caratteri').nullable().optional(),
+});
+type RoomFormData = z.infer<typeof roomSchema>;
 
 // --- useRooms hook (per D-23 through D-26) ---
 function useRooms() {
@@ -76,6 +88,72 @@ export default function RoomsPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [roomToEdit, setRoomToEdit] = useState<Room | null>(null);
   const [roomToDelete, setRoomToDelete] = useState<Room | null>(null);
+
+  // --- Mutation handlers ---
+
+  const handleCreate = async (data: RoomFormData) => {
+    const apiBody = {
+      name: data.name,
+      description: data.description?.trim() || null,
+    };
+    const res = await fetch('/api/rooms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(apiBody),
+    });
+    if (res.status === 409) throw new Error('Stanza con questo nome gia esistente');
+    if (!res.ok) throw new Error('Errore durante la creazione');
+    toastSuccess('Stanza creata');
+    setShowCreate(false);
+    await refetch();
+    await healthRefetch();
+  };
+
+  const handleEdit = async (data: RoomFormData) => {
+    if (!roomToEdit) return;
+    const apiBody = {
+      name: data.name,
+      description: data.description?.trim() || null,
+    };
+    const res = await fetch(`/api/rooms/${roomToEdit.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(apiBody),
+    });
+    if (res.status === 409) throw new Error('Stanza con questo nome gia esistente');
+    if (res.status === 404) {
+      toastError('Stanza non trovata');
+      setRoomToEdit(null);
+      await refetch();
+      return;
+    }
+    if (!res.ok) throw new Error('Errore durante la modifica');
+    toastSuccess('Stanza aggiornata');
+    setRoomToEdit(null);
+    await refetch();
+    await healthRefetch();
+  };
+
+  const handleDelete = async () => {
+    if (!roomToDelete) return;
+    const res = await fetch(`/api/rooms/${roomToDelete.id}`, { method: 'DELETE' });
+    if (res.status === 404) {
+      toastError('Stanza gia eliminata');
+      setRoomToDelete(null);
+      await refetch();
+      await healthRefetch();
+      return;
+    }
+    if (!res.ok) {
+      toastError("Errore durante l'eliminazione");
+      setRoomToDelete(null);
+      return;
+    }
+    toastSuccess('Stanza eliminata');
+    setRoomToDelete(null);
+    await refetch();
+    await healthRefetch();
+  };
 
   // --- Column definitions (per D-04, D-07) ---
   const columns: ColumnDef<Room>[] = [
@@ -182,7 +260,94 @@ export default function RoomsPage() {
         )}
       </Card>
 
-      {/* Plan 02: FormModal and ConfirmationDialog will be added here */}
+      {/* Create FormModal (per D-08, D-09) */}
+      <FormModal
+        isOpen={showCreate}
+        onClose={() => setShowCreate(false)}
+        onSubmit={handleCreate}
+        title="Crea stanza"
+        defaultValues={{ name: '', description: '' }}
+        validationSchema={roomSchema}
+        submitLabel="Crea"
+        cancelLabel="Annulla"
+      >
+        {({ control }: { control: Control<RoomFormData> }) => (
+          <>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input label="Nome" error={fieldState.error?.message} {...field} />
+              )}
+            />
+            <Controller
+              name="description"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  label="Descrizione"
+                  error={fieldState.error?.message}
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              )}
+            />
+          </>
+        )}
+      </FormModal>
+
+      {/* Edit FormModal (per D-13, D-14 — key prop for remount per Pitfall 3) */}
+      <FormModal
+        key={roomToEdit?.id ?? 'new'}
+        isOpen={roomToEdit !== null}
+        onClose={() => setRoomToEdit(null)}
+        onSubmit={handleEdit}
+        title="Modifica stanza"
+        defaultValues={
+          roomToEdit
+            ? { name: roomToEdit.name, description: roomToEdit.description ?? '' }
+            : { name: '', description: '' }
+        }
+        validationSchema={roomSchema}
+        submitLabel="Salva"
+        cancelLabel="Annulla"
+      >
+        {({ control }: { control: Control<RoomFormData> }) => (
+          <>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input label="Nome" error={fieldState.error?.message} {...field} />
+              )}
+            />
+            <Controller
+              name="description"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Input
+                  label="Descrizione"
+                  error={fieldState.error?.message}
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              )}
+            />
+          </>
+        )}
+      </FormModal>
+
+      {/* Delete ConfirmationDialog (per D-18, D-19) */}
+      <ConfirmationDialog
+        isOpen={roomToDelete !== null}
+        onClose={() => setRoomToDelete(null)}
+        onConfirm={handleDelete}
+        title="Elimina stanza"
+        description={`Eliminare "${roomToDelete?.name}" (${roomToDelete?.device_count ?? 0} dispositivi)?`}
+        confirmLabel="Elimina"
+        cancelLabel="Annulla"
+        variant="danger"
+      />
     </SettingsLayout>
   );
 }

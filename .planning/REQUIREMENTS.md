@@ -14,13 +14,13 @@ Requirements for Rooms & Device Registry milestone. Each maps to roadmap phases.
 - [x] **INFRA-03**: Proxy client per Rooms API con haGet/haPost/haPut/haDelete transport
 - [x] **INFRA-04**: TypeScript types per tutte le interfacce Rooms (Room, DeviceAssignment, RoomStatus, HouseStatus, RoomsHealth)
 - [x] **INFRA-05**: Next.js API routes per Device Registry (8 endpoint proxy)
-- [ ] **INFRA-06**: Next.js API routes per Rooms (11 endpoint proxy)
+- [x] **INFRA-06**: Next.js API routes per Rooms (11 endpoint proxy)
 
 ### Device Types
 
-- [ ] **DTYPE-01**: User can view list of all device types (built-in + custom)
-- [ ] **DTYPE-02**: User can create a custom device type with slug and label
-- [ ] **DTYPE-03**: User can delete a custom device type (built-in protected)
+- [x] **DTYPE-01**: User can view list of all device types (built-in + custom)
+- [x] **DTYPE-02**: User can create a custom device type with slug and label
+- [x] **DTYPE-03**: User can delete a custom device type (built-in protected)
 
 ### Device Registry
 
@@ -76,10 +76,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFRA-03 | Phase 119 | Complete |
 | INFRA-04 | Phase 119 | Complete |
 | INFRA-05 | Phase 118 | Complete |
-| INFRA-06 | Phase 119 | Pending |
-| DTYPE-01 | Phase 120 | Pending |
-| DTYPE-02 | Phase 120 | Pending |
-| DTYPE-03 | Phase 120 | Pending |
+| INFRA-06 | Phase 119 | Complete |
+| DTYPE-01 | Phase 120 | Complete |
+| DTYPE-02 | Phase 120 | Complete |
+| DTYPE-03 | Phase 120 | Complete |
 | DREG-01 | Phase 121 | Pending |
 | DREG-02 | Phase 121 | Pending |
 | DREG-03 | Phase 121 | Pending |

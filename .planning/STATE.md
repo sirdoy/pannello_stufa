@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v15.0
 milestone_name: Rooms & Device Registry
 status: unknown
-stopped_at: Completed 119-02-PLAN.md
-last_updated: "2026-03-23T09:06:50.598Z"
+stopped_at: Completed 120-01-PLAN.md
+last_updated: "2026-03-23T11:10:41.040Z"
 last_activity: 2026-03-23
 progress:
   total_phases: 7
-  completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
+  completed_phases: 3
+  total_plans: 5
+  completed_plans: 5
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-22)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 119 — rooms-infrastructure
+**Current focus:** Phase 120 — device-types-ui
 
 ## Current Position
 
-Phase: 120
-Plan: Not started
+Phase: 120 (device-types-ui) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -46,6 +46,7 @@ Plan: Not started
 | Phase 118 P02 | 8 | 2 tasks | 6 files |
 | Phase 119 P01 | 2 | 2 tasks | 3 files |
 | Phase 119 P02 | 5 | 2 tasks | 7 files |
+| Phase 120-device-types-ui P01 | 15 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,8 @@ See PROJECT.md Key Decisions table for full history. Recent decisions affecting 
 - [Phase 119-01]: getRoomDevices returns RegistryDevice[] from @/types/registry — API returns full registry rows, no rooms-specific shape needed
 - [Phase 119-01]: DeviceStatus.data typed as union of 6 provider status interfaces | null matching API spec discriminated union exactly
 - [Phase 119]: POST /rooms/{id}/devices uses success() (200) not created() (201) — device assignment is a relational operation, not resource creation
+- [Phase 120-01]: FormModal test mock bypasses render-prop children to avoid react-hook-form Controller needing real control object
+- [Phase 120-01]: Badge variant usage for device types: ocean=built-in, neutral=custom; sort order: built-in first, then alphabetical it-IT
 
 ### Pending Todos
 
@@ -82,5 +85,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-23
-Stopped at: Completed 119-02-PLAN.md
+Stopped at: Completed 120-01-PLAN.md
 Resume file: None

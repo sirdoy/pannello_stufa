@@ -52,7 +52,7 @@ See `.planning/milestones/` for full archives.
 
 - [x] **Phase 118: Registry Infrastructure** - Proxy client, TypeScript types, and API routes for Device Registry (completed 2026-03-22)
 - [x] **Phase 119: Rooms Infrastructure** - Proxy client, TypeScript types, and API routes for Rooms (completed 2026-03-23)
-- [ ] **Phase 120: Device Types UI** - Page to view, create, and delete device types
+- [x] **Phase 120: Device Types UI** - Page to view, create, and delete device types (completed 2026-03-23)
 - [ ] **Phase 121: Device Registry UI** - Page to view, filter, register, update, and unregister devices
 - [ ] **Phase 122: Room Management UI** - Page to create, edit, and delete rooms
 - [ ] **Phase 123: Room Device Assignment** - UI to view, assign, and remove devices within rooms
@@ -99,10 +99,10 @@ Plans:
   2. User can fill a form and submit to create a new custom device type with slug and label
   3. User can delete a custom device type after a confirmation dialog; built-in types show no delete option
   4. Creating or deleting a type refreshes the list without a full page reload
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 120-01-PLAN.md — Device Types page with useDeviceTypes hook, DataTable list, FormModal create, ConfirmationDialog delete + unit tests
+- [x] 120-01-PLAN.md — Device Types page with useDeviceTypes hook, DataTable list, FormModal create, ConfirmationDialog delete + unit tests
 
 ### Phase 121: Device Registry UI
 **Goal**: Users can see all registered devices and perform full CRUD operations from a dedicated page
@@ -168,7 +168,7 @@ Plans:
 | 1-117 | v1.0–v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118. Registry Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-22 |
 | 119. Rooms Infrastructure | v15.0 | 2/2 | Complete    | 2026-03-23 |
-| 120. Device Types UI | v15.0 | 0/1 | Not started | - |
+| 120. Device Types UI | v15.0 | 1/1 | Complete   | 2026-03-23 |
 | 121. Device Registry UI | v15.0 | 0/2 | Not started | - |
 | 122. Room Management UI | v15.0 | 0/1 | Not started | - |
 | 123. Room Device Assignment | v15.0 | 0/1 | Not started | - |

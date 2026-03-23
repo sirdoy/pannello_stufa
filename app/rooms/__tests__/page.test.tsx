@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import RoomsPage from '../page';
 import type { Room, RoomsHealthResponse } from '@/types/rooms';
 
@@ -306,5 +306,307 @@ describe('RoomsPage', () => {
     // 1700000000 * 1000 = Nov 14 or 15 2023 in it-IT locale
     const formatted = new Date(1700000000 * 1000).toLocaleDateString('it-IT');
     expect(screen.getByText(formatted)).toBeInTheDocument();
+  });
+
+  // ROOM-02: Create room
+  it('Test 8 (ROOM-02): "Crea stanza" button opens create FormModal', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    const createButton = screen.getByRole('button', { name: /crea stanza/i });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-modal-create')).toBeInTheDocument();
+    });
+  });
+
+  it('Test 9 (ROOM-02): Create onSubmit calls POST /api/rooms with { name, description: null } body', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    // Open create modal
+    const createButton = screen.getByRole('button', { name: /crea stanza/i });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-modal-create')).toBeInTheDocument();
+    });
+
+    // Override fetch for POST
+    const postSpy = jest.fn().mockImplementation((url: string, options?: any) => {
+      if (options?.method === 'POST') {
+        return Promise.resolve({
+          ok: true,
+          status: 201,
+          json: async () => ({ id: 3, name: 'Nuova Stanza', description: null, created_at: 1700300000, updated_at: 1700300000, device_count: 0 }),
+        });
+      }
+      if (url === '/api/rooms/health') {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+    });
+    global.fetch = postSpy;
+
+    const submitButton = screen.getByTestId('form-modal-create-submit');
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      const postCall = postSpy.mock.calls.find(
+        (call: any[]) => call[1]?.method === 'POST'
+      );
+      expect(postCall).toBeDefined();
+      expect(postCall![0]).toBe('/api/rooms');
+      expect(postCall![1].headers['Content-Type']).toBe('application/json');
+      const body = JSON.parse(postCall![1].body as string);
+      expect(body.name).toBe('Nuova Stanza');
+    });
+  });
+
+  it('Test 10 (ROOM-02): Create 409 throws — toastSuccess NOT called, form stays open', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    // Open create modal
+    const createButton = screen.getByRole('button', { name: /crea stanza/i });
+    fireEvent.click(createButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-modal-create')).toBeInTheDocument();
+    });
+
+    // Override fetch for POST 409
+    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+      if (options?.method === 'POST') {
+        return Promise.resolve({ ok: false, status: 409 });
+      }
+      if (url === '/api/rooms/health') {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+    });
+
+    const submitButton = screen.getByTestId('form-modal-create-submit');
+    fireEvent.click(submitButton);
+
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(mockToastSuccess).not.toHaveBeenCalled();
+  });
+
+  // ROOM-03: Edit room
+  it('Test 11 (ROOM-03): "Modifica" button opens edit FormModal', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    const editButtons = screen.getAllByRole('button', { name: /modifica/i });
+    fireEvent.click(editButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
+    });
+  });
+
+  it('Test 12 (ROOM-03): Edit onSubmit calls PUT /api/rooms/1 with numeric room.id', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    // Click Modifica on first row (room id=1 — Soggiorno)
+    const editButtons = screen.getAllByRole('button', { name: /modifica/i });
+    fireEvent.click(editButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
+    });
+
+    // Override fetch for PUT
+    const putSpy = jest.fn().mockImplementation((url: string, options?: any) => {
+      if (options?.method === 'PUT') {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: async () => ({ id: 1, name: 'Stanza Aggiornata', description: null, created_at: 1700000000, updated_at: 1700000000, device_count: 3 }),
+        });
+      }
+      if (url === '/api/rooms/health') {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+    });
+    global.fetch = putSpy;
+
+    const submitButton = screen.getByTestId('form-modal-edit-submit');
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      const putCall = putSpy.mock.calls.find(
+        (call: any[]) => call[1]?.method === 'PUT'
+      );
+      expect(putCall).toBeDefined();
+      expect(putCall![0]).toContain('/api/rooms/1');
+      expect(putCall![1].method).toBe('PUT');
+    });
+  });
+
+  it('Test 13 (ROOM-03): Edit 409 throws — toastSuccess NOT called', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    const editButtons = screen.getAllByRole('button', { name: /modifica/i });
+    fireEvent.click(editButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
+    });
+
+    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+      if (options?.method === 'PUT') {
+        return Promise.resolve({ ok: false, status: 409 });
+      }
+      if (url === '/api/rooms/health') {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+    });
+
+    const submitButton = screen.getByTestId('form-modal-edit-submit');
+    fireEvent.click(submitButton);
+
+    await new Promise((r) => setTimeout(r, 100));
+
+    expect(mockToastSuccess).not.toHaveBeenCalled();
+  });
+
+  it('Test 14 (ROOM-03): Edit 404 calls toastError — mockToastError called, NOT mockToastSuccess', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    const editButtons = screen.getAllByRole('button', { name: /modifica/i });
+    fireEvent.click(editButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
+    });
+
+    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+      if (options?.method === 'PUT') {
+        return Promise.resolve({ ok: false, status: 404 });
+      }
+      if (url === '/api/rooms/health') {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+    });
+
+    const submitButton = screen.getByTestId('form-modal-edit-submit');
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      expect(mockToastError).toHaveBeenCalled();
+    });
+    expect(mockToastSuccess).not.toHaveBeenCalled();
+  });
+
+  // ROOM-04: Delete room
+  it('Test 15 (ROOM-04): "Elimina" button opens ConfirmationDialog with room name and device count', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    const deleteButtons = screen.getAllByRole('button', { name: /elimina/i });
+    fireEvent.click(deleteButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
+      // Soggiorno has device_count: 3
+      expect(screen.getByTestId('confirmation-dialog').textContent).toContain('Soggiorno');
+      expect(screen.getByTestId('confirmation-dialog').textContent).toContain('3 dispositivi');
+    });
+  });
+
+  it('Test 16 (ROOM-04): Confirm delete calls DELETE /api/rooms/1 with numeric room.id', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    // Click Elimina on first row (room id=1 — Soggiorno)
+    const deleteButtons = screen.getAllByRole('button', { name: /elimina/i });
+    fireEvent.click(deleteButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
+    });
+
+    // Override fetch for DELETE
+    const deleteSpy = jest.fn().mockImplementation((url: string, options?: any) => {
+      if (options?.method === 'DELETE') {
+        return Promise.resolve({ ok: true, status: 204 });
+      }
+      if (url === '/api/rooms/health') {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+    });
+    global.fetch = deleteSpy;
+
+    const confirmButton = screen.getByTestId('confirm-button');
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => {
+      const deleteCall = deleteSpy.mock.calls.find(
+        (call: any[]) => call[1]?.method === 'DELETE'
+      );
+      expect(deleteCall).toBeDefined();
+      expect(deleteCall![0]).toContain('/api/rooms/1');
+      expect(deleteCall![1].method).toBe('DELETE');
+    });
+  });
+
+  it('Test 17 (ROOM-04): Delete 404 calls toastError', async () => {
+    render(<RoomsPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Soggiorno')).toBeInTheDocument();
+    });
+
+    const deleteButtons = screen.getAllByRole('button', { name: /elimina/i });
+    fireEvent.click(deleteButtons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
+    });
+
+    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+      if (options?.method === 'DELETE') {
+        return Promise.resolve({ ok: false, status: 404 });
+      }
+      if (url === '/api/rooms/health') {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
+      }
+      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+    });
+
+    const confirmButton = screen.getByTestId('confirm-button');
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => {
+      expect(mockToastError).toHaveBeenCalled();
+    });
   });
 });

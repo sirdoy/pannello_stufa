@@ -166,7 +166,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 131-01-PLAN.md — DirigeraCard dashboard card + device registry + Skeleton + DashboardCards integration
+- [x] 131-01-PLAN.md — DirigeraCard dashboard card + device registry + Skeleton + DashboardCards integration
 - [ ] 131-02-PLAN.md — /dirigera page + useDirigeraFullData hook + sensor list sub-components
 
 ### Phase 132: Fritz!Box System & Network Services
@@ -225,7 +225,7 @@ Plans:
 | 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 129 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 130 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 131 | v16.0 | 0/2 | Not started | - |
+| 131 | v16.0 | 1/2 | In Progress|  |
 | 132 | v16.0 | 0/TBD | Not started | - |
 | 133 | v16.0 | 0/TBD | Not started | - |
 | 134 | v16.0 | 0/TBD | Not started | - |

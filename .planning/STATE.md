@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
-stopped_at: Completed 130-02-PLAN.md (DIRIGERA API routes)
-last_updated: "2026-03-24T15:31:02.554Z"
+stopped_at: Completed 131-01-PLAN.md (DirigeraCard dashboard integration)
+last_updated: "2026-03-24T16:11:57.928Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
   completed_phases: 5
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 12
+  completed_plans: 11
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 130 — dirigera-infrastructure
+**Current focus:** Phase 131 — dirigera-frontend
 
 ## Current Position
 
-Phase: 131
-Plan: Not started
+Phase: 131 (dirigera-frontend) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Plan: Not started
 | Phase 129 P02 | 266 | 2 tasks | 9 files |
 | Phase 130 P01 | 3 | 2 tasks | 3 files |
 | Phase 130 P02 | 2 | 2 tasks | 5 files |
+| Phase 131 P01 | 260 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,8 @@ Recent decisions affecting v16.0:
 - [Phase 129]: [Phase 129-02]: Promise.allSettled for both playback and volume fetches — individual zone/speaker failures don't break the whole page
 - [Phase 130]: DIRIGERA is read-only haGet-only proxy per D-02; types/dirigeraProxy.ts defines all current + future-phase interfaces upfront per D-05; DirigeraDataFreshness is 3-state LIVE/STALE/UNREACHABLE per D-08
 - [Phase 130]: Object responses (health, summary) use double assertion; array responses (sensors, contact, motion) spread fields into success()
+- [Phase 131]: DirigeraCard uses ocean colorTheme (not info) matching plan research correction D-02
+- [Phase 131]: DIRIGERA health: error if offline_count > 0, warning if low_battery_count > 0
 
 ### Pending Todos
 
@@ -98,5 +101,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-24
-Stopped at: Completed 130-02-PLAN.md (DIRIGERA API routes)
+Stopped at: Completed 131-01-PLAN.md (DirigeraCard dashboard integration)
 Resume file: None

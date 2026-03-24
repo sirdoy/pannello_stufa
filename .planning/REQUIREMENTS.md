@@ -18,36 +18,36 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 ### Sonos Monitoring & Transport
 
-- [ ] **SONOS-07**: GET /sonos/zones/{group_id}/playback — stato playback corrente per zona
-- [ ] **SONOS-08**: GET /sonos/speakers/{uid}/volume — volume e mute state per speaker
-- [ ] **SONOS-09**: POST /sonos/zones/{group_id}/play — play su zone coordinator
-- [ ] **SONOS-10**: POST /sonos/zones/{group_id}/pause — pause zone coordinator
-- [ ] **SONOS-11**: POST /sonos/zones/{group_id}/stop — stop zone coordinator
-- [ ] **SONOS-12**: POST /sonos/zones/{group_id}/next — skip al brano successivo
-- [ ] **SONOS-13**: POST /sonos/zones/{group_id}/previous — skip al brano precedente
+- [x] **SONOS-07**: GET /sonos/zones/{group_id}/playback — stato playback corrente per zona
+- [x] **SONOS-08**: GET /sonos/speakers/{uid}/volume — volume e mute state per speaker
+- [x] **SONOS-09**: POST /sonos/zones/{group_id}/play — play su zone coordinator
+- [x] **SONOS-10**: POST /sonos/zones/{group_id}/pause — pause zone coordinator
+- [x] **SONOS-11**: POST /sonos/zones/{group_id}/stop — stop zone coordinator
+- [x] **SONOS-12**: POST /sonos/zones/{group_id}/next — skip al brano successivo
+- [x] **SONOS-13**: POST /sonos/zones/{group_id}/previous — skip al brano precedente
 
 ### Sonos Volume & Seek
 
-- [ ] **SONOS-14**: PUT /sonos/speakers/{uid}/volume — set volume speaker (0-100)
-- [ ] **SONOS-15**: PUT /sonos/speakers/{uid}/mute — set mute state speaker
-- [ ] **SONOS-16**: PUT /sonos/zones/{group_id}/volume — set volume per tutti gli speaker in una zona
-- [ ] **SONOS-17**: PUT /sonos/zones/{group_id}/seek — seek a posizione nel brano (HH:MM:SS)
+- [x] **SONOS-14**: PUT /sonos/speakers/{uid}/volume — set volume speaker (0-100)
+- [x] **SONOS-15**: PUT /sonos/speakers/{uid}/mute — set mute state speaker
+- [x] **SONOS-16**: PUT /sonos/zones/{group_id}/volume — set volume per tutti gli speaker in una zona
+- [x] **SONOS-17**: PUT /sonos/zones/{group_id}/seek — seek a posizione nel brano (HH:MM:SS)
 
 ### Sonos Extended Controls
 
-- [ ] **SONOS-18**: GET /sonos/speakers/{uid}/eq — EQ settings (bass, treble, loudness)
-- [ ] **SONOS-19**: PUT /sonos/speakers/{uid}/eq — set EQ settings (partial update)
-- [ ] **SONOS-20**: GET /sonos/zones/{group_id}/play-mode — play mode zona (shuffle, repeat, crossfade)
-- [ ] **SONOS-21**: PUT /sonos/zones/{group_id}/play-mode — set play mode zona
-- [ ] **SONOS-22**: GET /sonos/zones/{group_id}/queue — coda playback paginata
-- [ ] **SONOS-23**: GET /sonos/speakers/{uid}/home-theater — settings soundbar home theater
-- [ ] **SONOS-24**: PUT /sonos/speakers/{uid}/home-theater — set soundbar home theater (partial update)
-- [ ] **SONOS-25**: POST /sonos/speakers/{uid}/source — switch audio source (tv o line_in)
-- [ ] **SONOS-26**: POST /sonos/speakers/{uid}/join — join speaker a gruppo
-- [ ] **SONOS-27**: POST /sonos/speakers/{uid}/unjoin — rimuovi speaker da gruppo
-- [ ] **SONOS-28**: GET /sonos/zones/{group_id}/sleep-timer — sleep timer rimanente
-- [ ] **SONOS-29**: PUT /sonos/zones/{group_id}/sleep-timer — set/cancel sleep timer
-- [ ] **SONOS-30**: GET /sonos/history — volume/playback history con auto-granularity
+- [x] **SONOS-18**: GET /sonos/speakers/{uid}/eq — EQ settings (bass, treble, loudness)
+- [x] **SONOS-19**: PUT /sonos/speakers/{uid}/eq — set EQ settings (partial update)
+- [x] **SONOS-20**: GET /sonos/zones/{group_id}/play-mode — play mode zona (shuffle, repeat, crossfade)
+- [x] **SONOS-21**: PUT /sonos/zones/{group_id}/play-mode — set play mode zona
+- [x] **SONOS-22**: GET /sonos/zones/{group_id}/queue — coda playback paginata
+- [x] **SONOS-23**: GET /sonos/speakers/{uid}/home-theater — settings soundbar home theater
+- [x] **SONOS-24**: PUT /sonos/speakers/{uid}/home-theater — set soundbar home theater (partial update)
+- [x] **SONOS-25**: POST /sonos/speakers/{uid}/source — switch audio source (tv o line_in)
+- [x] **SONOS-26**: POST /sonos/speakers/{uid}/join — join speaker a gruppo
+- [x] **SONOS-27**: POST /sonos/speakers/{uid}/unjoin — rimuovi speaker da gruppo
+- [x] **SONOS-28**: GET /sonos/zones/{group_id}/sleep-timer — sleep timer rimanente
+- [x] **SONOS-29**: PUT /sonos/zones/{group_id}/sleep-timer — set/cancel sleep timer
+- [x] **SONOS-30**: GET /sonos/history — volume/playback history con auto-granularity
 
 ### Sonos Frontend
 
@@ -136,30 +136,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SONOS-04 | Phase 126 | Complete |
 | SONOS-05 | Phase 126 | Complete |
 | SONOS-06 | Phase 126 | Complete |
-| SONOS-07 | Phase 127 | Pending |
-| SONOS-08 | Phase 127 | Pending |
-| SONOS-09 | Phase 127 | Pending |
-| SONOS-10 | Phase 127 | Pending |
-| SONOS-11 | Phase 127 | Pending |
-| SONOS-12 | Phase 127 | Pending |
-| SONOS-13 | Phase 127 | Pending |
-| SONOS-14 | Phase 127 | Pending |
-| SONOS-15 | Phase 127 | Pending |
-| SONOS-16 | Phase 127 | Pending |
-| SONOS-17 | Phase 127 | Pending |
-| SONOS-18 | Phase 128 | Pending |
-| SONOS-19 | Phase 128 | Pending |
-| SONOS-20 | Phase 128 | Pending |
-| SONOS-21 | Phase 128 | Pending |
-| SONOS-22 | Phase 128 | Pending |
-| SONOS-23 | Phase 128 | Pending |
-| SONOS-24 | Phase 128 | Pending |
-| SONOS-25 | Phase 128 | Pending |
-| SONOS-26 | Phase 128 | Pending |
-| SONOS-27 | Phase 128 | Pending |
-| SONOS-28 | Phase 128 | Pending |
-| SONOS-29 | Phase 128 | Pending |
-| SONOS-30 | Phase 128 | Pending |
+| SONOS-07 | Phase 127 | Complete |
+| SONOS-08 | Phase 127 | Complete |
+| SONOS-09 | Phase 127 | Complete |
+| SONOS-10 | Phase 127 | Complete |
+| SONOS-11 | Phase 127 | Complete |
+| SONOS-12 | Phase 127 | Complete |
+| SONOS-13 | Phase 127 | Complete |
+| SONOS-14 | Phase 127 | Complete |
+| SONOS-15 | Phase 127 | Complete |
+| SONOS-16 | Phase 127 | Complete |
+| SONOS-17 | Phase 127 | Complete |
+| SONOS-18 | Phase 128 | Complete |
+| SONOS-19 | Phase 128 | Complete |
+| SONOS-20 | Phase 128 | Complete |
+| SONOS-21 | Phase 128 | Complete |
+| SONOS-22 | Phase 128 | Complete |
+| SONOS-23 | Phase 128 | Complete |
+| SONOS-24 | Phase 128 | Complete |
+| SONOS-25 | Phase 128 | Complete |
+| SONOS-26 | Phase 128 | Complete |
+| SONOS-27 | Phase 128 | Complete |
+| SONOS-28 | Phase 128 | Complete |
+| SONOS-29 | Phase 128 | Complete |
+| SONOS-30 | Phase 128 | Complete |
 | SONOS-31 | Phase 129 | Pending |
 | SONOS-32 | Phase 129 | Pending |
 | SONOS-33 | Phase 129 | Pending |

@@ -104,7 +104,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 127-01: Playback/volume read routes + command wrappers (play/pause/stop/next/prev/volume/mute/seek)
+- [ ] 127-01-PLAN.md — Proxy command wrappers (11 functions) + unit tests
+- [ ] 127-02-PLAN.md — 10 API route files (8 zone + 2 speaker)
 
 ### Phase 128: Sonos Extended Controls
 **Goal**: Users can access EQ, play modes, queue, home theater, grouping, sleep timer, and history for Sonos
@@ -216,8 +217,8 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
-| 126 | v16.0 | 2/2 | Complete   | 2026-03-23 |
-| 127 | v16.0 | 0/TBD | Not started | - |
+| 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
+| 127 | v16.0 | 0/2 | Not started | - |
 | 128 | v16.0 | 0/TBD | Not started | - |
 | 129 | v16.0 | 0/TBD | Not started | - |
 | 130 | v16.0 | 0/TBD | Not started | - |
@@ -230,4 +231,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-23 — v16.0 roadmap created (phases 126-134)*
+*Roadmap updated: 2026-03-24 — Phase 127 plans created (2 plans)*

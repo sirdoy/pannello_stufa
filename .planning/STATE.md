@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
-stopped_at: Completed 129-02-PLAN.md (Sonos /sonos page)
-last_updated: "2026-03-24T11:11:59.793Z"
+stopped_at: Completed 130-01-PLAN.md (DIRIGERA types + proxy client)
+last_updated: "2026-03-24T15:24:44.216Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
+  total_plans: 10
+  completed_plans: 9
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 129 — sonos-frontend
+**Current focus:** Phase 130 — dirigera-infrastructure
 
 ## Current Position
 
-Phase: 130
-Plan: Not started
+Phase: 130 (dirigera-infrastructure) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Plan: Not started
 | Phase 128 P02 | 2 | 2 tasks | 9 files |
 | Phase 129 P01 | 15 | 2 tasks | 6 files |
 | Phase 129 P02 | 266 | 2 tasks | 9 files |
+| Phase 130 P01 | 3 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,7 @@ Recent decisions affecting v16.0:
 - [Phase 129]: [Phase 129-02]: useSonosFullData exposes fetchData for command hook — enables post-command refresh without prop drilling
 - [Phase 129]: [Phase 129-02]: SonosSpeakerVolume uses 250ms debounce with localVolume optimistic state — avoids flooding PUT requests on slider drag
 - [Phase 129]: [Phase 129-02]: Promise.allSettled for both playback and volume fetches — individual zone/speaker failures don't break the whole page
+- [Phase 130]: DIRIGERA is read-only haGet-only proxy per D-02; types/dirigeraProxy.ts defines all current + future-phase interfaces upfront per D-05; DirigeraDataFreshness is 3-state LIVE/STALE/UNREACHABLE per D-08
 
 ### Pending Todos
 
@@ -94,5 +96,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-24
-Stopped at: Completed 129-02-PLAN.md (Sonos /sonos page)
+Stopped at: Completed 130-01-PLAN.md (DIRIGERA types + proxy client)
 Resume file: None

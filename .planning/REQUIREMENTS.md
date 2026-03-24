@@ -58,8 +58,8 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 ### DIRIGERA Infrastructure
 
-- [ ] **DIRIG-01**: Proxy client per DIRIGERA API con haGet transport (X-API-Key auth)
-- [ ] **DIRIG-02**: TypeScript types per tutti i response interfaces DIRIGERA (health, sensor, contact, motion, summary)
+- [x] **DIRIG-01**: Proxy client per DIRIGERA API con haGet transport (X-API-Key auth)
+- [x] **DIRIG-02**: TypeScript types per tutti i response interfaces DIRIGERA (health, sensor, contact, motion, summary)
 - [ ] **DIRIG-03**: GET /dirigera/health — hub connection status, firmware, connected sensors
 
 ### DIRIGERA Sensors
@@ -164,8 +164,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SONOS-32 | Phase 129 | Complete |
 | SONOS-33 | Phase 129 | Complete |
 | SONOS-34 | Phase 129 | Complete |
-| DIRIG-01 | Phase 130 | Pending |
-| DIRIG-02 | Phase 130 | Pending |
+| DIRIG-01 | Phase 130 | Complete |
+| DIRIG-02 | Phase 130 | Complete |
 | DIRIG-03 | Phase 130 | Pending |
 | DIRIG-04 | Phase 130 | Pending |
 | DIRIG-05 | Phase 130 | Pending |

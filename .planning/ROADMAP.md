@@ -151,7 +151,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 130-01-PLAN.md — DIRIGERA TypeScript types + dirigeraProxy.ts function module + unit tests
+- [x] 130-01-PLAN.md — DIRIGERA TypeScript types + dirigeraProxy.ts function module + unit tests
 - [ ] 130-02-PLAN.md — 5 DIRIGERA API routes (health, sensors, sensors/contact, sensors/motion, sensors/summary)
 
 ### Phase 131: DIRIGERA Frontend
@@ -223,7 +223,7 @@ Plans:
 | 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 129 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 130 | v16.0 | 0/2 | Not started | - |
+| 130 | v16.0 | 1/2 | In Progress|  |
 | 131 | v16.0 | 0/TBD | Not started | - |
 | 132 | v16.0 | 0/TBD | Not started | - |
 | 133 | v16.0 | 0/TBD | Not started | - |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
-stopped_at: Completed 129-01-PLAN.md (Sonos dashboard card)
-last_updated: "2026-03-24T11:01:28.538Z"
+stopped_at: Completed 129-02-PLAN.md (Sonos /sonos page)
+last_updated: "2026-03-24T11:08:14.121Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Plan: 2 of 2
 | Phase 128 P01 | 6 | 2 tasks | 2 files |
 | Phase 128 P02 | 2 | 2 tasks | 9 files |
 | Phase 129 P01 | 15 | 2 tasks | 6 files |
+| Phase 129 P02 | 266 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting v16.0:
 - [Phase 128]: Unjoin route uses _request (no body) matching D-13; history route uses no getPathParam (no dynamic segment)
 - [Phase 129]: SonosCard: Promise.allSettled for up to 5 zones playback, pick first PLAYING, else first zone
 - [Phase 129]: SonosCard follows RaspiCard/useRaspiData pattern exactly for structural consistency
+- [Phase 129]: [Phase 129-02]: useSonosFullData exposes fetchData for command hook — enables post-command refresh without prop drilling
+- [Phase 129]: [Phase 129-02]: SonosSpeakerVolume uses 250ms debounce with localVolume optimistic state — avoids flooding PUT requests on slider drag
+- [Phase 129]: [Phase 129-02]: Promise.allSettled for both playback and volume fetches — individual zone/speaker failures don't break the whole page
 
 ### Pending Todos
 
@@ -90,5 +94,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-24
-Stopped at: Completed 129-01-PLAN.md (Sonos dashboard card)
+Stopped at: Completed 129-02-PLAN.md (Sonos /sonos page)
 Resume file: None

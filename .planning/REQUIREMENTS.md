@@ -52,7 +52,7 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 ### Sonos Frontend
 
 - [x] **SONOS-31**: SonosCard dashboard card con now playing, zone status, speaker count
-- [ ] **SONOS-32**: /sonos page con zone list, playback controls, volume sliders
+- [x] **SONOS-32**: /sonos page con zone list, playback controls, volume sliders
 - [x] **SONOS-33**: Device registry integration per speaker Sonos
 - [x] **SONOS-34**: Navigation menu entry per Sonos
 
@@ -161,7 +161,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SONOS-29 | Phase 128 | Complete |
 | SONOS-30 | Phase 128 | Complete |
 | SONOS-31 | Phase 129 | Complete |
-| SONOS-32 | Phase 129 | Pending |
+| SONOS-32 | Phase 129 | Complete |
 | SONOS-33 | Phase 129 | Complete |
 | SONOS-34 | Phase 129 | Complete |
 | DIRIG-01 | Phase 130 | Pending |

@@ -66,7 +66,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 126: Sonos Infrastructure** - Proxy client, TypeScript types, discovery routes (health, devices, device detail, zones) (completed 2026-03-23)
 - [x] **Phase 127: Sonos Transport Controls** - Playback state/control routes (play/pause/stop/next/prev), volume routes (get/set per speaker and zone), seek (completed 2026-03-24)
 - [x] **Phase 128: Sonos Extended Controls** - EQ, play mode, queue, home theater, source switch, grouping, sleep timer, history routes (completed 2026-03-24)
-- [ ] **Phase 129: Sonos Frontend** - SonosCard dashboard card, /sonos page, device registry integration, navigation menu entry
+- [x] **Phase 129: Sonos Frontend** - SonosCard dashboard card, /sonos page, device registry integration, navigation menu entry (completed 2026-03-24)
 - [ ] **Phase 130: DIRIGERA Infrastructure** - Proxy client, TypeScript types, health route, all sensor routes (contact, motion, summary)
 - [ ] **Phase 131: DIRIGERA Frontend** - DirigeraCard dashboard card, /dirigera page, device registry integration, navigation menu entry
 - [ ] **Phase 132: Fritz!Box System & Network Services** - System info, WiFi clients/networks, DHCP reservations, port forwarding, UPnP, mesh topology routes
@@ -136,7 +136,7 @@ Plans:
 
 Plans:
 - [x] 129-01-PLAN.md — SonosCard dashboard card + useSonosData hook + Skeleton + DashboardCards registries
-- [ ] 129-02-PLAN.md — /sonos page + useSonosFullData + useSonosCommands + zone sub-components
+- [x] 129-02-PLAN.md — /sonos page + useSonosFullData + useSonosCommands + zone sub-components
 
 ### Phase 130: DIRIGERA Infrastructure
 **Goal**: The application can query DIRIGERA hub health and enumerate all sensors via typed proxy API
@@ -221,7 +221,7 @@ Plans:
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
 | 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 129 | v16.0 | 1/2 | In Progress|  |
+| 129 | v16.0 | 2/2 | Complete   | 2026-03-24 |
 | 130 | v16.0 | 0/TBD | Not started | - |
 | 131 | v16.0 | 0/TBD | Not started | - |
 | 132 | v16.0 | 0/TBD | Not started | - |

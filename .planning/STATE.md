@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
-stopped_at: Completed 130-01-PLAN.md (DIRIGERA types + proxy client)
-last_updated: "2026-03-24T15:24:44.216Z"
+stopped_at: Completed 130-02-PLAN.md (DIRIGERA API routes)
+last_updated: "2026-03-24T15:27:54.309Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 10
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -51,6 +51,7 @@ Plan: 2 of 2
 | Phase 129 P01 | 15 | 2 tasks | 6 files |
 | Phase 129 P02 | 266 | 2 tasks | 9 files |
 | Phase 130 P01 | 3 | 2 tasks | 3 files |
+| Phase 130 P02 | 2 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,7 @@ Recent decisions affecting v16.0:
 - [Phase 129]: [Phase 129-02]: SonosSpeakerVolume uses 250ms debounce with localVolume optimistic state — avoids flooding PUT requests on slider drag
 - [Phase 129]: [Phase 129-02]: Promise.allSettled for both playback and volume fetches — individual zone/speaker failures don't break the whole page
 - [Phase 130]: DIRIGERA is read-only haGet-only proxy per D-02; types/dirigeraProxy.ts defines all current + future-phase interfaces upfront per D-05; DirigeraDataFreshness is 3-state LIVE/STALE/UNREACHABLE per D-08
+- [Phase 130]: Object responses (health, summary) use double assertion; array responses (sensors, contact, motion) spread fields into success()
 
 ### Pending Todos
 
@@ -96,5 +98,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-24
-Stopped at: Completed 130-01-PLAN.md (DIRIGERA types + proxy client)
+Stopped at: Completed 130-02-PLAN.md (DIRIGERA API routes)
 Resume file: None

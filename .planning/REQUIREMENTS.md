@@ -60,14 +60,14 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 - [x] **DIRIG-01**: Proxy client per DIRIGERA API con haGet transport (X-API-Key auth)
 - [x] **DIRIG-02**: TypeScript types per tutti i response interfaces DIRIGERA (health, sensor, contact, motion, summary)
-- [ ] **DIRIG-03**: GET /dirigera/health — hub connection status, firmware, connected sensors
+- [x] **DIRIG-03**: GET /dirigera/health — hub connection status, firmware, connected sensors
 
 ### DIRIGERA Sensors
 
-- [ ] **DIRIG-04**: GET /dirigera/sensors — lista completa sensori (contatto + movimento)
-- [ ] **DIRIG-05**: GET /dirigera/sensors/contact — solo sensori contatto con data_freshness
-- [ ] **DIRIG-06**: GET /dirigera/sensors/motion — solo sensori movimento con light_level e data_freshness
-- [ ] **DIRIG-07**: GET /dirigera/sensors/summary — summary flotta (total, open, offline, low battery)
+- [x] **DIRIG-04**: GET /dirigera/sensors — lista completa sensori (contatto + movimento)
+- [x] **DIRIG-05**: GET /dirigera/sensors/contact — solo sensori contatto con data_freshness
+- [x] **DIRIG-06**: GET /dirigera/sensors/motion — solo sensori movimento con light_level e data_freshness
+- [x] **DIRIG-07**: GET /dirigera/sensors/summary — summary flotta (total, open, offline, low battery)
 
 ### DIRIGERA Frontend
 
@@ -166,11 +166,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SONOS-34 | Phase 129 | Complete |
 | DIRIG-01 | Phase 130 | Complete |
 | DIRIG-02 | Phase 130 | Complete |
-| DIRIG-03 | Phase 130 | Pending |
-| DIRIG-04 | Phase 130 | Pending |
-| DIRIG-05 | Phase 130 | Pending |
-| DIRIG-06 | Phase 130 | Pending |
-| DIRIG-07 | Phase 130 | Pending |
+| DIRIG-03 | Phase 130 | Complete |
+| DIRIG-04 | Phase 130 | Complete |
+| DIRIG-05 | Phase 130 | Complete |
+| DIRIG-06 | Phase 130 | Complete |
+| DIRIG-07 | Phase 130 | Complete |
 | DIRIG-08 | Phase 131 | Pending |
 | DIRIG-09 | Phase 131 | Pending |
 | DIRIG-10 | Phase 131 | Pending |

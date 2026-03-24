@@ -18,12 +18,15 @@
  *   - Other non-ok → ApiError(EXTERNAL_API_ERROR)
  */
 
-import { haGet } from '@/lib/haClient';
+import { haGet, haPost, haPut } from '@/lib/haClient';
 import type {
   SonosHealthResponse,
   SonosDeviceResponse,
   SonosDeviceDetailResponse,
   SonosZoneResponse,
+  SonosPlaybackResponse,
+  SonosVolumeResponse,
+  SonosCommandOkResponse,
 } from '@/types/sonosProxy';
 
 // =============================================================================
@@ -61,4 +64,119 @@ export async function getDevice(uid: string): Promise<SonosDeviceDetailResponse>
  */
 export async function getZones(): Promise<SonosZoneResponse[]> {
   return haGet<SonosZoneResponse[]>('/api/v1/sonos/zones');
+}
+
+// =============================================================================
+// MONITORING WRAPPERS (Phase 127)
+// =============================================================================
+
+/**
+ * Get the current playback state for a zone.
+ * Calls GET /api/v1/sonos/zones/{groupId}/playback on the HA proxy.
+ * @param groupId - Zone coordinator UID (RINCON_...)
+ */
+export async function getPlayback(groupId: string): Promise<SonosPlaybackResponse> {
+  return haGet<SonosPlaybackResponse>(`/api/v1/sonos/zones/${groupId}/playback`);
+}
+
+/**
+ * Get the volume and mute state for a specific speaker.
+ * Calls GET /api/v1/sonos/speakers/{uid}/volume on the HA proxy.
+ * @param uid - Speaker RINCON_... UID
+ */
+export async function getSpeakerVolume(uid: string): Promise<SonosVolumeResponse> {
+  return haGet<SonosVolumeResponse>(`/api/v1/sonos/speakers/${uid}/volume`);
+}
+
+// =============================================================================
+// TRANSPORT COMMAND WRAPPERS (Phase 127 — haPost with empty body)
+// =============================================================================
+
+/**
+ * Resume playback for a zone.
+ * Calls POST /api/v1/sonos/zones/{groupId}/play on the HA proxy.
+ * @param groupId - Zone coordinator UID (RINCON_...)
+ */
+export async function play(groupId: string): Promise<SonosCommandOkResponse> {
+  return haPost<SonosCommandOkResponse>(`/api/v1/sonos/zones/${groupId}/play`, {});
+}
+
+/**
+ * Pause playback for a zone.
+ * Calls POST /api/v1/sonos/zones/{groupId}/pause on the HA proxy.
+ * @param groupId - Zone coordinator UID (RINCON_...)
+ */
+export async function pause(groupId: string): Promise<SonosCommandOkResponse> {
+  return haPost<SonosCommandOkResponse>(`/api/v1/sonos/zones/${groupId}/pause`, {});
+}
+
+/**
+ * Stop playback for a zone.
+ * Calls POST /api/v1/sonos/zones/{groupId}/stop on the HA proxy.
+ * @param groupId - Zone coordinator UID (RINCON_...)
+ */
+export async function stop(groupId: string): Promise<SonosCommandOkResponse> {
+  return haPost<SonosCommandOkResponse>(`/api/v1/sonos/zones/${groupId}/stop`, {});
+}
+
+/**
+ * Skip to the next track in the queue for a zone.
+ * Calls POST /api/v1/sonos/zones/{groupId}/next on the HA proxy.
+ * @param groupId - Zone coordinator UID (RINCON_...)
+ */
+export async function next(groupId: string): Promise<SonosCommandOkResponse> {
+  return haPost<SonosCommandOkResponse>(`/api/v1/sonos/zones/${groupId}/next`, {});
+}
+
+/**
+ * Go back to the previous track in the queue for a zone.
+ * Calls POST /api/v1/sonos/zones/{groupId}/previous on the HA proxy.
+ * @param groupId - Zone coordinator UID (RINCON_...)
+ */
+export async function previous(groupId: string): Promise<SonosCommandOkResponse> {
+  return haPost<SonosCommandOkResponse>(`/api/v1/sonos/zones/${groupId}/previous`, {});
+}
+
+// =============================================================================
+// VOLUME/MUTE/SEEK COMMAND WRAPPERS (Phase 127 — haPut with typed body)
+// =============================================================================
+
+/**
+ * Set the volume for a specific speaker.
+ * Calls PUT /api/v1/sonos/speakers/{uid}/volume on the HA proxy.
+ * @param uid    - Speaker RINCON_... UID
+ * @param volume - Volume level 0-100
+ */
+export async function setSpeakerVolume(uid: string, volume: number): Promise<SonosCommandOkResponse> {
+  return haPut<SonosCommandOkResponse>(`/api/v1/sonos/speakers/${uid}/volume`, { volume });
+}
+
+/**
+ * Set the mute state for a specific speaker.
+ * Calls PUT /api/v1/sonos/speakers/{uid}/mute on the HA proxy.
+ * @param uid  - Speaker RINCON_... UID
+ * @param mute - true to mute, false to unmute
+ */
+export async function setSpeakerMute(uid: string, mute: boolean): Promise<SonosCommandOkResponse> {
+  return haPut<SonosCommandOkResponse>(`/api/v1/sonos/speakers/${uid}/mute`, { mute });
+}
+
+/**
+ * Set the volume for an entire zone (all speakers in the group).
+ * Calls PUT /api/v1/sonos/zones/{groupId}/volume on the HA proxy.
+ * @param groupId - Zone coordinator UID (RINCON_...)
+ * @param volume  - Volume level 0-100
+ */
+export async function setZoneVolume(groupId: string, volume: number): Promise<SonosCommandOkResponse> {
+  return haPut<SonosCommandOkResponse>(`/api/v1/sonos/zones/${groupId}/volume`, { volume });
+}
+
+/**
+ * Seek to a position in the current track for a zone.
+ * Calls PUT /api/v1/sonos/zones/{groupId}/seek on the HA proxy.
+ * @param groupId  - Zone coordinator UID (RINCON_...)
+ * @param position - Position in "HH:MM:SS" format
+ */
+export async function seek(groupId: string, position: string): Promise<SonosCommandOkResponse> {
+  return haPut<SonosCommandOkResponse>(`/api/v1/sonos/zones/${groupId}/seek`, { position });
 }

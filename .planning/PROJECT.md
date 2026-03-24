@@ -20,7 +20,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v15.0 (shipped 2026-03-23)
-**Status:** Executing v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — Phase 128 complete (Sonos extended controls: 12 proxy wrappers + 9 API routes for EQ, play modes, queue, home theater, grouping, sleep timer, history).
+**Status:** Executing v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — Phase 129 complete (Sonos frontend: SonosCard dashboard card, /sonos page with zone-based playback controls and per-speaker volume sliders, device registry and nav menu integration).
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

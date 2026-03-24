@@ -868,3 +868,42 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
     </Card>
   );
 };
+
+/**
+ * Skeleton.SonosCard - Skeleton for SonosCard component - Success/sage theme
+ */
+Skeleton.SonosCard = function SkeletonSonosCard() {
+  const SkeletonPulse = ({ className = '' }: { className?: string }) => (
+    <div
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+    >
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+    </div>
+  );
+
+  const Card = Skeleton.Card;
+
+  return (
+    <Card className="overflow-visible transition-all duration-500">
+      {/* Sage accent bar */}
+      <div className="h-1 bg-gradient-to-r from-success-500/50 via-success-400/50 to-success-600/50" />
+      <div className="p-5 sm:p-6">
+        {/* Header skeleton */}
+        <div className="flex items-center gap-3 mb-4">
+          <SkeletonPulse className="w-8 h-8 rounded-lg" />
+          <SkeletonPulse className="w-20 h-6 rounded" />
+        </div>
+        {/* Now-playing line */}
+        <div className="mb-2">
+          <SkeletonPulse className="h-5 w-3/4 rounded mb-2" />
+          <SkeletonPulse className="h-4 w-1/2 rounded" />
+        </div>
+        {/* Stats row: zone count + speaker count */}
+        <div className="flex gap-3 mt-4">
+          <SkeletonPulse className="flex-1 h-14 rounded-lg" />
+          <SkeletonPulse className="flex-1 h-14 rounded-lg" />
+        </div>
+      </div>
+    </Card>
+  );
+};

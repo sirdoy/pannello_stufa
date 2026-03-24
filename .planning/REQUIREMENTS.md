@@ -72,7 +72,7 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 ### DIRIGERA Frontend
 
 - [x] **DIRIG-08**: DirigeraCard dashboard card con sensor summary (total, open contacts, offline, low battery)
-- [ ] **DIRIG-09**: /dirigera page con lista sensori, stato real-time, filtro per tipo
+- [x] **DIRIG-09**: /dirigera page con lista sensori, stato real-time, filtro per tipo
 - [x] **DIRIG-10**: Device registry integration per sensori DIRIGERA
 - [x] **DIRIG-11**: Navigation menu entry per DIRIGERA
 
@@ -172,7 +172,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DIRIG-06 | Phase 130 | Complete |
 | DIRIG-07 | Phase 130 | Complete |
 | DIRIG-08 | Phase 131 | Complete |
-| DIRIG-09 | Phase 131 | Pending |
+| DIRIG-09 | Phase 131 | Complete |
 | DIRIG-10 | Phase 131 | Complete |
 | DIRIG-11 | Phase 131 | Complete |
 | FRITZ-01 | Phase 132 | Pending |

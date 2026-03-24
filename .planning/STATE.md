@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
-stopped_at: Completed 131-01-PLAN.md (DirigeraCard dashboard integration)
-last_updated: "2026-03-24T16:11:57.928Z"
+stopped_at: Completed 131-02-PLAN.md (/dirigera page)
+last_updated: "2026-03-24T16:17:04.003Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State
@@ -53,6 +53,7 @@ Plan: 2 of 2
 | Phase 130 P01 | 3 | 2 tasks | 3 files |
 | Phase 130 P02 | 2 | 2 tasks | 5 files |
 | Phase 131 P01 | 260 | 2 tasks | 7 files |
+| Phase 131 P02 | 15 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Recent decisions affecting v16.0:
 - [Phase 130]: Object responses (health, summary) use double assertion; array responses (sensors, contact, motion) spread fields into success()
 - [Phase 131]: DirigeraCard uses ocean colorTheme (not info) matching plan research correction D-02
 - [Phase 131]: DIRIGERA health: error if offline_count > 0, warning if low_battery_count > 0
+- [Phase 131]: SensorFilter reset on change uses useEffect to clear data/loading/dataRef for immediate refetch on filter switch
+- [Phase 131]: showFreshness = filter \!== 'all' — data_freshness field only present on ContactSensor/MotionSensor, not base DirigeraSensor
 
 ### Pending Todos
 
@@ -101,5 +104,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-24
-Stopped at: Completed 131-01-PLAN.md (DirigeraCard dashboard integration)
+Stopped at: Completed 131-02-PLAN.md (/dirigera page)
 Resume file: None

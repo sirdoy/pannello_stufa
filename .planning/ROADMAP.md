@@ -68,7 +68,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 128: Sonos Extended Controls** - EQ, play mode, queue, home theater, source switch, grouping, sleep timer, history routes (completed 2026-03-24)
 - [x] **Phase 129: Sonos Frontend** - SonosCard dashboard card, /sonos page, device registry integration, navigation menu entry (completed 2026-03-24)
 - [x] **Phase 130: DIRIGERA Infrastructure** - Proxy client, TypeScript types, health route, all sensor routes (contact, motion, summary) (completed 2026-03-24)
-- [ ] **Phase 131: DIRIGERA Frontend** - DirigeraCard dashboard card, /dirigera page, device registry integration, navigation menu entry
+- [x] **Phase 131: DIRIGERA Frontend** - DirigeraCard dashboard card, /dirigera page, device registry integration, navigation menu entry (completed 2026-03-24)
 - [ ] **Phase 132: Fritz!Box System & Network Services** - System info, WiFi clients/networks, DHCP reservations, port forwarding, UPnP, mesh topology routes
 - [ ] **Phase 133: Fritz!Box History & Budget** - Hourly/daily/auto bandwidth history routes, daily device count, budget stats route
 - [ ] **Phase 134: Fritz!Box Frontend** - System info section, WiFi clients tab, network services section, history charts with toggle in /network page
@@ -167,7 +167,7 @@ Plans:
 
 Plans:
 - [x] 131-01-PLAN.md — DirigeraCard dashboard card + device registry + Skeleton + DashboardCards integration
-- [ ] 131-02-PLAN.md — /dirigera page + useDirigeraFullData hook + sensor list sub-components
+- [x] 131-02-PLAN.md — /dirigera page + useDirigeraFullData hook + sensor list sub-components
 
 ### Phase 132: Fritz!Box System & Network Services
 **Goal**: The application exposes Fritz!Box system info, WiFi client data, and network service details via new API routes
@@ -225,7 +225,7 @@ Plans:
 | 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 129 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 130 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 131 | v16.0 | 1/2 | In Progress|  |
+| 131 | v16.0 | 2/2 | Complete   | 2026-03-24 |
 | 132 | v16.0 | 0/TBD | Not started | - |
 | 133 | v16.0 | 0/TBD | Not started | - |
 | 134 | v16.0 | 0/TBD | Not started | - |

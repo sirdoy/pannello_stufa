@@ -120,8 +120,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 128-01: Extended read routes (EQ, play-mode, queue, home-theater, sleep-timer, history)
-- [ ] 128-02: Extended command routes (set-EQ, set-play-mode, set-home-theater, source, join, unjoin, set-sleep-timer)
+- [ ] 128-01-PLAN.md — Proxy wrappers (12 functions) + unit tests for extended controls
+- [ ] 128-02-PLAN.md — 9 API route files (5 speaker + 3 zone + 1 history)
 
 ### Phase 129: Sonos Frontend
 **Goal**: Sonos is visible on the dashboard and has a dedicated control page accessible from the navigation menu
@@ -219,7 +219,7 @@ Plans:
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
 | 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 128 | v16.0 | 0/TBD | Not started | - |
+| 128 | v16.0 | 0/2 | Not started | - |
 | 129 | v16.0 | 0/TBD | Not started | - |
 | 130 | v16.0 | 0/TBD | Not started | - |
 | 131 | v16.0 | 0/TBD | Not started | - |
@@ -231,4 +231,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-24 — Phase 127 plans created (2 plans)*
+*Roadmap updated: 2026-03-24 — Phase 128 plans created (2 plans)*

@@ -4,7 +4,7 @@ milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
 stopped_at: Completed 129-02-PLAN.md (Sonos /sonos page)
-last_updated: "2026-03-24T11:08:14.121Z"
+last_updated: "2026-03-24T11:11:59.793Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 
 ## Current Position
 
-Phase: 129 (sonos-frontend) — EXECUTING
-Plan: 2 of 2
+Phase: 130
+Plan: Not started
 
 ## Performance Metrics
 

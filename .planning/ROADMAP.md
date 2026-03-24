@@ -221,7 +221,7 @@ Plans:
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
 | 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 129 | v16.0 | 2/2 | Complete   | 2026-03-24 |
+| 129 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 130 | v16.0 | 0/TBD | Not started | - |
 | 131 | v16.0 | 0/TBD | Not started | - |
 | 132 | v16.0 | 0/TBD | Not started | - |

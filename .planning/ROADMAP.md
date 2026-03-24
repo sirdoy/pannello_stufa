@@ -135,7 +135,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 129-01: SonosCard + /sonos page + device registry integration + nav menu entry
+- [ ] 129-01-PLAN.md — SonosCard dashboard card + useSonosData hook + Skeleton + DashboardCards registries
+- [ ] 129-02-PLAN.md — /sonos page + useSonosFullData + useSonosCommands + zone sub-components
 
 ### Phase 130: DIRIGERA Infrastructure
 **Goal**: The application can query DIRIGERA hub health and enumerate all sensors via typed proxy API
@@ -220,7 +221,7 @@ Plans:
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
 | 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 129 | v16.0 | 0/TBD | Not started | - |
+| 129 | v16.0 | 0/2 | Not started | - |
 | 130 | v16.0 | 0/TBD | Not started | - |
 | 131 | v16.0 | 0/TBD | Not started | - |
 | 132 | v16.0 | 0/TBD | Not started | - |
@@ -231,4 +232,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-24 — Phase 128 plans created (2 plans)*
+*Roadmap updated: 2026-03-24 — Phase 129 plans created (2 plans)*

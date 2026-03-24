@@ -219,7 +219,7 @@ Plans:
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
 | 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 128 | v16.0 | 2/2 | Complete   | 2026-03-24 |
+| 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 129 | v16.0 | 0/TBD | Not started | - |
 | 130 | v16.0 | 0/TBD | Not started | - |
 | 131 | v16.0 | 0/TBD | Not started | - |

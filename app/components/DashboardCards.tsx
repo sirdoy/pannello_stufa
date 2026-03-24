@@ -9,6 +9,7 @@ import LightsCard from './devices/lights/LightsCard';
 import WeatherCardWrapper from './devices/weather/WeatherCardWrapper';
 import NetworkCard from './devices/network/NetworkCard';
 import RaspiCard from './devices/raspi/RaspiCard';
+import SonosCard from './devices/sonos/SonosCard';
 import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
@@ -26,6 +27,7 @@ const CARD_COMPONENTS: Record<string, React.ComponentType> = {
   camera: CameraCard,
   network: NetworkCard,
   raspi: RaspiCard,
+  sonos: SonosCard,
 };
 
 // Skeleton registry - maps card IDs to their skeleton components
@@ -37,6 +39,7 @@ const CARD_SKELETONS: Record<string, React.ComponentType> = {
   camera: Skeleton.CameraCard,
   network: Skeleton.NetworkCard,
   raspi: Skeleton.RaspiCard,
+  sonos: Skeleton.SonosCard,
 };
 
 // Device metadata for error boundaries
@@ -48,6 +51,7 @@ const DEVICE_META: Record<string, { name: string; icon: string }> = {
   camera: { name: 'Camera', icon: '📷' },
   network: { name: 'Rete', icon: '📡' },
   raspi: { name: 'Raspberry Pi', icon: '🖥️' },
+  sonos: { name: 'Sonos', icon: '🎵' },
 };
 
 /**

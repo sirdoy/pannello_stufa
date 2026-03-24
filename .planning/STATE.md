@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
-stopped_at: Completed 128-01-PLAN.md (Sonos extended controls proxy wrappers)
-last_updated: "2026-03-24T09:54:15.763Z"
+stopped_at: Completed 128-02-PLAN.md (Sonos extended controls API routes)
+last_updated: "2026-03-24T09:57:47.933Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -47,6 +47,7 @@ Plan: 2 of 2
 | Phase 127 P01 | 95 | 1 tasks | 2 files |
 | Phase 127 P02 | 120 | 2 tasks | 10 files |
 | Phase 128 P01 | 6 | 2 tasks | 2 files |
+| Phase 128 P02 | 2 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -67,6 +68,7 @@ Recent decisions affecting v16.0:
 - [Phase 127]: Transport commands (play/pause/stop/next/previous) use haPost with empty body; volume/mute/seek use haPut with typed body
 - [Phase 127]: No idempotency wrappers on Sonos command routes (per D-04)
 - [Phase 128]: Use actual types/sonosProxy.ts field names (play_mode, dialog_mode) over plan context which had slightly different shapes
+- [Phase 128]: Unjoin route uses _request (no body) matching D-13; history route uses no getPathParam (no dynamic segment)
 
 ### Pending Todos
 
@@ -85,5 +87,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-24
-Stopped at: Completed 128-01-PLAN.md (Sonos extended controls proxy wrappers)
+Stopped at: Completed 128-02-PLAN.md (Sonos extended controls API routes)
 Resume file: None

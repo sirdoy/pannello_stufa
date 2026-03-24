@@ -65,7 +65,7 @@ See `.planning/milestones/` for full archives.
 
 - [x] **Phase 126: Sonos Infrastructure** - Proxy client, TypeScript types, discovery routes (health, devices, device detail, zones) (completed 2026-03-23)
 - [x] **Phase 127: Sonos Transport Controls** - Playback state/control routes (play/pause/stop/next/prev), volume routes (get/set per speaker and zone), seek (completed 2026-03-24)
-- [ ] **Phase 128: Sonos Extended Controls** - EQ, play mode, queue, home theater, source switch, grouping, sleep timer, history routes
+- [x] **Phase 128: Sonos Extended Controls** - EQ, play mode, queue, home theater, source switch, grouping, sleep timer, history routes (completed 2026-03-24)
 - [ ] **Phase 129: Sonos Frontend** - SonosCard dashboard card, /sonos page, device registry integration, navigation menu entry
 - [ ] **Phase 130: DIRIGERA Infrastructure** - Proxy client, TypeScript types, health route, all sensor routes (contact, motion, summary)
 - [ ] **Phase 131: DIRIGERA Frontend** - DirigeraCard dashboard card, /dirigera page, device registry integration, navigation menu entry
@@ -121,7 +121,7 @@ Plans:
 
 Plans:
 - [x] 128-01-PLAN.md — Proxy wrappers (12 functions) + unit tests for extended controls
-- [ ] 128-02-PLAN.md — 9 API route files (5 speaker + 3 zone + 1 history)
+- [x] 128-02-PLAN.md — 9 API route files (5 speaker + 3 zone + 1 history)
 
 ### Phase 129: Sonos Frontend
 **Goal**: Sonos is visible on the dashboard and has a dedicated control page accessible from the navigation menu
@@ -219,7 +219,7 @@ Plans:
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
 | 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 128 | v16.0 | 1/2 | In Progress|  |
+| 128 | v16.0 | 2/2 | Complete   | 2026-03-24 |
 | 129 | v16.0 | 0/TBD | Not started | - |
 | 130 | v16.0 | 0/TBD | Not started | - |
 | 131 | v16.0 | 0/TBD | Not started | - |

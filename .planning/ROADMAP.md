@@ -135,7 +135,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 129-01-PLAN.md — SonosCard dashboard card + useSonosData hook + Skeleton + DashboardCards registries
+- [x] 129-01-PLAN.md — SonosCard dashboard card + useSonosData hook + Skeleton + DashboardCards registries
 - [ ] 129-02-PLAN.md — /sonos page + useSonosFullData + useSonosCommands + zone sub-components
 
 ### Phase 130: DIRIGERA Infrastructure
@@ -221,7 +221,7 @@ Plans:
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
 | 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 129 | v16.0 | 0/2 | Not started | - |
+| 129 | v16.0 | 1/2 | In Progress|  |
 | 130 | v16.0 | 0/TBD | Not started | - |
 | 131 | v16.0 | 0/TBD | Not started | - |
 | 132 | v16.0 | 0/TBD | Not started | - |

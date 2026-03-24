@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
-stopped_at: Completed 128-02-PLAN.md (Sonos extended controls API routes)
-last_updated: "2026-03-24T10:01:07.740Z"
+stopped_at: Completed 129-01-PLAN.md (Sonos dashboard card)
+last_updated: "2026-03-24T11:01:28.538Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
   completed_phases: 3
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 8
+  completed_plans: 7
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 128 — sonos-extended-controls
+**Current focus:** Phase 129 — sonos-frontend
 
 ## Current Position
 
-Phase: 129
-Plan: Not started
+Phase: 129 (sonos-frontend) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Plan: Not started
 | Phase 127 P02 | 120 | 2 tasks | 10 files |
 | Phase 128 P01 | 6 | 2 tasks | 2 files |
 | Phase 128 P02 | 2 | 2 tasks | 9 files |
+| Phase 129 P01 | 15 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting v16.0:
 - [Phase 127]: No idempotency wrappers on Sonos command routes (per D-04)
 - [Phase 128]: Use actual types/sonosProxy.ts field names (play_mode, dialog_mode) over plan context which had slightly different shapes
 - [Phase 128]: Unjoin route uses _request (no body) matching D-13; history route uses no getPathParam (no dynamic segment)
+- [Phase 129]: SonosCard: Promise.allSettled for up to 5 zones playback, pick first PLAYING, else first zone
+- [Phase 129]: SonosCard follows RaspiCard/useRaspiData pattern exactly for structural consistency
 
 ### Pending Todos
 
@@ -87,5 +90,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-24
-Stopped at: Completed 128-02-PLAN.md (Sonos extended controls API routes)
+Stopped at: Completed 129-01-PLAN.md (Sonos dashboard card)
 Resume file: None

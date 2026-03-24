@@ -218,7 +218,7 @@ Plans:
 | 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
-| 127 | v16.0 | 2/2 | Complete   | 2026-03-24 |
+| 127 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 128 | v16.0 | 0/TBD | Not started | - |
 | 129 | v16.0 | 0/TBD | Not started | - |
 | 130 | v16.0 | 0/TBD | Not started | - |

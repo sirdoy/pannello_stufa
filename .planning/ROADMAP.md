@@ -166,7 +166,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 131-01: DirigeraCard + /dirigera page + device registry integration + nav menu entry
+- [ ] 131-01-PLAN.md — DirigeraCard dashboard card + device registry + Skeleton + DashboardCards integration
+- [ ] 131-02-PLAN.md — /dirigera page + useDirigeraFullData hook + sensor list sub-components
 
 ### Phase 132: Fritz!Box System & Network Services
 **Goal**: The application exposes Fritz!Box system info, WiFi client data, and network service details via new API routes
@@ -224,7 +225,7 @@ Plans:
 | 128 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 129 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 130 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 131 | v16.0 | 0/TBD | Not started | - |
+| 131 | v16.0 | 0/2 | Not started | - |
 | 132 | v16.0 | 0/TBD | Not started | - |
 | 133 | v16.0 | 0/TBD | Not started | - |
 | 134 | v16.0 | 0/TBD | Not started | - |
@@ -233,4 +234,4 @@ Plans:
 
 ---
 
-*Roadmap updated: 2026-03-24 — Phase 130 plans created (2 plans)*
+*Roadmap updated: 2026-03-24 — Phase 131 plans created (2 plans)*

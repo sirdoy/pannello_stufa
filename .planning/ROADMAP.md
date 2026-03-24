@@ -64,7 +64,7 @@ See `.planning/milestones/` for full archives.
 **Milestone Goal:** Integrate Sonos and DIRIGERA as new providers, complete advanced Fritz!Box endpoints — bringing documented API coverage from 56% to ~95%.
 
 - [x] **Phase 126: Sonos Infrastructure** - Proxy client, TypeScript types, discovery routes (health, devices, device detail, zones) (completed 2026-03-23)
-- [ ] **Phase 127: Sonos Transport Controls** - Playback state/control routes (play/pause/stop/next/prev), volume routes (get/set per speaker and zone), seek
+- [x] **Phase 127: Sonos Transport Controls** - Playback state/control routes (play/pause/stop/next/prev), volume routes (get/set per speaker and zone), seek (completed 2026-03-24)
 - [ ] **Phase 128: Sonos Extended Controls** - EQ, play mode, queue, home theater, source switch, grouping, sleep timer, history routes
 - [ ] **Phase 129: Sonos Frontend** - SonosCard dashboard card, /sonos page, device registry integration, navigation menu entry
 - [ ] **Phase 130: DIRIGERA Infrastructure** - Proxy client, TypeScript types, health route, all sensor routes (contact, motion, summary)
@@ -105,7 +105,7 @@ Plans:
 
 Plans:
 - [x] 127-01-PLAN.md — Proxy command wrappers (11 functions) + unit tests
-- [ ] 127-02-PLAN.md — 10 API route files (8 zone + 2 speaker)
+- [x] 127-02-PLAN.md — 10 API route files (8 zone + 2 speaker)
 
 ### Phase 128: Sonos Extended Controls
 **Goal**: Users can access EQ, play modes, queue, home theater, grouping, sleep timer, and history for Sonos
@@ -218,7 +218,7 @@ Plans:
 | 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
 | 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
 | 126 | v16.0 | 2/2 | Complete    | 2026-03-23 |
-| 127 | v16.0 | 1/2 | In Progress|  |
+| 127 | v16.0 | 2/2 | Complete   | 2026-03-24 |
 | 128 | v16.0 | 0/TBD | Not started | - |
 | 129 | v16.0 | 0/TBD | Not started | - |
 | 130 | v16.0 | 0/TBD | Not started | - |

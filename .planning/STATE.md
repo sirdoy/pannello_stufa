@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: unknown
-stopped_at: Completed 127-01-PLAN.md (Sonos proxy wrappers)
-last_updated: "2026-03-24T08:22:35.243Z"
+stopped_at: Completed 127-02-PLAN.md (Sonos transport control routes)
+last_updated: "2026-03-24T08:26:25.200Z"
 last_activity: 2026-03-24
 progress:
   total_phases: 9
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -45,6 +45,7 @@ Plan: 2 of 2
 | Phase 126 P01 | 3 | 2 tasks | 3 files |
 | Phase 126 P02 | 851 | 2 tasks | 4 files |
 | Phase 127 P01 | 95 | 1 tasks | 2 files |
+| Phase 127 P02 | 120 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,7 @@ Recent decisions affecting v16.0:
 - [Phase 126]: mute in SonosVolumeHistoryItem is number | null (not boolean) per API spec
 - [Phase 126]: Array responses (devices, zones) wrapped in named object keys; object responses (health, device detail) use double assertion for success() compatibility
 - [Phase 127]: Transport commands (play/pause/stop/next/previous) use haPost with empty body; volume/mute/seek use haPut with typed body
+- [Phase 127]: No idempotency wrappers on Sonos command routes (per D-04)
 
 ### Pending Todos
 
@@ -81,5 +83,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-24
-Stopped at: Completed 127-01-PLAN.md (Sonos proxy wrappers)
+Stopped at: Completed 127-02-PLAN.md (Sonos transport control routes)
 Resume file: None

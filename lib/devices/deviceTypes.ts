@@ -4,7 +4,7 @@
  */
 
 /** Device type union */
-export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos' | 'network' | 'raspi';
+export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos' | 'network' | 'raspi' | 'dirigera';
 
 /** Color palette type */
 export type DeviceColor = 'primary' | 'info' | 'ocean' | 'warning' | 'success';
@@ -20,6 +20,7 @@ export const DEVICE_TYPES = {
   SONOS: 'sonos',
   NETWORK: 'network',
   RASPI: 'raspi',
+  DIRIGERA: 'dirigera',
 } as const;
 
 /** Display item configuration */
@@ -60,6 +61,7 @@ interface DeviceFeatures {
   hasPlayback?: boolean;
   hasZones?: boolean;
   hasSearch?: boolean;
+  hasSensors?: boolean;
 }
 
 /** Device configuration */
@@ -200,6 +202,20 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
       hasErrors: false,
     },
   },
+  [DEVICE_TYPES.DIRIGERA]: {
+    id: 'dirigera',
+    name: 'DIRIGERA',
+    icon: '\uD83D\uDD0C',
+    color: 'info',
+    enabled: true,
+    routes: { main: '/dirigera' },
+    features: {
+      hasScheduler: false,
+      hasMaintenance: false,
+      hasErrors: false,
+      hasSensors: true,
+    },
+  },
 };
 
 /**
@@ -215,7 +231,7 @@ const ALL_DASHBOARD_ITEMS: Record<string, DeviceConfig | DisplayItem> = {
  * Default order for dashboard items (new users)
  * Defines initial order and visibility
  */
-export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network', 'raspi', 'sonos'];
+export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network', 'raspi', 'sonos', 'dirigera'];
 
 /** Color class configuration */
 interface ColorClasses {

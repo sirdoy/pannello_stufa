@@ -870,6 +870,42 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
 };
 
 /**
+ * Skeleton.DirigeraCard - Skeleton for DirigeraCard component - Ocean/info theme
+ */
+Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
+  const SkeletonPulse = ({ className = '' }: { className?: string }) => (
+    <div
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+    >
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+    </div>
+  );
+
+  const Card = Skeleton.Card;
+
+  return (
+    <Card className="overflow-visible transition-all duration-500">
+      {/* Ocean accent bar */}
+      <div className="h-1 bg-gradient-to-r from-ocean-500/50 via-ocean-400/50 to-ocean-600/50" />
+      <div className="p-5 sm:p-6">
+        {/* Header skeleton */}
+        <div className="flex items-center gap-3 mb-4">
+          <SkeletonPulse className="w-8 h-8 rounded-lg" />
+          <SkeletonPulse className="w-28 h-6 rounded" />
+        </div>
+        {/* 4 sensor stat boxes in 2x2 grid */}
+        <div className="grid grid-cols-2 gap-3">
+          <SkeletonPulse className="h-20 rounded-lg" />
+          <SkeletonPulse className="h-20 rounded-lg" />
+          <SkeletonPulse className="h-20 rounded-lg" />
+          <SkeletonPulse className="h-20 rounded-lg" />
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+/**
  * Skeleton.SonosCard - Skeleton for SonosCard component - Success/sage theme
  */
 Skeleton.SonosCard = function SkeletonSonosCard() {

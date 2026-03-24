@@ -10,6 +10,7 @@ import WeatherCardWrapper from './devices/weather/WeatherCardWrapper';
 import NetworkCard from './devices/network/NetworkCard';
 import RaspiCard from './devices/raspi/RaspiCard';
 import SonosCard from './devices/sonos/SonosCard';
+import DirigeraCard from './devices/dirigera/DirigeraCard';
 import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
@@ -28,6 +29,7 @@ const CARD_COMPONENTS: Record<string, React.ComponentType> = {
   network: NetworkCard,
   raspi: RaspiCard,
   sonos: SonosCard,
+  dirigera: DirigeraCard,
 };
 
 // Skeleton registry - maps card IDs to their skeleton components
@@ -40,6 +42,7 @@ const CARD_SKELETONS: Record<string, React.ComponentType> = {
   network: Skeleton.NetworkCard,
   raspi: Skeleton.RaspiCard,
   sonos: Skeleton.SonosCard,
+  dirigera: Skeleton.DirigeraCard,
 };
 
 // Device metadata for error boundaries
@@ -52,6 +55,7 @@ const DEVICE_META: Record<string, { name: string; icon: string }> = {
   network: { name: 'Rete', icon: '📡' },
   raspi: { name: 'Raspberry Pi', icon: '🖥️' },
   sonos: { name: 'Sonos', icon: '🎵' },
+  dirigera: { name: 'DIRIGERA', icon: '🔌' },
 };
 
 /**

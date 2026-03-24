@@ -20,7 +20,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v15.0 (shipped 2026-03-23)
-**Status:** Executing v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — Phase 130 complete (DIRIGERA infrastructure: typed proxy client with 5 haGet wrappers, 15 TypeScript interfaces, 5 authenticated API routes for hub health and sensor enumeration).
+**Status:** Executing v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — Phase 131 complete (DIRIGERA frontend: DirigeraCard dashboard card with ocean theme and 2x2 stats grid, /dirigera page with sensor list and type filter, device registry integration with automatic navigation).
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -777,4 +777,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 after Phase 130 (DIRIGERA Infrastructure) complete*
+*Last updated: 2026-03-24 after Phase 131 (DIRIGERA Frontend) complete*

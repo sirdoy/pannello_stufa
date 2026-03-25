@@ -7,6 +7,8 @@ import type {
   SonosPlayModeResponse,
   SonosSleepTimerResponse,
   SonosPlayMode,
+  SonosEqResponse,
+  SonosHomeTheaterResponse,
 } from '@/types/sonosProxy';
 import type { UseSonosCommandsReturn } from '../hooks/useSonosCommands';
 import SonosNowPlaying from './SonosNowPlaying';
@@ -23,6 +25,10 @@ interface SonosZoneSectionProps {
   playMode: SonosPlayModeResponse | undefined;
   sleepTimer: SonosSleepTimerResponse | undefined;
   commands: UseSonosCommandsReturn;
+  // Extended data props
+  eqData: Record<string, SonosEqResponse>;
+  homeTheaterData: Record<string, SonosHomeTheaterResponse>;
+  allZones: SonosZoneResponse[];
 }
 
 export default function SonosZoneSection({
@@ -32,6 +38,9 @@ export default function SonosZoneSection({
   playMode,
   sleepTimer,
   commands,
+  eqData,
+  homeTheaterData,
+  allZones,
 }: SonosZoneSectionProps) {
   return (
     <div className="rounded-2xl bg-slate-800/50 [html:not(.dark)_&]:bg-white p-5 sm:p-6 space-y-4">
@@ -83,6 +92,20 @@ export default function SonosZoneSection({
             volumeData={volumes[member.uid]}
             onSetVolume={commands.handleSetVolume}
             onSetMute={commands.handleSetMute}
+            role={member.role}
+            eqData={eqData[member.uid]}
+            htData={homeTheaterData[member.uid]}
+            currentSource={playback?.source_type ?? null}
+            isCoordinator={member.uid === zone.coordinator_uid}
+            zoneMemberCount={zone.member_count}
+            availableZones={allZones
+              .filter(z => z.group_id !== zone.group_id)
+              .map(z => ({ group_id: z.group_id, label: z.label, coordinator_uid: z.coordinator_uid }))}
+            onSetEq={commands.handleSetEq}
+            onSetHomeTheater={commands.handleSetHomeTheater}
+            onSwitchSource={commands.handleSwitchSource}
+            onJoinGroup={commands.handleJoinGroup}
+            onUnjoinGroup={commands.handleUnjoinGroup}
           />
         ))}
       </div>

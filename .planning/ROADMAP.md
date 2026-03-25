@@ -198,7 +198,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 133-01-PLAN.md — 5 client methods + interfaces + 3 bandwidth history routes + tests
+- [x] 133-01-PLAN.md — 5 client methods + interfaces + 3 bandwidth history routes + tests
 - [ ] 133-02-PLAN.md — Devices/daily route + budget-stats route + tests
 
 ### Phase 134: Fritz!Box Frontend
@@ -228,7 +228,7 @@ Plans:
 | 130 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 131 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 132 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 133 | v16.0 | 0/2 | Not started | - |
+| 133 | v16.0 | 1/2 | In Progress|  |
 | 134 | v16.0 | 0/TBD | Not started | - |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (9 phases planned).

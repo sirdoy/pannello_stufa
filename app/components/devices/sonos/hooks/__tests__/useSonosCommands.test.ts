@@ -43,6 +43,7 @@ function makeMockCommand(responseOverride?: Partial<Response> | null) {
 describe('useSonosCommands', () => {
   let mockTransportCmd: ReturnType<typeof makeMockCommand>;
   let mockVolumeCmd: ReturnType<typeof makeMockCommand>;
+  let mockExtendedCmd: ReturnType<typeof makeMockCommand>;
   let mockFetchData: jest.Mock;
   let mockSetError: jest.Mock;
 
@@ -51,14 +52,16 @@ describe('useSonosCommands', () => {
 
     mockTransportCmd = makeMockCommand();
     mockVolumeCmd = makeMockCommand();
+    mockExtendedCmd = makeMockCommand();
     mockFetchData = jest.fn().mockResolvedValue(undefined);
     mockSetError = jest.fn();
 
     let callCount = 0;
     mockUseRetryableCommand.mockImplementation(() => {
       callCount++;
-      if (callCount % 2 === 1) return mockTransportCmd as ReturnType<typeof useRetryableCommand>;
-      return mockVolumeCmd as ReturnType<typeof useRetryableCommand>;
+      if (callCount % 3 === 1) return mockTransportCmd as ReturnType<typeof useRetryableCommand>;
+      if (callCount % 3 === 2) return mockVolumeCmd as ReturnType<typeof useRetryableCommand>;
+      return mockExtendedCmd as ReturnType<typeof useRetryableCommand>;
     });
   });
 
@@ -214,5 +217,61 @@ describe('useSonosCommands', () => {
     // null response means deduplicated — should not call fetchData or setError
     expect(mockFetchData).not.toHaveBeenCalled();
     expect(mockSetError).not.toHaveBeenCalledWith(expect.stringContaining('Error'));
+  });
+
+  it('Test 10: handleSetPlayMode sends PUT with mode and calls fetchData', async () => {
+    const { result } = renderHook(() =>
+      useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
+    );
+
+    await act(async () => {
+      await result.current.handleSetPlayMode('RINCON_A', 'SHUFFLE');
+    });
+
+    expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
+      '/api/sonos/zones/RINCON_A/play-mode',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ mode: 'SHUFFLE' }),
+      })
+    );
+    expect(mockFetchData).toHaveBeenCalled();
+  });
+
+  it('Test 11: handleSetSleepTimer sends PUT with duration and calls fetchData', async () => {
+    const { result } = renderHook(() =>
+      useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
+    );
+
+    await act(async () => {
+      await result.current.handleSetSleepTimer('RINCON_A', 1800);
+    });
+
+    expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
+      '/api/sonos/zones/RINCON_A/sleep-timer',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ duration: 1800 }),
+      })
+    );
+    expect(mockFetchData).toHaveBeenCalled();
+  });
+
+  it('Test 12: handleSetSleepTimer with duration=0 cancels timer', async () => {
+    const { result } = renderHook(() =>
+      useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
+    );
+
+    await act(async () => {
+      await result.current.handleSetSleepTimer('RINCON_A', 0);
+    });
+
+    expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
+      '/api/sonos/zones/RINCON_A/sleep-timer',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ duration: 0 }),
+      })
+    );
   });
 });

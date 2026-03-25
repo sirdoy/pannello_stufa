@@ -6,7 +6,7 @@
  */
 
 import { renderHook, waitFor } from '@testing-library/react';
-import type { SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse } from '@/types/sonosProxy';
+import type { SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse } from '@/types/sonosProxy';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useAdaptivePolling');
@@ -71,17 +71,26 @@ const mockVolume1: SonosVolumeResponse = { uid: 'RINCON_A', volume: 40, mute: fa
 const mockVolume2: SonosVolumeResponse = { uid: 'RINCON_B', volume: 0, mute: true };
 const mockVolume3: SonosVolumeResponse = { uid: 'RINCON_C', volume: 25, mute: false };
 
+const mockPlayMode1: SonosPlayModeResponse = { group_id: 'RINCON_A', play_mode: 'NORMAL' };
+const mockPlayMode2: SonosPlayModeResponse = { group_id: 'RINCON_C', play_mode: 'SHUFFLE' };
+const mockSleepTimer1: SonosSleepTimerResponse = { group_id: 'RINCON_A', remaining_seconds: null };
+const mockSleepTimer2: SonosSleepTimerResponse = { group_id: 'RINCON_C', remaining_seconds: 1800 };
+
 function makeFetchMock(overrides?: {
   zonesOk?: boolean;
   playback1Ok?: boolean;
   playback2Ok?: boolean;
   volumeOk?: boolean;
+  playModeOk?: boolean;
+  sleepTimerOk?: boolean;
 }) {
   const opts = {
     zonesOk: true,
     playback1Ok: true,
     playback2Ok: true,
     volumeOk: true,
+    playModeOk: true,
+    sleepTimerOk: true,
     ...overrides,
   };
 
@@ -120,6 +129,30 @@ function makeFetchMock(overrides?: {
       return Promise.resolve({
         ok: opts.volumeOk,
         json: () => Promise.resolve(mockVolume3),
+      });
+    }
+    if (url === '/api/sonos/zones/RINCON_A/play-mode') {
+      return Promise.resolve({
+        ok: opts.playModeOk,
+        json: () => Promise.resolve(mockPlayMode1),
+      });
+    }
+    if (url === '/api/sonos/zones/RINCON_C/play-mode') {
+      return Promise.resolve({
+        ok: opts.playModeOk,
+        json: () => Promise.resolve(mockPlayMode2),
+      });
+    }
+    if (url === '/api/sonos/zones/RINCON_A/sleep-timer') {
+      return Promise.resolve({
+        ok: opts.sleepTimerOk,
+        json: () => Promise.resolve(mockSleepTimer1),
+      });
+    }
+    if (url === '/api/sonos/zones/RINCON_C/sleep-timer') {
+      return Promise.resolve({
+        ok: opts.sleepTimerOk,
+        json: () => Promise.resolve(mockSleepTimer2),
       });
     }
     return Promise.reject(new Error(`Unexpected URL: ${url as string}`));
@@ -253,6 +286,50 @@ describe('useSonosFullData', () => {
     await waitFor(() => expect(result.current.stale).toBe(true));
 
     expect(result.current.data).not.toBeNull();
+    expect(result.current.error).toBeNull();
+  });
+
+  it('Test 8: populates playModes record from per-zone play-mode fetch', async () => {
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.data).not.toBeNull();
+    expect(result.current.data!.playModes['RINCON_A']).toBeDefined();
+    expect(result.current.data!.playModes['RINCON_A']!.play_mode).toBe('NORMAL');
+    expect(result.current.data!.playModes['RINCON_C']).toBeDefined();
+    expect(result.current.data!.playModes['RINCON_C']!.play_mode).toBe('SHUFFLE');
+  });
+
+  it('Test 9: populates sleepTimers record from per-zone sleep-timer fetch', async () => {
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.data).not.toBeNull();
+    expect(result.current.data!.sleepTimers['RINCON_A']).toBeDefined();
+    expect(result.current.data!.sleepTimers['RINCON_A']!.remaining_seconds).toBeNull();
+    expect(result.current.data!.sleepTimers['RINCON_C']).toBeDefined();
+    expect(result.current.data!.sleepTimers['RINCON_C']!.remaining_seconds).toBe(1800);
+  });
+
+  it('Test 10: handles play-mode fetch failure gracefully (partial data)', async () => {
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock({ playModeOk: false }));
+
+    const { result } = renderHook(() => useSonosFullData());
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // playModes should be empty (all failed)
+    expect(result.current.data).not.toBeNull();
+    expect(Object.keys(result.current.data!.playModes)).toHaveLength(0);
+    // rest of data still present
+    expect(result.current.data!.zones).toHaveLength(2);
+    expect(result.current.data!.playback['RINCON_A']).toBeDefined();
     expect(result.current.error).toBeNull();
   });
 });

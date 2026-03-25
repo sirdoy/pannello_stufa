@@ -3,12 +3,14 @@
 import { useState, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
-import type { SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse } from '@/types/sonosProxy';
+import type { SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse } from '@/types/sonosProxy';
 
 export interface SonosFullData {
   zones: SonosZoneResponse[];
   playback: Record<string, SonosPlaybackResponse>;  // keyed by group_id
   volumes: Record<string, SonosVolumeResponse>;      // keyed by uid
+  playModes: Record<string, SonosPlayModeResponse>;  // keyed by group_id
+  sleepTimers: Record<string, SonosSleepTimerResponse>; // keyed by group_id
 }
 
 export interface UseSonosFullDataReturn {
@@ -70,7 +72,35 @@ export function useSonosFullData(): UseSonosFullDataReturn {
         if (r.status === 'fulfilled') volumes[allUids[i]!] = r.value;
       });
 
-      const newData: SonosFullData = { zones, playback, volumes };
+      // 5. Fetch play-mode and sleep-timer for ALL zones in parallel
+      const [playModeResults, sleepTimerResults] = await Promise.all([
+        Promise.allSettled(
+          zones.map(z =>
+            fetch(`/api/sonos/zones/${z.group_id}/play-mode`).then(r => {
+              if (!r.ok) throw new Error('play-mode failed');
+              return r.json() as Promise<SonosPlayModeResponse>;
+            })
+          )
+        ),
+        Promise.allSettled(
+          zones.map(z =>
+            fetch(`/api/sonos/zones/${z.group_id}/sleep-timer`).then(r => {
+              if (!r.ok) throw new Error('sleep-timer failed');
+              return r.json() as Promise<SonosSleepTimerResponse>;
+            })
+          )
+        ),
+      ]);
+      const playModes: Record<string, SonosPlayModeResponse> = {};
+      playModeResults.forEach((r, i) => {
+        if (r.status === 'fulfilled') playModes[zones[i]!.group_id] = r.value;
+      });
+      const sleepTimers: Record<string, SonosSleepTimerResponse> = {};
+      sleepTimerResults.forEach((r, i) => {
+        if (r.status === 'fulfilled') sleepTimers[zones[i]!.group_id] = r.value;
+      });
+
+      const newData: SonosFullData = { zones, playback, volumes, playModes, sleepTimers };
       dataRef.current = newData;
       setData(newData);
       setStale(false);

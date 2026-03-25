@@ -71,7 +71,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 131: DIRIGERA Frontend** - DirigeraCard dashboard card, /dirigera page, device registry integration, navigation menu entry (completed 2026-03-24)
 - [x] **Phase 132: Fritz!Box System & Network Services** - System info, WiFi clients/networks, DHCP reservations, port forwarding, UPnP, mesh topology routes (completed 2026-03-25)
 - [x] **Phase 133: Fritz!Box History & Budget** - Hourly/daily/auto bandwidth history routes, daily device count, budget stats route (completed 2026-03-25)
-- [ ] **Phase 134: Fritz!Box Frontend** - System info section, WiFi clients tab, network services section, history charts with toggle in /network page
+- [x] **Phase 134: Fritz!Box Frontend** - System info section, WiFi clients tab, network services section, history charts with toggle in /network page (completed 2026-03-25)
 
 ## Phase Details
 
@@ -214,7 +214,7 @@ Plans:
 
 Plans:
 - [x] 134-01-PLAN.md — Hooks (4) + components (3) + utility + tests
-- [ ] 134-02-PLAN.md — HistoryTierToggle + BandwidthChart tier integration + page.tsx orchestrator with tabs
+- [x] 134-02-PLAN.md — HistoryTierToggle + BandwidthChart tier integration + page.tsx orchestrator with tabs
 
 ## Progress
 
@@ -230,7 +230,7 @@ Plans:
 | 131 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 132 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 133 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 134 | v16.0 | 1/2 | In Progress|  |
+| 134 | v16.0 | 2/2 | Complete   | 2026-03-25 |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (9 phases planned).
 

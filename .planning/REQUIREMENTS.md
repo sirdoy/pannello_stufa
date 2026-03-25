@@ -102,7 +102,7 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 - [x] **FRITZ-13**: System info section nella /network page (model, firmware, uptime)
 - [x] **FRITZ-14**: WiFi clients tab nella /network page con signal strength e band
 - [x] **FRITZ-15**: Network services section (DHCP, port forwarding, UPnP, mesh) nella /network page
-- [ ] **FRITZ-16**: History charts con hourly/daily toggle nella /network page
+- [x] **FRITZ-16**: History charts con hourly/daily toggle nella /network page
 
 ## Future Requirements (v16.1+)
 
@@ -190,7 +190,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FRITZ-13 | Phase 134 | Complete |
 | FRITZ-14 | Phase 134 | Complete |
 | FRITZ-15 | Phase 134 | Complete |
-| FRITZ-16 | Phase 134 | Pending |
+| FRITZ-16 | Phase 134 | Complete |
 
 **Coverage:**
 - v16.0 requirements: 50 total

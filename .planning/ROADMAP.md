@@ -182,8 +182,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 132-01: System route + WiFi clients/networks routes
-- [ ] 132-02: DHCP reservations + port forwarding + UPnP + mesh routes
+- [ ] 132-01-PLAN.md — 7 client methods + inline types + unit tests + system/wifi routes
+- [ ] 132-02-PLAN.md — DHCP reservations + port forwarding + UPnP + mesh routes
 
 ### Phase 133: Fritz!Box History & Budget
 **Goal**: The application can retrieve multi-resolution bandwidth history and data budget statistics from Fritz!Box

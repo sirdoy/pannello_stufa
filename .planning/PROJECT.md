@@ -20,7 +20,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v15.0 (shipped 2026-03-23)
-**Status:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — 10 of 12 phases complete (126-135). Phase 135 complete (Sonos Zone Extended UI: play mode controls with shuffle/repeat toggles, sleep timer with presets and countdown, expandable queue viewer with load-more pagination — all wired per-zone in /sonos page).
+**Status:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — 11 of 12 phases complete (126-136). Phase 136 complete (Sonos Speaker Extended UI & History: per-speaker EQ sliders, home theater settings for soundbars, TV/line-in source switch, join/unjoin group controls, and global history chart with volume LineChart and playback event table in /sonos page).
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -777,4 +777,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 after Phase 131 (DIRIGERA Frontend) complete*
+*Last updated: 2026-03-25 after Phase 136 (Sonos Speaker Extended UI & History) complete*

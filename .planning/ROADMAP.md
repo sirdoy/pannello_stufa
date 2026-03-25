@@ -198,7 +198,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 133-01: History tier routes (hourly, daily, devices/daily, auto) + budget-stats route
+- [ ] 133-01-PLAN.md — 5 client methods + interfaces + 3 bandwidth history routes + tests
+- [ ] 133-02-PLAN.md — Devices/daily route + budget-stats route + tests
 
 ### Phase 134: Fritz!Box Frontend
 **Goal**: The /network page displays Fritz!Box system info, WiFi clients, network services, and multi-resolution bandwidth charts
@@ -227,11 +228,11 @@ Plans:
 | 130 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 131 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 132 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 133 | v16.0 | 0/TBD | Not started | - |
+| 133 | v16.0 | 0/2 | Not started | - |
 | 134 | v16.0 | 0/TBD | Not started | - |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (9 phases planned).
 
 ---
 
-*Roadmap updated: 2026-03-24 — Phase 131 plans created (2 plans)*
+*Roadmap updated: 2026-03-25 — Phase 133 plans created (2 plans)*

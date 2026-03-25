@@ -23,7 +23,7 @@
 - ✅ **v14.0 Hue Proxy Migration** — Phases 106-112 (shipped 2026-03-22)
 - ✅ **v14.1 Tech Debt & Type Safety** — Phases 113-117 (shipped 2026-03-22)
 - ✅ **v15.0 Rooms & Device Registry** — Phases 118-125 (shipped 2026-03-23)
-- 🚧 **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato** — Phases 126-134 (in progress)
+- 🚧 **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato** — Phases 126-137 (in progress)
 
 ## Phases
 
@@ -72,6 +72,9 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 132: Fritz!Box System & Network Services** - System info, WiFi clients/networks, DHCP reservations, port forwarding, UPnP, mesh topology routes (completed 2026-03-25)
 - [x] **Phase 133: Fritz!Box History & Budget** - Hourly/daily/auto bandwidth history routes, daily device count, budget stats route (completed 2026-03-25)
 - [x] **Phase 134: Fritz!Box Frontend** - System info section, WiFi clients tab, network services section, history charts with toggle in /network page (completed 2026-03-25)
+- [ ] **Phase 135: Sonos Zone Extended UI** - Play mode toggles, sleep timer, queue viewer per zone in /sonos page
+- [ ] **Phase 136: Sonos Speaker Extended UI & History** - EQ sliders, home theater settings, source switch, grouping, history chart in /sonos page
+- [ ] **Phase 137: Fritz!Box Extended Frontend** - WiFi networks, device count chart, budget stats, auto-granularity in /network page
 
 ## Phase Details
 
@@ -216,6 +219,43 @@ Plans:
 - [x] 134-01-PLAN.md — Hooks (4) + components (3) + utility + tests
 - [x] 134-02-PLAN.md — HistoryTierToggle + BandwidthChart tier integration + page.tsx orchestrator with tabs
 
+### Phase 135: Sonos Zone Extended UI
+**Goal**: The /sonos page shows play mode controls, sleep timer, and queue viewer for each zone
+**Depends on**: Phase 129 (existing /sonos page with transport + volume)
+**Requirements**: SONOS-35, SONOS-36, SONOS-37
+**Success Criteria** (what must be TRUE):
+  1. Each zone section in /sonos shows shuffle/repeat/crossfade toggle buttons reflecting current play mode state
+  2. Each zone section shows the remaining sleep timer and has set/cancel controls
+  3. Each zone section has an expandable queue viewer showing paginated track list (title, artist, duration)
+  4. Play mode and sleep timer mutations return 202 and trigger data refresh
+  5. Queue supports limit/offset pagination with load-more or scroll
+**Plans**: 2 plans
+
+Plans:
+- [ ] 135-01-PLAN.md — Extend hooks (useSonosFullData + useSonosCommands + new useSonosQueue) with play-mode, sleep-timer, queue support
+- [ ] 135-02-PLAN.md — 3 presentational components (PlayModeControls, SleepTimer, QueueViewer) + zone section wiring + page orchestrator
+
+### Phase 136: Sonos Speaker Extended UI & History
+**Goal**: The /sonos page shows per-speaker EQ/home theater/source/grouping controls and a global history chart
+**Depends on**: Phase 135
+**Requirements**: SONOS-38, SONOS-39, SONOS-40, SONOS-41, SONOS-42
+**Success Criteria** (what must be TRUE):
+  1. Each speaker in a zone has expandable EQ controls (bass/treble sliders -10 to +10, loudness toggle)
+  2. Speakers identified as soundbars show home theater settings (night mode, speech enhance, sub, surround toggles)
+  3. Each speaker has a source switch button (TV/line-in) visible when applicable
+  4. Each speaker has join/unjoin group controls allowing dynamic zone re-grouping
+  5. /sonos page has a history section with a chart showing volume or playback events, type selector, and time range picker
+
+### Phase 137: Fritz!Box Extended Frontend
+**Goal**: The /network page shows WiFi networks, device count history, budget statistics, and auto-granularity
+**Depends on**: Phase 134 (existing /network page with system info, WiFi clients, network services, tier toggle)
+**Requirements**: FRITZ-17, FRITZ-18, FRITZ-19, FRITZ-20
+**Success Criteria** (what must be TRUE):
+  1. /network WiFi tab (or new sub-tab) shows configured WiFi networks with SSID, band, enabled/disabled status badge
+  2. /network page has a device count chart showing daily connected device counts over time
+  3. /network page has a budget stats card showing data consumption, utilization percentage with progress bar, and ok/warning/danger status
+  4. Bandwidth chart supports auto-granularity mode that automatically selects hourly or daily resolution based on time range
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -231,9 +271,12 @@ Plans:
 | 132 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 133 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 134 | v16.0 | 2/2 | Complete    | 2026-03-25 |
+| 135 | v16.0 | 0/2 | Planned     | — |
+| 136 | v16.0 | 0/0 | Planned     | — |
+| 137 | v16.0 | 0/0 | Planned     | — |
 
-**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (9 phases planned).
+**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (12 phases, 9 complete + 3 planned).
 
 ---
 
-*Roadmap updated: 2026-03-25 — Phase 134 plans created (2 plans)*
+*Roadmap updated: 2026-03-25 — Phase 135 planned (2 plans in 2 waves)*

@@ -2,30 +2,41 @@
  * Network Page - /network
  *
  * Full-page orchestrator for Fritz!Box network monitoring:
+ * - System Info card (model, firmware, uptime)
  * - WAN status card (connection, IP, uptime, DNS, gateway)
- * - Device list table (name, IP, MAC, status, bandwidth)
- * - Bandwidth chart (download/upload trends over time)
+ * - Tab navigation: Dispositivi / WiFi Clients / Servizi di Rete
+ * - Bandwidth chart with tier toggle (Tempo reale / Orario / Giornaliero)
+ * - Bandwidth-stove correlation chart
+ * - Device history timeline
  *
  * Uses orchestrator pattern:
  * - Reuses useNetworkData hook from Phase 62 (single polling loop)
- * - Thin coordination layer (~80 lines)
+ * - Thin coordination layer
  * - Presentational components handle display
  */
 
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { PageLayout, Skeleton, Button, Heading } from '@/app/components/ui';
+import { cn } from '@/lib/utils/cn';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 import { useBandwidthHistory } from './hooks/useBandwidthHistory';
 import { useDeviceHistory } from './hooks/useDeviceHistory';
 import { useBandwidthCorrelation } from './hooks/useBandwidthCorrelation';
+import { useFritzSystemInfo } from './hooks/useFritzSystemInfo';
+import { useFritzWifiClients } from './hooks/useFritzWifiClients';
+import { useFritzNetworkServices } from './hooks/useFritzNetworkServices';
+import { useFritzBandwidthTiers } from './hooks/useFritzBandwidthTiers';
 import WanStatusCard from './components/WanStatusCard';
 import DeviceListTable from './components/DeviceListTable';
 import CorrelationInsight from './components/CorrelationInsight';
 import DeviceHistoryTimeline from './components/DeviceHistoryTimeline';
+import SystemInfoCard from './components/SystemInfoCard';
+import WifiClientsTable from './components/WifiClientsTable';
+import NetworkServicesCard from './components/NetworkServicesCard';
 
 const BandwidthChart = dynamic(
   () => import('./components/BandwidthChart'),
@@ -53,6 +64,8 @@ const BandwidthCorrelationChart = dynamic(
 import { STOVE_ROUTES } from '@/lib/routes';
 import type { DeviceCategory } from '@/types/firebase/network';
 
+type NetworkTab = 'dispositivi' | 'wifi' | 'servizi';
+
 export default function NetworkPage() {
   const router = useRouter();
   const networkData = useNetworkData();
@@ -61,6 +74,15 @@ export default function NetworkPage() {
   const correlation = useBandwidthCorrelation();
 
   const handleBack = () => router.push('/');
+
+  // Tab state
+  const [activeTab, setActiveTab] = useState<NetworkTab>('dispositivi');
+
+  // New hooks (Phase 134)
+  const systemInfo = useFritzSystemInfo();
+  const wifiClients = useFritzWifiClients({ paused: activeTab !== 'wifi' });
+  const networkServices = useFritzNetworkServices({ paused: activeTab !== 'servizi' });
+  const bandwidthTiers = useFritzBandwidthTiers();
 
   // Stove power level polling (lightweight, independent)
   const stovePowerRef = useRef<number | null>(null);
@@ -128,7 +150,9 @@ export default function NetworkPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-12 w-48 rounded-xl" />
+        <Skeleton className="h-[100px] rounded-2xl" />
         <Skeleton className="h-[280px] rounded-2xl" />
+        <Skeleton className="h-10 rounded-xl w-full" />
         <Skeleton className="h-[400px] rounded-2xl" />
         <Skeleton className="h-[380px] rounded-2xl" />
         <Skeleton className="h-[300px] rounded-2xl" />
@@ -154,6 +178,9 @@ export default function NetworkPage() {
       }
     >
       <div className="space-y-6">
+        {/* System Info Card - above WAN status card */}
+        <SystemInfoCard data={systemInfo.data} loading={systemInfo.loading} stale={systemInfo.stale} />
+
         {/* WAN Status Card - always visible, top position */}
         <WanStatusCard
           wan={networkData.wan}
@@ -161,14 +188,57 @@ export default function NetworkPage() {
           lastUpdated={networkData.lastUpdated}
         />
 
-        {/* Device List Table - below WAN card */}
-        <DeviceListTable
-          devices={networkData.devices}
-          isStale={networkData.stale}
-          onCategoryChange={handleCategoryChange}
-        />
+        {/* Tab Navigation */}
+        <div className="flex gap-1 border-b border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06] pb-0">
+          {([
+            { key: 'dispositivi' as const, label: 'Dispositivi' },
+            { key: 'wifi' as const, label: 'WiFi Clients' },
+            { key: 'servizi' as const, label: 'Servizi di Rete' },
+          ]).map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={cn(
+                'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+                activeTab === tab.key
+                  ? 'border-ember-400 text-ember-400'
+                  : 'border-transparent text-slate-400 hover:text-slate-200 [html:not(.dark)_&]:hover:text-slate-600'
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-        {/* Bandwidth Chart - below device list */}
+        {/* Tab Content */}
+        {activeTab === 'dispositivi' && (
+          <DeviceListTable
+            devices={networkData.devices}
+            isStale={networkData.stale}
+            onCategoryChange={handleCategoryChange}
+          />
+        )}
+        {activeTab === 'wifi' && (
+          <WifiClientsTable
+            clients={wifiClients.clients}
+            loading={wifiClients.loading}
+            band={wifiClients.band}
+            onBandChange={wifiClients.setBand}
+            total={wifiClients.total}
+          />
+        )}
+        {activeTab === 'servizi' && (
+          <NetworkServicesCard
+            dhcp={networkServices.dhcp}
+            portForwarding={networkServices.portForwarding}
+            upnp={networkServices.upnp}
+            mesh={networkServices.mesh}
+            loading={networkServices.loading}
+            stale={networkServices.stale}
+          />
+        )}
+
+        {/* Bandwidth Chart - below tab content */}
         <BandwidthChart
           data={bandwidthHistory.chartData}
           timeRange={bandwidthHistory.timeRange}
@@ -177,6 +247,10 @@ export default function NetworkPage() {
           isCollecting={bandwidthHistory.isCollecting}
           isLoading={bandwidthHistory.isLoading}
           pointCount={bandwidthHistory.pointCount}
+          activeTier={bandwidthTiers.tier}
+          onTierChange={bandwidthTiers.setTier}
+          tierData={bandwidthTiers.tierData}
+          tierLoading={bandwidthTiers.loading}
         />
 
         {/* Bandwidth-Stove Correlation (Phase 67) */}

@@ -277,7 +277,7 @@ Plans:
 | 133 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 134 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 135 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 136 | v16.0 | 2/2 | Complete   | 2026-03-25 |
+| 136 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 137 | v16.0 | 0/0 | Planned     | — |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (12 phases, 9 complete + 3 planned).

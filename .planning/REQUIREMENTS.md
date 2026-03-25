@@ -104,6 +104,27 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 - [x] **FRITZ-15**: Network services section (DHCP, port forwarding, UPnP, mesh) nella /network page
 - [x] **FRITZ-16**: History charts con hourly/daily toggle nella /network page
 
+### Sonos Zone Extended UI
+
+- [x] **SONOS-35**: Play mode controls per zona nella /sonos page (shuffle, repeat, crossfade toggle buttons)
+- [x] **SONOS-36**: Sleep timer display e set/cancel per zona nella /sonos page
+- [x] **SONOS-37**: Queue viewer paginato per zona nella /sonos page (lista brani con titolo, artista, durata)
+
+### Sonos Speaker Extended UI & History
+
+- [ ] **SONOS-38**: EQ controls per speaker nella /sonos page (bass/treble sliders, loudness toggle)
+- [ ] **SONOS-39**: Home theater settings per soundbar nella /sonos page (night mode, speech enhance, sub, surround)
+- [ ] **SONOS-40**: Source switch (TV/line-in) per speaker nella /sonos page
+- [ ] **SONOS-41**: Group management per speaker nella /sonos page (join a gruppo, unjoin da gruppo)
+- [ ] **SONOS-42**: History chart nella /sonos page (volume/playback, selettore tipo, time range, filtro speaker/zona)
+
+### Fritz!Box Extended Frontend
+
+- [ ] **FRITZ-17**: WiFi networks section nella /network page (reti configurate con stato abilitato/disabilitato)
+- [ ] **FRITZ-18**: Device count daily chart nella /network page (grafico dispositivi connessi per giorno)
+- [ ] **FRITZ-19**: Budget stats card nella /network page (consumo dati, percentuale utilizzo, stato ok/warning/danger)
+- [ ] **FRITZ-20**: Auto-granularity toggle nella /network page bandwidth chart (sostituzione o integrazione tier manuale)
+
 ## Future Requirements (v16.1+)
 
 ### DIRIGERA History & Stats
@@ -191,12 +212,24 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FRITZ-14 | Phase 134 | Complete |
 | FRITZ-15 | Phase 134 | Complete |
 | FRITZ-16 | Phase 134 | Complete |
+| SONOS-35 | Phase 135 | Planned |
+| SONOS-36 | Phase 135 | Planned |
+| SONOS-37 | Phase 135 | Planned |
+| SONOS-38 | Phase 136 | Planned |
+| SONOS-39 | Phase 136 | Planned |
+| SONOS-40 | Phase 136 | Planned |
+| SONOS-41 | Phase 136 | Planned |
+| SONOS-42 | Phase 136 | Planned |
+| FRITZ-17 | Phase 137 | Planned |
+| FRITZ-18 | Phase 137 | Planned |
+| FRITZ-19 | Phase 137 | Planned |
+| FRITZ-20 | Phase 137 | Planned |
 
 **Coverage:**
-- v16.0 requirements: 50 total
-- Mapped to phases: 50
+- v16.0 requirements: 62 total
+- Mapped to phases: 62
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 — traceability populated after roadmap creation*
+*Last updated: 2026-03-25 — added SONOS-35–42, FRITZ-17–20 for extended UI phases*

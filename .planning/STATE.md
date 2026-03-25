@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Milestone complete
-stopped_at: Phase 135 context gathered
-last_updated: "2026-03-25T10:25:16.642Z"
+status: Ready to execute
+stopped_at: Completed 135-01-PLAN.md
+last_updated: "2026-03-25T10:47:30.122Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 12
   completed_phases: 9
-  total_plans: 18
-  completed_plans: 18
+  total_plans: 20
+  completed_plans: 19
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 134 — fritz-box-frontend
+**Current focus:** Phase 135 — sonos-zone-extended-ui
 
 ## Current Position
 
-Phase: 134
-Plan: Not started
+Phase: 135 (sonos-zone-extended-ui) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Plan: Not started
 | Phase 133 P02 | 8 | 2 tasks | 5 files |
 | Phase 134 P01 | 452 | 2 tasks | 15 files |
 | Phase 134 P02 | 600 | 2 tasks | 4 files |
+| Phase 135 P01 | 8 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,9 @@ Recent decisions affecting v16.0:
 - [Phase 134]: useFritzNetworkServices: stale=true on partial failure while still displaying successful data
 - [Phase 134]: BandwidthChart tier props are all optional with defaults — fully backward-compatible
 - [Phase 134]: Tab navigation uses native button elements with cn + ember-400 border-b-2 active styling
+- [Phase 135]: useSonosFullData: playModes and sleepTimers fetched in single Promise.all wrapping two Promise.allSettled batches
+- [Phase 135]: useSonosQueue: QUEUE_PAGE_SIZE=20, fetchPage abstraction handles both reset (fetchInitial) and append (loadMore)
+- [Phase 135]: useSonosCommands tests: cycling callCount % 3 mock pattern to survive React re-renders calling hooks multiple times
 
 ### Pending Todos
 
@@ -120,5 +124,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-25
-Stopped at: Phase 135 context gathered
-Resume file: .planning/phases/135-sonos-zone-extended-ui/135-CONTEXT.md
+Stopped at: Completed 135-01-PLAN.md
+Resume file: None

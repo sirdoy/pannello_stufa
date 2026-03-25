@@ -232,7 +232,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 135-01-PLAN.md — Extend hooks (useSonosFullData + useSonosCommands + new useSonosQueue) with play-mode, sleep-timer, queue support
+- [x] 135-01-PLAN.md — Extend hooks (useSonosFullData + useSonosCommands + new useSonosQueue) with play-mode, sleep-timer, queue support
 - [ ] 135-02-PLAN.md — 3 presentational components (PlayModeControls, SleepTimer, QueueViewer) + zone section wiring + page orchestrator
 
 ### Phase 136: Sonos Speaker Extended UI & History
@@ -271,7 +271,7 @@ Plans:
 | 132 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 133 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 134 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 135 | v16.0 | 0/2 | Planned     | — |
+| 135 | v16.0 | 1/2 | In Progress|  |
 | 136 | v16.0 | 0/0 | Planned     | — |
 | 137 | v16.0 | 0/0 | Planned     | — |
 

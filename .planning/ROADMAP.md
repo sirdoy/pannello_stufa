@@ -213,7 +213,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 134-01-PLAN.md — Hooks (4) + components (3) + utility + tests
+- [x] 134-01-PLAN.md — Hooks (4) + components (3) + utility + tests
 - [ ] 134-02-PLAN.md — HistoryTierToggle + BandwidthChart tier integration + page.tsx orchestrator with tabs
 
 ## Progress
@@ -230,7 +230,7 @@ Plans:
 | 131 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 132 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 133 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 134 | v16.0 | 0/2 | Planned | - |
+| 134 | v16.0 | 1/2 | In Progress|  |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (9 phases planned).
 

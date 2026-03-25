@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Ready to plan
-stopped_at: Phase 134 context gathered
-last_updated: "2026-03-25T09:14:23.971Z"
+status: Ready to execute
+stopped_at: Completed 134-01-PLAN.md
+last_updated: "2026-03-25T09:42:58.663Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 9
   completed_phases: 8
-  total_plans: 16
-  completed_plans: 16
+  total_plans: 18
+  completed_plans: 17
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 133 — fritz-box-history-budget
+**Current focus:** Phase 134 — fritz-box-frontend
 
 ## Current Position
 
-Phase: 134
-Plan: Not started
+Phase: 134 (fritz-box-frontend) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -58,6 +58,7 @@ Plan: Not started
 | Phase 132 P02 | 5 | 2 tasks | 4 files |
 | Phase 133 P01 | 15 | 2 tasks | 7 files |
 | Phase 133 P02 | 8 | 2 tasks | 5 files |
+| Phase 134 P01 | 452 | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,8 @@ Recent decisions affecting v16.0:
 - [Phase 132]: UPnP and mesh routes are flat-object pass-through (no query params, no pagination)
 - [Phase 133]: Auto-mock workaround: guard new fritzboxClient methods with if(!mockFritzboxClient.getBandwidthXxx) before jest.fn() assignment — needed when tests run before main repo merge
 - [Phase 133]: devices/daily uses paginated pattern (days/limit/offset forwarding); budget-stats uses flat-object pattern (_request, no query params)
+- [Phase 134]: formatUptime extracted from WanStatusCard to shared app/network/utils/ for reuse
+- [Phase 134]: useFritzNetworkServices: stale=true on partial failure while still displaying successful data
 
 ### Pending Todos
 
@@ -114,5 +117,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-25
-Stopped at: Phase 134 context gathered
-Resume file: .planning/phases/134-fritz-box-frontend/134-CONTEXT.md
+Stopped at: Completed 134-01-PLAN.md
+Resume file: None

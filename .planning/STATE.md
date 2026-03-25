@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Ready to execute
-stopped_at: Completed 133-01-PLAN.md
-last_updated: "2026-03-25T08:57:09.290Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 133-02-PLAN.md
+last_updated: "2026-03-25T09:02:31.414Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 9
-  completed_phases: 7
+  completed_phases: 8
   total_plans: 16
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Project State
@@ -57,6 +57,7 @@ Plan: 2 of 2
 | Phase 132 P01 | 8 | 2 tasks | 5 files |
 | Phase 132 P02 | 5 | 2 tasks | 4 files |
 | Phase 133 P01 | 15 | 2 tasks | 7 files |
+| Phase 133 P02 | 8 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,7 @@ Recent decisions affecting v16.0:
 - [Phase 132]: DHCP and port-forwarding routes are paginated (forward limit/offset to proxy client)
 - [Phase 132]: UPnP and mesh routes are flat-object pass-through (no query params, no pagination)
 - [Phase 133]: Auto-mock workaround: guard new fritzboxClient methods with if(!mockFritzboxClient.getBandwidthXxx) before jest.fn() assignment — needed when tests run before main repo merge
+- [Phase 133]: devices/daily uses paginated pattern (days/limit/offset forwarding); budget-stats uses flat-object pattern (_request, no query params)
 
 ### Pending Todos
 
@@ -107,10 +109,10 @@ None.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260322-t5k | Remove analytics/monitoring subsystem + fix build errors | 2026-03-22 | de582d37 | [260322-t5k-rimuovi-la-parte-di-monitoring-analytics](./quick/260322-t5k-rimuovi-la-parte-di-monitoring-analytics/) |
-| 260325-ds8 | Scheduler technical doc for HA proxy team | 2026-03-25 | pending | [260325-ds8-scheduler-technical-doc-for-ha-proxy-tea](./quick/260325-ds8-scheduler-technical-doc-for-ha-proxy-tea/) |
+| 260325-ds8 | Scheduler technical doc for HA proxy team | 2026-03-25 | c746df6b | [260325-ds8-scheduler-technical-doc-for-ha-proxy-tea](./quick/260325-ds8-scheduler-technical-doc-for-ha-proxy-tea/) |
 
 ## Session Continuity
 
-Last activity: 2026-03-25 - Completed quick task 260325-ds8: Scheduler technical doc for HA proxy team
-Stopped at: Completed 133-01-PLAN.md
+Last activity: 2026-03-25
+Stopped at: Completed 133-02-PLAN.md
 Resume file: None

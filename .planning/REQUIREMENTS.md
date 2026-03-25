@@ -93,9 +93,9 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 - [x] **FRITZ-08**: GET /fritzbox/history/bandwidth/hourly — bandwidth aggregato orario
 - [x] **FRITZ-09**: GET /fritzbox/history/bandwidth/daily — bandwidth aggregato giornaliero
-- [ ] **FRITZ-10**: GET /fritzbox/history/devices/daily — device count giornaliero
+- [x] **FRITZ-10**: GET /fritzbox/history/devices/daily — device count giornaliero
 - [x] **FRITZ-11**: GET /fritzbox/history/bandwidth/auto — auto-granularity (hour/day switch)
-- [ ] **FRITZ-12**: GET /fritzbox/budget-stats — statistiche budget dati
+- [x] **FRITZ-12**: GET /fritzbox/budget-stats — statistiche budget dati
 
 ### Fritz!Box Frontend
 
@@ -184,9 +184,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FRITZ-07 | Phase 132 | Complete |
 | FRITZ-08 | Phase 133 | Complete |
 | FRITZ-09 | Phase 133 | Complete |
-| FRITZ-10 | Phase 133 | Pending |
+| FRITZ-10 | Phase 133 | Complete |
 | FRITZ-11 | Phase 133 | Complete |
-| FRITZ-12 | Phase 133 | Pending |
+| FRITZ-12 | Phase 133 | Complete |
 | FRITZ-13 | Phase 134 | Pending |
 | FRITZ-14 | Phase 134 | Pending |
 | FRITZ-15 | Phase 134 | Pending |

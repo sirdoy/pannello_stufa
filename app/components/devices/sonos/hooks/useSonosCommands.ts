@@ -1,7 +1,7 @@
 'use client';
 
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
-import type { SonosCommandOkResponse, SetVolumeRequest, SetMuteRequest, SonosPlayMode, SetPlayModeRequest, SetSleepTimerRequest } from '@/types/sonosProxy';
+import type { SonosCommandOkResponse, SetVolumeRequest, SetMuteRequest, SonosPlayMode, SetPlayModeRequest, SetSleepTimerRequest, SetEqRequest, SetHomeTheaterRequest, SwitchSourceRequest, JoinRequest } from '@/types/sonosProxy';
 
 export interface UseSonosCommandsParams {
   fetchData: () => Promise<void>;
@@ -18,6 +18,11 @@ export interface UseSonosCommandsReturn {
   handleSetMute: (uid: string, mute: boolean) => Promise<void>;
   handleSetPlayMode: (groupId: string, mode: SonosPlayMode) => Promise<void>;
   handleSetSleepTimer: (groupId: string, duration: number) => Promise<void>;
+  handleSetEq: (uid: string, eq: SetEqRequest) => Promise<void>;
+  handleSetHomeTheater: (uid: string, settings: SetHomeTheaterRequest) => Promise<void>;
+  handleSwitchSource: (uid: string, source: 'tv' | 'line_in') => Promise<void>;
+  handleJoinGroup: (uid: string, targetUid: string) => Promise<void>;
+  handleUnjoinGroup: (uid: string) => Promise<void>;
   sonosTransportCmd: ReturnType<typeof useRetryableCommand>;
   sonosVolumeCmd: ReturnType<typeof useRetryableCommand>;
   sonosExtendedCmd: ReturnType<typeof useRetryableCommand>;
@@ -180,6 +185,99 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
     }
   };
 
+  const handleSetEq = async (uid: string, eq: SetEqRequest) => {
+    try {
+      params.setError(null);
+      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/eq`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eq satisfies SetEqRequest),
+      });
+      if (response) {
+        if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
+        const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
+        await new Promise<void>(resolve => setTimeout(resolve, (data.suggested_poll_delay_s ?? 1) * 1000));
+        await params.fetchData();
+      }
+    } catch (err: unknown) {
+      params.setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const handleSetHomeTheater = async (uid: string, settings: SetHomeTheaterRequest) => {
+    try {
+      params.setError(null);
+      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/home-theater`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(settings satisfies SetHomeTheaterRequest),
+      });
+      if (response) {
+        if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
+        const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
+        await new Promise<void>(resolve => setTimeout(resolve, (data.suggested_poll_delay_s ?? 1) * 1000));
+        await params.fetchData();
+      }
+    } catch (err: unknown) {
+      params.setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const handleSwitchSource = async (uid: string, source: 'tv' | 'line_in') => {
+    try {
+      params.setError(null);
+      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/source`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ source } satisfies SwitchSourceRequest),
+      });
+      if (response) {
+        if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
+        const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
+        await new Promise<void>(resolve => setTimeout(resolve, (data.suggested_poll_delay_s ?? 1) * 1000));
+        await params.fetchData();
+      }
+    } catch (err: unknown) {
+      params.setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const handleJoinGroup = async (uid: string, targetUid: string) => {
+    try {
+      params.setError(null);
+      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_uid: targetUid } satisfies JoinRequest),
+      });
+      if (response) {
+        if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
+        const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
+        await new Promise<void>(resolve => setTimeout(resolve, (data.suggested_poll_delay_s ?? 1) * 1000));
+        await params.fetchData();
+      }
+    } catch (err: unknown) {
+      params.setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const handleUnjoinGroup = async (uid: string) => {
+    try {
+      params.setError(null);
+      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/unjoin`, {
+        method: 'POST',
+      });
+      if (response) {
+        if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
+        const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
+        await new Promise<void>(resolve => setTimeout(resolve, (data.suggested_poll_delay_s ?? 1) * 1000));
+        await params.fetchData();
+      }
+    } catch (err: unknown) {
+      params.setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
   return {
     handlePlay,
     handlePause,
@@ -190,6 +288,11 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
     handleSetMute,
     handleSetPlayMode,
     handleSetSleepTimer,
+    handleSetEq,
+    handleSetHomeTheater,
+    handleSwitchSource,
+    handleJoinGroup,
+    handleUnjoinGroup,
     sonosTransportCmd,
     sonosVolumeCmd,
     sonosExtendedCmd,

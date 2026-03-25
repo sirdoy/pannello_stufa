@@ -274,4 +274,39 @@ describe('useSonosCommands', () => {
       })
     );
   });
+
+  it('Test 13: handleSetEq calls PUT /api/sonos/speakers/{uid}/eq with EQ body', async () => {
+    const { result } = renderHook(() =>
+      useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
+    );
+
+    await act(async () => {
+      await result.current.handleSetEq('RINCON_A', { bass: 3, treble: -2 });
+    });
+
+    expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
+      '/api/sonos/speakers/RINCON_A/eq',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ bass: 3, treble: -2 }),
+      })
+    );
+    expect(mockFetchData).toHaveBeenCalled();
+  });
+
+  it('Test 14: handleUnjoinGroup calls POST /api/sonos/speakers/{uid}/unjoin', async () => {
+    const { result } = renderHook(() =>
+      useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
+    );
+
+    await act(async () => {
+      await result.current.handleUnjoinGroup('RINCON_A');
+    });
+
+    expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
+      '/api/sonos/speakers/RINCON_A/unjoin',
+      expect.objectContaining({ method: 'POST' })
+    );
+    expect(mockFetchData).toHaveBeenCalled();
+  });
 });

@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
-import type { SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse } from '@/types/sonosProxy';
+import type { SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse, SonosEqResponse, SonosHomeTheaterResponse } from '@/types/sonosProxy';
 
 export interface SonosFullData {
   zones: SonosZoneResponse[];
@@ -11,6 +11,8 @@ export interface SonosFullData {
   volumes: Record<string, SonosVolumeResponse>;      // keyed by uid
   playModes: Record<string, SonosPlayModeResponse>;  // keyed by group_id
   sleepTimers: Record<string, SonosSleepTimerResponse>; // keyed by group_id
+  eqData: Record<string, SonosEqResponse>;           // keyed by uid
+  homeTheaterData: Record<string, SonosHomeTheaterResponse>; // keyed by uid
 }
 
 export interface UseSonosFullDataReturn {
@@ -72,6 +74,34 @@ export function useSonosFullData(): UseSonosFullDataReturn {
         if (r.status === 'fulfilled') volumes[allUids[i]!] = r.value;
       });
 
+      // 4b. Fetch EQ and home-theater for ALL speakers in parallel
+      const [eqResults, htResults] = await Promise.all([
+        Promise.allSettled(
+          allUids.map(uid =>
+            fetch(`/api/sonos/speakers/${uid}/eq`).then(r => {
+              if (!r.ok) throw new Error('eq failed');
+              return r.json() as Promise<SonosEqResponse>;
+            })
+          )
+        ),
+        Promise.allSettled(
+          allUids.map(uid =>
+            fetch(`/api/sonos/speakers/${uid}/home-theater`).then(r => {
+              if (!r.ok) throw new Error('home-theater failed');
+              return r.json() as Promise<SonosHomeTheaterResponse>;
+            })
+          )
+        ),
+      ]);
+      const eqData: Record<string, SonosEqResponse> = {};
+      eqResults.forEach((r, i) => {
+        if (r.status === 'fulfilled') eqData[allUids[i]!] = r.value;
+      });
+      const homeTheaterData: Record<string, SonosHomeTheaterResponse> = {};
+      htResults.forEach((r, i) => {
+        if (r.status === 'fulfilled') homeTheaterData[allUids[i]!] = r.value;
+      });
+
       // 5. Fetch play-mode and sleep-timer for ALL zones in parallel
       const [playModeResults, sleepTimerResults] = await Promise.all([
         Promise.allSettled(
@@ -100,7 +130,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
         if (r.status === 'fulfilled') sleepTimers[zones[i]!.group_id] = r.value;
       });
 
-      const newData: SonosFullData = { zones, playback, volumes, playModes, sleepTimers };
+      const newData: SonosFullData = { zones, playback, volumes, playModes, sleepTimers, eqData, homeTheaterData };
       dataRef.current = newData;
       setData(newData);
       setStale(false);

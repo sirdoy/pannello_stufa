@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Ready to execute
-stopped_at: Completed 136-01-PLAN.md
-last_updated: "2026-03-25T14:21:12.177Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 136-02-PLAN.md
+last_updated: "2026-03-25T14:31:08.695Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 12
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 22
-  completed_plans: 21
+  completed_plans: 22
 ---
 
 # Project State
@@ -63,6 +63,7 @@ Plan: 2 of 2
 | Phase 135 P01 | 8 | 2 tasks | 6 files |
 | Phase 135 P02 | 12 | 2 tasks | 8 files |
 | Phase 136 P01 | 7 | 2 tasks | 15 files |
+| Phase 136 P02 | 5m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,8 @@ Recent decisions affecting v16.0:
 - [Phase 135]: SonosZoneSection layout: NowPlaying > Transport > PlayMode+SleepTimer row > QueueViewer > Volume
 - [Phase 136]: SonosVolumeChart extracted as separate file for next/dynamic import path stability
 - [Phase 136]: useSonosHistory fetchHistory uses useCallback with all filter deps for clean useEffect dependency tracking
+- [Phase 136]: SonosSourceSwitch and SonosGroupControls rendered below volume row (not inline) to preserve flex layout integrity with range slider
+- [Phase 136]: speakers prop for SonosHistoryChart uses Set dedup via flatMap over zone members to handle edge case of members in multiple zones
 
 ### Pending Todos
 
@@ -130,5 +133,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-25
-Stopped at: Completed 136-01-PLAN.md
+Stopped at: Completed 136-02-PLAN.md
 Resume file: None

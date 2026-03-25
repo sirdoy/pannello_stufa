@@ -245,6 +245,11 @@ Plans:
   3. Each speaker has a source switch button (TV/line-in) visible when applicable
   4. Each speaker has join/unjoin group controls allowing dynamic zone re-grouping
   5. /sonos page has a history section with a chart showing volume or playback events, type selector, and time range picker
+**Plans**: 2 plans
+
+Plans:
+- [ ] 136-01-PLAN.md — Extend hooks (useSonosCommands + useSonosFullData + useSonosHistory) + 5 new presentational components + tests
+- [ ] 136-02-PLAN.md — Wire components into SonosSpeakerVolume, SonosZoneSection, page.tsx + history section
 
 ### Phase 137: Fritz!Box Extended Frontend
 **Goal**: The /network page shows WiFi networks, device count history, budget statistics, and auto-granularity

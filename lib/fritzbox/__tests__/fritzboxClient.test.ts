@@ -172,6 +172,155 @@ describe('fritzboxClient', () => {
     });
   });
 
+  describe('getSystemInfo()', () => {
+    it('calls haGet with /api/v1/fritzbox/system and returns raw response', async () => {
+      const mockResponse = {
+        model: 'FRITZ!Box 7590 AX',
+        firmware_version: '8.20',
+        update_available: '',
+        device_uptime_seconds: 432000,
+        device_uptime_formatted: '5 days, 0:00:00',
+        is_stale: false,
+        fetched_at: '2026-02-16T12:34:56Z',
+      };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      const result = await fritzboxClient.getSystemInfo();
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/system');
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getWifiClients()', () => {
+    it('calls haGet without query string when no params provided', async () => {
+      const mockResponse = { items: [], total_count: 0, limit: 50, offset: 0 };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      const result = await fritzboxClient.getWifiClients();
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/wifi/clients');
+      expect(result).toEqual(mockResponse);
+    });
+
+    it('forwards band/limit params as query string', async () => {
+      const mockResponse = { items: [], total_count: 0, limit: 50, offset: 0 };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      const params = new URLSearchParams({ band: '5GHz', limit: '50' });
+      await fritzboxClient.getWifiClients(params);
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/wifi/clients?band=5GHz&limit=50');
+    });
+  });
+
+  describe('getWifiNetworks()', () => {
+    it('calls haGet with /api/v1/fritzbox/wifi/networks and returns raw response', async () => {
+      const mockResponse = {
+        networks: [
+          { service: 1, band: '2.4GHz', ssid: 'MyNetwork', channel: 6, possible_channels: '1,6,11', is_enabled: true, beacon_type: 'OWETransition' },
+        ],
+        is_stale: false,
+        fetched_at: '2026-02-16T12:34:56Z',
+      };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      const result = await fritzboxClient.getWifiNetworks();
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/wifi/networks');
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getDhcpReservations()', () => {
+    it('calls haGet without query string when no params provided', async () => {
+      const mockResponse = { items: [], total_count: 0, limit: 50, offset: 0 };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      await fritzboxClient.getDhcpReservations();
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/network/dhcp/reservations');
+    });
+
+    it('forwards limit/offset params as query string', async () => {
+      const mockResponse = { items: [], total_count: 0, limit: 10, offset: 20 };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      const params = new URLSearchParams({ limit: '10', offset: '20' });
+      await fritzboxClient.getDhcpReservations(params);
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/network/dhcp/reservations?limit=10&offset=20');
+    });
+  });
+
+  describe('getPortForwarding()', () => {
+    it('calls haGet without query string when no params provided', async () => {
+      const mockResponse = { items: [], total_count: 0, limit: 50, offset: 0 };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      await fritzboxClient.getPortForwarding();
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/network/port-forwarding');
+    });
+
+    it('forwards limit/offset params as query string', async () => {
+      const mockResponse = { items: [], total_count: 0, limit: 10, offset: 0 };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      const params = new URLSearchParams({ limit: '10', offset: '0' });
+      await fritzboxClient.getPortForwarding(params);
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/network/port-forwarding?limit=10&offset=0');
+    });
+  });
+
+  describe('getUpnpStatus()', () => {
+    it('calls haGet with /api/v1/fritzbox/network/upnp and returns raw response', async () => {
+      const mockResponse = {
+        enabled: true,
+        upnp_ports: [
+          { external_port: 8080, internal_port: 80, protocol: 'TCP', internal_client: '192.168.178.50', enabled: true, description: 'Web server', lease_duration: 0 },
+        ],
+        is_stale: false,
+        fetched_at: '2026-02-16T12:34:56Z',
+      };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      const result = await fritzboxClient.getUpnpStatus();
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/network/upnp');
+      expect(result).toEqual(mockResponse);
+    });
+  });
+
+  describe('getMeshTopology()', () => {
+    it('calls haGet with /api/v1/fritzbox/network/mesh and returns response with nullable link fields', async () => {
+      const mockResponse = {
+        schema_version: null,
+        node_count: 2,
+        link_count: 1,
+        nodes: [
+          { uid: 'node-1', name: 'FRITZ!Box 7590 AX', model: '7590 AX', mac: 'AA:BB:CC:DD:EE:FF', vendor: 'AVM', is_meshed: true, device_category: 'router' },
+          { uid: 'node-2', name: 'FRITZ!Repeater 1200', model: '1200', mac: '11:22:33:44:55:66', vendor: 'AVM', is_meshed: true, device_category: 'repeater' },
+        ],
+        links: [
+          { source_uid: 'node-1', source_name: 'FRITZ!Box 7590 AX', target_uid: 'node-2', target_name: 'FRITZ!Repeater 1200', type: null, state: null, cur_rx_kbps: null, cur_tx_kbps: null, max_rx_kbps: null, max_tx_kbps: null },
+        ],
+        is_stale: false,
+        fetched_at: '2026-02-16T12:34:56Z',
+      };
+      mockHaGet.mockResolvedValue(mockResponse);
+
+      const result = await fritzboxClient.getMeshTopology();
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/network/mesh');
+      expect(result).toEqual(mockResponse);
+      // Verify nullable link fields are preserved
+      expect(result.links[0]?.type).toBeNull();
+      expect(result.links[0]?.cur_rx_kbps).toBeNull();
+    });
+  });
+
   describe('error propagation', () => {
     it('propagates ApiError from haGet unchanged', async () => {
       const { ApiError, ERROR_CODES, HTTP_STATUS } = await import('@/lib/core/apiErrors');

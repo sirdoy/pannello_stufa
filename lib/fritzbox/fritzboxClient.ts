@@ -188,6 +188,175 @@ async function getDeviceEvents(
   }));
 }
 
+// ─── System & Network Services (FRITZ-01 through FRITZ-07) ───────────────────
+
+/**
+ * System information response from HA proxy.
+ * Raw pass-through — no transformation applied.
+ */
+interface SystemResponse {
+  model: string;
+  firmware_version: string;
+  update_available: string;
+  device_uptime_seconds: number;
+  device_uptime_formatted: string;
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/**
+ * Get Fritz!Box system info (model, firmware, uptime) — FRITZ-01
+ * Raw pass-through: no field transformation.
+ */
+async function getSystemInfo(): Promise<SystemResponse> {
+  return haGet<SystemResponse>('/api/v1/fritzbox/system');
+}
+
+/** A single WiFi client connected to the Fritz!Box */
+interface WiFiClientModel {
+  hostname: string;
+  mac: string;
+  ip: string;
+  band: string;
+  ssid: string;
+  signal_strength: number;
+  link_speed_mbps: number;
+  is_active: boolean;
+}
+
+/**
+ * Get paginated list of connected WiFi clients — FRITZ-02
+ * Supports optional `band`, `limit`, `offset` query params.
+ */
+async function getWifiClients(params?: URLSearchParams): Promise<PaginatedResponse<WiFiClientModel>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<WiFiClientModel>>(`/api/v1/fritzbox/wifi/clients${query}`);
+}
+
+/** A configured WiFi network (SSID) on the Fritz!Box */
+interface WiFiNetworkModel {
+  service: number;
+  band: string;
+  ssid: string;
+  channel: number;
+  possible_channels: string;
+  is_enabled: boolean;
+  beacon_type: string;
+}
+
+/** WiFi networks status response from HA proxy */
+interface WiFiStatusResponse {
+  networks: WiFiNetworkModel[];
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/**
+ * Get configured WiFi networks with enabled/disabled status — FRITZ-03
+ * Raw pass-through: no field transformation.
+ */
+async function getWifiNetworks(): Promise<WiFiStatusResponse> {
+  return haGet<WiFiStatusResponse>('/api/v1/fritzbox/wifi/networks');
+}
+
+/** A DHCP reservation entry in the Fritz!Box */
+interface DhcpReservationModel {
+  ip: string;
+  name: string;
+  mac: string;
+  interface_type: string;
+  address_source: string;
+}
+
+/**
+ * Get paginated DHCP reservations — FRITZ-04
+ * Supports optional `limit`, `offset` query params.
+ */
+async function getDhcpReservations(params?: URLSearchParams): Promise<PaginatedResponse<DhcpReservationModel>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<DhcpReservationModel>>(`/api/v1/fritzbox/network/dhcp/reservations${query}`);
+}
+
+/** A port forwarding rule configured on the Fritz!Box */
+interface PortForwardingRuleModel {
+  external_port: number;
+  internal_port: number;
+  protocol: 'TCP' | 'UDP';
+  internal_client: string;
+  enabled: boolean;
+  description: string;
+  lease_duration: number;
+}
+
+/**
+ * Get paginated port forwarding rules — FRITZ-05
+ * Supports optional `limit`, `offset` query params.
+ */
+async function getPortForwarding(params?: URLSearchParams): Promise<PaginatedResponse<PortForwardingRuleModel>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<PortForwardingRuleModel>>(`/api/v1/fritzbox/network/port-forwarding${query}`);
+}
+
+/** UPnP status response from HA proxy */
+interface UPnPStatusResponse {
+  enabled: boolean;
+  upnp_ports: PortForwardingRuleModel[];
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/**
+ * Get UPnP status and active UPnP port mappings — FRITZ-06
+ * Raw pass-through: no field transformation.
+ */
+async function getUpnpStatus(): Promise<UPnPStatusResponse> {
+  return haGet<UPnPStatusResponse>('/api/v1/fritzbox/network/upnp');
+}
+
+/** A node (router or repeater) in the Fritz!Box mesh */
+interface MeshNodeModel {
+  uid: string;
+  name: string;
+  model: string;
+  mac: string;
+  vendor: string;
+  is_meshed: boolean;
+  device_category: string;
+}
+
+/** A link between two mesh nodes */
+interface MeshLinkModel {
+  source_uid: string;
+  source_name: string;
+  target_uid: string;
+  target_name: string;
+  type: string | null;
+  state: string | null;
+  cur_rx_kbps: number | null;
+  cur_tx_kbps: number | null;
+  max_rx_kbps: number | null;
+  max_tx_kbps: number | null;
+}
+
+/** Mesh topology response from HA proxy */
+interface MeshTopologyResponse {
+  schema_version: string | null;
+  node_count: number;
+  link_count: number;
+  nodes: MeshNodeModel[];
+  links: MeshLinkModel[];
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/**
+ * Get Fritz!Box mesh network topology — FRITZ-07
+ * Raw pass-through: no field transformation.
+ */
+async function getMeshTopology(): Promise<MeshTopologyResponse> {
+  return haGet<MeshTopologyResponse>('/api/v1/fritzbox/network/mesh');
+}
+
 /**
  * Fritz!Box client object — preserves existing route call patterns (fritzboxClient.method())
  */
@@ -199,4 +368,11 @@ export const fritzboxClient = {
   getBandwidthHistory,
   getWanStatus,
   getDeviceEvents,
+  getSystemInfo,
+  getWifiClients,
+  getWifiNetworks,
+  getDhcpReservations,
+  getPortForwarding,
+  getUpnpStatus,
+  getMeshTopology,
 };

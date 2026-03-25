@@ -78,9 +78,9 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 ### Fritz!Box System & WiFi
 
-- [ ] **FRITZ-01**: GET /fritzbox/system — model, firmware, uptime, CPU load
-- [ ] **FRITZ-02**: GET /fritzbox/wifi/clients — WiFi clients con signal, band, speed (filtro per band)
-- [ ] **FRITZ-03**: GET /fritzbox/wifi/networks — reti WiFi configurate con stato
+- [x] **FRITZ-01**: GET /fritzbox/system — model, firmware, uptime, CPU load
+- [x] **FRITZ-02**: GET /fritzbox/wifi/clients — WiFi clients con signal, band, speed (filtro per band)
+- [x] **FRITZ-03**: GET /fritzbox/wifi/networks — reti WiFi configurate con stato
 
 ### Fritz!Box Network Services
 
@@ -175,9 +175,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DIRIG-09 | Phase 131 | Complete |
 | DIRIG-10 | Phase 131 | Complete |
 | DIRIG-11 | Phase 131 | Complete |
-| FRITZ-01 | Phase 132 | Pending |
-| FRITZ-02 | Phase 132 | Pending |
-| FRITZ-03 | Phase 132 | Pending |
+| FRITZ-01 | Phase 132 | Complete |
+| FRITZ-02 | Phase 132 | Complete |
+| FRITZ-03 | Phase 132 | Complete |
 | FRITZ-04 | Phase 132 | Pending |
 | FRITZ-05 | Phase 132 | Pending |
 | FRITZ-06 | Phase 132 | Pending |

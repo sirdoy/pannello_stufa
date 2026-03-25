@@ -182,7 +182,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 132-01-PLAN.md — 7 client methods + inline types + unit tests + system/wifi routes
+- [x] 132-01-PLAN.md — 7 client methods + inline types + unit tests + system/wifi routes
 - [ ] 132-02-PLAN.md — DHCP reservations + port forwarding + UPnP + mesh routes
 
 ### Phase 133: Fritz!Box History & Budget
@@ -226,7 +226,7 @@ Plans:
 | 129 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 130 | v16.0 | 2/2 | Complete    | 2026-03-24 |
 | 131 | v16.0 | 2/2 | Complete    | 2026-03-24 |
-| 132 | v16.0 | 0/TBD | Not started | - |
+| 132 | v16.0 | 1/2 | In Progress|  |
 | 133 | v16.0 | 0/TBD | Not started | - |
 | 134 | v16.0 | 0/TBD | Not started | - |
 

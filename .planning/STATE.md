@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: unknown
-stopped_at: Phase 132 context gathered
-last_updated: "2026-03-25T08:08:48.770Z"
-last_activity: 2026-03-24
+status: Ready to execute
+stopped_at: Completed 132-01-PLAN.md
+last_updated: "2026-03-25T08:25:10.436Z"
+last_activity: 2026-03-25
 progress:
   total_phases: 9
   completed_phases: 6
-  total_plans: 12
-  completed_plans: 12
+  total_plans: 14
+  completed_plans: 13
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 131 — dirigera-frontend
+**Current focus:** Phase 132 — fritz-box-system-network-services
 
 ## Current Position
 
-Phase: 132
-Plan: Not started
+Phase: 132 (fritz-box-system-network-services) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Plan: Not started
 | Phase 130 P02 | 2 | 2 tasks | 5 files |
 | Phase 131 P01 | 260 | 2 tasks | 7 files |
 | Phase 131 P02 | 15 | 2 tasks | 5 files |
+| Phase 132 P01 | 8 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,7 @@ Recent decisions affecting v16.0:
 - [Phase 131]: DIRIGERA health: error if offline_count > 0, warning if low_battery_count > 0
 - [Phase 131]: SensorFilter reset on change uses useEffect to clear data/loading/dataRef for immediate refetch on filter switch
 - [Phase 131]: showFreshness = filter \!== 'all' — data_freshness field only present on ContactSensor/MotionSensor, not base DirigeraSensor
+- [Phase 132]: 7 new fritzboxClient methods are raw haGet pass-through (no transformation) per plan D-01 through D-07
 
 ### Pending Todos
 
@@ -103,6 +105,6 @@ None.
 
 ## Session Continuity
 
-Last activity: 2026-03-24
-Stopped at: Phase 132 context gathered
-Resume file: .planning/phases/132-fritz-box-system-network-services/132-CONTEXT.md
+Last activity: 2026-03-25
+Stopped at: Completed 132-01-PLAN.md
+Resume file: None

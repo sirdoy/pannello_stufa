@@ -357,6 +357,102 @@ async function getMeshTopology(): Promise<MeshTopologyResponse> {
   return haGet<MeshTopologyResponse>('/api/v1/fritzbox/network/mesh');
 }
 
+// ─── History Tiers & Budget (FRITZ-08 through FRITZ-12) ──────────────────────
+
+/** Hourly bandwidth aggregation record — FRITZ-08 */
+interface BandwidthHourlyRecord {
+  hour_timestamp: number;
+  avg_upstream_rate: number;
+  min_upstream_rate: number;
+  max_upstream_rate: number;
+  avg_downstream_rate: number;
+  min_downstream_rate: number;
+  max_downstream_rate: number;
+  avg_bytes_sent: number;
+  avg_bytes_received: number;
+  sample_count: number;
+}
+
+/** Daily bandwidth aggregation record — FRITZ-09 */
+interface BandwidthDailyRecord {
+  day_timestamp: number;
+  avg_upstream_rate: number;
+  min_upstream_rate: number;
+  max_upstream_rate: number;
+  avg_downstream_rate: number;
+  min_downstream_rate: number;
+  max_downstream_rate: number;
+  avg_bytes_sent: number;
+  avg_bytes_received: number;
+  sample_count: number;
+}
+
+/** Daily device count record (24 rows per day) — FRITZ-10 */
+interface DeviceDailyRecord {
+  day_timestamp: number;
+  hour_bucket: number;    // 0-23
+  online_count: number;
+  offline_count: number;
+  total_devices: number;
+}
+
+/** Auto-granularity bandwidth record with discriminator — FRITZ-11 */
+interface BandwidthAggregatedRecord {
+  timestamp: number;
+  granularity: 'hourly' | 'daily';
+  avg_upstream_rate: number;
+  min_upstream_rate: number;
+  max_upstream_rate: number;
+  avg_downstream_rate: number;
+  min_downstream_rate: number;
+  max_downstream_rate: number;
+  avg_bytes_sent: number;
+  avg_bytes_received: number;
+  sample_count: number;
+}
+
+/** Budget consumption statistics — FRITZ-12 */
+interface BudgetStats {
+  window_seconds: number;
+  current_window_requests: number;
+  soft_limit: number;
+  hard_limit: number;
+  total_lifetime_requests: number;
+  warning_count: number;
+  utilization_percent: number;
+  status: 'ok' | 'warning' | 'danger';
+  message: string;
+}
+
+/** Get hourly bandwidth history — FRITZ-08. Raw pass-through per D-05. */
+async function getBandwidthHourly(params?: URLSearchParams): Promise<PaginatedResponse<BandwidthHourlyRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<BandwidthHourlyRecord>>(`/api/v1/fritzbox/history/bandwidth/hourly${query}`);
+}
+
+/** Get daily bandwidth history — FRITZ-09. Raw pass-through per D-05. */
+async function getBandwidthDaily(params?: URLSearchParams): Promise<PaginatedResponse<BandwidthDailyRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<BandwidthDailyRecord>>(`/api/v1/fritzbox/history/bandwidth/daily${query}`);
+}
+
+/** Get daily device count history — FRITZ-10. Raw pass-through per D-05. */
+async function getDevicesDaily(params?: URLSearchParams): Promise<PaginatedResponse<DeviceDailyRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<DeviceDailyRecord>>(`/api/v1/fritzbox/history/devices/daily${query}`);
+}
+
+/** Get auto-granularity bandwidth history — FRITZ-11. Server decides hourly vs daily based on days param. Raw pass-through per D-05/D-09. */
+async function getBandwidthAuto(params?: URLSearchParams): Promise<PaginatedResponse<BandwidthAggregatedRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<BandwidthAggregatedRecord>>(`/api/v1/fritzbox/history/bandwidth/auto${query}`);
+}
+
+/** Get data budget statistics — FRITZ-12. No query params per D-08. Raw pass-through per D-05. */
+async function getBudgetStats(): Promise<BudgetStats> {
+  return haGet<BudgetStats>('/api/v1/fritzbox/budget-stats');
+}
+
 /**
  * Fritz!Box client object — preserves existing route call patterns (fritzboxClient.method())
  */
@@ -375,4 +471,10 @@ export const fritzboxClient = {
   getPortForwarding,
   getUpnpStatus,
   getMeshTopology,
+  // Phase 133 additions:
+  getBandwidthHourly,
+  getBandwidthDaily,
+  getDevicesDaily,
+  getBandwidthAuto,
+  getBudgetStats,
 };

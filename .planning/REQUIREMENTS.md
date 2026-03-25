@@ -84,10 +84,10 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 ### Fritz!Box Network Services
 
-- [ ] **FRITZ-04**: GET /fritzbox/network/dhcp/reservations — DHCP leases statici
-- [ ] **FRITZ-05**: GET /fritzbox/network/port-forwarding — regole port forwarding attive
-- [ ] **FRITZ-06**: GET /fritzbox/network/upnp — stato UPnP e port mappings
-- [ ] **FRITZ-07**: GET /fritzbox/network/mesh — topologia mesh (nodi e link)
+- [x] **FRITZ-04**: GET /fritzbox/network/dhcp/reservations — DHCP leases statici
+- [x] **FRITZ-05**: GET /fritzbox/network/port-forwarding — regole port forwarding attive
+- [x] **FRITZ-06**: GET /fritzbox/network/upnp — stato UPnP e port mappings
+- [x] **FRITZ-07**: GET /fritzbox/network/mesh — topologia mesh (nodi e link)
 
 ### Fritz!Box History Tiers & Budget
 
@@ -178,10 +178,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FRITZ-01 | Phase 132 | Complete |
 | FRITZ-02 | Phase 132 | Complete |
 | FRITZ-03 | Phase 132 | Complete |
-| FRITZ-04 | Phase 132 | Pending |
-| FRITZ-05 | Phase 132 | Pending |
-| FRITZ-06 | Phase 132 | Pending |
-| FRITZ-07 | Phase 132 | Pending |
+| FRITZ-04 | Phase 132 | Complete |
+| FRITZ-05 | Phase 132 | Complete |
+| FRITZ-06 | Phase 132 | Complete |
+| FRITZ-07 | Phase 132 | Complete |
 | FRITZ-08 | Phase 133 | Pending |
 | FRITZ-09 | Phase 133 | Pending |
 | FRITZ-10 | Phase 133 | Pending |

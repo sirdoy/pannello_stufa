@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Ready to execute
-stopped_at: Completed 132-01-PLAN.md
-last_updated: "2026-03-25T08:25:10.436Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 132-02-PLAN.md
+last_updated: "2026-03-25T08:28:42.995Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 9
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -55,6 +55,7 @@ Plan: 2 of 2
 | Phase 131 P01 | 260 | 2 tasks | 7 files |
 | Phase 131 P02 | 15 | 2 tasks | 5 files |
 | Phase 132 P01 | 8 | 2 tasks | 5 files |
+| Phase 132 P02 | 5 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,8 @@ Recent decisions affecting v16.0:
 - [Phase 131]: SensorFilter reset on change uses useEffect to clear data/loading/dataRef for immediate refetch on filter switch
 - [Phase 131]: showFreshness = filter \!== 'all' — data_freshness field only present on ContactSensor/MotionSensor, not base DirigeraSensor
 - [Phase 132]: 7 new fritzboxClient methods are raw haGet pass-through (no transformation) per plan D-01 through D-07
+- [Phase 132]: DHCP and port-forwarding routes are paginated (forward limit/offset to proxy client)
+- [Phase 132]: UPnP and mesh routes are flat-object pass-through (no query params, no pagination)
 
 ### Pending Todos
 
@@ -106,5 +109,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-25
-Stopped at: Completed 132-01-PLAN.md
+Stopped at: Completed 132-02-PLAN.md
 Resume file: None

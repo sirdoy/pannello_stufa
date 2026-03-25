@@ -72,7 +72,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 132: Fritz!Box System & Network Services** - System info, WiFi clients/networks, DHCP reservations, port forwarding, UPnP, mesh topology routes (completed 2026-03-25)
 - [x] **Phase 133: Fritz!Box History & Budget** - Hourly/daily/auto bandwidth history routes, daily device count, budget stats route (completed 2026-03-25)
 - [x] **Phase 134: Fritz!Box Frontend** - System info section, WiFi clients tab, network services section, history charts with toggle in /network page (completed 2026-03-25)
-- [ ] **Phase 135: Sonos Zone Extended UI** - Play mode toggles, sleep timer, queue viewer per zone in /sonos page
+- [x] **Phase 135: Sonos Zone Extended UI** - Play mode toggles, sleep timer, queue viewer per zone in /sonos page (completed 2026-03-25)
 - [ ] **Phase 136: Sonos Speaker Extended UI & History** - EQ sliders, home theater settings, source switch, grouping, history chart in /sonos page
 - [ ] **Phase 137: Fritz!Box Extended Frontend** - WiFi networks, device count chart, budget stats, auto-granularity in /network page
 
@@ -233,7 +233,7 @@ Plans:
 
 Plans:
 - [x] 135-01-PLAN.md — Extend hooks (useSonosFullData + useSonosCommands + new useSonosQueue) with play-mode, sleep-timer, queue support
-- [ ] 135-02-PLAN.md — 3 presentational components (PlayModeControls, SleepTimer, QueueViewer) + zone section wiring + page orchestrator
+- [x] 135-02-PLAN.md — 3 presentational components (PlayModeControls, SleepTimer, QueueViewer) + zone section wiring + page orchestrator
 
 ### Phase 136: Sonos Speaker Extended UI & History
 **Goal**: The /sonos page shows per-speaker EQ/home theater/source/grouping controls and a global history chart
@@ -271,7 +271,7 @@ Plans:
 | 132 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 133 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 134 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 135 | v16.0 | 1/2 | In Progress|  |
+| 135 | v16.0 | 2/2 | Complete   | 2026-03-25 |
 | 136 | v16.0 | 0/0 | Planned     | — |
 | 137 | v16.0 | 0/0 | Planned     | — |
 

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Ready to execute
-stopped_at: Completed 135-01-PLAN.md
-last_updated: "2026-03-25T10:47:30.122Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 135-02-PLAN.md
+last_updated: "2026-03-25T10:54:02.115Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 12
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 20
-  completed_plans: 19
+  completed_plans: 20
 ---
 
 # Project State
@@ -61,6 +61,7 @@ Plan: 2 of 2
 | Phase 134 P01 | 452 | 2 tasks | 15 files |
 | Phase 134 P02 | 600 | 2 tasks | 4 files |
 | Phase 135 P01 | 8 | 2 tasks | 6 files |
+| Phase 135 P02 | 12 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,8 @@ Recent decisions affecting v16.0:
 - [Phase 135]: useSonosFullData: playModes and sleepTimers fetched in single Promise.all wrapping two Promise.allSettled batches
 - [Phase 135]: useSonosQueue: QUEUE_PAGE_SIZE=20, fetchPage abstraction handles both reset (fetchInitial) and append (loadMore)
 - [Phase 135]: useSonosCommands tests: cycling callCount % 3 mock pattern to survive React re-renders calling hooks multiple times
+- [Phase 135]: SonosQueueViewer: expand state local to component, fetchInitial on first expand (not in polling)
+- [Phase 135]: SonosZoneSection layout: NowPlaying > Transport > PlayMode+SleepTimer row > QueueViewer > Volume
 
 ### Pending Todos
 
@@ -124,5 +127,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-25
-Stopped at: Completed 135-01-PLAN.md
+Stopped at: Completed 135-02-PLAN.md
 Resume file: None

@@ -14,7 +14,9 @@ import { format } from 'date-fns';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import TimeRangeSelector from './TimeRangeSelector';
+import HistoryTierToggle from './HistoryTierToggle';
 import type { BandwidthHistoryPoint, BandwidthTimeRange } from '@/app/components/devices/network/types';
+import type { BandwidthTier } from '../hooks/useFritzBandwidthTiers';
 
 interface BandwidthChartProps {
   data: BandwidthHistoryPoint[];
@@ -24,6 +26,11 @@ interface BandwidthChartProps {
   isCollecting: boolean;
   isLoading?: boolean;
   pointCount: number;
+  // Tier props (optional — backward compatible, defaults to 'realtime')
+  activeTier?: BandwidthTier;
+  onTierChange?: (tier: BandwidthTier) => void;
+  tierData?: BandwidthHistoryPoint[];
+  tierLoading?: boolean;
 }
 
 interface CustomTooltipProps {
@@ -85,7 +92,12 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
  * BandwidthChart Component
  *
  * Recharts LineChart showing download and upload bandwidth over time.
- * Features time range selector, empty state, and collecting state.
+ * Features time range selector, tier toggle, empty state, and collecting state.
+ *
+ * Tier modes:
+ * - realtime: Uses real-time data with TimeRangeSelector (existing behavior)
+ * - hourly: Fetches hourly aggregated data (no TimeRangeSelector)
+ * - daily: Fetches daily aggregated data (no TimeRangeSelector)
  *
  * States:
  * - isEmpty: No data collected yet, shows message
@@ -100,9 +112,25 @@ export default function BandwidthChart({
   isCollecting,
   isLoading = false,
   pointCount,
+  activeTier = 'realtime',
+  onTierChange,
+  tierData = [],
+  tierLoading = false,
 }: BandwidthChartProps) {
-  // Tick formatter based on time range
+  const isRealtime = activeTier === 'realtime';
+
+  // Which data to render in the chart
+  const chartData = isRealtime ? data : tierData;
+
+  // Tick formatter based on tier / time range
   const formatXAxis = (timestamp: number) => {
+    if (!isRealtime) {
+      if (activeTier === 'daily') {
+        return format(timestamp, 'dd/MM');
+      }
+      // hourly
+      return format(timestamp, 'dd/MM HH:mm');
+    }
     if (timeRange === '7d') {
       return format(timestamp, 'dd/MM');
     }
@@ -111,18 +139,45 @@ export default function BandwidthChart({
 
   return (
     <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6">
-      {/* Header: Title + Time Range Selector */}
+      {/* Header: Title + Tier Toggle + Time Range Selector */}
       <div className="flex items-center justify-between mb-6">
         <Heading level={2} size="lg">
           Banda
         </Heading>
-        {!isEmpty && (
-          <TimeRangeSelector value={timeRange} onChange={onTimeRangeChange} />
-        )}
+        <div className="flex items-center gap-4">
+          {onTierChange && (
+            <HistoryTierToggle value={activeTier} onChange={onTierChange} />
+          )}
+          {isRealtime && !isEmpty && (
+            <TimeRangeSelector value={timeRange} onChange={onTimeRangeChange} />
+          )}
+        </div>
       </div>
 
-      {/* Loading State */}
-      {isLoading && data.length === 0 && (
+      {/* Tier Loading State (for historical tiers) */}
+      {!isRealtime && tierLoading && (
+        <div className="h-[300px] flex items-center justify-center">
+          <div className="text-center">
+            <Text variant="secondary">
+              Caricamento dati storici...
+            </Text>
+          </div>
+        </div>
+      )}
+
+      {/* Tier Empty State (for historical tiers) */}
+      {!isRealtime && !tierLoading && tierData.length === 0 && (
+        <div className="h-[300px] flex items-center justify-center">
+          <div className="text-center">
+            <Text variant="secondary">
+              Nessun dato storico disponibile
+            </Text>
+          </div>
+        </div>
+      )}
+
+      {/* Real-time: Loading State */}
+      {isRealtime && isLoading && data.length === 0 && (
         <div className="h-[300px] flex items-center justify-center">
           <div className="text-center">
             <Text variant="secondary">
@@ -132,8 +187,8 @@ export default function BandwidthChart({
         </div>
       )}
 
-      {/* Empty State */}
-      {isEmpty && (
+      {/* Real-time: Empty State */}
+      {isRealtime && isEmpty && (
         <div className="h-[300px] flex items-center justify-center">
           <div className="text-center">
             <Text variant="secondary">
@@ -146,8 +201,8 @@ export default function BandwidthChart({
         </div>
       )}
 
-      {/* Collecting State (shows progress, but still renders chart if data > 0) */}
-      {!isEmpty && isCollecting && (
+      {/* Real-time: Collecting State (shows progress, but still renders chart if data > 0) */}
+      {isRealtime && !isEmpty && isCollecting && (
         <div className="mb-4 flex items-center justify-center">
           <Text variant="secondary" size="sm">
             Raccolta dati: {pointCount}/10 punti
@@ -156,9 +211,9 @@ export default function BandwidthChart({
       )}
 
       {/* Chart */}
-      {!isEmpty && data.length > 0 && (
+      {chartData.length > 0 && (isRealtime ? !isEmpty : !tierLoading) && (
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <LineChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             {/* Grid */}
             <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-10" />
 

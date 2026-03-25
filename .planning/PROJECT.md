@@ -20,7 +20,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v15.0 (shipped 2026-03-23)
-**Status:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — All 9 phases complete (126-134). Phase 134 complete (Fritz!Box Frontend: /network page enhanced with system info section, WiFi clients tab with signal bars and band filter, network services collapsible sections, and multi-resolution bandwidth history charts with hourly/daily toggle).
+**Status:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — 10 of 12 phases complete (126-135). Phase 135 complete (Sonos Zone Extended UI: play mode controls with shuffle/repeat toggles, sleep timer with presets and countdown, expandable queue viewer with load-more pagination — all wired per-zone in /sonos page).
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

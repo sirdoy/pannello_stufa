@@ -77,6 +77,8 @@ export default function SonosPage() {
             zone={zone}
             playback={data.playback[zone.group_id]}
             volumes={data.volumes}
+            playMode={data.playModes[zone.group_id]}
+            sleepTimer={data.sleepTimers[zone.group_id]}
             commands={commands}
           />
         ))}

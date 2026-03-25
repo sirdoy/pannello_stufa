@@ -11,14 +11,16 @@ import { Banner } from '@/app/components/ui';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 import { useSonosCommands } from '@/app/components/devices/sonos/hooks/useSonosCommands';
 import SonosZoneSection from '@/app/components/devices/sonos/components/SonosZoneSection';
+import SonosHistoryChart from '@/app/components/devices/sonos/components/SonosHistoryChart';
 
 /**
  * /sonos page — Zone-based playback controls and per-speaker volume sliders
  *
  * Orchestrator pattern:
- * - useSonosFullData handles polling for zones + playback + volumes
- * - useSonosCommands handles transport + volume/mute mutations
+ * - useSonosFullData handles polling for zones + playback + volumes + eqData + homeTheaterData
+ * - useSonosCommands handles transport + volume/mute + extended mutations
  * - SonosZoneSection renders each zone with now-playing, controls, speakers
+ * - SonosHistoryChart renders below all zones with volume/playback history
  * - Loading skeleton on initial load before data arrives
  */
 export default function SonosPage() {
@@ -80,8 +82,19 @@ export default function SonosPage() {
             playMode={data.playModes[zone.group_id]}
             sleepTimer={data.sleepTimers[zone.group_id]}
             commands={commands}
+            eqData={data.eqData}
+            homeTheaterData={data.homeTheaterData}
+            allZones={data.zones}
           />
         ))}
+
+        {/* History section — below all zones per D-23 */}
+        {data && data.zones.length > 0 && (
+          <SonosHistoryChart
+            zones={data.zones}
+            speakers={[...new Set(data.zones.flatMap(z => z.members))].map(m => ({ uid: m.uid, name: m.name }))}
+          />
+        )}
       </div>
     </PageLayout>
   );

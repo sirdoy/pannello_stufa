@@ -248,7 +248,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 136-01-PLAN.md — Extend hooks (useSonosCommands + useSonosFullData + useSonosHistory) + 5 new presentational components + tests
+- [x] 136-01-PLAN.md — Extend hooks (useSonosCommands + useSonosFullData + useSonosHistory) + 5 new presentational components + tests
 - [ ] 136-02-PLAN.md — Wire components into SonosSpeakerVolume, SonosZoneSection, page.tsx + history section
 
 ### Phase 137: Fritz!Box Extended Frontend
@@ -277,7 +277,7 @@ Plans:
 | 133 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 134 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 135 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 136 | v16.0 | 0/0 | Planned     | — |
+| 136 | v16.0 | 1/2 | In Progress|  |
 | 137 | v16.0 | 0/0 | Planned     | — |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (12 phases, 9 complete + 3 planned).

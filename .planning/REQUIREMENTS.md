@@ -112,11 +112,11 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 ### Sonos Speaker Extended UI & History
 
-- [ ] **SONOS-38**: EQ controls per speaker nella /sonos page (bass/treble sliders, loudness toggle)
-- [ ] **SONOS-39**: Home theater settings per soundbar nella /sonos page (night mode, speech enhance, sub, surround)
-- [ ] **SONOS-40**: Source switch (TV/line-in) per speaker nella /sonos page
-- [ ] **SONOS-41**: Group management per speaker nella /sonos page (join a gruppo, unjoin da gruppo)
-- [ ] **SONOS-42**: History chart nella /sonos page (volume/playback, selettore tipo, time range, filtro speaker/zona)
+- [x] **SONOS-38**: EQ controls per speaker nella /sonos page (bass/treble sliders, loudness toggle)
+- [x] **SONOS-39**: Home theater settings per soundbar nella /sonos page (night mode, speech enhance, sub, surround)
+- [x] **SONOS-40**: Source switch (TV/line-in) per speaker nella /sonos page
+- [x] **SONOS-41**: Group management per speaker nella /sonos page (join a gruppo, unjoin da gruppo)
+- [x] **SONOS-42**: History chart nella /sonos page (volume/playback, selettore tipo, time range, filtro speaker/zona)
 
 ### Fritz!Box Extended Frontend
 

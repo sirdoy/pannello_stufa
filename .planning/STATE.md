@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Ready to plan
-stopped_at: Phase 136 context gathered
-last_updated: "2026-03-25T13:52:37.248Z"
+status: Ready to execute
+stopped_at: Completed 136-01-PLAN.md
+last_updated: "2026-03-25T14:21:12.177Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 12
   completed_phases: 10
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 22
+  completed_plans: 21
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 135 — sonos-zone-extended-ui
+**Current focus:** Phase 136 — sonos-speaker-extended-ui-history
 
 ## Current Position
 
-Phase: 136
-Plan: Not started
+Phase: 136 (sonos-speaker-extended-ui-history) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Plan: Not started
 | Phase 134 P02 | 600 | 2 tasks | 4 files |
 | Phase 135 P01 | 8 | 2 tasks | 6 files |
 | Phase 135 P02 | 12 | 2 tasks | 8 files |
+| Phase 136 P01 | 7 | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,8 @@ Recent decisions affecting v16.0:
 - [Phase 135]: useSonosCommands tests: cycling callCount % 3 mock pattern to survive React re-renders calling hooks multiple times
 - [Phase 135]: SonosQueueViewer: expand state local to component, fetchInitial on first expand (not in polling)
 - [Phase 135]: SonosZoneSection layout: NowPlaying > Transport > PlayMode+SleepTimer row > QueueViewer > Volume
+- [Phase 136]: SonosVolumeChart extracted as separate file for next/dynamic import path stability
+- [Phase 136]: useSonosHistory fetchHistory uses useCallback with all filter deps for clean useEffect dependency tracking
 
 ### Pending Todos
 
@@ -127,5 +130,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-25
-Stopped at: Phase 136 context gathered
-Resume file: .planning/phases/136-sonos-speaker-extended-ui-history/136-CONTEXT.md
+Stopped at: Completed 136-01-PLAN.md
+Resume file: None

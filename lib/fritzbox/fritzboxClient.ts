@@ -188,6 +188,271 @@ async function getDeviceEvents(
   }));
 }
 
+// ─── System & Network Services (FRITZ-01 through FRITZ-07) ───────────────────
+
+/**
+ * System information response from HA proxy.
+ * Raw pass-through — no transformation applied.
+ */
+interface SystemResponse {
+  model: string;
+  firmware_version: string;
+  update_available: string;
+  device_uptime_seconds: number;
+  device_uptime_formatted: string;
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/**
+ * Get Fritz!Box system info (model, firmware, uptime) — FRITZ-01
+ * Raw pass-through: no field transformation.
+ */
+async function getSystemInfo(): Promise<SystemResponse> {
+  return haGet<SystemResponse>('/api/v1/fritzbox/system');
+}
+
+/** A single WiFi client connected to the Fritz!Box */
+interface WiFiClientModel {
+  hostname: string;
+  mac: string;
+  ip: string;
+  band: string;
+  ssid: string;
+  signal_strength: number;
+  link_speed_mbps: number;
+  is_active: boolean;
+}
+
+/**
+ * Get paginated list of connected WiFi clients — FRITZ-02
+ * Supports optional `band`, `limit`, `offset` query params.
+ */
+async function getWifiClients(params?: URLSearchParams): Promise<PaginatedResponse<WiFiClientModel>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<WiFiClientModel>>(`/api/v1/fritzbox/wifi/clients${query}`);
+}
+
+/** A configured WiFi network (SSID) on the Fritz!Box */
+interface WiFiNetworkModel {
+  service: number;
+  band: string;
+  ssid: string;
+  channel: number;
+  possible_channels: string;
+  is_enabled: boolean;
+  beacon_type: string;
+}
+
+/** WiFi networks status response from HA proxy */
+interface WiFiStatusResponse {
+  networks: WiFiNetworkModel[];
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/**
+ * Get configured WiFi networks with enabled/disabled status — FRITZ-03
+ * Raw pass-through: no field transformation.
+ */
+async function getWifiNetworks(): Promise<WiFiStatusResponse> {
+  return haGet<WiFiStatusResponse>('/api/v1/fritzbox/wifi/networks');
+}
+
+/** A DHCP reservation entry in the Fritz!Box */
+interface DhcpReservationModel {
+  ip: string;
+  name: string;
+  mac: string;
+  interface_type: string;
+  address_source: string;
+}
+
+/**
+ * Get paginated DHCP reservations — FRITZ-04
+ * Supports optional `limit`, `offset` query params.
+ */
+async function getDhcpReservations(params?: URLSearchParams): Promise<PaginatedResponse<DhcpReservationModel>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<DhcpReservationModel>>(`/api/v1/fritzbox/network/dhcp/reservations${query}`);
+}
+
+/** A port forwarding rule configured on the Fritz!Box */
+interface PortForwardingRuleModel {
+  external_port: number;
+  internal_port: number;
+  protocol: 'TCP' | 'UDP';
+  internal_client: string;
+  enabled: boolean;
+  description: string;
+  lease_duration: number;
+}
+
+/**
+ * Get paginated port forwarding rules — FRITZ-05
+ * Supports optional `limit`, `offset` query params.
+ */
+async function getPortForwarding(params?: URLSearchParams): Promise<PaginatedResponse<PortForwardingRuleModel>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<PortForwardingRuleModel>>(`/api/v1/fritzbox/network/port-forwarding${query}`);
+}
+
+/** UPnP status response from HA proxy */
+interface UPnPStatusResponse {
+  enabled: boolean;
+  upnp_ports: PortForwardingRuleModel[];
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/**
+ * Get UPnP status and active UPnP port mappings — FRITZ-06
+ * Raw pass-through: no field transformation.
+ */
+async function getUpnpStatus(): Promise<UPnPStatusResponse> {
+  return haGet<UPnPStatusResponse>('/api/v1/fritzbox/network/upnp');
+}
+
+/** A node (router or repeater) in the Fritz!Box mesh */
+interface MeshNodeModel {
+  uid: string;
+  name: string;
+  model: string;
+  mac: string;
+  vendor: string;
+  is_meshed: boolean;
+  device_category: string;
+}
+
+/** A link between two mesh nodes */
+interface MeshLinkModel {
+  source_uid: string;
+  source_name: string;
+  target_uid: string;
+  target_name: string;
+  type: string | null;
+  state: string | null;
+  cur_rx_kbps: number | null;
+  cur_tx_kbps: number | null;
+  max_rx_kbps: number | null;
+  max_tx_kbps: number | null;
+}
+
+/** Mesh topology response from HA proxy */
+interface MeshTopologyResponse {
+  schema_version: string | null;
+  node_count: number;
+  link_count: number;
+  nodes: MeshNodeModel[];
+  links: MeshLinkModel[];
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/**
+ * Get Fritz!Box mesh network topology — FRITZ-07
+ * Raw pass-through: no field transformation.
+ */
+async function getMeshTopology(): Promise<MeshTopologyResponse> {
+  return haGet<MeshTopologyResponse>('/api/v1/fritzbox/network/mesh');
+}
+
+// ─── History Tiers & Budget (FRITZ-08 through FRITZ-12) ──────────────────────
+
+/** Hourly bandwidth aggregation record — FRITZ-08 */
+interface BandwidthHourlyRecord {
+  hour_timestamp: number;
+  avg_upstream_rate: number;
+  min_upstream_rate: number;
+  max_upstream_rate: number;
+  avg_downstream_rate: number;
+  min_downstream_rate: number;
+  max_downstream_rate: number;
+  avg_bytes_sent: number;
+  avg_bytes_received: number;
+  sample_count: number;
+}
+
+/** Daily bandwidth aggregation record — FRITZ-09 */
+interface BandwidthDailyRecord {
+  day_timestamp: number;
+  avg_upstream_rate: number;
+  min_upstream_rate: number;
+  max_upstream_rate: number;
+  avg_downstream_rate: number;
+  min_downstream_rate: number;
+  max_downstream_rate: number;
+  avg_bytes_sent: number;
+  avg_bytes_received: number;
+  sample_count: number;
+}
+
+/** Daily device count record (24 rows per day) — FRITZ-10 */
+interface DeviceDailyRecord {
+  day_timestamp: number;
+  hour_bucket: number;    // 0-23
+  online_count: number;
+  offline_count: number;
+  total_devices: number;
+}
+
+/** Auto-granularity bandwidth record with discriminator — FRITZ-11 */
+interface BandwidthAggregatedRecord {
+  timestamp: number;
+  granularity: 'hourly' | 'daily';
+  avg_upstream_rate: number;
+  min_upstream_rate: number;
+  max_upstream_rate: number;
+  avg_downstream_rate: number;
+  min_downstream_rate: number;
+  max_downstream_rate: number;
+  avg_bytes_sent: number;
+  avg_bytes_received: number;
+  sample_count: number;
+}
+
+/** Budget consumption statistics — FRITZ-12 */
+interface BudgetStats {
+  window_seconds: number;
+  current_window_requests: number;
+  soft_limit: number;
+  hard_limit: number;
+  total_lifetime_requests: number;
+  warning_count: number;
+  utilization_percent: number;
+  status: 'ok' | 'warning' | 'danger';
+  message: string;
+}
+
+/** Get hourly bandwidth history — FRITZ-08. Raw pass-through per D-05. */
+async function getBandwidthHourly(params?: URLSearchParams): Promise<PaginatedResponse<BandwidthHourlyRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<BandwidthHourlyRecord>>(`/api/v1/fritzbox/history/bandwidth/hourly${query}`);
+}
+
+/** Get daily bandwidth history — FRITZ-09. Raw pass-through per D-05. */
+async function getBandwidthDaily(params?: URLSearchParams): Promise<PaginatedResponse<BandwidthDailyRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<BandwidthDailyRecord>>(`/api/v1/fritzbox/history/bandwidth/daily${query}`);
+}
+
+/** Get daily device count history — FRITZ-10. Raw pass-through per D-05. */
+async function getDevicesDaily(params?: URLSearchParams): Promise<PaginatedResponse<DeviceDailyRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<DeviceDailyRecord>>(`/api/v1/fritzbox/history/devices/daily${query}`);
+}
+
+/** Get auto-granularity bandwidth history — FRITZ-11. Server decides hourly vs daily based on days param. Raw pass-through per D-05/D-09. */
+async function getBandwidthAuto(params?: URLSearchParams): Promise<PaginatedResponse<BandwidthAggregatedRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<BandwidthAggregatedRecord>>(`/api/v1/fritzbox/history/bandwidth/auto${query}`);
+}
+
+/** Get data budget statistics — FRITZ-12. No query params per D-08. Raw pass-through per D-05. */
+async function getBudgetStats(): Promise<BudgetStats> {
+  return haGet<BudgetStats>('/api/v1/fritzbox/budget-stats');
+}
+
 /**
  * Fritz!Box client object — preserves existing route call patterns (fritzboxClient.method())
  */
@@ -199,4 +464,17 @@ export const fritzboxClient = {
   getBandwidthHistory,
   getWanStatus,
   getDeviceEvents,
+  getSystemInfo,
+  getWifiClients,
+  getWifiNetworks,
+  getDhcpReservations,
+  getPortForwarding,
+  getUpnpStatus,
+  getMeshTopology,
+  // Phase 133 additions:
+  getBandwidthHourly,
+  getBandwidthDaily,
+  getDevicesDaily,
+  getBandwidthAuto,
+  getBudgetStats,
 };

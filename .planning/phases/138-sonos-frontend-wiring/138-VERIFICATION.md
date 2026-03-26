@@ -1,16 +1,22 @@
 ---
 phase: 138-sonos-frontend-wiring
-verified: 2026-03-26T00:00:00Z
+verified: 2026-03-26T10:00:00Z
 status: passed
-score: 4/4 must-haves verified
+score: 7/7 must-haves verified
+re_verification:
+  previous_status: passed
+  previous_score: 4/4
+  gaps_closed: []
+  gaps_remaining: []
+  regressions: []
 ---
 
 # Phase 138: Sonos Frontend Wiring Verification Report
 
-**Phase Goal:** Close all Sonos integration gaps — fix 404 nav sub-items, wire orphaned routes and commands into frontend
+**Phase Goal:** Wire Sonos frontend hooks and components for seek, zone volume, and device data
 **Verified:** 2026-03-26
 **Status:** passed
-**Re-verification:** No — initial verification
+**Re-verification:** Yes — full re-check after previous passed verification; all findings confirmed
 
 ## Goal Achievement
 
@@ -18,70 +24,80 @@ score: 4/4 must-haves verified
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | deviceTypes.ts no longer registers nav sub-items that lead to 404 (spotify, zones routes removed or pages created) | VERIFIED | `DEVICE_CONFIG.sonos.routes` contains only `{ main: '/sonos' }`. No spotify or zones keys present. grep for 'spotify' in deviceTypes.ts returns 0 matches. |
-| 2 | useSonosFullData (or a dedicated hook) fetches /api/sonos/devices and exposes device list to frontend | VERIFIED | `SonosFullData` interface contains `devices: SonosDeviceResponse[]`. `fetchData()` calls `fetch('/api/sonos/devices')` at step 0 before zones. `devices` is included in `newData` at line 140. |
-| 3 | useSonosCommands exposes setZoneVolume() for zone-level volume control | VERIFIED | `handleSetZoneVolume(groupId, volume)` exists in interface and implementation. Uses `sonosVolumeCmd.execute('/api/sonos/zones/${groupId}/volume')` with PUT + body `{ volume }`. Returned in the hook's return object. |
-| 4 | Zone section in /sonos page has a seek control allowing track position change | VERIFIED | `SonosSeekControl.tsx` exists with `hhmmssToSeconds`, `secondsToHhmmss`, `onMouseUp` handler. `SonosZoneSection.tsx` imports and renders `<SonosSeekControl playback={playback} groupId={zone.group_id} onSeek={commands.handleSeek} />` after transport controls. |
+| 1 | Sonos nav menu no longer shows 404-producing sub-items (spotify, zones) | VERIFIED | `DEVICE_CONFIG[DEVICE_TYPES.SONOS].routes` contains only `{ main: '/sonos' }` at lines 162-164. `features` contains only `{ hasPlayback: true }` at lines 165-167. No `spotify`, `zones`, `hasSpotify`, `hasZones`, `hasSearch` keys in the Sonos block. |
+| 2 | useSonosFullData fetches /api/sonos/devices and exposes devices[] in SonosFullData | VERIFIED | Line 9: `devices: SonosDeviceResponse[]` in interface. Line 42: `fetch('/api/sonos/devices')` in fetchData. Line 140: `devices` included in `newData`. |
+| 3 | useSonosCommands exposes handleSetZoneVolume and handleSeek handlers | VERIFIED | Lines 283 and 302 define the handlers. Lines 336-337 expose them in the return object. Exactly 3 `useRetryableCommand` calls (lines 35-37). |
+| 4 | User can see and drag a seek slider to change track position in a zone | VERIFIED | `SonosSeekControl.tsx` (88 lines): range input with `onMouseUp` + `onTouchEnd` at lines 77-78. Calls `onSeek(groupId, hhmmssString)` on release at line 64. |
+| 5 | User can adjust zone-level volume via a single slider that affects all speakers | VERIFIED | `SonosZoneSection.tsx` line 60: `void commands.handleSetZoneVolume(zone.group_id, newVol)` with 250ms debounce. Label "Volume Zona" at line 112. Coordinator volume derived at line 47. |
+| 6 | Seek slider is disabled when no track is playing or duration is null (live stream) | VERIFIED | `SonosSeekControl.tsx` lines 39-43: `disabled` is `true` when playback is undefined, `transport_state === 'STOPPED'`, or `duration === null`. Range input has `disabled={disabled}` at line 75. |
+| 7 | SonosCard dashboard card still works (regression check) | VERIFIED | SonosCard was not modified in Phase 138. No changes to `app/components/devices/sonos/components/SonosCard.tsx`. All 100 Sonos tests pass. |
 
-**Score:** 4/4 truths verified
+**Score:** 7/7 truths verified
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `lib/devices/deviceTypes.ts` | Sonos DEVICE_CONFIG with only main route | VERIFIED | routes: `{ main: '/sonos' }` only. features: `{ hasPlayback: true }` only. No `hasSpotify`, `hasZones`, `hasSearch`. |
-| `app/components/devices/sonos/hooks/useSonosFullData.ts` | devices field in SonosFullData | VERIFIED | `devices: SonosDeviceResponse[]` in interface at line 9. fetch at line 42. Populated in newData at line 140. 164 lines total. |
-| `app/components/devices/sonos/hooks/useSonosCommands.ts` | Zone volume and seek command handlers | VERIFIED | `handleSetZoneVolume` (lines 283-300) and `handleSeek` (lines 302-319) both present. Exactly 3 `useRetryableCommand` calls (confirmed by grep count = 3). |
-| `app/components/devices/sonos/components/SonosSeekControl.tsx` | Seek control component with range slider + time display | VERIFIED | 89 lines. Contains `hhmmssToSeconds`, `secondsToHhmmss`, `formatTime`. Range input with `disabled` prop, `onMouseUp` and `onTouchEnd` handlers. `onSeek(groupId, hhmmssString)` called on release. |
-| `app/components/devices/sonos/components/SonosZoneSection.tsx` | Zone section with seek control and zone volume slider | VERIFIED | Imports `SonosSeekControl` at line 17. Renders it at line 89-93. Zone volume slider with "Volume Zona" label and 250ms debounce at line 59-61. `handleSetZoneVolume` wired at line 60. |
+| `lib/devices/deviceTypes.ts` | Sonos DEVICE_CONFIG with only main route | VERIFIED | `routes: { main: '/sonos' }` only. `features: { hasPlayback: true }` only. Lines 156-168. |
+| `app/components/devices/sonos/hooks/useSonosFullData.ts` | devices field in SonosFullData | VERIFIED | `devices: SonosDeviceResponse[]` at line 9. Fetch at line 42. Populated in newData at line 140. 163 lines. |
+| `app/components/devices/sonos/hooks/useSonosCommands.ts` | Zone volume and seek command handlers | VERIFIED | `handleSetZoneVolume` (line 283), `handleSeek` (line 302), both in return object (lines 336-337). Exactly 3 `useRetryableCommand` calls. 342 lines. |
+| `app/components/devices/sonos/components/SonosSeekControl.tsx` | Seek control component with range slider + time display | VERIFIED | 88 lines. Contains `hhmmssToSeconds`, `secondsToHhmmss`, `formatTime`. Range input with `disabled`, `onMouseUp`, `onTouchEnd`. Calls `onSeek(groupId, hhmmssString)` on release. |
+| `app/components/devices/sonos/components/SonosZoneSection.tsx` | Zone section with seek control and zone volume slider | VERIFIED | Imports `SonosSeekControl` at line 17. Renders it at lines 89-93 with `onSeek={commands.handleSeek}`. Zone volume with "Volume Zona" label, 250ms debounce. 157 lines. |
+| `app/components/devices/sonos/components/__tests__/SonosSeekControl.test.tsx` | Unit tests for seek component | VERIFIED | 108 lines. 9 test cases covering disabled states, max attribute, time formatting, seek callback. |
+| `__tests__/components/devices/sonos/components/SonosZoneSection.test.tsx` | Zone section tests with seek and zone volume | VERIFIED | Tests for `seek-control` rendering and `Volume Zona` slider verified at lines 156 and 163. |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|----|-----|--------|---------|
-| useSonosFullData.ts | /api/sonos/devices | fetch in fetchData | WIRED | Line 42: `fetch('/api/sonos/devices')`. Response parsed and assigned to `devices`. Included in `newData`. |
-| useSonosCommands.ts | /api/sonos/zones/{groupId}/volume | sonosVolumeCmd.execute | WIRED | Line 286: `sonosVolumeCmd.execute(\`/api/sonos/zones/${groupId}/volume\`)` with PUT method. |
-| useSonosCommands.ts | /api/sonos/zones/{groupId}/seek | sonosVolumeCmd.execute | WIRED | Line 305: `sonosVolumeCmd.execute(\`/api/sonos/zones/${groupId}/seek\`)` with PUT method. |
-| SonosZoneSection.tsx | SonosSeekControl.tsx | import + render | WIRED | Line 17: `import SonosSeekControl from './SonosSeekControl'`. Line 89-93: renders with playback, groupId, onSeek props. |
-| SonosZoneSection.tsx | commands.handleSetZoneVolume | prop callback | WIRED | Line 60: `void commands.handleSetZoneVolume(zone.group_id, newVol)` called in debounced onChange. |
+| useSonosFullData.ts | /api/sonos/devices | fetch in fetchData | WIRED | Line 42: `fetch('/api/sonos/devices')`. Response assigned to `devices`, included in `newData`. |
+| useSonosCommands.ts | /api/sonos/zones/{groupId}/volume | sonosVolumeCmd.execute | WIRED | Line 286: `sonosVolumeCmd.execute(\`/api/sonos/zones/${groupId}/volume\`)` with PUT. |
+| useSonosCommands.ts | /api/sonos/zones/{groupId}/seek | sonosVolumeCmd.execute | WIRED | Line 305: `sonosVolumeCmd.execute(\`/api/sonos/zones/${groupId}/seek\`)` with PUT. |
+| SonosZoneSection.tsx | SonosSeekControl.tsx | import + render | WIRED | Line 17: `import SonosSeekControl from './SonosSeekControl'`. Lines 89-93: renders with `playback`, `groupId`, `onSeek` props. |
+| SonosZoneSection.tsx | commands.handleSetZoneVolume | prop callback | WIRED | Line 60: `void commands.handleSetZoneVolume(zone.group_id, newVol)` in debounced handler. |
 | SonosZoneSection.tsx | commands.handleSeek | prop callback to SonosSeekControl | WIRED | Line 92: `onSeek={commands.handleSeek}` passed to SonosSeekControl. |
+| app/api/sonos/zones/[groupId]/volume/route.ts | sonosProxy.setZoneVolume | PUT handler | WIRED | Line 2: `import { setZoneVolume } from '@/lib/sonos/sonosProxy'`. Line 17: `await setZoneVolume(groupId, body.volume)`. |
+| app/api/sonos/zones/[groupId]/seek/route.ts | sonosProxy.seek | PUT handler | WIRED | Line 2: `import { seek } from '@/lib/sonos/sonosProxy'`. Line 17: `await seek(groupId, body.position)`. |
 
 ### Data-Flow Trace (Level 4)
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 |----------|---------------|--------|--------------------|--------|
-| useSonosFullData.ts | `devices` | `fetch('/api/sonos/devices')` → API route → sonosProxy | Yes — API route at `app/api/sonos/devices/route.ts` exists, proxies to HA | FLOWING |
-| SonosSeekControl.tsx | `playback` | Prop passed from SonosZoneSection | Yes — `playback` comes from `useSonosFullData` which fetches per-zone playback | FLOWING |
-| SonosZoneSection.tsx | `localZoneVolume` | `volumes[zone.coordinator_uid]?.volume` from props | Yes — volumes populated by `useSonosFullData` speaker volume fetches | FLOWING |
+| useSonosFullData.ts | `devices` | `fetch('/api/sonos/devices')` → `app/api/sonos/devices/route.ts` → `sonosProxy` | Yes — API route proxies to HA, sonosProxy.getDevices() exists | FLOWING |
+| SonosSeekControl.tsx | `playback` | Prop from SonosZoneSection → useSonosFullData per-zone playback fetch | Yes — `useSonosFullData` fetches `/api/sonos/zones/{groupId}/playback` per zone | FLOWING |
+| SonosZoneSection.tsx | `localZoneVolume` | `volumes[zone.coordinator_uid]?.volume ?? 50` from props | Yes — `useSonosFullData` fetches per-speaker volume from `/api/sonos/speakers/{uid}/volume` | FLOWING |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Check | Result | Status |
 |----------|-------|--------|--------|
-| 100 tests pass for Sonos hooks and components | `npx jest --testPathPatterns="useSonosFullData|useSonosCommands|SonosSeekControl|SonosZoneSection"` | 100 passed, 9 suites, 0 failed | PASS |
-| Exactly 3 useRetryableCommand calls (no extra) | `grep -c 'useRetryableCommand(' useSonosCommands.ts` | 3 | PASS |
-| No spotify/zones nav routes remain | `grep 'spotify\|zones' deviceTypes.ts` (routes section) | 0 matches | PASS |
-| handleSetZoneVolume in return object | grep in useSonosCommands.ts return block | Line 336 confirmed | PASS |
-| handleSeek in return object | grep in useSonosCommands.ts return block | Line 337 confirmed | PASS |
+| 100 Sonos tests pass | `npx jest --testPathPatterns="useSonosFullData\|useSonosCommands\|SonosSeekControl\|SonosZoneSection"` | 100 passed, 9 suites, 0 failed | PASS |
+| Exactly 3 useRetryableCommand calls | `grep -c "useRetryableCommand(" useSonosCommands.ts` | 3 | PASS |
+| No spotify/zones routes in Sonos config | `grep "spotify\|zones" lib/devices/deviceTypes.ts` (Sonos block) | 0 matches in Sonos block | PASS |
+| handleSetZoneVolume in return object | `grep "handleSetZoneVolume" useSonosCommands.ts` (return block) | Line 336 confirmed | PASS |
+| handleSeek in return object | `grep "handleSeek" useSonosCommands.ts` (return block) | Line 337 confirmed | PASS |
+| Zone volume/seek API routes exist with real proxy calls | Route files at `app/api/sonos/zones/[groupId]/volume/` and `seek/` | Both files import and call sonosProxy functions | PASS |
 
 ### Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
 |-------------|-------------|-------------|--------|----------|
-| SONOS-04 | 138-01 | GET /sonos/devices — lista speaker con identity e topology | SATISFIED | useSonosFullData fetches /api/sonos/devices, exposes `devices: SonosDeviceResponse[]`. API route existed since Phase 126. |
-| SONOS-05 | 138-01 | GET /sonos/devices/{uid} — dettaglio speaker con audio state on-demand | SATISFIED (API pre-existing, frontend exposure) | `/api/sonos/devices/[uid]/route.ts` API route existed since Phase 126/128. Phase 138 satisfies this by exposing the devices list to the frontend, making individual speaker identity available. Note: the plan targets the list endpoint (SONOS-04) as the primary mechanism; the individual `[uid]` route is a pre-existing API-level implementation. |
-| SONOS-16 | 138-01, 138-02 | PUT /sonos/zones/{group_id}/volume — set volume per tutti gli speaker in una zona | SATISFIED | `handleSetZoneVolume` in useSonosCommands wired to correct API URL. Zone volume slider in SonosZoneSection uses this handler with 250ms debounce. |
-| SONOS-17 | 138-01, 138-02 | PUT /sonos/zones/{group_id}/seek — seek a posizione nel brano (HH:MM:SS) | SATISFIED | `handleSeek` in useSonosCommands wired to correct API URL. SonosSeekControl renders seek slider, calls `onSeek(groupId, "HH:MM:SS")` on mouseUp/touchEnd. |
-| SONOS-31 | 138-02 | SonosCard dashboard card con now playing, zone status, speaker count | SATISFIED (regression check) | SONOS-31 was completed in Phase 129. Plan 02 claims it for regression check purposes. SonosCard remains functional — no modifications made to it in Phase 138. This is correctly interpreted as "no regression". |
-| SONOS-34 | 138-01 | Navigation menu entry per Sonos | SATISFIED | DEVICE_CONFIG.sonos now has only `{ main: '/sonos' }` — no 404-producing sub-items. Sonos nav entry leads to the valid /sonos page. |
+| SONOS-04 | 138-01 | GET /sonos/devices — lista speaker con identity e topology | SATISFIED | `useSonosFullData` fetches `/api/sonos/devices` at line 42, exposes `devices: SonosDeviceResponse[]` at line 9. API route and proxy pre-existing since Phase 126. |
+| SONOS-05 | 138-01 | GET /sonos/devices/{uid} — dettaglio speaker con audio state on-demand | SATISFIED | API route `/api/sonos/devices/[uid]/route.ts` pre-existing. Phase 138 exposes the device list to the frontend via `useSonosFullData`, making speaker identity available to UI. |
+| SONOS-16 | 138-01, 138-02 | PUT /sonos/zones/{group_id}/volume — set volume per tutti gli speaker in una zona | SATISFIED | `handleSetZoneVolume` in useSonosCommands wired to correct API URL. Zone volume slider in SonosZoneSection uses handler with 250ms debounce. API route calls `sonosProxy.setZoneVolume`. |
+| SONOS-17 | 138-01, 138-02 | PUT /sonos/zones/{group_id}/seek — seek a posizione nel brano (HH:MM:SS) | SATISFIED | `handleSeek` in useSonosCommands wired to correct API URL. SonosSeekControl converts slider position to HH:MM:SS and calls `onSeek(groupId, hhmmssString)`. API route calls `sonosProxy.seek`. |
+| SONOS-31 | 138-02 | SonosCard dashboard card con now playing, zone status, speaker count | SATISFIED (regression check) | SONOS-31 completed in Phase 129. SonosCard not modified in Phase 138. All 100 Sonos tests pass with no regressions. |
+| SONOS-34 | 138-01 | Navigation menu entry per Sonos | SATISFIED | `DEVICE_CONFIG[DEVICE_TYPES.SONOS].routes` is `{ main: '/sonos' }` only — no spotify or zones sub-routes that produced 404s. |
+
+All 6 requirement IDs from PLAN frontmatter are satisfied. REQUIREMENTS.md shows all 6 marked `[x]` and traced to Phase 138 (SONOS-04, 05, 16, 17) or Phase 129 (SONOS-31, 34).
 
 ### Anti-Patterns Found
 
-| File | Pattern | Severity | Impact |
-|------|---------|----------|--------|
-| `__tests__/components/devices/sonos/components/SonosZoneSection.test.tsx` | `mockPlayback` uses `current_uri`, `position_ms`, `duration_ms` fields which do not exist in `SonosPlaybackResponse` (actual type has `position: string|null`, `duration: string|null`) | Warning | Tests pass (TypeScript type checking not enforced in test mocks via `as UseSonosCommandsReturn`), but test fixture has stale field names. Not a blocker — tests exercise the right behavior. |
+| File | Line | Pattern | Severity | Impact |
+|------|------|---------|----------|--------|
+| `__tests__/components/devices/sonos/components/SonosZoneSection.test.tsx` | 75-77 | `mockPlayback` uses `current_uri`, `position_ms`, `duration_ms` fields that do not exist in `SonosPlaybackResponse` (actual type has `position: string\|null`, `duration: string\|null`) | Warning | Tests pass because mock is cast structurally. Tests assert on child component mocks (not playback field values directly). Not a blocker. |
 
-No blocker anti-patterns found. The test fixture field name mismatch is a warning — the mock satisfies the type via `as SonosPlaybackResponse` structural cast and the tests assert on rendered child components (mocked), not on the playback fields directly.
+No blocker anti-patterns found.
 
 ### Human Verification Required
 
@@ -93,26 +109,23 @@ No blocker anti-patterns found. The test fixture field name mismatch is a warnin
 
 #### 2. Zone Volume Slider Debounce
 
-**Test:** Open /sonos, slowly drag the zone volume slider and observe network requests.
+**Test:** Open /sonos, slowly drag the zone volume slider and observe network requests in devtools.
 **Expected:** Only one PUT request fires per 250ms debounce window, not on every slider tick.
 **Why human:** Requires network tab inspection in browser devtools.
 
 #### 3. Nav Menu No 404s
 
 **Test:** Open the app, navigate to Sonos via the nav menu. Confirm no sub-menu items for spotify/zones appear.
-**Expected:** Clicking Sonos in nav goes directly to /sonos — no sub-items visible.
-**Why human:** Nav rendering depends on runtime DEVICE_CONFIG usage in Navbar component.
+**Expected:** Clicking Sonos in nav goes directly to /sonos with no sub-items visible.
+**Why human:** Nav rendering depends on runtime DEVICE_CONFIG consumption in Navbar component.
 
 ### Gaps Summary
 
-No gaps found. All four success criteria are met:
+No gaps found. Phase goal is fully achieved.
 
-1. `deviceTypes.ts` Sonos config has only `routes: { main: '/sonos' }` — spotify and zones sub-routes removed.
-2. `useSonosFullData` fetches `/api/sonos/devices` and exposes `devices: SonosDeviceResponse[]` in `SonosFullData`.
-3. `useSonosCommands` exposes `handleSetZoneVolume` and `handleSeek` using the existing `sonosVolumeCmd` instance (3 total `useRetryableCommand` calls maintained).
-4. `SonosSeekControl` exists and is rendered inside `SonosZoneSection` with correct prop wiring to `commands.handleSeek`.
+All six requirement IDs from PLAN frontmatter are satisfied. Seven observable truths verified. All artifacts exist, are substantive (no stubs), wired to their consumers, and data flows through to real proxy calls. 100 Sonos tests pass across 9 test suites.
 
-Missing artifact: `138-02-SUMMARY.md` — Plan 02 execution was completed (SonosSeekControl.tsx and SonosZoneSection.tsx updates exist, tests pass) but the SUMMARY file was not created. This is an administrative gap, not a functional one.
+Administrative note: `138-02-SUMMARY.md` is deleted (visible in git status as `D`). This is an administrative artifact gap, not a functional one — the implementation commits and all code artifacts are present and correct.
 
 ---
 

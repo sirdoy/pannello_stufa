@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
 status: executing
-stopped_at: Phase 139 context gathered
-last_updated: "2026-03-26T13:20:03.953Z"
-last_activity: 2026-03-26 -- Phase 139 execution started
+stopped_at: Completed 139-02-PLAN.md
+last_updated: "2026-03-26T13:32:27.803Z"
+last_activity: 2026-03-26
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 2
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 ## Current Position
 
 Phase: 139 (websocket-infrastructure) — EXECUTING
-Plan: 1 of 2
-Status: Executing Phase 139
-Last activity: 2026-03-26 -- Phase 139 execution started
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-03-26
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | v14.1 Tech Debt & Type Safety | 113-117 | 9 | 1 day |
 | v15.0 Rooms & Device Registry | 118-125 | 13 | 2 days |
 | v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato | 126-138 | 26 | 4 days |
+| Phase 139 P02 | 310 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,8 @@ Key context for v17.0:
 - Netatmo WS payload is raw Record<string, unknown> — Phase 143 needs adapter layer
 - alwaysActive on stove polling must survive WS migration (Phase 140 concern)
 - Fritz!Box sparkline buffer must survive WS/polling transitions (Phase 141 concern)
+- [Phase 139]: renderHook causes strict mode double-invocation — use toHaveBeenCalled() not toHaveBeenCalledTimes(1) for useWebSocket call count assertions
+- [Phase 139]: WebSocketContext.Provider placed inside Auth0Provider but outside ThemeProvider — gives all device hooks access to WS manager
 
 ### Pending Todos
 
@@ -81,5 +84,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Phase 139 context gathered
-Resume file: .planning/phases/139-websocket-infrastructure/139-CONTEXT.md
+Stopped at: Completed 139-02-PLAN.md
+Resume file: None

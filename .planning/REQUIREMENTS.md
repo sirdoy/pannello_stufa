@@ -9,11 +9,11 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 ### WebSocket Infrastructure
 
-- [ ] **WS-01**: App mantiene una singola connessione WebSocket condivisa verso `/ws/live` con auth via query parameter
-- [ ] **WS-02**: Connessione supporta subscribe/unsubscribe per topic individuali (`fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `hue`, `sonos`)
-- [ ] **WS-03**: Messaggi in arrivo vengono dispatchati ai consumer registrati in base al campo `topic`
-- [ ] **WS-04**: Connessione si riconnette automaticamente con exponential backoff (1s → 30s cap) dopo disconnessione
-- [ ] **WS-05**: Tutti i topic vengono ri-sottoscritti automaticamente dopo ogni riconnessione
+- [x] **WS-01**: App mantiene una singola connessione WebSocket condivisa verso `/ws/live` con auth via query parameter
+- [x] **WS-02**: Connessione supporta subscribe/unsubscribe per topic individuali (`fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `hue`, `sonos`)
+- [x] **WS-03**: Messaggi in arrivo vengono dispatchati ai consumer registrati in base al campo `topic`
+- [x] **WS-04**: Connessione si riconnette automaticamente con exponential backoff (1s → 30s cap) dopo disconnessione
+- [x] **WS-05**: Tutti i topic vengono ri-sottoscritti automaticamente dopo ogni riconnessione
 - [ ] **WS-06**: Tipi TypeScript per tutti i payload WS dei 6 provider derivati dalla spec `docs/api/websocket.md`
 
 ### Provider Migration — Stove
@@ -76,11 +76,11 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WS-01 | Phase 139 | Pending |
-| WS-02 | Phase 139 | Pending |
-| WS-03 | Phase 139 | Pending |
-| WS-04 | Phase 139 | Pending |
-| WS-05 | Phase 139 | Pending |
+| WS-01 | Phase 139 | Complete |
+| WS-02 | Phase 139 | Complete |
+| WS-03 | Phase 139 | Complete |
+| WS-04 | Phase 139 | Complete |
+| WS-05 | Phase 139 | Complete |
 | WS-06 | Phase 139 | Pending |
 | MIG-01 | Phase 140 | Pending |
 | MIG-02 | Phase 140 | Pending |

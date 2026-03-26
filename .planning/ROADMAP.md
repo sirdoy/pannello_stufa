@@ -91,9 +91,9 @@ See git history for details.
   3. Closing and reopening the browser tab reconnects automatically within 30 seconds using exponential backoff
   4. After any reconnection, all previously subscribed topics are re-subscribed without user action
   5. TypeScript types exist for all 6 provider WS payloads (`fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `hue`, `sonos`) derived from the spec
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
-- [ ] 139-01-PLAN.md — WS types, manager hook, React context
+- [x] 139-01-PLAN.md — WS types, manager hook, React context
 - [ ] 139-02-PLAN.md — Tests, mock, ClientProviders wiring
 
 ### Phase 140: Stove Migration
@@ -155,7 +155,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 139. WebSocket Infrastructure | v17.0 | 0/2 | Planning complete | - |
+| 139. WebSocket Infrastructure | v17.0 | 1/2 | In Progress|  |
 | 140. Stove Migration | v17.0 | 0/TBD | Not started | - |
 | 141. Fritz!Box & Hue Migration | v17.0 | 0/TBD | Not started | - |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 0/TBD | Not started | - |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Ready to execute
-stopped_at: Completed 137-01-PLAN.md
-last_updated: "2026-03-26T08:01:19.978Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 137-02-PLAN.md
+last_updated: "2026-03-26T08:08:45.367Z"
 last_activity: 2026-03-26
 progress:
   total_phases: 12
-  completed_phases: 11
+  completed_phases: 12
   total_plans: 24
-  completed_plans: 23
+  completed_plans: 24
 ---
 
 # Project State
@@ -65,6 +65,7 @@ Plan: 2 of 2
 | Phase 136 P01 | 7 | 2 tasks | 15 files |
 | Phase 136 P02 | 5m | 2 tasks | 4 files |
 | Phase 137 P01 | 4 | 2 tasks | 8 files |
+| Phase 137 P02 | 4 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -117,6 +118,9 @@ Recent decisions affecting v16.0:
 - [Phase 136]: speakers prop for SonosHistoryChart uses Set dedup via flatMap over zone members to handle edge case of members in multiple zones
 - [Phase 137]: useFritzBudgetStats uses useEffect([],[]) not polling — budget stats are informational snapshots per D-10
 - [Phase 137]: auto tier uses record.timestamp (unified field) not hour_timestamp/day_timestamp — per AggregatedRecord type
+- [Phase 137]: WifiNetworksTable empty state returns Card with Text (not null) — consistent with tab content area
+- [Phase 137]: BudgetStatsCard returns null when no data — avoids empty card placeholder in layout
+- [Phase 137]: DeviceCountChart uses next/dynamic (ssr:false) — Recharts is heavy and chart-only component
 
 ### Pending Todos
 
@@ -136,5 +140,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Completed 137-01-PLAN.md
+Stopped at: Completed 137-02-PLAN.md
 Resume file: None

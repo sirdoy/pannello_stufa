@@ -74,7 +74,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 134: Fritz!Box Frontend** - System info section, WiFi clients tab, network services section, history charts with toggle in /network page (completed 2026-03-25)
 - [x] **Phase 135: Sonos Zone Extended UI** - Play mode toggles, sleep timer, queue viewer per zone in /sonos page (completed 2026-03-25)
 - [x] **Phase 136: Sonos Speaker Extended UI & History** - EQ sliders, home theater settings, source switch, grouping, history chart in /sonos page (completed 2026-03-25)
-- [ ] **Phase 137: Fritz!Box Extended Frontend** - WiFi networks, device count chart, budget stats, auto-granularity in /network page
+- [x] **Phase 137: Fritz!Box Extended Frontend** - WiFi networks, device count chart, budget stats, auto-granularity in /network page (completed 2026-03-26)
 
 ## Phase Details
 
@@ -264,7 +264,7 @@ Plans:
 
 Plans:
 - [x] 137-01-PLAN.md — 3 new hooks (WiFi networks, budget stats, device count history) + extend bandwidth tiers hook with auto tier
-- [ ] 137-02-PLAN.md — 3 new components (WifiNetworksTable, BudgetStatsCard, DeviceCountChart) + extend HistoryTierToggle/BandwidthChart + page wiring
+- [x] 137-02-PLAN.md — 3 new components (WifiNetworksTable, BudgetStatsCard, DeviceCountChart) + extend HistoryTierToggle/BandwidthChart + page wiring
 
 ## Progress
 
@@ -283,7 +283,7 @@ Plans:
 | 134 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 135 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 136 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 137 | v16.0 | 1/2 | In Progress|  |
+| 137 | v16.0 | 2/2 | Complete   | 2026-03-26 |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (12 phases, 11 complete + 1 planned).
 

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Milestone complete
+status: Ready to execute
 stopped_at: Completed 138-02-PLAN.md
-last_updated: "2026-03-26T09:04:45.836Z"
+last_updated: "2026-03-26T09:10:10.381Z"
 last_activity: 2026-03-26
 progress:
   total_phases: 13
-  completed_phases: 12
+  completed_phases: 13
   total_plans: 26
-  completed_plans: 25
+  completed_plans: 26
 ---
 
 # Project State
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 
 ## Current Position
 
-Phase: 138
-Plan: Not started
+Phase: 138 (sonos-frontend-wiring) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Plan: Not started
 | Phase 136 P02 | 5m | 2 tasks | 4 files |
 | Phase 137 P01 | 4 | 2 tasks | 8 files |
 | Phase 137 P02 | 4 | 2 tasks | 10 files |
+| Phase 138 P02 | 10 | 2 tasks | 4 files |
 | Phase 138 P02 | 10 | 2 tasks | 4 files |
 
 ## Accumulated Context
@@ -122,6 +123,8 @@ Recent decisions affecting v16.0:
 - [Phase 137]: WifiNetworksTable empty state returns Card with Text (not null) — consistent with tab content area
 - [Phase 137]: BudgetStatsCard returns null when no data — avoids empty card placeholder in layout
 - [Phase 137]: DeviceCountChart uses next/dynamic (ssr:false) — Recharts is heavy and chart-only component
+- [Phase 138]: SonosSeekControl uses isDragging ref to prevent position sync during drag
+- [Phase 138]: Zone volume defaults to coordinator volume with 250ms debounce — matches SonosSpeakerVolume pattern
 - [Phase 138]: SonosSeekControl uses isDragging ref to prevent position sync during drag
 - [Phase 138]: Zone volume defaults to coordinator volume with 250ms debounce — matches SonosSpeakerVolume pattern
 

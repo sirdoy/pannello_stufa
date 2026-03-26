@@ -8,9 +8,16 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, lu
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: Planning next milestone
+## Current Milestone: v17.0 WebSocket Real-Time Transport
 
-**Last shipped:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato (2026-03-26)
+**Goal:** Sostituire il polling HTTP con WebSocket push come trasporto primario per tutti i 6 provider, mantenendo il polling attuale come fallback automatico.
+
+**Target features:**
+- Client WebSocket condiviso (singola connessione, multi-topic subscription) conforme alla spec `/ws/live`
+- Migrazione di tutti i data hook da polling-first a WS-first con fallback automatico a polling
+- Gestione reconnection con exponential backoff, re-subscribe on reconnect, auth via query parameter
+- Adattamento tipi: mapping tra payload WS (spec HA proxy) e interfacce esistenti dei hook
+- Rispetto vincolo MAX 2 connessioni: singola connessione condivisa con dispatcher interno
 
 ## Current State
 

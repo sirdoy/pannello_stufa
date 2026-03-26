@@ -2,25 +2,20 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, e monitoraggio server Raspberry Pi — tutti i dispositivi collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth). Include Device Registry per gestione tipi e dispositivi registrati, sistema Rooms per organizzare dispositivi in stanze con stato aggregato per stanza e panoramica whole-house. Sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, monitoraggio server Raspberry Pi, sistema audio Sonos (transport, EQ, queue, grouping, sleep timer, seek, history), e sensori DIRIGERA (contatto e movimento) — 7 provider collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth, copertura API ~95%). Include Device Registry per gestione tipi e dispositivi registrati, sistema Rooms per organizzare dispositivi in stanze con stato aggregato per stanza e panoramica whole-house. Sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato
+## Current Milestone: Planning next milestone
 
-**Goal:** Integrare Sonos e DIRIGERA come nuovi provider, completare gli endpoint Fritz!Box avanzati (WiFi, network, history tiers) — portando la copertura API documentata da 56% a ~95%.
-
-**Target features:**
-- Sonos integration (28 endpoint: discovery, transport, volume, seek, extended controls, history)
-- DIRIGERA integration (8 endpoint: health, sensori contatto/movimento, summary, history, stats, telemetry)
-- Fritz!Box advanced (9 endpoint: system, WiFi clients/networks, DHCP, port forwarding, UPnP, mesh, history tiers, budget stats — escluso telephony)
+**Last shipped:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato (2026-03-26)
 
 ## Current State
 
-**Version:** v15.0 (shipped 2026-03-23)
-**Status:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — ALL 13 phases complete (126-138). Phase 138 complete (Sonos Frontend Wiring & Nav Fix: fixed 404 nav sub-items, wired devices fetch + zone volume + seek handlers, created SonosSeekControl component). Milestone ready for completion.
+**Version:** v16.0 (shipped 2026-03-26)
+**Status:** Milestone complete. All 13 phases (126-138), 26 plans, 62/62 requirements satisfied. API coverage ~95%.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -34,7 +29,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
 - Fritz!Box TR-064 API integration via server-side proxy
-- Shared HomeAssistant API client (`haGet`/`haPost`/`haPut`) for all 5 providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue)
+- Shared HomeAssistant API client (`haGet`/`haPost`/`haPut`/`haDelete`) for all 7 providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue, Sonos, DIRIGERA)
+- Sonos integration via HA proxy: sonosProxy.ts (28 functions), 23 API routes, transport/EQ/queue/grouping/sleep timer/seek/history
+- DIRIGERA integration via HA proxy: dirigeraProxy.ts (5 functions), 5 API routes, contact/motion sensor data
 - Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
 - Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
@@ -581,6 +578,26 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **RSTAT-02**: Whole-house status (all rooms) — v15.0 (Phase 124)
 - ✓ **RSTAT-03**: Rooms health stats — v15.0 (Phase 124)
 
+**v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato (Shipped 2026-03-26):**
+
+**Sonos Integration (42 requirements):**
+- ✓ **SONOS-01** through **SONOS-06**: Proxy client, types, health/devices/zones routes — v16.0 (Phase 126)
+- ✓ **SONOS-07** through **SONOS-17**: Transport controls, volume, seek — v16.0 (Phases 127, 138)
+- ✓ **SONOS-18** through **SONOS-30**: Extended controls (EQ, play mode, queue, home theater, grouping, sleep timer, history) — v16.0 (Phase 128)
+- ✓ **SONOS-31** through **SONOS-34**: Frontend (SonosCard, /sonos page, device registry, nav) — v16.0 (Phases 129, 138)
+- ✓ **SONOS-35** through **SONOS-37**: Zone extended UI (play mode, sleep timer, queue viewer) — v16.0 (Phase 135)
+- ✓ **SONOS-38** through **SONOS-42**: Speaker extended UI & history (EQ, home theater, source, grouping, history chart) — v16.0 (Phase 136)
+
+**DIRIGERA Integration (11 requirements):**
+- ✓ **DIRIG-01** through **DIRIG-07**: Proxy client, types, health/sensors routes — v16.0 (Phase 130)
+- ✓ **DIRIG-08** through **DIRIG-11**: Frontend (DirigeraCard, /dirigera page, device registry, nav) — v16.0 (Phase 131)
+
+**Fritz!Box Advanced (20 requirements):**
+- ✓ **FRITZ-01** through **FRITZ-07**: System info, WiFi clients/networks, DHCP, port forwarding, UPnP, mesh — v16.0 (Phase 132)
+- ✓ **FRITZ-08** through **FRITZ-12**: Bandwidth history tiers, device count, budget stats — v16.0 (Phase 133)
+- ✓ **FRITZ-13** through **FRITZ-16**: Frontend system info, WiFi clients, network services, history charts — v16.0 (Phase 134)
+- ✓ **FRITZ-17** through **FRITZ-20**: Extended frontend (WiFi networks, device count chart, budget stats, auto-granularity) — v16.0 (Phase 137)
+
 ### Out of Scope
 
 - Notifiche email — Solo push notifications, no email
@@ -596,6 +613,10 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Complex ML models per consumi — Euristica sufficient, ML deferred to future
 - Third-party analytics (GA, Mixpanel) — Privacy-first approach, Firebase only
 - Cron UI builder — Configuration via code sufficient
+- Fritz!Box Telephony (DECT, calls, TAM) — User excluded, non necessario
+- Sonos TTS/announcement — Non documentato nell'API
+- DIRIGERA light control (bulbs) — Solo sensori in scope, luci gestite da Hue
+- Automations engine (rule CRUD) — Scope separato, milestone dedicato futuro
 
 ## Context
 
@@ -605,7 +626,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Firestore per notification history
 - Auth0 per autenticazione
 - Service Worker (Serwist) per offline capability e notification actions
-- Multi-device smart home control (stufa, termostato, luci, rete Fritz!Box, Raspberry Pi)
+- Multi-device smart home control (stufa, termostato, luci, rete Fritz!Box, Raspberry Pi, Sonos, DIRIGERA)
 - CVA + Radix UI design system (37+ components)
 - react-error-boundary per crash isolation
 - Fritz!Box TR-064 API via server-side proxy con rate limiting
@@ -614,21 +635,22 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Self-hosted Outfit + Space Grotesk fonts via next/font
 - Web Vitals pipeline (useReportWebVitals → sendBeacon → Firebase RTDB → dashboard)
 - Suspense streaming con loading.tsx skeleton shell + per-card boundaries
-- ~108,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
-- 590+ TypeScript source files, 4,000+ tests passing
+- ~128,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- 750+ TypeScript source files, 4,000+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination (stove, thermostat, Raspberry Pi)
 - GDPR-compliant analytics con consent banner
-- Playwright E2E smoke tests for all 9 app pages
+- Playwright E2E smoke tests for all app pages
 - All device polling unified at 60s via useAdaptivePolling (no Firebase RTDB real-time listener)
 - Device Registry + Rooms frontend with typed proxy clients and 19 API route proxies
-- 21 milestones shipped, 125 phases, 420 plans executed
+- 22 milestones shipped, 138 phases, 446 plans executed
 
-**v15.0 Milestone (2026-03-23):**
-- 8 phases executed (13 plans)
-- 25/25 requirements satisfied (100%)
-- 36 code files changed (+5,481 insertions, -64 deletions, net +5,417 LOC)
-- 2 days from start to completion
-- Full CRUD for device types, devices, rooms, device assignment, room status views
+**v16.0 Milestone (2026-03-26):**
+- 13 phases executed (26 plans)
+- 62/62 requirements satisfied (100%)
+- 164 code files changed (+20,498 insertions, -147 deletions, net +20,351 LOC)
+- 4 days from start to completion
+- 7 providers now integrated via shared HA proxy (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue, Sonos, DIRIGERA)
+- API coverage raised from 56% to ~95%
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -642,6 +664,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - 3 Netatmo routes without frontend consumer (synchomeschedule, createnewhomeschedule, getroommeasure)
 - Netatmo proxy connectivity depends on myfritz.net (same risk as Fritz!Box)
 - DataTable retains 5 useMemo for TanStack Table referential stability (intentional exception)
+- 26 Sonos/Fritz!Box/DIRIGERA human verification items requiring live devices (v16.0 tech debt)
+- SONOS-05: GET /api/sonos/devices/[uid] route exists but no frontend consumer for per-device detail
+- SonosZoneSection.test.tsx mock uses fields not in SonosPlaybackResponse type
 
 **User Feedback:**
 - None yet (awaiting operational deployment)
@@ -749,6 +774,16 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Manual refresh only for status page | No polling — Aggiorna button triggers refetch (D-20 spec) | ✓ Good — No unnecessary API load for status views (v15.0) |
 | Gap closure phase for navigation | Audit caught missing nav menu entry for v15.0 pages | ✓ Good — All pages reachable from hamburger menu (v15.0) |
 | Scene CRUD deferred | Proxy endpoints marked "planned" but not yet available | — Pending — Revisit when proxy team implements |
+| Sonos 28-function proxy module | Consistent with Thermorossi/Netatmo/Hue proxy pattern, haGet/haPost/haPut | ✓ Good — Unified transport across all 7 providers (v16.0) |
+| DIRIGERA read-only (haGet only) | Only sensors in scope, no control endpoints available | ✓ Good — Minimal surface, expandable later (v16.0) |
+| Fritz!Box extends existing infrastructure | Phases 61-67 client extended with 13 new methods, not rewritten | ✓ Good — No regressions on existing /network features (v16.0) |
+| Promise.allSettled for zone/speaker batches | Individual zone/speaker failures don't break entire page | ✓ Good — Resilient to partial Sonos outages (v16.0) |
+| SonosCard picks first PLAYING zone | Promise.allSettled for up to 5 zones, first PLAYING wins | ✓ Good — Dashboard shows most relevant state (v16.0) |
+| 250ms debounce on volume sliders | localVolume optimistic state + debounced PUT | ✓ Good — Smooth UX, avoids flooding (v16.0) |
+| SonosSeekControl isDragging ref | Prevents position_ms sync during slider drag | ✓ Good — Smooth seek UX without jumps (v16.0) |
+| Phase 138 gap closure | Milestone audit identified 4 gaps (nav 404, devices fetch, zone volume, seek) | ✓ Good — All gaps resolved pre-ship (v16.0) |
+| Auto-granularity for bandwidth/history | Fritz!Box and Sonos history routes switch hourly/daily based on time range | ✓ Good — User doesn't need to choose resolution (v16.0) |
+| DeviceCountChart via next/dynamic | Recharts is heavy, chart-only component deferred with ssr:false | ✓ Good — Consistent with existing chart code-splitting (v16.0) |
 
 ## Constraints
 

@@ -328,6 +328,56 @@
 
 ---
 
+## Milestone: v16.0 — Sonos, DIRIGERA & Fritz!Box Avanzato
+
+**Shipped:** 2026-03-26
+**Phases:** 13 | **Plans:** 26
+
+### What Was Built
+- Sonos full integration: sonosProxy.ts (28 functions), 23 API routes, 5 hooks, 12+ components — transport, EQ, queue, grouping, sleep timer, seek, history
+- DIRIGERA sensor integration: dirigeraProxy.ts (5 functions), 5 API routes, 2 hooks, 5 components — contact/motion sensors, summary, filtering
+- Fritz!Box advanced endpoints: 13 new routes (system, WiFi clients/networks, DHCP, port forwarding, UPnP, mesh, bandwidth history tiers, budget stats)
+- 3 provider frontends: /sonos page (zone-based playback + extended controls), /dirigera page (sensor list + filter), enhanced /network page
+- 2 new dashboard cards: SonosCard (now playing + zone status) and DirigeraCard (sensor summary)
+- Phase 138 gap closure: fixed nav 404s, wired orphaned routes (devices fetch, zone volume, seek control)
+
+### What Worked
+- Sonos and DIRIGERA proxy clients followed the exact same function module pattern — created in minutes
+- Provider onboarding (types → proxy → routes → hooks → card → page) is now a fully mechanical path — 7th provider (DIRIGERA) was trivial
+- Fritz!Box extensions built on existing infrastructure (phases 61-67) — 13 new routes added without touching existing ones
+- Promise.allSettled pattern for zone/speaker batch fetches — resilient to partial Sonos outages
+- Milestone audit caught 4 integration gaps pre-ship, all fixed by Phase 138 gap closure
+- Largest milestone by plan count (26 plans, 13 phases) completed in 4 days — pattern maturity pays off
+
+### What Was Inefficient
+- SUMMARY one_liner field still broken across most phases — 8th consecutive milestone with this issue, now a permanent tooling gap
+- Nyquist validation 0/13 phases compliant — all have VALIDATION.md but none pass compliance check
+- 26 human verification items accumulated across 7 phases — all requiring live devices that can't be automated
+- Phase 135 human_needed status for 3 visual items (shuffle/repeat styling, sleep timer countdown, queue expand) — can't be CI-verified
+- Some CONTEXT.md files untracked in git (not committed during phase execution)
+
+### Patterns Established
+- Zone-based UI architecture for multi-room audio (zone → speakers → controls hierarchy)
+- SonosSeekControl isDragging ref pattern — prevents position sync during slider drag
+- 250ms debounce on volume sliders with optimistic local state — smooth UX without API flooding
+- DeviceCountChart via next/dynamic (ssr:false) — consistent with existing Recharts code-splitting
+- Auto-granularity for history routes (Fritz!Box and Sonos) — user doesn't need to choose resolution
+- Tab navigation with ember-400 border-b-2 active styling — consistent tab pattern for multi-section pages
+
+### Key Lessons
+1. **Largest milestone ships in same timeframe** — 26 plans in 4 days (vs 13 plans in 2 days for v15.0). Pattern maturity keeps pace constant regardless of scope.
+2. **Human verification is the remaining testing gap** — 26 items across 7 phases all require live devices. No CI automation possible for physical hardware interactions.
+3. **Gap closure still needed for largest milestones** — Phase 138 fixed 4 gaps. For 13-phase milestones, budget 1 gap closure phase.
+4. **Read-only providers are trivially simple** — DIRIGERA (haGet only) took 2 phases (infrastructure + frontend) with zero edge cases. Control complexity drives effort.
+5. **Fritz!Box extension pattern works** — adding to existing infrastructure (vs replacing like Thermorossi/Hue migration) is faster and lower risk.
+
+### Cost Observations
+- Model mix: balanced profile (sonnet executors, sonnet verifiers)
+- Sessions: ~8 sessions across 4 days
+- Notable: 13 phases / 26 plans is the largest milestone to date — 2x the plan count of v15.0 but only 2x the time (4 vs 2 days)
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -343,6 +393,7 @@
 | v14.0 | 7 | 12 | Hue proxy migration — unified all 5 providers, no direct APIs remain |
 | v14.1 | 5 | 9 | Type safety + dead code cleanup — zero `as any` in production code |
 | v15.0 | 8 | 13 | Rooms & Device Registry — first greenfield UI milestone |
+| v16.0 | 13 | 26 | Sonos + DIRIGERA + Fritz!Box advanced — largest milestone, 7 providers |
 
 ### Cumulative Quality
 
@@ -357,6 +408,7 @@
 | v14.0 | 4,000+ | 27/27 requirements | +5,258 |
 | v14.1 | 4,000+ | 26/26 requirements | +5,798 |
 | v15.0 | 4,000+ | 25/25 requirements | +5,417 |
+| v16.0 | 4,000+ | 62/62 requirements | +20,351 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -370,4 +422,6 @@
 8. **SUMMARY frontmatter quality is a persistent tooling gap** — one_liner and requirements-completed consistently empty across v11.0-v14.0, needs executor-level fix
 9. **Full pages and debug panels are migration blind spots** — hooks/routes get migrated first, but full pages and debug tools use legacy patterns that audit must catch (verified v14.0)
 10. **UI CRUD pages are a repeatable template** — DataTable + FormModal + ConfirmationDialog + custom hook is the standard entity management pattern (verified v15.0)
-11. **Gap closure is converging** — from 4 phases (v10.0) to 1 phase (v15.0), showing improving execution quality over time
+11. **Gap closure is converging** — from 4 phases (v10.0) to 1 phase (v15.0, v16.0), showing improving execution quality over time
+12. **Pattern maturity keeps pace constant** — v16.0 (26 plans) shipped in 4 days, same daily throughput as v15.0 (13 plans in 2 days). Established patterns eliminate research overhead.
+13. **Human verification is the testing ceiling** — 26 items in v16.0 require physical hardware. No amount of automation can replace plugging in a Sonos speaker.

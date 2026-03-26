@@ -1,5 +1,43 @@
 # Project Milestones: Pannello Stufa
 
+## v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato (Shipped: 2026-03-26)
+
+**Delivered:** Full Sonos and DIRIGERA integration as new providers plus advanced Fritz!Box endpoints — bringing documented API coverage from 56% to ~95% with 3 new pages, 2 new dashboard cards, and complete transport/extended controls for Sonos.
+
+**Phases completed:** 126-138 (13 phases, 26 plans)
+
+**Key accomplishments:**
+
+- Sonos full integration: sonosProxy.ts (28 functions), 23 API routes, 5 hooks, 12+ components — transport, EQ, queue, grouping, sleep timer, seek, history
+- DIRIGERA sensor integration: dirigeraProxy.ts (5 functions), 5 API routes, 2 hooks, 5 components — contact/motion sensors, summary, filtering
+- Fritz!Box advanced endpoints: 13 new routes (system, WiFi clients/networks, DHCP, port forwarding, UPnP, mesh, bandwidth history tiers, budget stats)
+- 3 provider frontends: /sonos page (zone-based playback + extended controls), /dirigera page (sensor list + filter), enhanced /network page (system info + WiFi + services + charts)
+- 2 new dashboard cards: SonosCard (now playing + zone status) and DirigeraCard (sensor summary with open/offline/battery counts)
+- Phase 138 gap closure: fixed nav 404s, wired orphaned routes (devices fetch, zone volume, seek control), SonosSeekControl component
+
+**Stats:**
+
+- 26 plans executed across 13 phases
+- 62/62 v16.0 requirements satisfied (100%, 1 partial at integration level)
+- 164 code files changed (+20,498 insertions, -147 deletions, net +20,351 LOC)
+- 4 days (2026-03-23 → 2026-03-26)
+
+**Git range:** `feat(126-01)` (4e67f1f1) → `docs(phase-138)` (5e5060bd)
+
+**Known Gaps (accepted as tech debt):**
+
+- 26 human verification items across 7 phases (require live devices: Sonos speakers, Fritz!Box router, DIRIGERA hub)
+- SONOS-05: GET /api/sonos/devices/[uid] route exists but no frontend consumer for per-device detail
+- SonosZoneSection.test.tsx mock uses fields not in SonosPlaybackResponse type
+
+**Archives:**
+
+- [Roadmap](milestones/v16.0-ROADMAP.md)
+- [Requirements](milestones/v16.0-REQUIREMENTS.md)
+- [Milestone Audit](milestones/v16.0-MILESTONE-AUDIT.md)
+
+---
+
 ## v15.0 Rooms & Device Registry (Shipped: 2026-03-23)
 
 **Delivered:** Complete frontend layer for Device Registry and Rooms APIs — typed proxy clients, 19 API route proxies, full CRUD pages for device types/devices/rooms, device-to-room assignment, and whole-house status aggregation with provider-specific live metrics.

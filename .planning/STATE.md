@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Milestone complete
+status: v16.0 milestone complete
 stopped_at: Completed 138-02-PLAN.md
-last_updated: "2026-03-26T09:15:17.845Z"
+last_updated: "2026-03-26T09:28:35.710Z"
 last_activity: 2026-03-26
 progress:
   total_phases: 13
@@ -17,15 +17,15 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-23)
+See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 138 — sonos-frontend-wiring
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 138
-Plan: Not started
+Phase: N/A (milestone complete)
+Plan: N/A
 
 ## Performance Metrics
 

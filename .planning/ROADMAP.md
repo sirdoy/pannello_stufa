@@ -75,7 +75,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 135: Sonos Zone Extended UI** - Play mode toggles, sleep timer, queue viewer per zone in /sonos page (completed 2026-03-25)
 - [x] **Phase 136: Sonos Speaker Extended UI & History** - EQ sliders, home theater settings, source switch, grouping, history chart in /sonos page (completed 2026-03-25)
 - [x] **Phase 137: Fritz!Box Extended Frontend** - WiFi networks, device count chart, budget stats, auto-granularity in /network page (completed 2026-03-26)
-- [ ] **Phase 138: Sonos Frontend Wiring & Nav Fix** - Wire orphaned routes/commands into frontend, fix nav sub-item 404s (gap closure)
+- [x] **Phase 138: Sonos Frontend Wiring & Nav Fix** - Wire orphaned routes/commands into frontend, fix nav sub-item 404s (gap closure) (completed 2026-03-26)
 
 ## Phase Details
 
@@ -280,8 +280,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 138-01-PLAN.md — Fix nav 404s + extend useSonosFullData (devices) + extend useSonosCommands (zone volume, seek)
-- [ ] 138-02-PLAN.md — SonosSeekControl component + zone volume slider wired into SonosZoneSection
+- [x] 138-01-PLAN.md — Fix nav 404s + extend useSonosFullData (devices) + extend useSonosCommands (zone volume, seek)
+- [x] 138-02-PLAN.md — SonosSeekControl component + zone volume slider wired into SonosZoneSection
 
 ## Progress
 
@@ -301,7 +301,7 @@ Plans:
 | 135 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 136 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 137 | v16.0 | 2/2 | Complete    | 2026-03-26 |
-| 138 | v16.0 | 0/2 | Planned    |  |
+| 138 | v16.0 | 2/2 | Complete   | 2026-03-26 |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (13 phases, 12 complete + 1 planned).
 

@@ -2,7 +2,7 @@
 
 **Base path:** `/api/v1/registry`
 
-Central device registry for tracking all smart home devices across providers. Manage device types (the taxonomy of device categories: light, sensor, thermostat, etc.) and register individual devices with custom names and type assignments. Device types include a set of built-in types that cannot be deleted. 8 endpoints.
+Central device registry for tracking all smart home devices across providers. Manage device types (the taxonomy of device categories: light, sensor, thermostat, etc.) and register individual devices with custom names and type assignments. Device types include a set of built-in types that cannot be deleted. 9 endpoints.
 
 ---
 
@@ -12,6 +12,7 @@ Central device registry for tracking all smart home devices across providers. Ma
 |--------|------|-------------|------|
 | `GET` | `/api/v1/registry/types` | List all device types | No |
 | `POST` | `/api/v1/registry/types` | Create a custom device type | Yes |
+| `PUT` | `/api/v1/registry/types/{slug}` | Update a device type label | Yes |
 | `DELETE` | `/api/v1/registry/types/{slug}` | Delete a custom device type | Yes |
 | `GET` | `/api/v1/registry/devices` | List registered devices (paginated) | Yes |
 | `POST` | `/api/v1/registry/devices` | Register a new device | Yes |
@@ -26,6 +27,7 @@ Central device registry for tracking all smart home devices across providers. Ma
 - [Device Types](#device-types)
   - [GET /registry/types](#get-registrytypes)
   - [POST /registry/types](#post-registrytypes)
+  - [PUT /registry/types/{slug}](#put-registrytypesslug)
   - [DELETE /registry/types/{slug}](#delete-registrytypesslug)
 - [Devices](#devices)
   - [GET /registry/devices](#get-registrydevices)
@@ -54,28 +56,34 @@ Return all device types (the taxonomy used for classifying registered devices).
     "slug": "light",
     "label": "Light",
     "is_builtin": true,
-    "created_at": 1711000000
+    "created_at": 1711000000,
+    "is_deletable": false
   },
   {
     "slug": "sensor",
     "label": "Sensor",
     "is_builtin": true,
-    "created_at": 1711000000
+    "created_at": 1711000000,
+    "is_deletable": false
   },
   {
     "slug": "thermostat",
     "label": "Thermostat",
     "is_builtin": true,
-    "created_at": 1711000000
+    "created_at": 1711000000,
+    "is_deletable": false
   },
   {
     "slug": "irrigatore",
     "label": "Irrigatore giardino",
     "is_builtin": false,
-    "created_at": 1711200000
+    "created_at": 1711200000,
+    "is_deletable": true
   }
 ]
 ```
+
+> **Note:** `is_deletable` is `true` only when `is_builtin` is `false` AND no devices are currently assigned to the type. Built-in types always have `is_deletable: false`.
 
 **Error responses:**
 
@@ -130,6 +138,49 @@ curl -X POST http://localhost:8000/api/v1/registry/types \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
   -d '{"slug": "irrigatore", "label": "Irrigatore giardino"}'
+```
+
+---
+
+### PUT /registry/types/{slug}
+
+Update the label of a device type. The slug is immutable — only the label can be changed.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `label` | string | Yes | New human-readable display name, 1-128 chars |
+
+**Response (200):**
+
+```json
+{
+  "slug": "irrigatore",
+  "label": "Irrigatore giardino (aggiornato)",
+  "is_builtin": false,
+  "created_at": 1711200000
+}
+```
+
+**Error responses:**
+
+| Status | Condition |
+|--------|-----------|
+| 401 | Missing or invalid authentication |
+| 404 | Device type with this slug not found |
+| 422 | Label is empty or missing |
+| 503 | Registry DB not initialized |
+
+**curl:**
+
+```bash
+curl -X PUT http://localhost:8000/api/v1/registry/types/irrigatore \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"label": "Irrigatore giardino (aggiornato)"}'
 ```
 
 ---
@@ -410,12 +461,17 @@ interface DeviceType {
   slug: string;        // Pattern: ^[a-z0-9_]+$, max 64 chars
   label: string;       // Max 128 chars
   is_builtin: boolean; // Built-in types cannot be deleted
+  is_deletable: boolean; // true when custom type has no devices assigned
   created_at: number;  // Unix timestamp
 }
 
 interface DeviceTypeCreate {
   slug: string;    // Pattern: ^[a-z0-9_]+$, max 64 chars
   label: string;   // Max 128 chars
+}
+
+interface DeviceTypeLabelUpdate {
+  label: string;   // 1-128 chars
 }
 
 interface RegistryDevice {

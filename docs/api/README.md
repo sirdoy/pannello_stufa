@@ -27,10 +27,20 @@ See also: [Netatmo Setup Guide](../NETATMO_SETUP.md)
 | Module | Prefix | Description |
 |--------|--------|-------------|
 | [Rooms](./rooms.md) | `/api/v1/rooms` | Room management — CRUD, device association, room/house status, health — 11 endpoints |
-| [Device Registry](./registry.md) | `/api/v1/registry` | Device types and device CRUD, health — 8 endpoints |
+| [Device Registry](./registry.md) | `/api/v1/registry` | Device types and device CRUD, health — 9 endpoints |
 | [Automations](./automations.md) | `/api/v1/automations` | Automation rules CRUD and execution history — 6 endpoints |
 | [Auth](./auth.md) | `/auth` | JWT login and API key management — 4 endpoints |
 | [Common](./common.md) | N/A | Global health check and aggregated device list — 2 endpoints |
+
+---
+
+## Real-Time
+
+| Protocol | Path | Description |
+|----------|------|-------------|
+| [WebSocket](./websocket.md) | `/ws/live` | Real-time push — provider data via topic subscription, delta detection, reconnection — 6 topics |
+
+> **New to WebSocket?** See the [WebSocket Real-Time API](./websocket.md) guide for endpoint details, TypeScript interfaces, and a ready-to-use `useProviderData` React hook.
 
 ---
 

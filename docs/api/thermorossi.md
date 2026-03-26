@@ -143,6 +143,8 @@ interface ThermorossiStatusResponse {
   last_poll_at: string | null;         // ISO 8601
   error_code: number | null;           // WiNet Error field, populated only when stove_state is "alarm"
   error_description: string | null;    // WiNet ErrorDescription, populated only when stove_state is "alarm"
+  custom_name: string | null;          // Custom name from device registry, or null if not registered
+  device_type: string | null;          // Device type slug from registry, or null if not registered
 }
 ```
 
@@ -417,6 +419,13 @@ Ignites the stove. Note: the URL path is `/commands/ignit` (no trailing `e`); th
 
 **`suggested_poll_delay_s`:** 15 (stove ignition takes several minutes)
 
+**curl:**
+
+```bash
+curl -X POST YOUR_BASE_URL/api/v1/thermorossi/commands/ignit \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
 **Error responses:**
 
 | Status | Condition |
@@ -439,6 +448,13 @@ Shuts down the stove. Also allowed from `alarm` state for emergency remote shutd
 **Allowed states:** `working`, `alarm`, `igniting`, `modulating`
 
 **`suggested_poll_delay_s`:** 15
+
+**curl:**
+
+```bash
+curl -X POST YOUR_BASE_URL/api/v1/thermorossi/commands/shutdown \
+  -H "X-API-Key: YOUR_API_KEY"
+```
 
 **Error responses:**
 
@@ -467,6 +483,15 @@ Sets the stove power level. Valid range: 1-5.
 {
   "value": 3
 }
+```
+
+**curl:**
+
+```bash
+curl -X POST YOUR_BASE_URL/api/v1/thermorossi/settings/power \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"value": 3}'
 ```
 
 **Error responses:**
@@ -499,6 +524,15 @@ Sets the stove fan speed level. Valid range: 1-6.
 }
 ```
 
+**curl:**
+
+```bash
+curl -X POST YOUR_BASE_URL/api/v1/thermorossi/settings/fan-level \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"value": 4}'
+```
+
 **Error responses:**
 
 | Status | Condition |
@@ -527,6 +561,15 @@ Sets the hydronic water temperature setpoint. Valid range: 40-80C.
 {
   "value": 70
 }
+```
+
+**curl:**
+
+```bash
+curl -X POST YOUR_BASE_URL/api/v1/thermorossi/settings/temperature/water \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"value": 70}'
 ```
 
 **Error responses:**

@@ -227,6 +227,8 @@ interface SonosDeviceResponse {
   role: "soundbar" | "sub" | "surround" | "speaker";
   is_visible: boolean;   // false for surrounds, Sub
   is_coordinator: boolean;
+  custom_name: string | null;  // Custom name from device registry, or null if not registered
+  device_type: string | null;  // Device type slug from registry, or null if not registered
 }
 ```
 

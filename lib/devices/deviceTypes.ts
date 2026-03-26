@@ -198,7 +198,7 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
     id: 'dirigera',
     name: 'DIRIGERA',
     icon: '\uD83D\uDD0C',
-    color: 'info',
+    color: 'ocean',
     enabled: true,
     routes: { main: '/dirigera' },
     features: {

@@ -180,6 +180,8 @@ interface HueLight {
   room_name: string | null;
   model_id: string | null;
   light_type: string | null;                  // e.g. "Extended color light"
+  custom_name: string | null;                 // Custom name from device registry, or null if not registered
+  device_type: string | null;                 // Device type slug from registry, or null if not registered
 }
 ```
 

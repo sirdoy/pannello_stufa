@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Milestone complete
-stopped_at: Completed 138-01-PLAN.md
-last_updated: "2026-03-26T08:54:43.148Z"
+status: Executing Phase 138
+stopped_at: Completed 137-02-PLAN.md
+last_updated: "2026-03-26T08:49:18.694Z"
 last_activity: 2026-03-26
 progress:
   total_phases: 13
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 137 — fritz-box-extended-frontend
+**Current focus:** Phase 138 — sonos-frontend-wiring
 
 ## Current Position
 
-Phase: 137
-Plan: Not started
+Phase: 138 (sonos-frontend-wiring) — EXECUTING
+Plan: 1 of 2
 
 ## Performance Metrics
 
@@ -66,7 +66,6 @@ Plan: Not started
 | Phase 136 P02 | 5m | 2 tasks | 4 files |
 | Phase 137 P01 | 4 | 2 tasks | 8 files |
 | Phase 137 P02 | 4 | 2 tasks | 10 files |
-| Phase 138 P01 | 8 | 1 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -122,8 +121,6 @@ Recent decisions affecting v16.0:
 - [Phase 137]: WifiNetworksTable empty state returns Card with Text (not null) — consistent with tab content area
 - [Phase 137]: BudgetStatsCard returns null when no data — avoids empty card placeholder in layout
 - [Phase 137]: DeviceCountChart uses next/dynamic (ssr:false) — Recharts is heavy and chart-only component
-- [Phase 138]: SonosDeviceResponse actual type used (uid/name/ip/model/firmware/serial/role) — matches types/sonosProxy.ts
-- [Phase 138]: handleSetZoneVolume and handleSeek reuse sonosVolumeCmd — hook maintains exactly 3 useRetryableCommand calls
 
 ### Pending Todos
 
@@ -143,5 +140,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Completed 138-01-PLAN.md
+Stopped at: Completed 137-02-PLAN.md
 Resume file: None

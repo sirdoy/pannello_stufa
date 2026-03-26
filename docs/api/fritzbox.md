@@ -45,6 +45,7 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 - [Telephony](#telephony)
 - [Historical Data](#historical-data)
 - [Debug](#debug)
+- [Legacy / Deprecated Endpoints](#legacy--deprecated-endpoints)
 
 ---
 
@@ -96,6 +97,8 @@ interface Device {
   mac: string;
   status: 0 | 1; // 1=online, 0=offline
   provider_type: string | null;
+  custom_name: string | null;  // Custom name from device registry
+  device_type: string | null;  // Device type from device registry
 }
 
 interface PaginatedResponse<T> {
@@ -110,7 +113,7 @@ interface PaginatedResponse<T> {
 
 ```bash
 curl "YOUR_BASE_URL/api/v1/fritzbox/devices?limit=50" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -149,7 +152,7 @@ interface BandwidthResponse {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/bandwidth \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -192,7 +195,7 @@ interface WanResponse {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/wan \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -233,7 +236,7 @@ interface SystemResponse {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/system \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -294,11 +297,11 @@ interface WiFiClientModel {
 ```bash
 # All WiFi clients
 curl "YOUR_BASE_URL/api/v1/fritzbox/wifi/clients" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 
 # Only 5GHz clients
 curl "YOUR_BASE_URL/api/v1/fritzbox/wifi/clients?band=5GHz" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -360,7 +363,7 @@ interface WiFiStatusResponse {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/wifi/networks \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -413,7 +416,7 @@ interface DhcpReservationModel {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/network/dhcp/reservations \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -468,7 +471,7 @@ interface PortForwardingRuleModel {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/network/port-forwarding \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -513,7 +516,7 @@ interface UPnPStatusResponse {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/network/upnp \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -609,7 +612,7 @@ interface MeshTopologyResponse {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/network/mesh \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -669,7 +672,7 @@ interface DectListResponse {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/telephony/dect \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -758,11 +761,11 @@ interface CallRecordModel {
 ```bash
 # All calls
 curl "YOUR_BASE_URL/api/v1/fritzbox/telephony/calls" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 
 # Only missed calls
 curl "YOUR_BASE_URL/api/v1/fritzbox/telephony/calls?call_type=missed" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -807,7 +810,7 @@ interface TamStatusResponse {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/telephony/tam \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -871,7 +874,7 @@ interface BandwidthHistoryRecord {
 
 ```bash
 curl "YOUR_BASE_URL/api/v1/fritzbox/history/bandwidth?hours=6&limit=100" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -925,7 +928,7 @@ interface DeviceHistoryRecord {
 
 ```bash
 curl "YOUR_BASE_URL/api/v1/fritzbox/history/devices?hours=24&limit=100" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -985,14 +988,14 @@ interface DeviceEventRecord {
 
 ```bash
 curl "YOUR_BASE_URL/api/v1/fritzbox/history/device-events?hours=24&limit=100" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 **Filter by device:**
 
 ```bash
 curl "YOUR_BASE_URL/api/v1/fritzbox/history/device-events?hours=48&mac=AA:BB:CC:DD:EE:FF" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -1054,7 +1057,7 @@ interface BandwidthHourlyRecord {
 
 ```bash
 curl "YOUR_BASE_URL/api/v1/fritzbox/history/bandwidth/hourly?days=7" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -1116,7 +1119,7 @@ interface BandwidthDailyRecord {
 
 ```bash
 curl "YOUR_BASE_URL/api/v1/fritzbox/history/bandwidth/daily?days=30" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -1170,7 +1173,7 @@ interface DeviceDailyRecord {
 
 ```bash
 curl "YOUR_BASE_URL/api/v1/fritzbox/history/devices/daily?days=7" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -1242,7 +1245,7 @@ interface BandwidthAggregatedRecord {
 ```bash
 # Auto-select granularity for last 14 days (returns daily data)
 curl "YOUR_BASE_URL/api/v1/fritzbox/history/bandwidth/auto?days=14" \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -1270,14 +1273,21 @@ Introspects all available TR-064 services, actions, and action arguments from th
     "firmware_version": "8.20",
     "hardware_version": "233"
   },
-  "service_count": 50,
+  "service_count": 1,
   "services": {
     "WANIPConnection:1": {
       "version": "1",
       "service_type": "urn:dslforum-org:service:WANIPConnection:1",
       "control_url": "/upnp/control/WANIPConn1",
-      "actions": ["GetExternalIPAddress", "GetStatusInfo"],
-      "action_count": 2
+      "actions": [
+        {
+          "name": "GetExternalIPAddress",
+          "arguments": [
+            {"name": "NewExternalIPAddress", "direction": "out", "data_type": "string"}
+          ]
+        }
+      ],
+      "action_count": 1
     }
   }
 }
@@ -1287,7 +1297,7 @@ Introspects all available TR-064 services, actions, and action arguments from th
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/service-discovery \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---
@@ -1340,7 +1350,86 @@ interface BudgetStats {
 
 ```bash
 curl YOUR_BASE_URL/api/v1/fritzbox/budget-stats \
-  -H "Authorization: Bearer YOUR_TOKEN"
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+---
+
+## Legacy / Deprecated Endpoints
+
+These four endpoints exist for backward compatibility with pre-v1 clients and are marked `deprecated=True` in the FastAPI router. They proxy to the corresponding Fritz!Box provider endpoints. **Do not use these in new integrations.**
+
+| Method | Path | Status | Replacement |
+|--------|------|--------|-------------|
+| `GET` | `/api/v1/bandwidth` | Deprecated | `GET /api/v1/fritzbox/bandwidth` |
+| `GET` | `/api/v1/wan` | Deprecated | `GET /api/v1/fritzbox/wan` |
+| `GET` | `/api/v1/history/bandwidth` | Deprecated | `GET /api/v1/fritzbox/history/bandwidth` |
+| `GET` | `/api/v1/history/devices` | Deprecated | `GET /api/v1/fritzbox/history/devices` |
+
+### GET /api/v1/bandwidth (Deprecated)
+
+**Deprecated** — use `/api/v1/fritzbox/bandwidth` instead.
+
+Proxies to the Fritz!Box provider bandwidth endpoint. Returns current WAN upload/download bandwidth from the in-memory cache.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**curl:**
+
+```bash
+curl YOUR_BASE_URL/api/v1/bandwidth \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+---
+
+### GET /api/v1/wan (Deprecated)
+
+**Deprecated** — use `/api/v1/fritzbox/wan` instead.
+
+Proxies to the Fritz!Box provider WAN status endpoint. Returns WAN connection status and external IP information from the in-memory cache.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**curl:**
+
+```bash
+curl YOUR_BASE_URL/api/v1/wan \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+---
+
+### GET /api/v1/history/bandwidth (Deprecated)
+
+**Deprecated** — use `/api/v1/fritzbox/history/bandwidth` instead.
+
+Returns paginated bandwidth history records. Accepts `hours` (1–168, default 24), `limit`, and `offset` query parameters.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**curl:**
+
+```bash
+curl "YOUR_BASE_URL/api/v1/history/bandwidth?hours=24&limit=100" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+---
+
+### GET /api/v1/history/devices (Deprecated)
+
+**Deprecated** — use `/api/v1/fritzbox/history/devices` instead.
+
+Returns paginated device presence history records. Accepts `hours` (1–168, default 24), `limit`, and `offset` query parameters.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**curl:**
+
+```bash
+curl "YOUR_BASE_URL/api/v1/history/devices?hours=24&limit=100" \
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ---

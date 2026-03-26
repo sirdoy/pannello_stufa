@@ -306,6 +306,8 @@ interface NetatmoRoomMeasurement {
   therm_setpoint_temperature: number | null;
   heating_power_request: number | null;
   timestamp: number;           // Unix timestamp of the measurement
+  custom_name: string | null;  // Custom name from device registry (keyed by module_id)
+  device_type: string | null;  // Device type slug from registry
 }
 
 interface NetatmoHomestatusResponse {

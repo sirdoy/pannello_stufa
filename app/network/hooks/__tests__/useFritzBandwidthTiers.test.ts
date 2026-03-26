@@ -202,4 +202,122 @@ describe('useFritzBandwidthTiers', () => {
 
     expect(result.current.tierData[0]?.time).toBeLessThan(result.current.tierData[1]?.time ?? 0);
   });
+
+  // --- 'auto' tier tests ---
+
+  const mockAutoItems = [
+    { timestamp: 1700000000, granularity: 'hourly', avg_downstream_rate: 10_000_000, avg_upstream_rate: 2_000_000 },
+    { timestamp: 1700003600, granularity: 'hourly', avg_downstream_rate: 15_000_000, avg_upstream_rate: 3_000_000 },
+  ];
+
+  it('fetches /api/fritzbox/history/bandwidth/auto?days=7 for auto tier', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzBandwidthTiers());
+
+    act(() => {
+      result.current.setTier('auto');
+    });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(global.fetch).toHaveBeenCalledWith('/api/fritzbox/history/bandwidth/auto?days=7');
+  });
+
+  it('maps timestamp (not hour_timestamp) to chart points for auto tier', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzBandwidthTiers());
+
+    act(() => {
+      result.current.setTier('auto');
+    });
+
+    await waitFor(() => {
+      expect(result.current.tierData.length).toBe(2);
+    });
+
+    // timestamp: 1700000000 → time: 1700000000 * 1000 ms
+    const firstPoint = result.current.tierData[0];
+    expect(firstPoint?.time).toBe(1700000000 * 1000);
+    // avg_downstream_rate: 10_000_000 bps → 10 Mbps
+    expect(firstPoint?.download).toBe(10);
+    // avg_upstream_rate: 2_000_000 bps → 2 Mbps
+    expect(firstPoint?.upload).toBe(2);
+  });
+
+  it('sets autoGranularity from first item granularity field', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzBandwidthTiers());
+
+    act(() => {
+      result.current.setTier('auto');
+    });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.autoGranularity).toBe('hourly');
+  });
+
+  it('resets autoGranularity to null when switching from auto to realtime', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzBandwidthTiers());
+
+    // Switch to auto first
+    act(() => {
+      result.current.setTier('auto');
+    });
+
+    await waitFor(() => {
+      expect(result.current.autoGranularity).toBe('hourly');
+    });
+
+    // Switch back to realtime
+    act(() => {
+      result.current.setTier('realtime');
+    });
+
+    expect(result.current.autoGranularity).toBeNull();
+  });
+
+  it('returns empty tierData and null autoGranularity on auto fetch error', async () => {
+    global.fetch = jest.fn().mockRejectedValue(new Error('Network error')) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzBandwidthTiers());
+
+    act(() => {
+      result.current.setTier('auto');
+    });
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.tierData).toEqual([]);
+    expect(result.current.autoGranularity).toBeNull();
+  });
+
+  it('initializes with null autoGranularity', () => {
+    const { result } = renderHook(() => useFritzBandwidthTiers());
+
+    expect(result.current.autoGranularity).toBeNull();
+  });
 });

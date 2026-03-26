@@ -120,10 +120,10 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 ### Fritz!Box Extended Frontend
 
-- [ ] **FRITZ-17**: WiFi networks section nella /network page (reti configurate con stato abilitato/disabilitato)
-- [ ] **FRITZ-18**: Device count daily chart nella /network page (grafico dispositivi connessi per giorno)
-- [ ] **FRITZ-19**: Budget stats card nella /network page (consumo dati, percentuale utilizzo, stato ok/warning/danger)
-- [ ] **FRITZ-20**: Auto-granularity toggle nella /network page bandwidth chart (sostituzione o integrazione tier manuale)
+- [x] **FRITZ-17**: WiFi networks section nella /network page (reti configurate con stato abilitato/disabilitato)
+- [x] **FRITZ-18**: Device count daily chart nella /network page (grafico dispositivi connessi per giorno)
+- [x] **FRITZ-19**: Budget stats card nella /network page (consumo dati, percentuale utilizzo, stato ok/warning/danger)
+- [x] **FRITZ-20**: Auto-granularity toggle nella /network page bandwidth chart (sostituzione o integrazione tier manuale)
 
 ## Future Requirements (v16.1+)
 

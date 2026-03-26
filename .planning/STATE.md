@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
-status: Ready to plan
-stopped_at: Phase 137 context gathered
-last_updated: "2026-03-26T07:36:38.908Z"
-last_activity: 2026-03-25
+status: Ready to execute
+stopped_at: Completed 137-01-PLAN.md
+last_updated: "2026-03-26T08:01:19.978Z"
+last_activity: 2026-03-26
 progress:
   total_phases: 12
   completed_phases: 11
-  total_plans: 22
-  completed_plans: 22
+  total_plans: 24
+  completed_plans: 23
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 136 — sonos-speaker-extended-ui-history
+**Current focus:** Phase 137 — fritz-box-extended-frontend
 
 ## Current Position
 
-Phase: 137
-Plan: Not started
+Phase: 137 (fritz-box-extended-frontend) — EXECUTING
+Plan: 2 of 2
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Plan: Not started
 | Phase 135 P02 | 12 | 2 tasks | 8 files |
 | Phase 136 P01 | 7 | 2 tasks | 15 files |
 | Phase 136 P02 | 5m | 2 tasks | 4 files |
+| Phase 137 P01 | 4 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,8 @@ Recent decisions affecting v16.0:
 - [Phase 136]: useSonosHistory fetchHistory uses useCallback with all filter deps for clean useEffect dependency tracking
 - [Phase 136]: SonosSourceSwitch and SonosGroupControls rendered below volume row (not inline) to preserve flex layout integrity with range slider
 - [Phase 136]: speakers prop for SonosHistoryChart uses Set dedup via flatMap over zone members to handle edge case of members in multiple zones
+- [Phase 137]: useFritzBudgetStats uses useEffect([],[]) not polling — budget stats are informational snapshots per D-10
+- [Phase 137]: auto tier uses record.timestamp (unified field) not hour_timestamp/day_timestamp — per AggregatedRecord type
 
 ### Pending Todos
 
@@ -132,6 +135,6 @@ None.
 
 ## Session Continuity
 
-Last activity: 2026-03-25
-Stopped at: Phase 137 context gathered
-Resume file: .planning/phases/137-fritz-box-extended-frontend/137-CONTEXT.md
+Last activity: 2026-03-26
+Stopped at: Completed 137-01-PLAN.md
+Resume file: None

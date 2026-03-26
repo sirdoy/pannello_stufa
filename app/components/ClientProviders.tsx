@@ -12,6 +12,8 @@ import AxeDevtools from './AxeDevtools';
 import CommandPaletteProvider from './layout/CommandPaletteProvider';
 import InstallPrompt from '@/app/components/pwa/InstallPrompt';
 import { ReactNode } from 'react';
+import { WebSocketContext } from '@/app/context/WebSocketContext';
+import { useWebSocketManager } from '@/lib/hooks/useWebSocketManager';
 
 interface ClientProvidersProps {
   children: ReactNode;
@@ -19,6 +21,10 @@ interface ClientProvidersProps {
 
 // Client-side bypass flag — requires NEXT_PUBLIC_BYPASS_AUTH=true in .env.local
 const BYPASS_AUTH = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
+
+const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL ?? '';
+const WS_API_KEY = process.env.NEXT_PUBLIC_WS_API_KEY ?? '';
+const WS_URL = WS_BASE_URL && WS_API_KEY ? `${WS_BASE_URL}/ws/live?api_key=${WS_API_KEY}` : null;
 
 const MOCK_USER = BYPASS_AUTH
   ? {
@@ -40,10 +46,13 @@ const MOCK_USER = BYPASS_AUTH
  * revalidation keeps returning the mock user consistently.
  */
 export default function ClientProviders({ children }: ClientProvidersProps) {
+  const wsManager = useWebSocketManager(WS_URL);
+
   return (
     <Auth0Provider user={MOCK_USER}>
-      <ThemeScript />
-      <ThemeProvider>
+      <WebSocketContext.Provider value={wsManager}>
+        <ThemeScript />
+        <ThemeProvider>
         <PageTransitionProvider>
           <VersionProvider>
             <ToastProvider>
@@ -57,7 +66,8 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
             </ToastProvider>
           </VersionProvider>
         </PageTransitionProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </WebSocketContext.Provider>
     </Auth0Provider>
   );
 }

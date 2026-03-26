@@ -61,16 +61,8 @@ export const __mockHelpers = {
     mockOnOpen = null;
     (useWebSocket as jest.Mock).mockClear();
     (useWebSocket as jest.Mock).mockImplementation(
-      (
-        _url: string | null,
-        options?: {
-          onOpen?: () => void;
-          shouldReconnect?: () => boolean;
-          reconnectAttempts?: number;
-          reconnectInterval?: (attempt: number) => number;
-        },
-        _connect?: boolean,
-      ) => {
+      (...args: unknown[]) => {
+        const options = args[1] as { onOpen?: () => void } | undefined;
         if (options?.onOpen) {
           mockOnOpen = options.onOpen;
         }

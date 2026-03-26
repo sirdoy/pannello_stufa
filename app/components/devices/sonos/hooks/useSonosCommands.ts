@@ -1,7 +1,7 @@
 'use client';
 
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
-import type { SonosCommandOkResponse, SetVolumeRequest, SetMuteRequest, SonosPlayMode, SetPlayModeRequest, SetSleepTimerRequest, SetEqRequest, SetHomeTheaterRequest, SwitchSourceRequest, JoinRequest } from '@/types/sonosProxy';
+import type { SonosCommandOkResponse, SetVolumeRequest, SetMuteRequest, SetSeekRequest, SonosPlayMode, SetPlayModeRequest, SetSleepTimerRequest, SetEqRequest, SetHomeTheaterRequest, SwitchSourceRequest, JoinRequest } from '@/types/sonosProxy';
 
 export interface UseSonosCommandsParams {
   fetchData: () => Promise<void>;
@@ -23,6 +23,8 @@ export interface UseSonosCommandsReturn {
   handleSwitchSource: (uid: string, source: 'tv' | 'line_in') => Promise<void>;
   handleJoinGroup: (uid: string, targetUid: string) => Promise<void>;
   handleUnjoinGroup: (uid: string) => Promise<void>;
+  handleSetZoneVolume: (groupId: string, volume: number) => Promise<void>;
+  handleSeek: (groupId: string, position: string) => Promise<void>;
   sonosTransportCmd: ReturnType<typeof useRetryableCommand>;
   sonosVolumeCmd: ReturnType<typeof useRetryableCommand>;
   sonosExtendedCmd: ReturnType<typeof useRetryableCommand>;
@@ -278,6 +280,44 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
     }
   };
 
+  const handleSetZoneVolume = async (groupId: string, volume: number) => {
+    try {
+      params.setError(null);
+      const response = await sonosVolumeCmd.execute(`/api/sonos/zones/${groupId}/volume`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ volume } satisfies SetVolumeRequest),
+      });
+      if (response) {
+        if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
+        const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
+        await new Promise<void>(resolve => setTimeout(resolve, (data.suggested_poll_delay_s ?? 1) * 1000));
+        await params.fetchData();
+      }
+    } catch (err: unknown) {
+      params.setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const handleSeek = async (groupId: string, position: string) => {
+    try {
+      params.setError(null);
+      const response = await sonosVolumeCmd.execute(`/api/sonos/zones/${groupId}/seek`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ position } satisfies SetSeekRequest),
+      });
+      if (response) {
+        if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
+        const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
+        await new Promise<void>(resolve => setTimeout(resolve, (data.suggested_poll_delay_s ?? 1) * 1000));
+        await params.fetchData();
+      }
+    } catch (err: unknown) {
+      params.setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
   return {
     handlePlay,
     handlePause,
@@ -293,6 +333,8 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
     handleSwitchSource,
     handleJoinGroup,
     handleUnjoinGroup,
+    handleSetZoneVolume,
+    handleSeek,
     sonosTransportCmd,
     sonosVolumeCmd,
     sonosExtendedCmd,

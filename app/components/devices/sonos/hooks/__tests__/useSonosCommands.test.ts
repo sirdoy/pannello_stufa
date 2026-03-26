@@ -309,4 +309,38 @@ describe('useSonosCommands', () => {
     );
     expect(mockFetchData).toHaveBeenCalled();
   });
+
+  it('Test 15: handleSetZoneVolume calls PUT /api/sonos/zones/{groupId}/volume with body { volume: N }', async () => {
+    const { result } = renderHook(() =>
+      useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
+    );
+    await act(async () => {
+      await result.current.handleSetZoneVolume('RINCON_A', 60);
+    });
+    expect(mockVolumeCmd.execute).toHaveBeenCalledWith(
+      '/api/sonos/zones/RINCON_A/volume',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ volume: 60 }),
+      })
+    );
+    expect(mockFetchData).toHaveBeenCalled();
+  });
+
+  it('Test 16: handleSeek calls PUT /api/sonos/zones/{groupId}/seek with body { position: "HH:MM:SS" }', async () => {
+    const { result } = renderHook(() =>
+      useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
+    );
+    await act(async () => {
+      await result.current.handleSeek('RINCON_A', '00:02:30');
+    });
+    expect(mockVolumeCmd.execute).toHaveBeenCalledWith(
+      '/api/sonos/zones/RINCON_A/seek',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ position: '00:02:30' }),
+      })
+    );
+    expect(mockFetchData).toHaveBeenCalled();
+  });
 });

@@ -6,7 +6,7 @@
  */
 
 import { renderHook, waitFor } from '@testing-library/react';
-import type { SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse } from '@/types/sonosProxy';
+import type { SonosDeviceResponse, SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse } from '@/types/sonosProxy';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useAdaptivePolling');
@@ -18,6 +18,16 @@ import { useVisibility } from '@/lib/hooks/useVisibility';
 
 const mockUseVisibility = useVisibility as jest.MockedFunction<typeof useVisibility>;
 const mockUseAdaptivePolling = useAdaptivePolling as jest.MockedFunction<typeof useAdaptivePolling>;
+
+// Device fixtures
+const mockDevice1: SonosDeviceResponse = {
+  uid: 'RINCON_A', name: 'Beam', ip: '192.168.1.10', model: 'Sonos Beam',
+  firmware: '16.0', serial: 'A1B2C3', role: 'soundbar', is_visible: true, is_coordinator: true,
+};
+const mockDevice2: SonosDeviceResponse = {
+  uid: 'RINCON_C', name: 'One', ip: '192.168.1.12', model: 'Sonos One',
+  firmware: '16.0', serial: 'D4E5F6', role: 'speaker', is_visible: true, is_coordinator: true,
+};
 
 // Fixture data
 const mockZone1: SonosZoneResponse = {
@@ -77,6 +87,7 @@ const mockSleepTimer1: SonosSleepTimerResponse = { group_id: 'RINCON_A', remaini
 const mockSleepTimer2: SonosSleepTimerResponse = { group_id: 'RINCON_C', remaining_seconds: 1800 };
 
 function makeFetchMock(overrides?: {
+  devicesOk?: boolean;
   zonesOk?: boolean;
   playback1Ok?: boolean;
   playback2Ok?: boolean;
@@ -85,6 +96,7 @@ function makeFetchMock(overrides?: {
   sleepTimerOk?: boolean;
 }) {
   const opts = {
+    devicesOk: true,
     zonesOk: true,
     playback1Ok: true,
     playback2Ok: true,
@@ -95,6 +107,12 @@ function makeFetchMock(overrides?: {
   };
 
   return (url: string) => {
+    if (url === '/api/sonos/devices') {
+      return Promise.resolve({
+        ok: opts.devicesOk,
+        json: () => Promise.resolve({ devices: [mockDevice1, mockDevice2] }),
+      });
+    }
     if (url === '/api/sonos/zones') {
       return Promise.resolve({
         ok: opts.zonesOk,
@@ -198,7 +216,7 @@ describe('useSonosFullData', () => {
     expect(result.current.error).toBeNull();
   });
 
-  it('Test 2: data contains zones array, playback map, and volumes map', async () => {
+  it('Test 2: data contains devices array, zones array, playback map, and volumes map', async () => {
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
 
     const { result } = renderHook(() => useSonosFullData());
@@ -206,6 +224,8 @@ describe('useSonosFullData', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     expect(result.current.data).not.toBeNull();
+    expect(result.current.data!.devices).toHaveLength(2);
+    expect(result.current.data!.devices[0]!.uid).toBe('RINCON_A');
     expect(result.current.data!.zones).toHaveLength(2);
     expect(result.current.data!.playback['RINCON_A']).toBeDefined();
     expect(result.current.data!.playback['RINCON_A']!.transport_state).toBe('PLAYING');
@@ -331,5 +351,22 @@ describe('useSonosFullData', () => {
     expect(result.current.data!.zones).toHaveLength(2);
     expect(result.current.data!.playback['RINCON_A']).toBeDefined();
     expect(result.current.error).toBeNull();
+  });
+
+  it('Test 11: populates devices array from /api/sonos/devices fetch', async () => {
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data!.devices).toHaveLength(2);
+    expect(result.current.data!.devices[0]!.uid).toBe('RINCON_A');
+    expect(result.current.data!.devices[0]!.model).toBe('Sonos Beam');
+  });
+
+  it('Test 12: devices fetch failure triggers error (blocks entire fetch)', async () => {
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock({ devicesOk: false }));
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.error).toBe('Sonos non raggiungibile');
+    expect(result.current.stale).toBe(true);
   });
 });

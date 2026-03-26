@@ -3,9 +3,10 @@
 import { useState, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
-import type { SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse, SonosEqResponse, SonosHomeTheaterResponse } from '@/types/sonosProxy';
+import type { SonosDeviceResponse, SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse, SonosEqResponse, SonosHomeTheaterResponse } from '@/types/sonosProxy';
 
 export interface SonosFullData {
+  devices: SonosDeviceResponse[];
   zones: SonosZoneResponse[];
   playback: Record<string, SonosPlaybackResponse>;  // keyed by group_id
   volumes: Record<string, SonosVolumeResponse>;      // keyed by uid
@@ -36,6 +37,12 @@ export function useSonosFullData(): UseSonosFullDataReturn {
   const fetchData = async () => {
     try {
       setError(null);
+
+      // 0. Fetch devices list
+      const devicesRes = await fetch('/api/sonos/devices');
+      if (!devicesRes.ok) throw new Error('Devices endpoint failed');
+      const devicesBody = (await devicesRes.json()) as { devices: SonosDeviceResponse[] };
+      const devices = devicesBody.devices;
 
       // 1. Fetch zones (wrapped in { zones: [...] })
       const zonesRes = await fetch('/api/sonos/zones');
@@ -130,7 +137,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
         if (r.status === 'fulfilled') sleepTimers[zones[i]!.group_id] = r.value;
       });
 
-      const newData: SonosFullData = { zones, playback, volumes, playModes, sleepTimers, eqData, homeTheaterData };
+      const newData: SonosFullData = { devices, zones, playback, volumes, playModes, sleepTimers, eqData, homeTheaterData };
       dataRef.current = newData;
       setData(newData);
       setStale(false);

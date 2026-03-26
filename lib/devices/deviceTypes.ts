@@ -161,17 +161,9 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
     enabled: true,
     routes: {
       main: '/sonos',
-      spotify: '/sonos/spotify',
-      zones: '/sonos/zones',
     },
     features: {
-      hasScheduler: false,
-      hasMaintenance: false,
-      hasErrors: false,
-      hasSpotify: true,
       hasPlayback: true,
-      hasZones: true,
-      hasSearch: true,
     },
   },
   [DEVICE_TYPES.NETWORK]: {

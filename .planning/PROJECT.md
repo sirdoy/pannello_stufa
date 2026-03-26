@@ -20,7 +20,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v15.0 (shipped 2026-03-23)
-**Status:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — ALL 12 phases complete (126-137). Phase 137 complete (Fritz!Box Extended Frontend: /network page extended with WiFi networks tab, device count AreaChart, budget stats card with progress bar, and auto-granularity bandwidth mode). Milestone ready for completion.
+**Status:** v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato — ALL 13 phases complete (126-138). Phase 138 complete (Sonos Frontend Wiring & Nav Fix: fixed 404 nav sub-items, wired devices fetch + zone volume + seek handlers, created SonosSeekControl component). Milestone ready for completion.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -777,4 +777,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after Phase 136 (Sonos Speaker Extended UI & History) complete*
+*Last updated: 2026-03-26 after Phase 138 (Sonos Frontend Wiring & Nav Fix) complete*

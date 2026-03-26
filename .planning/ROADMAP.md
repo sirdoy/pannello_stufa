@@ -72,7 +72,7 @@ See git history for details.
 
 **Milestone Goal:** Tutte le card del dashboard ricevono dati live via WebSocket con fallback automatico a polling HTTP — senza alcuna modifica all'UX esistente.
 
-- [ ] **Phase 139: WebSocket Infrastructure** - Shared connection manager, TypeScript types, auth, reconnect, topic dispatch
+- [x] **Phase 139: WebSocket Infrastructure** - Shared connection manager, TypeScript types, auth, reconnect, topic dispatch (completed 2026-03-26)
 - [ ] **Phase 140: Stove Migration** - useStoveData migrated to WS primary channel with alwaysActive fallback preserved
 - [ ] **Phase 141: Fritz!Box & Hue Migration** - useNetworkData and useLightsData migrated to WS with buffer/history preservation
 - [ ] **Phase 142: Sonos & DIRIGERA Migration** - useSonosData and useDirigeraData migrated to WS
@@ -91,7 +91,7 @@ See git history for details.
   3. Closing and reopening the browser tab reconnects automatically within 30 seconds using exponential backoff
   4. After any reconnection, all previously subscribed topics are re-subscribed without user action
   5. TypeScript types exist for all 6 provider WS payloads (`fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `hue`, `sonos`) derived from the spec
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 139-01-PLAN.md — WS types, manager hook, React context
 - [ ] 139-02-PLAN.md — Tests, mock, ClientProviders wiring
@@ -155,7 +155,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 139. WebSocket Infrastructure | v17.0 | 1/2 | In Progress|  |
+| 139. WebSocket Infrastructure | v17.0 | 1/2 | Complete    | 2026-03-26 |
 | 140. Stove Migration | v17.0 | 0/TBD | Not started | - |
 | 141. Fritz!Box & Hue Migration | v17.0 | 0/TBD | Not started | - |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 0/TBD | Not started | - |

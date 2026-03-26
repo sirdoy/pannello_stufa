@@ -260,6 +260,11 @@ Plans:
   2. /network page has a device count chart showing daily connected device counts over time
   3. /network page has a budget stats card showing data consumption, utilization percentage with progress bar, and ok/warning/danger status
   4. Bandwidth chart supports auto-granularity mode that automatically selects hourly or daily resolution based on time range
+**Plans**: 2 plans
+
+Plans:
+- [ ] 137-01-PLAN.md — 3 new hooks (WiFi networks, budget stats, device count history) + extend bandwidth tiers hook with auto tier
+- [ ] 137-02-PLAN.md — 3 new components (WifiNetworksTable, BudgetStatsCard, DeviceCountChart) + extend HistoryTierToggle/BandwidthChart + page wiring
 
 ## Progress
 
@@ -278,10 +283,10 @@ Plans:
 | 134 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 135 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 136 | v16.0 | 2/2 | Complete    | 2026-03-25 |
-| 137 | v16.0 | 0/0 | Planned     | — |
+| 137 | v16.0 | 0/2 | Planned     | — |
 
-**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (12 phases, 9 complete + 3 planned).
+**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (12 phases, 11 complete + 1 planned).
 
 ---
 
-*Roadmap updated: 2026-03-25 — Phase 135 planned (2 plans in 2 waves)*
+*Roadmap updated: 2026-03-26 — Phase 137 planned (2 plans in 2 waves)*

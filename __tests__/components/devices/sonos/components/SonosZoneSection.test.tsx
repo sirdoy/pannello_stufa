@@ -35,6 +35,13 @@ jest.mock('@/app/components/devices/sonos/components/SonosQueueViewer', () => ({
   default: () => <div data-testid="sonos-queue-viewer">QueueViewer</div>,
 }));
 
+jest.mock('@/app/components/devices/sonos/components/SonosSeekControl', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => (
+    <div data-testid="seek-control" data-group-id={props.groupId as string} />
+  ),
+}));
+
 jest.mock('@/app/components/devices/sonos/components/SonosSpeakerVolume', () => ({
   __esModule: true,
   default: ({ speakerName, eqData }: { speakerName: string; eqData: SonosEqResponse | undefined }) => (
@@ -94,6 +101,8 @@ const mockCommands = {
   handleSwitchSource: jest.fn(),
   handleJoinGroup: jest.fn(),
   handleUnjoinGroup: jest.fn(),
+  handleSetZoneVolume: jest.fn().mockResolvedValue(undefined),
+  handleSeek: jest.fn().mockResolvedValue(undefined),
   sonosTransportCmd: {} as UseSonosCommandsReturn['sonosTransportCmd'],
   sonosVolumeCmd: {} as UseSonosCommandsReturn['sonosVolumeCmd'],
   sonosExtendedCmd: {} as UseSonosCommandsReturn['sonosExtendedCmd'],
@@ -140,5 +149,27 @@ describe('SonosZoneSection', () => {
   it('renders member count in header', () => {
     render(<SonosZoneSection {...defaultProps} />);
     expect(screen.getByText('2 speaker')).toBeInTheDocument();
+  });
+
+  it('renders SonosSeekControl with correct groupId', () => {
+    render(<SonosZoneSection {...defaultProps} />);
+    const seekControl = screen.getByTestId('seek-control');
+    expect(seekControl).toBeInTheDocument();
+    expect(seekControl.getAttribute('data-group-id')).toBe('RINCON_GROUP_1');
+  });
+
+  it('renders zone volume slider with coordinator volume as default', () => {
+    render(<SonosZoneSection {...defaultProps} />);
+    expect(screen.getByText('Volume Zona')).toBeInTheDocument();
+    // coordinatorVolume from mockVolumes['RINCON_A'].volume = 50
+    const sliders = screen.getAllByRole('slider');
+    const zoneVolumeSlider = sliders.find(s => s.getAttribute('aria-label') === 'Volume Zona');
+    expect(zoneVolumeSlider).toBeDefined();
+    expect(zoneVolumeSlider?.getAttribute('value')).toBe('50');
+  });
+
+  it('renders Volume Speaker section heading', () => {
+    render(<SonosZoneSection {...defaultProps} />);
+    expect(screen.getByText('Volume Speaker')).toBeInTheDocument();
   });
 });

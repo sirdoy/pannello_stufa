@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import type {
   SonosZoneResponse,
   SonosPlaybackResponse,
@@ -13,6 +14,7 @@ import type {
 import type { UseSonosCommandsReturn } from '../hooks/useSonosCommands';
 import SonosNowPlaying from './SonosNowPlaying';
 import SonosTransportControls from './SonosTransportControls';
+import SonosSeekControl from './SonosSeekControl';
 import SonosSpeakerVolume from './SonosSpeakerVolume';
 import SonosPlayModeControls from './SonosPlayModeControls';
 import SonosSleepTimer from './SonosSleepTimer';
@@ -42,6 +44,23 @@ export default function SonosZoneSection({
   homeTheaterData,
   allZones,
 }: SonosZoneSectionProps) {
+  const coordinatorVolume = volumes[zone.coordinator_uid]?.volume ?? 50;
+  const [localZoneVolume, setLocalZoneVolume] = useState(coordinatorVolume);
+  const zoneVolumeDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    setLocalZoneVolume(coordinatorVolume);
+  }, [coordinatorVolume]);
+
+  const handleZoneVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVol = parseInt(e.target.value, 10);
+    setLocalZoneVolume(newVol);
+    if (zoneVolumeDebounceRef.current) clearTimeout(zoneVolumeDebounceRef.current);
+    zoneVolumeDebounceRef.current = setTimeout(() => {
+      void commands.handleSetZoneVolume(zone.group_id, newVol);
+    }, 250);
+  };
+
   return (
     <div className="rounded-2xl bg-slate-800/50 [html:not(.dark)_&]:bg-white p-5 sm:p-6 space-y-4">
       {/* Zone header */}
@@ -66,6 +85,13 @@ export default function SonosZoneSection({
         onPrevious={commands.handlePrevious}
       />
 
+      {/* Seek Control */}
+      <SonosSeekControl
+        playback={playback}
+        groupId={zone.group_id}
+        onSeek={commands.handleSeek}
+      />
+
       {/* Play Mode + Sleep Timer — same row per D-16, stacks on mobile */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <SonosPlayModeControls
@@ -81,9 +107,26 @@ export default function SonosZoneSection({
       {/* Queue Viewer — expandable per D-10 */}
       <SonosQueueViewer groupId={zone.group_id} />
 
+      {/* Zone volume — affects all speakers in zone */}
+      <div className="border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 pt-3">
+        <h3 className="text-sm font-medium text-slate-400 mb-2">Volume Zona</h3>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-slate-500 w-8 text-right">{localZoneVolume}%</span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={localZoneVolume}
+            onChange={handleZoneVolumeChange}
+            className="w-full h-2 rounded-lg bg-slate-700 [html:not(.dark)_&]:bg-slate-200 accent-success-500"
+            aria-label="Volume Zona"
+          />
+        </div>
+      </div>
+
       {/* Volume per speaker */}
       <div className="border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 pt-3">
-        <h3 className="text-sm font-medium text-slate-400 mb-2">Volume</h3>
+        <h3 className="text-sm font-medium text-slate-400 mb-2">Volume Speaker</h3>
         {zone.members.map(member => (
           <SonosSpeakerVolume
             key={member.uid}

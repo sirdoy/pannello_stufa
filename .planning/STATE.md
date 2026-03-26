@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: ready to plan
-stopped_at: null
-last_updated: "2026-03-26"
-last_activity: 2026-03-26
+status: planning
+stopped_at: Phase 139 context gathered
+last_updated: "2026-03-26T13:04:12.576Z"
+last_activity: 2026-03-26 — Roadmap created for v17.0 (6 phases, 23 requirements)
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -54,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 See PROJECT.md Key Decisions table for full history.
 
 Key context for v17.0:
+
 - react-use-websocket is the suggested library (per docs/api/websocket.md spec)
 - MAX 2 concurrent WS connections — single shared manager is mandatory
 - Raspberry Pi is NOT in the 6 WS topics — stays on polling only
@@ -79,5 +81,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Roadmap created — ready to plan Phase 139
-Resume file: None
+Stopped at: Phase 139 context gathered
+Resume file: .planning/phases/139-websocket-infrastructure/139-CONTEXT.md

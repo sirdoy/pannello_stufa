@@ -31,6 +31,7 @@ interface BandwidthChartProps {
   onTierChange?: (tier: BandwidthTier) => void;
   tierData?: BandwidthHistoryPoint[];
   tierLoading?: boolean;
+  autoGranularity?: 'hourly' | 'daily' | null;
 }
 
 interface CustomTooltipProps {
@@ -116,6 +117,7 @@ export default function BandwidthChart({
   onTierChange,
   tierData = [],
   tierLoading = false,
+  autoGranularity = null,
 }: BandwidthChartProps) {
   const isRealtime = activeTier === 'realtime';
 
@@ -127,6 +129,11 @@ export default function BandwidthChart({
     if (!isRealtime) {
       if (activeTier === 'daily') {
         return format(timestamp, 'dd/MM');
+      }
+      if (activeTier === 'auto') {
+        return autoGranularity === 'daily'
+          ? format(timestamp, 'dd/MM')
+          : format(timestamp, 'dd/MM HH:mm');
       }
       // hourly
       return format(timestamp, 'dd/MM HH:mm');
@@ -147,6 +154,11 @@ export default function BandwidthChart({
         <div className="flex items-center gap-4">
           {onTierChange && (
             <HistoryTierToggle value={activeTier} onChange={onTierChange} />
+          )}
+          {activeTier === 'auto' && autoGranularity && (
+            <Text variant="secondary" size="xs">
+              Auto: {autoGranularity === 'daily' ? 'giornaliero' : 'orario'}
+            </Text>
           )}
           {isRealtime && !isEmpty && (
             <TimeRangeSelector value={timeRange} onChange={onTimeRangeChange} />

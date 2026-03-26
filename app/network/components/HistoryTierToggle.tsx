@@ -13,6 +13,7 @@ const tiers: { value: BandwidthTier; label: string }[] = [
   { value: 'realtime', label: 'Tempo reale' },
   { value: 'hourly', label: 'Orario' },
   { value: 'daily', label: 'Giornaliero' },
+  { value: 'auto', label: 'Auto' },
 ];
 
 /**

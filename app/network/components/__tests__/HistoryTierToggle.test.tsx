@@ -56,4 +56,23 @@ describe('HistoryTierToggle', () => {
     // The active button should exist and be visible
     expect(screen.getByText(label)).toBeInTheDocument();
   });
+
+  it('renders 4 buttons including "Auto"', () => {
+    const onChange = jest.fn();
+    render(<HistoryTierToggle value="realtime" onChange={onChange} />);
+    expect(screen.getByText('Tempo reale')).toBeInTheDocument();
+    expect(screen.getByText('Orario')).toBeInTheDocument();
+    expect(screen.getByText('Giornaliero')).toBeInTheDocument();
+    expect(screen.getByText('Auto')).toBeInTheDocument();
+    // Confirm 4 buttons via role
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.length).toBe(4);
+  });
+
+  it('clicking "Auto" calls onChange with "auto"', () => {
+    const onChange = jest.fn();
+    render(<HistoryTierToggle value="realtime" onChange={onChange} />);
+    fireEvent.click(screen.getByText('Auto'));
+    expect(onChange).toHaveBeenCalledWith('auto');
+  });
 });

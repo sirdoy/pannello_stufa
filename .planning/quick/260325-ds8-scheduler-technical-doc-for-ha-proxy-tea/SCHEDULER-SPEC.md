@@ -85,6 +85,7 @@ interface ScheduleInterval {
 ```
 
 **Vincoli**:
+
 - Durata minima intervallo: 15 minuti
 - Gli intervalli NON si sovrappongono (la UI gestisce overlap automaticamente)
 - Gli intervalli sono ordinati per orario crescente
@@ -151,11 +152,13 @@ interface ScheduleInterval {
 Modalita override temporaneo. L'utente vuole controllare manualmente la stufa durante un periodo programmato.
 
 **Attivazione**: L'utente preme "Semi-Manuale" nella UI. Il sistema:
+
 1. Calcola il prossimo cambio schedulato (start o end del prossimo intervallo)
 2. Imposta `returnToAutoAt` a quel timestamp
 3. Imposta `semiManual: true`
 
 **Comportamento cron**:
+
 ```
 if (semiManual && now < returnToAutoAt) -> SKIP (non fare nulla)
 if (semiManual && now >= returnToAutoAt) -> clear semiManual, torna in automatico
@@ -206,16 +209,19 @@ const active = intervals.find(({ start, end }) => {
 
 Tramite il proxy Thermorossi (attualmente `lib/stove/thermorossiProxy.ts`):
 
-| Azione | Funzione Proxy | Endpoint HA | Body |
-|--------|---------------|-------------|------|
-| Accensione | `sendIgnit()` | `POST /api/v1/thermorossi/command/ignite` | `{}` (empty) |
-| Spegnimento | `sendShutdown()` | `POST /api/v1/thermorossi/command/shutdown` | `{}` (empty) |
-| Set potenza | `setPower(level)` | `POST /api/v1/thermorossi/command/power` | `{ "value": 1-5 }` |
-| Set ventola | `setFan(level)` | `POST /api/v1/thermorossi/command/fan` | `{ "value": 1-6 }` |
-| Leggi stato | `getStatus()` | `GET /api/v1/thermorossi/status` | - |
-| Health check | `getHealth()` | `GET /api/v1/thermorossi/health` | - |
+
+| Azione       | Funzione Proxy    | Endpoint HA                                 | Body               |
+| ------------ | ----------------- | ------------------------------------------- | ------------------ |
+| Accensione   | `sendIgnit()`     | `POST /api/v1/thermorossi/command/ignite`   | `{}` (empty)       |
+| Spegnimento  | `sendShutdown()`  | `POST /api/v1/thermorossi/command/shutdown` | `{}` (empty)       |
+| Set potenza  | `setPower(level)` | `POST /api/v1/thermorossi/command/power`    | `{ "value": 1-5 }` |
+| Set ventola  | `setFan(level)`   | `POST /api/v1/thermorossi/command/fan`      | `{ "value": 1-6 }` |
+| Leggi stato  | `getStatus()`     | `GET /api/v1/thermorossi/status`            | -                  |
+| Health check | `getHealth()`     | `GET /api/v1/thermorossi/health`            | -                  |
+
 
 **Tutti i comandi POST ritornano 202 Accepted** con:
+
 ```json
 {
   "command": "ignite",
@@ -380,12 +386,14 @@ Authorization: Bearer {auth0_token}
 Body: { "operation": "...", "data": {...} }
 ```
 
-| Operazione | Data | Effetto |
-|-----------|------|---------|
-| `saveSchedule` | `{ day: "Lunedi", schedule: ScheduleInterval[] }` | Salva intervalli per un giorno nello schedule attivo |
-| `setSchedulerMode` | `{ enabled: boolean }` | Abilita/disabilita automatico |
-| `setSemiManualMode` | `{ returnToAutoAt: "ISO8601" }` | Attiva semi-manuale con scadenza |
-| `clearSemiManualMode` | `{}` | Disattiva semi-manuale, torna in automatico |
+
+| Operazione            | Data                                              | Effetto                                              |
+| --------------------- | ------------------------------------------------- | ---------------------------------------------------- |
+| `saveSchedule`        | `{ day: "Lunedi", schedule: ScheduleInterval[] }` | Salva intervalli per un giorno nello schedule attivo |
+| `setSchedulerMode`    | `{ enabled: boolean }`                            | Abilita/disabilita automatico                        |
+| `setSemiManualMode`   | `{ returnToAutoAt: "ISO8601" }`                   | Attiva semi-manuale con scadenza                     |
+| `clearSemiManualMode` | `{}`                                              | Disattiva semi-manuale, torna in automatico          |
+
 
 ---
 
@@ -393,14 +401,16 @@ Body: { "operation": "...", "data": {...} }
 
 Il cron invia push notification tramite FCM per:
 
-| Evento | Trigger | Cooldown |
-|--------|---------|----------|
-| Accensione automatica | Ogni `sendIgnit()` dallo scheduler | Nessuno |
-| Spegnimento automatico | Ogni `sendShutdown()` dallo scheduler | Nessuno |
-| Stove working | Stufa entra in stato `working` | 30 minuti |
-| Spegnimento imprevisto | Stufa si spegne durante intervallo attivo (dopo essere stata accesa dallo scheduler) | 1 ora |
-| Allarme stufa | `stove_state === 'alarm'` | 1 ora |
-| Manutenzione | Ore utilizzo raggiungono soglie (75%, 90%, 100%) | Basato su livello |
+
+| Evento                 | Trigger                                                                              | Cooldown          |
+| ---------------------- | ------------------------------------------------------------------------------------ | ----------------- |
+| Accensione automatica  | Ogni `sendIgnit()` dallo scheduler                                                   | Nessuno           |
+| Spegnimento automatico | Ogni `sendShutdown()` dallo scheduler                                                | Nessuno           |
+| Stove working          | Stufa entra in stato `working`                                                       | 30 minuti         |
+| Spegnimento imprevisto | Stufa si spegne durante intervallo attivo (dopo essere stata accesa dallo scheduler) | 1 ora             |
+| Allarme stufa          | `stove_state === 'alarm'`                                                            | 1 ora             |
+| Manutenzione           | Ore utilizzo raggiungono soglie (75%, 90%, 100%)                                     | Basato su livello |
+
 
 ---
 
@@ -408,15 +418,17 @@ Il cron invia push notification tramite FCM per:
 
 Questi task vengono eseguiti nel cron `/api/scheduler/check` in modo fire-and-forget (non bloccano il flusso principale):
 
-| Task | Frequenza | Descrizione |
-|------|-----------|-------------|
-| Health check Netatmo proxy | Ogni esecuzione | Salva stato health in Firebase |
-| Health check Thermorossi proxy | Ogni esecuzione | Salva stato health in Firebase |
-| Tracking ore manutenzione | Ogni esecuzione | Conta ore di funzionamento stufa |
-| Calibrazione valvole Netatmo | Ogni 12 ore | Invia comando calibrazione a Netatmo |
-| Refresh meteo | Ogni 30 minuti | Aggiorna cache dati meteo Open-Meteo |
-| Cleanup token FCM | Ogni 7 giorni | Rimuove token push notification scaduti |
-| Cron execution log | Ogni esecuzione | Registra esecuzione cron con durata e stato |
+
+| Task                           | Frequenza       | Descrizione                                 |
+| ------------------------------ | --------------- | ------------------------------------------- |
+| Health check Netatmo proxy     | Ogni esecuzione | Salva stato health in Firebase              |
+| Health check Thermorossi proxy | Ogni esecuzione | Salva stato health in Firebase              |
+| Tracking ore manutenzione      | Ogni esecuzione | Conta ore di funzionamento stufa            |
+| Calibrazione valvole Netatmo   | Ogni 12 ore     | Invia comando calibrazione a Netatmo        |
+| Refresh meteo                  | Ogni 30 minuti  | Aggiorna cache dati meteo Open-Meteo        |
+| Cleanup token FCM              | Ogni 7 giorni   | Rimuove token push notification scaduti     |
+| Cron execution log             | Ogni esecuzione | Registra esecuzione cron con durata e stato |
+
 
 ---
 
@@ -425,6 +437,7 @@ Questi task vengono eseguiti nel cron `/api/scheduler/check` in modo fire-and-fo
 ### 9.1 Storage (sostituisce Firebase RTDB)
 
 HA deve persistere:
+
 - **Schedules**: La struttura dati in sezione 2 (multi-schedule con slots settimanali)
 - **Mode**: Stato operativo (enabled/semiManual/returnToAutoAt)
 - **ActiveScheduleId**: Quale schedule e attivo
@@ -433,6 +446,7 @@ HA deve persistere:
 ### 9.2 API Endpoints Richiesti
 
 **Lettura**:
+
 - `GET /api/v1/scheduler/mode` -> SchedulerMode
 - `GET /api/v1/scheduler/schedules` -> lista schedule con metadata
 - `GET /api/v1/scheduler/schedules/{id}` -> schedule completo con slots
@@ -440,6 +454,7 @@ HA deve persistere:
 - `GET /api/v1/scheduler/next-action` -> prossima azione schedulata (timestamp + tipo)
 
 **Scrittura**:
+
 - `POST /api/v1/scheduler/mode` -> `{ enabled, semiManual?, returnToAutoAt? }`
 - `POST /api/v1/scheduler/schedules` -> crea schedule
 - `PUT /api/v1/scheduler/schedules/{id}` -> aggiorna schedule
@@ -527,6 +542,7 @@ UI (browser) ---> Next.js API Routes ---> HA Proxy (scheduler endpoints)
 Usato dalla UI per mostrare "Prossima accensione: Lunedi 06:30" e per calcolare il `returnToAutoAt` del semi-manuale.
 
 **Algoritmo**:
+
 1. Prendi ora corrente in Europe/Rome
 2. Cerca negli intervalli di OGGI se c'e un start o end futuro
 3. Se siamo DENTRO un intervallo -> prossimo cambio = end (action: shutdown)
@@ -544,3 +560,6 @@ Usato dalla UI per mostrare "Prossima accensione: Lunedi 06:30" e per calcolare 
 4. **Real-time sync**: Attualmente la UI usa Firebase `onValue` listener per aggiornamenti in tempo reale. Con HA, si passera a polling (useAdaptivePolling 60s).
 5. **Giorni senza intervalli**: Un giorno senza array (o con array vuoto) e valido - significa "stufa spenta tutto il giorno".
 6. **Step 15 minuti**: La UI permette di impostare orari con granularita 15 minuti (00, 15, 30, 45).
+
+
+

@@ -24,10 +24,10 @@ const STATUS_LABELS: Record<BudgetStats['status'], string> = {
   danger: 'Critico',
 };
 
-const BADGE_VARIANTS: Record<BudgetStats['status'], 'sage' | 'ember' | 'rose'> = {
+const BADGE_VARIANTS: Record<BudgetStats['status'], 'sage' | 'ember' | 'danger'> = {
   ok: 'sage',
   warning: 'ember',
-  danger: 'rose',
+  danger: 'danger',
 };
 
 /**

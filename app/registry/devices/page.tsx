@@ -215,7 +215,7 @@ function useRegisteredDeviceIds() {
       const map: Record<string, Set<string>> = {};
       for (const d of data.items) {
         if (!map[d.provider_name]) map[d.provider_name] = new Set();
-        map[d.provider_name].add(d.device_id);
+        map[d.provider_name]!.add(d.device_id);
       }
       setByProvider(map);
     } catch { /* non-critical */ }
@@ -600,7 +600,7 @@ export default function DeviceRegistryPage() {
             submitLabel="Registra"
             cancelLabel="Annulla"
           >
-            {({ control, setValue }) => (
+            {({ control, setValue }: any) => (
               <RegisterFormFields
                 control={control}
                 setValue={setValue}
@@ -622,7 +622,7 @@ export default function DeviceRegistryPage() {
             submitLabel="Salva"
             cancelLabel="Annulla"
           >
-            {({ control }) => (
+            {({ control }: any) => (
               <>
                 {/* Read-only context (per D-22) */}
                 <div className="text-sm text-slate-400 mb-2">

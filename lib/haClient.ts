@@ -179,7 +179,7 @@ export async function haGet<T>(
  */
 export async function haPost<T>(
   endpoint: string,
-  body: Record<string, unknown>,
+  body: Record<string, unknown> | object,
   options: HaRequestOptions = {}
 ): Promise<T> {
   const { baseUrl, apiKey } = getEnvConfig();
@@ -223,7 +223,7 @@ export async function haPost<T>(
  */
 export async function haPut<T>(
   endpoint: string,
-  body: Record<string, unknown>,
+  body: Record<string, unknown> | object,
   options: HaRequestOptions = {}
 ): Promise<T> {
   const { baseUrl, apiKey } = getEnvConfig();

@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v16.0
 milestone_name: Sonos, DIRIGERA & Fritz!Box Avanzato
 status: Ready to plan
-stopped_at: Completed 136-02-PLAN.md
-last_updated: "2026-03-25T14:37:19.382Z"
+stopped_at: Phase 137 context gathered
+last_updated: "2026-03-26T07:36:38.908Z"
 last_activity: 2026-03-25
 progress:
   total_phases: 12
@@ -133,5 +133,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-25
-Stopped at: Completed 136-02-PLAN.md
-Resume file: None
+Stopped at: Phase 137 context gathered
+Resume file: .planning/phases/137-fritz-box-extended-frontend/137-CONTEXT.md

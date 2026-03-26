@@ -24,6 +24,7 @@
 - ✅ **v14.1 Tech Debt & Type Safety** — Phases 113-117 (shipped 2026-03-22)
 - ✅ **v15.0 Rooms & Device Registry** — Phases 118-125 (shipped 2026-03-23)
 - ✅ **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato** — Phases 126-138 (shipped 2026-03-26)
+- 🚧 **v17.0 WebSocket Real-Time Transport** — Phases 139-144 (in progress)
 
 ## Phases
 
@@ -61,22 +62,99 @@
 </details>
 
 <details>
-<summary>✅ Earlier milestones (v1.0-v14.1)</summary>
+<summary>✅ Earlier milestones — v1.0 through v14.1 (Phases 1-117) — all shipped</summary>
 
-See `.planning/milestones/` for full archives.
+See git history for details.
 
 </details>
 
+### 🚧 v17.0 WebSocket Real-Time Transport (In Progress)
+
+**Milestone Goal:** Tutte le card del dashboard ricevono dati live via WebSocket con fallback automatico a polling HTTP — senza alcuna modifica all'UX esistente.
+
+- [ ] **Phase 139: WebSocket Infrastructure** - Shared connection manager, TypeScript types, auth, reconnect, topic dispatch
+- [ ] **Phase 140: Stove Migration** - useStoveData migrated to WS primary channel with alwaysActive fallback preserved
+- [ ] **Phase 141: Fritz!Box & Hue Migration** - useNetworkData and useLightsData migrated to WS with buffer/history preservation
+- [ ] **Phase 142: Sonos & DIRIGERA Migration** - useSonosData and useDirigeraData migrated to WS
+- [ ] **Phase 143: Netatmo Migration** - useThermostatData migrated to WS with raw payload adapter layer
+- [ ] **Phase 144: Connection UX** - Visual connection status indicator, flicker-free transitions, per-card timestamps
+
+## Phase Details
+
+### Phase 139: WebSocket Infrastructure
+**Goal**: A single shared WebSocket connection to `/ws/live` is available app-wide, handles auth, reconnects automatically, and dispatches messages to per-topic consumers
+**Depends on**: Phase 138 (v16.0 complete)
+**Requirements**: WS-01, WS-02, WS-03, WS-04, WS-05, WS-06
+**Success Criteria** (what must be TRUE):
+  1. Opening the app in two tabs does not open two WebSocket connections (MAX 2 connections respected via shared manager)
+  2. Subscribing to a topic (e.g., `fritzbox`) causes the manager to send a subscribe message and route arriving payloads to the registered consumer
+  3. Closing and reopening the browser tab reconnects automatically within 30 seconds using exponential backoff
+  4. After any reconnection, all previously subscribed topics are re-subscribed without user action
+  5. TypeScript types exist for all 6 provider WS payloads (`fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `hue`, `sonos`) derived from the spec
+**Plans**: TBD
+
+### Phase 140: Stove Migration
+**Goal**: useStoveData receives live stove data via WebSocket as primary channel, falls back to HTTP polling automatically, and preserves the alwaysActive behavior that keeps polling active even with the tab hidden
+**Depends on**: Phase 139
+**Requirements**: MIG-01, MIG-02, MIG-03
+**Success Criteria** (what must be TRUE):
+  1. Stove card updates within ~1s of a state change when WebSocket is connected
+  2. When the WebSocket disconnects, the stove card continues updating via HTTP polling with no user action required
+  3. With the browser tab hidden, polling fallback continues firing (alwaysActive preserved — no tab-visibility pause)
+**Plans**: TBD
+
+### Phase 141: Fritz!Box & Hue Migration
+**Goal**: useNetworkData and useLightsData receive data via WebSocket as primary channel, fall back to polling, and the Fritz!Box sparkline buffer and bandwidth history survive WS/polling transitions without data loss
+**Depends on**: Phase 139
+**Requirements**: MIG-04, MIG-05, MIG-06, MIG-07, MIG-08
+**Success Criteria** (what must be TRUE):
+  1. Network card (devices, bandwidth, WAN) updates live from the `fritzbox` WS topic when connected
+  2. Lights card updates live from the `hue` WS topic when connected
+  3. When WebSocket disconnects, both cards continue updating via HTTP polling
+  4. The bandwidth sparkline history is not reset or emptied when transitioning between WS and polling modes
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 142: Sonos & DIRIGERA Migration
+**Goal**: useSonosData and useDirigeraData receive data via WebSocket as primary channel with HTTP polling fallback
+**Depends on**: Phase 139
+**Requirements**: MIG-09, MIG-10, MIG-11, MIG-12
+**Success Criteria** (what must be TRUE):
+  1. Sonos card (speakers, groups) updates live from the `sonos` WS topic when connected
+  2. DIRIGERA card updates live from the `dirigera` WS topic when connected
+  3. When WebSocket disconnects, both Sonos and DIRIGERA cards continue updating via HTTP polling
+**Plans**: TBD
+
+### Phase 143: Netatmo Migration
+**Goal**: useThermostatData receives Netatmo data via WebSocket as primary channel with an adapter layer that normalises the raw `Record<string, unknown>` WS payload into the existing typed Netatmo shape, with HTTP polling fallback
+**Depends on**: Phase 139
+**Requirements**: MIG-13, MIG-14
+**Success Criteria** (what must be TRUE):
+  1. Thermostat card updates live from the `netatmo` WS topic when connected
+  2. The existing Netatmo typed interface is satisfied by the adapter — no TypeScript errors, no runtime shape mismatches
+  3. When WebSocket disconnects, the thermostat card continues updating via HTTP polling
+**Plans**: TBD
+
+### Phase 144: Connection UX
+**Goal**: Users can see the current WebSocket connection state at a glance, transitions between WebSocket and polling are invisible in the data stream, and every card shows when its data was last refreshed
+**Depends on**: Phase 143 (all migrations complete)
+**Requirements**: UX-01, UX-02, UX-03
+**Success Criteria** (what must be TRUE):
+  1. A connection status indicator is visible on the dashboard showing one of three states: connected (WS live), reconnecting (backoff in progress), or fallback (polling active)
+  2. Switching from WebSocket to polling and back does not cause any card to flash, blank, or show stale data for more than one polling interval
+  3. Every dashboard card displays a "last updated" timestamp sourced from the WS `ts` field when on WebSocket or from the polling response time when on HTTP
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
+
+**Execution Order:** 139 → 140 → 141 → 142 → 143 → 144
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1-117 | v1.0-v14.1 | 407/407 | Complete | 2026-03-22 |
-| 118-125 | v15.0 | 13/13 | Complete | 2026-03-23 |
-| 126-138 | v16.0 | 26/26 | Complete | 2026-03-26 |
-
-**Total:** 22 milestones shipped, 138 phases complete, 446 plans executed.
-
----
-
-*Roadmap updated: 2026-03-26 — v16.0 milestone completed and archived*
+| 139. WebSocket Infrastructure | v17.0 | 0/TBD | Not started | - |
+| 140. Stove Migration | v17.0 | 0/TBD | Not started | - |
+| 141. Fritz!Box & Hue Migration | v17.0 | 0/TBD | Not started | - |
+| 142. Sonos & DIRIGERA Migration | v17.0 | 0/TBD | Not started | - |
+| 143. Netatmo Migration | v17.0 | 0/TBD | Not started | - |
+| 144. Connection UX | v17.0 | 0/TBD | Not started | - |

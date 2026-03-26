@@ -76,35 +76,35 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| WS-01 | — | Pending |
-| WS-02 | — | Pending |
-| WS-03 | — | Pending |
-| WS-04 | — | Pending |
-| WS-05 | — | Pending |
-| WS-06 | — | Pending |
-| MIG-01 | — | Pending |
-| MIG-02 | — | Pending |
-| MIG-03 | — | Pending |
-| MIG-04 | — | Pending |
-| MIG-05 | — | Pending |
-| MIG-06 | — | Pending |
-| MIG-07 | — | Pending |
-| MIG-08 | — | Pending |
-| MIG-09 | — | Pending |
-| MIG-10 | — | Pending |
-| MIG-11 | — | Pending |
-| MIG-12 | — | Pending |
-| MIG-13 | — | Pending |
-| MIG-14 | — | Pending |
-| UX-01 | — | Pending |
-| UX-02 | — | Pending |
-| UX-03 | — | Pending |
+| WS-01 | Phase 139 | Pending |
+| WS-02 | Phase 139 | Pending |
+| WS-03 | Phase 139 | Pending |
+| WS-04 | Phase 139 | Pending |
+| WS-05 | Phase 139 | Pending |
+| WS-06 | Phase 139 | Pending |
+| MIG-01 | Phase 140 | Pending |
+| MIG-02 | Phase 140 | Pending |
+| MIG-03 | Phase 140 | Pending |
+| MIG-04 | Phase 141 | Pending |
+| MIG-05 | Phase 141 | Pending |
+| MIG-06 | Phase 141 | Pending |
+| MIG-07 | Phase 141 | Pending |
+| MIG-08 | Phase 141 | Pending |
+| MIG-09 | Phase 142 | Pending |
+| MIG-10 | Phase 142 | Pending |
+| MIG-11 | Phase 142 | Pending |
+| MIG-12 | Phase 142 | Pending |
+| MIG-13 | Phase 143 | Pending |
+| MIG-14 | Phase 143 | Pending |
+| UX-01 | Phase 144 | Pending |
+| UX-02 | Phase 144 | Pending |
+| UX-03 | Phase 144 | Pending |
 
 **Coverage:**
 - v17.0 requirements: 23 total
-- Mapped to phases: 0
-- Unmapped: 23 ⚠️
+- Mapped to phases: 23
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-26*
-*Last updated: 2026-03-26 after initial definition*
+*Last updated: 2026-03-26 after roadmap creation*

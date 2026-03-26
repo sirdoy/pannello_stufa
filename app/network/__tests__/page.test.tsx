@@ -116,6 +116,76 @@ jest.mock('../components/DeviceHistoryTimeline', () => ({
   ),
 }));
 
+jest.mock('../components/BudgetStatsCard', () => ({
+  __esModule: true,
+  default: ({ data, loading, error }: any) => (
+    <div
+      data-testid="budget-stats-card"
+      data-loading={loading}
+      data-error={error}
+      data-has-data={!!data}
+    />
+  ),
+}));
+
+jest.mock('../components/WifiNetworksTable', () => ({
+  __esModule: true,
+  default: ({ networks, loading, stale }: any) => (
+    <div
+      data-testid="wifi-networks-table"
+      data-count={networks.length}
+      data-loading={loading}
+      data-stale={stale}
+    />
+  ),
+}));
+
+jest.mock('../components/DeviceCountChart', () => ({
+  __esModule: true,
+  default: ({ data, loading }: any) => (
+    <div
+      data-testid="device-count-chart"
+      data-count={data.length}
+      data-loading={loading}
+    />
+  ),
+}));
+
+jest.mock('../hooks/useFritzWifiNetworks', () => ({
+  useFritzWifiNetworks: jest.fn(() => ({
+    networks: [],
+    loading: false,
+    stale: false,
+  })),
+}));
+
+jest.mock('../hooks/useFritzBudgetStats', () => ({
+  useFritzBudgetStats: jest.fn(() => ({
+    data: null,
+    loading: false,
+    error: false,
+  })),
+}));
+
+jest.mock('../hooks/useFritzDeviceCountHistory', () => ({
+  useFritzDeviceCountHistory: jest.fn(() => ({
+    days: 30,
+    setDays: jest.fn(),
+    chartData: [],
+    loading: false,
+  })),
+}));
+
+jest.mock('../hooks/useFritzBandwidthTiers', () => ({
+  useFritzBandwidthTiers: jest.fn(() => ({
+    tier: 'realtime',
+    setTier: jest.fn(),
+    tierData: [],
+    loading: false,
+    autoGranularity: null,
+  })),
+}));
+
 const mockedUseNetworkData = useNetworkData as jest.MockedFunction<typeof useNetworkData>;
 const mockedUseBandwidthHistory = useBandwidthHistory as jest.MockedFunction<typeof useBandwidthHistory>;
 const mockedUseDeviceHistory = useDeviceHistory as jest.MockedFunction<typeof useDeviceHistory>;
@@ -591,6 +661,58 @@ describe('NetworkPage', () => {
 
       const deviceTable = screen.getByTestId('device-list-table');
       expect(deviceTable).toHaveAttribute('data-has-on-category-change', 'true');
+    });
+  });
+
+  describe('Phase 137-02 Features', () => {
+    function renderWithData() {
+      mockedUseNetworkData.mockReturnValue(
+        createMockNetworkData({
+          loading: false,
+          wan: {
+            connected: true,
+            uptime: 3600,
+            externalIp: '1.2.3.4',
+            timestamp: Date.now(),
+          },
+          devices: [],
+        })
+      );
+    }
+
+    it('renders BudgetStatsCard on page', () => {
+      renderWithData();
+      render(<NetworkPage />);
+      expect(screen.getByTestId('budget-stats-card')).toBeInTheDocument();
+    });
+
+    it('renders DeviceCountChart on page', () => {
+      renderWithData();
+      render(<NetworkPage />);
+      expect(screen.getByTestId('device-count-chart')).toBeInTheDocument();
+    });
+
+    it('tab navigation shows 4 tabs including "Reti WiFi"', () => {
+      renderWithData();
+      render(<NetworkPage />);
+      expect(screen.getByRole('button', { name: 'Dispositivi' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'WiFi Clients' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Servizi di Rete' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Reti WiFi' })).toBeInTheDocument();
+    });
+
+    it('clicking "Reti WiFi" tab shows WifiNetworksTable', async () => {
+      const user = userEvent.setup();
+      renderWithData();
+      render(<NetworkPage />);
+
+      // Initially not visible (dispositivi tab is active)
+      expect(screen.queryByTestId('wifi-networks-table')).not.toBeInTheDocument();
+
+      // Click Reti WiFi tab
+      await user.click(screen.getByRole('button', { name: 'Reti WiFi' }));
+
+      expect(screen.getByTestId('wifi-networks-table')).toBeInTheDocument();
     });
   });
 });

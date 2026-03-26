@@ -30,6 +30,9 @@ import { useFritzSystemInfo } from './hooks/useFritzSystemInfo';
 import { useFritzWifiClients } from './hooks/useFritzWifiClients';
 import { useFritzNetworkServices } from './hooks/useFritzNetworkServices';
 import { useFritzBandwidthTiers } from './hooks/useFritzBandwidthTiers';
+import { useFritzWifiNetworks } from './hooks/useFritzWifiNetworks';
+import { useFritzBudgetStats } from './hooks/useFritzBudgetStats';
+import { useFritzDeviceCountHistory } from './hooks/useFritzDeviceCountHistory';
 import WanStatusCard from './components/WanStatusCard';
 import DeviceListTable from './components/DeviceListTable';
 import CorrelationInsight from './components/CorrelationInsight';
@@ -37,6 +40,8 @@ import DeviceHistoryTimeline from './components/DeviceHistoryTimeline';
 import SystemInfoCard from './components/SystemInfoCard';
 import WifiClientsTable from './components/WifiClientsTable';
 import NetworkServicesCard from './components/NetworkServicesCard';
+import BudgetStatsCard from './components/BudgetStatsCard';
+import WifiNetworksTable from './components/WifiNetworksTable';
 
 const BandwidthChart = dynamic(
   () => import('./components/BandwidthChart'),
@@ -61,10 +66,22 @@ const BandwidthCorrelationChart = dynamic(
     ),
   }
 );
+const DeviceCountChart = dynamic(
+  () => import('./components/DeviceCountChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6 h-[320px] flex items-center justify-center">
+        <Skeleton className="w-full h-full rounded-xl" />
+      </div>
+    ),
+  }
+);
+
 import { STOVE_ROUTES } from '@/lib/routes';
 import type { DeviceCategory } from '@/types/firebase/network';
 
-type NetworkTab = 'dispositivi' | 'wifi' | 'servizi';
+type NetworkTab = 'dispositivi' | 'wifi' | 'servizi' | 'reti-wifi';
 
 export default function NetworkPage() {
   const router = useRouter();
@@ -83,6 +100,9 @@ export default function NetworkPage() {
   const wifiClients = useFritzWifiClients({ paused: activeTab !== 'wifi' });
   const networkServices = useFritzNetworkServices({ paused: activeTab !== 'servizi' });
   const bandwidthTiers = useFritzBandwidthTiers();
+  const wifiNetworks = useFritzWifiNetworks({ paused: activeTab !== 'reti-wifi' });
+  const budgetStats = useFritzBudgetStats();
+  const deviceCountHistory = useFritzDeviceCountHistory();
 
   // Stove power level polling (lightweight, independent)
   const stovePowerRef = useRef<number | null>(null);
@@ -188,12 +208,16 @@ export default function NetworkPage() {
           lastUpdated={networkData.lastUpdated}
         />
 
+        {/* Budget Stats Card - system-level info above tabs (D-09) */}
+        <BudgetStatsCard data={budgetStats.data} loading={budgetStats.loading} error={budgetStats.error} />
+
         {/* Tab Navigation */}
         <div className="flex gap-1 border-b border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06] pb-0">
           {([
             { key: 'dispositivi' as const, label: 'Dispositivi' },
             { key: 'wifi' as const, label: 'WiFi Clients' },
             { key: 'servizi' as const, label: 'Servizi di Rete' },
+            { key: 'reti-wifi' as const, label: 'Reti WiFi' },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -237,6 +261,16 @@ export default function NetworkPage() {
             stale={networkServices.stale}
           />
         )}
+        {activeTab === 'reti-wifi' && (
+          <WifiNetworksTable
+            networks={wifiNetworks.networks}
+            loading={wifiNetworks.loading}
+            stale={wifiNetworks.stale}
+          />
+        )}
+
+        {/* Device Count Chart - daily connected device history (D-05) */}
+        <DeviceCountChart data={deviceCountHistory.chartData} loading={deviceCountHistory.loading} />
 
         {/* Bandwidth Chart - below tab content */}
         <BandwidthChart
@@ -251,6 +285,7 @@ export default function NetworkPage() {
           onTierChange={bandwidthTiers.setTier}
           tierData={bandwidthTiers.tierData}
           tierLoading={bandwidthTiers.loading}
+          autoGranularity={bandwidthTiers.autoGranularity}
         />
 
         {/* Bandwidth-Stove Correlation (Phase 67) */}

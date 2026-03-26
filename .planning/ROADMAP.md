@@ -23,7 +23,7 @@
 - ✅ **v14.0 Hue Proxy Migration** — Phases 106-112 (shipped 2026-03-22)
 - ✅ **v14.1 Tech Debt & Type Safety** — Phases 113-117 (shipped 2026-03-22)
 - ✅ **v15.0 Rooms & Device Registry** — Phases 118-125 (shipped 2026-03-23)
-- 🚧 **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato** — Phases 126-137 (in progress)
+- 🚧 **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato** — Phases 126-138 (in progress)
 
 ## Phases
 
@@ -277,7 +277,11 @@ Plans:
   2. useSonosFullData (or a dedicated hook) fetches /api/sonos/devices and exposes device list to frontend
   3. useSonosCommands exposes setZoneVolume() for zone-level volume control
   4. Zone section in /sonos page has a seek control allowing track position change
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 138-01-PLAN.md — Fix nav 404s + extend useSonosFullData (devices) + extend useSonosCommands (zone volume, seek)
+- [ ] 138-02-PLAN.md — SonosSeekControl component + zone volume slider wired into SonosZoneSection
 
 ## Progress
 
@@ -297,10 +301,10 @@ Plans:
 | 135 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 136 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 137 | v16.0 | 2/2 | Complete    | 2026-03-26 |
-| 138 | v16.0 | 0/0 | Planned     | — |
+| 138 | v16.0 | 0/2 | Planned     | — |
 
 **Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (13 phases, 12 complete + 1 planned).
 
 ---
 
-*Roadmap updated: 2026-03-26 — Phase 138 added (gap closure from milestone audit)*
+*Roadmap updated: 2026-03-26 — Phase 138 plans created (2 plans, 2 waves)*

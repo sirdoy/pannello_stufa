@@ -12,8 +12,8 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 - [x] **SONOS-01**: Proxy client per Sonos API con haGet/haPost/haPut transport (X-API-Key auth)
 - [x] **SONOS-02**: TypeScript types per tutti i response interfaces Sonos (health, device, zone, playback, volume, EQ, queue, history)
 - [x] **SONOS-03**: GET /sonos/health — speaker connectivity, data freshness, device count
-- [x] **SONOS-04**: GET /sonos/devices — lista speaker con identity e topology
-- [x] **SONOS-05**: GET /sonos/devices/{uid} — dettaglio speaker con audio state on-demand
+- [ ] **SONOS-04**: GET /sonos/devices — lista speaker con identity e topology
+- [ ] **SONOS-05**: GET /sonos/devices/{uid} — dettaglio speaker con audio state on-demand
 - [x] **SONOS-06**: GET /sonos/zones — zone groups con coordinator e members
 
 ### Sonos Monitoring & Transport
@@ -30,8 +30,8 @@ Requirements for Sonos, DIRIGERA & Fritz!Box Avanzato milestone. Each maps to ro
 
 - [x] **SONOS-14**: PUT /sonos/speakers/{uid}/volume — set volume speaker (0-100)
 - [x] **SONOS-15**: PUT /sonos/speakers/{uid}/mute — set mute state speaker
-- [x] **SONOS-16**: PUT /sonos/zones/{group_id}/volume — set volume per tutti gli speaker in una zona
-- [x] **SONOS-17**: PUT /sonos/zones/{group_id}/seek — seek a posizione nel brano (HH:MM:SS)
+- [ ] **SONOS-16**: PUT /sonos/zones/{group_id}/volume — set volume per tutti gli speaker in una zona
+- [ ] **SONOS-17**: PUT /sonos/zones/{group_id}/seek — seek a posizione nel brano (HH:MM:SS)
 
 ### Sonos Extended Controls
 
@@ -154,8 +154,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SONOS-01 | Phase 126 | Complete |
 | SONOS-02 | Phase 126 | Complete |
 | SONOS-03 | Phase 126 | Complete |
-| SONOS-04 | Phase 126 | Complete |
-| SONOS-05 | Phase 126 | Complete |
+| SONOS-04 | Phase 138 | Pending |
+| SONOS-05 | Phase 138 | Pending |
 | SONOS-06 | Phase 126 | Complete |
 | SONOS-07 | Phase 127 | Complete |
 | SONOS-08 | Phase 127 | Complete |
@@ -166,8 +166,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SONOS-13 | Phase 127 | Complete |
 | SONOS-14 | Phase 127 | Complete |
 | SONOS-15 | Phase 127 | Complete |
-| SONOS-16 | Phase 127 | Complete |
-| SONOS-17 | Phase 127 | Complete |
+| SONOS-16 | Phase 138 | Pending |
+| SONOS-17 | Phase 138 | Pending |
 | SONOS-18 | Phase 128 | Complete |
 | SONOS-19 | Phase 128 | Complete |
 | SONOS-20 | Phase 128 | Complete |
@@ -212,18 +212,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FRITZ-14 | Phase 134 | Complete |
 | FRITZ-15 | Phase 134 | Complete |
 | FRITZ-16 | Phase 134 | Complete |
-| SONOS-35 | Phase 135 | Planned |
-| SONOS-36 | Phase 135 | Planned |
-| SONOS-37 | Phase 135 | Planned |
-| SONOS-38 | Phase 136 | Planned |
-| SONOS-39 | Phase 136 | Planned |
-| SONOS-40 | Phase 136 | Planned |
-| SONOS-41 | Phase 136 | Planned |
-| SONOS-42 | Phase 136 | Planned |
-| FRITZ-17 | Phase 137 | Planned |
-| FRITZ-18 | Phase 137 | Planned |
-| FRITZ-19 | Phase 137 | Planned |
-| FRITZ-20 | Phase 137 | Planned |
+| SONOS-35 | Phase 135 | Complete |
+| SONOS-36 | Phase 135 | Complete |
+| SONOS-37 | Phase 135 | Complete |
+| SONOS-38 | Phase 136 | Complete |
+| SONOS-39 | Phase 136 | Complete |
+| SONOS-40 | Phase 136 | Complete |
+| SONOS-41 | Phase 136 | Complete |
+| SONOS-42 | Phase 136 | Complete |
+| FRITZ-17 | Phase 137 | Complete |
+| FRITZ-18 | Phase 137 | Complete |
+| FRITZ-19 | Phase 137 | Complete |
+| FRITZ-20 | Phase 137 | Complete |
 
 **Coverage:**
 - v16.0 requirements: 62 total
@@ -232,4 +232,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-25 — added SONOS-35–42, FRITZ-17–20 for extended UI phases*
+*Last updated: 2026-03-26 — gap closure: SONOS-04/05/16/17 reassigned to Phase 138, traceability drift fixed (12 reqs Planned→Complete)*

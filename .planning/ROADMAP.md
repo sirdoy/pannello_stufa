@@ -75,6 +75,7 @@ See `.planning/milestones/` for full archives.
 - [x] **Phase 135: Sonos Zone Extended UI** - Play mode toggles, sleep timer, queue viewer per zone in /sonos page (completed 2026-03-25)
 - [x] **Phase 136: Sonos Speaker Extended UI & History** - EQ sliders, home theater settings, source switch, grouping, history chart in /sonos page (completed 2026-03-25)
 - [x] **Phase 137: Fritz!Box Extended Frontend** - WiFi networks, device count chart, budget stats, auto-granularity in /network page (completed 2026-03-26)
+- [ ] **Phase 138: Sonos Frontend Wiring & Nav Fix** - Wire orphaned routes/commands into frontend, fix nav sub-item 404s (gap closure)
 
 ## Phase Details
 
@@ -266,6 +267,18 @@ Plans:
 - [x] 137-01-PLAN.md — 3 new hooks (WiFi networks, budget stats, device count history) + extend bandwidth tiers hook with auto tier
 - [x] 137-02-PLAN.md — 3 new components (WifiNetworksTable, BudgetStatsCard, DeviceCountChart) + extend HistoryTierToggle/BandwidthChart + page wiring
 
+### Phase 138: Sonos Frontend Wiring & Nav Fix
+**Goal**: Close all Sonos integration gaps — fix 404 nav sub-items, wire orphaned routes and commands into frontend
+**Depends on**: Phase 129, Phase 135
+**Requirements**: SONOS-04, SONOS-05, SONOS-16, SONOS-17 (partial → complete), SONOS-31, SONOS-34 (integration fix)
+**Gap Closure**: Closes gaps from v16.0 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. deviceTypes.ts no longer registers nav sub-items that lead to 404 (spotify, zones routes removed or pages created)
+  2. useSonosFullData (or a dedicated hook) fetches /api/sonos/devices and exposes device list to frontend
+  3. useSonosCommands exposes setZoneVolume() for zone-level volume control
+  4. Zone section in /sonos page has a seek control allowing track position change
+**Plans**: TBD
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -284,9 +297,10 @@ Plans:
 | 135 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 136 | v16.0 | 2/2 | Complete    | 2026-03-25 |
 | 137 | v16.0 | 2/2 | Complete    | 2026-03-26 |
+| 138 | v16.0 | 0/0 | Planned     | — |
 
-**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (12 phases, 11 complete + 1 planned).
+**Total:** 21 milestones shipped, 125 phases complete, 420 plans executed. v16.0 in progress (13 phases, 12 complete + 1 planned).
 
 ---
 
-*Roadmap updated: 2026-03-26 — Phase 137 planned (2 plans in 2 waves)*
+*Roadmap updated: 2026-03-26 — Phase 138 added (gap closure from milestone audit)*

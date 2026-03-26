@@ -21,8 +21,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v16.0 (shipped 2026-03-26)
-**Status:** Milestone complete. All 13 phases (126-138), 26 plans, 62/62 requirements satisfied. API coverage ~95%.
+**Version:** v17.0 (in progress)
+**Status:** Phase 139 complete — WebSocket infrastructure (types, manager hook, context, 17 tests). Phases 140-144 remaining.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -819,4 +819,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-26 after Phase 138 (Sonos Frontend Wiring & Nav Fix) complete*
+*Last updated: 2026-03-26 after Phase 139 (WebSocket Infrastructure) complete*

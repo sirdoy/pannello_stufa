@@ -104,7 +104,10 @@ Plans:
   1. Stove card updates within ~1s of a state change when WebSocket is connected
   2. When the WebSocket disconnects, the stove card continues updating via HTTP polling with no user action required
   3. With the browser tab hidden, polling fallback continues firing (alwaysActive preserved — no tab-visibility pause)
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 142-01-PLAN.md — Migrate useSonosData to WS-primary with polling fallback
+- [ ] 142-02-PLAN.md — Migrate useDirigeraData to WS-primary with polling fallback
 
 ### Phase 141: Fritz!Box & Hue Migration
 **Goal**: useNetworkData and useLightsData receive data via WebSocket as primary channel, fall back to polling, and the Fritz!Box sparkline buffer and bandwidth history survive WS/polling transitions without data loss
@@ -129,7 +132,10 @@ Plans:
   1. Sonos card (speakers, groups) updates live from the `sonos` WS topic when connected
   2. DIRIGERA card updates live from the `dirigera` WS topic when connected
   3. When WebSocket disconnects, both Sonos and DIRIGERA cards continue updating via HTTP polling
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 142-01-PLAN.md — Migrate useSonosData to WS-primary with polling fallback
+- [ ] 142-02-PLAN.md — Migrate useDirigeraData to WS-primary with polling fallback
 
 ### Phase 143: Netatmo Migration
 **Goal**: useThermostatData receives Netatmo data via WebSocket as primary channel with an adapter layer that normalises the raw `Record<string, unknown>` WS payload into the existing typed Netatmo shape, with HTTP polling fallback
@@ -139,7 +145,10 @@ Plans:
   1. Thermostat card updates live from the `netatmo` WS topic when connected
   2. The existing Netatmo typed interface is satisfied by the adapter — no TypeScript errors, no runtime shape mismatches
   3. When WebSocket disconnects, the thermostat card continues updating via HTTP polling
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 142-01-PLAN.md — Migrate useSonosData to WS-primary with polling fallback
+- [ ] 142-02-PLAN.md — Migrate useDirigeraData to WS-primary with polling fallback
 
 ### Phase 144: Connection UX
 **Goal**: Users can see the current WebSocket connection state at a glance, transitions between WebSocket and polling are invisible in the data stream, and every card shows when its data was last refreshed

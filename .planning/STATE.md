@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: executing
-stopped_at: Completed 142-01-PLAN.md
-last_updated: "2026-03-27T15:10:52.520Z"
+status: verifying
+stopped_at: Completed 142-02-PLAN.md
+last_updated: "2026-03-27T15:13:42.699Z"
 last_activity: 2026-03-27
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 Phase: 142 (sonos-dirigera-migration) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-27
 
 Progress: [░░░░░░░░░░] 0%
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 141 P02 | 20 | 2 tasks | 2 files |
 | Phase 141 P01 | 559 | 2 tasks | 2 files |
 | Phase 142 P01 | 15 | 2 tasks | 2 files |
+| Phase 142-sonos-dirigera-migration P02 | 18 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Key context for v17.0:
 - [Phase 141]: Health computation in separate useEffect([bandwidth, wan, downloadHistory, uploadHistory]) — runs on both WS and HTTP data sources
 - [Phase 142]: WS groups map to SonosZoneResponse[] via cast (identical shape)
 - [Phase 142]: fetchHealthRef/fetchPlaybackRef prevent stale closures in WS useEffect (Phase 141 pattern)
+- [Phase 142]: In-hook summary derivation for DIRIGERA: when WS active, SensorSummaryResponse computed from raw sensors array eliminating HTTP summary call
+- [Phase 142]: computeDirigeraHealth exported (was private) to enable direct unit testing
 
 ### Pending Todos
 
@@ -98,5 +101,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Completed 142-01-PLAN.md
+Stopped at: Completed 142-02-PLAN.md
 Resume file: None

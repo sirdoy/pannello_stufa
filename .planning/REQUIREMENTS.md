@@ -40,8 +40,8 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 ### Provider Migration — DIRIGERA
 
-- [ ] **MIG-11**: `useDirigeraData` riceve dati sensori via WebSocket come canale primario
-- [ ] **MIG-12**: `useDirigeraData` fallback automatico a polling HTTP se WebSocket non disponibile
+- [x] **MIG-11**: `useDirigeraData` riceve dati sensori via WebSocket come canale primario
+- [x] **MIG-12**: `useDirigeraData` fallback automatico a polling HTTP se WebSocket non disponibile
 
 ### Provider Migration — Netatmo
 
@@ -92,8 +92,8 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 | MIG-08 | Phase 141 | Complete |
 | MIG-09 | Phase 142 | Complete |
 | MIG-10 | Phase 142 | Complete |
-| MIG-11 | Phase 142 | Pending |
-| MIG-12 | Phase 142 | Pending |
+| MIG-11 | Phase 142 | Complete |
+| MIG-12 | Phase 142 | Complete |
 | MIG-13 | Phase 143 | Pending |
 | MIG-14 | Phase 143 | Pending |
 | UX-01 | Phase 144 | Pending |

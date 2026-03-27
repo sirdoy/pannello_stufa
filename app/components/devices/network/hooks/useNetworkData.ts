@@ -18,7 +18,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import { computeNetworkHealth, mapHealthToDeviceCard } from '../networkHealthUtils';
+import type { FritzBoxData } from '@/types/websocket';
 import type {
   BandwidthData,
   BandwidthHistoryPoint,
@@ -62,6 +65,10 @@ export function useNetworkData(): UseNetworkDataReturn {
   // Refs for stale-closure-safe reads of bandwidth/wan in fetchData error guards
   const bandwidthRef = useRef<BandwidthData | null>(null);
   const wanRef = useRef<WanData | null>(null);
+
+  // WS context — primary data channel (MIG-04)
+  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const isWsConnected = readyState === ReadyState.OPEN;
 
   // Seed sparklines with historical data on mount (fire-and-forget)
   useEffect(() => {
@@ -157,6 +164,100 @@ export function useNetworkData(): UseNetworkDataReturn {
     }
   };
 
+  // Ref to avoid stale closure on enrichDevicesWithCategories in WS useEffect (D-18)
+  const enrichDevicesWithCategoriesRef = useRef(enrichDevicesWithCategories);
+  enrichDevicesWithCategoriesRef.current = enrichDevicesWithCategories;
+
+  // WS subscription: primary data channel (MIG-04)
+  // Only subscribe when WS is OPEN — avoids spurious subscribe calls when disconnected
+  useEffect(() => {
+    if (!isWsConnected) return;
+
+    const handleMessage = (raw: unknown) => {
+      const data = raw as FritzBoxData;
+
+      // Bandwidth: bps → Mbps (D-04)
+      if (data.bandwidth) {
+        const downloadMbps = data.bandwidth.downstream_bps / 1_000_000;
+        const uploadMbps = data.bandwidth.upstream_bps / 1_000_000;
+        const bw: BandwidthData = { download: downloadMbps, upload: uploadMbps, timestamp: Date.now() };
+        setBandwidth(bw);
+        bandwidthRef.current = bw;
+        // Append to sparkline — same arrays as HTTP path (D-07)
+        const now = Date.now();
+        setDownloadHistory(prev => [...prev, { time: now, mbps: downloadMbps }].slice(-SPARKLINE_MAX_POINTS));
+        setUploadHistory(prev => [...prev, { time: now, mbps: uploadMbps }].slice(-SPARKLINE_MAX_POINTS));
+      }
+
+      // WAN: field rename (D-05)
+      if (data.wan) {
+        const mappedWan: WanData = {
+          connected: data.wan.is_connected,
+          uptime: data.wan.uptime,
+          externalIp: data.wan.external_ip ?? undefined,
+          linkSpeed: data.wan.max_downstream_bps / 1_000_000,
+          timestamp: Date.now(),
+        };
+        setWan(mappedWan);
+        wanRef.current = mappedWan;
+      }
+
+      // Devices: status 0|1 → active boolean (D-06)
+      if (data.devices) {
+        const rawDevices: DeviceData[] = data.devices.map(d => ({
+          id: d.mac,
+          name: d.name,
+          ip: d.ip,
+          mac: d.mac,
+          active: d.status === 1,
+        }));
+        setDevices(rawDevices);
+        // Fire-and-forget enrichment (D-10)
+        void enrichDevicesWithCategoriesRef.current(rawDevices).then(setDevices).catch(() => {});
+      }
+
+      setLoading(false);
+      setStale(false);
+      setLastUpdated(Date.now());
+      setError(null);
+    };
+
+    subscribe('fritzbox', handleMessage);
+    return () => { unsubscribe('fritzbox', handleMessage); };
+  }, [subscribe, unsubscribe, isWsConnected]);
+
+  // Health computation — runs on every data update from WS or HTTP (D-11)
+  useEffect(() => {
+    if (!bandwidth && !wan) return;
+
+    const THIRTY_MIN_MS = 30 * 60 * 1000;
+    const cutoff = Date.now() - THIRTY_MIN_MS;
+    const recentDownload = downloadHistory.filter(p => p.time >= cutoff);
+    const recentUpload = uploadHistory.filter(p => p.time >= cutoff);
+    const linkSpd = wan?.linkSpeed ?? 100;
+    let historicalAvgSaturation: number | undefined;
+    if (recentDownload.length >= 3) {
+      const avgDown = recentDownload.reduce((s, p) => s + p.mbps, 0) / recentDownload.length;
+      const avgUp = recentUpload.reduce((s, p) => s + p.mbps, 0) / Math.max(recentUpload.length, 1);
+      historicalAvgSaturation = Math.max(avgDown, avgUp) / linkSpd;
+    }
+
+    const newHealthResult = computeNetworkHealth({
+      wanConnected: wan?.connected ?? false,
+      wanUptime: wan?.uptime ?? 0,
+      downloadMbps: bandwidth?.download ?? 0,
+      uploadMbps: bandwidth?.upload ?? 0,
+      linkSpeedMbps: wan?.linkSpeed,
+      previousHealth: healthRef.current,
+      consecutiveReadings: consecutiveReadingsRef.current,
+      historicalAvgSaturation,
+    });
+
+    setHealth(newHealthResult.health);
+    healthRef.current = newHealthResult.health;
+    consecutiveReadingsRef.current = newHealthResult.consecutiveReadings;
+  }, [bandwidth, wan, downloadHistory, uploadHistory]);
+
   // Fetch data from Fritz!Box API routes
   const fetchData = async () => {
     try {
@@ -245,34 +346,7 @@ export function useNetworkData(): UseNetworkDataReturn {
         // Self-heals on next poll — unenriched MACs will be retried.
       });
 
-      // Compute average saturation over last 30 min from sparkline history (trend-awareness)
-      const THIRTY_MIN_MS = 30 * 60 * 1000;
-      const cutoff = Date.now() - THIRTY_MIN_MS;
-      const recentDownload = downloadHistory.filter(p => p.time >= cutoff);
-      const recentUpload = uploadHistory.filter(p => p.time >= cutoff);
-      const linkSpd = wanData.wan?.linkSpeed ?? 100;
-      let historicalAvgSaturation: number | undefined;
-      if (recentDownload.length >= 3) { // Need at least 3 points for meaningful average
-        const avgDown = recentDownload.reduce((s, p) => s + p.mbps, 0) / recentDownload.length;
-        const avgUp = recentUpload.reduce((s, p) => s + p.mbps, 0) / Math.max(recentUpload.length, 1);
-        historicalAvgSaturation = Math.max(avgDown, avgUp) / linkSpd;
-      }
-
-      // Update health
-      const newHealthResult = computeNetworkHealth({
-        wanConnected: wanData.wan?.connected ?? false,
-        wanUptime: wanData.wan?.uptime ?? 0,
-        downloadMbps: bw?.download ?? 0,
-        uploadMbps: bw?.upload ?? 0,
-        linkSpeedMbps: wanData.wan?.linkSpeed,
-        previousHealth: healthRef.current,
-        consecutiveReadings: consecutiveReadingsRef.current,
-        historicalAvgSaturation,
-      });
-
-      setHealth(newHealthResult.health);
-      healthRef.current = newHealthResult.health;
-      consecutiveReadingsRef.current = newHealthResult.consecutiveReadings;
+      // Health computation is handled by the separate useEffect watching [bandwidth, wan, downloadHistory, uploadHistory]
 
       // Clear error and stale
       setError(null);
@@ -294,11 +368,12 @@ export function useNetworkData(): UseNetworkDataReturn {
   };
 
   // Adaptive polling - 60s visible, 5min hidden
+  // D-01: suppress polling when WS is live (interval=null)
   // initialDelay: 500ms stagger to avoid thundering herd on dashboard mount
   useAdaptivePolling({
     callback: fetchData,
-    interval,
-    alwaysActive: false,  // Non-safety-critical monitoring
+    interval: isWsConnected ? null : interval,  // D-01: suppress when WS live
+    alwaysActive: false,  // D-02: non-safety-critical
     immediate: true,      // Fetch on mount
     initialDelay: 500,
   });

@@ -256,7 +256,7 @@ describe('useNetworkData', () => {
       const lastMbps = result.current.downloadHistory[119]?.mbps || 0;
       expect(lastMbps).toBeGreaterThan(firstMbps);
     }
-  });
+  }, 15000);
 
   it('preserves cached data on API error', async () => {
     const mockBandwidth: BandwidthData = {

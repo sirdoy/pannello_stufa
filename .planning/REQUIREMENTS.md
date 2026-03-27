@@ -30,8 +30,8 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 ### Provider Migration — Lights (Hue)
 
-- [ ] **MIG-07**: `useLightsData` riceve dati luci via WebSocket come canale primario
-- [ ] **MIG-08**: `useLightsData` fallback automatico a polling HTTP se WebSocket non disponibile
+- [x] **MIG-07**: `useLightsData` riceve dati luci via WebSocket come canale primario
+- [x] **MIG-08**: `useLightsData` fallback automatico a polling HTTP se WebSocket non disponibile
 
 ### Provider Migration — Sonos
 
@@ -88,8 +88,8 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 | MIG-04 | Phase 141 | Pending |
 | MIG-05 | Phase 141 | Pending |
 | MIG-06 | Phase 141 | Pending |
-| MIG-07 | Phase 141 | Pending |
-| MIG-08 | Phase 141 | Pending |
+| MIG-07 | Phase 141 | Complete |
+| MIG-08 | Phase 141 | Complete |
 | MIG-09 | Phase 142 | Pending |
 | MIG-10 | Phase 142 | Pending |
 | MIG-11 | Phase 142 | Pending |

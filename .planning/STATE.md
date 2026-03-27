@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: verifying
-stopped_at: Phase 141 context gathered
-last_updated: "2026-03-27T09:26:26.099Z"
+status: executing
+stopped_at: Completed 141-02-PLAN.md
+last_updated: "2026-03-27T10:33:58.047Z"
 last_activity: 2026-03-27
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 140 — stove-migration
+**Current focus:** Phase 141 — fritz-box-hue-migration
 
 ## Current Position
 
-Phase: 141
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 141 (fritz-box-hue-migration) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-03-27
 
 Progress: [░░░░░░░░░░] 0%
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 | v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato | 126-138 | 26 | 4 days |
 | Phase 139 P02 | 310 | 2 tasks | 3 files |
 | Phase 140 P01 | 3 | 2 tasks | 2 files |
+| Phase 141 P02 | 20 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,9 @@ Key context for v17.0:
 - [Phase 140]: alwaysActive:true preserved on polling fallback for safety-critical stove monitoring
 - [Phase 140]: Ref pattern used for side-fetch functions to avoid stale closures in WS useEffect
 - [Phase 140]: WS handleMessage mirrors HTTP error handling exactly (behavioral parity)
+- [Phase 141]: WS useEffect conditionally subscribes only when isWsConnected=true to avoid dead subscriptions
+- [Phase 141]: fetchScenesRef ref pattern prevents stale closure in WS handleMessage for scenes fire-and-forget
+- [Phase 141]: capability_tier defaults to color for WS-sourced lights — WS payload has no tier field
 
 ### Pending Todos
 
@@ -88,5 +92,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Phase 141 context gathered
-Resume file: .planning/phases/141-fritz-box-hue-migration/141-CONTEXT.md
+Stopped at: Completed 141-02-PLAN.md
+Resume file: None

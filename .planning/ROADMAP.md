@@ -118,7 +118,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [ ] 141-01-PLAN.md — Migrate useNetworkData to WS-primary with polling fallback (Fritz\!Box sparkline continuity)
-- [ ] 141-02-PLAN.md — Migrate useLightsData to WS-primary with polling fallback (Hue Record-to-array mapping)
+- [x] 141-02-PLAN.md — Migrate useLightsData to WS-primary with polling fallback (Hue Record-to-array mapping)
 **UI hint**: yes
 
 ### Phase 142: Sonos & DIRIGERA Migration
@@ -163,7 +163,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 139. WebSocket Infrastructure | v17.0 | 1/2 | Complete    | 2026-03-26 |
 | 140. Stove Migration | v17.0 | 1/1 | Complete    | 2026-03-27 |
-| 141. Fritz!Box & Hue Migration | v17.0 | 0/2 | Not started | - |
+| 141. Fritz!Box & Hue Migration | v17.0 | 1/2 | In Progress|  |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 0/TBD | Not started | - |
 | 143. Netatmo Migration | v17.0 | 0/TBD | Not started | - |
 | 144. Connection UX | v17.0 | 0/TBD | Not started | - |

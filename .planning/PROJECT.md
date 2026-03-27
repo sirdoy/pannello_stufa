@@ -22,7 +22,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.0 (in progress)
-**Status:** Phase 141 complete — useNetworkData and useLightsData migrated to WS-primary with polling fallback (25+38 tests). Fritz!Box sparkline buffer survives WS/polling transitions. Phases 142-144 remaining.
+**Status:** Phase 142 complete — useSonosData and useDirigeraData migrated to WS-primary with polling fallback (49+19 tests). Sonos health+playback as HTTP side-fetches; DIRIGERA summary derived in-hook from raw sensors. Phases 143-144 remaining.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -819,4 +819,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-26 after Phase 139 (WebSocket Infrastructure) complete*
+*Last updated: 2026-03-27 after Phase 142 (Sonos & DIRIGERA Migration) complete*

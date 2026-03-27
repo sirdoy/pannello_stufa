@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: executing
-stopped_at: Completed 141-02-PLAN.md
-last_updated: "2026-03-27T10:33:58.047Z"
+status: verifying
+stopped_at: Completed 141-01-PLAN.md
+last_updated: "2026-03-27T10:35:08.388Z"
 last_activity: 2026-03-27
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 Phase: 141 (fritz-box-hue-migration) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-27
 
 Progress: [░░░░░░░░░░] 0%
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 139 P02 | 310 | 2 tasks | 3 files |
 | Phase 140 P01 | 3 | 2 tasks | 2 files |
 | Phase 141 P02 | 20 | 2 tasks | 2 files |
+| Phase 141 P01 | 559 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Key context for v17.0:
 - [Phase 141]: WS useEffect conditionally subscribes only when isWsConnected=true to avoid dead subscriptions
 - [Phase 141]: fetchScenesRef ref pattern prevents stale closure in WS handleMessage for scenes fire-and-forget
 - [Phase 141]: capability_tier defaults to color for WS-sourced lights — WS payload has no tier field
+- [Phase 141]: Conditional WS subscription (if !isWsConnected return) — prevents spurious subscribe calls when CLOSED
+- [Phase 141]: Health computation in separate useEffect([bandwidth, wan, downloadHistory, uploadHistory]) — runs on both WS and HTTP data sources
 
 ### Pending Todos
 
@@ -92,5 +95,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Completed 141-02-PLAN.md
+Stopped at: Completed 141-01-PLAN.md
 Resume file: None

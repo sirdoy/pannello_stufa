@@ -74,7 +74,7 @@ See git history for details.
 
 - [x] **Phase 139: WebSocket Infrastructure** - Shared connection manager, TypeScript types, auth, reconnect, topic dispatch (completed 2026-03-26)
 - [x] **Phase 140: Stove Migration** - useStoveData migrated to WS primary channel with alwaysActive fallback preserved (completed 2026-03-27)
-- [ ] **Phase 141: Fritz!Box & Hue Migration** - useNetworkData and useLightsData migrated to WS with buffer/history preservation
+- [x] **Phase 141: Fritz!Box & Hue Migration** - useNetworkData and useLightsData migrated to WS with buffer/history preservation (completed 2026-03-27)
 - [ ] **Phase 142: Sonos & DIRIGERA Migration** - useSonosData and useDirigeraData migrated to WS
 - [ ] **Phase 143: Netatmo Migration** - useThermostatData migrated to WS with raw payload adapter layer
 - [ ] **Phase 144: Connection UX** - Visual connection status indicator, flicker-free transitions, per-card timestamps
@@ -117,7 +117,7 @@ Plans:
   4. The bandwidth sparkline history is not reset or emptied when transitioning between WS and polling modes
 **Plans**: 2 plans
 Plans:
-- [ ] 141-01-PLAN.md — Migrate useNetworkData to WS-primary with polling fallback (Fritz\!Box sparkline continuity)
+- [x] 141-01-PLAN.md — Migrate useNetworkData to WS-primary with polling fallback (Fritz\!Box sparkline continuity)
 - [x] 141-02-PLAN.md — Migrate useLightsData to WS-primary with polling fallback (Hue Record-to-array mapping)
 **UI hint**: yes
 
@@ -152,7 +152,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [ ] 141-01-PLAN.md — Migrate useNetworkData to WS-primary with polling fallback (Fritz\!Box sparkline continuity)
-- [ ] 141-02-PLAN.md — Migrate useLightsData to WS-primary with polling fallback (Hue Record-to-array mapping)
+- [x] 141-02-PLAN.md — Migrate useLightsData to WS-primary with polling fallback (Hue Record-to-array mapping)
 **UI hint**: yes
 
 ## Progress
@@ -163,7 +163,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 139. WebSocket Infrastructure | v17.0 | 1/2 | Complete    | 2026-03-26 |
 | 140. Stove Migration | v17.0 | 1/1 | Complete    | 2026-03-27 |
-| 141. Fritz!Box & Hue Migration | v17.0 | 1/2 | In Progress|  |
+| 141. Fritz!Box & Hue Migration | v17.0 | 2/2 | Complete   | 2026-03-27 |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 0/TBD | Not started | - |
 | 143. Netatmo Migration | v17.0 | 0/TBD | Not started | - |
 | 144. Connection UX | v17.0 | 0/TBD | Not started | - |

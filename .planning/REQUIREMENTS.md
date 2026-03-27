@@ -24,9 +24,9 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 ### Provider Migration — Network (Fritz!Box)
 
-- [ ] **MIG-04**: `useNetworkData` riceve dati Fritz!Box (devices, bandwidth, wan) via WebSocket come canale primario
-- [ ] **MIG-05**: `useNetworkData` fallback automatico a polling HTTP se WebSocket non disponibile
-- [ ] **MIG-06**: Sparkline buffer e bandwidth history preservati durante transizioni WS/polling
+- [x] **MIG-04**: `useNetworkData` riceve dati Fritz!Box (devices, bandwidth, wan) via WebSocket come canale primario
+- [x] **MIG-05**: `useNetworkData` fallback automatico a polling HTTP se WebSocket non disponibile
+- [x] **MIG-06**: Sparkline buffer e bandwidth history preservati durante transizioni WS/polling
 
 ### Provider Migration — Lights (Hue)
 
@@ -85,9 +85,9 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 | MIG-01 | Phase 140 | Complete |
 | MIG-02 | Phase 140 | Complete |
 | MIG-03 | Phase 140 | Complete |
-| MIG-04 | Phase 141 | Pending |
-| MIG-05 | Phase 141 | Pending |
-| MIG-06 | Phase 141 | Pending |
+| MIG-04 | Phase 141 | Complete |
+| MIG-05 | Phase 141 | Complete |
+| MIG-06 | Phase 141 | Complete |
 | MIG-07 | Phase 141 | Complete |
 | MIG-08 | Phase 141 | Complete |
 | MIG-09 | Phase 142 | Pending |

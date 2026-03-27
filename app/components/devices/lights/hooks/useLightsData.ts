@@ -2,7 +2,8 @@
  * useLightsData Hook
  *
  * Encapsulates all Philips Hue lights state management:
- * - Polling via useAdaptivePolling (60s interval)
+ * - WebSocket primary channel: subscribes to 'hue' topic (MIG-07)
+ * - HTTP polling fallback (60s, alwaysActive:false) when WS is unavailable (MIG-08)
  * - Connection checking via /api/hue/status (data_freshness-based staleness)
  * - Data fetching (groups, lights, scenes) using proxy-native flat shapes
  * - Derived state computation
@@ -15,9 +16,12 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
+import type { HueData, HueLight as WsHueLight, HueGroup as WsHueGroup } from '@/types/websocket';
 import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
 
 /**
@@ -111,6 +115,10 @@ export function useLightsData(): UseLightsDataReturn {
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
   const [localBrightness, setLocalBrightness] = useState<number | null>(null);
 
+  // WS context — primary data channel (MIG-07)
+  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const isWsConnected = readyState === ReadyState.OPEN;
+
   // Check connection on mount
   useEffect(() => {
     checkConnection();
@@ -141,6 +149,88 @@ export function useLightsData(): UseLightsDataReturn {
       setLoading(false);
     }
   }
+
+  // Standalone fetchScenes for fire-and-forget from WS handleMessage (D-14)
+  async function fetchScenes() {
+    try {
+      const res = await fetch('/api/hue/scenes');
+      if (!res.ok) return;
+      const data = await res.json() as { scenes?: HueScene[] };
+      setScenes(data.scenes ?? []);
+    } catch {
+      // Silent failure — scenes rarely change
+    }
+  }
+
+  // Ref to avoid stale closure in WS useEffect (D-18)
+  const fetchScenesRef = useRef(fetchScenes);
+  fetchScenesRef.current = fetchScenes;
+
+  // WS subscription: primary data channel (MIG-07)
+  useEffect(() => {
+    if (!isWsConnected) return;
+
+    const handleMessage = (raw: unknown) => {
+      const data = raw as HueData;
+
+      // Convert Record<string, WsHueLight> → HueLight[] (D-12, D-13)
+      if (data.lights) {
+        const lights: HueLight[] = Object.entries(data.lights).map(([id, wsLight]: [string, WsHueLight]) => ({
+          light_id: id,
+          name: wsLight.name,
+          on: wsLight.state.on,
+          brightness: wsLight.state.bri,                                    // bri → brightness (D-13)
+          ct_mirek: wsLight.state.ct,
+          ct_kelvin: wsLight.state.ct ? Math.round(1_000_000 / wsLight.state.ct) : null,
+          hue: null,
+          saturation: null,
+          colormode: wsLight.state.colormode,
+          reachable: wsLight.state.reachable,
+          capability_tier: 'color' as const,                                // WS has no tier — default to 'color'
+          room_id: null,
+          room_name: null,
+          model_id: wsLight.modelid,
+          light_type: wsLight.type,
+        }));
+        setLights(lights);
+      }
+
+      // Convert Record<string, WsHueGroup> → HueGroup[], sorted 'Casa' first (D-12)
+      if (data.groups) {
+        const rawGroups: HueGroup[] = Object.entries(data.groups).map(([id, wsGroup]: [string, WsHueGroup]) => ({
+          group_id: id,
+          name: wsGroup.name,
+          type: null,
+          group_class: null,
+          lights: wsGroup.lights,
+          any_on: wsGroup.state.any_on,
+          all_on: wsGroup.state.all_on,
+          brightness: null,
+          color_temp: null,
+          colormode: null,
+        }));
+        const sortedGroups = rawGroups.sort((a, b) => {
+          if (a.name === 'Casa') return -1;
+          if (b.name === 'Casa') return 1;
+          return a.name.localeCompare(b.name);
+        });
+        setGroups(sortedGroups);
+      }
+
+      // WS connection = live data (D-15)
+      setConnected(true);
+      setStale(false);
+      setLoading(false);
+      setError(null);
+
+      // Scenes not in WS payload — fire-and-forget HTTP fetch (D-14)
+      void fetchScenesRef.current();
+    };
+
+    subscribe('hue', handleMessage);
+    return () => { unsubscribe('hue', handleMessage); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWsConnected, subscribe, unsubscribe]);
 
   async function fetchData() {
     try {
@@ -186,10 +276,11 @@ export function useLightsData(): UseLightsDataReturn {
   }
 
   // Poll data every 60 seconds - pauses when tab hidden
+  // WS gate first: suppress polling when WS is OPEN (MIG-08)
   // initialDelay: 100ms stagger to avoid thundering herd on dashboard mount
   useAdaptivePolling({
     callback: fetchData,
-    interval: connected ? 60000 : null, // Only poll when connected
+    interval: isWsConnected ? null : (connected ? 60000 : null),  // WS gate first, then connected gate
     alwaysActive: false, // Non-critical: pause when hidden
     immediate: true,
     initialDelay: 100,

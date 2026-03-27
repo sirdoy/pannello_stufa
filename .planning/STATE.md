@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: executing
-stopped_at: Phase 140 context gathered
-last_updated: "2026-03-26T14:31:34.740Z"
-last_activity: 2026-03-26
+status: verifying
+stopped_at: Completed 140-01-PLAN.md
+last_updated: "2026-03-27T08:58:13.771Z"
+last_activity: 2026-03-27
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  completed_phases: 2
+  total_plans: 3
+  completed_plans: 3
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 139 — websocket-infrastructure
+**Current focus:** Phase 140 — stove-migration
 
 ## Current Position
 
-Phase: 140
+Phase: 141
 Plan: Not started
-Status: Ready to execute
-Last activity: 2026-03-26
+Status: Phase complete — ready for verification
+Last activity: 2026-03-27
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 | v15.0 Rooms & Device Registry | 118-125 | 13 | 2 days |
 | v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato | 126-138 | 26 | 4 days |
 | Phase 139 P02 | 310 | 2 tasks | 3 files |
+| Phase 140 P01 | 3 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,9 @@ Key context for v17.0:
 - Fritz!Box sparkline buffer must survive WS/polling transitions (Phase 141 concern)
 - [Phase 139]: renderHook causes strict mode double-invocation — use toHaveBeenCalled() not toHaveBeenCalledTimes(1) for useWebSocket call count assertions
 - [Phase 139]: WebSocketContext.Provider placed inside Auth0Provider but outside ThemeProvider — gives all device hooks access to WS manager
+- [Phase 140]: alwaysActive:true preserved on polling fallback for safety-critical stove monitoring
+- [Phase 140]: Ref pattern used for side-fetch functions to avoid stale closures in WS useEffect
+- [Phase 140]: WS handleMessage mirrors HTTP error handling exactly (behavioral parity)
 
 ### Pending Todos
 
@@ -84,5 +88,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Phase 140 context gathered
-Resume file: .planning/phases/140-stove-migration/140-CONTEXT.md
+Stopped at: Completed 140-01-PLAN.md
+Resume file: None

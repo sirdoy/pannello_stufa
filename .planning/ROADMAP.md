@@ -73,7 +73,7 @@ See git history for details.
 **Milestone Goal:** Tutte le card del dashboard ricevono dati live via WebSocket con fallback automatico a polling HTTP — senza alcuna modifica all'UX esistente.
 
 - [x] **Phase 139: WebSocket Infrastructure** - Shared connection manager, TypeScript types, auth, reconnect, topic dispatch (completed 2026-03-26)
-- [ ] **Phase 140: Stove Migration** - useStoveData migrated to WS primary channel with alwaysActive fallback preserved
+- [x] **Phase 140: Stove Migration** - useStoveData migrated to WS primary channel with alwaysActive fallback preserved (completed 2026-03-27)
 - [ ] **Phase 141: Fritz!Box & Hue Migration** - useNetworkData and useLightsData migrated to WS with buffer/history preservation
 - [ ] **Phase 142: Sonos & DIRIGERA Migration** - useSonosData and useDirigeraData migrated to WS
 - [ ] **Phase 143: Netatmo Migration** - useThermostatData migrated to WS with raw payload adapter layer
@@ -156,7 +156,7 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 139. WebSocket Infrastructure | v17.0 | 1/2 | Complete    | 2026-03-26 |
-| 140. Stove Migration | v17.0 | 0/TBD | Not started | - |
+| 140. Stove Migration | v17.0 | 1/1 | Complete    | 2026-03-27 |
 | 141. Fritz!Box & Hue Migration | v17.0 | 0/TBD | Not started | - |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 0/TBD | Not started | - |
 | 143. Netatmo Migration | v17.0 | 0/TBD | Not started | - |

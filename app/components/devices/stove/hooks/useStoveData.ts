@@ -2,12 +2,13 @@
  * useStoveData Hook
  *
  * Encapsulates all stove state management:
- * - Polling via useAdaptivePolling (60s, alwaysActive:true)
+ * - WebSocket primary channel: subscribes to 'thermorossi' topic (MIG-01)
+ * - HTTP polling fallback (60s, alwaysActive:true) when WS is unavailable (MIG-02, MIG-03)
  * - Staleness tracking from proxy data_freshness field
  * - Error monitoring
  *
  * This hook guarantees SINGLE polling loop for StoveCard.
- * Reads stove_state, power_level, fan_level from single /stove/status fetch.
+ * Reads stove_state, power_level, fan_level from WS messages or /stove/status fetch.
  */
 
 'use client';
@@ -20,6 +21,9 @@ import { getMaintenanceStatus } from '@/lib/maintenance/maintenanceService';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
+import type { ThermorossiData } from '@/types/websocket';
 import type { StoveState, ThermorossiStatusResponse } from '@/types/thermorossiProxy';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 
@@ -98,6 +102,10 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
   const { isOnline } = useOnlineStatus();
   const { hasPendingCommands, pendingCommands, lastSyncedCommand } = useBackgroundSync();
 
+  // WS context — primary data channel
+  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const isWsConnected = readyState === ReadyState.OPEN;
+
   // Core state
   const [status, setStatus] = useState<StoveState>('off');
   const [fanLevel, setFanLevel] = useState<number | null>(null);
@@ -167,6 +175,60 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     }
   };
 
+  // Refs to avoid stale closures in WS useEffect (per Research pitfall 2)
+  const fetchSchedulerModeRef = useRef(fetchSchedulerMode);
+  fetchSchedulerModeRef.current = fetchSchedulerMode;
+  const fetchMaintenanceStatusRef = useRef(fetchMaintenanceStatus);
+  fetchMaintenanceStatusRef.current = fetchMaintenanceStatus;
+  const checkVersionRef = useRef(checkVersion);
+  checkVersionRef.current = checkVersion;
+
+  // WS subscription: primary data channel (MIG-01)
+  useEffect(() => {
+    const handleMessage = (raw: unknown) => {
+      const data = raw as ThermorossiData;
+
+      // Map WS fields to hook state (per D-02)
+      setStatus(data.stove_state as StoveState);
+      setFanLevel(data.fan_level);
+      setPowerLevel(data.power_level);
+
+      // WS messages are inherently fresh (per D-03)
+      setIsStale(false);
+      setLastPollAt(new Date());
+
+      // Error handling — identical logic to HTTP path (per D-02)
+      if (data.stove_state === 'alarm') {
+        const code = data.error_code ?? 0;
+        const desc = data.error_description ?? '';
+        setErrorCode(code);
+        setErrorDescription(desc);
+        if (code !== 0) {
+          void logError(code, desc, { status: data.stove_state, source: 'status_monitor' });
+          if (shouldNotify(code, previousErrorCode.current)) {
+            // Push notification placeholder — same as HTTP path
+          }
+        }
+        previousErrorCode.current = code;
+      } else {
+        setErrorCode(0);
+        setErrorDescription('');
+        previousErrorCode.current = 0;
+      }
+
+      // Clear initial loading (per Research pitfall 4)
+      setInitialLoading(false);
+
+      // Trigger side-fetches via refs to avoid stale closure (per D-06, D-07)
+      void fetchSchedulerModeRef.current();
+      void fetchMaintenanceStatusRef.current();
+      void checkVersionRef.current();
+    };
+
+    subscribe('thermorossi', handleMessage);
+    return () => { unsubscribe('thermorossi', handleMessage); };
+  }, [subscribe, unsubscribe]);
+
   const fetchStatusAndUpdate = async () => {
     try {
       const res = await fetch(STOVE_ROUTES.status);
@@ -223,10 +285,10 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     }
   }, [lastSyncedCommand, fetchStatusAndUpdate]);
 
-  // Adaptive polling: 60s interval, always active (safety-critical)
+  // Polling fallback: suppressed when WS is live (per D-01), alwaysActive preserved (per D-08)
   useAdaptivePolling({
     callback: fetchStatusAndUpdate,
-    interval: 60000,
+    interval: isWsConnected ? null : 60000,
     alwaysActive: true,
     immediate: true,
   });

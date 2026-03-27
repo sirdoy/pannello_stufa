@@ -22,7 +22,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.0 (in progress)
-**Status:** Phase 140 complete — useStoveData migrated to WS-primary with polling fallback (29 tests). Phases 141-144 remaining.
+**Status:** Phase 141 complete — useNetworkData and useLightsData migrated to WS-primary with polling fallback (25+38 tests). Fritz!Box sparkline buffer survives WS/polling transitions. Phases 142-144 remaining.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

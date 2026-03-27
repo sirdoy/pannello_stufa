@@ -2,15 +2,19 @@
  * Tests for useSonosData Hook
  *
  * Validates loading state, data fetching from health+zones+playback endpoints,
- * error handling, stale state, and "most interesting zone" selection logic.
+ * error handling, stale state, "most interesting zone" selection logic,
+ * and WebSocket primary channel behaviour (MIG-09, MIG-10).
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import type { SonosHealthResponse, SonosZoneResponse, SonosPlaybackResponse } from '@/types/sonosProxy';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useAdaptivePolling');
 jest.mock('@/lib/hooks/useVisibility');
+jest.mock('@/app/context/WebSocketContext');
 
 // Import mocked modules
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
@@ -18,6 +22,9 @@ import { useVisibility } from '@/lib/hooks/useVisibility';
 
 const mockUseVisibility = useVisibility as jest.MockedFunction<typeof useVisibility>;
 const mockUseAdaptivePolling = useAdaptivePolling as jest.MockedFunction<typeof useAdaptivePolling>;
+
+let mockSubscribe: jest.Mock;
+let mockUnsubscribe: jest.Mock;
 
 // Fixture data
 const mockHealth: SonosHealthResponse = {
@@ -110,6 +117,16 @@ describe('useSonosData', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = jest.fn();
+
+    mockSubscribe = jest.fn();
+    mockUnsubscribe = jest.fn();
+
+    // Default: WS disconnected — existing HTTP tests unaffected
+    jest.mocked(useWebSocketContext).mockReturnValue({
+      subscribe: mockSubscribe,
+      unsubscribe: mockUnsubscribe,
+      readyState: ReadyState.CLOSED,
+    });
 
     mockUseVisibility.mockReturnValue(true);
 
@@ -245,5 +262,184 @@ describe('useSonosData', () => {
     expect(nowPlaying).toHaveProperty('group_id');
     expect(nowPlaying).toHaveProperty('transport_state');
     expect(nowPlaying).toHaveProperty('title');
+  });
+
+  describe('WebSocket primary channel', () => {
+    const mockWsPayload = {
+      speakers: [
+        { uid: 'RINCON_1', name: 'Living Room', ip: '192.168.1.10', model: 'Beam', firmware: '15.0', serial: 'S1', role: 'soundbar', is_visible: true, is_coordinator: true },
+        { uid: 'RINCON_2', name: 'Kitchen', ip: '192.168.1.11', model: 'One', firmware: '15.0', serial: 'S2', role: 'speaker', is_visible: true, is_coordinator: true },
+      ],
+      groups: [
+        { group_id: 'RINCON_1', label: 'Living Room', coordinator_uid: 'RINCON_1', coordinator_name: 'Living Room', member_count: 1, members: [{ uid: 'RINCON_1', name: 'Living Room', ip: '192.168.1.10', role: 'soundbar' }] },
+      ],
+    };
+
+    it('subscribes to sonos topic when WS is OPEN', () => {
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      mockUseAdaptivePolling.mockImplementation(() => {
+        // interval=null, don't call callback
+      });
+
+      renderHook(() => useSonosData());
+
+      expect(mockSubscribe).toHaveBeenCalledWith('sonos', expect.any(Function));
+    });
+
+    it('does not subscribe when WS is CLOSED', () => {
+      // Default CLOSED state — no override needed
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      renderHook(() => useSonosData());
+
+      expect(mockSubscribe).not.toHaveBeenCalledWith('sonos', expect.any(Function));
+    });
+
+    it('maps WS groups to zones and derives speakerCount/zoneCount', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      mockUseAdaptivePolling.mockImplementation(() => {
+        // interval=null, suppress polling
+      });
+
+      const { result } = renderHook(() => useSonosData());
+
+      await act(async () => {
+        capturedCallback?.(mockWsPayload);
+      });
+
+      expect(result.current.data?.speakerCount).toBe(2);
+      expect(result.current.data?.zoneCount).toBe(1);
+      expect(result.current.data?.zones.length).toBe(1);
+      expect(result.current.stale).toBe(false);
+    });
+
+    it('fires playback side-fetch after WS data update', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      mockUseAdaptivePolling.mockImplementation(() => {
+        // suppress polling
+      });
+
+      renderHook(() => useSonosData());
+
+      // Reset fetch mock to track side-fetch calls
+      (global.fetch as jest.Mock).mockImplementation((url: string) => {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+      });
+
+      await act(async () => {
+        capturedCallback?.(mockWsPayload);
+        // Allow async side-fetches to fire
+        await new Promise(resolve => setTimeout(resolve, 10));
+      });
+
+      const fetchCalls = (global.fetch as jest.Mock).mock.calls.map(([url]) => url as string);
+      const playbackCall = fetchCalls.find(url => /\/api\/sonos\/zones\/.*\/playback/.test(url));
+      expect(playbackCall).toBeDefined();
+    });
+
+    it('fires health side-fetch after WS data update', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      mockUseAdaptivePolling.mockImplementation(() => {
+        // suppress polling
+      });
+
+      renderHook(() => useSonosData());
+
+      // Reset fetch mock to track side-fetch calls
+      (global.fetch as jest.Mock).mockImplementation((_url: string) => {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+      });
+
+      await act(async () => {
+        capturedCallback?.(mockWsPayload);
+        await new Promise(resolve => setTimeout(resolve, 10));
+      });
+
+      const fetchCalls = (global.fetch as jest.Mock).mock.calls.map(([url]) => url as string);
+      const healthCall = fetchCalls.find(url => url === '/api/sonos/health');
+      expect(healthCall).toBeDefined();
+    });
+
+    it('suppresses polling interval when WS is connected (passes null)', () => {
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      let capturedInterval: number | null | undefined;
+      mockUseAdaptivePolling.mockImplementation((opts) => {
+        capturedInterval = opts.interval as number | null | undefined;
+      });
+
+      renderHook(() => useSonosData());
+
+      expect(capturedInterval).toBeNull();
+    });
+
+    it('cleans up subscription on unmount', () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+      mockUseAdaptivePolling.mockImplementation(() => {
+        // suppress polling
+      });
+
+      const { unmount } = renderHook(() => useSonosData());
+
+      unmount();
+
+      expect(mockUnsubscribe).toHaveBeenCalledWith('sonos', capturedCallback);
+    });
   });
 });

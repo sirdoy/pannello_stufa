@@ -18,9 +18,9 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 ### Provider Migration — Stove
 
-- [ ] **MIG-01**: `useStoveData` riceve dati stufa via WebSocket come canale primario
-- [ ] **MIG-02**: `useStoveData` fallback automatico a polling HTTP se WebSocket non disponibile
-- [ ] **MIG-03**: Comportamento `alwaysActive` preservato — polling fallback continua anche con tab nascosta
+- [x] **MIG-01**: `useStoveData` riceve dati stufa via WebSocket come canale primario
+- [x] **MIG-02**: `useStoveData` fallback automatico a polling HTTP se WebSocket non disponibile
+- [x] **MIG-03**: Comportamento `alwaysActive` preservato — polling fallback continua anche con tab nascosta
 
 ### Provider Migration — Network (Fritz!Box)
 
@@ -82,9 +82,9 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 | WS-04 | Phase 139 | Complete |
 | WS-05 | Phase 139 | Complete |
 | WS-06 | Phase 139 | Pending |
-| MIG-01 | Phase 140 | Pending |
-| MIG-02 | Phase 140 | Pending |
-| MIG-03 | Phase 140 | Pending |
+| MIG-01 | Phase 140 | Complete |
+| MIG-02 | Phase 140 | Complete |
+| MIG-03 | Phase 140 | Complete |
 | MIG-04 | Phase 141 | Pending |
 | MIG-05 | Phase 141 | Pending |
 | MIG-06 | Phase 141 | Pending |

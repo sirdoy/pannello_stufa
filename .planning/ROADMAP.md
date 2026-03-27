@@ -115,7 +115,10 @@ Plans:
   2. Lights card updates live from the `hue` WS topic when connected
   3. When WebSocket disconnects, both cards continue updating via HTTP polling
   4. The bandwidth sparkline history is not reset or emptied when transitioning between WS and polling modes
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 141-01-PLAN.md — Migrate useNetworkData to WS-primary with polling fallback (Fritz\!Box sparkline continuity)
+- [ ] 141-02-PLAN.md — Migrate useLightsData to WS-primary with polling fallback (Hue Record-to-array mapping)
 **UI hint**: yes
 
 ### Phase 142: Sonos & DIRIGERA Migration
@@ -146,7 +149,10 @@ Plans:
   1. A connection status indicator is visible on the dashboard showing one of three states: connected (WS live), reconnecting (backoff in progress), or fallback (polling active)
   2. Switching from WebSocket to polling and back does not cause any card to flash, blank, or show stale data for more than one polling interval
   3. Every dashboard card displays a "last updated" timestamp sourced from the WS `ts` field when on WebSocket or from the polling response time when on HTTP
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 141-01-PLAN.md — Migrate useNetworkData to WS-primary with polling fallback (Fritz\!Box sparkline continuity)
+- [ ] 141-02-PLAN.md — Migrate useLightsData to WS-primary with polling fallback (Hue Record-to-array mapping)
 **UI hint**: yes
 
 ## Progress
@@ -157,7 +163,7 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 139. WebSocket Infrastructure | v17.0 | 1/2 | Complete    | 2026-03-26 |
 | 140. Stove Migration | v17.0 | 1/1 | Complete    | 2026-03-27 |
-| 141. Fritz!Box & Hue Migration | v17.0 | 0/TBD | Not started | - |
+| 141. Fritz!Box & Hue Migration | v17.0 | 0/2 | Not started | - |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 0/TBD | Not started | - |
 | 143. Netatmo Migration | v17.0 | 0/TBD | Not started | - |
 | 144. Connection UX | v17.0 | 0/TBD | Not started | - |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: verifying
-stopped_at: Phase 142 planned and verified
-last_updated: "2026-03-27T15:05:13.483Z"
+status: executing
+stopped_at: Completed 142-01-PLAN.md
+last_updated: "2026-03-27T15:10:52.520Z"
 last_activity: 2026-03-27
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 141 — fritz-box-hue-migration
+**Current focus:** Phase 142 — sonos-dirigera-migration
 
 ## Current Position
 
-Phase: 142
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 142 (sonos-dirigera-migration) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-03-27
 
 Progress: [░░░░░░░░░░] 0%
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 140 P01 | 3 | 2 tasks | 2 files |
 | Phase 141 P02 | 20 | 2 tasks | 2 files |
 | Phase 141 P01 | 559 | 2 tasks | 2 files |
+| Phase 142 P01 | 15 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Key context for v17.0:
 - [Phase 141]: capability_tier defaults to color for WS-sourced lights — WS payload has no tier field
 - [Phase 141]: Conditional WS subscription (if !isWsConnected return) — prevents spurious subscribe calls when CLOSED
 - [Phase 141]: Health computation in separate useEffect([bandwidth, wan, downloadHistory, uploadHistory]) — runs on both WS and HTTP data sources
+- [Phase 142]: WS groups map to SonosZoneResponse[] via cast (identical shape)
+- [Phase 142]: fetchHealthRef/fetchPlaybackRef prevent stale closures in WS useEffect (Phase 141 pattern)
 
 ### Pending Todos
 
@@ -95,5 +98,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Phase 142 planned and verified
-Resume file: .planning/phases/142-sonos-dirigera-migration/142-01-PLAN.md
+Stopped at: Completed 142-01-PLAN.md
+Resume file: None

@@ -106,7 +106,7 @@ Plans:
   3. With the browser tab hidden, polling fallback continues firing (alwaysActive preserved — no tab-visibility pause)
 **Plans**: 2 plans
 Plans:
-- [ ] 142-01-PLAN.md — Migrate useSonosData to WS-primary with polling fallback
+- [x] 142-01-PLAN.md — Migrate useSonosData to WS-primary with polling fallback
 - [ ] 142-02-PLAN.md — Migrate useDirigeraData to WS-primary with polling fallback
 
 ### Phase 141: Fritz!Box & Hue Migration
@@ -173,6 +173,6 @@ Plans:
 | 139. WebSocket Infrastructure | v17.0 | 1/2 | Complete    | 2026-03-26 |
 | 140. Stove Migration | v17.0 | 1/1 | Complete    | 2026-03-27 |
 | 141. Fritz!Box & Hue Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
-| 142. Sonos & DIRIGERA Migration | v17.0 | 0/TBD | Not started | - |
+| 142. Sonos & DIRIGERA Migration | v17.0 | 1/2 | In Progress|  |
 | 143. Netatmo Migration | v17.0 | 0/TBD | Not started | - |
 | 144. Connection UX | v17.0 | 0/TBD | Not started | - |

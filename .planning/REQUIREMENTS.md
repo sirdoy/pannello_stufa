@@ -35,8 +35,8 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 ### Provider Migration — Sonos
 
-- [ ] **MIG-09**: `useSonosData` riceve dati Sonos (speakers, groups) via WebSocket come canale primario
-- [ ] **MIG-10**: `useSonosData` fallback automatico a polling HTTP se WebSocket non disponibile
+- [x] **MIG-09**: `useSonosData` riceve dati Sonos (speakers, groups) via WebSocket come canale primario
+- [x] **MIG-10**: `useSonosData` fallback automatico a polling HTTP se WebSocket non disponibile
 
 ### Provider Migration — DIRIGERA
 
@@ -90,8 +90,8 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 | MIG-06 | Phase 141 | Complete |
 | MIG-07 | Phase 141 | Complete |
 | MIG-08 | Phase 141 | Complete |
-| MIG-09 | Phase 142 | Pending |
-| MIG-10 | Phase 142 | Pending |
+| MIG-09 | Phase 142 | Complete |
+| MIG-10 | Phase 142 | Complete |
 | MIG-11 | Phase 142 | Pending |
 | MIG-12 | Phase 142 | Pending |
 | MIG-13 | Phase 143 | Pending |

@@ -4,13 +4,16 @@
  * Validates state management, polling, error handling, and derived state.
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { useNetworkData } from '../hooks/useNetworkData';
 import type { BandwidthData, DeviceData, WanData } from '../types';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useAdaptivePolling');
 jest.mock('@/lib/hooks/useVisibility');
+jest.mock('@/app/context/WebSocketContext');
 jest.mock('../networkHealthUtils', () => ({
   computeNetworkHealth: jest.fn((params) => ({
     health: params.wanConnected ? 'excellent' : 'poor',
@@ -26,20 +29,38 @@ import { useVisibility } from '@/lib/hooks/useVisibility';
 const mockUseVisibility = useVisibility as jest.MockedFunction<typeof useVisibility>;
 const mockUseAdaptivePolling = useAdaptivePolling as jest.MockedFunction<typeof useAdaptivePolling>;
 
+// Capture polling opts for WS assertions
+let lastPollingOpts: Record<string, unknown> = {};
+
 describe('useNetworkData', () => {
+  let mockSubscribe: jest.Mock;
+  let mockUnsubscribe: jest.Mock;
+
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
+    lastPollingOpts = {};
     global.fetch = jest.fn();
+
+    mockSubscribe = jest.fn();
+    mockUnsubscribe = jest.fn();
+
+    // Default: WS disconnected — existing HTTP polling tests unaffected
+    jest.mocked(useWebSocketContext).mockReturnValue({
+      subscribe: mockSubscribe,
+      unsubscribe: mockUnsubscribe,
+      readyState: ReadyState.CLOSED,
+    });
 
     // Mock useVisibility to return true (visible)
     mockUseVisibility.mockReturnValue(true);
 
-    // Mock useAdaptivePolling to call callback asynchronously (like real polling)
-    mockUseAdaptivePolling.mockImplementation(({ callback, immediate }) => {
-      if (immediate) {
+    // Mock useAdaptivePolling to capture options and call callback asynchronously (like real polling)
+    mockUseAdaptivePolling.mockImplementation((opts) => {
+      lastPollingOpts = opts as Record<string, unknown>;
+      if (opts.immediate) {
         // Call async to avoid state updates during render
-        setTimeout(() => callback(), 0);
+        setTimeout(() => opts.callback(), 0);
       }
     });
   });
@@ -582,5 +603,256 @@ describe('useNetworkData', () => {
     });
 
     expect(result.current.connected).toBe(false);
+  });
+
+  describe('WebSocket integration', () => {
+    const mockWsPayload = {
+      devices: [{ ip: '192.168.1.1', name: 'TestDevice', mac: 'AA:BB:CC:DD:EE:FF', status: 1 }],
+      bandwidth: { upstream_bps: 5_000_000, downstream_bps: 50_000_000, bytes_sent: 0, bytes_received: 0 },
+      wan: { is_connected: true, is_linked: true, uptime: 3600, external_ip: '1.2.3.4', max_upstream_bps: 50_000_000, max_downstream_bps: 250_000_000 },
+    };
+
+    it('subscribes to fritzbox topic when readyState is OPEN', () => {
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      // Mock fetch to never resolve
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      renderHook(() => useNetworkData());
+
+      expect(mockSubscribe).toHaveBeenCalled();
+      expect(mockSubscribe).toHaveBeenCalledWith('fritzbox', expect.any(Function));
+    });
+
+    it('does NOT subscribe when readyState is CLOSED', () => {
+      // Default mock is CLOSED — no override needed
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      renderHook(() => useNetworkData());
+
+      expect(mockSubscribe).not.toHaveBeenCalledWith('fritzbox', expect.any(Function));
+    });
+
+    it('passes interval=null to useAdaptivePolling when WS OPEN', () => {
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      renderHook(() => useNetworkData());
+
+      expect(lastPollingOpts).not.toBeNull();
+      expect(lastPollingOpts.interval).toBeNull();
+    });
+
+    it('passes visibility-aware interval (60000) to useAdaptivePolling when WS CLOSED + visible', () => {
+      // Default mock: CLOSED, useVisibility returns true (already set in beforeEach)
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      renderHook(() => useNetworkData());
+
+      expect(lastPollingOpts).not.toBeNull();
+      expect(lastPollingOpts.interval).toBe(60000);
+    });
+
+    it('passes interval=300000 when WS CLOSED + hidden', () => {
+      // Override visibility to hidden
+      mockUseVisibility.mockReturnValue(false);
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      renderHook(() => useNetworkData());
+
+      expect(lastPollingOpts).not.toBeNull();
+      expect(lastPollingOpts.interval).toBe(300000);
+    });
+
+    it('preserves alwaysActive=false', () => {
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      renderHook(() => useNetworkData());
+
+      expect(lastPollingOpts.alwaysActive).toBe(false);
+    });
+
+    it('WS handleMessage maps bandwidth bps to Mbps', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      const { result } = renderHook(() => useNetworkData());
+
+      await act(async () => {
+        capturedCallback?.(mockWsPayload);
+      });
+
+      expect(result.current.bandwidth?.download).toBe(50); // 50_000_000 / 1_000_000
+      expect(result.current.bandwidth?.upload).toBe(5);    // 5_000_000 / 1_000_000
+    });
+
+    it('WS handleMessage maps device status 0|1 to active boolean', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      const { result } = renderHook(() => useNetworkData());
+
+      // Test status:1 → active:true
+      await act(async () => {
+        capturedCallback?.(mockWsPayload);
+      });
+
+      expect(result.current.devices[0]?.active).toBe(true);
+
+      // Test status:0 → active:false
+      await act(async () => {
+        capturedCallback?.({
+          ...mockWsPayload,
+          devices: [{ ip: '192.168.1.1', name: 'TestDevice', mac: 'AA:BB:CC:DD:EE:FF', status: 0 }],
+        });
+      });
+
+      expect(result.current.devices[0]?.active).toBe(false);
+    });
+
+    it('WS handleMessage maps WAN fields (is_connected → connected, max_downstream_bps/1_000_000 → linkSpeed)', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      const { result } = renderHook(() => useNetworkData());
+
+      await act(async () => {
+        capturedCallback?.(mockWsPayload);
+      });
+
+      expect(result.current.wan?.connected).toBe(true);
+      expect(result.current.wan?.uptime).toBe(3600);
+      expect(result.current.wan?.linkSpeed).toBe(250); // 250_000_000 / 1_000_000
+    });
+
+    it('WS handleMessage appends to sparkline arrays without reset', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      const { result } = renderHook(() => useNetworkData());
+
+      // First WS message
+      await act(async () => {
+        capturedCallback?.(mockWsPayload);
+      });
+
+      const lengthAfterFirst = result.current.downloadHistory.length;
+      expect(lengthAfterFirst).toBeGreaterThan(0);
+
+      // Second WS message — should append, not reset
+      await act(async () => {
+        capturedCallback?.({
+          ...mockWsPayload,
+          bandwidth: { upstream_bps: 3_000_000, downstream_bps: 30_000_000, bytes_sent: 0, bytes_received: 0 },
+        });
+      });
+
+      expect(result.current.downloadHistory.length).toBeGreaterThan(lengthAfterFirst);
+    });
+
+    it('WS handleMessage sets loading=false, stale=false, and lastUpdated', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      // Polling suppressed — don't auto-call callback
+      mockUseAdaptivePolling.mockImplementation((opts) => {
+        lastPollingOpts = opts as Record<string, unknown>;
+        // interval=null means polling is suppressed, don't call callback
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      const { result } = renderHook(() => useNetworkData());
+
+      // Initially loading
+      expect(result.current.loading).toBe(true);
+
+      await act(async () => {
+        capturedCallback?.(mockWsPayload);
+      });
+
+      expect(result.current.loading).toBe(false);
+      expect(result.current.stale).toBe(false);
+      expect(result.current.lastUpdated).toBeGreaterThan(0);
+    });
+
+    it('unsubscribes from fritzbox topic on unmount', () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      (global.fetch as jest.Mock).mockImplementation(() => new Promise(() => {}));
+
+      const { unmount } = renderHook(() => useNetworkData());
+
+      unmount();
+
+      expect(mockUnsubscribe).toHaveBeenCalledWith('fritzbox', capturedCallback);
+    });
   });
 });

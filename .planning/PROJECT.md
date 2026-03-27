@@ -22,7 +22,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.0 (in progress)
-**Status:** Phase 139 complete — WebSocket infrastructure (types, manager hook, context, 17 tests). Phases 140-144 remaining.
+**Status:** Phase 140 complete — useStoveData migrated to WS-primary with polling fallback (29 tests). Phases 141-144 remaining.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

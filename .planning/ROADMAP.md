@@ -85,12 +85,14 @@ See git history and `.planning/milestones/` for details.
 **Success Criteria** (what must be TRUE):
   1. Every WS topic payload type includes a `data_freshness` field matching the corresponding REST endpoint shape
   2. FritzBoxData, FritzBoxDevice, DirigeraData, DirigeraBaseSensor, ThermorossiData, HueData, HueLight, SonosData, SonosSpeaker, and NetatmoData all compile without type errors against their enriched field additions
-  3. HueData uses `Record<string, HueLight>` and `Record<string, HueGroup>` (dict, not array) and existing consumers compile without change
+  3. HueData keeps array shape (D-01 override) — lights: HueLight[] | null, groups: HueGroup[] | null — with data_freshness added
   4. Topic union type includes all 8 topics (`raspi` and `tuya` added) and TopicDataMap maps them to their payload types
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 145-01: TBD
+- [ ] 145-01-PLAN.md — Create types/tuyaProxy.ts + add registry metadata to HueLight and ThermorossiStatusResponse
+- [ ] 145-02-PLAN.md — Add registry metadata to SonosDeviceResponse and DirigeraSensor
+- [ ] 145-03-PLAN.md — Rewrite types/websocket.ts with all 8 enriched topic types
 
 ### Phase 146: Raspi WS Migration
 **Goal**: useRaspiData subscribes to the `raspi` WS topic as primary source, falls back to HTTP polling when disconnected, and RaspiCard displays a live LastUpdated timestamp — extending the connection UX to cover the 8th provider
@@ -143,7 +145,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 145. WS Type Alignment | v17.1 | 0/TBD | Not started | - |
+| 145. WS Type Alignment | v17.1 | 0/3 | Not started | - |
 | 146. Raspi WS Migration | v17.1 | 0/TBD | Not started | - |
 | 147. Tuya Infrastructure | v17.1 | 0/TBD | Not started | - |
 | 148. Tuya Frontend | v17.1 | 0/TBD | Not started | - |

@@ -6,6 +6,7 @@ import { useVisibility } from '@/lib/hooks/useVisibility';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import type { SonosData as WsSonosData } from '@/types/websocket';
+// SonosData.groups is now SonosZoneResponse[] directly (proxy-shaped)
 import type {
   SonosHealthResponse,
   SonosZoneResponse,
@@ -149,8 +150,8 @@ export function useSonosData(): UseSonosDataReturn {
     const handleMessage = (raw: unknown) => {
       const wsData = raw as WsSonosData;
 
-      // D-03: groups map directly to zones (identical shape, cast safe)
-      const zones = (wsData.groups ?? []) as unknown as SonosZoneResponse[];
+      // Groups are now SonosZoneResponse[] directly (proxy-shaped, no cast needed)
+      const zones = wsData.groups ?? [];
       // D-04: derive counts from WS payload, not from health
       const speakerCount = wsData.speakers?.length ?? 0;
       const zoneCount = zones.length;

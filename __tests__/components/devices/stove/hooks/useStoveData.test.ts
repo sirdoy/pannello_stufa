@@ -651,6 +651,8 @@ describe('useStoveData', () => {
           stove_state: 'working',
           power_level: 3,
           fan_level: 4,
+          data_freshness: 'LIVE',
+          last_poll_at: '2026-03-19T12:00:00Z',
           error_code: null,
           error_description: null,
         });
@@ -682,6 +684,8 @@ describe('useStoveData', () => {
           stove_state: 'working',
           power_level: 3,
           fan_level: 4,
+          data_freshness: 'LIVE',
+          last_poll_at: '2026-03-19T12:00:00Z',
           error_code: null,
           error_description: null,
         });
@@ -721,6 +725,8 @@ describe('useStoveData', () => {
           stove_state: 'off',
           power_level: null,
           fan_level: null,
+          data_freshness: 'LIVE',
+          last_poll_at: null,
           error_code: null,
           error_description: null,
         });
@@ -774,6 +780,8 @@ describe('useStoveData', () => {
           stove_state: 'working',
           power_level: 3,
           fan_level: 4,
+          data_freshness: 'LIVE',
+          last_poll_at: '2026-03-19T12:00:00Z',
           error_code: null,
           error_description: null,
         });
@@ -807,6 +815,8 @@ describe('useStoveData', () => {
           stove_state: 'alarm',
           power_level: null,
           fan_level: null,
+          data_freshness: 'LIVE',
+          last_poll_at: '2026-03-19T12:00:00Z',
           error_code: 7,
           error_description: 'Sonda fumi',
         });

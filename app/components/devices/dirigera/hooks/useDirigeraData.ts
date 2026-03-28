@@ -5,7 +5,7 @@ import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
-import type { DirigeraData as WsDirigeraData, DirigeraContactSensor } from '@/types/websocket';
+import type { DirigeraData as WsDirigeraData } from '@/types/websocket';
 import type { DirigeraHealthResponse, SensorSummaryResponse } from '@/types/dirigeraProxy';
 
 export type DirigeraHealth = 'ok' | 'warning' | 'error';
@@ -107,7 +107,7 @@ export function useDirigeraData(): UseDirigeraDataReturn {
           s => s.battery_percentage !== null && s.battery_percentage <= 20
         ).length,
         open_count: sensors.filter(
-          s => s.type === 'openCloseSensor' && (s as DirigeraContactSensor).is_open
+          s => s.type === 'openCloseSensor' && s.is_open === true
         ).length,
         is_stale: false,
       };

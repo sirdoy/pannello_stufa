@@ -614,24 +614,36 @@ describe('useLightsData', () => {
   });
 
   describe('WebSocket integration', () => {
+    // WS now sends proxy-shaped data (flat HueLight[], HueGroup[])
     const mockWsLightsPayload = {
-      lights: {
-        '1': {
-          state: { on: true, bri: 200, ct: 300, colormode: 'ct', reachable: true },
+      lights: [
+        {
+          light_id: '1',
           name: 'Lampada Test',
-          type: 'Color temperature light',
-          modelid: 'LCT015',
+          on: true,
+          brightness: 200,
+          ct_mirek: 300,
+          ct_kelvin: 3333,
+          hue: null,
+          saturation: null,
+          colormode: 'ct' as const,
+          reachable: true,
+          capability_tier: 'color' as const,
+          room_id: null,
+          room_name: null,
+          model_id: 'LCT015',
+          light_type: 'Color temperature light',
         },
-      },
+      ],
       groups: null,
     };
 
     const mockWsGroupsPayload = {
       lights: null,
-      groups: {
-        '2': { name: 'Soggiorno', lights: ['1'], state: { any_on: false, all_on: false }, action: {} },
-        '0': { name: 'Casa', lights: ['1'], state: { any_on: true, all_on: false }, action: {} },
-      },
+      groups: [
+        { group_id: '2', name: 'Soggiorno', type: 'Room', group_class: 'Living room', lights: ['1'], any_on: false, all_on: false, brightness: null, color_temp: null, colormode: null },
+        { group_id: '0', name: 'Casa', type: 'Room', group_class: 'Other', lights: ['1'], any_on: true, all_on: false, brightness: null, color_temp: null, colormode: null },
+      ],
     };
 
     it('subscribes to hue topic when readyState is OPEN', () => {
@@ -697,7 +709,7 @@ describe('useLightsData', () => {
       expect(lastPollingOpts.alwaysActive).toBe(false);
     });
 
-    it('WS handleMessage converts Record lights to array with light_id from key', async () => {
+    it('WS handleMessage assigns proxy-shaped lights array directly', async () => {
       let capturedCallback: ((data: unknown) => void) | null = null;
       mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
         capturedCallback = cb;
@@ -719,7 +731,7 @@ describe('useLightsData', () => {
       expect(result.current.lights[0]?.light_id).toBe('1');
     });
 
-    it('WS handleMessage maps bri to brightness', async () => {
+    it('WS handleMessage preserves brightness from proxy-shaped payload', async () => {
       let capturedCallback: ((data: unknown) => void) | null = null;
       mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
         capturedCallback = cb;
@@ -740,7 +752,7 @@ describe('useLightsData', () => {
       expect(result.current.lights[0]?.brightness).toBe(200);
     });
 
-    it('WS handleMessage maps state.ct to ct_mirek and derives ct_kelvin', async () => {
+    it('WS handleMessage preserves ct_mirek and ct_kelvin from proxy-shaped payload', async () => {
       let capturedCallback: ((data: unknown) => void) | null = null;
       mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
         capturedCallback = cb;
@@ -762,7 +774,7 @@ describe('useLightsData', () => {
       expect(result.current.lights[0]?.ct_kelvin).toBe(3333);
     });
 
-    it('WS handleMessage converts Record groups to sorted array with Casa first', async () => {
+    it('WS handleMessage sorts proxy-shaped groups array with Casa first', async () => {
       let capturedCallback: ((data: unknown) => void) | null = null;
       mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
         capturedCallback = cb;

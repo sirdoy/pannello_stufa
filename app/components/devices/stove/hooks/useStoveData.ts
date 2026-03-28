@@ -196,14 +196,15 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     const handleMessage = (raw: unknown) => {
       const data = raw as ThermorossiData;
 
-      // Map WS fields to hook state (per D-02)
-      setStatus(data.stove_state as StoveState);
+      // Map WS fields to hook state — ThermorossiData is now ThermorossiStatusResponse
+      // so stove_state is already StoveState (no cast needed)
+      setStatus(data.stove_state);
       setFanLevel(data.fan_level);
       setPowerLevel(data.power_level);
 
-      // WS messages are inherently fresh (per D-03)
-      setIsStale(false);
-      setLastPollAt(new Date());
+      // Use data_freshness and last_poll_at from WS payload (proxy-shaped)
+      setIsStale(data.data_freshness === 'STALE');
+      setLastPollAt(data.last_poll_at ? new Date(data.last_poll_at) : new Date());
 
       // Error handling — identical logic to HTTP path (per D-02)
       if (data.stove_state === 'alarm') {

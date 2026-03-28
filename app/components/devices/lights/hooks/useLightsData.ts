@@ -21,7 +21,7 @@ import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
-import type { HueData, HueLight as WsHueLight, HueGroup as WsHueGroup } from '@/types/websocket';
+import type { HueData } from '@/types/websocket';
 import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
 
 /**
@@ -177,43 +177,13 @@ export function useLightsData(): UseLightsDataReturn {
     const handleMessage = (raw: unknown) => {
       const data = raw as HueData;
 
-      // Convert Record<string, WsHueLight> → HueLight[] (D-12, D-13)
+      // WS now sends proxy-shaped data: HueLight[] and HueGroup[] directly
       if (data.lights) {
-        const lights: HueLight[] = Object.entries(data.lights).map(([id, wsLight]: [string, WsHueLight]) => ({
-          light_id: id,
-          name: wsLight.name,
-          on: wsLight.state.on,
-          brightness: wsLight.state.bri,                                    // bri → brightness (D-13)
-          ct_mirek: wsLight.state.ct,
-          ct_kelvin: wsLight.state.ct ? Math.round(1_000_000 / wsLight.state.ct) : null,
-          hue: null,
-          saturation: null,
-          colormode: wsLight.state.colormode,
-          reachable: wsLight.state.reachable,
-          capability_tier: 'color' as const,                                // WS has no tier — default to 'color'
-          room_id: null,
-          room_name: null,
-          model_id: wsLight.modelid,
-          light_type: wsLight.type,
-        }));
-        setLights(lights);
+        setLights(data.lights);
       }
 
-      // Convert Record<string, WsHueGroup> → HueGroup[], sorted 'Casa' first (D-12)
       if (data.groups) {
-        const rawGroups: HueGroup[] = Object.entries(data.groups).map(([id, wsGroup]: [string, WsHueGroup]) => ({
-          group_id: id,
-          name: wsGroup.name,
-          type: null,
-          group_class: null,
-          lights: wsGroup.lights,
-          any_on: wsGroup.state.any_on,
-          all_on: wsGroup.state.all_on,
-          brightness: null,
-          color_temp: null,
-          colormode: null,
-        }));
-        const sortedGroups = rawGroups.sort((a, b) => {
+        const sortedGroups = [...data.groups].sort((a, b) => {
           if (a.name === 'Casa') return -1;
           if (b.name === 'Casa') return 1;
           return a.name.localeCompare(b.name);
@@ -221,14 +191,14 @@ export function useLightsData(): UseLightsDataReturn {
         setGroups(sortedGroups);
       }
 
-      // WS connection = live data (D-15)
+      // WS connection = live data
       setConnected(true);
       setStale(false);
       setLoading(false);
       setError(null);
       setLastUpdatedAt(Date.now());
 
-      // Scenes not in WS payload — fire-and-forget HTTP fetch (D-14)
+      // Scenes not in WS payload — fire-and-forget HTTP fetch
       void fetchScenesRef.current();
     };
 

@@ -26,12 +26,11 @@ const mockUseAdaptivePolling = useAdaptivePolling as jest.MockedFunction<typeof 
 const mockUseVisibility = useVisibility as jest.MockedFunction<typeof useVisibility>;
 const mockUseWebSocketContext = useWebSocketContext as jest.MockedFunction<typeof useWebSocketContext>;
 
-// Mock WS payload with three sensors of different types
+// Mock WS payload with three sensors using proxy DirigeraSensor shape
 const mockWsPayload: DirigeraData = {
   sensors: [
     {
       id: '1',
-      relation_id: null,
       type: 'openCloseSensor',
       custom_name: 'Door',
       room: 'Living',
@@ -43,7 +42,6 @@ const mockWsPayload: DirigeraData = {
     },
     {
       id: '2',
-      relation_id: null,
       type: 'openCloseSensor',
       custom_name: 'Window',
       room: 'Bedroom',
@@ -55,16 +53,14 @@ const mockWsPayload: DirigeraData = {
     },
     {
       id: '3',
-      relation_id: null,
-      type: 'motionSensor',
+      type: 'occupancySensor',
       custom_name: 'Hall',
       room: 'Hall',
       firmware_version: '1.0',
       battery_percentage: null,
       is_reachable: false, // offline
       last_seen: null,
-      is_detected: false,
-      light_level: null,
+      is_open: null, // motion sensors have is_open: null
     },
   ],
 };

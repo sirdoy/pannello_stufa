@@ -3,6 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
+import { adaptNetatmoWsPayload } from '@/lib/netatmo/netatmoWsAdapter';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 import { NETATMO_ROUTES } from '@/lib/routes';
 
@@ -81,6 +84,9 @@ export function useThermostatData(): UseThermostatDataReturn {
   const [error, setError] = useState<string | null>(null);
 
   const staleness = useDeviceStaleness('thermostat');
+
+  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const isWsConnected = readyState === ReadyState.OPEN;
 
   const connectionCheckedRef = useRef(false);
 
@@ -186,11 +192,28 @@ export function useThermostatData(): UseThermostatDataReturn {
     }
   }
 
-  // Poll status every 60 seconds — gated on topology being loaded
+  // WS subscription: subscribe to 'netatmo' topic when connection is OPEN (Phase 141 conditional guard pattern)
+  useEffect(() => {
+    if (!isWsConnected) return; // guard — prevent dead subscriptions when CLOSED
+
+    const handleMessage = (raw: unknown) => {
+      const adapted = adaptNetatmoWsPayload(raw as Record<string, unknown>);
+      if (adapted === null) return; // D-06: null payload → keep polling as fallback
+      setStatus(adapted);
+      setLoading(false);
+      setError(null);
+    };
+
+    subscribe('netatmo', handleMessage);
+    return () => { unsubscribe('netatmo', handleMessage); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWsConnected, subscribe, unsubscribe]);
+
+  // Poll status every 60 seconds — gated on topology being loaded, suppressed when WS is live
   useAdaptivePolling({
     callback: fetchStatus,
-    interval: topology ? 60000 : null, // gate on topology loaded
-    alwaysActive: false,                // D-13: non-safety-critical
+    interval: isWsConnected ? null : (topology ? 60000 : null), // D-12: suppress when WS connected
+    alwaysActive: false,                                          // D-13: non-safety-critical
     immediate: true,
     initialDelay: 50,
   });

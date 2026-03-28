@@ -13,6 +13,20 @@ import userEvent from '@testing-library/user-event';
 import ThermostatCard from '@/app/components/devices/thermostat/ThermostatCard';
 import { useScheduleData } from '@/lib/hooks/useScheduleData';
 
+// Mock WebSocketContext — required because useThermostatData now uses WS
+jest.mock('@/app/context/WebSocketContext', () => ({
+  useWebSocketContext: () => ({
+    subscribe: jest.fn(),
+    unsubscribe: jest.fn(),
+    readyState: 3, // ReadyState.CLOSED — polling fallback
+  }),
+}));
+
+// Mock useWebSocketManager (ReadyState enum used by useThermostatData)
+jest.mock('@/lib/hooks/useWebSocketManager', () => ({
+  ReadyState: { OPEN: 1, CLOSED: 3, CONNECTING: 0, CLOSING: 2, UNINSTANTIATED: -1 },
+}));
+
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
   useRouter: () => ({

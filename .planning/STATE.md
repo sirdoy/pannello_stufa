@@ -4,7 +4,7 @@ milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
 status: verifying
 stopped_at: Completed 144-02-PLAN.md
-last_updated: "2026-03-28T10:18:57.710Z"
+last_updated: "2026-03-28T10:23:45.509Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 6
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 ## Current Position
 
-Phase: 144 (connection-ux) — EXECUTING
-Plan: 2 of 2
+Phase: 144
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-03-28
 

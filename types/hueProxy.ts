@@ -69,6 +69,8 @@ export interface HueLight {
   room_name: string | null;
   model_id: string | null;
   light_type: string | null;           // e.g. "Extended color light"
+  custom_name?: string | null;         // registry override for display name
+  device_type?: string | null;         // registry device type slug
 }
 
 // =============================================================================

@@ -50,7 +50,7 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 ### Connection UX
 
-- [ ] **UX-01**: Indicatore visuale dello stato connessione WebSocket (connesso / riconnessione / fallback polling)
+- [x] **UX-01**: Indicatore visuale dello stato connessione WebSocket (connesso / riconnessione / fallback polling)
 - [ ] **UX-02**: Transizione tra WebSocket e polling avviene senza flicker o perdita dati visibile
 - [ ] **UX-03**: Dashboard card mostrano timestamp ultimo aggiornamento (da WS `ts` field o polling)
 
@@ -96,7 +96,7 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 | MIG-12 | Phase 142 | Complete |
 | MIG-13 | Phase 143 | Complete |
 | MIG-14 | Phase 143 | Complete |
-| UX-01 | Phase 144 | Pending |
+| UX-01 | Phase 144 | Complete |
 | UX-02 | Phase 144 | Pending |
 | UX-03 | Phase 144 | Pending |
 

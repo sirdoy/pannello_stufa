@@ -163,7 +163,7 @@ Plans:
   3. Every dashboard card displays a "last updated" timestamp sourced from the WS `ts` field when on WebSocket or from the polling response time when on HTTP
 **Plans:** 2 plans
 Plans:
-- [ ] 144-01-PLAN.md — Navbar connection indicator + useRelativeTime + LastUpdated component
+- [x] 144-01-PLAN.md — Navbar connection indicator + useRelativeTime + LastUpdated component
 - [ ] 144-02-PLAN.md — Wire lastUpdatedAt into all 6 device hooks + dashboard cards
 **UI hint**: yes
 
@@ -178,4 +178,4 @@ Plans:
 | 141. Fritz!Box & Hue Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
 | 143. Netatmo Migration | v17.0 | 1/1 | Complete    | 2026-03-28 |
-| 144. Connection UX | v17.0 | 0/2 | Not started | - |
+| 144. Connection UX | v17.0 | 1/2 | In Progress | - |

@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: verifying
-stopped_at: Phase 144 context gathered
-last_updated: "2026-03-28T08:54:27.520Z"
-last_activity: 2026-03-28
+status: executing
+stopped_at: "Completed 144-01-PLAN.md"
+last_updated: "2026-03-28T09:46:00.000Z"
+last_activity: 2026-03-28 -- Phase 144 Plan 01 complete
 progress:
   total_phases: 6
   completed_phases: 5
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 ## Current Position
 
-Phase: 144
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-03-28
+Phase: 144 (connection-ux) — EXECUTING
+Plan: 2 of 2
+Status: Executing Phase 144
+Last activity: 2026-03-28 -- Phase 144 Plan 01 complete
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 142-sonos-dirigera-migration P02 | 18 | 2 tasks | 4 files |
 | Phase 143 P01 | 5 | 2 tasks | 3 files |
 | Phase 143 P02 | 8m | 2 tasks | 4 files |
+| Phase 144 P01 | 33m | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,8 @@ Key context for v17.0:
 - [Phase 143]: page.tsx derives mode from status?.mode (hook provides status; setMode eliminated)
 - [Phase 143]: adaptNetatmoWsPayload is standalone pure function for independent testability
 - [Phase 143]: WS handleMessage does not call staleness.update() — StalenessInfo has no update method
+- [Phase 144-01]: mapReadyState exported as named function for direct unit testing; WS_STATUS_LABELS indexed by WsStatus union (not ReadyState) for cleaner rendering
+- [Phase 144-01]: LastUpdated test mocks useRelativeTime to isolate component from hook timer behavior
 
 ### Pending Todos
 

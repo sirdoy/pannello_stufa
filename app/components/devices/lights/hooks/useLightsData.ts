@@ -78,6 +78,9 @@ export interface UseLightsDataReturn {
   hasAnyLights: boolean;
   avgBrightness: number;
 
+  // Timestamp for LastUpdated component
+  lastUpdatedAt: number | null;
+
   // Dynamic styling state
   roomColors: string[];
   roomOnBrightness: number;
@@ -114,6 +117,7 @@ export function useLightsData(): UseLightsDataReturn {
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Caricamento...');
   const [localBrightness, setLocalBrightness] = useState<number | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
 
   // WS context — primary data channel (MIG-07)
   const { subscribe, unsubscribe, readyState } = useWebSocketContext();
@@ -222,6 +226,7 @@ export function useLightsData(): UseLightsDataReturn {
       setStale(false);
       setLoading(false);
       setError(null);
+      setLastUpdatedAt(Date.now());
 
       // Scenes not in WS payload — fire-and-forget HTTP fetch (D-14)
       void fetchScenesRef.current();
@@ -261,6 +266,7 @@ export function useLightsData(): UseLightsDataReturn {
       setGroups(sortedGroups);
       setLights(lightsData.lights ?? []);
       setScenes(scenesData.scenes ?? []);
+      setLastUpdatedAt(Date.now());
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore fetch dati Hue:', err);
@@ -510,6 +516,9 @@ export function useLightsData(): UseLightsDataReturn {
     allHouseLightsOff,
     hasAnyLights,
     avgBrightness,
+
+    // Timestamp
+    lastUpdatedAt,
 
     // Dynamic styling state
     roomColors,

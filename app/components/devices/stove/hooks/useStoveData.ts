@@ -71,6 +71,9 @@ export interface UseStoveDataReturn {
   pendingCommands: unknown[];
   staleness: StalenessInfo | null;
 
+  // Timestamp for LastUpdated component
+  lastUpdatedAt: number | null;
+
   // Derived state
   isAccesa: boolean;
   isSpenta: boolean;
@@ -142,6 +145,9 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     : lastPollAt
       ? { isStale: false, cachedAt: lastPollAt, ageSeconds: Math.floor((Date.now() - lastPollAt.getTime()) / 1000) }
       : null;
+
+  // Derived timestamp — milliseconds since epoch for LastUpdated component
+  const lastUpdatedAt: number | null = lastPollAt ? lastPollAt.getTime() : null;
 
   // Derived state — exact equality against proxy StoveState values
   const isAccesa = status === 'working' || status === 'igniting' || status === 'modulating';
@@ -323,6 +329,9 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     hasPendingCommands,
     pendingCommands,
     staleness,
+
+    // Timestamp
+    lastUpdatedAt,
 
     // Derived state
     isAccesa,

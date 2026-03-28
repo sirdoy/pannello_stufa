@@ -407,6 +407,7 @@ export function useNetworkData(): UseNetworkDataReturn {
     connected,
     stale,
     lastUpdated,
+    lastUpdatedAt: lastUpdated,
 
     // Health
     health,

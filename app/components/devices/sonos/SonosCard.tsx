@@ -5,10 +5,11 @@ import { Play, Pause, Square } from 'lucide-react';
 import Skeleton from '../../ui/Skeleton';
 import { SmartHomeCard, Banner } from '../../ui';
 import { useSonosData } from './hooks/useSonosData';
+import { LastUpdated } from '@/app/components/ui/LastUpdated';
 
 export default function SonosCard() {
   const router = useRouter();
-  const { data, loading, error, stale } = useSonosData();
+  const { data, loading, error, stale, lastUpdatedAt } = useSonosData();
 
   // Loading state — show skeleton
   if (loading && !data) {
@@ -95,6 +96,8 @@ export default function SonosCard() {
             </div>
           </SmartHomeCard.Controls>
         )}
+
+        <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
       </SmartHomeCard>
     </div>
   );

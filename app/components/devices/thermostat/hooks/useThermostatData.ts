@@ -73,6 +73,7 @@ export interface UseThermostatDataReturn {
   error: string | null;
   stale: boolean;
   staleness: StalenessInfo | null;
+  lastUpdatedAt: number | null;
   refetch: () => Promise<void>;
 }
 
@@ -82,6 +83,7 @@ export function useThermostatData(): UseThermostatDataReturn {
   const [status, setStatus] = useState<NetatmoStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
 
   const staleness = useDeviceStaleness('thermostat');
 
@@ -177,6 +179,7 @@ export function useThermostatData(): UseThermostatDataReturn {
       }
 
       setStatus(data as unknown as NetatmoStatus);
+      setLastUpdatedAt(Date.now());
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore fetch status termostato:', err);
@@ -202,6 +205,7 @@ export function useThermostatData(): UseThermostatDataReturn {
       setStatus(adapted);
       setLoading(false);
       setError(null);
+      setLastUpdatedAt(Date.now());
     };
 
     subscribe('netatmo', handleMessage);
@@ -230,6 +234,7 @@ export function useThermostatData(): UseThermostatDataReturn {
     error,
     stale: staleness?.isStale ?? false,
     staleness,
+    lastUpdatedAt,
     refetch,
   };
 }

@@ -19,6 +19,7 @@ import { SmartHomeCard } from '../../ui';
 import { HealthIndicator, Banner } from '../../ui';
 import { useNetworkData } from './hooks/useNetworkData';
 import { useNetworkCommands } from './hooks/useNetworkCommands';
+import { LastUpdated } from '@/app/components/ui/LastUpdated';
 import NetworkStatusBar from './components/NetworkStatusBar';
 import NetworkBandwidth from './components/NetworkBandwidth';
 import NetworkInfo from './components/NetworkInfo';
@@ -135,6 +136,8 @@ export default function NetworkCard() {
             health={networkData.health}
           />
         </div>
+
+        <LastUpdated tsMs={networkData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
       </SmartHomeCard>
     </div>
   );

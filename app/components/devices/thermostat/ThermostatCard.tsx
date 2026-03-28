@@ -17,6 +17,7 @@ import { useDebounce } from '@/app/hooks/useDebounce';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { useThermostatData } from './hooks/useThermostatData';
+import { LastUpdated } from '@/app/components/ui/LastUpdated';
 
 /**
  * ThermostatCard - Complete thermostat control for homepage
@@ -25,7 +26,7 @@ import { useThermostatData } from './hooks/useThermostatData';
  */
 export default function ThermostatCard() {
   const router = useRouter();
-  const { connected, topology, status, loading, error: dataError, staleness, refetch } = useThermostatData();
+  const { connected, topology, status, loading, error: dataError, staleness, lastUpdatedAt, refetch } = useThermostatData();
   const [commandError, setCommandError] = useState<string | null>(null);
   const error = dataError ?? commandError;
   const setError = setCommandError;
@@ -795,6 +796,8 @@ export default function ThermostatCard() {
           Vedi Tutte le Stanze →
         </Button>
       </div>
+
+      <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
     </DeviceCard>
   );
 }

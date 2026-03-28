@@ -10,6 +10,7 @@ import CardAccentBar from '../../ui/CardAccentBar';
 import { Heading, Badge, HealthIndicator } from '../../ui';
 import { useStoveData } from './hooks/useStoveData';
 import { useStoveCommands } from './hooks/useStoveCommands';
+import { LastUpdated } from '@/app/components/ui/LastUpdated';
 import { getStatusInfo, getStatusDisplay } from './stoveStatusUtils';
 import StoveStatus from './components/StoveStatus';
 import StovePrimaryActions from './components/StovePrimaryActions';
@@ -177,6 +178,8 @@ export default function StoveCard() {
                 onPowerChange={commands.handlePowerChange}
               />
             )}
+
+            <LastUpdated tsMs={stoveData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
           </div>
         </div>
       </Card>

@@ -62,6 +62,7 @@ const baseData: UseDirigeraDataReturn = {
   error: null,
   stale: false,
   health: 'ok',
+  lastUpdatedAt: null,
 };
 
 describe('DirigeraCard', () => {

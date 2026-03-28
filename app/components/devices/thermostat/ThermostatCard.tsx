@@ -188,7 +188,7 @@ export default function ThermostatCard() {
       const response = await netatmoModeCmd.execute(NETATMO_ROUTES.setThermMode, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ home_id: topology.home_id, mode: newMode }),
+        body: JSON.stringify({ home_id: topology!.home_id, mode: newMode }),
       });
 
       if (response) {
@@ -214,7 +214,7 @@ export default function ThermostatCard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          home_id: topology.home_id,
+          home_id: topology!.home_id,
           room_id: roomId,
           mode: 'manual',
           temp,

@@ -1,13 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import SonosQueueViewer from '../SonosQueueViewer';
+import type { SonosQueueItemResponse } from '@/types/sonosProxy';
 
 // Mock useSonosQueue at module level
 const mockFetchInitial = jest.fn();
 const mockLoadMore = jest.fn();
 
 const defaultMockReturn = {
-  items: [],
+  items: [] as SonosQueueItemResponse[],
   total: 0,
   loading: false,
   error: null,

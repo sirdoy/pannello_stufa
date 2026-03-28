@@ -6,7 +6,9 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { useWebSocket, __mockHelpers, ReadyState } from 'react-use-websocket';
+import useWebSocket from 'react-use-websocket';
+
+const { __mockHelpers, ReadyState } = jest.requireMock<typeof import('../../__mocks__/react-use-websocket')>('react-use-websocket');
 import { useWebSocketManager } from '@/lib/hooks/useWebSocketManager';
 
 jest.mock('react-use-websocket');

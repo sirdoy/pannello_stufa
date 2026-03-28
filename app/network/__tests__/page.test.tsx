@@ -208,6 +208,7 @@ function createMockNetworkData(overrides: Partial<UseNetworkDataReturn> = {}): U
     healthMapped: 'error',
     error: null,
     activeDeviceCount: 0,
+    lastUpdatedAt: null,
     updateDeviceCategory: jest.fn(),
     ...overrides,
   };

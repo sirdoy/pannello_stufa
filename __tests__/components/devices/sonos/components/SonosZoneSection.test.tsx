@@ -72,9 +72,8 @@ const mockPlayback: SonosPlaybackResponse = {
   album: null,
   album_art_url: null,
   source_type: 'streaming',
-  current_uri: null,
-  position_ms: 0,
-  duration_ms: null,
+  position: null,
+  duration: null,
 };
 
 const mockVolumes: Record<string, SonosVolumeResponse> = {

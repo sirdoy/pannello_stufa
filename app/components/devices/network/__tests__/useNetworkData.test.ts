@@ -57,7 +57,7 @@ describe('useNetworkData', () => {
 
     // Mock useAdaptivePolling to capture options and call callback asynchronously (like real polling)
     mockUseAdaptivePolling.mockImplementation((opts) => {
-      lastPollingOpts = opts as Record<string, unknown>;
+      lastPollingOpts = opts as unknown as Record<string, unknown>;
       if (opts.immediate) {
         // Call async to avoid state updates during render
         setTimeout(() => opts.callback(), 0);
@@ -814,7 +814,7 @@ describe('useNetworkData', () => {
 
       // Polling suppressed — don't auto-call callback
       mockUseAdaptivePolling.mockImplementation((opts) => {
-        lastPollingOpts = opts as Record<string, unknown>;
+        lastPollingOpts = opts as unknown as Record<string, unknown>;
         // interval=null means polling is suppressed, don't call callback
       });
 

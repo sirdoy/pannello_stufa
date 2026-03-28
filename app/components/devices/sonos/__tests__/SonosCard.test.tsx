@@ -84,6 +84,7 @@ const baseReturn: UseSonosDataReturn = {
   loading: false,
   error: null,
   stale: false,
+  lastUpdatedAt: null,
 };
 
 describe('SonosCard', () => {

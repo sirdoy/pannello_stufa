@@ -89,14 +89,13 @@ describe('useRelativeTime', () => {
   });
 
   it('returns null again when tsMs transitions to null', () => {
-    let tsMs: number | null = Date.now();
-    const { result, rerender } = renderHook(({ ts }) => useRelativeTime(ts), {
-      initialProps: { ts: tsMs },
-    });
+    const { result, rerender } = renderHook(
+      ({ ts }: { ts: number | null }) => useRelativeTime(ts),
+      { initialProps: { ts: Date.now() } as { ts: number | null } },
+    );
     expect(result.current).toBe('Adesso');
 
-    tsMs = null;
-    rerender({ ts: tsMs });
+    rerender({ ts: null });
     expect(result.current).toBeNull();
   });
 });

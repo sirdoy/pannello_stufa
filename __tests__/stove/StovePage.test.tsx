@@ -101,6 +101,7 @@ const createMockStoveData = (overrides: Record<string, unknown> = {}) => ({
   setNextScheduledAction: jest.fn(),
   fetchMaintenanceStatus: jest.fn(),
   fetchSchedulerMode: jest.fn(),
+  lastUpdatedAt: null,
   ...overrides,
 });
 

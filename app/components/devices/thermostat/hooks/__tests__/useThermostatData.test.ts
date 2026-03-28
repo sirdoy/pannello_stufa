@@ -176,7 +176,7 @@ describe('useThermostatData — WebSocket subscription', () => {
 
     mockUseDeviceStaleness.mockReturnValue({
       isStale: false,
-      cachedAt: Date.now(),
+      cachedAt: new Date(),
       ageSeconds: 0,
     });
 

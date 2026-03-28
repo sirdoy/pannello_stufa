@@ -360,11 +360,11 @@ describe('/registry/devices page', () => {
     fireEvent.change(providerSelect, { target: { value: 'hue' } });
 
     await waitFor(() => {
-      const deviceCalls = fetchSpy.mock.calls.filter((call: string[]) =>
-        call[0].includes('/api/registry/devices')
+      const deviceCalls = fetchSpy.mock.calls.filter((call: any[]) =>
+        (call[0] as string).includes('/api/registry/devices')
       );
       expect(deviceCalls.length).toBeGreaterThan(0);
-      const lastDeviceCall = deviceCalls[deviceCalls.length - 1];
+      const lastDeviceCall = deviceCalls[deviceCalls.length - 1]!;
       expect(lastDeviceCall[0]).toContain('provider_name=hue');
     });
   });
@@ -483,11 +483,11 @@ describe('/registry/devices page', () => {
     fireEvent.click(nextButton);
 
     await waitFor(() => {
-      const deviceCalls = fetchSpy.mock.calls.filter((call: string[]) =>
-        call[0].includes('/api/registry/devices')
+      const deviceCalls = fetchSpy.mock.calls.filter((call: any[]) =>
+        (call[0] as string).includes('/api/registry/devices')
       );
       expect(deviceCalls.length).toBeGreaterThan(0);
-      const lastCall = deviceCalls[deviceCalls.length - 1];
+      const lastCall = deviceCalls[deviceCalls.length - 1]!;
       expect(lastCall[0]).toContain('offset=20');
     });
   });
@@ -501,7 +501,7 @@ describe('/registry/devices page', () => {
 
     // Click the "Registra dispositivo" toolbar button
     const registerButtons = screen.getAllByRole('button', { name: /registra dispositivo/i });
-    fireEvent.click(registerButtons[0]);
+    fireEvent.click(registerButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-register')).toBeInTheDocument();
@@ -516,7 +516,7 @@ describe('/registry/devices page', () => {
 
     // Open register modal
     const registerButtons = screen.getAllByRole('button', { name: /registra dispositivo/i });
-    fireEvent.click(registerButtons[0]);
+    fireEvent.click(registerButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-register')).toBeInTheDocument();
@@ -547,7 +547,7 @@ describe('/registry/devices page', () => {
 
     await waitFor(() => {
       const postCall = postSpy.mock.calls.find(
-        (call: string[]) => call[1]?.method === 'POST'
+        (call: any[]) => call[1]?.method === 'POST'
       );
       expect(postCall).toBeDefined();
       expect(postCall![0]).toBe('/api/registry/devices');
@@ -569,7 +569,7 @@ describe('/registry/devices page', () => {
 
     // Open register modal
     const registerButtons = screen.getAllByRole('button', { name: /registra dispositivo/i });
-    fireEvent.click(registerButtons[0]);
+    fireEvent.click(registerButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-register')).toBeInTheDocument();
@@ -608,7 +608,7 @@ describe('/registry/devices page', () => {
 
     // Click "Modifica" on row 1
     const modificaButtons = screen.getAllByRole('button', { name: /modifica/i });
-    fireEvent.click(modificaButtons[0]);
+    fireEvent.click(modificaButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-update')).toBeInTheDocument();
@@ -623,7 +623,7 @@ describe('/registry/devices page', () => {
 
     // Click "Modifica" on row with id=1
     const modificaButtons = screen.getAllByRole('button', { name: /modifica/i });
-    fireEvent.click(modificaButtons[0]);
+    fireEvent.click(modificaButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('form-modal-update')).toBeInTheDocument();
@@ -667,7 +667,7 @@ describe('/registry/devices page', () => {
 
     // Click "Rimuovi" on row 1
     const rimuoviButtons = screen.getAllByRole('button', { name: /rimuovi/i });
-    fireEvent.click(rimuoviButtons[0]);
+    fireEvent.click(rimuoviButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
@@ -685,7 +685,7 @@ describe('/registry/devices page', () => {
 
     // Click "Rimuovi" on row with id=1
     const rimuoviButtons = screen.getAllByRole('button', { name: /rimuovi/i });
-    fireEvent.click(rimuoviButtons[0]);
+    fireEvent.click(rimuoviButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
@@ -727,7 +727,7 @@ describe('/registry/devices page', () => {
 
     // Click "Rimuovi" on row 1
     const rimuoviButtons = screen.getAllByRole('button', { name: /rimuovi/i });
-    fireEvent.click(rimuoviButtons[0]);
+    fireEvent.click(rimuoviButtons[0]!);
 
     await waitFor(() => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();

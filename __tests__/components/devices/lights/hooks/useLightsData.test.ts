@@ -113,7 +113,7 @@ describe('useLightsData', () => {
 
     // Mock useAdaptivePolling — capture opts for WS fallback assertions
     jest.mocked(useAdaptivePolling).mockImplementation((opts) => {
-      lastPollingOpts = opts as Record<string, unknown>;
+      lastPollingOpts = opts as unknown as Record<string, unknown>;
       if (opts.immediate && opts.interval !== null) {
         setTimeout(() => opts.callback(), 0);
       }

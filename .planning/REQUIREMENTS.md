@@ -45,7 +45,7 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 
 ### Provider Migration — Netatmo
 
-- [ ] **MIG-13**: `useThermostatData` riceve dati Netatmo via WebSocket come canale primario
+- [x] **MIG-13**: `useThermostatData` riceve dati Netatmo via WebSocket come canale primario
 - [x] **MIG-14**: `useThermostatData` fallback automatico a polling HTTP se WebSocket non disponibile
 
 ### Connection UX
@@ -94,7 +94,7 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 | MIG-10 | Phase 142 | Complete |
 | MIG-11 | Phase 142 | Complete |
 | MIG-12 | Phase 142 | Complete |
-| MIG-13 | Phase 143 | Pending |
+| MIG-13 | Phase 143 | Complete |
 | MIG-14 | Phase 143 | Complete |
 | UX-01 | Phase 144 | Pending |
 | UX-02 | Phase 144 | Pending |

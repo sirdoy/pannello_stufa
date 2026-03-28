@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: executing
-stopped_at: Completed 143-01-PLAN.md
-last_updated: "2026-03-28T08:25:59.587Z"
+status: verifying
+stopped_at: Completed 143-02-PLAN.md
+last_updated: "2026-03-28T08:33:23.596Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 9
+  total_plans: 7
   completed_plans: 8
   percent: 0
 ---
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 Phase: 143 (netatmo-migration) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-28
 
 Progress: [░░░░░░░░░░] 0%
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 142 P01 | 15 | 2 tasks | 2 files |
 | Phase 142-sonos-dirigera-migration P02 | 18 | 2 tasks | 4 files |
 | Phase 143 P01 | 5 | 2 tasks | 3 files |
+| Phase 143 P02 | 8m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,8 @@ Key context for v17.0:
 - [Phase 143]: useThermostatData exposes StalenessInfo | null (not stale/update/lastUpdate) to match actual useDeviceStaleness API
 - [Phase 143]: ThermostatCard uses commandError local state for mutation errors; dataError from hook is read-only (pattern: error = dataError ?? commandError)
 - [Phase 143]: page.tsx derives mode from status?.mode (hook provides status; setMode eliminated)
+- [Phase 143]: adaptNetatmoWsPayload is standalone pure function for independent testability
+- [Phase 143]: WS handleMessage does not call staleness.update() — StalenessInfo has no update method
 
 ### Pending Todos
 
@@ -105,5 +108,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Completed 143-01-PLAN.md
+Stopped at: Completed 143-02-PLAN.md
 Resume file: None

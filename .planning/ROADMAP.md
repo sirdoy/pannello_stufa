@@ -76,7 +76,7 @@ See git history for details.
 - [x] **Phase 140: Stove Migration** - useStoveData migrated to WS primary channel with alwaysActive fallback preserved (completed 2026-03-27)
 - [x] **Phase 141: Fritz!Box & Hue Migration** - useNetworkData and useLightsData migrated to WS with buffer/history preservation (completed 2026-03-27)
 - [x] **Phase 142: Sonos & DIRIGERA Migration** - useSonosData and useDirigeraData migrated to WS (completed 2026-03-27)
-- [ ] **Phase 143: Netatmo Migration** - useThermostatData migrated to WS with raw payload adapter layer
+- [x] **Phase 143: Netatmo Migration** - useThermostatData migrated to WS with raw payload adapter layer (completed 2026-03-28)
 - [ ] **Phase 144: Connection UX** - Visual connection status indicator, flicker-free transitions, per-card timestamps
 
 ## Phase Details
@@ -177,5 +177,5 @@ Plans:
 | 140. Stove Migration | v17.0 | 1/1 | Complete    | 2026-03-27 |
 | 141. Fritz!Box & Hue Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
-| 143. Netatmo Migration | v17.0 | 1/2 | In Progress|  |
+| 143. Netatmo Migration | v17.0 | 1/1 | Complete   | 2026-03-28 |
 | 144. Connection UX | v17.0 | 0/TBD | Not started | - |

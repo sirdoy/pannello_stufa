@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text, Grid, InfoBox, PageLayout } from '@/app/components/ui';
@@ -10,62 +10,8 @@ import type { Module } from '@/app/components/devices/thermostat/BatteryWarning'
 import ThermostatTabs from './components/ThermostatTabs';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { Calendar, Clock } from 'lucide-react';
-
-interface NetatmoTopology {
-  home_id: string;
-  home_name: string;
-  rooms?: NetatmoRoom[];
-  modules?: NetatmoModule[];
-  [key: string]: unknown;
-}
-
-interface NetatmoRoom {
-  id: string;
-  name?: string;
-  module_ids?: string[];
-  modules?: string[];
-  [key: string]: unknown;
-}
-
-interface NetatmoModule {
-  id: string;
-  type: string;
-  battery_state?: string;
-  battery_level?: number;
-  reachable?: boolean;
-  rf_strength?: number;
-  [key: string]: unknown;
-}
-
-interface NetatmoStatus {
-  mode?: string;
-  rooms?: RoomStatus[];
-  modules?: ModuleStatus[];
-  hasLowBattery?: boolean;
-  hasCriticalBattery?: boolean;
-  lowBatteryModules?: NetatmoModule[];
-  [key: string]: unknown;
-}
-
-interface RoomStatus {
-  room_id: string;
-  temperature?: number;
-  setpoint?: number;
-  mode?: string;
-  heating?: boolean;
-  stoveSync?: boolean;
-  stoveSyncSetpoint?: number;
-  [key: string]: unknown;
-}
-
-interface ModuleStatus {
-  id: string;
-  battery_state?: string;
-  battery_level?: number;
-  reachable?: boolean;
-  rf_strength?: number;
-  [key: string]: unknown;
-}
+import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
+import type { NetatmoTopology, NetatmoRoom, NetatmoModule, NetatmoStatus, RoomStatus, ModuleStatus } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 
 interface RoomWithStatus extends NetatmoRoom {
   name: string;
@@ -86,18 +32,12 @@ interface RoomWithStatus extends NetatmoRoom {
 function NetatmoContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [connected, setConnected] = useState<boolean>(false);
-  const [topology, setTopology] = useState<NetatmoTopology | null>(null);
-  const [status, setStatus] = useState<NetatmoStatus | null>(null);
-  const [mode, setMode] = useState<string>('schedule');
+  const { connected, topology, status, loading, error, refetch } = useThermostatData();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [oauthError, setOauthError] = useState<string | null>(null);
 
-  // Flags per prevenire double fetch in React Strict Mode
-  const connectionCheckedRef = useRef(false);
-  const pollingStartedRef = useRef(false);
+  // Derive mode from status
+  const mode = status?.mode ?? 'schedule';
 
   // Check for OAuth callback errors in URL
   useEffect(() => {
@@ -109,40 +49,6 @@ function NetatmoContent() {
     }
   }, [searchParams]);
 
-  // Check connection status on mount
-  useEffect(() => {
-    // Skip se già controllato (React 18 Strict Mode double mount)
-    if (connectionCheckedRef.current) return;
-    connectionCheckedRef.current = true;
-
-    checkConnection();
-  }, []);
-
-  // Fetch topology if connected
-  useEffect(() => {
-    if (connected) {
-      fetchTopology();
-    }
-  }, [connected]);
-
-  // Poll status every 30 seconds
-  useEffect(() => {
-    if (!topology) return;
-
-    // Previeni double execution in React Strict Mode
-    if (pollingStartedRef.current) return;
-    pollingStartedRef.current = true;
-
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 30000);
-
-    return () => {
-      clearInterval(interval);
-      // Reset ref on unmount per permettere re-mount
-      pollingStartedRef.current = false;
-    };
-  }, [topology]);
-
   // Redirect to /netatmo if not connected (must be in useEffect to avoid setState-in-render)
   useEffect(() => {
     if (!loading && !connected) {
@@ -150,116 +56,29 @@ function NetatmoContent() {
     }
   }, [loading, connected, router]);
 
-  async function checkConnection() {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(NETATMO_ROUTES.homesData);
-      const data = await response.json();
-
-      // ✅ Handle reconnect flag from token helper
-      if (data.reconnect) {
-        setConnected(false);
-        setError(data.error);
-        return;
-      }
-
-      // If we get data without error, we're connected
-      if (!data.error && data.home_id) {
-        setConnected(true);
-        setTopology(data as NetatmoTopology);
-      } else if (data.error && (data.error.includes('refresh token') || data.error.includes('Nessun refresh token'))) {
-        // Not connected - show auth card
-        setConnected(false);
-      } else {
-        // Other error - still connected but something else failed
-        console.error('❌ Netatmo: API error -', data.error);
-        setConnected(true);
-        throw new Error(data.error);
-      }
-    } catch (err) {
-      console.error('❌ Netatmo: Exception in checkConnection -', err);
-      // If fetch fails, check if it's auth error
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      if (message.includes('refresh token') || message.includes('Nessun refresh token')) {
-        setConnected(false);
-      } else {
-        setError(message);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchTopology(): Promise<void> {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(NETATMO_ROUTES.homesData);
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setTopology(data as NetatmoTopology);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchStatus(): Promise<void> {
-    try {
-      setError(null);
-
-      const response = await fetch(NETATMO_ROUTES.homeStatus);
-      const data = await response.json();
-
-      if (data.error) {
-        throw new Error(data.error);
-      }
-
-      setStatus(data as NetatmoStatus);
-      setMode(data.mode || 'schedule');
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setError(message);
-    }
-  }
-
   async function handleModeChange(newMode: string): Promise<void> {
     try {
-      setError(null);
-
       const response = await fetch(NETATMO_ROUTES.setThermMode, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ home_id: topology?.home_id, mode: newMode }),
       });
 
-      const data = await response.json();
+      const data = await response.json() as { error?: string };
 
       if (data.error) {
         throw new Error(data.error);
       }
 
-      setMode(newMode);
-      await fetchStatus();
+      await refetch();
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown error';
-      setError(message);
+      console.error('❌ Netatmo: handleModeChange error -', err);
     }
   }
 
   async function handleRefresh(): Promise<void> {
     setRefreshing(true);
-    await fetchTopology();
-    await fetchStatus();
+    await refetch();
     setRefreshing(false);
   }
 
@@ -294,7 +113,7 @@ function NetatmoContent() {
           </Banner>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button variant="ember" onClick={checkConnection}>
+            <Button variant="ember" onClick={() => refetch()}>
               🔄 Riprova
             </Button>
           </div>
@@ -570,7 +389,7 @@ function NetatmoContent() {
                   key={room.id}
                   room={room}
                   homeId={topology?.home_id}
-                  onRefresh={fetchStatus}
+                  onRefresh={refetch}
                 />
               ))}
             </Grid>

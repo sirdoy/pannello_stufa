@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Minus } from 'lucide-react';
 import { NETATMO_ROUTES } from '@/lib/routes';
@@ -12,12 +12,11 @@ import { Divider, Heading, Text, Button, EmptyState, Spinner, Select, Badge } fr
 import BatteryWarning, { ModuleBatteryList } from './BatteryWarning';
 import { useScheduleData } from '@/lib/hooks/useScheduleData';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
-import { useDeviceStaleness } from '@/lib/hooks/useDeviceStaleness';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
-import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useDebounce } from '@/app/hooks/useDebounce';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
+import { useThermostatData } from './hooks/useThermostatData';
 
 /**
  * ThermostatCard - Complete thermostat control for homepage
@@ -26,11 +25,10 @@ import { it } from 'date-fns/locale';
  */
 export default function ThermostatCard() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [connected, setConnected] = useState(false);
-  const [topology, setTopology] = useState<any>(null);
-  const [status, setStatus] = useState<any>(null);
+  const { connected, topology, status, loading, error: dataError, staleness, refetch } = useThermostatData();
+  const [commandError, setCommandError] = useState<string | null>(null);
+  const error = dataError ?? commandError;
+  const setError = setCommandError;
   const [refreshing, setRefreshing] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [calibrating, setCalibrating] = useState(false);
@@ -47,9 +45,8 @@ export default function ThermostatCard() {
   // Schedule management
   const { schedules, activeSchedule, loading: scheduleLoading, refetch: refetchSchedules } = useScheduleData();
 
-  // Online status and staleness tracking
+  // Online status tracking
   const { isOnline } = useOnlineStatus();
-  const staleness = useDeviceStaleness('thermostat');
 
   // Type assertion for schedules data (from useScheduleData hook)
   interface ScheduleItem {
@@ -60,8 +57,6 @@ export default function ThermostatCard() {
   const typedActiveSchedule = activeSchedule as unknown as ScheduleItem | undefined;
   const [switchingSchedule, setSwitchingSchedule] = useState(false);
   const [selectedScheduleId, setSelectedScheduleId] = useState<string | null>(null);
-
-  const connectionCheckedRef = useRef(false);
 
   // Retry infrastructure - one hook per command type
   const netatmoModeCmd = useRetryableCommand({ device: 'netatmo', action: 'setMode' });
@@ -94,23 +89,6 @@ export default function ThermostatCard() {
   useEffect(() => {
     setPendingSetpoint(null);
   }, [selectedRoomId]);
-
-  // Check connection on mount
-  useEffect(() => {
-    if (connectionCheckedRef.current) return;
-    connectionCheckedRef.current = true;
-    checkConnection();
-  }, []);
-
-  // Poll status every 60 seconds - pauses when tab hidden
-  // initialDelay: 50ms stagger to avoid thundering herd on dashboard mount
-  useAdaptivePolling({
-    callback: fetchStatus,
-    interval: topology ? 60000 : null, // Only poll when connected (topology exists)
-    alwaysActive: false, // Non-critical: pause when hidden
-    immediate: true,
-    initialDelay: 50,
-  });
 
   // Get rooms with status (includes stove sync info)
   // Shows ALL rooms including offline ones
@@ -195,115 +173,9 @@ export default function ThermostatCard() {
            (room.setpoint && room.temperature && room.setpoint > room.temperature);
   });
 
-  async function checkConnection(retryCount = 0) {
-    const MAX_RETRIES = 1;
-    const RETRY_DELAY_MS = 1500;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Show retry message on subsequent attempts
-      if (retryCount > 0) {
-        setLoadingMessage('Riconnessione in corso...');
-      } else {
-        setLoadingMessage('Caricamento...');
-      }
-
-      const response = await fetch(NETATMO_ROUTES.homesData);
-      const data = await response.json();
-
-      if (data.reconnect) {
-        // Token expired/invalid - retry once in case token was just refreshed
-        if (retryCount < MAX_RETRIES) {
-          setLoadingMessage('Verifica token in corso...');
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-          return checkConnection(retryCount + 1);
-        }
-        // All retries exhausted - show reconnect UI
-        setConnected(false);
-        setError(data.error);
-        return;
-      }
-
-      if (!data.error && data.home_id) {
-        setConnected(true);
-        setTopology(data);
-      } else {
-        // Other error - retry once for transient issues
-        if (retryCount < MAX_RETRIES && !data.reconnect) {
-          setLoadingMessage('Nuovo tentativo...');
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-          return checkConnection(retryCount + 1);
-        }
-        setConnected(false);
-      }
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('Errore connessione termostato:', err);
-      // Retry on network errors
-      if (retryCount < MAX_RETRIES) {
-        setLoadingMessage('Nuovo tentativo...');
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-        return checkConnection(retryCount + 1);
-      }
-      setConnected(false);
-      setError(message);
-    } finally {
-      setLoading(false);
-      setLoadingMessage('Caricamento...');
-    }
-  }
-
-  async function fetchStatus(retryCount = 0) {
-    const MAX_RETRIES = 1;
-    const RETRY_DELAY_MS = 1500;
-
-    try {
-      setError(null);
-
-      const response = await fetch(NETATMO_ROUTES.homeStatus);
-      const data = await response.json();
-
-      if (data.reconnect) {
-        // Token issue during polling - retry once before disconnecting
-        if (retryCount < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-          return fetchStatus(retryCount + 1);
-        }
-        setConnected(false);
-        return;
-      }
-
-      if (data.error) {
-        // Rate limiting error - don't show to user, just skip this poll
-        if (data.error.includes('concurrency limited')) {
-          console.warn('⚠️ Netatmo rate limit - skipping this poll');
-          return;
-        }
-        throw new Error(data.error);
-      }
-
-      setStatus(data);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      console.error('Errore fetch status termostato:', err);
-      // Retry on network errors (but not rate limit)
-      if (retryCount < MAX_RETRIES && !message.includes('concurrency limited')) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-        return fetchStatus(retryCount + 1);
-      }
-      // Don't show rate limit errors to user
-      if (!message.includes('concurrency limited')) {
-        setError(message);
-      }
-    }
-  }
-
   async function handleRefresh() {
     setRefreshing(true);
-    await checkConnection();
-    if (topology) await fetchStatus();
+    await refetch();
     setRefreshing(false);
   }
 
@@ -321,7 +193,7 @@ export default function ThermostatCard() {
       if (response) {
         const data = await response.json() as { error?: string };
         if (data.error) throw new Error(data.error);
-        await fetchStatus();
+        await refetch();
       }
       // If response is null, request was deduplicated (silently blocked)
     } catch (err: unknown) {
@@ -351,7 +223,7 @@ export default function ThermostatCard() {
       if (response) {
         const data = await response.json() as { error?: string };
         if (data.error) throw new Error(data.error);
-        await fetchStatus();
+        await refetch();
       }
       // If response is null, request was deduplicated (silently blocked)
     } catch (err: unknown) {
@@ -388,7 +260,7 @@ export default function ThermostatCard() {
           setTimeout(() => setCalibrationSuccess(null), 5000);
         }
 
-        await fetchStatus();
+        await refetch();
       }
       // If response is null, request was deduplicated (silently blocked)
     } catch (err: unknown) {

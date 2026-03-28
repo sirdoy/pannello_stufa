@@ -21,7 +21,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.0 (shipped 2026-03-28)
-**Status:** Starting v17.1 — WebSocket Alignment & Tuya Integration
+**Status:** v17.1 in progress — Phase 145 (WS Type Alignment) complete, Phase 146 next
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

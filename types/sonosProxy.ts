@@ -43,6 +43,8 @@ export interface SonosDeviceResponse {
   role: 'soundbar' | 'sub' | 'surround' | 'speaker';
   is_visible: boolean;      // false for surrounds, Sub
   is_coordinator: boolean;
+  custom_name?: string | null;   // registry override for display name
+  device_type?: string | null;   // registry device type slug
 }
 
 // Source: docs/api/sonos.md — SonosDeviceDetailResponse

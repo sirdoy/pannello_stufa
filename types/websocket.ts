@@ -2,8 +2,22 @@
  * WebSocket type definitions for all 6 provider payloads.
  *
  * Source of truth: docs/api/websocket.md
- * These types are derived verbatim from the server's payload interfaces.
+ *
+ * Since the WS server sends data in the same format as the HA proxy REST
+ * endpoints, most payload types are re-exported from the proxy type files.
+ * Only FritzBox (canonical here) and Netatmo (raw format) define local types.
  */
+
+import type { HueLight, HueGroup } from '@/types/hueProxy';
+import type { ThermorossiStatusResponse } from '@/types/thermorossiProxy';
+import type { SonosDeviceResponse, SonosZoneResponse } from '@/types/sonosProxy';
+import type { DirigeraSensor } from '@/types/dirigeraProxy';
+
+// Re-export proxy types for convenience
+export type { HueLight, HueGroup } from '@/types/hueProxy';
+export type { ThermorossiStatusResponse } from '@/types/thermorossiProxy';
+export type { SonosDeviceResponse, SonosZoneResponse } from '@/types/sonosProxy';
+export type { DirigeraSensor } from '@/types/dirigeraProxy';
 
 // ---------------------------------------------------------------------------
 // Core types
@@ -25,7 +39,7 @@ export interface WebSocketMessage<T = unknown> {
 }
 
 // ---------------------------------------------------------------------------
-// FritzBox interfaces
+// FritzBox interfaces (canonical — no proxy type file for these)
 // ---------------------------------------------------------------------------
 
 export interface FritzBoxDevice {
@@ -60,34 +74,8 @@ export interface FritzBoxData {
 }
 
 // ---------------------------------------------------------------------------
-// DIRIGERA interfaces
+// DIRIGERA — uses proxy DirigeraSensor (flat, with is_open: boolean | null)
 // ---------------------------------------------------------------------------
-
-export interface DirigeraBaseSensor {
-  id: string;
-  relation_id: string | null;
-  type: 'openCloseSensor' | 'occupancySensor' | 'motionSensor';
-  custom_name: string | null;
-  room: string | null;
-  firmware_version: string | null;
-  battery_percentage: number | null;
-  is_reachable: boolean;
-  /** ISO 8601 */
-  last_seen: string | null;
-}
-
-export interface DirigeraContactSensor extends DirigeraBaseSensor {
-  type: 'openCloseSensor';
-  is_open: boolean;
-}
-
-export interface DirigeraMotionSensor extends DirigeraBaseSensor {
-  type: 'occupancySensor' | 'motionSensor';
-  is_detected: boolean;
-  light_level: number | null;
-}
-
-export type DirigeraSensor = DirigeraContactSensor | DirigeraMotionSensor;
 
 export interface DirigeraData {
   sensors: DirigeraSensor[] | null;
@@ -99,107 +87,37 @@ export interface DirigeraData {
 
 /**
  * Raw Netatmo cloud API homestatus response.
- * Adapter layer added in Phase 143.
- * For full schema see: GET /api/v1/netatmo/energy/homestatus
+ * WS sends raw Netatmo homestatus envelope (body.home.rooms[]), NOT proxy format.
+ * Adapter in lib/netatmo/netatmoWsAdapter.ts handles conversion.
  */
 export type NetatmoData = Record<string, unknown>;
 
 // ---------------------------------------------------------------------------
-// Thermorossi interface
+// Thermorossi — alias for proxy ThermorossiStatusResponse
 // ---------------------------------------------------------------------------
 
-export interface ThermorossiData {
-  /** 'off' | 'igniting' | 'working' | 'cooling' | 'alarm' | ... */
-  stove_state: string;
-  /** 1–5 (fuel feed rate) */
-  power_level: number | null;
-  /** 1–5 (combustion air) */
-  fan_level: number | null;
-  error_code: number | null;
-  error_description: string | null;
-  /** Additional raw WiNet fields may be present */
-  [key: string]: unknown;
-}
+/**
+ * WS sends the same shape as GET /api/v1/thermorossi/status.
+ * Gains strict StoveState union (not string) plus data_freshness and last_poll_at.
+ */
+export type ThermorossiData = ThermorossiStatusResponse;
 
 // ---------------------------------------------------------------------------
-// Hue interfaces
+// Hue — uses proxy HueLight[] and HueGroup[] (flat, not nested Bridge format)
 // ---------------------------------------------------------------------------
-
-export interface HueLightState {
-  on: boolean;
-  /** brightness 0–254 */
-  bri: number | null;
-  /** color temperature in mirek */
-  ct: number | null;
-  colormode: 'ct' | 'hs' | 'xy' | null;
-  reachable: boolean;
-  [key: string]: unknown;
-}
-
-export interface HueLight {
-  state: HueLightState;
-  name: string;
-  type: string;
-  modelid: string | null;
-  [key: string]: unknown;
-}
-
-export interface HueGroupState {
-  any_on: boolean;
-  all_on: boolean;
-}
-
-export interface HueGroup {
-  name: string;
-  /** array of light_id strings */
-  lights: string[];
-  state: HueGroupState;
-  action: Record<string, unknown>;
-  [key: string]: unknown;
-}
 
 export interface HueData {
-  /** key = light_id (e.g. "1", "2") */
-  lights: Record<string, HueLight> | null;
-  /** key = group_id (e.g. "1") */
-  groups: Record<string, HueGroup> | null;
+  lights: HueLight[] | null;
+  groups: HueGroup[] | null;
 }
 
 // ---------------------------------------------------------------------------
-// Sonos interfaces
+// Sonos — uses proxy SonosDeviceResponse and SonosZoneResponse
 // ---------------------------------------------------------------------------
-
-export interface SonosSpeaker {
-  uid: string;
-  name: string;
-  ip: string;
-  model: string | null;
-  firmware: string | null;
-  serial: string | null;
-  role: 'soundbar' | 'sub' | 'surround' | 'speaker';
-  is_visible: boolean;
-  is_coordinator: boolean;
-}
-
-export interface SonosGroupMember {
-  uid: string;
-  name: string;
-  ip: string;
-  role: string;
-}
-
-export interface SonosGroup {
-  group_id: string;
-  label: string;
-  coordinator_uid: string;
-  coordinator_name: string;
-  member_count: number;
-  members: SonosGroupMember[];
-}
 
 export interface SonosData {
-  speakers: SonosSpeaker[] | null;
-  groups: SonosGroup[] | null;
+  speakers: SonosDeviceResponse[] | null;
+  groups: SonosZoneResponse[] | null;
 }
 
 // ---------------------------------------------------------------------------

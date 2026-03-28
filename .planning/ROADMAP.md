@@ -25,6 +25,7 @@
 - ✅ **v15.0 Rooms & Device Registry** — Phases 118-125 (shipped 2026-03-23)
 - ✅ **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato** — Phases 126-138 (shipped 2026-03-26)
 - ✅ **v17.0 WebSocket Real-Time Transport** — Phases 139-144 (shipped 2026-03-28)
+- 🚧 **v17.1 WebSocket Alignment & Tuya Integration** — Phases 145-148 (in progress)
 
 ## Phases
 
@@ -65,3 +66,84 @@
 See git history and `.planning/milestones/` for details.
 
 </details>
+
+### 🚧 v17.1 WebSocket Alignment & Tuya Integration (In Progress)
+
+**Milestone Goal:** Align all 8 WS topic payload types with the enriched HA proxy shapes, migrate Raspberry Pi to WS-primary transport, and deliver the Tuya smart plug provider end-to-end (infrastructure + frontend + WS subscription).
+
+- [ ] **Phase 145: WS Type Alignment** - Update all topic payload types to match enriched HA proxy shapes
+- [ ] **Phase 146: Raspi WS Migration** - Migrate useRaspiData to WS-primary with polling fallback and connection UX
+- [ ] **Phase 147: Tuya Infrastructure** - Proxy client, TypeScript types, and 6 API route proxies
+- [ ] **Phase 148: Tuya Frontend** - Hooks, dashboard card, /tuya page, registry entry, and energy history chart
+
+## Phase Details
+
+### Phase 145: WS Type Alignment
+**Goal**: All 8 WS topic payload types match the enriched HA proxy shapes — adding data_freshness, registry metadata fields, and correcting structural mismatches
+**Depends on**: Phase 144 (existing WS infrastructure)
+**Requirements**: WSTYPE-01, WSTYPE-02, WSTYPE-03, WSTYPE-04, WSTYPE-05, WSTYPE-06, WSTYPE-07, WSTYPE-08, WSTYPE-09, WSTYPE-10, WSTYPE-11, WSTYPE-12, WSTYPE-13, WSTYPE-14
+**Success Criteria** (what must be TRUE):
+  1. Every WS topic payload type includes a `data_freshness` field matching the corresponding REST endpoint shape
+  2. FritzBoxData, FritzBoxDevice, DirigeraData, DirigeraBaseSensor, ThermorossiData, HueData, HueLight, SonosData, SonosSpeaker, and NetatmoData all compile without type errors against their enriched field additions
+  3. HueData uses `Record<string, HueLight>` and `Record<string, HueGroup>` (dict, not array) and existing consumers compile without change
+  4. Topic union type includes all 8 topics (`raspi` and `tuya` added) and TopicDataMap maps them to their payload types
+**Plans**: TBD
+
+Plans:
+- [ ] 145-01: TBD
+
+### Phase 146: Raspi WS Migration
+**Goal**: useRaspiData subscribes to the `raspi` WS topic as primary source, falls back to HTTP polling when disconnected, and RaspiCard displays a live LastUpdated timestamp — extending the connection UX to cover the 8th provider
+**Depends on**: Phase 145
+**Requirements**: RASPI-01, RASPI-02, RASPI-03, RASPI-04, UX-01, UX-03
+**Success Criteria** (what must be TRUE):
+  1. RaspiCard data refreshes in real time without user interaction when WS is connected
+  2. RaspiCard continues updating via HTTP polling when WS is disconnected (no data freeze)
+  3. RaspiCard displays an Italian-locale "aggiornato X secondi fa" timestamp that updates live
+  4. NavbarConnectionStatus reflects the `raspi` topic as part of the WS subscription set
+  5. RaspiData TypeScript type matches the documented WS payload shape and compiles cleanly
+**Plans**: TBD
+
+Plans:
+- [ ] 146-01: TBD
+**UI hint**: yes
+
+### Phase 147: Tuya Infrastructure
+**Goal**: A complete server-side Tuya integration — proxy client, types, and 6 API route proxies — that the frontend hooks can consume in the next phase
+**Depends on**: Phase 145
+**Requirements**: TUYA-01, TUYA-02, TUYA-03, TUYA-04, TUYA-05, TUYA-06, TUYA-07, TUYA-08
+**Success Criteria** (what must be TRUE):
+  1. `GET /api/tuya/health` returns proxy health without authentication errors
+  2. `GET /api/tuya/plugs` returns a typed list of TuyaPlug objects
+  3. `GET /api/tuya/plugs/[device_id]` and `GET /api/tuya/plugs/[device_id]/history` return correctly typed single-plug and energy history responses
+  4. `POST /api/tuya/plugs/[device_id]/state` and `POST /api/tuya/plugs/[device_id]/timer` accept typed request bodies and return 202 Accepted
+  5. All route files compile with zero TypeScript errors and follow the existing haGet/haPost proxy pattern
+**Plans**: TBD
+
+Plans:
+- [ ] 147-01: TBD
+
+### Phase 148: Tuya Frontend
+**Goal**: Users can monitor and control Tuya smart plugs from the dashboard and a dedicated /tuya page, with live WS data, on/off toggles, timer controls, energy history charts, and correct registry entries
+**Depends on**: Phase 147
+**Requirements**: TUYA-09, TUYA-10, TUYA-11, TUYA-12, TUYA-13, TUYA-14, UX-02
+**Success Criteria** (what must be TRUE):
+  1. TuyaCard on the dashboard shows plug status, power gauge, and a live LastUpdated timestamp that updates without page reload
+  2. User can toggle a plug on/off from TuyaCard and the state change reflects immediately
+  3. /tuya page shows a multi-plug grid with on/off toggles, energy charts with 24h/7d/30d selector, and timer controls
+  4. Tuya device appears in the device registry and in the navigation menu without 404 errors
+  5. NavbarConnectionStatus includes the `tuya` WS topic subscription
+**Plans**: TBD
+
+Plans:
+- [ ] 148-01: TBD
+**UI hint**: yes
+
+## Progress
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 145. WS Type Alignment | v17.1 | 0/TBD | Not started | - |
+| 146. Raspi WS Migration | v17.1 | 0/TBD | Not started | - |
+| 147. Tuya Infrastructure | v17.1 | 0/TBD | Not started | - |
+| 148. Tuya Frontend | v17.1 | 0/TBD | Not started | - |

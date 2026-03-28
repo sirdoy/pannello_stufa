@@ -65,4 +65,38 @@ None — all scoped features included in this milestone.
 
 | REQ-ID | Phase | Plan | Status |
 |--------|-------|------|--------|
-| (filled by roadmapper) | | | |
+| WSTYPE-01 | Phase 145 | TBD | Pending |
+| WSTYPE-02 | Phase 145 | TBD | Pending |
+| WSTYPE-03 | Phase 145 | TBD | Pending |
+| WSTYPE-04 | Phase 145 | TBD | Pending |
+| WSTYPE-05 | Phase 145 | TBD | Pending |
+| WSTYPE-06 | Phase 145 | TBD | Pending |
+| WSTYPE-07 | Phase 145 | TBD | Pending |
+| WSTYPE-08 | Phase 145 | TBD | Pending |
+| WSTYPE-09 | Phase 145 | TBD | Pending |
+| WSTYPE-10 | Phase 145 | TBD | Pending |
+| WSTYPE-11 | Phase 145 | TBD | Pending |
+| WSTYPE-12 | Phase 145 | TBD | Pending |
+| WSTYPE-13 | Phase 145 | TBD | Pending |
+| WSTYPE-14 | Phase 145 | TBD | Pending |
+| RASPI-01 | Phase 146 | TBD | Pending |
+| RASPI-02 | Phase 146 | TBD | Pending |
+| RASPI-03 | Phase 146 | TBD | Pending |
+| RASPI-04 | Phase 146 | TBD | Pending |
+| UX-01 | Phase 146 | TBD | Pending |
+| UX-03 | Phase 146 | TBD | Pending |
+| TUYA-01 | Phase 147 | TBD | Pending |
+| TUYA-02 | Phase 147 | TBD | Pending |
+| TUYA-03 | Phase 147 | TBD | Pending |
+| TUYA-04 | Phase 147 | TBD | Pending |
+| TUYA-05 | Phase 147 | TBD | Pending |
+| TUYA-06 | Phase 147 | TBD | Pending |
+| TUYA-07 | Phase 147 | TBD | Pending |
+| TUYA-08 | Phase 147 | TBD | Pending |
+| TUYA-09 | Phase 148 | TBD | Pending |
+| TUYA-10 | Phase 148 | TBD | Pending |
+| TUYA-11 | Phase 148 | TBD | Pending |
+| TUYA-12 | Phase 148 | TBD | Pending |
+| TUYA-13 | Phase 148 | TBD | Pending |
+| TUYA-14 | Phase 148 | TBD | Pending |
+| UX-02 | Phase 148 | TBD | Pending |

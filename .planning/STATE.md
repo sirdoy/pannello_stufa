@@ -7,7 +7,7 @@ stopped_at: null
 last_updated: "2026-03-28T14:00:00.000Z"
 last_activity: 2026-03-28
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v17.1 — WebSocket Alignment & Tuya Integration
+**Current focus:** Phase 145 — WS Type Alignment
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 145 of 148 (WS Type Alignment)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-03-28 — Milestone v17.1 started
+Status: Ready to plan
+Last activity: 2026-03-28 — Roadmap created for v17.1
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -36,27 +36,16 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed (all milestones): 446
-- v16.0 average: 2.0 plans/phase (26 plans / 13 phases)
+- Total plans completed (all milestones): 457
+- v17.0 average: 1.8 plans/phase (11 plans / 6 phases)
 
 **By Milestone (recent):**
 
 | Milestone | Phases | Plans | Duration |
 |-----------|--------|-------|----------|
-| v14.0 Hue Proxy Migration | 106-112 | 12 | 2 days |
-| v14.1 Tech Debt & Type Safety | 113-117 | 9 | 1 day |
 | v15.0 Rooms & Device Registry | 118-125 | 13 | 2 days |
 | v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato | 126-138 | 26 | 4 days |
-| Phase 139 P02 | 310 | 2 tasks | 3 files |
-| Phase 140 P01 | 3 | 2 tasks | 2 files |
-| Phase 141 P02 | 20 | 2 tasks | 2 files |
-| Phase 141 P01 | 559 | 2 tasks | 2 files |
-| Phase 142 P01 | 15 | 2 tasks | 2 files |
-| Phase 142-sonos-dirigera-migration P02 | 18 | 2 tasks | 4 files |
-| Phase 143 P01 | 5 | 2 tasks | 3 files |
-| Phase 143 P02 | 8m | 2 tasks | 4 files |
-| Phase 144 P01 | 33m | 2 tasks | 7 files |
-| Phase 144-connection-ux P02 | 22 | 2 tasks | 14 files |
+| v17.0 WebSocket Real-Time Transport | 139-144 | 11 | 3 days |
 
 ## Accumulated Context
 
@@ -64,38 +53,15 @@ Progress: [░░░░░░░░░░] 0%
 
 See PROJECT.md Key Decisions table for full history.
 
-Key context for v17.0:
+Key context for v17.1:
 
-- react-use-websocket is the suggested library (per docs/api/websocket.md spec)
-- MAX 2 concurrent WS connections — single shared manager is mandatory
-- Raspberry Pi is NOT in the 6 WS topics — stays on polling only
-- Netatmo WS payload is raw Record<string, unknown> — Phase 143 needs adapter layer
-- alwaysActive on stove polling must survive WS migration (Phase 140 concern)
-- Fritz!Box sparkline buffer must survive WS/polling transitions (Phase 141 concern)
-- [Phase 139]: renderHook causes strict mode double-invocation — use toHaveBeenCalled() not toHaveBeenCalledTimes(1) for useWebSocket call count assertions
-- [Phase 139]: WebSocketContext.Provider placed inside Auth0Provider but outside ThemeProvider — gives all device hooks access to WS manager
-- [Phase 140]: alwaysActive:true preserved on polling fallback for safety-critical stove monitoring
-- [Phase 140]: Ref pattern used for side-fetch functions to avoid stale closures in WS useEffect
-- [Phase 140]: WS handleMessage mirrors HTTP error handling exactly (behavioral parity)
-- [Phase 141]: WS useEffect conditionally subscribes only when isWsConnected=true to avoid dead subscriptions
-- [Phase 141]: fetchScenesRef ref pattern prevents stale closure in WS handleMessage for scenes fire-and-forget
-- [Phase 141]: capability_tier defaults to color for WS-sourced lights — WS payload has no tier field
-- [Phase 141]: Conditional WS subscription (if !isWsConnected return) — prevents spurious subscribe calls when CLOSED
-- [Phase 141]: Health computation in separate useEffect([bandwidth, wan, downloadHistory, uploadHistory]) — runs on both WS and HTTP data sources
-- [Phase 142]: WS groups map to SonosZoneResponse[] via cast (identical shape)
-- [Phase 142]: fetchHealthRef/fetchPlaybackRef prevent stale closures in WS useEffect (Phase 141 pattern)
-- [Phase 142]: In-hook summary derivation for DIRIGERA: when WS active, SensorSummaryResponse computed from raw sensors array eliminating HTTP summary call
-- [Phase 142]: computeDirigeraHealth exported (was private) to enable direct unit testing
-- [Phase 143]: useThermostatData exposes StalenessInfo | null (not stale/update/lastUpdate) to match actual useDeviceStaleness API
-- [Phase 143]: ThermostatCard uses commandError local state for mutation errors; dataError from hook is read-only (pattern: error = dataError ?? commandError)
-- [Phase 143]: page.tsx derives mode from status?.mode (hook provides status; setMode eliminated)
-- [Phase 143]: adaptNetatmoWsPayload is standalone pure function for independent testability
-- [Phase 143]: WS handleMessage does not call staleness.update() — StalenessInfo has no update method
-- [Phase 144-01]: mapReadyState exported as named function for direct unit testing; WS_STATUS_LABELS indexed by WsStatus union (not ReadyState) for cleaner rendering
-- [Phase 144-01]: LastUpdated test mocks useRelativeTime to isolate component from hook timer behavior
-- [Phase 144-connection-ux]: useStoveData derives lastUpdatedAt from existing lastPollAt (Date->ms) rather than adding new state
-- [Phase 144-connection-ux]: useNetworkData aliases lastUpdated as lastUpdatedAt for backward compat (both fields preserved)
-- [Phase 144-connection-ux]: NetworkCard test mock updated to include lastUpdatedAt:null default to match updated UseNetworkDataReturn type
+- [Phase 144]: useStoveData derives lastUpdatedAt from existing lastPollAt (Date->ms); useNetworkData aliases lastUpdated as lastUpdatedAt for backward compat
+- [Phase 143]: adaptNetatmoWsPayload is standalone pure function; WS handleMessage does not call staleness.update()
+- [Phase 141]: Conditional WS subscription guard (if !isWsConnected return) — prevents spurious subscribe when CLOSED
+- [Phase 141]: capability_tier defaults to color for WS-sourced lights (no tier field in WS payload)
+- v17.1 context: WSTYPE-* changes are the foundation — phases 146-148 depend on TopicDataMap having raspi+tuya entries
+- v17.1 context: UX-03 == RASPI-03 (same requirement, counted once in Phase 146)
+- v17.1 context: Tuya infrastructure (Phase 147) can be planned in parallel with Raspi migration (Phase 146) — no dependency between them
 
 ### Pending Todos
 
@@ -116,5 +82,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Completed quick task 260328-jyf
+Stopped at: v17.1 roadmap created — ready to plan Phase 145
 Resume file: None

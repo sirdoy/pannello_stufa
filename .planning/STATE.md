@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
 status: executing
-stopped_at: Completed 145-02-PLAN.md
-last_updated: "2026-03-28T15:08:37.488Z"
+stopped_at: Completed 145-01-PLAN.md
+last_updated: "2026-03-28T15:09:11.950Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 145 (ws-type-alignment) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-03-28
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato | 126-138 | 26 | 4 days |
 | v17.0 WebSocket Real-Time Transport | 139-144 | 11 | 3 days |
 | Phase 145 P02 | 5 | 2 tasks | 2 files |
+| Phase 145 P01 | 76 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -65,6 +66,8 @@ Key context for v17.1:
 - v17.1 context: Tuya infrastructure (Phase 147) can be planned in parallel with Raspi migration (Phase 146) — no dependency between them
 - [Phase 145]: Add fields to base interfaces only — SonosDeviceDetailResponse, ContactSensor, MotionSensor inherit automatically
 - [Phase 145]: custom_name on DirigeraSensor kept as string (non-nullable) to avoid breaking existing consumers
+- [Phase 145]: TuyaPlugMutation extends TuyaPlug (inheritance) to avoid field duplication
+- [Phase 145]: custom_name and device_type added as optional fields to HueLight and ThermorossiStatusResponse to avoid breaking existing consumers
 
 ### Pending Todos
 
@@ -85,5 +88,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Completed 145-02-PLAN.md
+Stopped at: Completed 145-01-PLAN.md
 Resume file: None

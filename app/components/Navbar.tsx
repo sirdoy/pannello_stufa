@@ -15,6 +15,7 @@ import {
 } from './navigation';
 import Text from './ui/Text';
 import TransitionLink from './TransitionLink';
+import { NavbarConnectionStatus } from './layout/NavbarConnectionStatus';
 
 /**
  * Get mobile bottom nav quick actions based on enabled devices
@@ -429,6 +430,8 @@ export default function Navbar() {
 
             {/* User & Menu Buttons */}
             <div className="flex items-center gap-3">
+              {/* WS Connection Status Indicator (UX-01, D-01) */}
+              <NavbarConnectionStatus />
 
               {/* Desktop User Dropdown - Now hidden (replaced by hamburger menu) */}
               {user && (

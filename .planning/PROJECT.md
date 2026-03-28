@@ -22,7 +22,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.0 (in progress)
-**Status:** Phase 142 complete — useSonosData and useDirigeraData migrated to WS-primary with polling fallback (49+19 tests). Sonos health+playback as HTTP side-fetches; DIRIGERA summary derived in-hook from raw sensors. Phases 143-144 remaining.
+**Status:** Phase 143 complete — useThermostatData migrated to WS-primary with standalone netatmoWsAdapter for raw Record<string, unknown> → NetatmoStatus mapping, HTTP polling fallback, 16 new tests. All 6 provider data hooks now WS-primary. Phase 144 (Connection UX) remaining.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

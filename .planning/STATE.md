@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: planning
-stopped_at: Phase 145 context gathered
-last_updated: "2026-03-28T14:46:11.866Z"
-last_activity: 2026-03-28 — Roadmap created for v17.1
+status: executing
+stopped_at: Completed 145-02-PLAN.md
+last_updated: "2026-03-28T15:08:37.488Z"
+last_activity: 2026-03-28
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 3
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 145 — WS Type Alignment
+**Current focus:** Phase 145 — ws-type-alignment
 
 ## Current Position
 
-Phase: 145 of 148 (WS Type Alignment)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-03-28 — Roadmap created for v17.1
+Phase: 145 (ws-type-alignment) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-03-28
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -46,6 +46,7 @@ Progress: [░░░░░░░░░░] 0%
 | v15.0 Rooms & Device Registry | 118-125 | 13 | 2 days |
 | v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato | 126-138 | 26 | 4 days |
 | v17.0 WebSocket Real-Time Transport | 139-144 | 11 | 3 days |
+| Phase 145 P02 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,8 @@ Key context for v17.1:
 - v17.1 context: WSTYPE-* changes are the foundation — phases 146-148 depend on TopicDataMap having raspi+tuya entries
 - v17.1 context: UX-03 == RASPI-03 (same requirement, counted once in Phase 146)
 - v17.1 context: Tuya infrastructure (Phase 147) can be planned in parallel with Raspi migration (Phase 146) — no dependency between them
+- [Phase 145]: Add fields to base interfaces only — SonosDeviceDetailResponse, ContactSensor, MotionSensor inherit automatically
+- [Phase 145]: custom_name on DirigeraSensor kept as string (non-nullable) to avoid breaking existing consumers
 
 ### Pending Todos
 
@@ -82,5 +85,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Phase 145 context gathered
-Resume file: .planning/phases/145-ws-type-alignment/145-CONTEXT.md
+Stopped at: Completed 145-02-PLAN.md
+Resume file: None

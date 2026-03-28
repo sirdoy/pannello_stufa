@@ -5,15 +5,15 @@
 - [ ] **WSTYPE-01**: All WS topic payload types include `data_freshness` field matching REST endpoint shape
 - [ ] **WSTYPE-02**: FritzBoxData WS type includes `is_stale`, `fetched_at`, `data_freshness` fields
 - [ ] **WSTYPE-03**: FritzBoxDevice includes `custom_name` and `device_type` registry metadata
-- [ ] **WSTYPE-04**: DirigeraData includes `data_freshness` field
-- [ ] **WSTYPE-05**: DirigeraBaseSensor includes `device_type` registry metadata
+- [x] **WSTYPE-04**: DirigeraData includes `data_freshness` field
+- [x] **WSTYPE-05**: DirigeraBaseSensor includes `device_type` registry metadata
 - [ ] **WSTYPE-06**: NetatmoData is typed interface with `body`, `status`, `time_server`, `data_freshness`
 - [ ] **WSTYPE-07**: ThermorossiData includes `data_freshness`, `custom_name`, `device_type`
 - [ ] **WSTYPE-08**: HueData uses `Record<string, HueLight>` and `Record<string, HueGroup>` (dict shape, not array)
 - [ ] **WSTYPE-09**: HueLight includes `custom_name` and `device_type` registry metadata
 - [ ] **WSTYPE-10**: HueData includes `data_freshness` field
-- [ ] **WSTYPE-11**: SonosSpeaker includes `custom_name` and `device_type` registry metadata
-- [ ] **WSTYPE-12**: SonosData includes `data_freshness` field
+- [x] **WSTYPE-11**: SonosSpeaker includes `custom_name` and `device_type` registry metadata
+- [x] **WSTYPE-12**: SonosData includes `data_freshness` field
 - [ ] **WSTYPE-13**: Topic union type includes all 8 topics (adding `raspi` and `tuya`)
 - [ ] **WSTYPE-14**: TopicDataMap maps `raspi` and `tuya` to their respective payload types
 

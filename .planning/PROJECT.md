@@ -8,10 +8,20 @@ PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, lu
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
+## Current Milestone: v17.1 WebSocket Alignment & Tuya Integration
+
+**Goal:** Align the WebSocket implementation with the updated API documentation — add raspi WS support, integrate the new Tuya smart plug provider end-to-end, and ensure all topic types match the enriched payload shapes.
+
+**Target features:**
+- Raspi WS migration: add `raspi` topic to WS infrastructure, migrate useRaspiData to WS-primary with polling fallback
+- Tuya provider integration: tuyaProxy client, types, API routes, hooks (useTuyaData + useTuyaCommands), dashboard card, /tuya page, WS topic subscription
+- WS type alignment: ensure all 8 topic payload types match the documented enriched shapes (data_freshness, custom_name, device_type, is_stale, fetched_at)
+- Connection UX: extend LastUpdated and NavbarConnectionStatus to cover the 2 new providers
+
 ## Current State
 
 **Version:** v17.0 (shipped 2026-03-28)
-**Status:** v17.0 SHIPPED — All 6 provider data hooks migrated to WS-primary with HTTP polling fallback. Connection UX delivered: Navbar indicator (Connesso via WS / Riconnessione / Polling attivo), LastUpdated Italian timestamps on all 6 dashboard cards. 23/23 requirements satisfied.
+**Status:** Starting v17.1 — WebSocket Alignment & Tuya Integration
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -836,4 +846,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-28 after v17.0 milestone (WebSocket Real-Time Transport)*
+*Last updated: 2026-03-28 — v17.1 milestone started (WebSocket Alignment & Tuya Integration)*

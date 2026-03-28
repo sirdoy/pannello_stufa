@@ -76,6 +76,7 @@ export interface UseNetworkDataReturn {
   connected: boolean;
   stale: boolean;
   lastUpdated: number | null;
+  lastUpdatedAt: number | null;
 
   // Health
   health: NetworkHealthStatus;

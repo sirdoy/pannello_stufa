@@ -21,6 +21,7 @@ export interface UseDirigeraDataReturn {
   error: string | null;
   stale: boolean;
   health: DirigeraHealth;
+  lastUpdatedAt: number | null;
 }
 
 export function computeDirigeraHealth(summary: SensorSummaryResponse): DirigeraHealth {
@@ -34,6 +35,7 @@ export function useDirigeraData(): UseDirigeraDataReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stale, setStale] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const dataRef = useRef<DirigeraCardData | null>(null);
 
   const isVisible = useVisibility();
@@ -63,6 +65,7 @@ export function useDirigeraData(): UseDirigeraDataReturn {
       dataRef.current = newData;
       setData(newData);
       setStale(false);
+      setLastUpdatedAt(Date.now());
     } catch {
       setStale(true);
       if (!dataRef.current) {
@@ -116,6 +119,7 @@ export function useDirigeraData(): UseDirigeraDataReturn {
       setStale(false); // D-13: WS messages are always fresh
       setLoading(false);
       setError(null);
+      setLastUpdatedAt(Date.now());
 
       // D-09: health not in WS — fire-and-forget side-fetch
       void fetchHealthRef.current();
@@ -136,5 +140,5 @@ export function useDirigeraData(): UseDirigeraDataReturn {
 
   const health: DirigeraHealth = data ? computeDirigeraHealth(data.summary) : 'ok';
 
-  return { data, loading, error, stale, health };
+  return { data, loading, error, stale, health, lastUpdatedAt };
 }

@@ -25,6 +25,7 @@ export interface UseSonosDataReturn {
   loading: boolean;
   error: string | null;
   stale: boolean;
+  lastUpdatedAt: number | null;
 }
 
 export function useSonosData(): UseSonosDataReturn {
@@ -32,6 +33,7 @@ export function useSonosData(): UseSonosDataReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stale, setStale] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const dataRef = useRef<SonosData | null>(null);
 
   const isVisible = useVisibility();
@@ -90,6 +92,7 @@ export function useSonosData(): UseSonosDataReturn {
       dataRef.current = newData;
       setData(newData);
       setStale(false);
+      setLastUpdatedAt(Date.now());
     } catch {
       setStale(true);
       if (!dataRef.current) {
@@ -161,6 +164,7 @@ export function useSonosData(): UseSonosDataReturn {
       setStale(false);   // D-13: WS messages are always fresh
       setLoading(false);
       setError(null);
+      setLastUpdatedAt(Date.now());
 
       // D-05: playback not in WS — fire-and-forget side-fetch with fresh zones
       void fetchPlaybackRef.current(zones);
@@ -181,5 +185,5 @@ export function useSonosData(): UseSonosDataReturn {
     initialDelay: 600,
   });
 
-  return { data, loading, error, stale };
+  return { data, loading, error, stale, lastUpdatedAt };
 }

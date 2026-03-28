@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: verifying
-stopped_at: Phase 143 context gathered
-last_updated: "2026-03-28T08:09:26.842Z"
-last_activity: 2026-03-27
+status: executing
+stopped_at: Completed 143-01-PLAN.md
+last_updated: "2026-03-28T08:25:59.587Z"
+last_activity: 2026-03-28
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 8
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 142 — sonos-dirigera-migration
+**Current focus:** Phase 143 — netatmo-migration
 
 ## Current Position
 
-Phase: 143
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-03-27
+Phase: 143 (netatmo-migration) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-03-28
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 141 P01 | 559 | 2 tasks | 2 files |
 | Phase 142 P01 | 15 | 2 tasks | 2 files |
 | Phase 142-sonos-dirigera-migration P02 | 18 | 2 tasks | 4 files |
+| Phase 143 P01 | 5 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,9 @@ Key context for v17.0:
 - [Phase 142]: fetchHealthRef/fetchPlaybackRef prevent stale closures in WS useEffect (Phase 141 pattern)
 - [Phase 142]: In-hook summary derivation for DIRIGERA: when WS active, SensorSummaryResponse computed from raw sensors array eliminating HTTP summary call
 - [Phase 142]: computeDirigeraHealth exported (was private) to enable direct unit testing
+- [Phase 143]: useThermostatData exposes StalenessInfo | null (not stale/update/lastUpdate) to match actual useDeviceStaleness API
+- [Phase 143]: ThermostatCard uses commandError local state for mutation errors; dataError from hook is read-only (pattern: error = dataError ?? commandError)
+- [Phase 143]: page.tsx derives mode from status?.mode (hook provides status; setMode eliminated)
 
 ### Pending Todos
 
@@ -101,5 +105,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Phase 143 context gathered
-Resume file: .planning/phases/143-netatmo-migration/143-CONTEXT.md
+Stopped at: Completed 143-01-PLAN.md
+Resume file: None

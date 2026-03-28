@@ -147,7 +147,7 @@ Plans:
   3. When WebSocket disconnects, the thermostat card continues updating via HTTP polling
 **Plans**: 2 plans
 Plans:
-- [ ] 143-01-PLAN.md — Extract useThermostatData hook with HTTP polling
+- [x] 143-01-PLAN.md — Extract useThermostatData hook with HTTP polling
 - [ ] 143-02-PLAN.md — WS subscription + adapter layer for netatmo topic
 
 
@@ -177,5 +177,5 @@ Plans:
 | 140. Stove Migration | v17.0 | 1/1 | Complete    | 2026-03-27 |
 | 141. Fritz!Box & Hue Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
-| 143. Netatmo Migration | v17.0 | 0/2 | Not started | - |
+| 143. Netatmo Migration | v17.0 | 1/2 | In Progress|  |
 | 144. Connection UX | v17.0 | 0/TBD | Not started | - |

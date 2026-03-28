@@ -22,7 +22,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.0 (in progress)
-**Status:** Phase 143 complete — useThermostatData migrated to WS-primary with standalone netatmoWsAdapter for raw Record<string, unknown> → NetatmoStatus mapping, HTTP polling fallback, 16 new tests. All 6 provider data hooks now WS-primary. Phase 144 (Connection UX) remaining.
+**Status:** v17.0 COMPLETE — All 6 provider data hooks migrated to WS-primary with HTTP polling fallback. Phase 144 (Connection UX) delivered: global Navbar connection indicator (Connesso via WS / Riconnessione / Polling attivo), useRelativeTime Italian relative timestamps, LastUpdated component wired into all 6 dashboard card footers, flicker-free WS/polling transitions verified.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

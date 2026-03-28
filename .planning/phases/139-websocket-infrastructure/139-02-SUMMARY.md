@@ -3,6 +3,7 @@ phase: 139-websocket-infrastructure
 plan: "02"
 subsystem: websocket
 tags: [websocket, testing, jest, mock, react-use-websocket, ClientProviders, context]
+requirements_completed: [WS-04, WS-05, WS-06]
 dependency_graph:
   requires:
     - 139-01 — types/websocket.ts, lib/hooks/useWebSocketManager.ts, app/context/WebSocketContext.ts

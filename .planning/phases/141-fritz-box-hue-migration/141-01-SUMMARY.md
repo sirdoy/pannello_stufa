@@ -3,6 +3,7 @@ phase: 141-fritz-box-hue-migration
 plan: "01"
 subsystem: network-hook
 tags: [websocket, fritz-box, polling-fallback, tdd, mig-04, mig-05, mig-06]
+requirements_completed: [MIG-04, MIG-05, MIG-06]
 dependency_graph:
   requires:
     - "Phase 139: WebSocketContext + useWebSocketManager"

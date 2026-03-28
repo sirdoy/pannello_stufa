@@ -3,6 +3,7 @@ phase: 142-sonos-dirigera-migration
 plan: 02
 subsystem: ui
 tags: [dirigera, websocket, hooks, react, testing]
+requirements_completed: [MIG-11, MIG-12]
 
 # Dependency graph
 requires:

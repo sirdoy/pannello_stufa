@@ -7,7 +7,7 @@ import type { Topic, WebSocketMessage } from '@/types/websocket';
 export { ReadyState } from 'react-use-websocket';
 
 /** Callback invoked when a message arrives for a subscribed topic */
-export type TopicCallback = (data: unknown) => void;
+type TopicCallback = (data: unknown) => void;
 
 /**
  * Public API surface of the shared WebSocket connection manager.

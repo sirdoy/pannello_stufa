@@ -3,6 +3,7 @@ phase: 143
 plan: 01
 subsystem: thermostat
 tags: [netatmo, hook-extraction, data-hook, polling]
+requirements_completed: [MIG-13]
 requires: []
 provides: [useThermostatData]
 affects: [ThermostatCard, thermostat/page]

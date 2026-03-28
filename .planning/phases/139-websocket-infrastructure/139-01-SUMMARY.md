@@ -3,6 +3,7 @@ phase: 139-websocket-infrastructure
 plan: "01"
 subsystem: websocket
 tags: [websocket, types, hooks, context, react-use-websocket]
+requirements_completed: [WS-01, WS-02, WS-03]
 dependency_graph:
   requires: []
   provides:

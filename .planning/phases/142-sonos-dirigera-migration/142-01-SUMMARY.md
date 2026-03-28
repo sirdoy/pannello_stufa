@@ -3,6 +3,7 @@ phase: 142-sonos-dirigera-migration
 plan: "01"
 subsystem: sonos
 tags: [websocket, migration, polling-fallback, hooks]
+requirements_completed: [MIG-09, MIG-10]
 dependency_graph:
   requires: []
   provides: [useSonosData-ws-primary]

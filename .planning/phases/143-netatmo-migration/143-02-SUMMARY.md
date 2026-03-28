@@ -3,6 +3,7 @@ phase: 143
 plan: 02
 subsystem: thermostat
 tags: [netatmo, websocket, adapter, ws-primary, polling-fallback]
+requirements_completed: [MIG-14]
 requires: [143-01]
 provides: [netatmoWsAdapter, useThermostatData-ws]
 affects: [useThermostatData, ThermostatCard]

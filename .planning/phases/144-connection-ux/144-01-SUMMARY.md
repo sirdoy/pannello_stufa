@@ -3,6 +3,7 @@ phase: 144-connection-ux
 plan: "01"
 subsystem: connection-ux
 tags: [websocket, navbar, connection-status, relative-time, italian-ux]
+requirements_completed: [UX-01, UX-02]
 dependency_graph:
   requires: [WebSocketContext, useWebSocketManager, ConnectionStatus]
   provides: [useRelativeTime, formatRelativeTime, LastUpdated, NavbarConnectionStatus]

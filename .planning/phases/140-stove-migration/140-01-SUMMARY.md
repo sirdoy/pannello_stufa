@@ -3,6 +3,7 @@ phase: 140-stove-migration
 plan: "01"
 subsystem: stove-data-hook
 tags: [websocket, migration, polling, tdd]
+requirements_completed: [MIG-01, MIG-02, MIG-03]
 dependency_graph:
   requires:
     - "139-01: WebSocketContext + useWebSocketManager infrastructure"

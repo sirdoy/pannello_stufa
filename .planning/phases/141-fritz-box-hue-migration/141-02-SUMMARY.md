@@ -3,6 +3,7 @@ phase: 141-fritz-box-hue-migration
 plan: "02"
 subsystem: lights
 tags: [websocket, hue, polling-fallback, tdd, migration]
+requirements_completed: [MIG-07, MIG-08]
 dependency_graph:
   requires:
     - "139: WebSocketContext + useWebSocketManager infrastructure"

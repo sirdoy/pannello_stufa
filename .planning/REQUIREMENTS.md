@@ -14,7 +14,7 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 - [x] **WS-03**: Messaggi in arrivo vengono dispatchati ai consumer registrati in base al campo `topic`
 - [x] **WS-04**: Connessione si riconnette automaticamente con exponential backoff (1s → 30s cap) dopo disconnessione
 - [x] **WS-05**: Tutti i topic vengono ri-sottoscritti automaticamente dopo ogni riconnessione
-- [ ] **WS-06**: Tipi TypeScript per tutti i payload WS dei 6 provider derivati dalla spec `docs/api/websocket.md`
+- [x] **WS-06**: Tipi TypeScript per tutti i payload WS dei 6 provider derivati dalla spec `docs/api/websocket.md`
 
 ### Provider Migration — Stove
 
@@ -81,7 +81,7 @@ Requirements for WebSocket Real-Time Transport milestone. Each maps to roadmap p
 | WS-03 | Phase 139 | Complete |
 | WS-04 | Phase 139 | Complete |
 | WS-05 | Phase 139 | Complete |
-| WS-06 | Phase 139 | Pending |
+| WS-06 | Phase 139 | Complete |
 | MIG-01 | Phase 140 | Complete |
 | MIG-02 | Phase 140 | Complete |
 | MIG-03 | Phase 140 | Complete |

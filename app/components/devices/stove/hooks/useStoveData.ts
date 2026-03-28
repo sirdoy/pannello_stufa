@@ -191,6 +191,8 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
 
   // WS subscription: primary data channel (MIG-01)
   useEffect(() => {
+    if (!isWsConnected) return;
+
     const handleMessage = (raw: unknown) => {
       const data = raw as ThermorossiData;
 
@@ -212,7 +214,7 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
         if (code !== 0) {
           void logError(code, desc, { status: data.stove_state, source: 'status_monitor' });
           if (shouldNotify(code, previousErrorCode.current)) {
-            // Push notification placeholder — same as HTTP path
+            // TODO: send push notification (same as HTTP path)
           }
         }
         previousErrorCode.current = code;
@@ -233,7 +235,7 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
 
     subscribe('thermorossi', handleMessage);
     return () => { unsubscribe('thermorossi', handleMessage); };
-  }, [subscribe, unsubscribe]);
+  }, [isWsConnected, subscribe, unsubscribe]);
 
   const fetchStatusAndUpdate = async () => {
     try {

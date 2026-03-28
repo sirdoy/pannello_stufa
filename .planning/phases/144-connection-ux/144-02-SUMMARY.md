@@ -3,6 +3,7 @@ phase: 144-connection-ux
 plan: "02"
 subsystem: connection-ux
 tags: [websocket, last-updated, timestamps, italian-ux, device-hooks]
+requirements_completed: [UX-03]
 dependency_graph:
   requires: [useRelativeTime, LastUpdated, useStoveData, useNetworkData, useLightsData, useSonosData, useDirigeraData, useThermostatData]
   provides: [lastUpdatedAt-in-all-hooks, LastUpdated-in-all-cards]

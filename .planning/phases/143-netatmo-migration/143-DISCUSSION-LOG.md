@@ -3,9 +3,9 @@
 > **Audit trail only.** Do not use as input to planning, research, or execution agents.
 > Decisions are captured in CONTEXT.md — this log preserves the alternatives considered.
 
-**Date:** 2026-03-27
+**Date:** 2026-03-28 (updated from 2026-03-27)
 **Phase:** 143-netatmo-migration
-**Areas discussed:** Hook extraction, WS payload adapter, Data scope, Consumer unification
+**Areas discussed:** Hook extraction, WS payload adapter, Data scope, Consumer unification, Adapter placement, Hook return type, Topology re-fetch, Test mocking, Page.tsx polling normalization
 **Mode:** Auto (all recommended defaults selected)
 
 ---
@@ -27,12 +27,12 @@
 
 | Option | Description | Selected |
 |--------|-------------|----------|
-| Adapter function in hook | Parse raw Record<string, unknown> envelope into existing internal types within handleMessage | ✓ |
-| Standalone adapter module | Separate lib/netatmo/netatmoWsAdapter.ts utility | |
+| Adapter function in hook | Parse raw Record<string, unknown> envelope into existing internal types within handleMessage | |
+| Standalone adapter module | Separate utility file, independently testable | ✓ |
 | Zod schema validation | Full runtime validation of WS payload before mapping | |
 
-**User's choice:** [auto] Adapter function in hook (recommended default)
-**Notes:** The WS payload is the raw Netatmo cloud API response (body.home.rooms/modules). Adapter maps to existing NetatmoProxyRoomMeasurement and module shapes. Most complex adapter of all 6 providers due to untyped payload.
+**User's choice:** [auto-updated] Standalone utility function (D-19)
+**Notes:** Reversed from initial auto-selection. The adapter is the most complex of all 6 providers (nested Netatmo envelope → flat internal types). Standalone enables unit testing with raw payload fixtures and is consistent with the lights adapter pattern.
 
 ---
 
@@ -62,14 +62,71 @@
 
 ---
 
-## Claude's Discretion
+## Adapter Placement (new — resolves Claude's Discretion)
 
-- Adapter function structure (standalone vs inline)
-- Hook return type design for dual consumers
-- Topology re-fetch strategy
-- Test mocking approach
-- Page.tsx polling normalisation to useAdaptivePolling
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Standalone utility function | Separate file, independently testable, consistent with lights adapter | ✓ |
+| Inline in handleMessage | Simpler, fewer files, but harder to test in isolation | |
+
+**User's choice:** [auto] Standalone utility function
+**Notes:** Most complex adapter of all 6 providers — standalone enables unit testing with raw payload fixtures
+
+---
+
+## Hook Return Type (new — resolves Claude's Discretion)
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Single hook, full data | Card derives subset; matches useSonosData pattern | ✓ |
+| Separate hooks per consumer | useThermostatCardData + useThermostatPageData; more specific but duplicates logic | |
+
+**User's choice:** [auto] Single hook with full data
+**Notes:** Consistent with all other provider hooks in the codebase
+
+---
+
+## Topology Re-fetch Strategy (new — resolves Claude's Discretion)
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Fetch on mount only | Structural data, changes rarely; consistent with D-08/D-14 | ✓ |
+| Re-fetch after WS updates | More current topology but unnecessary network traffic | |
+
+**User's choice:** [auto] Only on mount
+**Notes:** Topology changes only when rooms/devices are added or removed
+
+---
+
+## Test Mocking Approach (new — resolves Claude's Discretion)
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Mock useWebSocketContext with jest.fn | Established pattern from Phase 140-142 tests | ✓ |
+| Full WS mock server | More realistic but heavy setup, overkill for unit tests | |
+
+**User's choice:** [auto] Mock useWebSocketContext with jest.fn subscribe/unsubscribe
+**Notes:** Adapter gets its own unit tests with raw payload fixtures
+
+---
+
+## Page.tsx Polling Normalization (new — resolves Claude's Discretion)
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Migrate to useAdaptivePolling | Consistent with ThermostatCard, visibility-aware | ✓ |
+| Preserve setInterval(30000) | Less change but inconsistent with rest of codebase | |
+
+**User's choice:** [auto] Migrate to useAdaptivePolling
+**Notes:** Hook extraction normalises all polling through a single mechanism
+
+---
+
+## Claude's Discretion (remaining)
+
+- Internal naming of adapter helper functions
+- Error handling strategy within adapter for malformed payloads
 
 ## Deferred Ideas
 
-None
+None — discussion stayed within phase scope

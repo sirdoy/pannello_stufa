@@ -1,6 +1,6 @@
 # Phase 143: Netatmo Migration - Context
 
-**Gathered:** 2026-03-27
+**Gathered:** 2026-03-28
 **Status:** Ready for planning
 
 <domain>
@@ -22,6 +22,7 @@ Migrate Netatmo thermostat data from HTTP polling to WebSocket as primary data c
 - **D-04:** The WS `netatmo` topic sends the raw Netatmo cloud API `homestatus` response as `Record<string, unknown>`. The envelope is `{ body: { home: { id, rooms: [...], modules: [...] } }, status: "ok", time_server: number }`. An adapter function maps this into the existing internal interfaces used by ThermostatCard and page.tsx.
 - **D-05:** The adapter extracts `body.home.rooms` and `body.home.modules` from the raw WS payload and maps them to the existing `RoomStatus[]` and `ModuleStatus[]` shapes used by the components. Field mapping: `therm_measured_temperature` → `temperature`, `therm_setpoint_temperature` → `setpoint`, `therm_setpoint_mode` → `mode`, `heating_power_request > 0` → `heating`.
 - **D-06:** If the WS payload is `null` (Netatmo cloud hasn't responded since server start), the adapter returns null and the hook falls back to HTTP polling.
+- **D-19:** [auto] The adapter is a standalone utility function (not inline in handleMessage). Rationale: it's the most complex adapter of all 6 providers (nested Netatmo envelope → flat internal types), standalone is testable independently and consistent with lights adapter pattern.
 
 ### Data Scope (WS vs HTTP)
 - **D-07:** `homestatus` (room temperatures, heating status, module battery/reachable) — via WS as primary, HTTP polling as fallback.
@@ -30,9 +31,18 @@ Migrate Netatmo thermostat data from HTTP polling to WebSocket as primary data c
 - **D-10:** Health check (connection status) — remains as HTTP side-fetch on mount.
 - **D-11:** Calibration, mode changes, temperature setpoints — remain as HTTP POST commands (WS is read-only push per spec).
 
+### Hook Return Type
+- **D-20:** [auto] Single hook returns full data (rooms, modules, topology, health, staleness, loading state). ThermostatCard derives the subset it needs from the full return. Matches useSonosData pattern where the card uses a subset of the hook's data.
+
+### Topology Re-fetch Strategy
+- **D-21:** [auto] Topology (homesdata) is fetched only on mount — not re-fetched after WS data updates. Topology is structural data that changes rarely, consistent with D-08/D-14 decisions.
+
 ### Fallback Trigger (carried from Phase 140/141/142)
 - **D-12:** Same pattern as all other providers: `readyState === OPEN` → WS primary, polling suppressed via `interval: isWsConnected ? null : existingInterval`. When WS disconnects, polling activates immediately.
 - **D-13:** `alwaysActive: false` preserved — thermostat is non-safety-critical (matches current ThermostatCard behavior).
+
+### Page.tsx Polling Normalization
+- **D-22:** [auto] The page.tsx raw `setInterval(30000)` is migrated to `useAdaptivePolling` during hook extraction for consistency with ThermostatCard's existing usage. The hook normalises all polling through `useAdaptivePolling`.
 
 ### Side-Fetch Pattern (carried from Phase 140)
 - **D-14:** Side-fetches (topology/homesdata, health) fire on mount. Status side-fetches are not needed — WS provides the homestatus data directly.
@@ -45,12 +55,12 @@ Migrate Netatmo thermostat data from HTTP polling to WebSocket as primary data c
 - **D-17:** `subscribe('netatmo', handleMessage)` in useEffect with `unsubscribe()` cleanup.
 - **D-18:** Ref pattern for side-effect functions to avoid stale closures.
 
+### Test Mocking
+- **D-23:** [auto] Mock `useWebSocketContext` with `jest.fn` subscribe/unsubscribe — established pattern from Phase 140-142 test suites. The standalone adapter function (D-19) gets its own unit tests with raw payload fixtures.
+
 ### Claude's Discretion
-- Whether the adapter is a standalone utility function or inline in the handleMessage callback
-- How to structure the hook's return type to serve both ThermostatCard (summary view) and page.tsx (full room list)
-- Whether topology should be re-fetched after WS data updates or only on mount
-- Test mocking approach for WS subscribe/unsubscribe
-- Whether to preserve the page.tsx `setInterval(30000)` as-is for fallback or migrate to `useAdaptivePolling`
+- Internal naming of adapter helper functions (e.g., `mapRooms`, `mapModules`)
+- Exact error handling within the adapter for malformed payloads (type guards vs try/catch)
 
 </decisions>
 
@@ -107,7 +117,7 @@ Migrate Netatmo thermostat data from HTTP polling to WebSocket as primary data c
 ### Established Patterns
 - **WS-primary + HTTP fallback:** 5 providers already migrated with identical pattern (subscribe in useEffect, `isWsConnected ? null : interval` for polling control)
 - **Ref pattern:** All migrated hooks use refs for side-fetch functions to avoid stale closures in WS callbacks
-- **Adapter in handleMessage:** Stove maps `stove_state` → `status`, lights convert `Record<string, HueLight>` → array. Netatmo adapter will be most complex (nested Netatmo API envelope → flat internal types).
+- **Standalone adapter:** Lights hook uses adapter for Record-to-array; Netatmo adapter will be standalone (D-19) for the more complex nested envelope mapping
 - **Side-fetch on mount:** Structural data (topology) fetched once on mount via HTTP, not through WS
 
 ### Integration Points
@@ -123,7 +133,7 @@ Migrate Netatmo thermostat data from HTTP polling to WebSocket as primary data c
 
 - The Netatmo WS adapter is the most complex of all 6 providers because the WS payload is raw `Record<string, unknown>` (the full Netatmo cloud API response), not a typed interface like the other 5 providers. Robust type guards / parsing are needed.
 - ThermostatCard currently uses `topology ? 60000 : null` to gate polling on connection — the hook should preserve this behavior (only poll when connected/topology loaded).
-- The page.tsx uses a raw `setInterval(30000)` instead of `useAdaptivePolling` — the hook extraction should normalise this to use `useAdaptivePolling` for consistency.
+- The page.tsx uses a raw `setInterval(30000)` instead of `useAdaptivePolling` — normalised to `useAdaptivePolling` per D-22.
 
 </specifics>
 
@@ -137,4 +147,4 @@ None — discussion stayed within phase scope
 ---
 
 *Phase: 143-netatmo-migration*
-*Context gathered: 2026-03-27*
+*Context gathered: 2026-03-28*

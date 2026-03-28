@@ -4,7 +4,7 @@ milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
 status: verifying
 stopped_at: Completed 145-03-PLAN.md
-last_updated: "2026-03-28T15:29:29.120Z"
+last_updated: "2026-03-28T15:34:15.301Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 4
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 ## Current Position
 
-Phase: 145 (ws-type-alignment) — EXECUTING
-Plan: 3 of 3
+Phase: 146
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-03-28
 

@@ -145,7 +145,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 145. WS Type Alignment | v17.1 | 3/3 | Complete   | 2026-03-28 |
+| 145. WS Type Alignment | v17.1 | 3/3 | Complete    | 2026-03-28 |
 | 146. Raspi WS Migration | v17.1 | 0/TBD | Not started | - |
 | 147. Tuya Infrastructure | v17.1 | 0/TBD | Not started | - |
 | 148. Tuya Frontend | v17.1 | 0/TBD | Not started | - |

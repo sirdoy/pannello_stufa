@@ -8,6 +8,7 @@ import RoomSelector from '../../ui/RoomSelector';
 import { EmptyState } from '../../ui';
 import { useLightsData } from './hooks/useLightsData';
 import { useLightsCommands } from './hooks/useLightsCommands';
+import { LastUpdated } from '@/app/components/ui/LastUpdated';
 import { buildLightsBanners } from './components/LightsBanners';
 import LightsHouseControl from './components/LightsHouseControl';
 import LightsRoomControl from './components/LightsRoomControl';
@@ -150,6 +151,8 @@ export default function LightsCard() {
           title="Nessuna stanza disponibile"
         />
       )}
+
+      <LastUpdated tsMs={lightsData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
     </DeviceCard>
   );
 }

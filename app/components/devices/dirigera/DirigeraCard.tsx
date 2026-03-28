@@ -4,11 +4,12 @@ import { useRouter } from 'next/navigation';
 import Skeleton from '../../ui/Skeleton';
 import { SmartHomeCard, HealthIndicator, Banner } from '../../ui';
 import { useDirigeraData } from './hooks/useDirigeraData';
+import { LastUpdated } from '@/app/components/ui/LastUpdated';
 import DirigeraStats from './components/DirigeraStats';
 
 export default function DirigeraCard() {
   const router = useRouter();
-  const { data, loading, error, stale, health } = useDirigeraData();
+  const { data, loading, error, stale, health, lastUpdatedAt } = useDirigeraData();
 
   // Loading state — show skeleton
   if (loading) {
@@ -73,6 +74,8 @@ export default function DirigeraCard() {
             <DirigeraStats summary={data.summary} />
           </SmartHomeCard.Controls>
         )}
+
+        <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
       </SmartHomeCard>
     </div>
   );

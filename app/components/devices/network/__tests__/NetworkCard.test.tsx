@@ -66,6 +66,7 @@ describe('NetworkCard', () => {
     connected: true,
     stale: false,
     lastUpdated: Date.now(),
+    lastUpdatedAt: null,
     health: 'excellent',
     healthMapped: 'ok',
     error: null,

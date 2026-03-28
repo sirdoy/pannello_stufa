@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
 status: verifying
-stopped_at: Completed 143-02-PLAN.md
-last_updated: "2026-03-28T08:39:05.100Z"
+stopped_at: Phase 144 context gathered
+last_updated: "2026-03-28T08:54:27.520Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 6
@@ -108,5 +108,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Completed 143-02-PLAN.md
-Resume file: None
+Stopped at: Phase 144 context gathered
+Resume file: .planning/phases/144-connection-ux/144-CONTEXT.md

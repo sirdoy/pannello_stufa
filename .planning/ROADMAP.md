@@ -77,7 +77,7 @@ See git history for details.
 - [x] **Phase 141: Fritz!Box & Hue Migration** - useNetworkData and useLightsData migrated to WS with buffer/history preservation (completed 2026-03-27)
 - [x] **Phase 142: Sonos & DIRIGERA Migration** - useSonosData and useDirigeraData migrated to WS (completed 2026-03-27)
 - [x] **Phase 143: Netatmo Migration** - useThermostatData migrated to WS with raw payload adapter layer (completed 2026-03-28)
-- [ ] **Phase 144: Connection UX** - Visual connection status indicator, flicker-free transitions, per-card timestamps
+- [x] **Phase 144: Connection UX** - Visual connection status indicator, flicker-free transitions, per-card timestamps (completed 2026-03-28)
 
 ## Phase Details
 
@@ -161,10 +161,10 @@ Plans:
   1. A connection status indicator is visible on the dashboard showing one of three states: connected (WS live), reconnecting (backoff in progress), or fallback (polling active)
   2. Switching from WebSocket to polling and back does not cause any card to flash, blank, or show stale data for more than one polling interval
   3. Every dashboard card displays a "last updated" timestamp sourced from the WS `ts` field when on WebSocket or from the polling response time when on HTTP
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 144-01-PLAN.md — Navbar connection indicator + useRelativeTime + LastUpdated component
-- [ ] 144-02-PLAN.md — Wire lastUpdatedAt into all 6 device hooks + dashboard cards
+- [x] 144-02-PLAN.md — Wire lastUpdatedAt into all 6 device hooks + dashboard cards
 **UI hint**: yes
 
 ## Progress
@@ -178,4 +178,4 @@ Plans:
 | 141. Fritz!Box & Hue Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
 | 142. Sonos & DIRIGERA Migration | v17.0 | 2/2 | Complete    | 2026-03-27 |
 | 143. Netatmo Migration | v17.0 | 1/1 | Complete    | 2026-03-28 |
-| 144. Connection UX | v17.0 | 1/2 | In Progress | - |
+| 144. Connection UX | v17.0 | 2/2 | Complete   | 2026-03-28 |

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: executing
-stopped_at: "Completed 144-01-PLAN.md"
-last_updated: "2026-03-28T09:46:00.000Z"
-last_activity: 2026-03-28 -- Phase 144 Plan 01 complete
+status: verifying
+stopped_at: Completed 144-02-PLAN.md
+last_updated: "2026-03-28T10:18:57.710Z"
+last_activity: 2026-03-28
 progress:
   total_phases: 6
-  completed_phases: 5
-  total_plans: 9
-  completed_plans: 9
-  percent: 0
+  completed_phases: 6
+  total_plans: 11
+  completed_plans: 11
+  percent: 50
 ---
 
 # Project State
@@ -27,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 Phase: 144 (connection-ux) — EXECUTING
 Plan: 2 of 2
-Status: Executing Phase 144
-Last activity: 2026-03-28 -- Phase 144 Plan 01 complete
+Status: Phase complete — ready for verification
+Last activity: 2026-03-28
 
 Progress: [█████░░░░░] 50%
 
@@ -56,6 +56,7 @@ Progress: [█████░░░░░] 50%
 | Phase 143 P01 | 5 | 2 tasks | 3 files |
 | Phase 143 P02 | 8m | 2 tasks | 4 files |
 | Phase 144 P01 | 33m | 2 tasks | 7 files |
+| Phase 144-connection-ux P02 | 22 | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,9 @@ Key context for v17.0:
 - [Phase 143]: WS handleMessage does not call staleness.update() — StalenessInfo has no update method
 - [Phase 144-01]: mapReadyState exported as named function for direct unit testing; WS_STATUS_LABELS indexed by WsStatus union (not ReadyState) for cleaner rendering
 - [Phase 144-01]: LastUpdated test mocks useRelativeTime to isolate component from hook timer behavior
+- [Phase 144-connection-ux]: useStoveData derives lastUpdatedAt from existing lastPollAt (Date->ms) rather than adding new state
+- [Phase 144-connection-ux]: useNetworkData aliases lastUpdated as lastUpdatedAt for backward compat (both fields preserved)
+- [Phase 144-connection-ux]: NetworkCard test mock updated to include lastUpdatedAt:null default to match updated UseNetworkDataReturn type
 
 ### Pending Todos
 
@@ -111,5 +115,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-26
-Stopped at: Phase 144 context gathered
-Resume file: .planning/phases/144-connection-ux/144-CONTEXT.md
+Stopped at: Completed 144-02-PLAN.md
+Resume file: None

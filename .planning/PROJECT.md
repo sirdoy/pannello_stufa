@@ -2,27 +2,16 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, monitoraggio server Raspberry Pi, sistema audio Sonos (transport, EQ, queue, grouping, sleep timer, seek, history), e sensori DIRIGERA (contatto e movimento) — 7 provider collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth, copertura API ~95%). Include Device Registry per gestione tipi e dispositivi registrati, sistema Rooms per organizzare dispositivi in stanze con stato aggregato per stanza e panoramica whole-house. Sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, monitoraggio server Raspberry Pi, sistema audio Sonos (transport, EQ, queue, grouping, sleep timer, seek, history), e sensori DIRIGERA (contatto e movimento) — 7 provider collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth, copertura API ~95%). Dati live via WebSocket con fallback automatico a polling HTTP per tutti i 6 provider principali (singola connessione condivisa, topic dispatch, exponential backoff reconnect). Include Device Registry per gestione tipi e dispositivi registrati, sistema Rooms per organizzare dispositivi in stanze con stato aggregato per stanza e panoramica whole-house. Sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Indicatore stato connessione WebSocket in navbar e timestamp ultimo aggiornamento su ogni card. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: v17.0 WebSocket Real-Time Transport
-
-**Goal:** Sostituire il polling HTTP con WebSocket push come trasporto primario per tutti i 6 provider, mantenendo il polling attuale come fallback automatico.
-
-**Target features:**
-- Client WebSocket condiviso (singola connessione, multi-topic subscription) conforme alla spec `/ws/live`
-- Migrazione di tutti i data hook da polling-first a WS-first con fallback automatico a polling
-- Gestione reconnection con exponential backoff, re-subscribe on reconnect, auth via query parameter
-- Adattamento tipi: mapping tra payload WS (spec HA proxy) e interfacce esistenti dei hook
-- Rispetto vincolo MAX 2 connessioni: singola connessione condivisa con dispatcher interno
-
 ## Current State
 
-**Version:** v17.0 (in progress)
-**Status:** v17.0 COMPLETE — All 6 provider data hooks migrated to WS-primary with HTTP polling fallback. Phase 144 (Connection UX) delivered: global Navbar connection indicator (Connesso via WS / Riconnessione / Polling attivo), useRelativeTime Italian relative timestamps, LastUpdated component wired into all 6 dashboard card footers, flicker-free WS/polling transitions verified.
+**Version:** v17.0 (shipped 2026-03-28)
+**Status:** v17.0 SHIPPED — All 6 provider data hooks migrated to WS-primary with HTTP polling fallback. Connection UX delivered: Navbar indicator (Connesso via WS / Riconnessione / Polling attivo), LastUpdated Italian timestamps on all 6 dashboard cards. 23/23 requirements satisfied.
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -585,6 +574,22 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **RSTAT-02**: Whole-house status (all rooms) — v15.0 (Phase 124)
 - ✓ **RSTAT-03**: Rooms health stats — v15.0 (Phase 124)
 
+**v17.0 WebSocket Real-Time Transport (Shipped 2026-03-28):**
+
+**WebSocket Infrastructure:**
+- ✓ **WS-01** through **WS-06**: Shared WS connection manager, topic subscribe/unsubscribe, message dispatch, exponential backoff reconnect, auto re-subscribe, TypeScript types for all 6 provider payloads — v17.0 (Phase 139)
+
+**Provider Migration:**
+- ✓ **MIG-01** through **MIG-03**: useStoveData WS-primary with alwaysActive polling fallback — v17.0 (Phase 140)
+- ✓ **MIG-04** through **MIG-08**: useNetworkData and useLightsData WS-primary with sparkline/history preservation — v17.0 (Phase 141)
+- ✓ **MIG-09** through **MIG-12**: useSonosData and useDirigeraData WS-primary with polling fallback — v17.0 (Phase 142)
+- ✓ **MIG-13** through **MIG-14**: useThermostatData WS-primary with adapter layer for raw WS payload — v17.0 (Phase 143)
+
+**Connection UX:**
+- ✓ **UX-01**: Visual connection status indicator (connected/reconnecting/fallback) — v17.0 (Phase 144)
+- ✓ **UX-02**: Flicker-free WS/polling transitions — v17.0 (Phase 144)
+- ✓ **UX-03**: Per-card last updated timestamps — v17.0 (Phase 144)
+
 **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato (Shipped 2026-03-26):**
 
 **Sonos Integration (42 requirements):**
@@ -624,6 +629,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Sonos TTS/announcement — Non documentato nell'API
 - DIRIGERA light control (bulbs) — Solo sensori in scope, luci gestite da Hue
 - Automations engine (rule CRUD) — Scope separato, milestone dedicato futuro
+- WebSocket per comandi (write) — Spec `/ws/live` is read-only push; commands stay via REST POST/PUT
+- SharedWorker multi-tab WS — Complexity deferred, single tab WS sufficient
+- Raspberry Pi via WS — Not included in HA proxy WS topics, stays on polling only
 
 ## Context
 
@@ -642,22 +650,23 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Self-hosted Outfit + Space Grotesk fonts via next/font
 - Web Vitals pipeline (useReportWebVitals → sendBeacon → Firebase RTDB → dashboard)
 - Suspense streaming con loading.tsx skeleton shell + per-card boundaries
-- ~128,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
+- ~131,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false)
 - 750+ TypeScript source files, 4,000+ tests passing
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination (stove, thermostat, Raspberry Pi)
 - GDPR-compliant analytics con consent banner
 - Playwright E2E smoke tests for all app pages
-- All device polling unified at 60s via useAdaptivePolling (no Firebase RTDB real-time listener)
+- WebSocket real-time transport (react-use-websocket) for all 6 providers with HTTP polling fallback
+- All device polling unified at 60s via useAdaptivePolling (fallback when WS disconnected)
 - Device Registry + Rooms frontend with typed proxy clients and 19 API route proxies
-- 22 milestones shipped, 138 phases, 446 plans executed
+- 23 milestones shipped, 144 phases, 457 plans executed
 
-**v16.0 Milestone (2026-03-26):**
-- 13 phases executed (26 plans)
-- 62/62 requirements satisfied (100%)
-- 164 code files changed (+20,498 insertions, -147 deletions, net +20,351 LOC)
-- 4 days from start to completion
-- 7 providers now integrated via shared HA proxy (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue, Sonos, DIRIGERA)
-- API coverage raised from 56% to ~95%
+**v17.0 Milestone (2026-03-28):**
+- 6 phases executed (11 plans)
+- 23/23 requirements satisfied (100%)
+- 37 code files changed (+3,641 insertions, -396 deletions, net +3,245 LOC)
+- 3 days from start to completion
+- All 6 device providers now receive live data via WebSocket with HTTP polling fallback
+- react-use-websocket added as dependency
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -791,6 +800,14 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Phase 138 gap closure | Milestone audit identified 4 gaps (nav 404, devices fetch, zone volume, seek) | ✓ Good — All gaps resolved pre-ship (v16.0) |
 | Auto-granularity for bandwidth/history | Fritz!Box and Sonos history routes switch hourly/daily based on time range | ✓ Good — User doesn't need to choose resolution (v16.0) |
 | DeviceCountChart via next/dynamic | Recharts is heavy, chart-only component deferred with ssr:false | ✓ Good — Consistent with existing chart code-splitting (v16.0) |
+| react-use-websocket for WS client | Mature library, exponential backoff built-in, React hooks API | ✓ Good — Single shared connection with topic dispatch (v17.0) |
+| Singleton WS via React Context | WebSocketProvider in ClientProviders ensures one connection per app | ✓ Good — MAX 2 connections respected, no duplicate subs (v17.0) |
+| WS-primary with polling fallback pattern | All 6 hooks: interval = isWsConnected ? null : pollInterval | ✓ Good — Zero behavior change from user perspective (v17.0) |
+| Conditional WS subscription guard | Subscribe only when isWsConnected=true, prevents dead subscriptions | ✓ Good — Clean lifecycle, no spurious subscribe calls (v17.0) |
+| Ref pattern for stale closure avoidance | fetchRef for side-fetch functions in WS useEffect callbacks | ✓ Good — Prevents stale closures across all 6 provider hooks (v17.0) |
+| Standalone Netatmo WS adapter | Pure function adaptNetatmoWsPayload for raw→typed conversion | ✓ Good — Independently testable, no coupling to hook (v17.0) |
+| lastUpdatedAt derived from existing state | Stove: lastPollAt→ms, Network: alias, others: new state | ✓ Good — Minimal changes, backward compatible (v17.0) |
+| Italian connection status labels | WS_STATUS_LABELS: Connesso via WS / Riconnessione / Polling attivo | ✓ Good — Consistent with app's Italian UI (v17.0) |
 
 ## Constraints
 
@@ -819,4 +836,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-27 after Phase 142 (Sonos & DIRIGERA Migration) complete*
+*Last updated: 2026-03-28 after v17.0 milestone (WebSocket Real-Time Transport)*

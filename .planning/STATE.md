@@ -2,32 +2,32 @@
 gsd_state_version: 1.0
 milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
-status: verifying
-stopped_at: Completed 144-02-PLAN.md
-last_updated: "2026-03-28T10:23:45.509Z"
+status: completed
+stopped_at: Milestone v17.0 archived
+last_updated: "2026-03-28T12:30:00.000Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 6
   completed_phases: 6
   total_plans: 11
   completed_plans: 11
-  percent: 50
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-26)
+See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 143 — netatmo-migration
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 144
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 144 (final)
+Plan: All complete
+Status: v17.0 milestone shipped and archived
 Last activity: 2026-03-28
 
 Progress: [█████░░░░░] 50%

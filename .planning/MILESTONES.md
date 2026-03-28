@@ -1,5 +1,36 @@
 # Project Milestones: Pannello Stufa
 
+## v17.0 WebSocket Real-Time Transport (Shipped: 2026-03-28)
+
+**Delivered:** All 6 device provider hooks migrated from HTTP polling-first to WebSocket-primary with automatic polling fallback — live data push via single shared WS connection, visual connection indicator, and per-card timestamps.
+
+**Phases completed:** 139-144 (6 phases, 11 plans)
+
+**Key accomplishments:**
+
+- Shared WebSocket infrastructure: single connection manager with exponential backoff reconnect, topic dispatch, and React context integration (react-use-websocket)
+- All 6 provider hooks migrated to WS-primary: Stove, Fritz!Box, Hue, Sonos, DIRIGERA, Netatmo — each with automatic HTTP polling fallback
+- Netatmo adapter layer: standalone pure function normalizes raw WS payload into existing typed interface
+- Connection UX: Navbar indicator (Connesso via WS / Riconnessione / Polling attivo) + LastUpdated Italian timestamps on all 6 dashboard cards
+- Zero breaking changes: alwaysActive stove polling, Fritz!Box sparkline buffers, Hue scene fetching all preserved
+
+**Stats:**
+
+- 11 plans executed across 6 phases
+- 23/23 v17.0 requirements satisfied (100%)
+- 37 code files changed (+3,641 insertions, -396 deletions, net +3,245 LOC)
+- 3 days (2026-03-26 → 2026-03-28)
+
+**Git range:** `feat(139-01)` (2ea555c4) → `fix(v17.0)` (6c3dc9d8)
+
+**Tech debt (accepted):**
+
+- Stove unconditional WS subscription vs guarded pattern in other hooks (both work correctly)
+- TopicCallback exported but unused externally (cosmetic orphan)
+- SUMMARY frontmatter missing requirements_completed field in some plans
+
+---
+
 ## v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato (Shipped: 2026-03-26)
 
 **Delivered:** Full Sonos and DIRIGERA integration as new providers plus advanced Fritz!Box endpoints — bringing documented API coverage from 56% to ~95% with 3 new pages, 2 new dashboard cards, and complete transport/extended controls for Sonos.

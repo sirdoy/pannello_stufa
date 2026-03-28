@@ -378,6 +378,47 @@
 
 ---
 
+## Milestone: v17.0 — WebSocket Real-Time Transport
+
+**Shipped:** 2026-03-28
+**Phases:** 6 | **Plans:** 11
+
+### What Was Built
+- Shared WebSocket connection manager (react-use-websocket) with exponential backoff, topic dispatch, and React context integration
+- All 6 device provider hooks (Stove, Fritz!Box, Hue, Sonos, DIRIGERA, Netatmo) migrated to WS-primary with automatic HTTP polling fallback
+- Netatmo WS adapter: standalone pure function normalizing raw Record<string, unknown> payload into typed interface
+- Connection UX: Navbar status indicator (Connesso via WS / Riconnessione / Polling attivo) + LastUpdated timestamps on all 6 dashboard cards
+
+### What Worked
+- Consistent migration pattern across all 6 providers: WS-primary + polling fallback, conditional subscription guard, ref pattern for stale closures
+- Phase 140 (Stove) established the template that Phases 141-143 replicated with minimal variation
+- Netatmo adapter as standalone pure function enabled independent unit testing without hook complexity
+- Milestone audit caught only cosmetic tech debt (5 items, no blockers) — execution quality high
+
+### What Was Inefficient
+- SUMMARY frontmatter one_liner field empty in most plans — gsd-tools accomplishment extraction produced garbage, had to manually rewrite MILESTONES.md entry
+- Phase 140 ROADMAP plan references were wrong (listed 142-01/02 instead of 140-01) — copy-paste error in roadmap creation
+- Stove unconditional WS subscription differs from guarded pattern in other hooks — inconsistency should have been caught during Phase 140 review
+
+### Patterns Established
+- WS-primary + polling-fallback hook pattern: `interval = isWsConnected ? null : pollInterval`
+- Conditional WS subscription guard: `if (!isWsConnected) return` in useEffect
+- Ref pattern for WS callbacks: `fetchRef.current = fetchFn` to avoid stale closures
+- lastUpdatedAt derivation: prefer deriving from existing state over adding new state
+
+### Key Lessons
+1. **Pattern replication is the fastest execution mode** — once Phase 140 established the WS migration template, Phases 141-143 required zero research and minimal plan variation
+2. **Adapter functions isolate complexity** — Netatmo's raw WS payload was the only non-trivial mapping; isolating it as a pure function made it independently testable
+3. **Small milestones ship clean** — 6 phases / 11 plans completed in 3 days with only cosmetic tech debt, no gap closure needed
+4. **Connection UX should be part of every transport change** — Phase 144 was essential for user confidence in the WS transition
+
+### Cost Observations
+- Model mix: balanced profile (sonnet executors, sonnet verifiers)
+- Sessions: ~4 sessions across 3 days
+- Notable: fastest per-phase execution rate (1.8 plans/day average)
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -394,6 +435,7 @@
 | v14.1 | 5 | 9 | Type safety + dead code cleanup — zero `as any` in production code |
 | v15.0 | 8 | 13 | Rooms & Device Registry — first greenfield UI milestone |
 | v16.0 | 13 | 26 | Sonos + DIRIGERA + Fritz!Box advanced — largest milestone, 7 providers |
+| v17.0 | 6 | 11 | WebSocket real-time transport — WS-primary for all 6 providers |
 
 ### Cumulative Quality
 
@@ -409,6 +451,7 @@
 | v14.1 | 4,000+ | 26/26 requirements | +5,798 |
 | v15.0 | 4,000+ | 25/25 requirements | +5,417 |
 | v16.0 | 4,000+ | 62/62 requirements | +20,351 |
+| v17.0 | 4,000+ | 23/23 requirements | +3,245 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -425,3 +468,4 @@
 11. **Gap closure is converging** — from 4 phases (v10.0) to 1 phase (v15.0, v16.0), showing improving execution quality over time
 12. **Pattern maturity keeps pace constant** — v16.0 (26 plans) shipped in 4 days, same daily throughput as v15.0 (13 plans in 2 days). Established patterns eliminate research overhead.
 13. **Human verification is the testing ceiling** — 26 items in v16.0 require physical hardware. No amount of automation can replace plugging in a Sonos speaker.
+14. **Pattern replication is the fastest execution mode** — v17.0 established one migration template (Phase 140) then replicated it 5 times with minimal variation, shipping 6 phases in 3 days (verified v17.0)

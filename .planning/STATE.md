@@ -4,13 +4,13 @@ milestone: v17.0
 milestone_name: WebSocket Real-Time Transport
 status: verifying
 stopped_at: Completed 143-02-PLAN.md
-last_updated: "2026-03-28T08:33:23.596Z"
+last_updated: "2026-03-28T08:39:05.100Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 6
-  completed_phases: 4
-  total_plans: 7
-  completed_plans: 8
+  completed_phases: 5
+  total_plans: 9
+  completed_plans: 9
   percent: 0
 ---
 
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 ## Current Position
 
-Phase: 143 (netatmo-migration) — EXECUTING
-Plan: 2 of 2
+Phase: 144
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-03-28
 

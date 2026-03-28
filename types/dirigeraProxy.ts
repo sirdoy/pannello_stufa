@@ -49,6 +49,7 @@ export interface DirigeraSensor {
   is_reachable: boolean;
   is_open: boolean | null;    // null for motion sensors
   last_seen: string | null;   // ISO 8601 timestamp
+  device_type?: string | null;   // registry device type slug, null if not set
 }
 
 // Source: docs/api/dirigera.md — DirigeraSensorsResponse

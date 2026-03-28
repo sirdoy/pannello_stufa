@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: active
-stopped_at: null
-last_updated: "2026-03-28T14:00:00.000Z"
-last_activity: 2026-03-28
+status: planning
+stopped_at: Phase 145 context gathered
+last_updated: "2026-03-28T14:46:11.866Z"
+last_activity: 2026-03-28 — Roadmap created for v17.1
 progress:
   total_phases: 4
   completed_phases: 0
@@ -82,5 +82,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: v17.1 roadmap created — ready to plan Phase 145
-Resume file: None
+Stopped at: Phase 145 context gathered
+Resume file: .planning/phases/145-ws-type-alignment/145-CONTEXT.md

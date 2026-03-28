@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: executing
-stopped_at: Completed 145-01-PLAN.md
-last_updated: "2026-03-28T15:09:11.950Z"
+status: verifying
+stopped_at: Completed 145-03-PLAN.md
+last_updated: "2026-03-28T15:29:29.120Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 Phase: 145 (ws-type-alignment) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-28
 
 Progress: [░░░░░░░░░░] 0%
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 | v17.0 WebSocket Real-Time Transport | 139-144 | 11 | 3 days |
 | Phase 145 P02 | 5 | 2 tasks | 2 files |
 | Phase 145 P01 | 76 | 2 tasks | 3 files |
+| Phase 145-ws-type-alignment P03 | 8 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,9 @@ Key context for v17.1:
 - [Phase 145]: custom_name on DirigeraSensor kept as string (non-nullable) to avoid breaking existing consumers
 - [Phase 145]: TuyaPlugMutation extends TuyaPlug (inheritance) to avoid field duplication
 - [Phase 145]: custom_name and device_type added as optional fields to HueLight and ThermorossiStatusResponse to avoid breaking existing consumers
+- [Phase 145]: HueData.lights stays HueLight[] | null array (D-01 locked) — useLightsData iterates as array
+- [Phase 145]: NetatmoData promoted from type alias to interface with index signature for backward compat
+- [Phase 145]: Inline freshness unions where proxy type width differs from WS envelope width
 
 ### Pending Todos
 
@@ -88,5 +92,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Completed 145-01-PLAN.md
+Stopped at: Completed 145-03-PLAN.md
 Resume file: None

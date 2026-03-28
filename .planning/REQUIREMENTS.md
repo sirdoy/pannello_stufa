@@ -2,14 +2,14 @@
 
 ## WS Type Alignment
 
-- [ ] **WSTYPE-01**: All WS topic payload types include `data_freshness` field matching REST endpoint shape
-- [ ] **WSTYPE-02**: FritzBoxData WS type includes `is_stale`, `fetched_at`, `data_freshness` fields
-- [ ] **WSTYPE-03**: FritzBoxDevice includes `custom_name` and `device_type` registry metadata
+- [x] **WSTYPE-01**: All WS topic payload types include `data_freshness` field matching REST endpoint shape
+- [x] **WSTYPE-02**: FritzBoxData WS type includes `is_stale`, `fetched_at`, `data_freshness` fields
+- [x] **WSTYPE-03**: FritzBoxDevice includes `custom_name` and `device_type` registry metadata
 - [x] **WSTYPE-04**: DirigeraData includes `data_freshness` field
 - [x] **WSTYPE-05**: DirigeraBaseSensor includes `device_type` registry metadata
-- [ ] **WSTYPE-06**: NetatmoData is typed interface with `body`, `status`, `time_server`, `data_freshness`
+- [x] **WSTYPE-06**: NetatmoData is typed interface with `body`, `status`, `time_server`, `data_freshness`
 - [x] **WSTYPE-07**: ThermorossiData includes `data_freshness`, `custom_name`, `device_type`
-- [ ] **WSTYPE-08**: HueData uses `Record<string, HueLight>` and `Record<string, HueGroup>` (dict shape, not array)
+- [x] **WSTYPE-08**: HueData uses `Record<string, HueLight>` and `Record<string, HueGroup>` (dict shape, not array)
 - [x] **WSTYPE-09**: HueLight includes `custom_name` and `device_type` registry metadata
 - [x] **WSTYPE-10**: HueData includes `data_freshness` field
 - [x] **WSTYPE-11**: SonosSpeaker includes `custom_name` and `device_type` registry metadata

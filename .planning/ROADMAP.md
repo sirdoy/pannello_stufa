@@ -71,7 +71,7 @@ See git history and `.planning/milestones/` for details.
 
 **Milestone Goal:** Align all 8 WS topic payload types with the enriched HA proxy shapes, migrate Raspberry Pi to WS-primary transport, and deliver the Tuya smart plug provider end-to-end (infrastructure + frontend + WS subscription).
 
-- [ ] **Phase 145: WS Type Alignment** - Update all topic payload types to match enriched HA proxy shapes
+- [x] **Phase 145: WS Type Alignment** - Update all topic payload types to match enriched HA proxy shapes (completed 2026-03-28)
 - [ ] **Phase 146: Raspi WS Migration** - Migrate useRaspiData to WS-primary with polling fallback and connection UX
 - [ ] **Phase 147: Tuya Infrastructure** - Proxy client, TypeScript types, and 6 API route proxies
 - [ ] **Phase 148: Tuya Frontend** - Hooks, dashboard card, /tuya page, registry entry, and energy history chart
@@ -92,7 +92,7 @@ See git history and `.planning/milestones/` for details.
 Plans:
 - [x] 145-01-PLAN.md — Create types/tuyaProxy.ts + add registry metadata to HueLight and ThermorossiStatusResponse
 - [x] 145-02-PLAN.md — Add registry metadata to SonosDeviceResponse and DirigeraSensor
-- [ ] 145-03-PLAN.md — Rewrite types/websocket.ts with all 8 enriched topic types
+- [x] 145-03-PLAN.md — Rewrite types/websocket.ts with all 8 enriched topic types
 
 ### Phase 146: Raspi WS Migration
 **Goal**: useRaspiData subscribes to the `raspi` WS topic as primary source, falls back to HTTP polling when disconnected, and RaspiCard displays a live LastUpdated timestamp — extending the connection UX to cover the 8th provider
@@ -145,7 +145,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 145. WS Type Alignment | v17.1 | 2/3 | In Progress|  |
+| 145. WS Type Alignment | v17.1 | 3/3 | Complete   | 2026-03-28 |
 | 146. Raspi WS Migration | v17.1 | 0/TBD | Not started | - |
 | 147. Tuya Infrastructure | v17.1 | 0/TBD | Not started | - |
 | 148. Tuya Frontend | v17.1 | 0/TBD | Not started | - |

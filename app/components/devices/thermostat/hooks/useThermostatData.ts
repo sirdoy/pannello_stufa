@@ -48,6 +48,8 @@ export interface RoomStatus {
 
 export interface ModuleStatus {
   id: string;
+  type?: string;
+  name?: string;
   battery_state?: string;
   battery_level?: number;
   reachable?: boolean;
@@ -91,6 +93,8 @@ export function useThermostatData(): UseThermostatDataReturn {
   const isWsConnected = readyState === ReadyState.OPEN;
 
   const connectionCheckedRef = useRef(false);
+  const topologyRef = useRef<NetatmoTopology | null>(null);
+  topologyRef.current = topology;
 
   async function checkConnection(retryCount = 0): Promise<void> {
     const MAX_RETRIES = 1;
@@ -202,6 +206,16 @@ export function useThermostatData(): UseThermostatDataReturn {
     const handleMessage = (raw: unknown) => {
       const adapted = adaptNetatmoWsPayload(raw as Record<string, unknown>);
       if (adapted === null) return; // D-06: null payload → keep polling as fallback
+
+      // Enrich WS modules with name/type from topology (WS payload may lack these fields)
+      const topoModules = topologyRef.current?.modules;
+      if (topoModules && adapted.lowBatteryModules) {
+        adapted.lowBatteryModules = adapted.lowBatteryModules.map(m => {
+          const topo = topoModules.find(t => t.id === m.id);
+          return topo ? { ...m, name: m.name ?? topo['name'] as string, type: m.type || (topo['type'] as string ?? '') } : m;
+        });
+      }
+
       setStatus(adapted);
       setLoading(false);
       setError(null);

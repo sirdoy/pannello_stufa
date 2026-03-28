@@ -58,6 +58,8 @@ export function adaptNetatmoWsPayload(raw: Record<string, unknown>): NetatmoStat
   // Module fields pass through with normalised types
   const modules: ModuleStatus[] = wsModules.map(m => ({
     id: String(m['id'] ?? ''),
+    type: m['type'] as string | undefined,
+    name: m['name'] as string | undefined,
     battery_state: m['battery_state'] as string | undefined,
     battery_level: m['battery_level'] as number | undefined,
     reachable: m['reachable'] as boolean | undefined,
@@ -69,7 +71,8 @@ export function adaptNetatmoWsPayload(raw: Record<string, unknown>): NetatmoStat
     .filter(m => m.battery_state === 'low' || m.battery_state === 'very_low')
     .map(m => ({
       id: m.id,
-      type: '',
+      type: m.type ?? '',
+      name: m.name,
       battery_state: m.battery_state,
       battery_level: m.battery_level,
       reachable: m.reachable,

@@ -95,13 +95,15 @@ describe('adaptNetatmoWsPayload', () => {
         home: {
           id: 'home1',
           rooms: [],
-          modules: [{ id: 'mod1', battery_state: 'low', reachable: true, rf_strength: 70 }],
+          modules: [{ id: 'mod1', type: 'NRV', name: 'Valvola Camera', battery_state: 'low', reachable: true, rf_strength: 70 }],
         },
       },
     };
     const result = adaptNetatmoWsPayload(payload);
     expect(result?.hasLowBattery).toBe(true);
     expect(result?.lowBatteryModules).toHaveLength(1);
+    expect(result?.lowBatteryModules?.[0]?.type).toBe('NRV');
+    expect(result?.lowBatteryModules?.[0]?.name).toBe('Valvola Camera');
   });
 
   it('Test 5: Module battery_state=very_low sets hasCriticalBattery=true', () => {
@@ -137,6 +139,11 @@ describe('adaptNetatmoWsPayload', () => {
 
   it('Test 9: Missing body.home field returns null', () => {
     expect(adaptNetatmoWsPayload({ body: { status: 'ok' } })).toBeNull();
+  });
+
+  it('Test 4b: Module type and name are passed through to modules array', () => {
+    const result = adaptNetatmoWsPayload(mockWsPayload);
+    expect(result?.modules?.[0]?.type).toBe('NATherm1');
   });
 
   it('Test 10: Empty rooms/modules arrays returns valid NetatmoStatus with rooms=[], modules=[]', () => {
@@ -229,6 +236,56 @@ describe('useThermostatData — WebSocket subscription', () => {
 
     expect(result.current.status?.rooms).toHaveLength(2);
     expect(result.current.status?.rooms?.[0]?.temperature).toBe(21.4);
+  });
+
+  it('Test 13b: WS low-battery modules enriched with name/type from topology', async () => {
+    // Simulate topology loaded via fetch (includes module name/type)
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({
+        home_id: 'h1',
+        home_name: 'Home',
+        modules: [
+          { id: 'mod1', type: 'NRV', name: 'Valvola Camera' },
+        ],
+      }),
+    }) as jest.Mock;
+
+    mockUseWebSocketContext.mockReturnValue({
+      subscribe: mockSubscribe,
+      unsubscribe: mockUnsubscribe,
+      readyState: ReadyState.OPEN,
+    });
+
+    const { result } = renderHook(() => useThermostatData());
+
+    // Wait for checkConnection fetch to resolve and set topology
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    });
+
+    // Send WS message with low battery module (no name in WS payload)
+    const handleMessage = mockSubscribe.mock.calls[0]?.[1];
+    expect(handleMessage).toBeDefined();
+
+    const wsPayloadWithLowBattery: Record<string, unknown> = {
+      body: {
+        home: {
+          id: 'home1',
+          rooms: [],
+          modules: [{ id: 'mod1', battery_state: 'low', reachable: true }],
+        },
+      },
+    };
+
+    await act(async () => {
+      handleMessage(wsPayloadWithLowBattery);
+    });
+
+    // Should be enriched with topology name/type
+    expect(result.current.status?.lowBatteryModules).toHaveLength(1);
+    expect(result.current.status?.lowBatteryModules?.[0]?.name).toBe('Valvola Camera');
+    expect(result.current.status?.lowBatteryModules?.[0]?.type).toBe('NRV');
   });
 
   it('Test 14: null WS payload (adapter returns null) does not update status', async () => {

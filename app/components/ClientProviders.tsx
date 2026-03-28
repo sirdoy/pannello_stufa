@@ -14,6 +14,7 @@ import InstallPrompt from '@/app/components/pwa/InstallPrompt';
 import { ReactNode } from 'react';
 import { WebSocketContext } from '@/app/context/WebSocketContext';
 import { useWebSocketManager } from '@/lib/hooks/useWebSocketManager';
+import { OnlineStatusProvider } from '@/app/context/OnlineStatusContext';
 
 interface ClientProvidersProps {
   children: ReactNode;
@@ -51,22 +52,24 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <Auth0Provider user={MOCK_USER}>
       <WebSocketContext.Provider value={wsManager}>
-        <ThemeScript />
-        <ThemeProvider>
-        <PageTransitionProvider>
-          <VersionProvider>
-            <ToastProvider>
-              <CommandPaletteProvider>
-                <AxeDevtools />
-                <PWAInitializer />
-                <OfflineBanner fixed showPendingCount />
-                {children}
-                <InstallPrompt />
-              </CommandPaletteProvider>
-            </ToastProvider>
-          </VersionProvider>
-        </PageTransitionProvider>
-        </ThemeProvider>
+        <OnlineStatusProvider>
+          <ThemeScript />
+          <ThemeProvider>
+          <PageTransitionProvider>
+            <VersionProvider>
+              <ToastProvider>
+                <CommandPaletteProvider>
+                  <AxeDevtools />
+                  <PWAInitializer />
+                  <OfflineBanner fixed showPendingCount />
+                  {children}
+                  <InstallPrompt />
+                </CommandPaletteProvider>
+              </ToastProvider>
+            </VersionProvider>
+          </PageTransitionProvider>
+          </ThemeProvider>
+        </OnlineStatusProvider>
       </WebSocketContext.Provider>
     </Auth0Provider>
   );

@@ -63,6 +63,7 @@ const mockWsPayload: DirigeraData = {
       is_open: null, // motion sensors have is_open: null
     },
   ],
+  data_freshness: 'LIVE',
 };
 
 describe('useDirigeraData', () => {
@@ -343,7 +344,7 @@ describe('useDirigeraData', () => {
       const handleMessage = mockSubscribe.mock.calls[0]?.[1] as (raw: unknown) => void;
 
       await act(async () => {
-        handleMessage({ sensors: [] } as DirigeraData);
+        handleMessage({ sensors: [], data_freshness: 'LIVE' } as DirigeraData);
       });
 
       expect(result.current.data?.summary.total_sensors).toBe(0);

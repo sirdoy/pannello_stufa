@@ -37,12 +37,19 @@ import type { DeviceCategory } from '@/types/firebase/network';
 // 2h of data at 60s polling interval
 const SPARKLINE_MAX_POINTS = 120;
 
+interface UseNetworkDataOptions {
+  /** Enable vendor-lookup enrichment for device categories. Default: false.
+   *  Only needed on /network page — dashboard card doesn't show categories. */
+  enrichVendors?: boolean;
+}
+
 /**
  * Custom hook for Fritz!Box network data management
  *
  * @returns All network state and actions
  */
-export function useNetworkData(): UseNetworkDataReturn {
+export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataReturn {
+  const enrichVendors = options?.enrichVendors ?? false;
   // Core state
   const [bandwidth, setBandwidth] = useState<BandwidthData | null>(null);
   const [devices, setDevices] = useState<DeviceData[]>([]);
@@ -212,8 +219,10 @@ export function useNetworkData(): UseNetworkDataReturn {
           active: d.status === 1,
         }));
         setDevices(rawDevices);
-        // Fire-and-forget enrichment (D-10)
-        void enrichDevicesWithCategoriesRef.current(rawDevices).then(setDevices).catch(() => {});
+        // Fire-and-forget enrichment — only when enrichVendors enabled (D-10)
+        if (enrichVendors) {
+          void enrichDevicesWithCategoriesRef.current(rawDevices).then(setDevices).catch(() => {});
+        }
       }
 
       setLoading(false);
@@ -338,13 +347,15 @@ export function useNetworkData(): UseNetworkDataReturn {
       setWan(wanData.wan || null);
       wanRef.current = wanData.wan || null;
 
-      // Fire-and-forget category enrichment (non-blocking, self-heals on next poll)
-      enrichDevicesWithCategories(rawDevices).then(enrichedDevices => {
-        setDevices(enrichedDevices);
-      }).catch(() => {
-        // Intentional silent failure: category enrichment is non-critical.
-        // Self-heals on next poll — unenriched MACs will be retried.
-      });
+      // Fire-and-forget category enrichment — only when enrichVendors enabled
+      if (enrichVendors) {
+        enrichDevicesWithCategories(rawDevices).then(enrichedDevices => {
+          setDevices(enrichedDevices);
+        }).catch(() => {
+          // Intentional silent failure: category enrichment is non-critical.
+          // Self-heals on next poll — unenriched MACs will be retried.
+        });
+      }
 
       // Health computation is handled by the separate useEffect watching [bandwidth, wan, downloadHistory, uploadHistory]
 

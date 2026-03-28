@@ -85,7 +85,7 @@ type NetworkTab = 'dispositivi' | 'wifi' | 'servizi' | 'reti-wifi';
 
 export default function NetworkPage() {
   const router = useRouter();
-  const networkData = useNetworkData();
+  const networkData = useNetworkData({ enrichVendors: true });
   const bandwidthHistory = useBandwidthHistory();
   const deviceHistory = useDeviceHistory();
   const correlation = useBandwidthCorrelation();

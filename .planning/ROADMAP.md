@@ -140,7 +140,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 148-01-PLAN.md — Hooks (useTuyaData, useTuyaCommands) + device registry + skeleton
+- [x] 148-01-PLAN.md — Hooks (useTuyaData, useTuyaCommands) + device registry + skeleton
 - [ ] 148-02-PLAN.md — TuyaCard dashboard card with aggregate summary + LastUpdated
 - [ ] 148-03-PLAN.md — /tuya page with plug grid, timer controls, energy history chart
 **UI hint**: yes
@@ -152,4 +152,4 @@ Plans:
 | 145. WS Type Alignment | v17.1 | 3/3 | Complete    | 2026-03-28 |
 | 146. Raspi WS Migration | v17.1 | 2/2 | Complete    | 2026-03-30 |
 | 147. Tuya Infrastructure | v17.1 | 2/2 | Complete    | 2026-03-30 |
-| 148. Tuya Frontend | v17.1 | 0/3 | Not started | - |
+| 148. Tuya Frontend | v17.1 | 1/3 | In Progress|  |

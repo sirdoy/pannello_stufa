@@ -37,11 +37,11 @@
 
 ## Tuya Provider — Frontend
 
-- [ ] **TUYA-09**: useTuyaData hook with WS-primary (`tuya` topic) and polling fallback
-- [ ] **TUYA-10**: useTuyaCommands hook for state toggle and timer control
+- [x] **TUYA-09**: useTuyaData hook with WS-primary (`tuya` topic) and polling fallback
+- [x] **TUYA-10**: useTuyaCommands hook for state toggle and timer control
 - [ ] **TUYA-11**: TuyaCard dashboard card showing plug status, power gauge, freshness badge
 - [ ] **TUYA-12**: /tuya page with multi-plug grid, on/off toggles, energy charts, timer controls
-- [ ] **TUYA-13**: Tuya device registered in device registry and navigation menu
+- [x] **TUYA-13**: Tuya device registered in device registry and navigation menu
 - [ ] **TUYA-14**: Energy history chart with auto-granularity period selector (24h/7d/30d)
 
 ## Connection UX

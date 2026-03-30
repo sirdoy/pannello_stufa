@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: verifying
-stopped_at: Phase 148 context gathered
-last_updated: "2026-03-30T12:10:27.499Z"
+status: executing
+stopped_at: Completed 148-01-PLAN.md
+last_updated: "2026-03-30T12:37:27.037Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 10
+  completed_plans: 8
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 147 — tuya-infrastructure
+**Current focus:** Phase 148 — tuya-frontend
 
 ## Current Position
 
-Phase: 148
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 148 (tuya-frontend) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-03-30
 
 Progress: [░░░░░░░░░░] 0%
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 146 P02 | 5 minutes | 2 tasks | 2 files |
 | Phase 147-tuya-infrastructure P01 | 2min | 1 tasks | 2 files |
 | Phase 147-tuya-infrastructure P02 | 525589min | 3 tasks | 12 files |
+| Phase 148-tuya-frontend P01 | 239 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ Key context for v17.1:
 - [Phase 147-01]: getHistory: Object.entries filter approach to omit undefined params before URLSearchParams construction
 - [Phase 147-tuya-infrastructure]: Health route uses withErrorHandler (not withAuthAndErrorHandler) per D-04 — no auth required for connectivity checks
 - [Phase 147-tuya-infrastructure]: POST state/timer routes return 200 (not 202) — Tuya proxy confirms commands synchronously via data_confirmed field
+- [Phase 148-01]: useTuyaData null-plugs WS guard sets stale=true without crashing (consistent with FritzBox pattern)
+- [Phase 148-01]: useTuyaCommands uses plain fetch (not useRetryableCommand) matching simpler hooks like useDirigeraCommands
 
 ### Pending Todos
 
@@ -102,5 +105,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Phase 148 context gathered
-Resume file: .planning/phases/148-tuya-frontend/148-CONTEXT.md
+Stopped at: Completed 148-01-PLAN.md
+Resume file: None

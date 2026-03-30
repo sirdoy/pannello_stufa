@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: verifying
-stopped_at: Phase 146 context gathered
-last_updated: "2026-03-30T07:38:57.620Z"
-last_activity: 2026-03-28
+status: executing
+stopped_at: Completed 146-01-PLAN.md
+last_updated: "2026-03-30T07:55:01.421Z"
+last_activity: 2026-03-30
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 5
+  completed_plans: 4
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 145 — ws-type-alignment
+**Current focus:** Phase 146 — raspi-ws-migration
 
 ## Current Position
 
-Phase: 146
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-03-28
+Phase: 146 (raspi-ws-migration) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-03-30
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 145 P02 | 5 | 2 tasks | 2 files |
 | Phase 145 P01 | 76 | 2 tasks | 3 files |
 | Phase 145-ws-type-alignment P03 | 8 | 1 tasks | 2 files |
+| Phase 146 P01 | 7 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,7 @@ Key context for v17.1:
 - [Phase 145]: HueData.lights stays HueLight[] | null array (D-01 locked) — useLightsData iterates as array
 - [Phase 145]: NetatmoData promoted from type alias to interface with index signature for backward compat
 - [Phase 145]: Inline freshness unions where proxy type width differs from WS envelope width
+- [Phase 146]: Inline WS payload mapping in handleMessage for Raspi (no standalone adapter) — health computed inline via computeRaspiHealth
 
 ### Pending Todos
 
@@ -92,5 +94,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Phase 146 context gathered
-Resume file: .planning/phases/146-raspi-ws-migration/146-CONTEXT.md
+Stopped at: Completed 146-01-PLAN.md
+Resume file: None

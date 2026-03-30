@@ -19,10 +19,10 @@
 
 ## Raspi WS Migration
 
-- [ ] **RASPI-01**: useRaspiData subscribes to `raspi` WS topic for live data push
-- [ ] **RASPI-02**: useRaspiData falls back to HTTP polling when WS disconnected (interval gating pattern)
+- [x] **RASPI-01**: useRaspiData subscribes to `raspi` WS topic for live data push
+- [x] **RASPI-02**: useRaspiData falls back to HTTP polling when WS disconnected (interval gating pattern)
 - [ ] **RASPI-03**: RaspiCard displays LastUpdated timestamp from WS/polling data
-- [ ] **RASPI-04**: RaspiData type matches documented WS payload shape
+- [x] **RASPI-04**: RaspiData type matches documented WS payload shape
 
 ## Tuya Provider — Infrastructure
 
@@ -46,7 +46,7 @@
 
 ## Connection UX
 
-- [ ] **UX-01**: NavbarConnectionStatus includes raspi and tuya WS topic subscriptions
+- [x] **UX-01**: NavbarConnectionStatus includes raspi and tuya WS topic subscriptions
 - [ ] **UX-02**: TuyaCard displays LastUpdated timestamp
 - [ ] **UX-03**: RaspiCard displays LastUpdated timestamp
 

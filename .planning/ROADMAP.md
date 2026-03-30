@@ -74,7 +74,7 @@ See git history and `.planning/milestones/` for details.
 - [x] **Phase 145: WS Type Alignment** - Update all topic payload types to match enriched HA proxy shapes (completed 2026-03-28)
 - [x] **Phase 146: Raspi WS Migration** - Migrate useRaspiData to WS-primary with polling fallback and connection UX (completed 2026-03-30)
 - [x] **Phase 147: Tuya Infrastructure** - Proxy client, TypeScript types, and 6 API route proxies (completed 2026-03-30)
-- [ ] **Phase 148: Tuya Frontend** - Hooks, dashboard card, /tuya page, registry entry, and energy history chart
+- [x] **Phase 148: Tuya Frontend** - Hooks, dashboard card, /tuya page, registry entry, and energy history chart (completed 2026-03-30)
 
 ## Phase Details
 
@@ -141,8 +141,8 @@ Plans:
 
 Plans:
 - [x] 148-01-PLAN.md — Hooks (useTuyaData, useTuyaCommands) + device registry + skeleton
-- [ ] 148-02-PLAN.md — TuyaCard dashboard card with aggregate summary + LastUpdated
-- [ ] 148-03-PLAN.md — /tuya page with plug grid, timer controls, energy history chart
+- [x] 148-02-PLAN.md — TuyaCard dashboard card with aggregate summary + LastUpdated
+- [x] 148-03-PLAN.md — /tuya page with plug grid, timer controls, energy history chart
 **UI hint**: yes
 
 ## Progress
@@ -152,4 +152,4 @@ Plans:
 | 145. WS Type Alignment | v17.1 | 3/3 | Complete    | 2026-03-28 |
 | 146. Raspi WS Migration | v17.1 | 2/2 | Complete    | 2026-03-30 |
 | 147. Tuya Infrastructure | v17.1 | 2/2 | Complete    | 2026-03-30 |
-| 148. Tuya Frontend | v17.1 | 1/3 | In Progress|  |
+| 148. Tuya Frontend | v17.1 | 3/3 | Complete   | 2026-03-30 |

@@ -124,7 +124,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 147-01-PLAN.md — tuyaProxy.ts function module + unit tests
+- [x] 147-01-PLAN.md — tuyaProxy.ts function module + unit tests
 - [ ] 147-02-PLAN.md — 6 API route proxies (health, plugs, single plug, state, timer, history)
 
 ### Phase 148: Tuya Frontend
@@ -149,5 +149,5 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 145. WS Type Alignment | v17.1 | 3/3 | Complete    | 2026-03-28 |
 | 146. Raspi WS Migration | v17.1 | 2/2 | Complete    | 2026-03-30 |
-| 147. Tuya Infrastructure | v17.1 | 0/2 | Not started | - |
+| 147. Tuya Infrastructure | v17.1 | 1/2 | In Progress|  |
 | 148. Tuya Frontend | v17.1 | 0/TBD | Not started | - |

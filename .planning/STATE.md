@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: verifying
-stopped_at: Phase 147 planned (2 plans, 2 waves)
-last_updated: "2026-03-30T08:29:14.041Z"
+status: executing
+stopped_at: Completed 147-01-PLAN.md
+last_updated: "2026-03-30T08:33:09.922Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-28)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 146 — raspi-ws-migration
+**Current focus:** Phase 147 — tuya-infrastructure
 
 ## Current Position
 
-Phase: 147
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 147 (tuya-infrastructure) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-03-30
 
 Progress: [░░░░░░░░░░] 0%
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 145-ws-type-alignment P03 | 8 | 1 tasks | 2 files |
 | Phase 146 P01 | 7 | 2 tasks | 2 files |
 | Phase 146 P02 | 5 minutes | 2 tasks | 2 files |
+| Phase 147-tuya-infrastructure P01 | 2min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Key context for v17.1:
 - [Phase 145]: Inline freshness unions where proxy type width differs from WS envelope width
 - [Phase 146]: Inline WS payload mapping in handleMessage for Raspi (no standalone adapter) — health computed inline via computeRaspiHealth
 - [Phase 146]: LastUpdated placed outside data conditional in RaspiCard — renders when tsMs is set regardless of data state, handles null gracefully
+- [Phase 147-01]: setState/setTimer return TuyaPlugMutation (200 pass-through) not 202 Accepted — Tuya proxy confirms command synchronously
+- [Phase 147-01]: getHistory: Object.entries filter approach to omit undefined params before URLSearchParams construction
 
 ### Pending Todos
 
@@ -96,5 +99,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Phase 147 planned (2 plans, 2 waves)
-Resume file: .planning/phases/147-tuya-infrastructure/147-01-PLAN.md
+Stopped at: Completed 147-01-PLAN.md
+Resume file: None

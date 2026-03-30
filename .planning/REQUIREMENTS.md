@@ -26,8 +26,8 @@
 
 ## Tuya Provider — Infrastructure
 
-- [ ] **TUYA-01**: tuyaProxy.ts function module with haGet/haPost transport for all 6 endpoints
-- [ ] **TUYA-02**: TypeScript interfaces for TuyaPlug, TuyaPlugMutation, TuyaHealth, TuyaHistoryResponse
+- [x] **TUYA-01**: tuyaProxy.ts function module with haGet/haPost transport for all 6 endpoints
+- [x] **TUYA-02**: TypeScript interfaces for TuyaPlug, TuyaPlugMutation, TuyaHealth, TuyaHistoryResponse
 - [ ] **TUYA-03**: API route proxy GET /api/tuya/health (no auth)
 - [ ] **TUYA-04**: API route proxy GET /api/tuya/plugs (list all plugs)
 - [ ] **TUYA-05**: API route proxy GET /api/tuya/plugs/[device_id] (single plug)

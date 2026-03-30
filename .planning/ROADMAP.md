@@ -152,4 +152,4 @@ Plans:
 | 145. WS Type Alignment | v17.1 | 3/3 | Complete    | 2026-03-28 |
 | 146. Raspi WS Migration | v17.1 | 2/2 | Complete    | 2026-03-30 |
 | 147. Tuya Infrastructure | v17.1 | 2/2 | Complete    | 2026-03-30 |
-| 148. Tuya Frontend | v17.1 | 3/3 | Complete   | 2026-03-30 |
+| 148. Tuya Frontend | v17.1 | 3/3 | Complete    | 2026-03-30 |

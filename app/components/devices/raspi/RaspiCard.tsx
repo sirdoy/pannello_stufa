@@ -6,10 +6,11 @@ import { SmartHomeCard } from '../../ui';
 import { HealthIndicator, Banner } from '../../ui';
 import { useRaspiData } from './hooks/useRaspiData';
 import RaspiStats from './components/RaspiStats';
+import { LastUpdated } from '../../ui/LastUpdated';
 
 export default function RaspiCard() {
   const router = useRouter();
-  const { data, loading, error, stale, health } = useRaspiData();
+  const { data, loading, error, stale, health, lastUpdatedAt } = useRaspiData();
 
   // Loading state — show skeleton
   if (loading) {
@@ -74,6 +75,11 @@ export default function RaspiCard() {
             <RaspiStats data={data} />
           </SmartHomeCard.Controls>
         )}
+
+        {/* LastUpdated timestamp */}
+        <SmartHomeCard.Controls>
+          <LastUpdated tsMs={lastUpdatedAt} className="mt-2" />
+        </SmartHomeCard.Controls>
       </SmartHomeCard>
     </div>
   );

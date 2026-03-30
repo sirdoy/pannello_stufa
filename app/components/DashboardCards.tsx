@@ -11,6 +11,7 @@ import NetworkCard from './devices/network/NetworkCard';
 import RaspiCard from './devices/raspi/RaspiCard';
 import SonosCard from './devices/sonos/SonosCard';
 import DirigeraCard from './devices/dirigera/DirigeraCard';
+import TuyaCard from './devices/tuya/TuyaCard';
 import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
@@ -30,6 +31,7 @@ const CARD_COMPONENTS: Record<string, React.ComponentType> = {
   raspi: RaspiCard,
   sonos: SonosCard,
   dirigera: DirigeraCard,
+  tuya: TuyaCard,
 };
 
 // Skeleton registry - maps card IDs to their skeleton components
@@ -43,6 +45,7 @@ const CARD_SKELETONS: Record<string, React.ComponentType> = {
   raspi: Skeleton.RaspiCard,
   sonos: Skeleton.SonosCard,
   dirigera: Skeleton.DirigeraCard,
+  tuya: Skeleton.TuyaCard,
 };
 
 // Device metadata for error boundaries
@@ -56,6 +59,7 @@ const DEVICE_META: Record<string, { name: string; icon: string }> = {
   raspi: { name: 'Raspberry Pi', icon: '🖥️' },
   sonos: { name: 'Sonos', icon: '🎵' },
   dirigera: { name: 'DIRIGERA', icon: '🔌' },
+  tuya: { name: 'Tuya', icon: '\u26A1' },
 };
 
 /**

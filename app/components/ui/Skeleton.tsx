@@ -906,6 +906,40 @@ Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
 };
 
 /**
+ * Skeleton.TuyaCard - Skeleton for TuyaCard component - Warning/amber theme
+ */
+Skeleton.TuyaCard = function SkeletonTuyaCard() {
+  const SkeletonPulse = ({ className = '' }: { className?: string }) => (
+    <div
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+    >
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+    </div>
+  );
+
+  const Card = Skeleton.Card;
+
+  return (
+    <Card className="overflow-visible transition-all duration-500">
+      {/* Warning/amber accent bar */}
+      <div className="h-1 bg-gradient-to-r from-warning-500/50 via-warning-400/50 to-warning-600/50" />
+      <div className="p-5 sm:p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <SkeletonPulse className="w-8 h-8 rounded-lg" />
+          <SkeletonPulse className="w-24 h-6 rounded" />
+        </div>
+        {/* 3 metric boxes (total plugs, total W, on/off) */}
+        <div className="grid grid-cols-3 gap-3">
+          <SkeletonPulse className="h-16 rounded-lg" />
+          <SkeletonPulse className="h-16 rounded-lg" />
+          <SkeletonPulse className="h-16 rounded-lg" />
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+/**
  * Skeleton.SonosCard - Skeleton for SonosCard component - Success/sage theme
  */
 Skeleton.SonosCard = function SkeletonSonosCard() {

@@ -4,7 +4,7 @@
  */
 
 /** Device type union */
-export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos' | 'network' | 'raspi' | 'dirigera';
+export type DeviceTypeId = 'stove' | 'thermostat' | 'camera' | 'lights' | 'sonos' | 'network' | 'raspi' | 'dirigera' | 'tuya';
 
 /** Color palette type */
 export type DeviceColor = 'primary' | 'info' | 'ocean' | 'warning' | 'success';
@@ -21,6 +21,7 @@ export const DEVICE_TYPES = {
   NETWORK: 'network',
   RASPI: 'raspi',
   DIRIGERA: 'dirigera',
+  TUYA: 'tuya',
 } as const;
 
 /** Display item configuration */
@@ -208,6 +209,19 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
       hasSensors: true,
     },
   },
+  [DEVICE_TYPES.TUYA]: {
+    id: 'tuya',
+    name: 'Tuya',
+    icon: '\u26A1',
+    color: 'warning',
+    enabled: true,
+    routes: { main: '/tuya' },
+    features: {
+      hasScheduler: false,
+      hasMaintenance: false,
+      hasErrors: false,
+    },
+  },
 };
 
 /**
@@ -223,7 +237,7 @@ const ALL_DASHBOARD_ITEMS: Record<string, DeviceConfig | DisplayItem> = {
  * Default order for dashboard items (new users)
  * Defines initial order and visibility
  */
-export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network', 'raspi', 'sonos', 'dirigera'];
+export const DEFAULT_DEVICE_ORDER: string[] = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network', 'raspi', 'sonos', 'dirigera', 'tuya'];
 
 /** Color class configuration */
 interface ColorClasses {

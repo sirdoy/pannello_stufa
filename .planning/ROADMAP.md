@@ -108,7 +108,7 @@ Plans:
 
 Plans:
 - [x] 146-01-PLAN.md — Rewrite useRaspiData with WS-primary + polling fallback + tests
-- [ ] 146-02-PLAN.md — Add LastUpdated timestamp to RaspiCard + tests
+- [x] 146-02-PLAN.md — Add LastUpdated timestamp to RaspiCard + tests
 **UI hint**: yes
 
 ### Phase 147: Tuya Infrastructure
@@ -119,12 +119,13 @@ Plans:
   1. `GET /api/tuya/health` returns proxy health without authentication errors
   2. `GET /api/tuya/plugs` returns a typed list of TuyaPlug objects
   3. `GET /api/tuya/plugs/[device_id]` and `GET /api/tuya/plugs/[device_id]/history` return correctly typed single-plug and energy history responses
-  4. `POST /api/tuya/plugs/[device_id]/state` and `POST /api/tuya/plugs/[device_id]/timer` accept typed request bodies and return 202 Accepted
+  4. `POST /api/tuya/plugs/[device_id]/state` and `POST /api/tuya/plugs/[device_id]/timer` accept typed request bodies and return 200 with data_confirmed
   5. All route files compile with zero TypeScript errors and follow the existing haGet/haPost proxy pattern
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 147-01: TBD
+- [ ] 147-01-PLAN.md — tuyaProxy.ts function module + unit tests
+- [ ] 147-02-PLAN.md — 6 API route proxies (health, plugs, single plug, state, timer, history)
 
 ### Phase 148: Tuya Frontend
 **Goal**: Users can monitor and control Tuya smart plugs from the dashboard and a dedicated /tuya page, with live WS data, on/off toggles, timer controls, energy history charts, and correct registry entries
@@ -147,6 +148,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 145. WS Type Alignment | v17.1 | 3/3 | Complete    | 2026-03-28 |
-| 146. Raspi WS Migration | v17.1 | 1/2 | Complete    | 2026-03-30 |
-| 147. Tuya Infrastructure | v17.1 | 0/TBD | Not started | - |
+| 146. Raspi WS Migration | v17.1 | 2/2 | Complete    | 2026-03-30 |
+| 147. Tuya Infrastructure | v17.1 | 0/2 | Not started | - |
 | 148. Tuya Frontend | v17.1 | 0/TBD | Not started | - |

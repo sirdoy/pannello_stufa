@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: executing
-stopped_at: Completed 146-01-PLAN.md
-last_updated: "2026-03-30T07:55:01.421Z"
+status: verifying
+stopped_at: Completed 146-02-PLAN.md
+last_updated: "2026-03-30T08:00:57.634Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 4
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 Phase: 146 (raspi-ws-migration) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-30
 
 Progress: [░░░░░░░░░░] 0%
@@ -50,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 145 P01 | 76 | 2 tasks | 3 files |
 | Phase 145-ws-type-alignment P03 | 8 | 1 tasks | 2 files |
 | Phase 146 P01 | 7 | 2 tasks | 2 files |
+| Phase 146 P02 | 5 minutes | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,7 @@ Key context for v17.1:
 - [Phase 145]: NetatmoData promoted from type alias to interface with index signature for backward compat
 - [Phase 145]: Inline freshness unions where proxy type width differs from WS envelope width
 - [Phase 146]: Inline WS payload mapping in handleMessage for Raspi (no standalone adapter) — health computed inline via computeRaspiHealth
+- [Phase 146]: LastUpdated placed outside data conditional in RaspiCard — renders when tsMs is set regardless of data state, handles null gracefully
 
 ### Pending Todos
 
@@ -94,5 +96,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Completed 146-01-PLAN.md
+Stopped at: Completed 146-02-PLAN.md
 Resume file: None

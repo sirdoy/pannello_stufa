@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: executing
-stopped_at: Completed 147-01-PLAN.md
-last_updated: "2026-03-30T08:33:09.922Z"
+status: verifying
+stopped_at: Completed 147-02-PLAN.md
+last_updated: "2026-03-30T08:42:20.777Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 4
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 Phase: 147 (tuya-infrastructure) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-03-30
 
 Progress: [░░░░░░░░░░] 0%
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 146 P01 | 7 | 2 tasks | 2 files |
 | Phase 146 P02 | 5 minutes | 2 tasks | 2 files |
 | Phase 147-tuya-infrastructure P01 | 2min | 1 tasks | 2 files |
+| Phase 147-tuya-infrastructure P02 | 525589min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Key context for v17.1:
 - [Phase 146]: LastUpdated placed outside data conditional in RaspiCard — renders when tsMs is set regardless of data state, handles null gracefully
 - [Phase 147-01]: setState/setTimer return TuyaPlugMutation (200 pass-through) not 202 Accepted — Tuya proxy confirms command synchronously
 - [Phase 147-01]: getHistory: Object.entries filter approach to omit undefined params before URLSearchParams construction
+- [Phase 147-tuya-infrastructure]: Health route uses withErrorHandler (not withAuthAndErrorHandler) per D-04 — no auth required for connectivity checks
+- [Phase 147-tuya-infrastructure]: POST state/timer routes return 200 (not 202) — Tuya proxy confirms commands synchronously via data_confirmed field
 
 ### Pending Todos
 
@@ -99,5 +102,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Completed 147-01-PLAN.md
+Stopped at: Completed 147-02-PLAN.md
 Resume file: None

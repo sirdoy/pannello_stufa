@@ -28,12 +28,12 @@
 
 - [x] **TUYA-01**: tuyaProxy.ts function module with haGet/haPost transport for all 6 endpoints
 - [x] **TUYA-02**: TypeScript interfaces for TuyaPlug, TuyaPlugMutation, TuyaHealth, TuyaHistoryResponse
-- [ ] **TUYA-03**: API route proxy GET /api/tuya/health (no auth)
-- [ ] **TUYA-04**: API route proxy GET /api/tuya/plugs (list all plugs)
-- [ ] **TUYA-05**: API route proxy GET /api/tuya/plugs/[device_id] (single plug)
-- [ ] **TUYA-06**: API route proxy POST /api/tuya/plugs/[device_id]/state (toggle on/off)
-- [ ] **TUYA-07**: API route proxy POST /api/tuya/plugs/[device_id]/timer (countdown)
-- [ ] **TUYA-08**: API route proxy GET /api/tuya/plugs/[device_id]/history (energy history)
+- [x] **TUYA-03**: API route proxy GET /api/tuya/health (no auth)
+- [x] **TUYA-04**: API route proxy GET /api/tuya/plugs (list all plugs)
+- [x] **TUYA-05**: API route proxy GET /api/tuya/plugs/[device_id] (single plug)
+- [x] **TUYA-06**: API route proxy POST /api/tuya/plugs/[device_id]/state (toggle on/off)
+- [x] **TUYA-07**: API route proxy POST /api/tuya/plugs/[device_id]/timer (countdown)
+- [x] **TUYA-08**: API route proxy GET /api/tuya/plugs/[device_id]/history (energy history)
 
 ## Tuya Provider — Frontend
 

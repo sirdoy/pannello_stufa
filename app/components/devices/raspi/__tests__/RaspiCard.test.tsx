@@ -42,12 +42,18 @@ jest.mock('../../../ui/Skeleton', () => {
   return { __esModule: true, default: Skeleton };
 });
 
+jest.mock('../../../ui/LastUpdated', () => ({
+  LastUpdated: ({ tsMs }: { tsMs: number | null }) =>
+    tsMs ? <div data-testid="last-updated">{tsMs}</div> : null,
+}));
+
 const baseData: UseRaspiDataReturn = {
   data: { cpuPercent: 25.3, memoryPercent: 50.0, diskPercent: 25.0, cpuTemperature: 45.2 },
   loading: false,
   error: null,
   stale: false,
   health: 'ok',
+  lastUpdatedAt: 1711800000000,
 };
 
 describe('RaspiCard', () => {
@@ -117,5 +123,17 @@ describe('RaspiCard', () => {
     });
     render(<RaspiCard />);
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('renders LastUpdated when lastUpdatedAt is set', () => {
+    mockUseRaspiData.mockReturnValue({ ...baseData, lastUpdatedAt: 1711800000000 });
+    render(<RaspiCard />);
+    expect(screen.getByTestId('last-updated')).toBeInTheDocument();
+  });
+
+  it('does not render LastUpdated when lastUpdatedAt is null', () => {
+    mockUseRaspiData.mockReturnValue({ ...baseData, lastUpdatedAt: null });
+    render(<RaspiCard />);
+    expect(screen.queryByTestId('last-updated')).not.toBeInTheDocument();
   });
 });

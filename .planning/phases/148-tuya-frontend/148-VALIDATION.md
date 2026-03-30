@@ -44,7 +44,7 @@ created: 2026-03-30
 | 148-02-02 | 02 | 1 | UX-02 | unit | `npx jest TuyaCard --testNamePattern=LastUpdated` | ❌ W0 | ⬜ pending |
 | 148-03-01 | 03 | 2 | TUYA-12 | unit | `npx jest tuya/page` | ❌ W0 | ⬜ pending |
 | 148-03-02 | 03 | 2 | TUYA-14 | unit | `npx jest TuyaEnergyChart` | ❌ W0 | ⬜ pending |
-| 148-04-01 | 04 | 2 | TUYA-13 | unit | `npx jest DashboardCards` | ✅ | ⬜ pending |
+| 148-01-02 | 01 | 1 | TUYA-13 | grep | `grep tuya lib/devices/deviceTypes.ts` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -55,7 +55,7 @@ created: 2026-03-30
 - [ ] `app/components/devices/tuya/hooks/__tests__/useTuyaData.test.ts` — stubs for TUYA-09
 - [ ] `app/components/devices/tuya/hooks/__tests__/useTuyaCommands.test.ts` — stubs for TUYA-10
 - [ ] `app/components/devices/tuya/__tests__/TuyaCard.test.tsx` — stubs for TUYA-11, UX-02
-- [ ] `app/(app)/tuya/__tests__/page.test.tsx` — stubs for TUYA-12, TUYA-14
+- [ ] `app/tuya/__tests__/page.test.tsx` — stubs for TUYA-12, TUYA-14
 
 *Existing infrastructure covers test framework — only test files needed.*
 

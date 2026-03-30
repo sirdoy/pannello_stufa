@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
 status: verifying
-stopped_at: Completed 145-03-PLAN.md
-last_updated: "2026-03-28T15:34:15.301Z"
+stopped_at: Phase 146 context gathered
+last_updated: "2026-03-30T07:38:57.620Z"
 last_activity: 2026-03-28
 progress:
   total_phases: 4
@@ -92,5 +92,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Completed 145-03-PLAN.md
-Resume file: None
+Stopped at: Phase 146 context gathered
+Resume file: .planning/phases/146-raspi-ws-migration/146-CONTEXT.md

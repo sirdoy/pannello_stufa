@@ -72,7 +72,7 @@ See git history and `.planning/milestones/` for details.
 **Milestone Goal:** Align all 8 WS topic payload types with the enriched HA proxy shapes, migrate Raspberry Pi to WS-primary transport, and deliver the Tuya smart plug provider end-to-end (infrastructure + frontend + WS subscription).
 
 - [x] **Phase 145: WS Type Alignment** - Update all topic payload types to match enriched HA proxy shapes (completed 2026-03-28)
-- [ ] **Phase 146: Raspi WS Migration** - Migrate useRaspiData to WS-primary with polling fallback and connection UX
+- [x] **Phase 146: Raspi WS Migration** - Migrate useRaspiData to WS-primary with polling fallback and connection UX (completed 2026-03-30)
 - [ ] **Phase 147: Tuya Infrastructure** - Proxy client, TypeScript types, and 6 API route proxies
 - [ ] **Phase 148: Tuya Frontend** - Hooks, dashboard card, /tuya page, registry entry, and energy history chart
 
@@ -147,6 +147,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 145. WS Type Alignment | v17.1 | 3/3 | Complete    | 2026-03-28 |
-| 146. Raspi WS Migration | v17.1 | 1/2 | In Progress|  |
+| 146. Raspi WS Migration | v17.1 | 1/2 | Complete    | 2026-03-30 |
 | 147. Tuya Infrastructure | v17.1 | 0/TBD | Not started | - |
 | 148. Tuya Frontend | v17.1 | 0/TBD | Not started | - |

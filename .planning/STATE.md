@@ -4,13 +4,13 @@ milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
 status: verifying
 stopped_at: Completed 146-02-PLAN.md
-last_updated: "2026-03-30T08:00:57.634Z"
+last_updated: "2026-03-30T08:07:16.571Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 
 ## Current Position
 
-Phase: 146 (raspi-ws-migration) — EXECUTING
-Plan: 2 of 2
+Phase: 147
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-03-30
 

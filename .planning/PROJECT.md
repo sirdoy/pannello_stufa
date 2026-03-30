@@ -21,7 +21,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.0 (shipped 2026-03-28)
-**Status:** v17.1 in progress — Phase 146 (Raspi WS Migration) complete, Phase 147 next
+**Status:** v17.1 in progress — Phase 147 (Tuya Infrastructure) complete, Phase 148 next
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -35,9 +35,10 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - react-error-boundary for crash isolation
 - GitHub Actions for cron automation (5-min schedule)
 - Fritz!Box TR-064 API integration via server-side proxy
-- Shared HomeAssistant API client (`haGet`/`haPost`/`haPut`/`haDelete`) for all 7 providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue, Sonos, DIRIGERA)
+- Shared HomeAssistant API client (`haGet`/`haPost`/`haPut`/`haDelete`) for all 8 providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue, Sonos, DIRIGERA, Tuya)
 - Sonos integration via HA proxy: sonosProxy.ts (28 functions), 23 API routes, transport/EQ/queue/grouping/sleep timer/seek/history
 - DIRIGERA integration via HA proxy: dirigeraProxy.ts (5 functions), 5 API routes, contact/motion sensor data
+- Tuya smart plug integration via HA proxy: tuyaProxy.ts (6 functions), 6 API routes, plug state/energy/history/timer
 - Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
 - Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)

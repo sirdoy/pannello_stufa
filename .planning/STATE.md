@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
 status: executing
-stopped_at: Completed 148-01-PLAN.md
-last_updated: "2026-03-30T12:37:27.037Z"
+stopped_at: Completed 148-02-PLAN.md
+last_updated: "2026-03-30T12:43:57.121Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 4
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-03-28)
 ## Current Position
 
 Phase: 148 (tuya-frontend) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-03-30
 
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 147-tuya-infrastructure P01 | 2min | 1 tasks | 2 files |
 | Phase 147-tuya-infrastructure P02 | 525589min | 3 tasks | 12 files |
 | Phase 148-tuya-frontend P01 | 239 | 2 tasks | 7 files |
+| Phase 148-tuya-frontend P02 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,8 @@ Key context for v17.1:
 - [Phase 147-tuya-infrastructure]: POST state/timer routes return 200 (not 202) — Tuya proxy confirms commands synchronously via data_confirmed field
 - [Phase 148-01]: useTuyaData null-plugs WS guard sets stale=true without crashing (consistent with FritzBox pattern)
 - [Phase 148-01]: useTuyaCommands uses plain fetch (not useRetryableCommand) matching simpler hooks like useDirigeraCommands
+- [Phase 148-02]: TuyaCard uses router.push('/tuya') matching RaspiCard pattern for accessible navigation
+- [Phase 148-02]: LastUpdated placed outside data conditional in TuyaCard — renders when tsMs is set (Phase 146 pattern)
 
 ### Pending Todos
 
@@ -105,5 +108,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-03-28
-Stopped at: Completed 148-01-PLAN.md
+Stopped at: Completed 148-02-PLAN.md
 Resume file: None

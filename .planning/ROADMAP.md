@@ -104,10 +104,11 @@ Plans:
   3. RaspiCard displays an Italian-locale "aggiornato X secondi fa" timestamp that updates live
   4. NavbarConnectionStatus reflects the `raspi` topic as part of the WS subscription set
   5. RaspiData TypeScript type matches the documented WS payload shape and compiles cleanly
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 146-01: TBD
+- [ ] 146-01-PLAN.md — Rewrite useRaspiData with WS-primary + polling fallback + tests
+- [ ] 146-02-PLAN.md — Add LastUpdated timestamp to RaspiCard + tests
 **UI hint**: yes
 
 ### Phase 147: Tuya Infrastructure
@@ -146,6 +147,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 145. WS Type Alignment | v17.1 | 3/3 | Complete    | 2026-03-28 |
-| 146. Raspi WS Migration | v17.1 | 0/TBD | Not started | - |
+| 146. Raspi WS Migration | v17.1 | 0/2 | Not started | - |
 | 147. Tuya Infrastructure | v17.1 | 0/TBD | Not started | - |
 | 148. Tuya Frontend | v17.1 | 0/TBD | Not started | - |

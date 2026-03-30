@@ -2,26 +2,16 @@
 
 ## What This Is
 
-PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, monitoraggio server Raspberry Pi, sistema audio Sonos (transport, EQ, queue, grouping, sleep timer, seek, history), e sensori DIRIGERA (contatto e movimento) — 7 provider collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth, copertura API ~95%). Dati live via WebSocket con fallback automatico a polling HTTP per tutti i 7 provider principali (incluso Raspberry Pi) (singola connessione condivisa, topic dispatch, exponential backoff reconnect). Include Device Registry per gestione tipi e dispositivi registrati, sistema Rooms per organizzare dispositivi in stanze con stato aggregato per stanza e panoramica whole-house. Sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Indicatore stato connessione WebSocket in navbar e timestamp ultimo aggiornamento su ogni card. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
+PWA completa per controllo smart home: stufa Thermorossi, termostato Netatmo, luci Philips Hue, monitoraggio rete Fritz!Box, monitoraggio server Raspberry Pi, sistema audio Sonos (transport, EQ, queue, grouping, sleep timer, seek, history), sensori DIRIGERA (contatto e movimento), e smart plug Tuya (on/off, timer, energy history) — 8 provider collegati tramite un unico client HomeAssistant API condiviso (singolo base URL + X-API-Key auth, copertura API ~95%). Dati live via WebSocket con fallback automatico a polling HTTP per tutti gli 8 provider (singola connessione condivisa, topic dispatch, exponential backoff reconnect). Include Device Registry per gestione tipi e dispositivi registrati, sistema Rooms per organizzare dispositivi in stanze con stato aggregato per stanza e panoramica whole-house. Sistema notifiche push production-ready con action buttons interattive, monitoring automatico stufa con cron GitHub Actions, offline mode avanzato con staleness indicators, PWA install prompt guidato, analytics dashboard GDPR-compliant con stima consumo pellet e correlazione meteo. Monitoraggio rete Fritz!Box con dashboard card, pagina dedicata /network con WAN status, device list con categorizzazione automatica, bandwidth charts con decimation LTTB, device history timeline, e correlazione bandwidth-stufa con consent gate. Monitoraggio Raspberry Pi con dashboard card (CPU/RAM/disk/temp/health) e pagina dedicata /raspi con statistiche complete. Smart plug Tuya con dashboard card (potenza aggregata, plug count), pagina dedicata /tuya con griglia plug, toggle on/off, timer countdown, e grafici energy history con selettore periodo (24h/7g/30g). Dashboard home con masonry layout (flexbox two-column split) che elimina gap verticali tra card di altezze diverse, con Suspense streaming e skeleton fallback per card individuali. Indicatore stato connessione WebSocket in navbar e timestamp ultimo aggiornamento su ogni card. Applicazione resiliente con retry automatico + idempotency, error boundaries per crash isolation, adaptive polling via Page Visibility API con stagger iniziale per evitare thundering herd, e componenti refactored con orchestrator pattern (~85% LOC reduction). Performance ottimizzata con React Compiler auto-memoization, code splitting Recharts via next/dynamic, font self-hosted via next/font, e Web Vitals pipeline. Codebase interamente in TypeScript con strict mode completo e zero errori di compilazione.
 
 ## Core Value
 
 I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## Current Milestone: v17.1 WebSocket Alignment & Tuya Integration
-
-**Goal:** Align the WebSocket implementation with the updated API documentation — add raspi WS support, integrate the new Tuya smart plug provider end-to-end, and ensure all topic types match the enriched payload shapes.
-
-**Target features:**
-- Raspi WS migration: add `raspi` topic to WS infrastructure, migrate useRaspiData to WS-primary with polling fallback
-- Tuya provider integration: tuyaProxy client, types, API routes, hooks (useTuyaData + useTuyaCommands), dashboard card, /tuya page, WS topic subscription
-- WS type alignment: ensure all 8 topic payload types match the documented enriched shapes (data_freshness, custom_name, device_type, is_stale, fetched_at)
-- Connection UX: extend LastUpdated and NavbarConnectionStatus to cover the 2 new providers
-
 ## Current State
 
-**Version:** v17.0 (shipped 2026-03-28)
-**Status:** v17.1 complete — all 4 phases shipped (WS Type Alignment, Raspi WS Migration, Tuya Infrastructure, Tuya Frontend)
+**Version:** v17.1 (shipped 2026-03-30)
+**Status:** Planning next milestone
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -38,11 +28,11 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Shared HomeAssistant API client (`haGet`/`haPost`/`haPut`/`haDelete`) for all 8 providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue, Sonos, DIRIGERA, Tuya)
 - Sonos integration via HA proxy: sonosProxy.ts (28 functions), 23 API routes, transport/EQ/queue/grouping/sleep timer/seek/history
 - DIRIGERA integration via HA proxy: dirigeraProxy.ts (5 functions), 5 API routes, contact/motion sensor data
-- Tuya smart plug integration via HA proxy: tuyaProxy.ts (6 functions), 6 API routes, hooks (useTuyaData WS+polling, useTuyaCommands), TuyaCard dashboard, /tuya page with plug grid + energy charts
+- Tuya smart plug integration via HA proxy: tuyaProxy.ts (6 functions), 6 API routes, hooks (useTuyaData WS+polling, useTuyaCommands), TuyaCard dashboard, /tuya page with plug grid + energy charts + timer controls
 - Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
-- Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client
+- Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client, WS-primary with polling fallback
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
-- ~103,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false, React Compiler auto-memoization)
+- ~113,000 lines TypeScript (strict: true, noUncheckedIndexedAccess, allowJs: false, React Compiler auto-memoization)
 
 ## Requirements
 
@@ -601,6 +591,21 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **UX-02**: Flicker-free WS/polling transitions — v17.0 (Phase 144)
 - ✓ **UX-03**: Per-card last updated timestamps — v17.0 (Phase 144)
 
+**v17.1 WebSocket Alignment & Tuya Integration (Shipped 2026-03-30):**
+
+**WS Type Alignment:**
+- ✓ **WSTYPE-01** through **WSTYPE-14**: All 8 WS topic payload types enriched with data_freshness, custom_name, device_type fields, TopicDataMap includes raspi+tuya — v17.1 (Phase 145)
+
+**Raspi WS Migration:**
+- ✓ **RASPI-01** through **RASPI-04**: useRaspiData WS-primary with polling fallback, RaspiCard LastUpdated — v17.1 (Phase 146)
+
+**Tuya Integration:**
+- ✓ **TUYA-01** through **TUYA-08**: tuyaProxy.ts function module + 6 API route proxies — v17.1 (Phase 147)
+- ✓ **TUYA-09** through **TUYA-14**: useTuyaData/useTuyaCommands hooks, TuyaCard, /tuya page with plug grid + energy charts + timer — v17.1 (Phase 148)
+
+**Connection UX:**
+- ✓ **UX-01** through **UX-03**: NavbarConnectionStatus includes raspi+tuya, LastUpdated on TuyaCard and RaspiCard — v17.1 (Phases 146, 148)
+
 **v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato (Shipped 2026-03-26):**
 
 **Sonos Integration (42 requirements):**
@@ -642,7 +647,9 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Automations engine (rule CRUD) — Scope separato, milestone dedicato futuro
 - WebSocket per comandi (write) — Spec `/ws/live` is read-only push; commands stay via REST POST/PUT
 - SharedWorker multi-tab WS — Complexity deferred, single tab WS sufficient
-- Raspberry Pi via WS — Not included in HA proxy WS topics, stays on polling only
+- Tuya device discovery/pairing — Handled by tinytuya CLI on server side
+- Tuya firmware updates — Hardware vendor responsibility
+- Tuya scenes/automation — Not in API docs
 
 ## Context
 
@@ -666,18 +673,21 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - GitHub Actions cron (5-min schedule) per health monitoring e coordination (stove, thermostat, Raspberry Pi)
 - GDPR-compliant analytics con consent banner
 - Playwright E2E smoke tests for all app pages
-- WebSocket real-time transport (react-use-websocket) for all 6 providers with HTTP polling fallback
+- WebSocket real-time transport (react-use-websocket) for all 8 providers with HTTP polling fallback
 - All device polling unified at 60s via useAdaptivePolling (fallback when WS disconnected)
 - Device Registry + Rooms frontend with typed proxy clients and 19 API route proxies
-- 23 milestones shipped, 144 phases, 457 plans executed
+- 24 milestones shipped, 148 phases, 467 plans executed
 
-**v17.0 Milestone (2026-03-28):**
-- 6 phases executed (11 plans)
-- 23/23 requirements satisfied (100%)
-- 37 code files changed (+3,641 insertions, -396 deletions, net +3,245 LOC)
+**v17.1 Milestone (2026-03-30):**
+- 4 phases executed (10 plans)
+- 35/35 requirements satisfied (100%)
+- 84 files changed (+10,102 insertions, -89 deletions, net +10,013 LOC)
 - 3 days from start to completion
-- All 6 device providers now receive live data via WebSocket with HTTP polling fallback
+- All 8 device providers now receive live data via WebSocket with HTTP polling fallback
+- Tuya smart plug integrated as 8th provider end-to-end
 - react-use-websocket added as dependency
+- 3 Tuya human verification items pending (plug toggle, energy chart granularity, timer countdown) — require live Tuya hub
+- GET /api/tuya/plugs/[device_id] single-plug route has no frontend caller (consistent with other providers)
 
 **Known Issues:**
 - Worker teardown warning (React 19 cosmetic, not actionable)
@@ -819,6 +829,13 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 | Standalone Netatmo WS adapter | Pure function adaptNetatmoWsPayload for raw→typed conversion | ✓ Good — Independently testable, no coupling to hook (v17.0) |
 | lastUpdatedAt derived from existing state | Stove: lastPollAt→ms, Network: alias, others: new state | ✓ Good — Minimal changes, backward compatible (v17.0) |
 | Italian connection status labels | WS_STATUS_LABELS: Connesso via WS / Riconnessione / Polling attivo | ✓ Good — Consistent with app's Italian UI (v17.0) |
+| Enriched WS types with registry metadata | data_freshness, custom_name, device_type added to all 8 topic types | ✓ Good — WS types match REST shapes exactly (v17.1) |
+| Inline WS payload mapping for Raspi | No standalone adapter needed — computeRaspiHealth inline in handleMessage | ✓ Good — Simpler than Netatmo adapter (fewer fields) (v17.1) |
+| Tuya 200 OK (not 202 Accepted) | Tuya proxy confirms commands synchronously via data_confirmed field | ✓ Good — Consistent with Tuya proxy behavior (v17.1) |
+| TuyaPlugMutation extends TuyaPlug | Inheritance avoids field duplication between read and write types | ✓ Good — Clean type hierarchy (v17.1) |
+| useTuyaCommands with plain fetch | Matches simpler hooks like useDirigeraCommands, no useRetryableCommand | ✓ Good — Appropriate for synchronous-confirm API (v17.1) |
+| TuyaEnergyChart via next/dynamic | Recharts deferred with ssr:false, consistent with all chart code-splitting | ✓ Good — /tuya page loads fast (v17.1) |
+| Two useEffects for timer countdown | Sync from plug.countdown_s (WS push) + interval tick for smooth countdown | ✓ Good — Accurate to WS state, smooth UX (v17.1) |
 
 ## Constraints
 
@@ -847,4 +864,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-30 — v17.1 milestone complete (WebSocket Alignment & Tuya Integration)*
+*Last updated: 2026-03-30 after v17.1 milestone*

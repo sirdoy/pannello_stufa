@@ -1,5 +1,28 @@
 # Project Milestones: Pannello Stufa
 
+## v17.1 WebSocket Alignment & Tuya Integration (Shipped: 2026-03-30)
+
+**Delivered:** All 8 WS topic types aligned with enriched HA proxy shapes, Raspberry Pi migrated to WS-primary transport, and Tuya smart plug provider integrated end-to-end as the 8th device provider.
+
+**Phases completed:** 145-148 (4 phases, 10 plans)
+
+**Key accomplishments:**
+
+- WS type alignment: all 8 topic payload types enriched with data_freshness, custom_name, device_type fields matching HA proxy shapes
+- Raspberry Pi migrated to WS-primary with polling fallback — completing 8/8 providers on WebSocket transport
+- Tuya proxy client (tuyaProxy.ts) with 6 haGet/haPost wrappers + 6 API route proxies (health, plugs, state, timer, history)
+- Tuya frontend: useTuyaData/useTuyaCommands hooks, TuyaCard dashboard card, /tuya page with plug grid, energy charts, timer controls
+- 8th device provider (Tuya smart plugs) unified on shared HA proxy + WS transport
+
+**Stats:**
+
+- 10 plans executed across 4 phases
+- 35/35 v17.1 requirements satisfied (100%)
+- 84 files changed (+10,102 insertions, -89 deletions, net +10,013 LOC)
+- 3 days (2026-03-28 → 2026-03-30)
+
+---
+
 ## v17.0 WebSocket Real-Time Transport (Shipped: 2026-03-28)
 
 **Delivered:** All 6 device provider hooks migrated from HTTP polling-first to WebSocket-primary with automatic polling fallback — live data push via single shared WS connection, visual connection indicator, and per-card timestamps.

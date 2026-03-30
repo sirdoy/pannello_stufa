@@ -419,6 +419,44 @@
 
 ---
 
+## Milestone: v17.1 — WebSocket Alignment & Tuya Integration
+
+**Shipped:** 2026-03-30
+**Phases:** 4 | **Plans:** 10
+
+### What Was Built
+- All 8 WS topic payload types enriched with data_freshness, custom_name, device_type to match HA proxy shapes
+- Raspberry Pi migrated to WS-primary transport (8th and final provider on WebSocket)
+- Tuya smart plug provider end-to-end: proxy client (6 functions), 6 API routes, 2 hooks, dashboard card, /tuya page with plug grid + energy charts + timer controls
+- Device registry and navigation updated for Tuya as 8th provider
+
+### What Worked
+- WS type alignment (Phase 145) was a clean foundation — additive field additions with no breaking changes
+- Tuya followed established provider onboarding template (types → client → routes → hooks → card → page → registry)
+- Phase 146 and 147 ran as independent parallel tracks (no dependency between Raspi WS and Tuya infra)
+- Milestone audit scored 35/35 requirements, 6/6 E2E flows — zero gaps found
+
+### What Was Inefficient
+- SUMMARY.md one_liner extraction failed for most Phase 145-146 summaries (empty one-liners) — persistent tooling gap
+- Nyquist compliance partial (1/4 phases fully compliant) — validation drafts not promoted
+
+### Patterns Established
+- Tuya 200 OK (not 202 Accepted) pattern for synchronous-confirm APIs — different from Thermorossi/Hue 202 pattern
+- Two useEffect timer pattern: sync from WS push + interval tick for countdown display
+- Inline WS payload mapping (no standalone adapter) for simple providers with few fields
+
+### Key Lessons
+- 8th provider onboarding was fastest yet — proxy pattern fully mature, zero research needed for implementation approach
+- SUMMARY frontmatter quality remains a gap (same observation since v11.0) — tooling fix needed at executor level
+- Timer countdown UX requires two effects (WS sync + tick) to avoid stale state — not immediately obvious pattern
+
+### Cost Observations
+- Model mix: ~40% opus, ~60% sonnet (via balanced profile)
+- Sessions: ~4 (discuss, plan, execute, milestone audit)
+- Notable: smallest milestone in recent history (4 phases, 10 plans) but highest LOC output (+10,013) due to Tuya greenfield code
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -436,6 +474,7 @@
 | v15.0 | 8 | 13 | Rooms & Device Registry — first greenfield UI milestone |
 | v16.0 | 13 | 26 | Sonos + DIRIGERA + Fritz!Box advanced — largest milestone, 7 providers |
 | v17.0 | 6 | 11 | WebSocket real-time transport — WS-primary for all 6 providers |
+| v17.1 | 4 | 10 | WS type alignment + Tuya integration — 8th provider, all on WS |
 
 ### Cumulative Quality
 
@@ -452,6 +491,7 @@
 | v15.0 | 4,000+ | 25/25 requirements | +5,417 |
 | v16.0 | 4,000+ | 62/62 requirements | +20,351 |
 | v17.0 | 4,000+ | 23/23 requirements | +3,245 |
+| v17.1 | 4,000+ | 35/35 requirements | +10,013 |
 
 ### Top Lessons (Verified Across Milestones)
 

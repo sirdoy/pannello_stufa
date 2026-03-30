@@ -2,32 +2,32 @@
 gsd_state_version: 1.0
 milestone: v17.1
 milestone_name: WebSocket Alignment & Tuya Integration
-status: executing
-stopped_at: Completed 148-03-PLAN.md
-last_updated: "2026-03-30T12:51:23.282Z"
+status: completed
+stopped_at: Milestone v17.1 archived
+last_updated: "2026-03-30T15:02:00.000Z"
 last_activity: 2026-03-30
 progress:
   total_phases: 4
   completed_phases: 4
   total_plans: 10
   completed_plans: 10
-  percent: 0
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-28)
+See: .planning/PROJECT.md (updated 2026-03-30)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 148 — tuya-frontend
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 148
-Plan: Not started
-Status: Ready to execute
+Phase: 148 (final)
+Plan: All complete
+Status: Milestone v17.1 shipped
 Last activity: 2026-03-30
 
 Progress: [░░░░░░░░░░] 0%

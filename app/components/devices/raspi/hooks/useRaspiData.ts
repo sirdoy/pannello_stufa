@@ -1,8 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
+import type { RaspiData as WsRaspiData } from '@/types/websocket';
 import type { CpuResponse, MemoryResponse, DiskResponse, SystemResponse } from '@/types/raspi';
 
 export type RaspiHealth = 'ok' | 'warning' | 'error';
@@ -20,9 +23,10 @@ export interface UseRaspiDataReturn {
   error: string | null;
   stale: boolean;
   health: RaspiHealth;
+  lastUpdatedAt: number | null;
 }
 
-function computeRaspiHealth(d: RaspiData): RaspiHealth {
+export function computeRaspiHealth(d: RaspiData): RaspiHealth {
   if (d.diskPercent > 90 || d.memoryPercent > 95) return 'error';
   if (
     d.cpuPercent > 80 ||
@@ -40,10 +44,14 @@ export function useRaspiData(): UseRaspiDataReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stale, setStale] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
   const dataRef = useRef<RaspiData | null>(null);
 
   const isVisible = useVisibility();
   const interval = isVisible ? 60000 : 300000;
+
+  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const isWsConnected = readyState === ReadyState.OPEN;
 
   const fetchData = async () => {
     try {
@@ -76,6 +84,7 @@ export function useRaspiData(): UseRaspiDataReturn {
       dataRef.current = newData;
       setData(newData);
       setStale(false);
+      setLastUpdatedAt(Date.now());
     } catch {
       setStale(true);
       if (!dataRef.current) {
@@ -86,9 +95,36 @@ export function useRaspiData(): UseRaspiDataReturn {
     }
   };
 
+  // WS subscription: subscribe to 'raspi' topic when connection is OPEN (Phase 141 pattern)
+  useEffect(() => {
+    if (!isWsConnected) return; // guard against CLOSED state
+
+    const handleMessage = (raw: unknown) => {
+      const wsData = raw as WsRaspiData;
+
+      const newData: RaspiData = {
+        cpuPercent: wsData.cpu_percent,
+        memoryPercent: (wsData.memory as { percent: number }).percent,
+        diskPercent: (wsData.disk as { percent: number }).percent,
+        cpuTemperature: (wsData.system as { temperature: number | null }).temperature ?? null,
+      };
+
+      dataRef.current = newData;
+      setData(newData);
+      setStale(false);
+      setLoading(false);
+      setError(null);
+      setLastUpdatedAt(Date.now());
+    };
+
+    subscribe('raspi', handleMessage);
+    return () => { unsubscribe('raspi', handleMessage); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWsConnected, subscribe, unsubscribe]);
+
   useAdaptivePolling({
     callback: fetchData,
-    interval,
+    interval: isWsConnected ? null : interval,
     alwaysActive: false,
     immediate: true,
     initialDelay: 600,
@@ -96,5 +132,5 @@ export function useRaspiData(): UseRaspiDataReturn {
 
   const health: RaspiHealth = data ? computeRaspiHealth(data) : 'ok';
 
-  return { data, loading, error, stale, health };
+  return { data, loading, error, stale, health, lastUpdatedAt };
 }

@@ -21,7 +21,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.0 (shipped 2026-03-28)
-**Status:** v17.1 in progress — Phase 147 (Tuya Infrastructure) complete, Phase 148 next
+**Status:** v17.1 complete — all 4 phases shipped (WS Type Alignment, Raspi WS Migration, Tuya Infrastructure, Tuya Frontend)
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -38,7 +38,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - Shared HomeAssistant API client (`haGet`/`haPost`/`haPut`/`haDelete`) for all 8 providers (Thermorossi, Netatmo, Fritz!Box, Raspberry Pi, Hue, Sonos, DIRIGERA, Tuya)
 - Sonos integration via HA proxy: sonosProxy.ts (28 functions), 23 API routes, transport/EQ/queue/grouping/sleep timer/seek/history
 - DIRIGERA integration via HA proxy: dirigeraProxy.ts (5 functions), 5 API routes, contact/motion sensor data
-- Tuya smart plug integration via HA proxy: tuyaProxy.ts (6 functions), 6 API routes, plug state/energy/history/timer
+- Tuya smart plug integration via HA proxy: tuyaProxy.ts (6 functions), 6 API routes, hooks (useTuyaData WS+polling, useTuyaCommands), TuyaCard dashboard, /tuya page with plug grid + energy charts
 - Netatmo integration via local HomeAssistant proxy (X-API-Key auth, SQLite-backed)
 - Raspberry Pi monitoring (health, CPU, memory, disk, system) via shared HA client
 - Web Vitals pipeline (useReportWebVitals + sendBeacon + Firebase RTDB)
@@ -847,4 +847,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-28 — v17.1 milestone started (WebSocket Alignment & Tuya Integration)*
+*Last updated: 2026-03-30 — v17.1 milestone complete (WebSocket Alignment & Tuya Integration)*

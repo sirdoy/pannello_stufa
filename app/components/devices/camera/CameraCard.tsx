@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { RefreshCw } from 'lucide-react';
 import { CAMERA_ROUTES } from '@/lib/routes';
@@ -9,7 +9,7 @@ import DeviceCard from '../../ui/DeviceCard';
 import { Text, Button, Switch } from '../../ui';
 import { getCameraTypeName } from '@/lib/netatmo/netatmoCameraApi';
 import HlsPlayer from './HlsPlayer';
-import type { CameraStatus, DataFreshness } from '@/types/netatmoProxy';
+import { useCameraData } from './hooks/useCameraData';
 
 /**
  * CameraCard - Camera summary view for homepage
@@ -17,11 +17,8 @@ import type { CameraStatus, DataFreshness } from '@/types/netatmoProxy';
  */
 export default function CameraCard() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [connected, setConnected] = useState(false);
-  const [cameras, setCameras] = useState<CameraStatus[]>([]);
-  const [dataFreshness, setDataFreshness] = useState<DataFreshness | null>(null);
+  const { cameras, loading, error, connected, stale, dataFreshness, refresh } = useCameraData();
+
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null);
   const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
@@ -32,16 +29,6 @@ export default function CameraCard() {
   const [streamError, setStreamError] = useState(false);
   const [monitoringOn, setMonitoringOn] = useState<boolean>(false);
   const [monitoringLoading, setMonitoringLoading] = useState(false);
-
-  const connectionCheckedRef = useRef(false);
-
-  // Check connection on mount — staggered 400ms to avoid thundering herd on dashboard mount
-  useEffect(() => {
-    if (connectionCheckedRef.current) return;
-    connectionCheckedRef.current = true;
-    const t = setTimeout(() => fetchCameras(), 400);
-    return () => clearTimeout(t);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-select first camera
   useEffect(() => {
@@ -67,44 +54,6 @@ export default function CameraCard() {
       setMonitoringOn(camera.status === 'on');
     }
   }, [selectedCameraId, cameras]);
-
-  async function fetchCameras(retryCount: number = 0) {
-    const MAX_RETRIES = 1;
-    const RETRY_DELAY_MS = 1500;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(CAMERA_ROUTES.status);
-      const data = await response.json() as { cameras?: CameraStatus[]; data_freshness?: DataFreshness | null; error?: string };
-
-      if (!response.ok || data.error) {
-        // Retry on server errors
-        if (retryCount < MAX_RETRIES) {
-          await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-          return fetchCameras(retryCount + 1);
-        }
-        setConnected(false);
-        setError(data.error ?? `Errore ${response.status}`);
-        return;
-      }
-
-      setConnected(true);
-      setCameras(data.cameras ?? []);
-      setDataFreshness(data.data_freshness ?? null);
-    } catch (err) {
-      console.error('Errore fetch cameras:', err);
-      if (retryCount < MAX_RETRIES) {
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-        return fetchCameras(retryCount + 1);
-      }
-      setError(err instanceof Error ? err.message : String(err));
-      setConnected(false);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   async function fetchStreamUrl(cameraId: string) {
     setStreamLoading(true);
@@ -135,13 +84,12 @@ export default function CameraCard() {
 
   async function handleRefresh() {
     setRefreshing(true);
-    connectionCheckedRef.current = false;
     // Bust snapshot cache by appending a new timestamp — forces a fresh image load
     if (selectedCameraId) {
       setSnapshotError(false);
       setSnapshotUrl(CAMERA_ROUTES.snapshot(selectedCameraId) + `&t=${Date.now()}`);
     }
-    await fetchCameras();
+    await refresh();
     setRefreshing(false);
   }
 
@@ -179,7 +127,7 @@ export default function CameraCard() {
   }
 
   const selectedCamera = cameras.find(c => c.camera_id === selectedCameraId);
-  const isStale = dataFreshness === 'UNREACHABLE';
+  const isStale = dataFreshness === 'UNREACHABLE' || stale;
 
   // Get status badge based on camera state
   const getStatusBadge = () => {
@@ -204,10 +152,7 @@ export default function CameraCard() {
         colorTheme="ocean"
         connected={false}
         connectionError={error ?? 'Errore di connessione alle videocamere.'}
-        onConnect={() => {
-          connectionCheckedRef.current = false;
-          void fetchCameras();
-        }}
+        onConnect={() => void refresh()}
         connectButtonLabel="Riprova"
       />
     );

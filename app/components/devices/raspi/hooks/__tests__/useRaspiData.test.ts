@@ -258,14 +258,14 @@ describe('useRaspiData', () => {
     expect(mockUnsubscribe).toHaveBeenCalledWith('raspi', expect.any(Function));
   });
 
-  it('suspends polling when WS is connected', () => {
+  it('keeps polling active even when WS is connected (raspi not in WS topics)', () => {
     setWsConnected(true);
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
 
     renderHook(() => useRaspiData());
 
     const pollingArgs = mockUseAdaptivePolling.mock.calls[0]?.[0];
-    expect(pollingArgs?.interval).toBeNull();
+    expect(pollingArgs?.interval).toBe(60000);
   });
 
   it('maps WS payload to RaspiData correctly', async () => {

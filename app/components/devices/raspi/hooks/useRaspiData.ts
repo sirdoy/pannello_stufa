@@ -122,9 +122,10 @@ export function useRaspiData(): UseRaspiDataReturn {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWsConnected, subscribe, unsubscribe]);
 
+  // Raspi is not in HA proxy WS topics — always poll regardless of WS state
   useAdaptivePolling({
     callback: fetchData,
-    interval: isWsConnected ? null : interval,
+    interval,
     alwaysActive: false,
     immediate: true,
     initialDelay: 600,

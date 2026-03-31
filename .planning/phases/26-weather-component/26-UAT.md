@@ -3,7 +3,7 @@ status: complete
 phase: 26-weather-component
 source: [26-01-SUMMARY.md, 26-02-SUMMARY.md, 26-03-SUMMARY.md, 26-04-SUMMARY.md]
 started: 2026-02-03T09:00:00Z
-updated: 2026-02-03T09:30:00Z
+updated: 2026-03-31T00:00:00Z
 ---
 
 ## Current Test
@@ -38,8 +38,8 @@ result: pass (fixed - now fills card width)
 
 ### 7. Forecast Horizontal Scroll
 expected: Forecast row scrolls horizontally with snap behavior. Right edge shows fade gradient indicating more content. Momentum scrolling works smoothly.
-result: skipped
-reason: User wants forecast days to fill card width instead of scrolling
+result: resolved
+resolution: User explicitly wanted forecast days to fill card width instead of scrolling. ForecastRow.tsx now uses grid-cols-5 layout. Test 6 confirms this works ("pass (fixed - now fills card width)"). This test validated the old rejected behavior.
 
 ### 8. Tap Day for Details
 expected: Tapping a forecast day card opens a modal with full details: date, temperature range, weather icon, extended stats (UV, humidity, wind, precipitation).
@@ -65,9 +65,10 @@ result: pass
 
 total: 12
 passed: 11
+resolved: 1
 issues: 0
 pending: 0
-skipped: 1
+skipped: 0
 
 ## Gaps
 

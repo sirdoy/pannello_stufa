@@ -36,11 +36,20 @@ import Sheet from '@/app/components/ui/Sheet';
 import CommandPalette from '@/app/components/ui/CommandPalette';
 import Kbd from '@/app/components/ui/Kbd';
 import DataTable from '@/app/components/ui/DataTable';
+import Slider from '@/app/components/ui/Slider';
+import RadioGroup from '@/app/components/ui/RadioGroup';
+import Label from '@/app/components/ui/Label';
+import Tabs from '@/app/components/ui/Tabs';
+import Pagination from '@/app/components/ui/Pagination';
+import Switch from '@/app/components/ui/Switch';
+import InfoBox from '@/app/components/ui/InfoBox';
+import Panel from '@/app/components/ui/Panel';
+import { LastUpdated } from '@/app/components/ui/LastUpdated';
 import { WeatherIcon, getWeatherLabel } from '@/app/components/weather/WeatherIcon';
 import { useState } from 'react';
 import { z } from 'zod';
 import { Controller } from 'react-hook-form';
-import { Home, Settings, Power, Moon } from 'lucide-react';
+import { Home, Settings, Power, Moon, Calendar, Sliders as SlidersIcon } from 'lucide-react';
 import CodeBlock from './components/CodeBlock';
 import PropTable from './components/PropTable';
 import AccessibilitySection from './components/AccessibilitySection';
@@ -97,6 +106,12 @@ export default function DesignSystemPage() {
   const [topSheetOpen, setTopSheetOpen] = useState<boolean>(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
   const [menuCheckboxState, setMenuCheckboxState] = useState<boolean>(false);
+  // New component states
+  const [sliderValue, setSliderValue] = useState<number>(50);
+  const [radioValue, setRadioValue] = useState<string>('auto');
+  const [switchState, setSwitchState] = useState<boolean>(true);
+  const [paginationPage, setPaginationPage] = useState<number>(0);
+  const [tabValue, setTabValue] = useState<string>('tab1');
   // Dialog Patterns states
   const [showConfirmDefault, setShowConfirmDefault] = useState<boolean>(false);
   const [showConfirmDanger, setShowConfirmDanger] = useState<boolean>(false);
@@ -177,6 +192,11 @@ export default function DesignSystemPage() {
                 { icon: '🏠', title: 'Smart Home', anchor: 'smart-home-components' },
                 { icon: '📐', title: 'Layout', anchor: 'layout-components' },
                 { icon: '📝', title: 'Form Inputs', anchor: 'form-inputs' },
+                { icon: '🎚️', title: 'Slider', anchor: 'slider' },
+                { icon: '🔘', title: 'Radio & Switch', anchor: 'radio-switch' },
+                { icon: '📑', title: 'Tabs', anchor: 'tabs' },
+                { icon: '📄', title: 'Pagination', anchor: 'pagination' },
+                { icon: 'ℹ️', title: 'InfoBox & Panel', anchor: 'infobox-panel' },
                 { icon: '📊', title: 'Progress Bar', anchor: 'progress-bar' },
                 { icon: '🪟', title: 'Modal & Overlays', anchor: 'modal-overlays' },
                 { icon: '🪗', title: 'Accordion', anchor: 'accordion' },
@@ -197,12 +217,7 @@ export default function DesignSystemPage() {
                 <a
                   key={anchor}
                   href={`#${anchor}`}
-                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm
-                    text-slate-300 hover:text-ember-400
-                    bg-white/[0.02] hover:bg-white/[0.06]
-                    [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-ember-600
-                    [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:hover:bg-slate-200
-                    transition-colors duration-200"
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm text-slate-600 hover:text-ember-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:hover:text-ember-400 dark:bg-white/[0.02] dark:hover:bg-white/[0.06] transition-colors duration-200"
                 >
                   <span aria-hidden="true">{icon}</span>
                   <span className="truncate">{title}</span>
@@ -340,7 +355,7 @@ export default function DesignSystemPage() {
                     <Button variant="ghost">Ghost</Button>
                     <Button variant="success">Success</Button>
                     <Button variant="danger">Danger</Button>
-                    <Button variant="subtle">Ocean</Button>
+                    <Button variant="ocean">Ocean</Button>
                     <Button variant="outline">Outline</Button>
                   </div>
                 </div>
@@ -434,7 +449,8 @@ export default function DesignSystemPage() {
                 <CardTitle icon="🔥">Default Card</CardTitle>
               </CardHeader>
               <CardContent>
-                <Text variant="secondary">bg-slate-900/80, subtle dark container, best for most use cases</Text>
+                <Text variant="secondary">Default container. Best for most use cases.</Text>
+                <CodeBlock code={`<Card>content</Card>`} />
               </CardContent>
             </Card>
 
@@ -443,7 +459,8 @@ export default function DesignSystemPage() {
                 <CardTitle icon="⬆️">Elevated Card</CardTitle>
               </CardHeader>
               <CardContent>
-                <Text variant="secondary">bg-slate-850/90, stronger shadow, more prominent</Text>
+                <Text variant="secondary">Stronger shadow, more prominent. For featured content.</Text>
+                <CodeBlock code={`<Card variant="elevated">content</Card>`} />
               </CardContent>
             </Card>
 
@@ -452,7 +469,8 @@ export default function DesignSystemPage() {
                 <CardTitle icon="👻">Subtle Card</CardTitle>
               </CardHeader>
               <CardContent>
-                <Text variant="secondary">bg-white/[0.03], minimal, for nested/secondary content</Text>
+                <Text variant="secondary">Minimal background. For nested/secondary content.</Text>
+                <CodeBlock code={`<Card variant="subtle">content</Card>`} />
               </CardContent>
             </Card>
 
@@ -461,7 +479,8 @@ export default function DesignSystemPage() {
                 <CardTitle icon="🔲">Outlined Card</CardTitle>
               </CardHeader>
               <CardContent>
-                <Text variant="secondary">bg-transparent, visible border only</Text>
+                <Text variant="secondary">Transparent background, visible border only.</Text>
+                <CodeBlock code={`<Card variant="outlined">content</Card>`} />
               </CardContent>
             </Card>
 
@@ -470,7 +489,8 @@ export default function DesignSystemPage() {
                 <CardTitle icon="💎">Glass Card</CardTitle>
               </CardHeader>
               <CardContent>
-                <Text variant="secondary">bg-slate-900/70, strong glass effect, backdrop-blur-2xl</Text>
+                <Text variant="secondary">Glass morphism with backdrop-blur. For overlays.</Text>
+                <CodeBlock code={`<Card variant="glass">content</Card>`} />
               </CardContent>
             </Card>
 
@@ -479,7 +499,8 @@ export default function DesignSystemPage() {
                 <CardTitle icon="✨">Hover + Glow</CardTitle>
               </CardHeader>
               <CardContent>
-                <Text variant="secondary">Interactive card, hover:-translate-y-0.5, shadow-ember-glow</Text>
+                <Text variant="secondary">Interactive: lift on hover + ember glow shadow.</Text>
+                <CodeBlock code={`<Card hover glow>content</Card>`} />
               </CardContent>
             </Card>
           </div>
@@ -1045,39 +1066,46 @@ export default function DesignSystemPage() {
                   </Text>
                   <div className="space-y-4 max-w-md">
                     <Input
-                      aria-label="Text Input"
+                      label="Text Input"
                       placeholder="Enter text..."
                       icon="📧"
                       autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
-                      aria-label="Password Input"
+                      label="Password Input"
                       type="password"
                       placeholder="Enter password..."
                       icon="🔒"
                       autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
-                      aria-label="Input with Variant"
-                      placeholder="Default variant..."
-                      icon="🌊"
-                      variant="default"
+                      label="Ember Variant"
+                      placeholder="Ember focus ring..."
+                      icon="🔥"
+                      variant="ember"
                       autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
-                      aria-label="Input with Helper Text"
+                      label="Ocean Variant"
+                      placeholder="Ocean focus ring..."
+                      icon="🌊"
+                      variant="ocean"
+                      autoComplete="off" data-lpignore="true" data-1p-ignore
+                    />
+                    <Input
+                      label="With Helper Text"
                       placeholder="Enter text..."
                       helperText="This is helper text that provides additional context"
                       autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
-                      aria-label="Input with Error"
+                      label="Error State"
                       placeholder="Enter text..."
                       error="This field is required"
                       autoComplete="off" data-lpignore="true" data-1p-ignore
                     />
                     <Input
-                      aria-label="Disabled Input"
+                      label="Disabled"
                       placeholder="Disabled..."
                       disabled
                       value="Cannot edit"
@@ -1400,6 +1428,293 @@ export default function DesignSystemPage() {
           </Card>
         </SectionShowcase>
 
+        {/* Slider */}
+        <SectionShowcase title="Slider" icon="🎚️" docs="app/components/ui/Slider.tsx">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Slider Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Radix UI slider with single value and range mode. Props: value, onValueChange, min, max, step, variant, disabled, range, showTooltip
+                  </Text>
+                  <div className="space-y-6 max-w-md">
+                    <div>
+                      <Label>Default Slider (value: {sliderValue})</Label>
+                      <Slider value={sliderValue} onValueChange={(v) => setSliderValue(typeof v === 'number' ? v : v[0] ?? 0)} aria-label="Default slider" />
+                    </div>
+                    <div>
+                      <Label>Ember Variant</Label>
+                      <Slider value={70} variant="ember" onValueChange={() => {}} aria-label="Ember variant" />
+                    </div>
+                    <div>
+                      <Label>Ocean Variant</Label>
+                      <Slider value={40} variant="ocean" onValueChange={() => {}} aria-label="Ocean variant" />
+                    </div>
+                    <div>
+                      <Label>With Tooltip</Label>
+                      <Slider value={60} showTooltip onValueChange={() => {}} aria-label="Slider with tooltip" />
+                    </div>
+                    <div>
+                      <Label>Disabled</Label>
+                      <Slider value={30} disabled onValueChange={() => {}} aria-label="Disabled slider" />
+                    </div>
+                  </div>
+                </div>
+                <CardDivider />
+                <div>
+                  <Text variant="label" size="xs" className="mb-2">Props Reference</Text>
+                  <PropTable props={[
+                    { name: 'value', type: 'number | number[]', description: 'Current value' },
+                    { name: 'onValueChange', type: '(value: number | number[]) => void', description: 'Value change callback' },
+                    { name: 'min', type: 'number', default: '0', description: 'Minimum value' },
+                    { name: 'max', type: 'number', default: '100', description: 'Maximum value' },
+                    { name: 'step', type: 'number', default: '1', description: 'Step increment' },
+                    { name: 'variant', type: "'default' | 'ember' | 'ocean'", default: "'default'", description: 'Color variant' },
+                    { name: 'disabled', type: 'boolean', default: 'false', description: 'Disabled state' },
+                    { name: 'range', type: 'boolean', default: 'false', description: 'Enable dual-thumb range' },
+                    { name: 'showTooltip', type: 'boolean', default: 'false', description: 'Show value tooltip' },
+                  ]} />
+                </div>
+                <div>
+                  <Text variant="label" size="xs" className="mb-2">Usage</Text>
+                  <CodeBlock code={`<Slider
+  value={brightness}
+  onValueChange={setBrightness}
+  min={0}
+  max={100}
+  step={1}
+  variant="ember"
+  showTooltip
+/>`} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
+        {/* Radio Group & Switch */}
+        <SectionShowcase title="Radio & Switch" icon="🔘" docs="app/components/ui/RadioGroup.tsx">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">RadioGroup Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Radix radio group with keyboard navigation. Props: value, onValueChange, orientation, variant, size
+                  </Text>
+                  <div className="space-y-4 max-w-md">
+                    <RadioGroup value={radioValue} onValueChange={setRadioValue}>
+                      <RadioGroup.Item value="auto" label="Automatico" />
+                      <RadioGroup.Item value="manual" label="Manuale" />
+                      <RadioGroup.Item value="semi" label="Semi-Manuale" />
+                    </RadioGroup>
+                  </div>
+                </div>
+                <CardDivider />
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">RadioGroup Props</Text>
+                  <PropTable props={[
+                    { name: 'value', type: 'string', description: 'Selected value' },
+                    { name: 'onValueChange', type: '(value: string) => void', description: 'Value change callback' },
+                    { name: 'orientation', type: "'vertical' | 'horizontal'", default: "'vertical'", description: 'Layout direction' },
+                    { name: 'variant', type: "'default' | 'ember'", default: "'default'", description: 'Color variant' },
+                    { name: 'size', type: "'sm' | 'md' | 'lg'", default: "'md'", description: 'Radio button size' },
+                  ]} />
+                  <CodeBlock code={`<RadioGroup value={mode} onValueChange={setMode}>
+  <RadioGroup.Item value="auto" label="Automatic" />
+  <RadioGroup.Item value="manual" label="Manual" />
+</RadioGroup>`} />
+                </div>
+                <CardDivider />
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Switch Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Toggle switch with label. Built on Radix Switch primitive.
+                  </Text>
+                  <div className="space-y-4 max-w-md">
+                    <div className="flex items-center gap-3">
+                      <Switch checked={switchState} onCheckedChange={setSwitchState} />
+                      <Label>Notifiche Push {switchState ? '(Attive)' : '(Disattive)'}</Label>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Switch checked={false} disabled onCheckedChange={() => {}} />
+                      <Label>Disabilitato</Label>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <CodeBlock code={`<Switch
+  checked={enabled}
+  onCheckedChange={setEnabled}
+/>
+<Label>Notifiche Push</Label>`} />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
+        {/* Tabs */}
+        <SectionShowcase title="Tabs" icon="📑" docs="app/components/ui/Tabs.tsx">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Tabs Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Radix Tabs with sliding underline indicator, icon support, and keyboard navigation.
+                  </Text>
+                  <Tabs defaultValue="tab1">
+                    <Tabs.List>
+                      <Tabs.Trigger value="tab1" icon={<Calendar size={16} />}>Schedule</Tabs.Trigger>
+                      <Tabs.Trigger value="tab2" icon={<SlidersIcon size={16} />}>Manuale</Tabs.Trigger>
+                      <Tabs.Trigger value="tab3" icon={<Settings size={16} />}>Impostazioni</Tabs.Trigger>
+                    </Tabs.List>
+                    <Tabs.Content value="tab1">
+                      <div className="p-4">
+                        <Text variant="secondary">Contenuto della tab Schedule</Text>
+                      </div>
+                    </Tabs.Content>
+                    <Tabs.Content value="tab2">
+                      <div className="p-4">
+                        <Text variant="secondary">Contenuto della tab Manuale</Text>
+                      </div>
+                    </Tabs.Content>
+                    <Tabs.Content value="tab3">
+                      <div className="p-4">
+                        <Text variant="secondary">Contenuto della tab Impostazioni</Text>
+                      </div>
+                    </Tabs.Content>
+                  </Tabs>
+                </div>
+                <CardDivider />
+                <div>
+                  <Text variant="label" size="xs" className="mb-2">Props Reference</Text>
+                  <PropTable props={[
+                    { name: 'defaultValue', type: 'string', description: 'Initial active tab' },
+                    { name: 'value', type: 'string', description: 'Controlled active tab' },
+                    { name: 'onValueChange', type: '(value: string) => void', description: 'Tab change callback' },
+                    { name: 'orientation', type: "'horizontal' | 'vertical'", default: "'horizontal'", description: 'Layout direction' },
+                  ]} />
+                  <Text variant="label" size="xs" className="mt-3 mb-2">Tabs.Trigger Props</Text>
+                  <PropTable props={[
+                    { name: 'value', type: 'string', required: true, description: 'Tab identifier' },
+                    { name: 'icon', type: 'ReactNode', description: 'Icon before text' },
+                    { name: 'disabled', type: 'boolean', default: 'false', description: 'Disabled state' },
+                  ]} />
+                </div>
+                <div>
+                  <Text variant="label" size="xs" className="mb-2">Usage</Text>
+                  <CodeBlock code={`<Tabs defaultValue="schedule">
+  <Tabs.List>
+    <Tabs.Trigger value="schedule" icon={<Calendar />}>
+      Schedule
+    </Tabs.Trigger>
+    <Tabs.Trigger value="manual">Manual</Tabs.Trigger>
+  </Tabs.List>
+  <Tabs.Content value="schedule">...</Tabs.Content>
+  <Tabs.Content value="manual">...</Tabs.Content>
+</Tabs>`} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
+        {/* Pagination */}
+        <SectionShowcase title="Pagination" icon="📄" docs="app/components/ui/Pagination.tsx">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Pagination Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Page navigation with ellipsis, keyboard support, and configurable siblings.
+                  </Text>
+                  <Pagination currentPage={paginationPage} totalPages={10} onPrevious={() => setPaginationPage(p => Math.max(0, p - 1))} onNext={() => setPaginationPage(p => Math.min(9, p + 1))} />
+                </div>
+                <CardDivider />
+                <div>
+                  <Text variant="label" size="xs" className="mb-2">Props Reference</Text>
+                  <PropTable props={[
+                    { name: 'currentPage', type: 'number', required: true, description: 'Current page (0-based index)' },
+                    { name: 'totalPages', type: 'number', required: true, description: 'Total number of pages' },
+                    { name: 'onPrevious', type: '() => void', required: true, description: 'Previous page callback' },
+                    { name: 'onNext', type: '() => void', required: true, description: 'Next page callback' },
+                  ]} />
+                </div>
+                <div>
+                  <Text variant="label" size="xs" className="mb-2">Usage</Text>
+                  <CodeBlock code={`<Pagination
+  currentPage={page}
+  totalPages={Math.ceil(total / pageSize)}
+  onPrevious={() => setPage(p => Math.max(0, p - 1))}
+  onNext={() => setPage(p => Math.min(lastPage, p + 1))}
+/>`} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
+        {/* InfoBox & Panel */}
+        <SectionShowcase title="InfoBox & Panel" icon="ℹ️" docs="app/components/ui/InfoBox.tsx">
+          <Card>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">InfoBox Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Info box with icon, label, and value display. Used in device cards for summary statistics.
+                  </Text>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <InfoBox icon="🔥" label="Potenza" value="3" variant="ember" />
+                    <InfoBox icon="🌡️" label="Temperatura" value="22°C" variant="ocean" />
+                    <InfoBox icon="💨" label="Ventola" value="Auto" variant="sage" />
+                    <InfoBox icon="⚠️" label="Allarmi" value="0" variant="warning" />
+                    <InfoBox icon="❌" label="Errori" value="1" variant="danger" />
+                    <InfoBox icon="📊" label="Uptime" value="48h" variant="neutral" />
+                  </div>
+                </div>
+                <CardDivider />
+                <div>
+                  <Text variant="label" size="xs" className="mb-2">Props Reference</Text>
+                  <PropTable props={[
+                    { name: 'icon', type: 'string', required: true, description: 'Emoji icon' },
+                    { name: 'label', type: 'string', required: true, description: 'Label text (uppercase)' },
+                    { name: 'value', type: 'string | number', required: true, description: 'Value to display' },
+                    { name: 'variant', type: "'neutral' | 'ember' | 'ocean' | 'sage' | 'warning' | 'danger'", default: "'neutral'", description: 'Value text color' },
+                    { name: 'layout', type: "'vertical' | 'horizontal'", default: "'horizontal'", description: 'Layout orientation' },
+                  ]} />
+                  <CodeBlock code={`<InfoBox icon="🔥" label="Potenza" value="3" variant="ember" />
+<InfoBox icon="🌡️" label="Temperatura" value="22°C" variant="ocean" />`} />
+                </div>
+                <CardDivider />
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">Panel Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Content container with optional title and padding. Lighter than Card, for grouping related content.
+                  </Text>
+                  <Panel>
+                    <Text variant="secondary">Default panel content. Used for grouping related elements.</Text>
+                  </Panel>
+                </div>
+                <div>
+                  <Text variant="label" size="xs" className="mb-3">LastUpdated Component</Text>
+                  <Text variant="tertiary" size="sm" className="mb-4">
+                    Italian-localized relative timestamp. Shows when data was last refreshed.
+                  </Text>
+                  <Text variant="tertiary" size="sm" className="mb-2">
+                    Shows Italian relative time: &quot;3s fa&quot;, &quot;2min fa&quot;, &quot;1h fa&quot;
+                  </Text>
+                  <CodeBlock code={`<LastUpdated tsMs={data.lastUpdatedAt} />`} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </SectionShowcase>
+
         {/* Progress Bar */}
         <SectionShowcase title="Progress Bar" icon="📊" docs="docs/design-system.md#progressbar">
           <Card>
@@ -1597,7 +1912,7 @@ export default function DesignSystemPage() {
         </SectionShowcase>
 
         {/* Accordion Component */}
-        <SectionShowcase title="Accordion" icon="🪗" docs="app/components/ui/Accordion.js">
+        <SectionShowcase title="Accordion" icon="🪗" docs="app/components/ui/Accordion.tsx">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -1687,7 +2002,7 @@ export default function DesignSystemPage() {
         </SectionShowcase>
 
         {/* Sheet Component */}
-        <SectionShowcase title="Sheet" icon="📋" docs="app/components/ui/Sheet.js">
+        <SectionShowcase title="Sheet" icon="📋" docs="app/components/ui/Sheet.tsx">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -1876,7 +2191,7 @@ export default function DesignSystemPage() {
 
                 <div className="mt-4 space-y-2">
                   <Text variant="label" size="xs">Features:</Text>
-                  <ul className="list-disc list-inside text-slate-400 text-sm space-y-1 [html:not(.dark)_&]:text-slate-600">
+                  <ul className="list-disc list-inside text-slate-600 dark:text-slate-400 text-sm space-y-1">
                     <li>Global <Kbd>Cmd+K</Kbd> / <Kbd>Ctrl+K</Kbd> shortcut</li>
                     <li>Fuzzy search filtering</li>
                     <li>Arrow key navigation with wrapping</li>
@@ -2335,42 +2650,42 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
         <SectionShowcase title="Shadow System" icon="🌑" docs="docs/design-system.md#shadows---ember-noir-depth-system">
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="shadow-card">
-                <CardContent>
-                  <Text variant="label" size="xs" className="mb-2">Card Shadow</Text>
-                  <Text variant="tertiary" size="sm">shadow-card - Default card depth</Text>
-                </CardContent>
-              </Card>
-              <Card className="shadow-card-elevated">
-                <CardContent>
-                  <Text variant="label" size="xs" className="mb-2">Card Elevated</Text>
-                  <Text variant="tertiary" size="sm">shadow-card-elevated - Floating cards</Text>
-                </CardContent>
-              </Card>
-              <Card className="shadow-ember-glow-sm">
-                <CardContent>
-                  <Text variant="label" size="xs" className="mb-2">Ember Glow Small</Text>
-                  <Text variant="tertiary" size="sm">shadow-ember-glow-sm - Subtle active state</Text>
-                </CardContent>
-              </Card>
-              <Card className="shadow-ember-glow">
-                <CardContent>
-                  <Text variant="label" size="xs" className="mb-2">Ember Glow</Text>
-                  <Text variant="tertiary" size="sm">shadow-ember-glow - Standard glow</Text>
-                </CardContent>
-              </Card>
-              <Card className="shadow-ember-glow-lg">
-                <CardContent>
-                  <Text variant="label" size="xs" className="mb-2">Ember Glow Large</Text>
-                  <Text variant="tertiary" size="sm">shadow-ember-glow-lg - Prominent glow</Text>
-                </CardContent>
-              </Card>
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-white/5" style={{ boxShadow: 'var(--shadow-card)' }}>
+                <Text variant="label" size="xs" className="mb-2">Card Shadow</Text>
+                <Text variant="tertiary" size="sm">shadow-card</Text>
+                <CodeBlock code={`<Card className="shadow-card">`} />
+              </div>
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-850/90 border border-slate-200 dark:border-white/5" style={{ boxShadow: 'var(--shadow-card-elevated)' }}>
+                <Text variant="label" size="xs" className="mb-2">Card Elevated</Text>
+                <Text variant="tertiary" size="sm">shadow-card-elevated</Text>
+                <CodeBlock code={`<Card variant="elevated">`} />
+              </div>
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/80 border border-ember-200 dark:border-ember-500/20" style={{ boxShadow: 'var(--shadow-ember-glow-sm)' }}>
+                <Text variant="label" size="xs" className="mb-2">Ember Glow Small</Text>
+                <Text variant="tertiary" size="sm">shadow-ember-glow-sm</Text>
+                <CodeBlock code={`.shadow-ember-glow-sm`} />
+              </div>
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/80 border border-ember-200 dark:border-ember-500/20" style={{ boxShadow: 'var(--shadow-ember-glow)' }}>
+                <Text variant="label" size="xs" className="mb-2">Ember Glow</Text>
+                <Text variant="tertiary" size="sm">shadow-ember-glow</Text>
+                <CodeBlock code={`.shadow-ember-glow`} />
+              </div>
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/80 border border-ember-300 dark:border-ember-500/30" style={{ boxShadow: 'var(--shadow-ember-glow-lg)' }}>
+                <Text variant="label" size="xs" className="mb-2">Ember Glow Large</Text>
+                <Text variant="tertiary" size="sm">shadow-ember-glow-lg</Text>
+                <CodeBlock code={`.shadow-ember-glow-lg`} />
+              </div>
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900/80 border border-ember-400 dark:border-ember-500/40" style={{ boxShadow: 'var(--shadow-ember-glow-intense)' }}>
+                <Text variant="label" size="xs" className="mb-2">Ember Glow Intense</Text>
+                <Text variant="tertiary" size="sm">shadow-ember-glow-intense</Text>
+                <CodeBlock code={`.shadow-ember-glow-intense`} />
+              </div>
             </div>
           </div>
         </SectionShowcase>
 
         {/* Dialog Patterns */}
-        <SectionShowcase title="Dialog Patterns" icon="💬" docs="app/components/ui/ConfirmationDialog.js">
+        <SectionShowcase title="Dialog Patterns" icon="💬" docs="app/components/ui/ConfirmationDialog.tsx">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -2516,7 +2831,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
         </SectionShowcase>
 
         {/* Data Table */}
-        <SectionShowcase title="Data Table" icon="📊" docs="app/components/ui/DataTable.js">
+        <SectionShowcase title="Data Table" icon="📊" docs="app/components/ui/DataTable.tsx">
           <Card>
             <CardContent>
               <div className="space-y-6">
@@ -2591,20 +2906,20 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
                 />
                 <Banner
                   variant="warning"
-                  title="⚠️ AVOID Triple Overrides"
-                  description="WRONG: 'text-slate-800 [html:not(.dark)_&]:text-slate-800 text-slate-200'. RIGHT: 'text-slate-200 [html:not(.dark)_&]:text-slate-800'"
+                  title="⚠️ Use Light-First + dark: Override"
+                  description="Pattern: 'text-slate-800 dark:text-slate-200'. Light value first, dark: prefix for dark mode. Avoids SSR hydration mismatches."
                   compact
                 />
                 <Banner
                   variant="warning"
-                  title="⚠️ DON'T Mix dark: and [html:not(.dark)_&]:"
-                  description="Use ONLY ONE pattern. Prefer dark-first: 'bg-slate-900 [html:not(.dark)_&]:bg-white'"
+                  title="⚠️ AVOID [html:not(.dark)_&]"
+                  description="This pattern causes hydration mismatches. Use standard Tailwind dark: prefix instead. Example: 'bg-white dark:bg-slate-900'"
                   compact
                 />
                 <Banner
                   variant="ember"
-                  title="🎨 Dark-First Philosophy"
-                  description="Design for dark mode first, then add light mode overrides. Test both modes always."
+                  title="🎨 Test Both Themes"
+                  description="Always verify components render correctly in both light and dark mode. Use /settings/theme to switch."
                   compact
                 />
               </div>
@@ -2776,7 +3091,8 @@ function ColorSwatch({ name, description, colors, usage }: ColorSwatchProps) {
           {colors.map((color: string) => (
             <div
               key={color}
-              className={`w-8 h-8 rounded-lg bg-${color} border border-white/10`}
+              className="w-8 h-8 rounded-lg border border-white/10 dark:border-white/10 border-slate-200"
+              style={{ backgroundColor: `var(--color-${color})` }}
               title={color}
             />
           ))}
@@ -2794,7 +3110,7 @@ function ColorSwatch({ name, description, colors, usage }: ColorSwatchProps) {
  */
 function WeatherIconDemo({ code, label, isNight = false }: WeatherIconDemoProps) {
   return (
-    <div className="flex flex-col items-center gap-2 p-3 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+    <div className="flex flex-col items-center gap-2 p-3 bg-slate-100/80 dark:bg-slate-800/40 rounded-xl">
       <WeatherIcon code={code} isNight={isNight} size={32} className="text-ocean-400" />
       <Text variant="tertiary" size="xs" className="text-center">{label}</Text>
       <Text mono size="xs" variant="secondary">WMO: {code}</Text>

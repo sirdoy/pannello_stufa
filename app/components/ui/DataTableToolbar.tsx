@@ -211,6 +211,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
             value={searchValue}
             onChange={handleSearchChange}
             placeholder="Search..."
+            aria-label={searchPlaceholder}
             className={cn(
               'w-full pl-10 pr-4 py-2 rounded-xl',
               'bg-slate-800/60 backdrop-blur-xl',

@@ -181,6 +181,7 @@ export default function StatusBadge({
   if (variant === 'dot') {
     return (
       <span
+        role="img"
         className={`
           inline-block
           ${sizes.dot}

@@ -289,12 +289,6 @@ interface GlobalSection {
  * Rimosso LOG e CHANGELOG - ora sono nel dropdown Impostazioni
  */
 export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
-  MONITORING: {
-    id: 'monitoring',
-    name: 'Monitoring',
-    icon: '📊',
-    route: '/monitoring',
-  },
   REGISTRO: {
     id: 'registry',
     name: 'Registro',

@@ -21,8 +21,8 @@ import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { supportsColor, getCurrentColorHex } from '@/lib/hue/colorUtils';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
-import type { HueData } from '@/types/websocket';
 import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
+import { adaptWsLights, adaptWsGroups } from '@/lib/hue/hueWsAdapter';
 
 /**
  * Adaptive classes for UI based on background contrast
@@ -175,15 +175,17 @@ export function useLightsData(): UseLightsDataReturn {
     if (!isWsConnected) return;
 
     const handleMessage = (raw: unknown) => {
-      const data = raw as HueData;
+      const data = raw as Record<string, unknown>;
 
-      // WS now sends proxy-shaped data: HueLight[] and HueGroup[] directly
-      if (data.lights) {
-        setLights(data.lights);
+      // WS sends Bridge v1 dicts — adapt to proxy-shaped arrays
+      const wsLights = adaptWsLights(data.lights);
+      if (wsLights.length > 0) {
+        setLights(wsLights);
       }
 
-      if (data.groups) {
-        const sortedGroups = [...data.groups].sort((a, b) => {
+      const wsGroups = adaptWsGroups(data.groups);
+      if (wsGroups.length > 0) {
+        const sortedGroups = [...wsGroups].sort((a, b) => {
           if (a.name === 'Casa') return -1;
           if (b.name === 'Casa') return 1;
           return a.name.localeCompare(b.name);
@@ -234,7 +236,7 @@ export function useLightsData(): UseLightsDataReturn {
         return a.name.localeCompare(b.name);
       });
       setGroups(sortedGroups);
-      setLights(lightsData.lights ?? []);
+      setLights(Array.isArray(lightsData.lights) ? lightsData.lights : []);
       setScenes(scenesData.scenes ?? []);
       setLastUpdatedAt(Date.now());
     } catch (err: unknown) {

@@ -614,36 +614,27 @@ describe('useLightsData', () => {
   });
 
   describe('WebSocket integration', () => {
-    // WS now sends proxy-shaped data (flat HueLight[], HueGroup[])
+    // WS sends Bridge v1 dicts — adapter converts to proxy-shaped arrays
     const mockWsLightsPayload = {
-      lights: [
-        {
-          light_id: '1',
+      lights: {
+        '1': {
+          state: { on: true, bri: 200, ct: 300, colormode: 'ct', reachable: true },
           name: 'Lampada Test',
-          on: true,
-          brightness: 200,
-          ct_mirek: 300,
-          ct_kelvin: 3333,
-          hue: null,
-          saturation: null,
-          colormode: 'ct' as const,
-          reachable: true,
-          capability_tier: 'color' as const,
-          room_id: null,
-          room_name: null,
-          model_id: 'LCT015',
-          light_type: 'Color temperature light',
+          type: 'Extended color light',
+          modelid: 'LCT015',
         },
-      ],
+      },
       groups: null,
+      data_freshness: 'LIVE',
     };
 
     const mockWsGroupsPayload = {
       lights: null,
-      groups: [
-        { group_id: '2', name: 'Soggiorno', type: 'Room', group_class: 'Living room', lights: ['1'], any_on: false, all_on: false, brightness: null, color_temp: null, colormode: null },
-        { group_id: '0', name: 'Casa', type: 'Room', group_class: 'Other', lights: ['1'], any_on: true, all_on: false, brightness: null, color_temp: null, colormode: null },
-      ],
+      groups: {
+        '2': { name: 'Soggiorno', lights: ['1'], type: 'Room', class: 'Living room', state: { any_on: false, all_on: false }, action: {} },
+        '0': { name: 'Casa', lights: ['1'], type: 'Room', class: 'Other', state: { any_on: true, all_on: false }, action: {} },
+      },
+      data_freshness: 'LIVE',
     };
 
     it('subscribes to hue topic when readyState is OPEN', () => {
@@ -851,6 +842,29 @@ describe('useLightsData', () => {
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalledWith('/api/hue/scenes');
       });
+    });
+
+    it('WS handleMessage ignores invalid (non-object) lights payload', async () => {
+      let capturedCallback: ((data: unknown) => void) | null = null;
+      mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+        capturedCallback = cb;
+      });
+
+      jest.mocked(useWebSocketContext).mockReturnValue({
+        subscribe: mockSubscribe,
+        unsubscribe: mockUnsubscribe,
+        readyState: ReadyState.OPEN,
+      });
+
+      const { result } = renderHook(() => useLightsData());
+
+      // Send invalid lights value (string instead of dict or array)
+      await act(async () => {
+        capturedCallback?.({ lights: 'not-a-dict', groups: null, data_freshness: 'LIVE' });
+      });
+
+      // lights should remain empty array (initial state), not crash
+      expect(result.current.lights).toEqual([]);
     });
 
     it('unsubscribes on unmount', () => {

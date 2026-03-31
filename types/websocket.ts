@@ -121,13 +121,13 @@ export interface NetatmoData {
 export type ThermorossiData = ThermorossiStatusResponse;
 
 // ---------------------------------------------------------------------------
-// Hue — uses proxy HueLight[] and HueGroup[] (flat, not nested Bridge format)
+// Hue — WS sends Bridge v1 dicts; adaptWsLights/adaptWsGroups convert to proxy arrays
 // ---------------------------------------------------------------------------
 
 export interface HueData {
-  lights: HueLight[] | null;     // D-01 LOCKED: keep array, not Record<string, HueLight>
-  groups: HueGroup[] | null;     // D-01 LOCKED: keep array, not Record<string, HueGroup>
-  data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';  // wider than HueDataFreshness (3-state)
+  lights: Record<string, unknown> | null;   // Bridge v1 dict keyed by light_id
+  groups: Record<string, unknown> | null;   // Bridge v1 dict keyed by group_id
+  data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';
 }
 
 // ---------------------------------------------------------------------------

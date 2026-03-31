@@ -282,7 +282,7 @@ export const NOTIFICATION_TYPES = {
     body: (data: NotificationData) => data.message || 'La stufa non risponde. Verifica la connessione.',
     icon: '/icons/icon-192.png',
     priority: 'high',
-    url: '/monitoring',
+    url: '/stove',
   },
   monitoring_state_mismatch: {
     id: 'monitoring_state_mismatch',
@@ -293,7 +293,7 @@ export const NOTIFICATION_TYPES = {
     body: (data: NotificationData) => data.message || `Stufa dovrebbe essere ${data.expected} ma e ${data.actual}`,
     icon: '/icons/icon-192.png',
     priority: 'high',
-    url: '/monitoring',
+    url: '/stove',
   },
   monitoring_stove_error: {
     id: 'monitoring_stove_error',
@@ -304,7 +304,7 @@ export const NOTIFICATION_TYPES = {
     body: (data: NotificationData) => data.message || `Errore AL${data.errorCode}: ${data.errorDescription || 'Richiesto intervento'}`,
     icon: '/icons/icon-192.png',
     priority: 'high',
-    url: '/monitoring',
+    url: '/stove',
   },
 
   // === GENERIC ===

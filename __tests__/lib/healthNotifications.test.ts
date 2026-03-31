@@ -20,7 +20,7 @@ describe('Health Monitoring Notification Types', () => {
       expect(type.category).toBe('monitoring');
       expect(type.defaultEnabled).toBe(true);
       expect(type.priority).toBe('high');
-      expect(type.url).toBe('/monitoring');
+      expect(type.url).toBe('/stove');
     });
 
     test('monitoring_state_mismatch type exists with correct config', () => {

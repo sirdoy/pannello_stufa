@@ -1,6 +1,6 @@
 # WebSocket Real-Time API
 
-Single endpoint for real-time push from all 6 providers. The server sends data immediately when provider state changes — no polling required. Authentication is required via query parameter. Subscriptions are topic-based and per-connection.
+Single endpoint for real-time push from all providers. The server sends data immediately when provider state changes — no polling required. Authentication is required via query parameter. Subscriptions are topic-based and per-connection.
 
 ---
 
@@ -10,7 +10,7 @@ Single endpoint for real-time push from all 6 providers. The server sends data i
 |----------|------|-------------|------|
 | `wss://` | `/ws/live` | Real-time provider data push via topic subscription | Required (`?api_key=` or `?token=`) |
 
-**Available topics:** `fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `hue`, `sonos`
+**Available topics:** `fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `hue`, `sonos`, `raspi`
 
 ---
 
@@ -29,6 +29,7 @@ Single endpoint for real-time push from all 6 providers. The server sends data i
   - [thermorossi](#thermorossi)
   - [hue](#hue)
   - [sonos](#sonos)
+  - [raspi](#raspi)
 - [Reconnection](#reconnection)
 - [Complete Example](#complete-example)
 - [Error Codes / Close Codes](#error-codes--close-codes)
@@ -37,11 +38,12 @@ Single endpoint for real-time push from all 6 providers. The server sends data i
 
 ## Overview
 
-The `/ws/live` endpoint replaces REST polling for all six providers. Key behaviours:
+The `/ws/live` endpoint provides real-time push for all providers. Key behaviours:
 
 - **Delta detection:** The server only pushes when provider data changes (MD5 fingerprint comparison). If the router returns the same device list twice in a row, no WebSocket message is sent.
 - **Snapshot on subscribe:** When you subscribe to a topic, the server immediately sends the current cached state (`type: "snapshot"`). You do not have to wait for the next poll cycle.
-- **Topic-based subscription:** A single connection can subscribe to any combination of the 6 topics. Each subscription is independent.
+- **Topic-based subscription:** A single connection can subscribe to any combination of topics. Each subscription is independent.
+- **Enriched payloads:** All topic payloads include `data_freshness` and registry metadata (`custom_name`, `device_type`) matching the corresponding REST endpoints exactly.
 - **Per-connection subscriptions:** Subscriptions are not persisted. If the connection drops and reconnects, you must re-subscribe. Always send subscribe messages inside the `onOpen` callback.
 
 ---
@@ -157,6 +159,8 @@ interface WebSocketMessage<T = unknown> {
 }
 ```
 
+> **Enrichment metadata:** All topic payloads now include enrichment metadata (`data_freshness`, and where applicable: `is_stale`, `fetched_at`, `custom_name`, `device_type`). These fields match the corresponding REST API endpoints exactly, so clients consuming both channels receive identical data shapes.
+
 ---
 
 ## Topics and Payload Interfaces
@@ -176,7 +180,9 @@ interface FritzBoxDevice {
   ip: string;
   name: string;
   mac: string;
-  status: 0 | 1;  // 1 = online, 0 = offline
+  status: 0 | 1;              // 1 = online, 0 = offline
+  custom_name?: string | null; // registry override, null if not set
+  device_type?: string | null; // registry device type slug, null if not set
 }
 
 interface FritzBoxBandwidth {
@@ -199,6 +205,9 @@ interface FritzBoxData {
   devices: FritzBoxDevice[] | null;
   bandwidth: FritzBoxBandwidth | null;
   wan: FritzBoxWan | null;
+  is_stale: boolean;                  // true if cache is older than max_age_seconds
+  fetched_at: string | null;          // ISO 8601 timestamp of last successful fetch, or null
+  data_freshness: 'LIVE' | 'STALE';  // 'LIVE' if not stale, 'STALE' otherwise
 }
 ```
 
@@ -211,19 +220,25 @@ interface FritzBoxData {
       "ip": "192.168.178.25",
       "name": "iPhone-Federico",
       "mac": "AA:BB:CC:DD:EE:FF",
-      "status": 1
+      "status": 1,
+      "custom_name": "Federico iPhone",
+      "device_type": "smartphone"
     },
     {
       "ip": "192.168.178.31",
       "name": "MacBook-Federico",
       "mac": "11:22:33:44:55:66",
-      "status": 1
+      "status": 1,
+      "custom_name": null,
+      "device_type": null
     },
     {
       "ip": "192.168.178.50",
       "name": "RaspberryPi",
       "mac": "DC:A6:32:AA:BB:CC",
-      "status": 1
+      "status": 1,
+      "custom_name": "Raspberry Pi",
+      "device_type": "server"
     }
   ],
   "bandwidth": {
@@ -239,7 +254,10 @@ interface FritzBoxData {
     "uptime": 432000,
     "max_upstream_bps": 50000000,
     "max_downstream_bps": 250000000
-  }
+  },
+  "is_stale": false,
+  "fetched_at": "2026-03-28T14:00:00.000000Z",
+  "data_freshness": "LIVE"
 }
 ```
 
@@ -256,12 +274,13 @@ interface DirigeraBaseSensor {
   id: string;
   relation_id: string | null;
   type: 'openCloseSensor' | 'occupancySensor' | 'motionSensor';
-  custom_name: string | null;
+  custom_name: string | null;  // hub name, overridden by registry if registry has a value
   room: string | null;
   firmware_version: string | null;
   battery_percentage: number | null;
   is_reachable: boolean;
-  last_seen: string | null;  // ISO 8601
+  last_seen: string | null;     // ISO 8601
+  device_type?: string | null;  // registry device type slug, null if not set
 }
 
 interface DirigeraContactSensor extends DirigeraBaseSensor {
@@ -279,6 +298,7 @@ type DirigeraSensor = DirigeraContactSensor | DirigeraMotionSensor;
 
 interface DirigeraData {
   sensors: DirigeraSensor[] | null;
+  data_freshness: 'LIVE' | 'STALE';  // based on cache staleness
 }
 ```
 
@@ -313,7 +333,8 @@ function processSensor(sensor: DirigeraSensor) {
       "battery_percentage": 87,
       "is_reachable": true,
       "last_seen": "2026-03-23T10:00:00.000Z",
-      "is_open": false
+      "is_open": false,
+      "device_type": "contact_sensor"
     },
     {
       "id": "ghi012-3456-7890-abcd-ef1234567891",
@@ -326,13 +347,15 @@ function processSensor(sensor: DirigeraSensor) {
       "is_reachable": true,
       "last_seen": "2026-03-23T09:58:00.000Z",
       "is_detected": false,
-      "light_level": 45
+      "light_level": 45,
+      "device_type": "motion_sensor"
     }
-  ]
+  ],
+  "data_freshness": "LIVE"
 }
 ```
 
-**Nullability:** `sensors` is nullable. Individual fields `relation_id`, `custom_name`, `room`, `firmware_version`, `battery_percentage`, `last_seen` can be `null` if the hub did not report them.
+**Nullability:** `sensors` is nullable. Individual fields `relation_id`, `custom_name`, `room`, `firmware_version`, `battery_percentage`, `last_seen`, `device_type` can be `null` if the hub did not report them or the device is not in the registry.
 
 ---
 
@@ -341,13 +364,19 @@ function processSensor(sensor: DirigeraSensor) {
 Netatmo energy system data: thermostat state, room temperatures, schedule, valve status.
 
 ```typescript
-// Raw Netatmo cloud API homestatus response.
+// Raw Netatmo cloud API homestatus response with enrichment metadata.
 // This is a large nested object mirroring the Netatmo API format.
 // For full schema, see the REST endpoint: GET /api/v1/netatmo/energy/homestatus
-type NetatmoData = Record<string, unknown>;
+interface NetatmoData {
+  body: Record<string, unknown>;  // Netatmo API envelope (home, rooms, modules)
+  status: string;
+  time_server: number;
+  data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';  // based on last poll recency
+  [key: string]: unknown;  // additional Netatmo API top-level fields
+}
 ```
 
-The WebSocket payload is the raw `get_last_homestatus()` response from the Netatmo cloud API. Top-level structure follows Netatmo's standard API envelope:
+The WebSocket payload is the raw `get_last_homestatus()` response from the Netatmo cloud API, enriched with `data_freshness`. Top-level structure follows Netatmo's standard API envelope:
 
 ```json
 {
@@ -359,7 +388,8 @@ The WebSocket payload is the raw `get_last_homestatus()` response from the Netat
     }
   },
   "status": "ok",
-  "time_server": 1742728441
+  "time_server": 1742728441,
+  "data_freshness": "LIVE"
 }
 ```
 
@@ -375,16 +405,19 @@ Thermorossi pellet stove status: operating state, power level, fan level, error 
 
 ```typescript
 interface ThermorossiData {
-  stove_state: string;          // 'off' | 'igniting' | 'working' | 'cooling' | 'alarm' | ...
-  power_level: number | null;   // 1–5 (fuel feed rate)
-  fan_level: number | null;     // 1–5 (combustion air)
+  stove_state: string;            // 'off' | 'igniting' | 'working' | 'cooling' | 'alarm' | ...
+  power_level: number | null;     // 1–5 (fuel feed rate)
+  fan_level: number | null;       // 1–5 (combustion air)
   error_code: number | null;
   error_description: string | null;
-  [key: string]: unknown;       // additional raw WiNet fields may be present
+  data_freshness: 'LIVE' | 'STALE';  // based on last successful poll recency
+  custom_name?: string | null;    // registry override for device display name
+  device_type?: string | null;    // registry device type slug
+  [key: string]: unknown;         // additional raw WiNet fields may be present
 }
 ```
 
-The payload is the raw WiNet API status response. The documented fields above are the key operational fields. Additional raw WiNet fields may be present — for full field documentation see `GET /api/v1/thermorossi/status` in [Thermorossi REST endpoints](./thermorossi.md).
+The payload is the raw WiNet API status response enriched with registry metadata. The documented fields above are the key operational fields. Additional raw WiNet fields may be present — for full field documentation see `GET /api/v1/thermorossi/status` in [Thermorossi REST endpoints](./thermorossi.md).
 
 **JSON example:**
 
@@ -394,11 +427,14 @@ The payload is the raw WiNet API status response. The documented fields above ar
   "power_level": 3,
   "fan_level": 2,
   "error_code": null,
-  "error_description": null
+  "error_description": null,
+  "data_freshness": "LIVE",
+  "custom_name": "Stufa Pellet",
+  "device_type": "pellet_stove"
 }
 ```
 
-**Nullability:** The entire payload can be `null` if no status has been fetched since server start. `power_level`, `fan_level`, `error_code`, `error_description` can be `null` when the stove is off or when the field is not reported by the WiNet firmware.
+**Nullability:** The entire payload can be `null` if no status has been fetched since server start. `power_level`, `fan_level`, `error_code`, `error_description` can be `null` when the stove is off or when the field is not reported by the WiNet firmware. `custom_name` and `device_type` are `null` if the device is not in the registry.
 
 ---
 
@@ -421,6 +457,8 @@ interface HueLight {
   name: string;
   type: string;
   modelid: string | null;
+  custom_name?: string | null;  // registry override for display name
+  device_type?: string | null;  // registry device type slug
   [key: string]: unknown;
 }
 
@@ -440,6 +478,7 @@ interface HueGroup {
 interface HueData {
   lights: Record<string, HueLight> | null;    // key = light_id (e.g. "1", "2")
   groups: Record<string, HueGroup> | null;    // key = group_id (e.g. "1")
+  data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';  // based on Bridge reachability and poll age
 }
 ```
 
@@ -460,7 +499,9 @@ interface HueData {
       },
       "name": "Luce Soggiorno",
       "type": "Extended color light",
-      "modelid": "LCT016"
+      "modelid": "LCT016",
+      "custom_name": "Luce Soggiorno",
+      "device_type": "hue_color"
     },
     "2": {
       "state": {
@@ -472,7 +513,9 @@ interface HueData {
       },
       "name": "Luce Camera",
       "type": "Extended color light",
-      "modelid": "LCT010"
+      "modelid": "LCT010",
+      "custom_name": null,
+      "device_type": null
     }
   },
   "groups": {
@@ -488,11 +531,12 @@ interface HueData {
         "bri": 200
       }
     }
-  }
+  },
+  "data_freshness": "LIVE"
 }
 ```
 
-**Nullability:** `lights` and `groups` are each independently nullable.
+**Nullability:** `lights` and `groups` are each independently nullable. `custom_name` and `device_type` per light are `null` if the light is not in the device registry.
 
 ---
 
@@ -511,6 +555,8 @@ interface SonosSpeaker {
   role: 'soundbar' | 'sub' | 'surround' | 'speaker';
   is_visible: boolean;
   is_coordinator: boolean;
+  custom_name?: string | null;  // registry override for display name
+  device_type?: string | null;  // registry device type slug
 }
 
 interface SonosGroupMember {
@@ -532,6 +578,7 @@ interface SonosGroup {
 interface SonosData {
   speakers: SonosSpeaker[] | null;
   groups: SonosGroup[] | null;
+  data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';  // based on Sonos network reachability
 }
 ```
 
@@ -549,7 +596,9 @@ interface SonosData {
       "serial": "00-0E-58-12:34:56:7",
       "role": "soundbar",
       "is_visible": true,
-      "is_coordinator": true
+      "is_coordinator": true,
+      "custom_name": "Soundbar Soggiorno",
+      "device_type": "soundbar"
     },
     {
       "uid": "RINCON_7828CA987654321001400",
@@ -560,7 +609,9 @@ interface SonosData {
       "serial": "00-0E-58-98:76:54:3",
       "role": "speaker",
       "is_visible": true,
-      "is_coordinator": false
+      "is_coordinator": false,
+      "custom_name": null,
+      "device_type": null
     }
   ],
   "groups": [
@@ -579,11 +630,59 @@ interface SonosData {
         }
       ]
     }
-  ]
+  ],
+  "data_freshness": "LIVE"
 }
 ```
 
-**Nullability:** `speakers` and `groups` are each independently nullable.
+**Nullability:** `speakers` and `groups` are each independently nullable. `custom_name` and `device_type` per speaker are `null` if the speaker is not in the device registry.
+
+---
+
+### raspi
+
+Raspberry Pi system stats: CPU, memory, disk, temperature, uptime, network, and load average. Data is always collected live on each poll — no caching involved.
+
+```typescript
+interface RaspiData {
+  cpu_percent: number;          // current CPU usage percentage
+  memory: Record<string, unknown>;  // RAM usage statistics
+  disk: Record<string, unknown>;    // disk usage for root partition
+  system: Record<string, unknown>;  // temperature, uptime, load, processes, network
+  data_freshness: 'LIVE';       // always 'LIVE' — raspi is an on-demand provider
+}
+```
+
+`data_freshness` is always `"LIVE"` for this topic. The Raspberry Pi collects data via `psutil` on each poll cycle — there is no cache with a freshness threshold.
+
+**JSON example:**
+
+```json
+{
+  "cpu_percent": 12.5,
+  "memory": {
+    "total": 8589934592,
+    "available": 4294967296,
+    "percent": 50.0,
+    "used": 4294967296
+  },
+  "disk": {
+    "total": 32212254720,
+    "used": 12884901888,
+    "free": 19327352832,
+    "percent": 40.0
+  },
+  "system": {
+    "temperature": 42.5,
+    "uptime": 86400,
+    "load_avg": [0.5, 0.3, 0.2],
+    "process_count": 145
+  },
+  "data_freshness": "LIVE"
+}
+```
+
+**Nullability:** Individual fields within `memory`, `disk`, and `system` may be `null` if `psutil` cannot read a specific metric on the hardware.
 
 ---
 

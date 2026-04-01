@@ -14,8 +14,8 @@ Requirements for Dark-Only & Mobile-First milestone.
 - [x] **THEME-03**: ThemeScript component removed from layout
 - [x] **THEME-04**: Theme settings page (/settings/theme) removed and nav entry deleted
 - [x] **THEME-05**: Theme API route (GET/POST /api/user/theme) removed
-- [ ] **THEME-06**: All `dark:` Tailwind prefixes removed from ~16 files (hardcode dark-only values)
-- [ ] **THEME-07**: All `[html:not(.dark)_&]:` selectors removed from components
+- [x] **THEME-06**: All `dark:` Tailwind prefixes removed from ~16 files (hardcode dark-only values)
+- [x] **THEME-07**: All `[html:not(.dark)_&]:` selectors removed from components
 - [x] **THEME-08**: `class="dark"` hardcoded on `<html>` element, localStorage theme key removed
 - [x] **THEME-09**: theme-color meta tag hardcoded to dark value (#0f172a)
 - [ ] **THEME-10**: Design system page updated to reflect dark-only (remove theme toggle showcase)
@@ -76,8 +76,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | THEME-03 | Phase 149 | Complete |
 | THEME-04 | Phase 149 | Complete |
 | THEME-05 | Phase 149 | Complete |
-| THEME-06 | Phase 150 | Pending |
-| THEME-07 | Phase 150 | Pending |
+| THEME-06 | Phase 150 | Complete |
+| THEME-07 | Phase 150 | Complete |
 | THEME-08 | Phase 149 | Complete |
 | THEME-09 | Phase 149 | Complete |
 | THEME-10 | Phase 150 | Pending |

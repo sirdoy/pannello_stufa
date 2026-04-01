@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v18.0
 milestone_name: Dark-Only & Mobile-First
-status: verifying
-stopped_at: Phase 150 context gathered
-last_updated: "2026-04-01T10:46:26.493Z"
+status: executing
+stopped_at: Completed 150-01-PLAN.md
+last_updated: "2026-04-01T11:13:42.088Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 2
-  completed_plans: 2
+  total_plans: 5
+  completed_plans: 3
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 149 — theme-removal-core
+**Current focus:** Phase 150 — theme-prefix-cleanup
 
 ## Current Position
 
-Phase: 150
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 150 (theme-prefix-cleanup) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 | v18.0 Dark-Only & Mobile-First | 149-154 | TBD | in progress |
 | Phase 149 P01 | 414 | 2 tasks | 9 files |
 | Phase 149 P02 | 5 | 2 tasks | 1 files |
+| Phase 150 P01 | 640s | 2 tasks | 77 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,7 @@ Recent decisions affecting v18.0:
 - [Phase 149]: Replace inline localStorage theme script with static meta tag (#0f172a)
 - [Phase 149]: Remove all html:not(.dark) blocks rather than converting to dark: prefix utilities — simpler and eliminates dead code
 - [Phase 149]: Remove theme-switching transition entirely — 200ms overhead on every element eliminated
+- [Phase 150]: Two-stage approach for theme prefix removal: global regex for html:not(.dark) (multiline-safe), per-line char-scanner for dark: with fallback global pass
 
 ### Pending Todos
 
@@ -86,5 +88,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-01 - Roadmap created for v18.0
-Stopped at: Phase 150 context gathered
-Resume file: .planning/phases/150-theme-prefix-cleanup/150-CONTEXT.md
+Stopped at: Completed 150-01-PLAN.md
+Resume file: None

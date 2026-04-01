@@ -66,7 +66,7 @@ function ScheduleContent() {
           Termostato
         </Button>
 
-        <div className="flex items-start justify-between">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <Heading level={1} size="3xl" className="flex items-center gap-3">
               <Calendar className="text-ember-400" />

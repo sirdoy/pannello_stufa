@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v18.0
 milestone_name: Dark-Only & Mobile-First
 status: executing
-stopped_at: Completed 150-01-PLAN.md
-last_updated: "2026-04-01T11:13:42.088Z"
+stopped_at: Completed 150-02-PLAN.md
+last_updated: "2026-04-01T11:20:03.930Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 ## Current Position
 
 Phase: 150 (theme-prefix-cleanup) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-01
 
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 149 P01 | 414 | 2 tasks | 9 files |
 | Phase 149 P02 | 5 | 2 tasks | 1 files |
 | Phase 150 P01 | 640s | 2 tasks | 77 files |
+| Phase 150 P02 | 16 | 2 tasks | 92 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting v18.0:
 - [Phase 149]: Remove all html:not(.dark) blocks rather than converting to dark: prefix utilities — simpler and eliminates dead code
 - [Phase 149]: Remove theme-switching transition entirely — 200ms overhead on every element eliminated
 - [Phase 150]: Two-stage approach for theme prefix removal: global regex for html:not(.dark) (multiline-safe), per-line char-scanner for dark: with fallback global pass
+- [Phase 150]: lib/version.ts dark: occurrences are changelog text strings — left unchanged to preserve data integrity
+- [Phase 150]: useLightsData.ts 'dark: {}' is a TypeScript object key in adaptiveClasses record — not a CSS prefix, left unchanged
 
 ### Pending Todos
 
@@ -88,5 +91,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-01 - Roadmap created for v18.0
-Stopped at: Completed 150-01-PLAN.md
+Stopped at: Completed 150-02-PLAN.md
 Resume file: None

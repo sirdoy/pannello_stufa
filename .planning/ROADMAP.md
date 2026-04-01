@@ -118,7 +118,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 150-01-PLAN.md — Remove dark: and html:not(.dark) from UI + general components (77 files)
-- [ ] 150-02-PLAN.md — Remove dark: and html:not(.dark) from device components + pages + lib (93 files)
+- [x] 150-02-PLAN.md — Remove dark: and html:not(.dark) from device components + pages + lib (93 files)
 - [ ] 150-03-PLAN.md — Design system page semantic cleanup + codebase-wide verification
 **UI hint**: yes
 
@@ -193,7 +193,7 @@ Plans:
 | 147. Tuya Infrastructure | v17.1 | 2/2 | Complete | 2026-03-30 |
 | 148. Tuya Frontend | v17.1 | 3/3 | Complete | 2026-03-30 |
 | 149. Theme Removal Core | v18.0 | 2/2 | Complete    | 2026-04-01 |
-| 150. Theme Prefix Cleanup | v18.0 | 1/3 | In Progress|  |
+| 150. Theme Prefix Cleanup | v18.0 | 2/3 | In Progress|  |
 | 151. Design System Mobile-First | v18.0 | 0/TBD | Not started | - |
 | 152. Pages Audit — Core & Device Pages | v18.0 | 0/TBD | Not started | - |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 0/TBD | Not started | - |

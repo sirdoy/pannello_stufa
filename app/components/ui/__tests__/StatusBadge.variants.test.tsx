@@ -22,8 +22,8 @@ describe('StatusBadge Variants', () => {
       const { container } = render(
         <StatusBadge status="Warning" color="warning" />
       );
-      // Check for warning color classes (dark mode default)
-      expect(container.querySelector('.bg-warning-500\\/15')).toBeInTheDocument();
+      // Check for warning color classes (dark-only value)
+      expect(container.querySelector('.bg-warning-500\\/20')).toBeInTheDocument();
     });
 
     test('renders with icon', () => {

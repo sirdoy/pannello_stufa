@@ -101,7 +101,10 @@ See git history and `.planning/milestones/` for details.
   3. Calling GET or POST /api/user/theme returns 404
   4. The html element in every rendered page has class="dark" hardcoded with no JavaScript toggling it
   5. The theme-color meta tag reads #0f172a in every rendered page's head
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
+- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
 **UI hint**: yes
 
 ### Phase 150: Theme Prefix Cleanup
@@ -112,7 +115,10 @@ See git history and `.planning/milestones/` for details.
   1. A codebase search for "dark:" returns zero results in any .tsx/.ts/.css file
   2. A codebase search for "html:not(.dark)" returns zero results
   3. The design system showcase page (/debug/design-system) loads without any theme toggle UI or light-mode examples
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
+- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
 **UI hint**: yes
 
 ### Phase 151: Design System Mobile-First
@@ -124,7 +130,10 @@ See git history and `.planning/milestones/` for details.
   2. The bottom navigation bar displays all 4 columns without clipping or overlap at 375px
   3. All typography on the design system page is readable at 375px with no horizontal scroll
   4. The design system showcase page (/debug/design-system) includes a mobile-first patterns section documenting base=mobile, sm:=desktop convention
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
+- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
 **UI hint**: yes
 
 ### Phase 152: Pages Audit — Core & Device Pages
@@ -137,7 +146,10 @@ See git history and `.planning/milestones/` for details.
   3. Both thermostat pages (/thermostat, /thermostat/schedule) show full controls without horizontal scroll at 375px
   4. All lights pages (/lights, /lights/scenes, /lights/automation) are fully operable on touch at 375px
   5. The network page (/network) displays charts and tables without overflow at 375px
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
+- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
 **UI hint**: yes
 
 ### Phase 153: Pages Audit — Extended Device Pages
@@ -149,7 +161,10 @@ See git history and `.planning/milestones/` for details.
   2. The DIRIGERA page (/dirigera) renders the sensor list without horizontal scroll at 375px
   3. The Raspi page (/raspi) and Tuya page (/tuya) display their cards without layout breakage at 375px
   4. All Rooms pages (/rooms, /rooms/status, /rooms/[id]) show room cards and device assignments in a readable single-column layout at 375px
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
+- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
 **UI hint**: yes
 
 ### Phase 154: Pages Audit — Admin & Support Pages
@@ -162,7 +177,10 @@ See git history and `.planning/milestones/` for details.
   3. Debug pages (/debug, /debug/api, /debug/logs, /debug/notifications) show their full content without horizontal scroll at 375px
   4. Camera pages (/camera, /camera/events) display without layout breakage at 375px
   5. The remaining pages (changelog, offline, log) render correctly in a single-column layout at 375px
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
+- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
 **UI hint**: yes
 
 ## Progress

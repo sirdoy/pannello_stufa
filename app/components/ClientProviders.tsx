@@ -2,10 +2,8 @@
 
 import { Auth0Provider } from '@auth0/nextjs-auth0/client';
 import { VersionProvider } from '@/app/context/VersionContext';
-import { ThemeProvider } from '@/app/context/ThemeContext';
 import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 import { ToastProvider } from '@/app/components/ui';
-import ThemeScript from './ThemeScript';
 import { OfflineBanner } from '@/app/components/ui';
 import PWAInitializer from './PWAInitializer';
 import AxeDevtools from './AxeDevtools';
@@ -53,8 +51,6 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
     <Auth0Provider user={MOCK_USER}>
       <WebSocketContext.Provider value={wsManager}>
         <OnlineStatusProvider>
-          <ThemeScript />
-          <ThemeProvider>
           <PageTransitionProvider>
             <VersionProvider>
               <ToastProvider>
@@ -68,7 +64,6 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
               </ToastProvider>
             </VersionProvider>
           </PageTransitionProvider>
-          </ThemeProvider>
         </OnlineStatusProvider>
       </WebSocketContext.Provider>
     </Auth0Provider>

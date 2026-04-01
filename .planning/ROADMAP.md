@@ -83,7 +83,7 @@ See git history and `.planning/milestones/` for details.
 **Milestone Goal:** Eliminate the light theme entirely (dark-only codebase) and ensure every page and design system component is fully usable on a 375px mobile viewport.
 
 - [x] **Phase 149: Theme Removal Core** - Remove ThemeContext, ThemeProvider, settings page, API route, and hardcode dark on html element (completed 2026-04-01)
-- [ ] **Phase 150: Theme Prefix Cleanup** - Remove all dark: Tailwind prefixes and html:not(.dark) selectors across the codebase
+- [x] **Phase 150: Theme Prefix Cleanup** - Remove all dark: Tailwind prefixes and html:not(.dark) selectors across the codebase (completed 2026-04-01)
 - [ ] **Phase 151: Design System Mobile-First** - Fix ButtonGroup wrapping, verify all DS components at 375px, update DS showcase
 - [ ] **Phase 152: Pages Audit — Core & Device Pages** - Audit dashboard, stove, thermostat, lights, and network pages at 375px
 - [ ] **Phase 153: Pages Audit — Extended Device Pages** - Audit Sonos, DIRIGERA, Raspi, Tuya, and Rooms pages at 375px
@@ -193,7 +193,7 @@ Plans:
 | 147. Tuya Infrastructure | v17.1 | 2/2 | Complete | 2026-03-30 |
 | 148. Tuya Frontend | v17.1 | 3/3 | Complete | 2026-03-30 |
 | 149. Theme Removal Core | v18.0 | 2/2 | Complete    | 2026-04-01 |
-| 150. Theme Prefix Cleanup | v18.0 | 2/3 | In Progress|  |
+| 150. Theme Prefix Cleanup | v18.0 | 2/3 | Complete    | 2026-04-01 |
 | 151. Design System Mobile-First | v18.0 | 0/TBD | Not started | - |
 | 152. Pages Audit — Core & Device Pages | v18.0 | 0/TBD | Not started | - |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 0/TBD | Not started | - |

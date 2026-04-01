@@ -77,44 +77,44 @@ export default function StatusBadge({
   // Color presets - Ember Noir palette
   const colorStyles = {
     ember: {
-      bg: 'bg-ember-500/15 dark:bg-ember-500/20',
-      border: 'border-ember-400/25 dark:border-ember-500/30',
-      text: 'text-ember-300 dark:text-ember-300 [html:not(.dark)_&]:text-ember-700',
+      bg: 'bg-ember-500/20',
+      border: 'border-ember-500/30',
+      text: 'text-ember-300',
       dot: 'bg-ember-500',
       glow: 'shadow-ember-glow-sm',
     },
     sage: {
-      bg: 'bg-sage-500/15 dark:bg-sage-500/20',
-      border: 'border-sage-400/25 dark:border-sage-500/30',
-      text: 'text-sage-300 dark:text-sage-300 [html:not(.dark)_&]:text-sage-700',
+      bg: 'bg-sage-500/20',
+      border: 'border-sage-500/30',
+      text: 'text-sage-300',
       dot: 'bg-sage-500',
       glow: 'shadow-[0_0_10px_rgba(96,115,96,0.3)]',
     },
     ocean: {
-      bg: 'bg-ocean-500/15 dark:bg-ocean-500/20',
-      border: 'border-ocean-400/25 dark:border-ocean-500/30',
-      text: 'text-ocean-300 dark:text-ocean-300 [html:not(.dark)_&]:text-ocean-700',
+      bg: 'bg-ocean-500/20',
+      border: 'border-ocean-500/30',
+      text: 'text-ocean-300',
       dot: 'bg-ocean-500',
       glow: 'shadow-[0_0_10px_rgba(67,125,174,0.3)]',
     },
     warning: {
-      bg: 'bg-warning-500/15 dark:bg-warning-500/20',
-      border: 'border-warning-400/25 dark:border-warning-500/30',
-      text: 'text-warning-300 dark:text-warning-300 [html:not(.dark)_&]:text-warning-700',
+      bg: 'bg-warning-500/20',
+      border: 'border-warning-500/30',
+      text: 'text-warning-300',
       dot: 'bg-warning-500',
       glow: 'shadow-[0_0_10px_rgba(234,179,8,0.3)]',
     },
     danger: {
-      bg: 'bg-danger-500/15 dark:bg-danger-500/20',
-      border: 'border-danger-400/25 dark:border-danger-500/30',
-      text: 'text-danger-300 dark:text-danger-300 [html:not(.dark)_&]:text-danger-700',
+      bg: 'bg-danger-500/20',
+      border: 'border-danger-500/30',
+      text: 'text-danger-300',
       dot: 'bg-danger-500',
       glow: 'shadow-[0_0_10px_rgba(239,68,68,0.3)]',
     },
     neutral: {
-      bg: 'bg-slate-500/10 dark:bg-slate-500/15',
-      border: 'border-slate-400/20 dark:border-slate-500/25',
-      text: 'text-slate-400 dark:text-slate-400 [html:not(.dark)_&]:text-slate-600',
+      bg: 'bg-slate-500/15',
+      border: 'border-slate-500/25',
+      text: 'text-slate-400',
       dot: 'bg-slate-500',
       glow: '',
     },
@@ -220,7 +220,7 @@ export default function StatusBadge({
             rounded-full
             shadow-lg
             ring-2 ring-slate-900/50
-            [html:not(.dark)_&]:ring-white/50
+            
           `.trim().replace(/\s+/g, ' ')}>
             <span className="text-xs font-bold font-display">
               {resolvedIcon && <span className="mr-1">{resolvedIcon}</span>}

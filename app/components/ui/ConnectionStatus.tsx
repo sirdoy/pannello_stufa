@@ -14,10 +14,10 @@ export const connectionStatusVariants = cva(
   {
     variants: {
       status: {
-        online: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
-        offline: 'text-slate-400 [html:not(.dark)_&]:text-slate-600',
-        connecting: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
-        unknown: 'text-slate-400/70 [html:not(.dark)_&]:text-slate-500',
+        online: 'text-sage-400 ',
+        offline: 'text-slate-400 ',
+        connecting: 'text-warning-400 ',
+        unknown: 'text-slate-400/70 ',
       },
       size: {
         sm: 'text-xs',
@@ -40,10 +40,10 @@ export const dotVariants = cva(
   {
     variants: {
       status: {
-        online: 'bg-sage-500 [html:not(.dark)_&]:bg-sage-600',
-        offline: 'bg-slate-500 [html:not(.dark)_&]:bg-slate-400',
-        connecting: 'bg-warning-500 animate-pulse [html:not(.dark)_&]:bg-warning-500',
-        unknown: 'bg-slate-400 [html:not(.dark)_&]:bg-slate-400',
+        online: 'bg-sage-500 ',
+        offline: 'bg-slate-500 ',
+        connecting: 'bg-warning-500 animate-pulse ',
+        unknown: 'bg-slate-400 ',
       },
       size: {
         sm: 'w-1.5 h-1.5',

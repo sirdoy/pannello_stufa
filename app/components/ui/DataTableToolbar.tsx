@@ -39,15 +39,15 @@ export interface DataTableToolbarProps<TData> {
  *
  * @example
  * <DataTableToolbar
- *   table={table}
- *   globalFilter={globalFilter}
- *   onGlobalFilterChange={setGlobalFilter}
- *   showBulkActions={selectedCount > 0}
- *   bulkActions={[
- *     { id: 'delete', label: 'Delete', variant: 'danger' },
- *     { id: 'export', label: 'Export', variant: 'subtle' },
- *   ]}
- *   onBulkAction={(action, rows) => handleBulkAction(action, rows)}
+ * table={table}
+ * globalFilter={globalFilter}
+ * onGlobalFilterChange={setGlobalFilter}
+ * showBulkActions={selectedCount > 0}
+ * bulkActions={[
+ * { id: 'delete', label: 'Delete', variant: 'danger' },
+ * { id: 'export', label: 'Export', variant: 'subtle' },
+ * ]}
+ * onBulkAction={(action, rows) => handleBulkAction(action, rows)}
  * />
  */
 const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(function DataTableToolbar(
@@ -221,10 +221,6 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
               'focus:outline-none focus-visible:ring-2',
               'focus-visible:ring-ember-500/50 focus-visible:border-ember-500/60',
               'transition-all duration-200',
-              '[html:not(.dark)_&]:bg-white/80',
-              '[html:not(.dark)_&]:text-slate-900',
-              '[html:not(.dark)_&]:placeholder:text-slate-400',
-              '[html:not(.dark)_&]:border-slate-300/60'
             )}
             aria-label="Search table"
           />

@@ -17,25 +17,25 @@ import { cn } from '@/lib/utils/cn';
  * @example
  * // Simple API (backwards compatible)
  * <Select
- *   label="Choose mode"
- *   options={[
- *     { value: 'auto', label: 'Automatic' },
- *     { value: 'manual', label: 'Manual' },
- *   ]}
- *   value={mode}
- *   onChange={(e) => setMode(e.target.value)}
+ * label="Choose mode"
+ * options={[
+ * { value: 'auto', label: 'Automatic' },
+ * { value: 'manual', label: 'Manual' },
+ * ]}
+ * value={mode}
+ * onChange={(e) => setMode(e.target.value)}
  * />
  *
  * @example
  * // Compound component pattern (advanced)
  * <SelectRoot value={mode} onValueChange={setMode}>
- *   <SelectTrigger>
- *     <SelectValue placeholder="Select..." />
- *   </SelectTrigger>
- *   <SelectContent>
- *     <SelectItem value="auto">Automatic</SelectItem>
- *     <SelectItem value="manual">Manual</SelectItem>
- *   </SelectContent>
+ * <SelectTrigger>
+ * <SelectValue placeholder="Select..." />
+ * </SelectTrigger>
+ * <SelectContent>
+ * <SelectItem value="auto">Automatic</SelectItem>
+ * <SelectItem value="manual">Manual</SelectItem>
+ * </SelectContent>
  * </SelectRoot>
  */
 
@@ -55,9 +55,9 @@ const selectTriggerVariants = cva(
     // Disabled
     'disabled:opacity-50 disabled:cursor-not-allowed',
     // Light mode
-    '[html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-300/60',
-    '[html:not(.dark)_&]:text-slate-900 [html:not(.dark)_&]:placeholder:text-slate-400',
-    '[html:not(.dark)_&]:hover:bg-white/90 [html:not(.dark)_&]:hover:border-slate-400/60',
+    ' ',
+    ' ',
+    ' ',
   ],
   {
     variants: {
@@ -87,7 +87,7 @@ const selectItemVariants = cva(
     'outline-none',
     // Hover/highlighted state
     'data-[highlighted]:bg-slate-700/50',
-    '[html:not(.dark)_&]:data-[highlighted]:bg-slate-100',
+    ']:bg-slate-100',
     // Disabled state
     'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
   ],
@@ -95,19 +95,19 @@ const selectItemVariants = cva(
     variants: {
       variant: {
         default: [
-          'text-slate-200 [html:not(.dark)_&]:text-slate-700',
+          'text-slate-200 ',
           'data-[state=checked]:bg-ember-900/40 data-[state=checked]:text-ember-300',
-          '[html:not(.dark)_&]:data-[state=checked]:bg-ember-100/80 [html:not(.dark)_&]:data-[state=checked]:text-ember-700',
+          ']:bg-ember-100/80 ]:text-ember-700',
         ],
         ember: [
-          'text-slate-200 [html:not(.dark)_&]:text-slate-700',
+          'text-slate-200 ',
           'data-[state=checked]:bg-ember-900/40 data-[state=checked]:text-ember-300',
-          '[html:not(.dark)_&]:data-[state=checked]:bg-ember-100/80 [html:not(.dark)_&]:data-[state=checked]:text-ember-700',
+          ']:bg-ember-100/80 ]:text-ember-700',
         ],
         ocean: [
-          'text-slate-200 [html:not(.dark)_&]:text-slate-700',
+          'text-slate-200 ',
           'data-[state=checked]:bg-ocean-900/40 data-[state=checked]:text-ocean-300',
-          '[html:not(.dark)_&]:data-[state=checked]:bg-ocean-100/80 [html:not(.dark)_&]:data-[state=checked]:text-ocean-700',
+          ']:bg-ocean-100/80 ]:text-ocean-700',
         ],
       },
     },
@@ -147,7 +147,6 @@ const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(({
       <ChevronDown
         className={cn(
           'h-5 w-5 text-slate-400 transition-transform duration-200 shrink-0 ml-2',
-          '[html:not(.dark)_&]:text-slate-500'
         )}
       />
     </SelectPrimitive.Icon>
@@ -186,8 +185,7 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(({
         'bg-slate-800/95 backdrop-blur-2xl border border-slate-700/60',
         'shadow-lg',
         // Light mode
-        '[html:not(.dark)_&]:bg-white/95 [html:not(.dark)_&]:border-slate-200',
-        '[html:not(.dark)_&]:shadow-lg',
+        ' ',
         // Animation
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
@@ -226,7 +224,7 @@ const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(({
   >
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     <SelectPrimitive.ItemIndicator className="absolute right-3 flex items-center justify-center">
-      <Check className="h-4 w-4 text-ember-400 [html:not(.dark)_&]:text-ember-600" />
+      <Check className="h-4 w-4 text-ember-400 " />
     </SelectPrimitive.ItemIndicator>
   </SelectPrimitive.Item>
 ));
@@ -249,7 +247,6 @@ const SelectLabel = forwardRef<HTMLDivElement, SelectLabelProps>(({ className, .
     ref={ref}
     className={cn(
       'px-4 py-2 text-sm font-semibold text-slate-400',
-      '[html:not(.dark)_&]:text-slate-500',
       className
     )}
     {...props}
@@ -268,7 +265,6 @@ const SelectSeparator = forwardRef<HTMLDivElement, SelectSeparatorProps>(({ clas
     ref={ref}
     className={cn(
       '-mx-1 my-1 h-px bg-slate-700/50',
-      '[html:not(.dark)_&]:bg-slate-200',
       className
     )}
     {...props}
@@ -353,7 +349,7 @@ function Select({
           id={labelId}
           className={cn(
             'block text-sm font-bold mb-3 font-display',
-            'text-slate-300 [html:not(.dark)_&]:text-slate-700'
+            'text-slate-300 '
           )}
           suppressHydrationWarning
         >

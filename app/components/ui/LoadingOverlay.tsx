@@ -56,7 +56,7 @@ export default function LoadingOverlay({
       aria-busy="true"
     >
       {/* Backdrop - Ember Noir dark/light blur */}
-      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xl will-change-[backdrop-filter] transform-gpu [html:not(.dark)_&]:bg-slate-100/80" />
+      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xl will-change-[backdrop-filter] transform-gpu " />
 
       {/* Loading card */}
       <div className="relative z-10 animate-spring-in will-change-transform transform-gpu">
@@ -69,9 +69,9 @@ export default function LoadingOverlay({
           flex flex-col items-center gap-5 sm:gap-6
           min-w-[280px] sm:min-w-[320px]
           relative overflow-hidden
-          [html:not(.dark)_&]:bg-white/95
-          [html:not(.dark)_&]:border-slate-200
-          [html:not(.dark)_&]:shadow-[0_8px_32px_rgba(0,0,0,0.15)]
+          
+          
+          ,0,0,0.15)]
         ">
           {/* Animated spinner icon */}
           <div className="relative">

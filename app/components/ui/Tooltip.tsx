@@ -53,10 +53,10 @@ const TooltipContent = forwardRef<React.ElementRef<typeof TooltipPrimitive.Conte
         sideOffset={sideOffset}
         className={cn(
           'z-50 px-3 py-1.5 text-sm',
-          'bg-slate-800 [html:not(.dark)_&]:bg-slate-900',
+          'bg-slate-800 ',
           'text-slate-100',
           'rounded-lg shadow-lg',
-          'border border-slate-700/50 [html:not(.dark)_&]:border-slate-700',
+          'border border-slate-700/50 ',
           // Animation
           'animate-fade-in',
           'data-[state=closed]:animate-fade-out',
@@ -68,7 +68,7 @@ const TooltipContent = forwardRef<React.ElementRef<typeof TooltipPrimitive.Conte
       >
         {children}
         <TooltipPrimitive.Arrow
-          className="fill-slate-800 [html:not(.dark)_&]:fill-slate-900"
+          className="fill-slate-800 "
         />
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
@@ -83,7 +83,7 @@ const TooltipContent = forwardRef<React.ElementRef<typeof TooltipPrimitive.Conte
  *
  * @example
  * <Tooltip content="Hello world">
- *   <Button>Hover me</Button>
+ * <Button>Hover me</Button>
  * </Tooltip>
  */
 export interface TooltipProps extends Omit<TooltipRootProps, 'children'> {

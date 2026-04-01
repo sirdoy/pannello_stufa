@@ -13,9 +13,9 @@ import type { ReactNode, HTMLAttributes } from 'react';
  *
  * // Card skeleton
  * <Skeleton.Card>
- *   <Skeleton className="h-6 w-1/2 mb-4" />
- *   <Skeleton className="h-4 w-full mb-2" />
- *   <Skeleton className="h-4 w-3/4" />
+ * <Skeleton className="h-6 w-1/2 mb-4" />
+ * <Skeleton className="h-4 w-full mb-2" />
+ * <Skeleton className="h-4 w-3/4" />
  * </Skeleton.Card>
  */
 export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
@@ -25,11 +25,11 @@ export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
 export default function Skeleton({ className = '', ...props }: SkeletonProps) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
       {...props}
     >
       {/* Shimmer overlay effect */}
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 }
@@ -44,7 +44,7 @@ interface SkeletonCardProps extends HTMLAttributes<HTMLDivElement> {
 Skeleton.Card = function SkeletonCard({ children, className = '', ...props }: SkeletonCardProps) {
   return (
     <div
-      className={`bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-[0_4px_20px_rgba(0,0,0,0.3)] [html:not(.dark)_&]:bg-white/90 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:shadow-[0_4px_20px_rgba(0,0,0,0.1)] ${className}`}
+      className={`bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-[0_4px_20px_rgba(0,0,0,0.3)] ,0,0,0.1)] ${className}`}
       {...props}
     >
       {children}
@@ -69,7 +69,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
 
             {/* Status Display */}
             <div className="mb-6">
-              <div className="relative bg-slate-800/60 rounded-2xl p-8 sm:p-10 border border-slate-700/50 overflow-visible [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+              <div className="relative bg-slate-800/60 rounded-2xl p-8 sm:p-10 border border-slate-700/50 overflow-visible ">
                 <div className="text-center mb-8 sm:mb-10">
                   <Skeleton className="h-8 w-48 mx-auto" />
                 </div>
@@ -78,14 +78,14 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
                     <Skeleton className="h-[120px] w-[120px] sm:h-[140px] sm:w-[140px] rounded-full" />
                   </div>
                   <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
-                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 ">
                       <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                         <Skeleton className="h-6 w-6 rounded-full mb-2" />
                         <Skeleton className="h-3 w-16 mb-1" />
                         <Skeleton className="h-8 w-12" />
                       </div>
                     </div>
-                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 ">
                       <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                         <Skeleton className="h-6 w-6 rounded-full mb-2" />
                         <Skeleton className="h-3 w-16 mb-1" />
@@ -114,7 +114,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             </div>
 
             {/* Mode Indicator */}
-            <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 sm:p-6 mb-6 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+            <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 sm:p-6 mb-6 ">
               <div className="flex items-center gap-4 mb-4">
                 <Skeleton className="h-12 w-12 rounded-xl" />
                 <div className="flex-1 min-w-0">
@@ -127,7 +127,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
 
             {/* Controls */}
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 sm:p-6 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+              <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 sm:p-6 ">
                 <div className="flex items-center gap-3 mb-4">
                   <Skeleton className="h-10 w-10 rounded-xl" />
                   <Skeleton className="h-5 w-24" />
@@ -171,15 +171,15 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
 
             {/* Temperature Display */}
             <div className="space-y-4 mb-4 sm:mb-6">
-              <div className="relative rounded-2xl p-6 sm:p-8 bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+              <div className="relative rounded-2xl p-6 sm:p-8 bg-slate-800/60 border border-slate-700/50 ">
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 ">
                     <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
                       <Skeleton className="h-3 w-16 mb-2" />
                       <Skeleton className="h-12 sm:h-14 w-16 sm:w-20" />
                     </div>
                   </div>
-                  <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 border border-ocean-500/30 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200">
+                  <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 border border-ocean-500/30 ">
                     <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
                       <Skeleton className="h-3 w-16 mb-2" />
                       <Skeleton className="h-12 sm:h-14 w-16 sm:w-20" />
@@ -189,7 +189,7 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
               </div>
 
               {/* Temperature controls */}
-              <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+              <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-4 sm:p-5 ">
                 <div className="flex items-center gap-3">
                   <Skeleton className="flex-1 h-16 sm:h-18 rounded-xl" />
                   <div className="flex flex-col items-center justify-center px-4">
@@ -253,7 +253,7 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
 
             {/* Main Control Area */}
             <div className="mb-6">
-              <div className="relative rounded-2xl p-6 sm:p-8 bg-slate-800/60 border border-slate-700/50 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+              <div className="relative rounded-2xl p-6 sm:p-8 bg-slate-800/60 border border-slate-700/50 ">
                 {/* ON/OFF buttons */}
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <Skeleton className="h-16 sm:h-20 rounded-xl" />
@@ -261,7 +261,7 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
                 </div>
 
                 {/* Brightness Control */}
-                <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-4 sm:p-5 ">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -293,15 +293,15 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
             {/* Scenes */}
             <div className="mb-6">
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start ">
                   <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
                   <Skeleton className="h-3 w-20 mx-auto" />
                 </div>
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start ">
                   <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
                   <Skeleton className="h-3 w-20 mx-auto" />
                 </div>
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start ">
                   <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
                   <Skeleton className="h-3 w-20 mx-auto" />
                 </div>
@@ -355,7 +355,7 @@ Skeleton.WeatherCard = function SkeletonWeatherCard() {
               {/* Weather details grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+                  <div key={i} className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl ">
                     <Skeleton className="h-5 w-5 rounded-full mb-2" />
                     <Skeleton className="h-3 w-12 mb-1" />
                     <Skeleton className="h-4 w-10" />
@@ -369,7 +369,7 @@ Skeleton.WeatherCard = function SkeletonWeatherCard() {
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="flex-shrink-0 w-20 p-3 rounded-xl bg-slate-800/40 [html:not(.dark)_&]:bg-slate-100/80"
+                  className="flex-shrink-0 w-20 p-3 rounded-xl bg-slate-800/40 "
                 >
                   <Skeleton className="h-3 w-10 mx-auto mb-2" />
                   <Skeleton className="h-8 w-8 rounded-full mx-auto mb-2" />
@@ -397,7 +397,7 @@ Skeleton.Scheduler = function SkeletonScheduler() {
         <Skeleton className="h-8 sm:h-9 w-64 sm:w-80 mb-8" />
 
         {/* Status e toggle */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-slate-100/80 [html:not(.dark)_&]:bg-slate-100/80 bg-slate-800/60 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-slate-100/80 bg-slate-800/60 mb-4">
           {/* ModeIndicator */}
           <div className="flex items-center gap-2">
             <Skeleton className="h-6 w-6 rounded-lg" />
@@ -439,7 +439,7 @@ Skeleton.Scheduler = function SkeletonScheduler() {
 
             {/* TimeBar compatta */}
             <div className="mt-4">
-              <div className="relative h-4 w-full bg-slate-200 [html:not(.dark)_&]:bg-slate-200 bg-slate-700/50 rounded-lg overflow-hidden shadow-inner">
+              <div className="relative h-4 w-full bg-slate-200 bg-slate-700/50 rounded-lg overflow-hidden shadow-inner">
                 <div className="absolute top-0 bottom-0 bg-gradient-to-r from-ember-400 to-flame-500" style={{ left: '20%', width: '30%' }} />
                 <div className="absolute top-0 bottom-0 bg-gradient-to-r from-ember-400 to-flame-500" style={{ left: '60%', width: '25%' }} />
               </div>
@@ -474,7 +474,7 @@ Skeleton.CameraCard = function SkeletonCameraCard() {
         </div>
 
         {/* Video preview area */}
-        <div className="relative aspect-video bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded-xl overflow-hidden mb-4">
+        <div className="relative aspect-video bg-slate-800 rounded-xl overflow-hidden mb-4">
           <div className="absolute inset-0 flex items-center justify-center">
             <Skeleton className="h-12 w-12 rounded-full" />
           </div>
@@ -501,7 +501,7 @@ Skeleton.CameraCard = function SkeletonCameraCard() {
  */
 Skeleton.LogEntry = function SkeletonLogEntry() {
   return (
-    <li className="border-b border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700/50 pb-4 mb-4 last:border-b-0 flex items-start gap-3">
+    <li className="border-b border-slate-200 border-slate-700/50 pb-4 mb-4 last:border-b-0 flex items-start gap-3">
       {/* Icon */}
       <Skeleton className="h-8 w-8 rounded-full flex-shrink-0 mt-1" />
 
@@ -604,7 +604,7 @@ Skeleton.Changelog = function SkeletonChangelog() {
       {/* Timeline */}
       <div className="relative">
         {/* Vertical line */}
-        <div className="absolute left-[23px] sm:left-[27px] top-8 bottom-8 w-px bg-slate-700/30 [html:not(.dark)_&]:bg-slate-200" />
+        <div className="absolute left-[23px] sm:left-[27px] top-8 bottom-8 w-px bg-slate-700/30 " />
 
         <div className="space-y-6">
           {[...Array(5)].map((_, index) => (
@@ -614,7 +614,7 @@ Skeleton.Changelog = function SkeletonChangelog() {
 
               <Skeleton.Card className="overflow-hidden">
                 {/* Header */}
-                <div className="p-5 sm:p-6 bg-slate-800/30 [html:not(.dark)_&]:bg-slate-100/50 border-b border-slate-700/30 [html:not(.dark)_&]:border-slate-200/50">
+                <div className="p-5 sm:p-6 bg-slate-800/30 border-b border-slate-700/30 ">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <Skeleton className="h-6 w-24" />
@@ -709,7 +709,7 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
             <Skeleton className="h-6 w-12" />
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700/50">
+        <div className="mt-4 pt-4 border-t border-slate-200 border-slate-700/50">
           <Skeleton className="h-9 w-56 rounded-xl" />
         </div>
       </Skeleton.Card>
@@ -785,9 +785,9 @@ Skeleton.SchedulePage = function SkeletonSchedulePage() {
 Skeleton.RaspiCard = function SkeletonRaspiCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -822,9 +822,9 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
   // Internal SkeletonPulse component
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -875,9 +875,9 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
 Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -911,9 +911,9 @@ Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
 Skeleton.TuyaCard = function SkeletonTuyaCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -945,9 +945,9 @@ Skeleton.TuyaCard = function SkeletonTuyaCard() {
 Skeleton.SonosCard = function SkeletonSonosCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent [html:not(.dark)_&]:via-slate-400/40" />
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 

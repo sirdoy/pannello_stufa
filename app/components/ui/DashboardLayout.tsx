@@ -52,7 +52,7 @@ const sidebarVariants = cva(
   [
     'fixed top-0 left-0 h-full z-40',
     'bg-slate-900 border-r border-slate-800',
-    '[html:not(.dark)_&]:bg-white [html:not(.dark)_&]:border-slate-200',
+    ' ',
     'transition-all duration-300 ease-in-out',
     'flex flex-col',
   ],
@@ -166,7 +166,7 @@ const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(function Si
     <div
       ref={ref}
       className={cn(
-        'h-16 flex items-center border-b border-slate-800 [html:not(.dark)_&]:border-slate-200',
+        'h-16 flex items-center border-b border-slate-800 ',
         collapsed ? 'px-2 justify-center' : 'px-4',
         className
       )}
@@ -216,7 +216,7 @@ const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(function Si
     <div
       ref={ref}
       className={cn(
-        'border-t border-slate-800 [html:not(.dark)_&]:border-slate-200 py-4',
+        'border-t border-slate-800 py-4',
         collapsed ? 'px-2' : 'px-4',
         className
       )}
@@ -246,7 +246,7 @@ const SidebarToggle = forwardRef<HTMLButtonElement, SidebarToggleProps>(function
       className={cn(
         'p-2 rounded-lg',
         'text-slate-400 hover:text-slate-200 hover:bg-slate-800',
-        '[html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-slate-900 [html:not(.dark)_&]:hover:bg-slate-100',
+        ' ',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500',
         'transition-colors',
         className
@@ -292,7 +292,7 @@ const MobileMenuButton = forwardRef<HTMLButtonElement, MobileMenuButtonProps>(fu
       className={cn(
         'lg:hidden p-2 rounded-lg',
         'text-slate-400 hover:text-slate-200 hover:bg-slate-800',
-        '[html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-slate-900 [html:not(.dark)_&]:hover:bg-slate-100',
+        ' ',
         'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500',
         'transition-colors',
         className
@@ -361,17 +361,17 @@ const MainContent = forwardRef<HTMLDivElement, MainContentProps>(function MainCo
  *
  * @example
  * <DashboardLayout
- *   sidebar={
- *     <DashboardLayout.Sidebar>
- *       <DashboardLayout.SidebarHeader>Logo</DashboardLayout.SidebarHeader>
- *       <DashboardLayout.SidebarContent>Nav items</DashboardLayout.SidebarContent>
- *       <DashboardLayout.SidebarFooter>
- *         <DashboardLayout.SidebarToggle />
- *       </DashboardLayout.SidebarFooter>
- *     </DashboardLayout.Sidebar>
- *   }
+ * sidebar={
+ * <DashboardLayout.Sidebar>
+ * <DashboardLayout.SidebarHeader>Logo</DashboardLayout.SidebarHeader>
+ * <DashboardLayout.SidebarContent>Nav items</DashboardLayout.SidebarContent>
+ * <DashboardLayout.SidebarFooter>
+ * <DashboardLayout.SidebarToggle />
+ * </DashboardLayout.SidebarFooter>
+ * </DashboardLayout.Sidebar>
+ * }
  * >
- *   <DashboardLayout.Main>Content</DashboardLayout.Main>
+ * <DashboardLayout.Main>Content</DashboardLayout.Main>
  * </DashboardLayout>
  */
 export interface DashboardLayoutProps extends ComponentPropsWithoutRef<'div'> {

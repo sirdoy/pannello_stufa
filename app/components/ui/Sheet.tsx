@@ -23,31 +23,31 @@ import { X } from 'lucide-react';
  * @example
  * // Basic usage with controlled state
  * <Sheet open={open} onOpenChange={setOpen}>
- *   <Sheet.Trigger asChild>
- *     <Button>Open Sheet</Button>
- *   </Sheet.Trigger>
- *   <Sheet.Content side="bottom" size="md">
- *     <Sheet.Header>
- *       <Sheet.Title>Settings</Sheet.Title>
- *       <Sheet.Description>Adjust your preferences</Sheet.Description>
- *     </Sheet.Header>
- *     {content}
- *     <Sheet.Footer>
- *       <Button onClick={() => setOpen(false)}>Done</Button>
- *     </Sheet.Footer>
- *   </Sheet.Content>
+ * <Sheet.Trigger asChild>
+ * <Button>Open Sheet</Button>
+ * </Sheet.Trigger>
+ * <Sheet.Content side="bottom" size="md">
+ * <Sheet.Header>
+ * <Sheet.Title>Settings</Sheet.Title>
+ * <Sheet.Description>Adjust your preferences</Sheet.Description>
+ * </Sheet.Header>
+ * {content}
+ * <Sheet.Footer>
+ * <Button onClick={() => setOpen(false)}>Done</Button>
+ * </Sheet.Footer>
+ * </Sheet.Content>
  * </Sheet>
  *
  * @example
  * // Different sides
- * <Sheet.Content side="right" size="md">...</Sheet.Content>  // Desktop side panel
+ * <Sheet.Content side="right" size="md">...</Sheet.Content> // Desktop side panel
  * <Sheet.Content side="bottom" size="lg">...</Sheet.Content> // Mobile bottom sheet
  */
 
 // CVA variants for overlay (same as Modal)
 const overlayVariants = cva([
   'fixed inset-0 z-50',
-  'bg-slate-950/70 [html:not(.dark)_&]:bg-slate-900/40',
+  'bg-slate-950/70 ',
   'backdrop-blur-md',
   'data-[state=open]:animate-fade-in',
   'data-[state=closed]:animate-fade-out',
@@ -57,9 +57,9 @@ const overlayVariants = cva([
 const contentVariants = cva(
   [
     'fixed z-50 p-6',
-    'bg-slate-900/95 [html:not(.dark)_&]:bg-white/95',
+    'bg-slate-900/95 ',
     'backdrop-blur-3xl',
-    'border border-slate-700/50 [html:not(.dark)_&]:border-slate-200',
+    'border border-slate-700/50 ',
     'shadow-card-elevated',
     'focus:outline-none',
     'overflow-y-auto',
@@ -170,8 +170,8 @@ const SheetContent = forwardRef<React.ElementRef<typeof DialogPrimitive.Content>
             className={cn(
               'absolute right-4 top-4 p-2 rounded-xl',
               'text-slate-400 hover:text-slate-200',
-              '[html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700',
-              'hover:bg-white/[0.06] [html:not(.dark)_&]:hover:bg-black/[0.04]',
+              ' ',
+              'hover:bg-white/[0.06] ]',
               'transition-colors duration-200',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50'
             )}
@@ -241,7 +241,7 @@ const SheetTitle = forwardRef<React.ElementRef<typeof DialogPrimitive.Title>, Sh
         ref={ref}
         className={cn(
           'text-xl font-display font-semibold',
-          'text-slate-100 [html:not(.dark)_&]:text-slate-900',
+          'text-slate-100 ',
           className
         )}
         {...props}
@@ -265,7 +265,7 @@ const SheetDescription = forwardRef<React.ElementRef<typeof DialogPrimitive.Desc
       <DialogPrimitive.Description
         ref={ref}
         className={cn(
-          'text-sm text-slate-400 [html:not(.dark)_&]:text-slate-600',
+          'text-sm text-slate-400 ',
           className
         )}
         {...props}

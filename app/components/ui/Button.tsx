@@ -28,7 +28,6 @@ export const buttonVariants = cva(
     'focus-visible:outline-none',
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-    '[html:not(.dark)_&]:focus-visible:ring-offset-slate-50',
     // Active state - spring physics for responsive feel
     'active:scale-[0.97]',
     'active:duration-[var(--duration-fast)]',
@@ -58,11 +57,10 @@ export const buttonVariants = cva(
           'hover:border-white/[0.12]',
           'hover:-translate-y-0.5',
           'hover:ease-[var(--ease-spring-subtle)]',
-          '[html:not(.dark)_&]:bg-black/[0.04]',
-          '[html:not(.dark)_&]:text-slate-700',
-          '[html:not(.dark)_&]:border-black/[0.08]',
-          '[html:not(.dark)_&]:hover:bg-black/[0.06]',
-          '[html:not(.dark)_&]:hover:border-black/[0.12]',
+          ']',
+          ']',
+          ']',
+          ']',
         ],
         // Ghost - Transparent with hover
         ghost: [
@@ -70,9 +68,7 @@ export const buttonVariants = cva(
           'text-slate-300',
           'hover:bg-white/[0.06]',
           'hover:text-slate-100',
-          '[html:not(.dark)_&]:text-slate-600',
-          '[html:not(.dark)_&]:hover:bg-black/[0.04]',
-          '[html:not(.dark)_&]:hover:text-slate-900',
+          ']',
         ],
         // Success action - Muted sage green
         success: [
@@ -103,10 +99,6 @@ export const buttonVariants = cva(
           'hover:border-ember-500/60',
           'hover:-translate-y-0.5',
           'hover:ease-[var(--ease-spring-subtle)]',
-          '[html:not(.dark)_&]:text-ember-600',
-          '[html:not(.dark)_&]:border-ember-500/50',
-          '[html:not(.dark)_&]:hover:bg-ember-500/10',
-          '[html:not(.dark)_&]:hover:border-ember-500/70',
         ],
       },
       size: {
@@ -138,43 +130,43 @@ export const buttonVariants = cva(
       {
         variant: 'subtle',
         colorScheme: 'sage',
-        className: 'bg-sage-500/20 text-sage-300 border border-sage-500/40 shadow-sm [html:not(.dark)_&]:bg-sage-500/20 [html:not(.dark)_&]:text-sage-700 [html:not(.dark)_&]:border-sage-500/30',
+        className: 'bg-sage-500/20 text-sage-300 border border-sage-500/40 shadow-sm ',
       },
       {
         variant: 'subtle',
         colorScheme: 'ocean',
-        className: 'bg-ocean-500/20 text-ocean-300 border border-ocean-500/40 shadow-sm [html:not(.dark)_&]:bg-ocean-500/20 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:border-ocean-500/30',
+        className: 'bg-ocean-500/20 text-ocean-300 border border-ocean-500/40 shadow-sm ',
       },
       {
         variant: 'subtle',
         colorScheme: 'warning',
-        className: 'bg-warning-500/20 text-warning-300 border border-warning-500/40 shadow-sm [html:not(.dark)_&]:bg-warning-500/20 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-500/30',
+        className: 'bg-warning-500/20 text-warning-300 border border-warning-500/40 shadow-sm ',
       },
       {
         variant: 'subtle',
         colorScheme: 'slate',
-        className: 'bg-slate-500/20 text-slate-300 border border-slate-500/40 shadow-sm [html:not(.dark)_&]:bg-slate-500/20 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:border-slate-500/30',
+        className: 'bg-slate-500/20 text-slate-300 border border-slate-500/40 shadow-sm ',
       },
       // ghost + colorScheme compound variants
       {
         variant: 'ghost',
         colorScheme: 'sage',
-        className: 'text-sage-300 hover:bg-sage-500/10 [html:not(.dark)_&]:text-sage-700 [html:not(.dark)_&]:hover:bg-sage-500/10',
+        className: 'text-sage-300 hover:bg-sage-500/10 ',
       },
       {
         variant: 'ghost',
         colorScheme: 'ocean',
-        className: 'text-ocean-300 hover:bg-ocean-500/10 [html:not(.dark)_&]:text-ocean-700 [html:not(.dark)_&]:hover:bg-ocean-500/10',
+        className: 'text-ocean-300 hover:bg-ocean-500/10 ',
       },
       {
         variant: 'ghost',
         colorScheme: 'warning',
-        className: 'text-warning-300 hover:bg-warning-500/10 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:hover:bg-warning-500/10',
+        className: 'text-warning-300 hover:bg-warning-500/10 ',
       },
       {
         variant: 'ghost',
         colorScheme: 'slate',
-        className: 'text-slate-300 hover:bg-slate-500/10 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:hover:bg-slate-500/10',
+        className: 'text-slate-300 hover:bg-slate-500/10 ',
       },
     ],
     defaultVariants: {

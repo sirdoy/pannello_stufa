@@ -22,8 +22,8 @@ export interface KbdProps extends HTMLAttributes<HTMLElement> {
  *
  * @example
  * // With symbols (Mac-style)
- * <Kbd>{'\u2318'}K</Kbd>  // Command + K
- * <Kbd>{'\u21E7'}Enter</Kbd>  // Shift + Enter
+ * <Kbd>{'\u2318'}K</Kbd> // Command + K
+ * <Kbd>{'\u21E7'}Enter</Kbd> // Shift + Enter
  *
  * @example
  * // Multiple keys
@@ -44,9 +44,9 @@ function Kbd({ children, className, ...props }: KbdProps) {
         'inline-flex items-center justify-center',
         'px-2 py-1 rounded-md',
         'text-xs font-mono font-medium',
-        'bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200',
-        'text-slate-300 [html:not(.dark)_&]:text-slate-700',
-        'border border-slate-600/50 [html:not(.dark)_&]:border-slate-300',
+        'bg-slate-700/50 ',
+        'text-slate-300 ',
+        'border border-slate-600/50 ',
         'shadow-sm',
         className
       )}

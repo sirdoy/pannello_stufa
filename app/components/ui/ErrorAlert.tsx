@@ -63,11 +63,11 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
         {errorDescription || errorInfo.description}
       </span>
       {showSuggestion && suggestion && (
-        <span className="block mt-3 p-3 bg-slate-800/40 backdrop-blur-2xl rounded-lg ring-1 ring-slate-700/50 ring-inset [html:not(.dark)_&]:bg-slate-100/60 [html:not(.dark)_&]:ring-slate-200">
-          <span className="block mb-1 text-sm font-medium text-slate-300 [html:not(.dark)_&]:text-slate-600">
+        <span className="block mt-3 p-3 bg-slate-800/40 backdrop-blur-2xl rounded-lg ring-1 ring-slate-700/50 ring-inset ">
+          <span className="block mb-1 text-sm font-medium text-slate-300 ">
             💡 Suggerimento:
           </span>
-          <span className="block text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500">
+          <span className="block text-sm text-slate-400 ">
             {suggestion}
           </span>
         </span>

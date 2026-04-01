@@ -14,21 +14,17 @@ import { cn } from '@/lib/utils/cn';
  */
 const dividerVariants = cva(
   // Base classes (minimal - most styling per orientation)
-  '',
   {
     variants: {
       variant: {
         solid: [
           'bg-slate-700',
-          '[html:not(.dark)_&]:bg-slate-300',
         ],
         dashed: [
           'border-dashed border-slate-600 bg-transparent',
-          '[html:not(.dark)_&]:border-slate-300',
         ],
         gradient: [
           'bg-gradient-to-r from-transparent via-slate-600/50 to-transparent',
-          '[html:not(.dark)_&]:via-slate-300/60',
         ],
       },
     },
@@ -131,7 +127,7 @@ const Divider = forwardRef<HTMLDivElement, DividerProps>(function Divider(
           <span className={cn(
             'px-4 py-1.5 backdrop-blur-xl font-semibold font-display text-xs uppercase tracking-[0.15em] rounded-full',
             'bg-slate-800/80 text-slate-300 border border-slate-700/50',
-            '[html:not(.dark)_&]:bg-white/90 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:border-slate-200'
+            ' '
           )}>
             {label}
           </span>

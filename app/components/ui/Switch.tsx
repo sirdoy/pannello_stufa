@@ -23,11 +23,10 @@ const switchTrackVariants = cva(
     // Focus ring - ember glow
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-    '[html:not(.dark)_&]:focus-visible:ring-offset-slate-50',
     // Disabled state
     'disabled:opacity-50 disabled:cursor-not-allowed',
     // Unchecked state - dark/light
-    'bg-slate-700 [html:not(.dark)_&]:bg-slate-300',
+    'bg-slate-700 ',
   ],
   {
     variants: {

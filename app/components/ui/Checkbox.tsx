@@ -24,11 +24,10 @@ const checkboxVariants = cva(
     // Focus ring - ember glow
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-    '[html:not(.dark)_&]:focus-visible:ring-offset-slate-50',
     // Disabled state
     'disabled:opacity-50 disabled:cursor-not-allowed',
     // Base border (unchecked)
-    'border-slate-500 [html:not(.dark)_&]:border-slate-400',
+    'border-slate-500 ',
   ],
   {
     variants: {
@@ -39,39 +38,39 @@ const checkboxVariants = cva(
       },
       variant: {
         primary: [
-          'hover:border-ember-400 [html:not(.dark)_&]:hover:border-ember-500',
+          'hover:border-ember-400 ',
           'data-[state=checked]:bg-ember-500 data-[state=checked]:border-ember-500',
           'data-[state=indeterminate]:bg-ember-500 data-[state=indeterminate]:border-ember-500',
-          '[html:not(.dark)_&]:data-[state=checked]:bg-ember-600 [html:not(.dark)_&]:data-[state=checked]:border-ember-600',
-          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-ember-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-ember-600',
+          ']:bg-ember-600 ]:border-ember-600',
+          ']:bg-ember-600 ]:border-ember-600',
         ],
         ember: [
-          'hover:border-ember-400 [html:not(.dark)_&]:hover:border-ember-500',
+          'hover:border-ember-400 ',
           'data-[state=checked]:bg-ember-500 data-[state=checked]:border-ember-500',
           'data-[state=indeterminate]:bg-ember-500 data-[state=indeterminate]:border-ember-500',
-          '[html:not(.dark)_&]:data-[state=checked]:bg-ember-600 [html:not(.dark)_&]:data-[state=checked]:border-ember-600',
-          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-ember-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-ember-600',
+          ']:bg-ember-600 ]:border-ember-600',
+          ']:bg-ember-600 ]:border-ember-600',
         ],
         ocean: [
-          'hover:border-ocean-400 [html:not(.dark)_&]:hover:border-ocean-500',
+          'hover:border-ocean-400 ',
           'data-[state=checked]:bg-ocean-500 data-[state=checked]:border-ocean-500',
           'data-[state=indeterminate]:bg-ocean-500 data-[state=indeterminate]:border-ocean-500',
-          '[html:not(.dark)_&]:data-[state=checked]:bg-ocean-600 [html:not(.dark)_&]:data-[state=checked]:border-ocean-600',
-          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-ocean-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-ocean-600',
+          ']:bg-ocean-600 ]:border-ocean-600',
+          ']:bg-ocean-600 ]:border-ocean-600',
         ],
         sage: [
-          'hover:border-sage-400 [html:not(.dark)_&]:hover:border-sage-500',
+          'hover:border-sage-400 ',
           'data-[state=checked]:bg-sage-500 data-[state=checked]:border-sage-500',
           'data-[state=indeterminate]:bg-sage-500 data-[state=indeterminate]:border-sage-500',
-          '[html:not(.dark)_&]:data-[state=checked]:bg-sage-600 [html:not(.dark)_&]:data-[state=checked]:border-sage-600',
-          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-sage-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-sage-600',
+          ']:bg-sage-600 ]:border-sage-600',
+          ']:bg-sage-600 ]:border-sage-600',
         ],
         flame: [
-          'hover:border-flame-400 [html:not(.dark)_&]:hover:border-flame-500',
+          'hover:border-flame-400 ',
           'data-[state=checked]:bg-flame-500 data-[state=checked]:border-flame-500',
           'data-[state=indeterminate]:bg-flame-500 data-[state=indeterminate]:border-flame-500',
-          '[html:not(.dark)_&]:data-[state=checked]:bg-flame-600 [html:not(.dark)_&]:data-[state=checked]:border-flame-600',
-          '[html:not(.dark)_&]:data-[state=indeterminate]:bg-flame-600 [html:not(.dark)_&]:data-[state=indeterminate]:border-flame-600',
+          ']:bg-flame-600 ]:border-flame-600',
+          ']:bg-flame-600 ]:border-flame-600',
         ],
       },
     },
@@ -194,7 +193,7 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(
           htmlFor={id}
           className={cn(
             'text-sm font-medium select-none',
-            'text-white [html:not(.dark)_&]:text-slate-900',
+            'text-white ',
             disabled ? 'cursor-not-allowed' : 'cursor-pointer'
           )}
         >

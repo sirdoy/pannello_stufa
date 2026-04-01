@@ -189,7 +189,6 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
         className={cn(
           'relative h-2 w-full grow overflow-hidden rounded-full',
           'bg-slate-700',
-          '[html:not(.dark)_&]:bg-slate-200'
         )}
       >
         {/* Range fill */}
@@ -211,7 +210,6 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
                 'absolute left-1/2 -translate-x-1/2 -top-8',
                 'bg-slate-800 px-2 py-1 rounded text-xs text-white',
                 'whitespace-nowrap pointer-events-none',
-                '[html:not(.dark)_&]:bg-slate-900'
               )}
             >
               {displayValues[index]}

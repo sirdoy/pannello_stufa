@@ -115,7 +115,7 @@ export default function OfflineBanner({
       <div
         className={cn(
           baseClasses,
-          'bg-emerald-500/90 dark:bg-emerald-600/90',
+          'bg-emerald-600/90',
           'backdrop-blur-lg',
           'border-b border-emerald-400/30',
           'px-4 py-3',
@@ -151,7 +151,7 @@ export default function OfflineBanner({
       <div
         className={cn(
           baseClasses,
-          'bg-emerald-500/90 dark:bg-emerald-600/90',
+          'bg-emerald-600/90',
           'backdrop-blur-lg',
           'border-b border-emerald-400/30',
           'px-4 py-3',
@@ -180,11 +180,9 @@ export default function OfflineBanner({
         className={cn(
           baseClasses,
           // Dark mode: slate-800 with high opacity, muted border
-          'bg-slate-800/95 dark:bg-slate-800/95',
+          'bg-slate-800/95',
           'border-b border-slate-700/50',
           // Light mode: slate-100 background
-          '[html:not(.dark)_&]:bg-slate-100/95',
-          '[html:not(.dark)_&]:border-slate-200',
           'backdrop-blur-lg',
           'px-4 py-3',
           className
@@ -195,7 +193,7 @@ export default function OfflineBanner({
           {/* Main offline message */}
           <div className="flex items-start gap-3">
             {/* Icon - subtle informational, NOT alarming */}
-            <div className="flex-shrink-0 text-slate-400 dark:text-slate-400 [html:not(.dark)_&]:text-slate-500">
+            <div className="flex-shrink-0 text-slate-400">
               <WifiOff size={20} strokeWidth={2} aria-hidden="true" />
             </div>
 
@@ -205,7 +203,7 @@ export default function OfflineBanner({
               <Heading
                 level={2}
                 size="sm"
-                className="text-slate-200 dark:text-slate-200 [html:not(.dark)_&]:text-slate-700"
+                className="text-slate-200"
               >
                 Sei offline
               </Heading>
@@ -214,7 +212,7 @@ export default function OfflineBanner({
               {lastOnlineAt && (
                 <Text
                   size="xs"
-                  className="text-slate-400 dark:text-slate-400 [html:not(.dark)_&]:text-slate-600 mt-0.5"
+                  className="text-slate-400 mt-0.5"
                 >
                   Ultimo aggiornamento:{' '}
                   {formatDistanceToNow(lastOnlineAt, {
@@ -233,8 +231,8 @@ export default function OfflineBanner({
                     className={cn(
                       'flex items-center gap-2 w-full',
                       'text-left',
-                      'text-slate-300 dark:text-slate-300 [html:not(.dark)_&]:text-slate-600',
-                      'hover:text-slate-200 dark:hover:text-slate-200 [html:not(.dark)_&]:hover:text-slate-700',
+                      'text-slate-300',
+                      'hover:text-slate-200 hover:text-slate-200',
                       'transition-colors duration-200'
                     )}
                   >
@@ -258,8 +256,7 @@ export default function OfflineBanner({
                           className={cn(
                             'flex items-center justify-between gap-3',
                             'p-2.5 rounded-lg',
-                            'bg-white/5 dark:bg-white/5',
-                            '[html:not(.dark)_&]:bg-slate-200/50',
+                            'bg-white/5',
                             'transition-all duration-200'
                           )}
                         >
@@ -272,8 +269,7 @@ export default function OfflineBanner({
                               <Text
                                 size="sm"
                                 className={cn(
-                                  'text-slate-200 dark:text-slate-200',
-                                  '[html:not(.dark)_&]:text-slate-700',
+                                  'text-slate-200',
                                   'truncate'
                                 )}
                               >
@@ -282,8 +278,7 @@ export default function OfflineBanner({
                               <Text
                                 size="xs"
                                 className={cn(
-                                  'text-slate-400 dark:text-slate-400',
-                                  '[html:not(.dark)_&]:text-slate-500'
+                                  'text-slate-400',
                                 )}
                               >
                                 {cmd.formattedTime}
@@ -298,12 +293,9 @@ export default function OfflineBanner({
                             onClick={() => cmd.id && cancelCommand(cmd.id)}
                             className={cn(
                               'flex-shrink-0 h-8 px-3',
-                              'text-slate-300 dark:text-slate-300',
-                              '[html:not(.dark)_&]:text-slate-600',
-                              'border-slate-600/50 dark:border-slate-600/50',
-                              '[html:not(.dark)_&]:border-slate-300',
-                              'hover:bg-white/10 dark:hover:bg-white/10',
-                              '[html:not(.dark)_&]:hover:bg-slate-200'
+                              'text-slate-300',
+                              'border-slate-600/50',
+                              'hover:bg-white/10 hover:bg-white/10',
                             )}
                             aria-label={`Annulla ${cmd.label}`}
                           >

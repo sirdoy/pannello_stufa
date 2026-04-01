@@ -21,34 +21,34 @@ import { ChevronDown } from 'lucide-react';
  * @example
  * // Single mode (one item open at a time)
  * <Accordion type="single" defaultValue="item-1" collapsible>
- *   <Accordion.Item value="item-1">
- *     <Accordion.Trigger>Is this collapsible?</Accordion.Trigger>
- *     <Accordion.Content>Yes, click trigger to collapse.</Accordion.Content>
- *   </Accordion.Item>
- *   <Accordion.Item value="item-2">
- *     <Accordion.Trigger>Another question?</Accordion.Trigger>
- *     <Accordion.Content>Another answer here.</Accordion.Content>
- *   </Accordion.Item>
+ * <Accordion.Item value="item-1">
+ * <Accordion.Trigger>Is this collapsible?</Accordion.Trigger>
+ * <Accordion.Content>Yes, click trigger to collapse.</Accordion.Content>
+ * </Accordion.Item>
+ * <Accordion.Item value="item-2">
+ * <Accordion.Trigger>Another question?</Accordion.Trigger>
+ * <Accordion.Content>Another answer here.</Accordion.Content>
+ * </Accordion.Item>
  * </Accordion>
  *
  * @example
  * // Multiple mode (multiple items can be open)
  * <Accordion type="multiple" defaultValue={['item-1', 'item-2']}>
- *   <Accordion.Item value="item-1">
- *     <Accordion.Trigger>First section</Accordion.Trigger>
- *     <Accordion.Content>First content</Accordion.Content>
- *   </Accordion.Item>
- *   <Accordion.Item value="item-2">
- *     <Accordion.Trigger>Second section</Accordion.Trigger>
- *     <Accordion.Content>Second content</Accordion.Content>
- *   </Accordion.Item>
+ * <Accordion.Item value="item-1">
+ * <Accordion.Trigger>First section</Accordion.Trigger>
+ * <Accordion.Content>First content</Accordion.Content>
+ * </Accordion.Item>
+ * <Accordion.Item value="item-2">
+ * <Accordion.Trigger>Second section</Accordion.Trigger>
+ * <Accordion.Content>Second content</Accordion.Content>
+ * </Accordion.Item>
  * </Accordion>
  */
 
 // CVA variants for AccordionItem
 const itemVariants = cva([
   'border-b border-white/[0.06]',
-  '[html:not(.dark)_&]:border-black/[0.06]',
+  ']',
   'last:border-b-0',
 ]);
 
@@ -58,9 +58,9 @@ const triggerVariants = cva([
   'min-h-[48px] px-4 py-3',
   'font-display font-medium text-sm',
   // Text colors - Ember Noir
-  'text-slate-200 [html:not(.dark)_&]:text-slate-900',
+  'text-slate-200 ',
   // Hover state
-  'hover:text-ember-400 [html:not(.dark)_&]:hover:text-ember-700',
+  'hover:text-ember-400 ',
   // Transition
   'transition-colors duration-[var(--duration-fast)]',
   // Focus ring
@@ -73,7 +73,7 @@ const triggerVariants = cva([
 const contentVariants = cva([
   'overflow-hidden',
   // Text colors - Ember Noir
-  'text-slate-400 [html:not(.dark)_&]:text-slate-600',
+  'text-slate-400 ',
   'text-sm',
   // Animation based on open/closed state
   'data-[state=open]:animate-accordion-down',
@@ -122,7 +122,7 @@ const AccordionTrigger = forwardRef<React.ElementRef<typeof AccordionPrimitive.T
           <ChevronDown
             className={cn(
               'h-4 w-4 shrink-0',
-              'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+              'text-slate-400 ',
               // Rotate chevron when open - smooth transition with animation token
               'transition-transform duration-[var(--duration-smooth)]',
               'group-data-[state=open]:rotate-180',

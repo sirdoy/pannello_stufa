@@ -57,9 +57,9 @@ export const dataTableVariants = cva(
   {
     variants: {
       density: {
-        compact: '[&_td]:py-2 [&_th]:py-2',    // 32px rows
-        default: '[&_td]:py-3 [&_th]:py-3',    // 44px rows
-        relaxed: '[&_td]:py-4 [&_th]:py-4',    // 52px rows
+        compact: '[&_td]:py-2 [&_th]:py-2', // 32px rows
+        default: '[&_td]:py-3 [&_th]:py-3', // 44px rows
+        relaxed: '[&_td]:py-4 [&_th]:py-4', // 52px rows
       },
       striped: {
         true: '[&_tbody_tr:nth-child(even)]:bg-white/[0.02]',
@@ -158,30 +158,30 @@ function SortIndicator({ isSorted, direction }: { isSorted: boolean | string; di
  * @example
  * // Basic usage
  * const columns = [
- *   { accessorKey: 'name', header: 'Name' },
- *   { accessorKey: 'status', header: 'Status' },
+ * { accessorKey: 'name', header: 'Name' },
+ * { accessorKey: 'status', header: 'Status' },
  * ];
  * const data = [
- *   { id: '1', name: 'Alpha', status: 'active' },
- *   { id: '2', name: 'Beta', status: 'pending' },
+ * { id: '1', name: 'Alpha', status: 'active' },
+ * { id: '2', name: 'Beta', status: 'pending' },
  * ];
  * <DataTable data={data} columns={columns} />
  *
  * @example
  * // With variants
  * <DataTable
- *   data={data}
- *   columns={columns}
- *   density="compact"
- *   striped
- *   stickyHeader
+ * data={data}
+ * columns={columns}
+ * density="compact"
+ * striped
+ * stickyHeader
  * />
  *
  * @example
  * // With row click handler
  * <DataTable
- *   data={data}
- *   columns={columns}
+ * data={data}
+ * columns={columns}
  * />
  */
 const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataTable(
@@ -658,7 +658,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
             <div className="flex items-center gap-2">
               <label
                 htmlFor="page-size"
-                className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-600"
+                className="text-sm text-slate-300 "
               >
                 Rows:
               </label>
@@ -672,9 +672,6 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
                   'border border-slate-700/50',
                   'focus:outline-none focus-visible:ring-2',
                   'focus-visible:ring-ember-500/50',
-                  '[html:not(.dark)_&]:bg-white/80',
-                  '[html:not(.dark)_&]:text-slate-700',
-                  '[html:not(.dark)_&]:border-slate-300/60'
                 )}
               >
                 {pageSizeOptions.map((size: number) => (

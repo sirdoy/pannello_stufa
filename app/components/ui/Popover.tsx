@@ -20,26 +20,26 @@ import { cn } from '@/lib/utils/cn';
  * @example
  * // Basic click-triggered popover
  * <Popover>
- *   <Popover.Trigger>Open</Popover.Trigger>
- *   <Popover.Content>
- *     <p>Popover content here</p>
- *   </Popover.Content>
+ * <Popover.Trigger>Open</Popover.Trigger>
+ * <Popover.Content>
+ * <p>Popover content here</p>
+ * </Popover.Content>
  * </Popover>
  *
  * @example
  * // Hover-triggered with arrow
  * <Popover triggerMode="hover">
- *   <Popover.Trigger>Hover me</Popover.Trigger>
- *   <Popover.Content arrow>
- *     <p>Info panel</p>
- *   </Popover.Content>
+ * <Popover.Trigger>Hover me</Popover.Trigger>
+ * <Popover.Content arrow>
+ * <p>Info panel</p>
+ * </Popover.Content>
  * </Popover>
  *
  * @example
  * // Different sizes
  * <Popover>
- *   <Popover.Trigger>Small</Popover.Trigger>
- *   <Popover.Content size="sm">Compact content</Popover.Content>
+ * <Popover.Trigger>Small</Popover.Trigger>
+ * <Popover.Content size="sm">Compact content</Popover.Content>
  * </Popover>
  */
 
@@ -47,9 +47,9 @@ import { cn } from '@/lib/utils/cn';
 const contentVariants = cva(
   [
     'z-50 rounded-2xl p-4',
-    'bg-slate-900/95 [html:not(.dark)_&]:bg-white/95',
+    'bg-slate-900/95 ',
     'backdrop-blur-xl',
-    'border border-slate-700/50 [html:not(.dark)_&]:border-slate-200',
+    'border border-slate-700/50 ',
     'shadow-card-elevated',
     // Animation - scale from 95% + fade
     'data-[state=open]:animate-scale-in',
@@ -71,7 +71,7 @@ const contentVariants = cva(
 
 // CVA variants for arrow
 const arrowVariants = cva([
-  'fill-slate-900/95 [html:not(.dark)_&]:fill-white/95',
+  'fill-slate-900/95 ',
 ]);
 
 /**
@@ -154,8 +154,8 @@ const PopoverClose = forwardRef<React.ElementRef<typeof PopoverPrimitive.Close>,
         className={cn(
           'p-2 rounded-xl',
           'text-slate-400 hover:text-slate-200',
-          '[html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700',
-          'hover:bg-white/[0.06] [html:not(.dark)_&]:hover:bg-black/[0.04]',
+          ' ',
+          'hover:bg-white/[0.06] ]',
           'transition-colors duration-200',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
           className

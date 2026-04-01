@@ -20,13 +20,11 @@ export const controlButtonVariants = cva(
     'transition-all duration-200',
     'flex items-center justify-center',
     'border border-white/10',
-    '[html:not(.dark)_&]:border-black/5',
     'text-white',
     // Focus ring - ember glow (consistent with Phase 12 components)
     'focus-visible:outline-none',
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-    '[html:not(.dark)_&]:focus-visible:ring-offset-slate-50',
     // Active state
     'active:scale-95',
     // Touch optimization
@@ -35,7 +33,7 @@ export const controlButtonVariants = cva(
     // Disabled state
     'disabled:bg-slate-800 disabled:text-slate-600',
     'disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none',
-    '[html:not(.dark)_&]:disabled:bg-slate-200 [html:not(.dark)_&]:disabled:text-slate-400',
+    ' ',
     'disabled:pointer-events-none',
   ],
   {
@@ -80,9 +78,8 @@ export const controlButtonVariants = cva(
           'bg-white/[0.06]',
           'text-slate-200',
           'hover:bg-white/[0.1]',
-          '[html:not(.dark)_&]:bg-black/[0.04]',
-          '[html:not(.dark)_&]:text-slate-700',
-          '[html:not(.dark)_&]:hover:bg-black/[0.06]',
+          ']',
+          ']',
         ],
       },
       size: {

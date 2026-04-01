@@ -34,15 +34,15 @@ export default function Pagination({
 
   const enabledClasses = `
     bg-slate-700/50 hover:bg-slate-600/60 text-slate-200
-    [html:not(.dark)_&]:bg-slate-200/80 [html:not(.dark)_&]:hover:bg-slate-300/80 [html:not(.dark)_&]:text-slate-700
-    ring-1 ring-slate-600/30 [html:not(.dark)_&]:ring-slate-300/50
+      
+    ring-1 ring-slate-600/30 
     shadow-liquid-sm
   `;
 
   const disabledClasses = `
     bg-slate-800/30 text-slate-500 cursor-not-allowed
-    [html:not(.dark)_&]:bg-slate-100/50 [html:not(.dark)_&]:text-slate-400
-    ring-1 ring-slate-700/20 [html:not(.dark)_&]:ring-slate-200/50
+     
+    ring-1 ring-slate-700/20 
   `;
 
   return (

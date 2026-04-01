@@ -29,24 +29,24 @@ const toastVariants = cva(
     variants: {
       variant: {
         success: [
-          'bg-sage-900/90 [html:not(.dark)_&]:bg-sage-50/95',
+          'bg-sage-900/90 ',
           'border-sage-500/30',
-          'text-sage-100 [html:not(.dark)_&]:text-sage-800',
+          'text-sage-100 ',
         ],
         error: [
-          'bg-danger-900/90 [html:not(.dark)_&]:bg-danger-50/95',
+          'bg-danger-900/90 ',
           'border-danger-500/30',
-          'text-danger-100 [html:not(.dark)_&]:text-danger-800',
+          'text-danger-100 ',
         ],
         warning: [
-          'bg-warning-900/90 [html:not(.dark)_&]:bg-warning-50/95',
+          'bg-warning-900/90 ',
           'border-warning-500/30',
-          'text-warning-100 [html:not(.dark)_&]:text-warning-800',
+          'text-warning-100 ',
         ],
         info: [
-          'bg-ocean-900/90 [html:not(.dark)_&]:bg-ocean-50/95',
+          'bg-ocean-900/90 ',
           'border-ocean-500/30',
-          'text-ocean-100 [html:not(.dark)_&]:text-ocean-800',
+          'text-ocean-100 ',
         ],
       },
     },
@@ -93,9 +93,9 @@ export interface ToastProps
  *
  * // With action
  * toast({
- *   variant: 'info',
- *   message: 'Update available',
- *   action: { label: 'Refresh', onClick: () => location.reload() }
+ * variant: 'info',
+ * message: 'Update available',
+ * action: { label: 'Refresh', onClick: () => location.reload() }
  * });
  */
 const Toast = forwardRef<
@@ -134,7 +134,7 @@ const Toast = forwardRef<
               onClick={action.onClick}
               className="flex-shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium
                 bg-white/10 hover:bg-white/20 transition-colors
-                [html:not(.dark)_&]:bg-black/5 [html:not(.dark)_&]:hover:bg-black/10"
+                 "
             >
               {action.label}
             </button>
@@ -145,7 +145,7 @@ const Toast = forwardRef<
         <ToastPrimitive.Close
           className="flex-shrink-0 p-1.5 rounded-lg
             hover:bg-white/10 transition-colors
-            [html:not(.dark)_&]:hover:bg-black/5"
+            "
           aria-label="Close"
         >
           <X className="h-4 w-4" />

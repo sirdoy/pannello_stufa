@@ -18,7 +18,7 @@ Requirements for Dark-Only & Mobile-First milestone.
 - [x] **THEME-07**: All `[html:not(.dark)_&]:` selectors removed from components
 - [x] **THEME-08**: `class="dark"` hardcoded on `<html>` element, localStorage theme key removed
 - [x] **THEME-09**: theme-color meta tag hardcoded to dark value (#0f172a)
-- [ ] **THEME-10**: Design system page updated to reflect dark-only (remove theme toggle showcase)
+- [x] **THEME-10**: Design system page updated to reflect dark-only (remove theme toggle showcase)
 
 ### Design System Mobile-First
 
@@ -80,7 +80,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | THEME-07 | Phase 150 | Complete |
 | THEME-08 | Phase 149 | Complete |
 | THEME-09 | Phase 149 | Complete |
-| THEME-10 | Phase 150 | Pending |
+| THEME-10 | Phase 150 | Complete |
 | MOBILE-01 | Phase 151 | Pending |
 | MOBILE-02 | Phase 151 | Pending |
 | MOBILE-03 | Phase 151 | Pending |

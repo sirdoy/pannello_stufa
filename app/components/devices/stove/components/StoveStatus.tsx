@@ -84,7 +84,7 @@ export default function StoveStatus({
             {/* Two Info Boxes */}
             <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
               {/* Fan Level Box */}
-              <div className={`relative overflow-hidden rounded-2xl ${statusInfo.boxBgColor} border border-white/10 
+              <div className={`relative overflow-hidden rounded-2xl ${statusInfo.boxBgColor} border border-white/10`}>
                 <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <span className="text-xl sm:text-2xl">💨</span>
@@ -102,7 +102,7 @@ export default function StoveStatus({
               </div>
 
               {/* Power Level Box */}
-              <div className={`relative overflow-hidden rounded-2xl ${statusInfo.boxBgColor} border border-white/10 
+              <div className={`relative overflow-hidden rounded-2xl ${statusInfo.boxBgColor} border border-white/10`}>
                 <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <span className="text-xl sm:text-2xl">⚡</span>

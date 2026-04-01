@@ -11,7 +11,17 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.1 (shipped 2026-03-30)
-**Status:** Planning next milestone
+**Status:** Active — v18.0
+
+## Current Milestone: v18.0 Dark-Only & Mobile-First
+
+**Goal:** Rimuovere completamente il tema light e la selezione tema, uniformare design system e tutte le pagine per essere mobile-first (min 375px).
+
+**Target features:**
+- Rimozione completa tema light (CSS, variabili, toggle, logica di selezione)
+- Design system aggiornato come mobile-first (breakpoint, spacing, button groups, layout)
+- Tutte le pagine e sotto-pagine verificate e fixate per viewport 375px+
+- Design system come fonte unica di verità (DS aggiornato prima, poi propagato)
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -864,4 +874,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-30 after v17.1 milestone*
+*Last updated: 2026-04-01 after v18.0 milestone start*

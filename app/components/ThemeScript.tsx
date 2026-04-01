@@ -17,10 +17,10 @@ export default function ThemeScript() {
       // Add transition for smooth theme change
       html.style.transition = 'background-color 0.3s ease, color 0.3s ease';
 
-      if (savedTheme === 'dark') {
-        html.classList.add('dark');
-      } else {
+      if (savedTheme === 'light') {
         html.classList.remove('dark');
+      } else {
+        html.classList.add('dark');
       }
 
       // Remove transition after animation completes

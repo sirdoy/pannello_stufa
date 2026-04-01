@@ -1399,11 +1399,13 @@ export default function DesignSystemPage() {
                           id="checkbox-no-label-1"
                           checked={true}
                           onChange={() => {}}
+                          aria-label="Example checkbox checked"
                         />
                         <Checkbox
                           id="checkbox-no-label-2"
                           checked={false}
                           onChange={() => {}}
+                          aria-label="Example checkbox unchecked"
                         />
                         <Text variant="secondary" size="sm">Use aria-label when omitting visible label</Text>
                       </div>
@@ -1534,12 +1536,12 @@ export default function DesignSystemPage() {
                   </Text>
                   <div className="space-y-4 max-w-md">
                     <div className="flex items-center gap-3">
-                      <Switch checked={switchState} onCheckedChange={setSwitchState} />
-                      <Label>Notifiche Push {switchState ? '(Attive)' : '(Disattive)'}</Label>
+                      <Switch id="switch-push" checked={switchState} onCheckedChange={setSwitchState} aria-label="Notifiche Push" />
+                      <Label htmlFor="switch-push">Notifiche Push {switchState ? '(Attive)' : '(Disattive)'}</Label>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Switch checked={false} disabled onCheckedChange={() => {}} />
-                      <Label>Disabilitato</Label>
+                      <Switch id="switch-disabled" checked={false} disabled onCheckedChange={() => {}} aria-label="Disabilitato" />
+                      <Label htmlFor="switch-disabled">Disabilitato</Label>
                     </div>
                   </div>
                   <div className="mt-4">

@@ -47,9 +47,9 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
     return success({ theme });
   }
 
-  // Default: light
+  // Default: dark (Ember Noir is dark-first)
   return success({
-    theme: 'light' as Theme,
+    theme: 'dark' as Theme,
     default: true,
   });
 }, 'User/GetTheme');

@@ -57,8 +57,8 @@ export async function getThemePreference(userId: string | null | undefined): Pro
     }
   }
 
-  // Default to light
-  return THEMES.LIGHT;
+  // Default to dark (Ember Noir is dark-first)
+  return THEMES.DARK;
 }
 
 /**

@@ -54,7 +54,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         dangerouslySetInnerHTML={{
           __html: `
             try {
-              const isDark = localStorage.getItem('pannello-stufa-theme') === 'dark';
+              const theme = localStorage.getItem('pannello-stufa-theme');
+              const isDark = theme !== 'light';
               if (isDark) {
                 document.documentElement.classList.add('dark');
               }

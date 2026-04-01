@@ -15,7 +15,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
-  const [theme, setThemeState] = useState<'light' | 'dark'>(THEMES.LIGHT);
+  const [theme, setThemeState] = useState<'light' | 'dark'>(THEMES.DARK);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Initialize theme on mount

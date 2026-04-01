@@ -133,8 +133,8 @@ Plans:
   4. The design system showcase page (/debug/design-system) includes a mobile-first patterns section documenting base=mobile, sm:=desktop convention
 **Plans**: 2 plans
 Plans:
-- [ ] 151-01-PLAN.md — TBD
-- [ ] 151-02-PLAN.md — TBD
+- [ ] 151-01-PLAN.md — ButtonGroup flex-wrap fix + bottom nav verification + layout component audit
+- [ ] 151-02-PLAN.md — Mobile-First Patterns documentation section + visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 152: Pages Audit — Core & Device Pages

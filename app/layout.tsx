@@ -33,7 +33,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it" data-scroll-behavior="smooth" className={`${outfit.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
+    <html lang="it" data-scroll-behavior="smooth" className={`${outfit.variable} ${spaceGrotesk.variable} dark`} suppressHydrationWarning>
     <head>
       <meta name="view-transition" content="same-origin" />
       {/* Preconnect: critical API domains */}
@@ -48,32 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="apple-mobile-web-app-title" content="Stufa" />
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta name="mobile-web-app-capable" content="yes" />
-
-      {/* Theme script - blocking per evitare flash */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            try {
-              const theme = localStorage.getItem('pannello-stufa-theme');
-              const isDark = theme !== 'light';
-              if (isDark) {
-                document.documentElement.classList.add('dark');
-              }
-              // Update theme-color based on theme
-              const themeColor = isDark ? '#0f172a' : '#f8fafc';
-              const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-              if (metaThemeColor) {
-                metaThemeColor.setAttribute('content', themeColor);
-              } else {
-                const meta = document.createElement('meta');
-                meta.name = 'theme-color';
-                meta.content = themeColor;
-                document.head.appendChild(meta);
-              }
-            } catch (e) {}
-          `,
-        }}
-      />
+      <meta name="theme-color" content="#0f172a" />
     </head>
     <body className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col" suppressHydrationWarning>
     {/* Skip to content - Accessibility */}

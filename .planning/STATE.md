@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v18.0
 milestone_name: Dark-Only & Mobile-First
-status: verifying
-stopped_at: Phase 151 context gathered
-last_updated: "2026-04-01T12:20:08.318Z"
+status: executing
+stopped_at: Completed 151-02-PLAN.md
+last_updated: "2026-04-01T12:39:24.801Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 7
+  completed_plans: 6
   percent: 0
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 150 — theme-prefix-cleanup
+**Current focus:** Phase 151 — design-system-mobile-first
 
 ## Current Position
 
-Phase: 151
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 151 (design-system-mobile-first) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
 Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 150 P01 | 640s | 2 tasks | 77 files |
 | Phase 150 P02 | 16 | 2 tasks | 92 files |
 | Phase 150-theme-prefix-cleanup P03 | 20 | 2 tasks | 2 files |
+| Phase 151 P02 | 8min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,7 @@ Recent decisions affecting v18.0:
 - [Phase 150]: useLightsData.ts 'dark: {}' is a TypeScript object key in adaptiveClasses record — not a CSS prefix, left unchanged
 - [Phase 150-03]: lib/version.ts dark:/html:not(.dark) are changelog text strings — left unchanged to preserve history (per Plan 02 decision)
 - [Phase 150-03]: StatusBadge test bg-warning-500/15 updated to /20 to match Plan 01's dark-only promotion of warning class
+- [Phase 151]: Typography already mobile-safe via sm: responsive variants — no changes needed
 
 ### Pending Todos
 
@@ -94,5 +96,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-01 - Roadmap created for v18.0
-Stopped at: Phase 151 context gathered
-Resume file: .planning/phases/151-design-system-mobile-first/151-CONTEXT.md
+Stopped at: Completed 151-02-PLAN.md
+Resume file: None

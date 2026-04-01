@@ -134,7 +134,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [ ] 151-01-PLAN.md — ButtonGroup flex-wrap fix + bottom nav verification + layout component audit
-- [ ] 151-02-PLAN.md — Mobile-First Patterns documentation section + visual verification checkpoint
+- [x] 151-02-PLAN.md — Mobile-First Patterns documentation section + visual verification checkpoint
 **UI hint**: yes
 
 ### Phase 152: Pages Audit — Core & Device Pages
@@ -194,7 +194,7 @@ Plans:
 | 148. Tuya Frontend | v17.1 | 3/3 | Complete | 2026-03-30 |
 | 149. Theme Removal Core | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 150. Theme Prefix Cleanup | v18.0 | 2/3 | Complete    | 2026-04-01 |
-| 151. Design System Mobile-First | v18.0 | 0/TBD | Not started | - |
+| 151. Design System Mobile-First | v18.0 | 1/2 | In Progress|  |
 | 152. Pages Audit — Core & Device Pages | v18.0 | 0/TBD | Not started | - |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 0/TBD | Not started | - |
 | 154. Pages Audit — Admin & Support Pages | v18.0 | 0/TBD | Not started | - |

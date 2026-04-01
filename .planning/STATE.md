@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v18.0
 milestone_name: Dark-Only & Mobile-First
 status: executing
-stopped_at: Completed 151-02-PLAN.md
-last_updated: "2026-04-01T12:39:24.801Z"
+stopped_at: Completed 151-01-PLAN.md
+last_updated: "2026-04-01T14:46:52.516Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
   percent: 0
 ---
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 150 P02 | 16 | 2 tasks | 92 files |
 | Phase 150-theme-prefix-cleanup P03 | 20 | 2 tasks | 2 files |
 | Phase 151 P02 | 8min | 2 tasks | 1 files |
+| Phase 151 P01 | 10min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,8 @@ Recent decisions affecting v18.0:
 - [Phase 150-03]: lib/version.ts dark:/html:not(.dark) are changelog text strings — left unchanged to preserve history (per Plan 02 decision)
 - [Phase 150-03]: StatusBadge test bg-warning-500/15 updated to /20 to match Plan 01's dark-only promotion of warning class
 - [Phase 151]: Typography already mobile-safe via sm: responsive variants — no changes needed
+- [Phase 151]: ButtonGroup adds flex-wrap only — no equal-sizing, no vertical stacking per design decision D-02
+- [Phase 151]: All 12 layout DS components confirmed mobile-safe at 375px with no additional changes needed
 
 ### Pending Todos
 
@@ -96,5 +99,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-01 - Roadmap created for v18.0
-Stopped at: Completed 151-02-PLAN.md
+Stopped at: Completed 151-01-PLAN.md
 Resume file: None

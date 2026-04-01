@@ -22,12 +22,12 @@ Requirements for Dark-Only & Mobile-First milestone.
 
 ### Design System Mobile-First
 
-- [ ] **MOBILE-01**: ButtonGroup component wraps responsively on 375px (flex-wrap)
-- [ ] **MOBILE-02**: All DS components verified at 375px viewport width
+- [x] **MOBILE-01**: ButtonGroup component wraps responsively on 375px (flex-wrap)
+- [x] **MOBILE-02**: All DS components verified at 375px viewport width
 - [x] **MOBILE-03**: DS typography scales appropriately for mobile (no horizontal overflow)
 - [x] **MOBILE-04**: DS spacing tokens documented as mobile-first (base = mobile, sm: = desktop)
 - [x] **MOBILE-05**: Design system showcase page (/debug/design-system) updated with mobile-first patterns
-- [ ] **MOBILE-06**: Bottom nav bar safe at 375px (4-column grid verified or adjusted)
+- [x] **MOBILE-06**: Bottom nav bar safe at 375px (4-column grid verified or adjusted)
 
 ### Pages Mobile Audit
 
@@ -81,12 +81,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | THEME-08 | Phase 149 | Complete |
 | THEME-09 | Phase 149 | Complete |
 | THEME-10 | Phase 150 | Complete |
-| MOBILE-01 | Phase 151 | Pending |
-| MOBILE-02 | Phase 151 | Pending |
+| MOBILE-01 | Phase 151 | Complete |
+| MOBILE-02 | Phase 151 | Complete |
 | MOBILE-03 | Phase 151 | Complete |
 | MOBILE-04 | Phase 151 | Complete |
 | MOBILE-05 | Phase 151 | Complete |
-| MOBILE-06 | Phase 151 | Pending |
+| MOBILE-06 | Phase 151 | Complete |
 | AUDIT-01 | Phase 152 | Pending |
 | AUDIT-02 | Phase 152 | Pending |
 | AUDIT-03 | Phase 152 | Pending |

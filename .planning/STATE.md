@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v18.0
 milestone_name: Dark-Only & Mobile-First
-status: ready_to_plan
-stopped_at: null
-last_updated: "2026-04-01T00:00:00.000Z"
-last_activity: 2026-04-01
+status: planning
+stopped_at: Phase 149 context gathered
+last_updated: "2026-04-01T10:10:35.476Z"
+last_activity: 2026-04-01 — Roadmap created for v18.0 (6 phases, 31 requirements mapped)
 progress:
   total_phases: 6
   completed_phases: 0
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 See PROJECT.md Key Decisions table for full history.
 
 Recent decisions affecting v18.0:
+
 - Theme removal is complete (no light theme preserved) — explicit user request
 - Tablet design deferred to future milestone (custom 900px breakpoint already defined)
 - Scope is pure CSS/layout — no new features or animation redesign
@@ -79,5 +80,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-01 - Roadmap created for v18.0
-Stopped at: Roadmap complete, ready to plan Phase 149
-Resume file: None
+Stopped at: Phase 149 context gathered
+Resume file: .planning/phases/149-theme-removal-core/149-CONTEXT.md

@@ -76,7 +76,7 @@ export default function SonosSeekControl({ playback, groupId, onSeek }: SonosSee
         onChange={handleChange}
         onMouseUp={handleRelease}
         onTouchEnd={handleRelease}
-        className="w-full h-2 rounded-lg bg-slate-700 [html:not(.dark)_&]:bg-slate-200 accent-success-500 disabled:opacity-50"
+        className="w-full h-2 rounded-lg bg-slate-700 accent-success-500 disabled:opacity-50"
         aria-label="Seek"
       />
       <div className="flex justify-between text-xs text-slate-400">

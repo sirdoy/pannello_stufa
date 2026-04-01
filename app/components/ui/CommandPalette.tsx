@@ -42,12 +42,12 @@ interface CommandGroup {
  * @example
  * // Direct usage
  * const commands = [
- *   {
- *     heading: 'Navigation',
- *     items: [
- *       { id: 'nav-home', label: 'Dashboard', icon: <Home />, shortcut: 'Cmd+D', onSelect: () => router.push('/') },
- *     ]
- *   }
+ * {
+ * heading: 'Navigation',
+ * items: [
+ * { id: 'nav-home', label: 'Dashboard', icon: <Home />, shortcut: 'Cmd+D', onSelect: () => router.push('/') },
+ * ]
+ * }
  * ];
  * <CommandPalette open={open} onOpenChange={setOpen} commands={commands} />
  */
@@ -109,7 +109,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
       <div
         className={cn(
           'fixed inset-0 z-50',
-          'bg-slate-950/70 [html:not(.dark)_&]:bg-slate-900/40',
+          'bg-slate-950/70 ',
           'backdrop-blur-md'
         )}
         aria-hidden="true"
@@ -131,8 +131,8 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
           className={cn(
             'flex flex-col',
             'rounded-3xl',
-            'border border-slate-700/50 [html:not(.dark)_&]:border-slate-200',
-            'bg-slate-900/95 [html:not(.dark)_&]:bg-white/95',
+            'border border-slate-700/50 ',
+            'bg-slate-900/95 ',
             'backdrop-blur-3xl',
             'shadow-card-elevated',
             'overflow-hidden',
@@ -148,9 +148,9 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
               'w-full px-4 py-4',
               'text-lg font-medium',
               'bg-transparent',
-              'border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200',
-              'text-slate-100 [html:not(.dark)_&]:text-slate-900',
-              'placeholder:text-slate-500 [html:not(.dark)_&]:placeholder:text-slate-400',
+              'border-b border-slate-700/50 ',
+              'text-slate-100 ',
+              'placeholder:text-slate-500 ',
               'focus:outline-none'
             )}
           />
@@ -167,7 +167,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
             <Command.Empty
               className={cn(
                 'py-8 text-center',
-                'text-sm text-slate-500 [html:not(.dark)_&]:text-slate-400'
+                'text-sm text-slate-500 '
               )}
             >
               No results found.
@@ -183,7 +183,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
                   '[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2',
                   '[&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold',
                   '[&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider',
-                  '[&_[cmdk-group-heading]]:text-slate-500 [html:not(.dark)_&]:[&_[cmdk-group-heading]]:text-slate-400'
+                  '[&_[cmdk-group-heading]]:text-slate-500 ]]:text-slate-400'
                 )}
               >
                 {group.items?.map((item) => (
@@ -196,11 +196,11 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
                       'px-3 py-3 rounded-xl',
                       'text-sm font-medium',
                       'cursor-pointer',
-                      'text-slate-300 [html:not(.dark)_&]:text-slate-700',
+                      'text-slate-300 ',
                       // Selection state (via data attribute from cmdk)
-                      'data-[selected=true]:bg-slate-700/50 [html:not(.dark)_&]:data-[selected=true]:bg-slate-100',
+                      'data-[selected=true]:bg-slate-700/50 ]:bg-slate-100',
                       // Hover state
-                      'hover:bg-slate-700/30 [html:not(.dark)_&]:hover:bg-slate-50',
+                      'hover:bg-slate-700/30 ',
                       // Transition
                       'transition-colors duration-150',
                       // Disabled state
@@ -210,7 +210,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
                     <div className="flex items-center gap-3">
                       {/* Icon (user decision: all items have icons) */}
                       {item.icon && (
-                        <span className="flex-shrink-0 text-slate-400 [html:not(.dark)_&]:text-slate-500" aria-hidden="true">
+                        <span className="flex-shrink-0 text-slate-400 " aria-hidden="true">
                           {item.icon}
                         </span>
                       )}

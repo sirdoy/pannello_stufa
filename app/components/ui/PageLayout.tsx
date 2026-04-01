@@ -157,7 +157,7 @@ const PageFooter = forwardRef<HTMLElement, PageFooterProps>(function PageFooter(
     <footer
       ref={ref}
       className={cn(
-        'py-6 border-t border-slate-800 [html:not(.dark)_&]:border-slate-200',
+        'py-6 border-t border-slate-800 ',
         className
       )}
       {...props}
@@ -188,16 +188,16 @@ export interface PageLayoutProps
  *
  * @example
  * <PageLayout
- *   header={
- *     <PageLayout.Header
- *       title="Dashboard"
- *       description="Overview of your devices"
- *       actions={<Button>Add Device</Button>}
- *     />
- *   }
- *   footer={<PageLayout.Footer>Footer content</PageLayout.Footer>}
+ * header={
+ * <PageLayout.Header
+ * title="Dashboard"
+ * description="Overview of your devices"
+ * actions={<Button>Add Device</Button>}
+ * />
+ * }
+ * footer={<PageLayout.Footer>Footer content</PageLayout.Footer>}
  * >
- *   <main content />
+ * <main content />
  * </PageLayout>
  */
 const PageLayout = forwardRef<HTMLDivElement, PageLayoutProps>(function PageLayout(

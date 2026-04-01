@@ -97,7 +97,7 @@ export default function ProgressBar({
       <div
         className={`
           relative rounded-full overflow-hidden backdrop-blur-sm
-          bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200/60
+          bg-slate-700/50 
           ${sizeClasses[size]}
         `.trim().replace(/\s+/g, ' ')}
       >

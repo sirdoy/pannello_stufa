@@ -129,7 +129,7 @@ function LogContent() {
 
       <div className="space-y-3 max-h-[500px] overflow-y-auto">
         {logs.length === 0 ? (
-          <Card className="p-6 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 text-center">
+          <Card className="p-6 bg-slate-800/50 text-center">
             <Text variant="tertiary">Nessun log trovato</Text>
           </Card>
         ) : (
@@ -138,10 +138,10 @@ function LogContent() {
               key={log.id || index}
               className={`p-4 ${
                 log.message.includes('Errore')
-                  ? 'border-l-4 border-l-ember-500 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-50'
+                  ? 'border-l-4 border-l-ember-500 bg-ember-500/10'
                   : log.message.includes('successo')
-                  ? 'border-l-4 border-l-sage-500 bg-sage-500/10 [html:not(.dark)_&]:bg-sage-50'
-                  : 'bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50'
+                  ? 'border-l-4 border-l-sage-500 bg-sage-500/10'
+                  : 'bg-slate-800/50'
               }`}
             >
               <div className="flex justify-between items-start mb-2">
@@ -233,7 +233,7 @@ function NotificheContent() {
 
       {stats && !loading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-200">
+          <Card className="p-6 bg-ocean-50 border-2 border-ocean-200">
             <Text variant="tertiary" size="xs" className="mb-2">Notifiche Oggi</Text>
             <Text variant="tertiary" className="text-4xl">
               {stats.notifications.total}
@@ -242,10 +242,10 @@ function NotificheContent() {
 
           <Card className={`p-6 ${
             getDeliveryRateColor(stats.notifications.deliveryRate) === 'sage'
-              ? 'bg-sage-50 [html:not(.dark)_&]:bg-sage-50 border-2 border-sage-300'
+              ? 'bg-sage-50 border-2 border-sage-300'
               : getDeliveryRateColor(stats.notifications.deliveryRate) === 'warning'
-              ? 'bg-warning-50 [html:not(.dark)_&]:bg-warning-50 border-2 border-warning-300'
-              : 'bg-ember-50 [html:not(.dark)_&]:bg-ember-50 border-2 border-ember-300'
+              ? 'bg-warning-50 border-2 border-warning-300'
+              : 'bg-ember-50 border-2 border-ember-300'
           }`}>
             <Text variant="tertiary" size="xs" className="mb-2">Delivery Rate</Text>
             <Text
@@ -258,7 +258,7 @@ function NotificheContent() {
             </Text>
           </Card>
 
-          <Card className="p-6 bg-slate-50 [html:not(.dark)_&]:bg-slate-50 border-2 border-slate-200">
+          <Card className="p-6 bg-slate-50 border-2 border-slate-200">
             <Text variant="tertiary" size="xs" className="mb-2">Device Attivi</Text>
             <Text as="p" className="text-4xl">
               {stats.devices.active}
@@ -370,10 +370,10 @@ function DebugPageContent() {
         </div>
 
         {/* Keyboard shortcuts hint */}
-        <div className="flex flex-wrap gap-2 text-xs text-slate-500 [html:not(.dark)_&]:text-slate-600">
-          <span className="px-2 py-1 bg-slate-800 text-slate-200 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-700 rounded">1-9: Switch tabs</span>
-          <span className="px-2 py-1 bg-slate-800 text-slate-200 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-700 rounded">Cmd+R: Refresh</span>
-          <span className="px-2 py-1 bg-slate-800 text-slate-200 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-700 rounded">A: Auto-refresh</span>
+        <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+          <span className="px-2 py-1 bg-slate-800 text-slate-200 rounded">1-9: Switch tabs</span>
+          <span className="px-2 py-1 bg-slate-800 text-slate-200 rounded">Cmd+R: Refresh</span>
+          <span className="px-2 py-1 bg-slate-800 text-slate-200 rounded">A: Auto-refresh</span>
         </div>
 
         <Card variant="glass" className="p-6">

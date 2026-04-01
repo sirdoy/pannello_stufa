@@ -92,7 +92,7 @@ export default function NetworkCard() {
       role="link"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter' || e.key === '') {
           e.preventDefault();
           commands.navigateToNetwork();
         }
@@ -137,7 +137,7 @@ export default function NetworkCard() {
           />
         </div>
 
-        <LastUpdated tsMs={networkData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
+        <LastUpdated tsMs={networkData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />
       </SmartHomeCard>
     </div>
   );

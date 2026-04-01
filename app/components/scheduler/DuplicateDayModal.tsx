@@ -122,7 +122,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
           {availableDays.map(day => (
             <div
               key={day}
-              className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:hover:bg-slate-200 transition-colors"
+              className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors"
             >
               <Checkbox
                 id={`day-${day}`}

@@ -387,7 +387,7 @@ export function useLightsData(): UseLightsDataReturn {
     const gradientStops = roomColors.map((color, i) => {
       const position = (i / (roomColors.length - 1)) * 100;
       return `${color}${Math.round(baseOpacity * 255).toString(16).padStart(2, '0')} ${position}%`;
-    }).join(', ');
+    }).join(',');
 
     // Use first and last colors for border glow effect
     const primaryColor = roomColors[0];

@@ -118,7 +118,7 @@ export default function LightsPage() {
       </Card>
 
       {lightsData.hasAnyLights && (
-        <Card className="p-6 mb-6 bg-gradient-to-br from-slate-800/40 to-slate-900/60 border-slate-700/50 [html:not(.dark)_&]:from-slate-50 [html:not(.dark)_&]:to-slate-100 [html:not(.dark)_&]:border-slate-200">
+        <Card className="p-6 mb-6 bg-gradient-to-br from-slate-800/40 to-slate-900/60 border-slate-700/50">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🏠</span>
@@ -133,7 +133,7 @@ export default function LightsPage() {
                 <Button variant="subtle" onClick={() => lightsCommands.handleAllLightsToggle(false)} disabled={lightsData.refreshing} icon="🌙">Spegni Tutte</Button>
               </>)}
               {lightsData.allHouseLightsOff && (
-                <Button variant="ember" onClick={() => lightsCommands.handleAllLightsToggle(true)} disabled={lightsData.refreshing} icon="💡" className="ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white">Accendi Tutte le Luci</Button>
+                <Button variant="ember" onClick={() => lightsCommands.handleAllLightsToggle(true)} disabled={lightsData.refreshing} icon="💡" className="ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900">Accendi Tutte le Luci</Button>
               )}
               {lightsData.allHouseLightsOn && (
                 <Button variant="subtle" onClick={() => lightsCommands.handleAllLightsToggle(false)} disabled={lightsData.refreshing} icon="🌙">Spegni Tutte le Luci</Button>
@@ -158,7 +158,7 @@ export default function LightsPage() {
             const allOff = groupLights.length > 0 && onCount === 0;
             return (
               <Card key={group.group_id} className="overflow-hidden">
-                <div className={`p-6 ${isOn ? 'bg-gradient-to-br from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20' : ''}`}>
+                <div className={`p-6 ${isOn ? 'bg-gradient-to-br from-warning-900/20 to-warning-800/20' : ''}`}>
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <Heading level={3} size="md" className="mb-1">{group.name}</Heading>
@@ -176,7 +176,7 @@ export default function LightsPage() {
                         <Button variant="subtle" onClick={() => lightsCommands.handleRoomToggle(group.group_id, false)} disabled={lightsData.refreshing} size="sm" icon="🌙">Spegni Stanza</Button>
                       </div>
                     )}
-                    {allOff && <Button variant="ember" onClick={() => lightsCommands.handleRoomToggle(group.group_id, true)} disabled={lightsData.refreshing} size="sm" icon="💡" fullWidth className="ring-2 ring-ember-500/30 ring-offset-2 ring-offset-white dark:ring-offset-slate-900">Accendi Stanza</Button>}
+                    {allOff && <Button variant="ember" onClick={() => lightsCommands.handleRoomToggle(group.group_id, true)} disabled={lightsData.refreshing} size="sm" icon="💡" fullWidth className="ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900">Accendi Stanza</Button>}
                     {allOn && <Button variant="subtle" onClick={() => lightsCommands.handleRoomToggle(group.group_id, false)} disabled={lightsData.refreshing} size="sm" icon="🌙" fullWidth>Spegni Stanza</Button>}
                   </div>
                   {isOn && (
@@ -195,7 +195,7 @@ export default function LightsPage() {
                   )}
                 </div>
                 {isExpanded && (
-                  <div className="p-6 border-t border-slate-700 bg-slate-900/20 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:bg-slate-50">
+                  <div className="p-6 border-t border-slate-700 bg-slate-900/20">
                     {groupLights.length > 0 && (
                       <>
                         <Heading level={4} size="sm" className="mb-3">💡 Luci Individuali</Heading>
@@ -204,7 +204,7 @@ export default function LightsPage() {
                             const briPct = Math.round((light.brightness ?? 0) * 100 / 254);
                             const hasColor = supportsColor(light);
                             return (
-                              <div key={light.light_id} className={cn("p-4 rounded-xl border-2 transition-colors", light.on ? "border-warning-500/50 bg-warning-500/10" : "border-slate-700 bg-slate-800 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:bg-white")}>
+                              <div key={light.light_id} className={cn("p-4 rounded-xl border-2 transition-colors", light.on ? "border-warning-500/50 bg-warning-500/10" : "border-slate-700 bg-slate-800")}>
                                 <div className="flex items-center justify-between mb-2">
                                   <div>
                                     <Text size="sm">{light.name}</Text>
@@ -232,7 +232,7 @@ export default function LightsPage() {
                                         <Text variant="tertiary" size="xs">Colore</Text>
                                         <div className="grid grid-cols-5 gap-1.5">
                                           {COLOR_PRESETS.map(preset => (
-                                            <button key={preset.name} onClick={() => handleLightColorChange(light.light_id, preset)} disabled={changingColor === light.light_id} className="relative w-full aspect-square rounded-lg border-2 border-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-50 [html:not(.dark)_&]:border-slate-300 [html:not(.dark)_&]:hover:border-slate-500" style={{ backgroundColor: preset.hex }} title={preset.name}>
+                                            <button key={preset.name} onClick={() => handleLightColorChange(light.light_id, preset)} disabled={changingColor === light.light_id} className="relative w-full aspect-square rounded-lg border-2 border-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-50" style={{ backgroundColor: preset.hex }} title={preset.name}>
                                               {changingColor === light.light_id && <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg"><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>}
                                             </button>
                                           ))}
@@ -252,7 +252,7 @@ export default function LightsPage() {
                         <Heading level={4} size="sm" className="mb-3">🎨 Scene della Stanza</Heading>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                           {groupScenes.map((scene: HueScene) => (
-                            <button key={scene.scene_id} onClick={() => { setActivatingScene(scene.scene_id); lightsCommands.handleSceneActivate(scene.scene_id, scene.group_id).finally(() => setActivatingScene(null)); }} disabled={activatingScene === scene.scene_id} className={cn("relative p-4 rounded-xl border-2 transition-all active:scale-95", activatingScene === scene.scene_id ? "border-warning-500 bg-warning-500/10" : "border-slate-700 hover:border-warning-500/50 [html:not(.dark)_&]:border-slate-200 [html:not(.dark)_&]:hover:border-warning-400")}>
+                            <button key={scene.scene_id} onClick={() => { setActivatingScene(scene.scene_id); lightsCommands.handleSceneActivate(scene.scene_id, scene.group_id).finally(() => setActivatingScene(null)); }} disabled={activatingScene === scene.scene_id} className={cn("relative p-4 rounded-xl border-2 transition-all active:scale-95", activatingScene === scene.scene_id ? "border-warning-500 bg-warning-500/10" : "border-slate-700 hover:border-warning-500/50")}>
                               <div className="text-2xl mb-1">🎨</div>
                               <Text size="xs" className="text-center">{scene.name}</Text>
                               {activatingScene === scene.scene_id && <div className="absolute top-1 right-1"><div className="w-3 h-3 border-2 border-warning-500 border-t-transparent rounded-full animate-spin"></div></div>}

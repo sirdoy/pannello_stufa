@@ -59,7 +59,7 @@ export default function SonosEqControls({ uid, eqData, onSetEq }: SonosEqControl
     <div className="mt-2">
       <button
         onClick={() => setIsExpanded(prev => !prev)}
-        className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700 transition-colors"
+        className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
         aria-label="EQ"
       >
         <span>EQ</span>
@@ -73,14 +73,14 @@ export default function SonosEqControls({ uid, eqData, onSetEq }: SonosEqControl
         <div className="mt-2 space-y-2">
           {/* Bass slider */}
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 w-14">Bass</span>
+            <span className="text-xs text-slate-400 w-14">Bass</span>
             <input
               type="range"
               min={-10}
               max={10}
               value={localBass}
               onChange={handleBassChange}
-              className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 accent-emerald-500"
+              className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500"
               aria-label="Bass"
             />
             <span className="text-xs text-slate-400 min-w-[28px] text-right">
@@ -90,14 +90,14 @@ export default function SonosEqControls({ uid, eqData, onSetEq }: SonosEqControl
 
           {/* Treble slider */}
           <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 w-14">Treble</span>
+            <span className="text-xs text-slate-400 w-14">Treble</span>
             <input
               type="range"
               min={-10}
               max={10}
               value={localTreble}
               onChange={handleTrebleChange}
-              className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 accent-emerald-500"
+              className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500"
               aria-label="Treble"
             />
             <span className="text-xs text-slate-400 min-w-[28px] text-right">
@@ -111,7 +111,7 @@ export default function SonosEqControls({ uid, eqData, onSetEq }: SonosEqControl
             className={`text-xs px-3 py-1 rounded-md transition-colors ${
               eqData.loudness
                 ? 'bg-amber-500/80 text-white'
-                : 'bg-slate-700 text-slate-400 hover:bg-slate-600 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-500'
+                : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
             }`}
             aria-label={`Loudness ${eqData.loudness ? 'attivo' : 'disattivo'}`}
           >

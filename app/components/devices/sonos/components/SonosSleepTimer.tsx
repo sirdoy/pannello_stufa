@@ -22,7 +22,7 @@ function formatRemainingTime(seconds: number): string {
 }
 
 const presetButtonClass =
-  'text-xs px-2 py-1 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-300 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-300 [html:not(.dark)_&]:text-slate-700';
+  'text-xs px-2 py-1 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-300';
 
 export default function SonosSleepTimer({ remainingSeconds, onSetTimer }: SonosSleepTimerProps) {
   const hasActiveTimer = remainingSeconds !== null && remainingSeconds > 0;

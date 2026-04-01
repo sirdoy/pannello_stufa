@@ -64,7 +64,7 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
       : null;
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl bg-slate-800/50 px-4 py-3 [html:not(.dark)_&]:bg-white [html:not(.dark)_&]:shadow-sm">
+    <div className="flex items-center justify-between gap-4 rounded-2xl bg-slate-800/50 px-4 py-3">
       {/* Left: icon + name + room */}
       <div className="flex items-center gap-3 min-w-0">
         <span className="text-xl flex-shrink-0" aria-hidden="true">

@@ -90,7 +90,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     <div className="space-y-6">
       {/* Location waiting state */}
       {!location && (
-        <div className="bg-amber-900/20 [html:not(.dark)_&]:bg-amber-50 border border-amber-700/50 [html:not(.dark)_&]:border-amber-300 rounded-lg p-4">
+        <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
           <Text variant="secondary" size="sm">
             Waiting for location data from Firebase config...
           </Text>
@@ -110,7 +110,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       )}
 
       {/* Weather Info */}
-      <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Text variant="secondary" size="sm">
           Weather data is fetched from Open-Meteo API and cached for 30 minutes. The scheduler automatically refreshes
           weather data every 30 minutes via the cron endpoint.
@@ -145,7 +145,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       </div>
 
       {/* Additional Info */}
-      <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Heading level={3} size="sm" className="mb-2">
           📍 Cache Configuration
         </Heading>

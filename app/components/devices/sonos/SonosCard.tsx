@@ -22,7 +22,7 @@ export default function SonosCard() {
       <SmartHomeCard icon="🎵" title="Sonos" colorTheme="sage">
         <SmartHomeCard.Controls>
           <Banner variant="warning" title="Non raggiungibile" compact={false}>
-            <p className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-600">
+            <p className="text-sm text-slate-300">
               {error}
             </p>
           </Banner>
@@ -46,7 +46,7 @@ export default function SonosCard() {
       role="link"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter' || e.key === '') {
           e.preventDefault();
           router.push('/sonos');
         }
@@ -77,19 +77,19 @@ export default function SonosCard() {
 
             {/* Stats row */}
             <div className="flex gap-3">
-              <div className="flex-1 bg-slate-800/50 rounded-lg p-3 text-center [html:not(.dark)_&]:bg-slate-100/80">
-                <p className="text-lg font-semibold text-white [html:not(.dark)_&]:text-slate-900">
+              <div className="flex-1 bg-slate-800/50 rounded-lg p-3 text-center">
+                <p className="text-lg font-semibold text-white">
                   {data.zoneCount}
                 </p>
-                <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500">
+                <p className="text-xs text-slate-400">
                   {data.zoneCount === 1 ? 'zona' : 'zone'}
                 </p>
               </div>
-              <div className="flex-1 bg-slate-800/50 rounded-lg p-3 text-center [html:not(.dark)_&]:bg-slate-100/80">
-                <p className="text-lg font-semibold text-white [html:not(.dark)_&]:text-slate-900">
+              <div className="flex-1 bg-slate-800/50 rounded-lg p-3 text-center">
+                <p className="text-lg font-semibold text-white">
                   {data.speakerCount}
                 </p>
-                <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500">
+                <p className="text-xs text-slate-400">
                   {data.speakerCount === 1 ? 'speaker' : 'speaker'}
                 </p>
               </div>
@@ -97,7 +97,7 @@ export default function SonosCard() {
           </SmartHomeCard.Controls>
         )}
 
-        <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
+        <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />
       </SmartHomeCard>
     </div>
   );

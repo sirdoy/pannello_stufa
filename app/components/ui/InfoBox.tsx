@@ -38,12 +38,12 @@ export default function InfoBox({
 }: InfoBoxProps) {
   // Ember Noir variant colors with light mode support
   const variantClasses: Record<string, string> = {
-    neutral: 'text-slate-100 [html:not(.dark)_&]:text-slate-900',
-    ember: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
-    ocean: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
-    sage: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
-    warning: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
-    danger: 'text-danger-400 [html:not(.dark)_&]:text-danger-600',
+    neutral: 'text-slate-100 ',
+    ember: 'text-ember-400 ',
+    ocean: 'text-ocean-400 ',
+    sage: 'text-sage-400 ',
+    warning: 'text-warning-400 ',
+    danger: 'text-danger-400 ',
   };
 
   // Compact vertical layout optimized for 2-column grid
@@ -54,10 +54,10 @@ export default function InfoBox({
       border border-slate-700/40
       transition-all duration-200
       hover:bg-slate-800/70 hover:border-slate-600/50
-      [html:not(.dark)_&]:bg-white/70
-      [html:not(.dark)_&]:border-slate-200
-      [html:not(.dark)_&]:hover:bg-white/90
-      [html:not(.dark)_&]:hover:border-slate-300
+      
+      
+      
+      
       ${className}
     `} {...props}>
       <div className="relative z-10 flex flex-col items-center justify-center p-3 sm:p-4 min-h-[90px]">

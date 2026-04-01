@@ -65,7 +65,7 @@ export default function AutomationPage() {
       </div>
 
       {/* Coming Soon Notice */}
-      <Card className="p-8 mb-8 bg-gradient-to-br from-ocean-50 to-ocean-100 [html:not(.dark)_&]:from-ocean-50 [html:not(.dark)_&]:to-ocean-100 from-ocean-900/20 to-ocean-800/20 border-2 border-ocean-300 [html:not(.dark)_&]:border-ocean-300 border-ocean-700">
+      <Card className="p-8 mb-8 bg-gradient-to-br from-ocean-50 to-ocean-100 from-ocean-900/20 to-ocean-800/20 border-2 border-ocean-300 border-ocean-700">
         <div className="flex flex-col items-center text-center">
           <div className="text-6xl mb-4">🚧</div>
           <Heading level={2} size="lg" className="mb-2">

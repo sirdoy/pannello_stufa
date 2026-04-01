@@ -50,7 +50,7 @@ export default function InstallPrompt() {
           'fixed bottom-0 left-0 right-0 z-[55]',
           'max-w-2xl mx-auto',
           'bg-slate-900 border-t border-slate-700/50',
-          '[html:not(.dark)_&]:bg-white [html:not(.dark)_&]:border-slate-200',
+          ' ',
           'rounded-t-3xl',
           'shadow-liquid-xl',
           'animate-slide-up',
@@ -65,7 +65,7 @@ export default function InstallPrompt() {
           <div
             className={cn(
               'w-12 h-1.5 rounded-full',
-              'bg-slate-700 [html:not(.dark)_&]:bg-slate-300'
+              'bg-slate-700 '
             )}
             aria-hidden="true"
           />
@@ -83,7 +83,7 @@ export default function InstallPrompt() {
             >
               <Download
                 size={24}
-                className="text-ember-400 [html:not(.dark)_&]:text-ember-600"
+                className="text-ember-400 "
                 aria-hidden="true"
               />
             </div>
@@ -91,7 +91,7 @@ export default function InstallPrompt() {
               level={2}
               size="lg"
               id="install-prompt-title"
-              className="text-slate-100 [html:not(.dark)_&]:text-slate-900"
+              className="text-slate-100 "
             >
               Installa Pannello Stufa
             </Heading>
@@ -105,9 +105,7 @@ export default function InstallPrompt() {
               'text-slate-400 hover:text-slate-200',
               'hover:bg-white/[0.06]',
               'transition-all duration-200',
-              '[html:not(.dark)_&]:text-slate-500',
-              '[html:not(.dark)_&]:hover:text-slate-700',
-              '[html:not(.dark)_&]:hover:bg-black/[0.04]'
+              ']'
             )}
             aria-label="Chiudi"
           >
@@ -120,12 +118,12 @@ export default function InstallPrompt() {
           <div className="flex items-start gap-3">
             <Wifi
               size={20}
-              className="flex-shrink-0 mt-0.5 text-ocean-400 [html:not(.dark)_&]:text-ocean-600"
+              className="flex-shrink-0 mt-0.5 text-ocean-400 "
               aria-hidden="true"
             />
             <Text
               size="sm"
-              className="text-slate-300 [html:not(.dark)_&]:text-slate-700"
+              className="text-slate-300 "
             >
               Funziona anche offline
             </Text>
@@ -134,12 +132,12 @@ export default function InstallPrompt() {
           <div className="flex items-start gap-3">
             <Bell
               size={20}
-              className="flex-shrink-0 mt-0.5 text-sage-400 [html:not(.dark)_&]:text-sage-600"
+              className="flex-shrink-0 mt-0.5 text-sage-400 "
               aria-hidden="true"
             />
             <Text
               size="sm"
-              className="text-slate-300 [html:not(.dark)_&]:text-slate-700"
+              className="text-slate-300 "
             >
               Notifiche push in tempo reale
             </Text>
@@ -148,12 +146,12 @@ export default function InstallPrompt() {
           <div className="flex items-start gap-3">
             <Smartphone
               size={20}
-              className="flex-shrink-0 mt-0.5 text-ember-400 [html:not(.dark)_&]:text-ember-600"
+              className="flex-shrink-0 mt-0.5 text-ember-400 "
               aria-hidden="true"
             />
             <Text
               size="sm"
-              className="text-slate-300 [html:not(.dark)_&]:text-slate-700"
+              className="text-slate-300 "
             >
               Accesso rapido dalla home screen
             </Text>
@@ -169,12 +167,12 @@ export default function InstallPrompt() {
                 className={cn(
                   'p-4 rounded-xl',
                   'bg-slate-800 border border-slate-700',
-                  '[html:not(.dark)_&]:bg-slate-50 [html:not(.dark)_&]:border-slate-200'
+                  ' '
                 )}
               >
                 <Text
                   size="sm"
-                  className="font-semibold mb-2 text-slate-200 [html:not(.dark)_&]:text-slate-800"
+                  className="font-semibold mb-2 text-slate-200 "
                 >
                   Come installare:
                 </Text>
@@ -182,25 +180,25 @@ export default function InstallPrompt() {
                   <div className="flex items-start gap-2">
                     <Text
                       size="sm"
-                      className="text-slate-300 [html:not(.dark)_&]:text-slate-700"
+                      className="text-slate-300 "
                     >
                       1. Tocca
                     </Text>
                     <Share
                       size={16}
-                      className="mt-0.5 text-ocean-400 [html:not(.dark)_&]:text-ocean-600"
+                      className="mt-0.5 text-ocean-400 "
                       aria-hidden="true"
                     />
                     <Text
                       size="sm"
-                      className="text-slate-300 [html:not(.dark)_&]:text-slate-700"
+                      className="text-slate-300 "
                     >
                       nella barra del browser
                     </Text>
                   </div>
                   <Text
                     size="sm"
-                    className="text-slate-300 [html:not(.dark)_&]:text-slate-700"
+                    className="text-slate-300 "
                   >
                     2. Seleziona &quot;Aggiungi alla schermata Home&quot;
                   </Text>

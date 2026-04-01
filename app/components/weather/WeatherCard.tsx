@@ -93,14 +93,14 @@ export interface WeatherCardProps {
  *
  * @example
  * <WeatherCard
- *   weatherData={data}
- *   locationName="Milano"
- *   indoorTemp={20.5}
- *   isLoading={false}
- *   error={null}
- *   onRetry={() => refetch()}
- *   onRefresh={() => handleRefresh()}
- *   isRefreshing={false}
+ * weatherData={data}
+ * locationName="Milano"
+ * indoorTemp={20.5}
+ * isLoading={false}
+ * error={null}
+ * onRetry={() => refetch()}
+ * onRefresh={() => handleRefresh()}
+ * isRefreshing={false}
  * />
  */
 export function WeatherCard({
@@ -211,7 +211,7 @@ export function WeatherCard({
 
         {/* Forecast row */}
         {weatherData.forecast && weatherData.forecast.length > 0 && (
-          <div className="mt-6 pt-6 border-t border-slate-700/30 [html:not(.dark)_&]:border-slate-200/50">
+          <div className="mt-6 pt-6 border-t border-slate-700/30 ">
             <ForecastRow
               forecast={weatherData.forecast}
               onDayClick={setSelectedDay}

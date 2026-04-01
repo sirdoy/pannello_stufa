@@ -64,9 +64,8 @@ export default function ScheduleSelector({
             // Disabled
             'disabled:opacity-50 disabled:cursor-not-allowed',
             // Light mode
-            '[html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-300/60',
-            '[html:not(.dark)_&]:text-slate-900',
-            '[html:not(.dark)_&]:hover:bg-white/90 [html:not(.dark)_&]:hover:border-slate-400/60',
+            ' ',
+            ' ',
             // Size - matching Select md
             'px-4 py-4 min-h-[56px]'
           )}
@@ -88,7 +87,6 @@ export default function ScheduleSelector({
           <ChevronDown
             className={cn(
               'h-5 w-5 text-slate-400 transition-transform duration-200 shrink-0 ml-2',
-              '[html:not(.dark)_&]:text-slate-500',
               isOpen && 'rotate-180'
             )}
           />
@@ -111,13 +109,13 @@ export default function ScheduleSelector({
               <Text variant="tertiary" size="xs" className="mb-4">
                 Esegui la migrazione per creare la struttura v2
               </Text>
-              <div className="bg-slate-700/40 rounded-xl p-3 text-left [html:not(.dark)_&]:bg-slate-100/60">
+              <div className="bg-slate-700/40 rounded-xl p-3 text-left ">
                 <Text as="code" size="xs" className="block font-mono">
                   npm run migrate:schedules
                 </Text>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+            <div className="mt-3 pt-3 border-t border-slate-700/50 ">
               <Button
                 variant="ember"
                 size="sm"
@@ -132,22 +130,22 @@ export default function ScheduleSelector({
         ) : (
           <>
             {/* Active Schedule Section */}
-            <div className="p-3 border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+            <div className="p-3 border-b border-slate-700/50 ">
               <Text as="div" variant="tertiary" size="xs" className="uppercase tracking-wider mb-2 px-2">
                 Attiva
               </Text>
-              <div className="px-3 py-2 bg-sage-950/30 rounded-xl flex items-center gap-3 [html:not(.dark)_&]:bg-sage-50/50">
+              <div className="px-3 py-2 bg-sage-950/30 rounded-xl flex items-center gap-3 ">
                 <div className="w-2 h-2 rounded-full bg-sage-500 shadow-sage-glow-sm shrink-0" />
                 <Text as="div" size="sm" variant="sage" className="flex-1">
                   {activeSchedule?.name}
                 </Text>
-                <Check className="w-4 h-4 text-sage-400 [html:not(.dark)_&]:text-sage-600" />
+                <Check className="w-4 h-4 text-sage-400 " />
               </div>
             </div>
 
             {/* Other Schedules Section */}
             {otherSchedules.length > 0 && (
-              <div className="p-3 border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+              <div className="p-3 border-b border-slate-700/50 ">
                 <Text as="div" variant="tertiary" size="xs" className="uppercase tracking-wider mb-2 px-2">
                   Disponibili
                 </Text>
@@ -159,20 +157,20 @@ export default function ScheduleSelector({
                       className={cn(
                         'w-full px-3 py-2 text-left rounded-xl flex items-center gap-3 group',
                         'transition-colors duration-150',
-                        'hover:bg-slate-700/50 [html:not(.dark)_&]:hover:bg-slate-100'
+                        'hover:bg-slate-700/50 '
                       )}
                     >
                       <div className={cn(
                         'w-2 h-2 rounded-full shrink-0 transition-colors',
                         'bg-slate-600 group-hover:bg-ember-500',
-                        '[html:not(.dark)_&]:bg-slate-300 [html:not(.dark)_&]:group-hover:bg-ember-400'
+                        ' '
                       )} />
                       <Text
                         as="div"
                         size="sm"
                        
                         variant="secondary"
-                        className="flex-1 group-hover:text-slate-100 [html:not(.dark)_&]:group-hover:text-slate-900"
+                        className="flex-1 group-hover:text-slate-100 "
                       >
                         {schedule.name}
                       </Text>

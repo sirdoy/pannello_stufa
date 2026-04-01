@@ -92,7 +92,7 @@ export default function BottomSheet({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/60 [html:not(.dark)_&]:bg-slate-500/40 backdrop-blur-sm animate-fadeIn"
+        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm animate-fadeIn"
         style={{ zIndex }}
         onClick={handleBackdropClick}
         aria-hidden="true"
@@ -108,11 +108,11 @@ export default function BottomSheet({
       >
         <div
           className={`
-            bg-slate-900/95 [html:not(.dark)_&]:bg-white/95
+            bg-slate-900/95 
             backdrop-blur-3xl
             rounded-t-3xl
             shadow-liquid-lg
-            border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200/50
+            border-t border-slate-700/50 
             p-6
             max-h-[85vh] overflow-y-auto
             ${className}
@@ -120,7 +120,7 @@ export default function BottomSheet({
         >
           {/* Drag Handle */}
           {showHandle && (
-            <div className="w-12 h-1.5 bg-slate-600/50 [html:not(.dark)_&]:bg-slate-400/50 rounded-full mx-auto mb-6" />
+            <div className="w-12 h-1.5 bg-slate-600/50 rounded-full mx-auto mb-6" />
           )}
 
           {/* Header */}

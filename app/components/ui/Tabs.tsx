@@ -21,32 +21,32 @@ import { cn } from '@/lib/utils/cn';
  * @example
  * // Basic usage
  * <Tabs defaultValue="tab1">
- *   <Tabs.List>
- *     <Tabs.Trigger value="tab1">Schedule</Tabs.Trigger>
- *     <Tabs.Trigger value="tab2">Manual</Tabs.Trigger>
- *     <Tabs.Trigger value="tab3">History</Tabs.Trigger>
- *   </Tabs.List>
- *   <Tabs.Content value="tab1">Schedule content</Tabs.Content>
- *   <Tabs.Content value="tab2">Manual content</Tabs.Content>
- *   <Tabs.Content value="tab3">History content</Tabs.Content>
+ * <Tabs.List>
+ * <Tabs.Trigger value="tab1">Schedule</Tabs.Trigger>
+ * <Tabs.Trigger value="tab2">Manual</Tabs.Trigger>
+ * <Tabs.Trigger value="tab3">History</Tabs.Trigger>
+ * </Tabs.List>
+ * <Tabs.Content value="tab1">Schedule content</Tabs.Content>
+ * <Tabs.Content value="tab2">Manual content</Tabs.Content>
+ * <Tabs.Content value="tab3">History content</Tabs.Content>
  * </Tabs>
  *
  * @example
  * // With icons
  * <Tabs defaultValue="schedule">
- *   <Tabs.List>
- *     <Tabs.Trigger value="schedule" icon={<Calendar />}>Schedule</Tabs.Trigger>
- *     <Tabs.Trigger value="manual" icon={<Sliders />}>Manual</Tabs.Trigger>
- *   </Tabs.List>
+ * <Tabs.List>
+ * <Tabs.Trigger value="schedule" icon={<Calendar />}>Schedule</Tabs.Trigger>
+ * <Tabs.Trigger value="manual" icon={<Sliders />}>Manual</Tabs.Trigger>
+ * </Tabs.List>
  * </Tabs>
  *
  * @example
  * // Vertical orientation
  * <Tabs defaultValue="tab1" orientation="vertical">
- *   <Tabs.List orientation="vertical">
- *     <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
- *     <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
- *   </Tabs.List>
+ * <Tabs.List orientation="vertical">
+ * <Tabs.Trigger value="tab1">Tab 1</Tabs.Trigger>
+ * <Tabs.Trigger value="tab2">Tab 2</Tabs.Trigger>
+ * </Tabs.List>
  * </Tabs>
  */
 
@@ -62,7 +62,7 @@ const listVariants = cva(
   [
     'relative flex gap-1',
     'border-b border-white/[0.06]',
-    '[html:not(.dark)_&]:border-black/[0.06]',
+    ']',
   ],
   {
     variants: {
@@ -88,13 +88,13 @@ const triggerVariants = cva(
     'px-4 py-2.5 min-h-[44px]',
     'font-display font-medium text-sm',
     'text-slate-400 hover:text-slate-200',
-    '[html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-slate-900',
+    ' ',
     'transition-colors duration-[var(--duration-fast)]',
     // Focus ring
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:ring-inset',
     // Active state
     'data-[state=active]:text-slate-100',
-    '[html:not(.dark)_&]:data-[state=active]:text-slate-900',
+    ']:text-slate-900',
     // Disabled state
     'disabled:pointer-events-none disabled:opacity-50',
   ],
@@ -157,7 +157,6 @@ const TabsList = forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsLis
         <span
           className={cn(
             'absolute bg-ember-500',
-            '[html:not(.dark)_&]:bg-ember-700',
             'transition-all duration-[var(--duration-smooth)]',
             // Use spring easing with subtle overshoot for polished feel
             'ease-[var(--ease-spring-subtle)]',

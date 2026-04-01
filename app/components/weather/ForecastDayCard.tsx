@@ -60,9 +60,9 @@ export interface ForecastDayCardProps {
  *
  * @example
  * <ForecastDayCard
- *   day={{ date: '2026-02-03', tempMax: 12, tempMin: 5, weatherCode: 2, precipChance: 30 }}
- *   isToday={false}
- *   onClick={() => handleDayClick(day)}
+ * day={{ date: '2026-02-03', tempMax: 12, tempMin: 5, weatherCode: 2, precipChance: 30 }}
+ * isToday={false}
+ * onClick={() => handleDayClick(day)}
  * />
  */
 export function ForecastDayCard({
@@ -85,7 +85,7 @@ export function ForecastDayCard({
       className={cn(
         'flex flex-col items-center p-3 rounded-xl cursor-pointer',
         'bg-slate-800/40 hover:bg-slate-800/60',
-        '[html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:hover:bg-slate-200/80',
+        ' ',
         'transition-colors duration-200',
         className
       )}

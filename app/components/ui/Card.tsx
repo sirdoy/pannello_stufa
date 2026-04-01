@@ -30,25 +30,25 @@ export const cardVariants = cva(
       variant: {
         default: [
           'bg-slate-900/80 border border-white/[0.06] shadow-card backdrop-blur-xl',
-          '[html:not(.dark)_&]:bg-white/90 [html:not(.dark)_&]:border-black/[0.06]',
-          '[html:not(.dark)_&]:shadow-[0_2px_8px_rgba(0,0,0,0.08)]',
+          ' ]',
+          ',0,0,0.08)]',
         ],
         elevated: [
           'bg-slate-850/90 border border-white/[0.08] shadow-card-elevated backdrop-blur-xl',
-          '[html:not(.dark)_&]:bg-white/95 [html:not(.dark)_&]:border-black/[0.08]',
-          '[html:not(.dark)_&]:shadow-[0_8px_24px_rgba(0,0,0,0.12)]',
+          ' ]',
+          ',0,0,0.12)]',
         ],
         subtle: [
           'bg-white/[0.03] border border-white/[0.04]',
-          '[html:not(.dark)_&]:bg-black/[0.02] [html:not(.dark)_&]:border-black/[0.04]',
+          '] ]',
         ],
         outlined: [
           'bg-transparent border border-white/[0.12]',
-          '[html:not(.dark)_&]:border-black/[0.12]',
+          ']',
         ],
         glass: [
           'bg-slate-900/70 border border-white/[0.08] shadow-card backdrop-blur-2xl backdrop-saturate-150',
-          '[html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-black/[0.06]',
+          ' ]',
         ],
       },
       hover: {
@@ -56,16 +56,15 @@ export const cardVariants = cva(
           'hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer',
           'hover:border-white/[0.1]',
           'hover:ease-[var(--ease-spring-subtle)]',
-          '[html:not(.dark)_&]:hover:shadow-[0_12px_32px_rgba(0,0,0,0.15)]',
-          '[html:not(.dark)_&]:hover:border-black/[0.1]',
+          ',0,0,0.15)]',
+          ']',
         ],
         false: [],
       },
       glow: {
         true: [
           'shadow-ember-glow border-ember-500/20',
-          '[html:not(.dark)_&]:shadow-[0_0_20px_rgba(237,111,16,0.12)]',
-          '[html:not(.dark)_&]:border-ember-500/25',
+          ',111,16,0.12)]',
         ],
         false: [],
       },
@@ -172,7 +171,7 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
         ref={ref}
         className={cn(
           'mt-5 pt-4 border-t border-white/[0.06]',
-          '[html:not(.dark)_&]:border-black/[0.06]',
+          ']',
           className
         )}
         {...props}
@@ -195,7 +194,7 @@ const CardDivider = forwardRef<HTMLDivElement, CardDividerProps>(
         ref={ref}
         className={cn(
           'h-px my-4 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent',
-          '[html:not(.dark)_&]:via-black/[0.08]',
+          ']',
           className
         )}
         {...props}

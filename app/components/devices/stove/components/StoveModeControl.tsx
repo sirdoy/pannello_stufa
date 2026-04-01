@@ -36,12 +36,12 @@ export default function StoveModeControl({
       <Divider label="Modalità Controllo" variant="gradient" spacing="large" />
 
       {/* Mode Indicator - Ember Noir */}
-      <div className="flex flex-col gap-4 p-5 sm:p-6 bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 relative overflow-hidden [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+      <div className="flex flex-col gap-4 p-5 sm:p-6 bg-slate-800/50 backdrop-blur-xl rounded-2xl border border-slate-700/50 relative overflow-hidden">
         <div className="flex items-center gap-3 sm:gap-4 relative z-10">
           <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${
-            schedulerEnabled && semiManualMode ? 'bg-warning-900/40 border-2 border-warning-500/50 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:border-warning-300' :
-            schedulerEnabled ? 'bg-sage-900/40 border-2 border-sage-500/50 [html:not(.dark)_&]:bg-sage-100/80 [html:not(.dark)_&]:border-sage-300' :
-            'bg-ember-900/40 border-2 border-ember-500/50 [html:not(.dark)_&]:bg-ember-100/80 [html:not(.dark)_&]:border-ember-300'
+            schedulerEnabled && semiManualMode ? 'bg-warning-900/40 border-2 border-warning-500/50' :
+            schedulerEnabled ? 'bg-sage-900/40 border-2 border-sage-500/50' :
+            'bg-ember-900/40 border-2 border-ember-500/50'
           }`}>
             <span className="text-2xl sm:text-3xl">
               {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
@@ -90,11 +90,11 @@ export default function StoveModeControl({
                 })()
               ) : schedulerEnabled && nextScheduledAction ? (
                 <>
-                  <Text as="span" className={nextScheduledAction.action === 'ignite' ? 'text-ember-400 [html:not(.dark)_&]:text-ember-600' : 'text-slate-300 [html:not(.dark)_&]:text-slate-600'}>
+                  <Text as="span" className={nextScheduledAction.action === 'ignite' ? 'text-ember-400' : 'text-slate-300'}>
                     {nextScheduledAction.action === 'ignite' ? '🔥 Accensione' : '❄️ Spegnimento'}
                   </Text>
-                  {' alle '}
-                  <Text as="span" className="text-slate-300 [html:not(.dark)_&]:text-slate-600">
+                  {' alle'}
+                  <Text as="span" className="text-slate-300">
                     {(() => {
                       const date = new Date(nextScheduledAction.timestamp);
                       const time = date.toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit' });

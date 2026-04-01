@@ -48,7 +48,7 @@ export default function TimelineSlot({
         opacity-0 group-hover:opacity-100
         transition-opacity pointer-events-none
         whitespace-nowrap z-20
-        [html:not(.dark)_&]:bg-slate-800
+        
       ">
         {startTime}-{endTime}
       </div>

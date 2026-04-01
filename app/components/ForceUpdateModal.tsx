@@ -44,28 +44,28 @@ export default function ForceUpdateModal({ show, firebaseVersion }: ForceUpdateM
         </div>
 
         {/* Header */}
-        <Heading level={2} className="mb-4 text-center text-slate-900 [html:not(.dark)_&]:text-white">
+        <Heading level={2} className="mb-4 text-center text-slate-900 ">
           Aggiornamento Disponibile
         </Heading>
 
         {/* Content */}
         <div className="space-y-4 mb-6">
-          <Text className="text-center text-slate-700 [html:not(.dark)_&]:text-slate-300">
+          <Text className="text-center text-slate-700 ">
             È disponibile una nuova versione dell&apos;applicazione. Per continuare ad utilizzare il pannello è necessario aggiornare.
           </Text>
 
           {/* Version info */}
-          <div className="bg-slate-100 [html:not(.dark)_&]:bg-slate-800 rounded-xl p-4 space-y-2">
+          <div className="bg-slate-100 rounded-xl p-4 space-y-2">
             <div className="flex justify-between items-center">
-              <Text as="span" size="sm" className="text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" size="sm" className="text-slate-600 ">
                 Versione attuale:
               </Text>
-              <Text as="span" size="sm" className="text-slate-900 [html:not(.dark)_&]:text-white">
+              <Text as="span" size="sm" className="text-slate-900 ">
                 {APP_VERSION}
               </Text>
             </div>
             <div className="flex justify-between items-center">
-              <Text as="span" size="sm" className="text-slate-600 [html:not(.dark)_&]:text-slate-400">
+              <Text as="span" size="sm" className="text-slate-600 ">
                 Nuova versione:
               </Text>
               <Text as="span" size="sm" variant="ember">
@@ -74,7 +74,7 @@ export default function ForceUpdateModal({ show, firebaseVersion }: ForceUpdateM
             </div>
           </div>
 
-          <Text size="sm" className="text-center italic text-slate-600 [html:not(.dark)_&]:text-slate-400">
+          <Text size="sm" className="text-center italic text-slate-600 ">
             L&apos;aggiornamento richiede solo il ricaricamento della pagina.
           </Text>
         </div>

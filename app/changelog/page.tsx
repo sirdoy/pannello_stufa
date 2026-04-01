@@ -73,21 +73,21 @@ export default function ChangelogPage() {
       icon: '🚀',
       label: 'Major Release',
       badgeColor: 'ember',
-      accentClass: 'from-ember-500/20 to-flame-500/10 border-ember-500/30 [html:not(.dark)_&]:from-ember-100 [html:not(.dark)_&]:to-flame-100/50 [html:not(.dark)_&]:border-ember-300',
+      accentClass: 'from-ember-500/20 to-flame-500/10 border-ember-500/30',
       dotClass: 'bg-gradient-to-br from-ember-400 to-flame-500 shadow-[0_0_12px_rgba(237,111,16,0.4)]',
     },
     minor: {
       icon: '✨',
       label: 'Minor Update',
       badgeColor: 'sage',
-      accentClass: 'from-sage-500/20 to-sage-500/10 border-sage-500/30 [html:not(.dark)_&]:from-sage-100 [html:not(.dark)_&]:to-sage-100/50 [html:not(.dark)_&]:border-sage-300',
+      accentClass: 'from-sage-500/20 to-sage-500/10 border-sage-500/30',
       dotClass: 'bg-gradient-to-br from-sage-400 to-sage-500 shadow-[0_0_12px_rgba(96,115,96,0.4)]',
     },
     patch: {
       icon: '🔧',
       label: 'Patch',
       badgeColor: 'ocean',
-      accentClass: 'from-ocean-500/20 to-ocean-500/10 border-ocean-500/30 [html:not(.dark)_&]:from-ocean-100 [html:not(.dark)_&]:to-ocean-100/50 [html:not(.dark)_&]:border-ocean-300',
+      accentClass: 'from-ocean-500/20 to-ocean-500/10 border-ocean-500/30',
       dotClass: 'bg-gradient-to-br from-ocean-400 to-ocean-500 shadow-[0_0_12px_rgba(67,125,174,0.4)]',
     },
   } as const;
@@ -113,7 +113,7 @@ export default function ChangelogPage() {
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-ember-500/20 to-flame-500/10 border border-ember-500/30 [html:not(.dark)_&]:from-ember-100 [html:not(.dark)_&]:to-flame-100 [html:not(.dark)_&]:border-ember-200">
+                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-ember-500/20 to-flame-500/10 border border-ember-500/30">
                   <span className="text-2xl">📋</span>
                 </div>
                 <div>
@@ -150,7 +150,7 @@ export default function ChangelogPage() {
       {/* Timeline */}
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute left-[23px] sm:left-[27px] top-8 bottom-8 w-px bg-gradient-to-b from-slate-600/50 via-slate-700/30 to-transparent [html:not(.dark)_&]:from-slate-300 [html:not(.dark)_&]:via-slate-200/50" />
+        <div className="absolute left-[23px] sm:left-[27px] top-8 bottom-8 w-px bg-gradient-to-b from-slate-600/50 via-slate-700/30 to-transparent" />
 
         <div className="space-y-6">
           {paginatedChangelog.map((version, index) => {
@@ -166,7 +166,7 @@ export default function ChangelogPage() {
 
                 <Card variant="default" hover className="overflow-hidden transition-all duration-300">
                   {/* Header with gradient accent */}
-                  <div className={`p-5 sm:p-6 bg-gradient-to-r ${config.accentClass} border-b border-slate-700/30 [html:not(.dark)_&]:border-slate-200/50`}>
+                  <div className={`p-5 sm:p-6 bg-gradient-to-r ${config.accentClass} border-b border-slate-700/30 
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div className="flex items-center gap-3 flex-wrap">
                         <Heading level={2} size="xl">v{version.version}</Heading>
@@ -204,10 +204,10 @@ export default function ChangelogPage() {
                         <li key={changeIndex} className="flex items-start gap-3 group">
                           <span className={`mt-1.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors ${
                             version.type === 'major'
-                              ? 'bg-ember-500/20 text-ember-400 group-hover:bg-ember-500/30 [html:not(.dark)_&]:bg-ember-100 [html:not(.dark)_&]:text-ember-600'
+                              ? 'bg-ember-500/20 text-ember-400 group-hover:bg-ember-500/30'
                               : version.type === 'minor'
-                                ? 'bg-sage-500/20 text-sage-400 group-hover:bg-sage-500/30 [html:not(.dark)_&]:bg-sage-100 [html:not(.dark)_&]:text-sage-600'
-                                : 'bg-ocean-500/20 text-ocean-400 group-hover:bg-ocean-500/30 [html:not(.dark)_&]:bg-ocean-100 [html:not(.dark)_&]:text-ocean-600'
+                                ? 'bg-sage-500/20 text-sage-400 group-hover:bg-sage-500/30'
+                                : 'bg-ocean-500/20 text-ocean-400 group-hover:bg-ocean-500/30'
                           }`}>
                             ✓
                           </span>
@@ -232,8 +232,8 @@ export default function ChangelogPage() {
             disabled={currentPage === 1}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
               currentPage === 1
-                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-500'
-                : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:hover:bg-slate-300'
+                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed'
+                : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95'
             }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -274,7 +274,7 @@ export default function ChangelogPage() {
                   className={`min-w-[40px] h-10 rounded-xl font-medium transition-all duration-200 ${
                     isCurrentPage
                       ? 'bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/25'
-                      : 'bg-slate-800/30 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:bg-slate-200'
+                      : 'bg-slate-800/30 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
                   }`}
                 >
                   {page}
@@ -289,8 +289,8 @@ export default function ChangelogPage() {
             disabled={currentPage === totalPages}
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
               currentPage === totalPages
-                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-500'
-                : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:hover:bg-slate-300'
+                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed'
+                : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95'
             }`}
           >
             <span className="hidden sm:inline">Successiva</span>
@@ -316,7 +316,7 @@ export default function ChangelogPage() {
           <div className="flex items-center gap-6">
             {Object.entries(versionConfig).map(([type, config]) => (
               <div key={type} className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${config.dotClass.split(' ')[0]} ${config.dotClass.split(' ')[1]}`} />
+                <div className={`w-3 h-3 rounded-full ${config.dotClass.split('')[0]} ${config.dotClass.split('')[1]}`} />
                 <Text variant="tertiary" size="xs">{config.label}</Text>
               </div>
             ))}

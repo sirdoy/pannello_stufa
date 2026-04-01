@@ -136,21 +136,21 @@ export default function MaintenancePage() {
           <Heading level={2} size="xl" className="mb-4">📊 Stato Attuale</Heading>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/[0.05] [html:not(.dark)_&]:bg-white/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/[0.08] [html:not(.dark)_&]:ring-white/[0.15] ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] [html:not(.dark)_&]:before:from-white/[0.12] before:to-transparent before:pointer-events-none">
+            <div className="bg-white/[0.05] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/[0.08] ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] before:to-transparent before:pointer-events-none">
               <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore di Utilizzo</Text>
               <Heading level={3} size="2xl" className="relative z-10">
                 {formatHoursToHHMM(maintenanceData?.currentHours || 0)}
               </Heading>
             </div>
 
-            <div className="bg-ember-500/[0.15] [html:not(.dark)_&]:bg-ember-500/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-ember-500/30 [html:not(.dark)_&]:ring-ember-500/20 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-ember-500/[0.20] [html:not(.dark)_&]:before:from-ember-500/[0.12] before:to-transparent before:pointer-events-none">
+            <div className="bg-ember-500/[0.15] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-ember-500/30 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-ember-500/[0.20] before:to-transparent before:pointer-events-none">
               <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore Target</Text>
               <Heading level={3} size="2xl" variant="ember" className="relative z-10">
                 {formatHoursToHHMM(maintenanceData?.targetHours || 50)}
               </Heading>
             </div>
 
-            <div className="bg-sage-500/[0.15] [html:not(.dark)_&]:bg-sage-500/[0.08] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-sage-500/30 [html:not(.dark)_&]:ring-sage-500/20 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-sage-500/[0.20] [html:not(.dark)_&]:before:from-sage-500/[0.12] before:to-transparent before:pointer-events-none">
+            <div className="bg-sage-500/[0.15] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-sage-500/30 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-sage-500/[0.20] before:to-transparent before:pointer-events-none">
               <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore Rimanenti</Text>
               <Heading level={3} size="2xl" variant="sage" className="relative z-10">
                 {formatHoursToHHMM(Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)))}
@@ -159,7 +159,7 @@ export default function MaintenancePage() {
           </div>
 
           {/* Reset Button */}
-          <div className="mt-4 pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
+          <div className="mt-4 pt-4 border-t border-slate-700">
             <Button
               variant="danger"
               onClick={handleResetRequest}
@@ -171,7 +171,7 @@ export default function MaintenancePage() {
           </div>
 
           {maintenanceData?.lastCleanedAt && (
-            <div className="mt-4 pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
+            <div className="mt-4 pt-4 border-t border-slate-700">
               <Text variant="tertiary" size="sm">
                 Ultima pulizia: {new Date(maintenanceData.lastCleanedAt).toLocaleDateString('it-IT', {
                   day: '2-digit',
@@ -220,7 +220,7 @@ export default function MaintenancePage() {
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
                       targetHours === hours
                         ? 'bg-ember-600 text-white shadow-liquid-sm'
-                        : 'bg-white/[0.08] [html:not(.dark)_&]:bg-white/[0.08] bg-white/[0.05] backdrop-blur-2xl text-slate-300 [html:not(.dark)_&]:text-slate-700 hover:bg-white/[0.12] [html:not(.dark)_&]:hover:bg-white/[0.12] hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/[0.15] [html:not(.dark)_&]:ring-white/[0.15] ring-white/[0.08] ring-inset'
+                        : 'bg-white/[0.08] bg-white/[0.05] backdrop-blur-2xl text-slate-300 hover:bg-white/[0.12] hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/[0.15] ring-white/[0.08] ring-inset'
                     }`}
                     disabled={isSaving}
                   >
@@ -242,8 +242,8 @@ export default function MaintenancePage() {
             {saveMessage && (
               <div className={`p-3 rounded-lg text-sm ${
                 saveMessage.type === 'success'
-                  ? 'bg-sage-100 [html:not(.dark)_&]:bg-sage-100 bg-sage-900/30 text-sage-400 [html:not(.dark)_&]:text-sage-800'
-                  : 'bg-ember-100 [html:not(.dark)_&]:bg-ember-100 bg-ember-900/30 text-ember-400 [html:not(.dark)_&]:text-ember-800'
+                  ? 'bg-sage-100 bg-sage-900/30 text-sage-400'
+                  : 'bg-ember-100 bg-ember-900/30 text-ember-400'
               }`}>
                 {saveMessage.text}
               </div>
@@ -252,7 +252,7 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Info Card */}
-        <Card variant="glass" className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800">
+        <Card variant="glass" className="p-6 sm:p-8 bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 border-ocean-800">
           <Heading level={3} variant="subtle" className="mb-2">ℹ️ Come Funziona</Heading>
           <ul className="space-y-1 list-disc list-inside">
             <li><Text variant="tertiary" size="sm" as="span">Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</Text></li>

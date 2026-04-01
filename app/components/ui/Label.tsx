@@ -29,15 +29,12 @@ const labelVariants = cva(
       variant: {
         default: [
           'text-slate-300',
-          '[html:not(.dark)_&]:text-slate-700',
         ],
         muted: [
           'text-slate-400',
-          '[html:not(.dark)_&]:text-slate-500',
         ],
         required: [
           'text-slate-300',
-          '[html:not(.dark)_&]:text-slate-700',
           "after:content-['*'] after:ml-0.5 after:text-ember-500",
         ],
       },

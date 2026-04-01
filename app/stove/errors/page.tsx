@@ -170,7 +170,7 @@ export default function ErrorsPage() {
                 />
 
                 {/* Metadata */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700">
                   <div>
                     <Text variant="tertiary" size="xs" className="mb-1">Data e Ora</Text>
                     <Text size="sm">
@@ -210,7 +210,7 @@ export default function ErrorsPage() {
 
                 {/* Actions */}
                 {!error.resolved && (
-                  <div className="pt-4 border-t border-slate-700 [html:not(.dark)_&]:border-slate-200">
+                  <div className="pt-4 border-t border-slate-700">
                     <Button
                       variant="success"
                       size="sm"

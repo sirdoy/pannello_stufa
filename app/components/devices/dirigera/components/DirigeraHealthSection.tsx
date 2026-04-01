@@ -12,7 +12,7 @@ interface DirigeraHealthSectionProps {
  */
 export default function DirigeraHealthSection({ health }: DirigeraHealthSectionProps) {
   return (
-    <div className="rounded-2xl bg-slate-800/50 p-4 [html:not(.dark)_&]:bg-white [html:not(.dark)_&]:shadow-sm">
+    <div className="rounded-2xl bg-slate-800/50 p-4">
       <div className="flex flex-wrap gap-6">
         {/* Firmware */}
         <div className="flex flex-col gap-0.5">

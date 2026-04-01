@@ -15,23 +15,22 @@ import { cn } from '@/lib/utils/cn';
  */
 const textVariants = cva(
   // Base classes (minimal)
-  '',
   {
     variants: {
       variant: {
         // Neutral hierarchy
-        body: 'text-slate-100 [html:not(.dark)_&]:text-slate-900',
-        secondary: 'text-slate-300 [html:not(.dark)_&]:text-slate-600',
-        tertiary: 'text-slate-400 [html:not(.dark)_&]:text-slate-600',
+        body: 'text-slate-100 ',
+        secondary: 'text-slate-300 ',
+        tertiary: 'text-slate-400 ',
         // Accent colors - Ember Noir palette
-        ember: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
-        ocean: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
-        sage: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
-        warning: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
-        danger: 'text-danger-400 [html:not(.dark)_&]:text-danger-600',
-        info: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600', // alias for ocean
+        ember: 'text-ember-400 ',
+        ocean: 'text-ocean-400 ',
+        sage: 'text-sage-400 ',
+        warning: 'text-warning-400 ',
+        danger: 'text-danger-400 ',
+        info: 'text-ocean-400 ', // alias for ocean
         // Special variants
-        label: 'text-slate-400 [html:not(.dark)_&]:text-slate-600 uppercase tracking-wider',
+        label: 'text-slate-400 uppercase tracking-wider',
       },
       size: {
         xs: 'text-xs',

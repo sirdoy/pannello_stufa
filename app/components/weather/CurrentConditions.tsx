@@ -62,7 +62,7 @@ interface WeatherDetailCellProps {
  */
 function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, sublabel }: WeatherDetailCellProps) {
   return (
-    <div className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+    <div className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl ">
       <span className={`w-5 h-5 ${iconColor} mb-1.5`}>
         {icon}
       </span>
@@ -97,16 +97,16 @@ export interface CurrentConditionsProps {
  *
  * @example
  * <CurrentConditions
- *   current={{
- *     temperature: 18.5,
- *     feelsLike: 17.2,
- *     humidity: 65,
- *     windSpeed: 12,
- *     condition: { description: 'Parzialmente nuvoloso', code: 2 }
- *   }}
- *   todayForecast={{ tempMax: 22.5, tempMin: 12.3, uvIndex: 5 }}
- *   hourlyTemperatures={[15, 16, 17, 18, 19, 20, 21]}
- *   indoorTemp={20.5}
+ * current={{
+ * temperature: 18.5,
+ * feelsLike: 17.2,
+ * humidity: 65,
+ * windSpeed: 12,
+ * condition: { description: 'Parzialmente nuvoloso', code: 2 }
+ * }}
+ * todayForecast={{ tempMax: 22.5, tempMin: 12.3, uvIndex: 5 }}
+ * hourlyTemperatures={[15, 16, 17, 18, 19, 20, 21]}
+ * indoorTemp={20.5}
  * />
  */
 export function CurrentConditions({ current, todayForecast = null, hourlyTemperatures = null, indoorTemp = null }: CurrentConditionsProps) {
@@ -316,7 +316,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
 
       {/* Sunrise/Sunset row - compact horizontal display */}
       {todayForecast && (todayForecast.sunrise || todayForecast.sunset) && (
-        <div className="flex items-center justify-center gap-6 pt-3 mt-3 border-t border-slate-700/20 [html:not(.dark)_&]:border-slate-200/30">
+        <div className="flex items-center justify-center gap-6 pt-3 mt-3 border-t border-slate-700/20 ">
           {todayForecast.sunrise && (
             <div className="flex items-center gap-2">
               <Sunrise className="w-4 h-4 text-warning-400" />

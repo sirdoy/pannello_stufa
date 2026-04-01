@@ -27,25 +27,25 @@ export const bannerVariants = cva(
     variants: {
       variant: {
         info: [
-          'bg-ocean-500/[0.15] [html:not(.dark)_&]:bg-ocean-500/[0.08]',
-          'border-ocean-500/25 [html:not(.dark)_&]:border-ocean-400/25',
+          'bg-ocean-500/[0.15] ]',
+          'border-ocean-500/25 ',
         ],
         warning: [
-          'bg-warning-500/[0.15] [html:not(.dark)_&]:bg-warning-500/[0.08]',
-          'border-warning-500/25 [html:not(.dark)_&]:border-warning-400/25',
+          'bg-warning-500/[0.15] ]',
+          'border-warning-500/25 ',
         ],
         error: [
-          'bg-danger-500/[0.15] [html:not(.dark)_&]:bg-danger-500/[0.08]',
-          'border-danger-500/25 [html:not(.dark)_&]:border-danger-400/25',
+          'bg-danger-500/[0.15] ]',
+          'border-danger-500/25 ',
         ],
         success: [
-          'bg-sage-500/[0.15] [html:not(.dark)_&]:bg-sage-500/[0.08]',
-          'border-sage-500/25 [html:not(.dark)_&]:border-sage-400/25',
+          'bg-sage-500/[0.15] ]',
+          'border-sage-500/25 ',
         ],
         ember: [
-          'bg-ember-500/[0.15] [html:not(.dark)_&]:bg-ember-500/[0.08]',
-          'border-ember-500/25 [html:not(.dark)_&]:border-ember-400/25',
-          'shadow-ember-glow-sm [html:not(.dark)_&]:shadow-none',
+          'bg-ember-500/[0.15] ]',
+          'border-ember-500/25 ',
+          'shadow-ember-glow-sm ',
         ],
       },
       compact: {
@@ -65,29 +65,29 @@ export const bannerVariants = cva(
  */
 const textVariants = {
   info: {
-    title: 'text-ocean-200 [html:not(.dark)_&]:text-ocean-800',
-    description: 'text-ocean-300 [html:not(.dark)_&]:text-ocean-700',
-    icon: 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600',
+    title: 'text-ocean-200 ',
+    description: 'text-ocean-300 ',
+    icon: 'text-ocean-400 ',
   },
   warning: {
-    title: 'text-warning-200 [html:not(.dark)_&]:text-warning-800',
-    description: 'text-warning-300 [html:not(.dark)_&]:text-warning-700',
-    icon: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
+    title: 'text-warning-200 ',
+    description: 'text-warning-300 ',
+    icon: 'text-warning-400 ',
   },
   error: {
-    title: 'text-danger-200 [html:not(.dark)_&]:text-danger-800',
-    description: 'text-danger-300 [html:not(.dark)_&]:text-danger-700',
-    icon: 'text-danger-400 [html:not(.dark)_&]:text-danger-600',
+    title: 'text-danger-200 ',
+    description: 'text-danger-300 ',
+    icon: 'text-danger-400 ',
   },
   success: {
-    title: 'text-sage-200 [html:not(.dark)_&]:text-sage-800',
-    description: 'text-sage-300 [html:not(.dark)_&]:text-sage-700',
-    icon: 'text-sage-400 [html:not(.dark)_&]:text-sage-600',
+    title: 'text-sage-200 ',
+    description: 'text-sage-300 ',
+    icon: 'text-sage-400 ',
   },
   ember: {
-    title: 'text-ember-200 [html:not(.dark)_&]:text-ember-800',
-    description: 'text-ember-300 [html:not(.dark)_&]:text-ember-700',
-    icon: 'text-ember-400 [html:not(.dark)_&]:text-ember-600',
+    title: 'text-ember-200 ',
+    description: 'text-ember-300 ',
+    icon: 'text-ember-400 ',
   },
 };
 
@@ -132,10 +132,10 @@ export interface BannerProps extends VariantProps<typeof bannerVariants> {
  *
  * @example
  * <Banner
- *   variant="warning"
- *   title="Connection Lost"
- *   description="Attempting to reconnect..."
- *   dismissible
+ * variant="warning"
+ * title="Connection Lost"
+ * description="Attempting to reconnect..."
+ * dismissible
  * />
  */
 export default function Banner({
@@ -261,9 +261,7 @@ export default function Banner({
               'text-slate-400 hover:text-slate-200',
               'hover:bg-white/[0.06]',
               'transition-all duration-200',
-              '[html:not(.dark)_&]:text-slate-500',
-              '[html:not(.dark)_&]:hover:text-slate-700',
-              '[html:not(.dark)_&]:hover:bg-black/[0.04]'
+              ']'
             )}
             aria-label="Dismiss"
           >

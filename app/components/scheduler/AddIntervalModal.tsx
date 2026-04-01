@@ -237,7 +237,7 @@ export default function AddIntervalModal({
           )}
 
           {/* End Time Preview */}
-          <div className="p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-xl">
+          <div className="p-4 bg-slate-800/50 rounded-xl">
             <Text variant="secondary" size="sm" className="mb-1">
               {inputMode === 'duration' ? 'Orario fine calcolato:' : 'Orario fine selezionato:'}
             </Text>

@@ -42,7 +42,7 @@ export function EndpointCard({
       className={`border rounded-lg p-4 transition-colors ${
         hasError
           ? 'border-danger-500/50 bg-danger-500/5'
-          : 'border-slate-700 [html:not(.dark)_&]:border-slate-300 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50'
+          : 'border-slate-700 bg-slate-800/50'
       }`}
     >
       <div className="flex items-start justify-between mb-3">
@@ -55,7 +55,7 @@ export function EndpointCard({
               GET
             </Badge>
             {timing && (
-              <span className="flex items-center gap-1 text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600">
+              <span className="flex items-center gap-1 text-xs text-slate-400">
                 <Clock className="w-3 h-3" />
                 {timing}ms
               </span>
@@ -73,18 +73,18 @@ export function EndpointCard({
           </div>
           {externalUrl && (
             <div className="flex items-center gap-2 mt-1">
-              <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
+              <code className="text-xs text-slate-400 truncate block">
                 {externalUrl}
               </code>
               <button
                 onClick={onCopyUrl}
-                className="flex-shrink-0 p-1 hover:bg-slate-700 [html:not(.dark)_&]:hover:bg-slate-200 rounded transition-colors"
+                className="flex-shrink-0 p-1 hover:bg-slate-700 rounded transition-colors"
                 title="Copy external URL"
               >
                 {isCopied ? (
                   <Check className="w-3 h-3 text-green-500" />
                 ) : (
-                  <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
+                  <Copy className="w-3 h-3 text-slate-400" />
                 )}
               </button>
             </div>
@@ -165,7 +165,7 @@ export function PostEndpointCard({
       className={`border rounded-lg p-4 transition-colors ${
         hasError
           ? 'border-danger-500/50 bg-danger-500/5'
-          : 'border-slate-700 [html:not(.dark)_&]:border-slate-300 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50'
+          : 'border-slate-700 bg-slate-800/50'
       }`}
     >
       <div className="flex items-start justify-between mb-3">
@@ -178,7 +178,7 @@ export function PostEndpointCard({
               POST
             </Badge>
             {timing && (
-              <span className="flex items-center gap-1 text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600">
+              <span className="flex items-center gap-1 text-xs text-slate-400">
                 <Clock className="w-3 h-3" />
                 {timing}ms
               </span>
@@ -196,18 +196,18 @@ export function PostEndpointCard({
           </div>
           {externalUrl && (
             <div className="flex items-center gap-2 mt-1">
-              <code className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-600 truncate block">
+              <code className="text-xs text-slate-400 truncate block">
                 {externalUrl}
               </code>
               <button
                 onClick={onCopyUrl}
-                className="flex-shrink-0 p-1 hover:bg-slate-700 [html:not(.dark)_&]:hover:bg-slate-200 rounded transition-colors"
+                className="flex-shrink-0 p-1 hover:bg-slate-700 rounded transition-colors"
                 title="Copy external URL"
               >
                 {isCopied ? (
                   <Check className="w-3 h-3 text-green-500" />
                 ) : (
-                  <Copy className="w-3 h-3 text-slate-400 [html:not(.dark)_&]:text-slate-500" />
+                  <Copy className="w-3 h-3 text-slate-400" />
                 )}
               </button>
             </div>
@@ -225,7 +225,7 @@ export function PostEndpointCard({
                     <select
                       value={formValues[param.name]}
                       onChange={(e) => handleInputChange(param.name, e.target.value)}
-                      className="flex-1 px-3 py-1.5 border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-lg bg-slate-800 [html:not(.dark)_&]:bg-white text-slate-100 [html:not(.dark)_&]:text-slate-900"
+                      className="flex-1 px-3 py-1.5 border border-slate-600 rounded-lg bg-slate-800 text-slate-100"
                     >
                       {param.options?.map((opt) => (
                         <option key={opt} value={opt}>
@@ -245,7 +245,7 @@ export function PostEndpointCard({
                           param.type === 'number' ? e.target.value : e.target.value
                         )
                       }
-                      className="flex-1 px-3 py-1.5 border border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded-lg bg-slate-800 [html:not(.dark)_&]:bg-white text-slate-100 [html:not(.dark)_&]:text-slate-900"
+                      className="flex-1 px-3 py-1.5 border border-slate-600 rounded-lg bg-slate-800 text-slate-100"
                     />
                   )}
                 </div>
@@ -294,16 +294,16 @@ function JsonDisplay({ data }: JsonDisplayProps) {
     <div className="relative">
       <button
         onClick={handleCopy}
-        className="absolute top-2 right-2 p-1.5 bg-slate-800 [html:not(.dark)_&]:bg-slate-200 hover:bg-slate-700 [html:not(.dark)_&]:hover:bg-slate-300 rounded transition-colors z-10"
+        className="absolute top-2 right-2 p-1.5 bg-slate-800 hover:bg-slate-700 rounded transition-colors z-10"
         title="Copy JSON"
       >
         {copied ? (
           <Check className="w-3.5 h-3.5 text-green-500" />
         ) : (
-          <Copy className="w-3.5 h-3.5 text-slate-400 [html:not(.dark)_&]:text-slate-600" />
+          <Copy className="w-3.5 h-3.5 text-slate-400" />
         )}
       </button>
-      <pre className="mt-2 p-3 bg-slate-900 [html:not(.dark)_&]:bg-slate-900 text-green-400 rounded-lg text-xs overflow-x-auto font-mono">
+      <pre className="mt-2 p-3 bg-slate-900 text-green-400 rounded-lg text-xs overflow-x-auto font-mono">
         {JSON.stringify(data, null, 2)}
       </pre>
     </div>

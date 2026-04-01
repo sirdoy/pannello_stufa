@@ -69,7 +69,7 @@ export default function PropTable({ props = [], className = '' }: PropTableProps
                 <code className="font-mono text-ember-400">
                   {prop.name}
                   {prop.required && (
-                    <span className="text-danger-400 ml-0.5" aria-label="required">
+                    <span role="img" className="text-danger-400 ml-0.5" aria-label="required">
                       *
                     </span>
                   )}

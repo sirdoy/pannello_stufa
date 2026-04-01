@@ -133,7 +133,7 @@ export default function OfflinePage() {
               </Heading>
               <Text variant="tertiary" size="sm">
                 {pendingCommands.length} {pendingCommands.length === 1 ? 'comando' : 'comandi'} in coda.
-                {' '}Verranno eseguiti al ripristino della connessione.
+                {''}Verranno eseguiti al ripristino della connessione.
               </Text>
             </div>
           </div>
@@ -143,7 +143,7 @@ export default function OfflinePage() {
             {pendingCommands.slice(0, 3).map((cmd: any) => (
               <div
                 key={cmd.id}
-                className="flex items-center gap-2 p-2 rounded-lg bg-white/5 dark:bg-white/[0.02]"
+                className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02]"
               >
                 <Text>{cmd.icon}</Text>
                 <Text size="sm" className="flex-1">{cmd.label}</Text>
@@ -163,8 +163,8 @@ export default function OfflinePage() {
       {loading && (
         <Card className="p-8 text-center">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-1/2 mx-auto" />
-            <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4 mx-auto" />
+            <div className="h-8 bg-slate-700 rounded w-1/2 mx-auto" />
+            <div className="h-4 bg-slate-700 rounded w-3/4 mx-auto" />
           </div>
         </Card>
       )}
@@ -199,7 +199,7 @@ export default function OfflinePage() {
                 <Heading level={2} size="lg">Stufa</Heading>
                 <Text variant="tertiary" size="xs">
                   {getCacheAge(stoveState.cachedAt.toISOString())}
-                  {stoveState.isStale && ' (dati non recenti)'}
+                  {stoveState.isStale && '(dati non recenti)'}
                 </Text>
               </div>
             </div>
@@ -212,11 +212,11 @@ export default function OfflinePage() {
           {/* Temperature Grid */}
           <div className="grid grid-cols-3 gap-4">
             {/* Room Temperature */}
-            <div className="text-center p-3 rounded-lg bg-white/5 dark:bg-white/[0.02]">
+            <div className="text-center p-3 rounded-lg bg-white/[0.02]">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Ambiente
               </Text>
-              <Text size="xl" className="text-ember-500 dark:text-ember-400">
+              <Text size="xl" className="text-ember-400">
                 {stoveState.temperature != null
                   ? `${stoveState.temperature}°`
                   : '--'}
@@ -224,7 +224,7 @@ export default function OfflinePage() {
             </div>
 
             {/* Setpoint */}
-            <div className="text-center p-3 rounded-lg bg-white/5 dark:bg-white/[0.02]">
+            <div className="text-center p-3 rounded-lg bg-white/[0.02]">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Target
               </Text>
@@ -236,7 +236,7 @@ export default function OfflinePage() {
             </div>
 
             {/* Exhaust Temperature */}
-            <div className="text-center p-3 rounded-lg bg-white/5 dark:bg-white/[0.02]">
+            <div className="text-center p-3 rounded-lg bg-white/[0.02]">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Fumi
               </Text>
@@ -264,7 +264,7 @@ export default function OfflinePage() {
           {/* Stale Data Warning */}
           {stoveState.isStale && (
             <div className="mt-4 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              <Text size="xs" className="text-amber-600 dark:text-amber-400">
+              <Text size="xs" className="text-amber-400">
                 ⚠️ Dati memorizzati {stoveState.ageMinutes} minuti fa.
                 Lo stato attuale potrebbe essere diverso.
               </Text>
@@ -294,11 +294,11 @@ export default function OfflinePage() {
           {/* Temperature Display */}
           <div className="grid grid-cols-2 gap-4">
             {/* Current Temperature */}
-            <div className="text-center p-4 rounded-lg bg-white/5 dark:bg-white/[0.02]">
+            <div className="text-center p-4 rounded-lg bg-white/[0.02]">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 {thermostatState.roomName || 'Temperatura'}
               </Text>
-              <Text size="xl" className="text-ocean-500 dark:text-ocean-400">
+              <Text size="xl" className="text-ocean-400">
                 {thermostatState.temperature != null
                   ? `${thermostatState.temperature.toFixed(1)}°`
                   : '--'}
@@ -311,7 +311,7 @@ export default function OfflinePage() {
             </div>
 
             {/* Setpoint */}
-            <div className="text-center p-4 rounded-lg bg-white/5 dark:bg-white/[0.02]">
+            <div className="text-center p-4 rounded-lg bg-white/[0.02]">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Target
               </Text>
@@ -331,7 +331,7 @@ export default function OfflinePage() {
           {/* Stale Data Warning */}
           {thermostatState.isStale && (
             <div className="mt-4 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              <Text size="xs" className="text-amber-600 dark:text-amber-400">
+              <Text size="xs" className="text-amber-400">
                 ⚠️ Dati memorizzati {thermostatState.ageMinutes} minuti fa.
               </Text>
             </div>

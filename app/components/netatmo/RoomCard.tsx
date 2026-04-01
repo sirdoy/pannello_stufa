@@ -64,11 +64,11 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
   // Temperature color coding with dark mode
   function getTempColor(temp?: number, setpoint?: number): string {
-    if (!temp || !setpoint) return 'text-slate-400 [html:not(.dark)_&]:text-slate-600';
+    if (!temp || !setpoint) return 'text-slate-400 ';
     const diff = temp - setpoint;
-    if (diff >= 0.5) return 'text-sage-400 [html:not(.dark)_&]:text-sage-600';
-    if (diff <= -1) return 'text-ember-400 [html:not(.dark)_&]:text-ember-600';
-    return 'text-warning-400 [html:not(.dark)_&]:text-warning-700';
+    if (diff >= 0.5) return 'text-sage-400 ';
+    if (diff <= -1) return 'text-ember-400 ';
+    return 'text-warning-400 ';
   }
 
   // Mode badge config with dark mode colors
@@ -191,11 +191,11 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
   // Badge color classes with dark mode
   const badgeColors: Record<string, string> = {
-    ocean: 'bg-ocean-900/40 [html:not(.dark)_&]:bg-ocean-100 text-ocean-300 [html:not(.dark)_&]:text-ocean-700 border-ocean-700 [html:not(.dark)_&]:border-ocean-200',
-    flame: 'bg-flame-900/40 [html:not(.dark)_&]:bg-flame-100 text-flame-300 [html:not(.dark)_&]:text-flame-700 border-flame-700 [html:not(.dark)_&]:border-flame-200',
-    sage: 'bg-sage-900/40 [html:not(.dark)_&]:bg-sage-100 text-sage-300 [html:not(.dark)_&]:text-sage-700 border-sage-700 [html:not(.dark)_&]:border-sage-200',
-    warning: 'bg-warning-900/40 [html:not(.dark)_&]:bg-warning-100 text-warning-300 [html:not(.dark)_&]:text-warning-700 border-warning-700 [html:not(.dark)_&]:border-warning-200',
-    slate: 'bg-slate-800 [html:not(.dark)_&]:bg-slate-100 text-slate-300 [html:not(.dark)_&]:text-slate-600 border-slate-700 [html:not(.dark)_&]:border-slate-200',
+    ocean: 'bg-ocean-900/40 text-ocean-300 border-ocean-700 ',
+    flame: 'bg-flame-900/40 text-flame-300 border-flame-700 ',
+    sage: 'bg-sage-900/40 text-sage-300 border-sage-700 ',
+    warning: 'bg-warning-900/40 text-warning-300 border-warning-700 ',
+    slate: 'bg-slate-800 text-slate-300 border-slate-700 ',
   };
 
   // Get battery/offline/stoveSync status from room
@@ -283,7 +283,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
       {/* Temperature Display - Glass container */}
       {room.setpoint !== undefined ? (
-        <div className="mb-4 p-4 rounded-2xl bg-white/[0.05] [html:not(.dark)_&]:bg-white/[0.08] backdrop-blur-xl border border-white/5 [html:not(.dark)_&]:border-white/10">
+        <div className="mb-4 p-4 rounded-2xl bg-white/[0.05] ] backdrop-blur-xl border border-white/5 ">
           <div className="flex items-baseline gap-2">
             {room.temperature !== undefined ? (
               <>
@@ -300,7 +300,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
                 <Text variant="tertiary" size="xl" as="span" className="mx-1">/</Text>
               </>
             )}
-            <span className="text-xl font-bold text-ocean-400 [html:not(.dark)_&]:text-ocean-600">
+            <span className="text-xl font-bold text-ocean-400 ">
               {room.setpoint.toFixed(1)}°
             </span>
           </div>
@@ -309,7 +309,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
           </Text>
         </div>
       ) : (
-        <div className="mb-4 p-3 bg-warning-900/20 [html:not(.dark)_&]:bg-warning-50/50 border border-warning-700 [html:not(.dark)_&]:border-warning-200 rounded-xl backdrop-blur-sm">
+        <div className="mb-4 p-3 bg-warning-900/20 border border-warning-700 rounded-xl backdrop-blur-sm">
           <Text variant="warning" size="sm" className="flex items-center gap-2">
             <span>⚠️</span>
             <span>Stanza non configurata o fuori linea</span>
@@ -319,7 +319,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-3 bg-danger-900/30 [html:not(.dark)_&]:bg-danger-50/80 border border-danger-700 [html:not(.dark)_&]:border-danger-200 rounded-xl backdrop-blur-sm">
+        <div className="mb-4 p-3 bg-danger-900/30 border border-danger-700 rounded-xl backdrop-blur-sm">
           <Text variant="danger" size="sm">{error}</Text>
         </div>
       )}
@@ -327,7 +327,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
       {/* Temperature Editor */}
       {editingTemp ? (
         <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] ] backdrop-blur-sm border border-white/10">
             <Button
               variant="subtle"
               size="sm"
@@ -337,7 +337,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
               −
             </Button>
             <div className="flex-1 text-center">
-              <span className="text-3xl font-black text-ocean-400 [html:not(.dark)_&]:text-ocean-600">
+              <span className="text-3xl font-black text-ocean-400 ">
                 {targetTemp.toFixed(1)}°
               </span>
             </div>
@@ -405,7 +405,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
       {/* Module Details with Battery Status */}
       {room.roomModules && room.roomModules.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-white/5 [html:not(.dark)_&]:border-white/10">
+        <div className="mt-4 pt-4 border-t border-white/5 ">
           <Text variant="secondary" size="xs" className="mb-2">
             Dispositivi ({room.roomModules.length})
           </Text>
@@ -418,8 +418,8 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
                   key={module.id}
                   className={`flex items-center gap-2 p-2.5 backdrop-blur-sm rounded-xl border transition-all duration-200 ${
                     isModuleOffline
-                      ? 'bg-slate-800/40 [html:not(.dark)_&]:bg-slate-200/60 border-slate-600/30 [html:not(.dark)_&]:border-slate-300'
-                      : 'bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] border-white/5 [html:not(.dark)_&]:border-white/10 hover:bg-white/[0.08] [html:not(.dark)_&]:hover:bg-white/[0.10]'
+                      ? 'bg-slate-800/40 border-slate-600/30 '
+                      : 'bg-white/[0.04] ] border-white/5 hover:bg-white/[0.08] ]'
                   }`}
                 >
                   <span className={`text-lg flex-shrink-0 ${isModuleOffline ? 'opacity-50' : ''}`}>{deviceInfo.icon}</span>
@@ -438,13 +438,13 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
                     )}
                     {/* Show battery OK for non-critical states */}
                     {module.battery_state && !['low', 'very_low'].includes(module.battery_state) && (
-                      <span className="text-xs text-sage-400 [html:not(.dark)_&]:text-sage-600" title={`Batteria: ${module.battery_state}`}>
+                      <span className="text-xs text-sage-400 " title={`Batteria: ${module.battery_state}`}>
                         🔋
                       </span>
                     )}
                     {/* Offline badge */}
                     {isModuleOffline && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium bg-slate-700/60 text-slate-300 border border-slate-600/40 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:border-slate-300">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium bg-slate-700/60 text-slate-300 border border-slate-600/40 ">
                         📵 Offline
                       </span>
                     )}

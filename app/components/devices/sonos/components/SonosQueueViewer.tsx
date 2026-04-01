@@ -23,10 +23,10 @@ export default function SonosQueueViewer({ groupId }: SonosQueueViewerProps) {
   const headerLabel = total > 0 ? `Coda (${total} brani)` : 'Coda';
 
   return (
-    <div className="border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 pt-3">
+    <div className="border-t border-slate-700/50 pt-3">
       <button
         onClick={handleToggle}
-        className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700 transition-colors"
+        className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
       >
         <ListMusic size={14} />
         <span>{headerLabel}</span>
@@ -51,7 +51,7 @@ export default function SonosQueueViewer({ groupId }: SonosQueueViewerProps) {
                   <span className="w-6 text-right text-xs text-slate-500 flex-shrink-0">
                     {item.position}
                   </span>
-                  <span className="flex-1 truncate text-sm text-slate-200 [html:not(.dark)_&]:text-slate-700">
+                  <span className="flex-1 truncate text-sm text-slate-200">
                     {item.title ?? '—'}
                   </span>
                   <span className="text-xs text-slate-400 truncate max-w-[120px]">

@@ -98,7 +98,7 @@ export default function ConfirmDialog({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn [html:not(.dark)_&]:bg-slate-500/40"
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn "
       onClick={onCancel}
       role="dialog"
       aria-modal="true"

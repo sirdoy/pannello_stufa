@@ -179,7 +179,7 @@ export default function StoveCard() {
               />
             )}
 
-            <LastUpdated tsMs={stoveData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
+            <LastUpdated tsMs={stoveData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />
           </div>
         </div>
       </Card>

@@ -1,34 +1,34 @@
 ---
 gsd_state_version: 1.0
-milestone: v17.1
-milestone_name: WebSocket Alignment & Tuya Integration
-status: completed
-stopped_at: Milestone v17.1 archived
-last_updated: "2026-03-30T15:02:00.000Z"
-last_activity: 2026-03-30
+milestone: v18.0
+milestone_name: Dark-Only & Mobile-First
+status: executing
+stopped_at: Completed 150-02-PLAN.md
+last_updated: "2026-04-01T11:20:03.930Z"
+last_activity: 2026-04-01
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 10
-  completed_plans: 10
-  percent: 100
+  total_phases: 6
+  completed_phases: 1
+  total_plans: 5
+  completed_plans: 4
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-30)
+See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Planning next milestone
+**Current focus:** Phase 150 — theme-prefix-cleanup
 
 ## Current Position
 
-Phase: 148 (final)
-Plan: All complete
-Status: Milestone v17.1 shipped
-Last activity: 2026-03-30
+Phase: 150 (theme-prefix-cleanup) — EXECUTING
+Plan: 3 of 3
+Status: Ready to execute
+Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -36,25 +36,20 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed (all milestones): 457
-- v17.0 average: 1.8 plans/phase (11 plans / 6 phases)
+- Total plans completed (all milestones): 467
+- v17.1 average: 2.5 plans/phase (10 plans / 4 phases)
 
 **By Milestone (recent):**
 
 | Milestone | Phases | Plans | Duration |
 |-----------|--------|-------|----------|
-| v15.0 Rooms & Device Registry | 118-125 | 13 | 2 days |
-| v16.0 Sonos, DIRIGERA & Fritz!Box Avanzato | 126-138 | 26 | 4 days |
 | v17.0 WebSocket Real-Time Transport | 139-144 | 11 | 3 days |
-| Phase 145 P02 | 5 | 2 tasks | 2 files |
-| Phase 145 P01 | 76 | 2 tasks | 3 files |
-| Phase 145-ws-type-alignment P03 | 8 | 1 tasks | 2 files |
-| Phase 146 P01 | 7 | 2 tasks | 2 files |
-| Phase 146 P02 | 5 minutes | 2 tasks | 2 files |
-| Phase 147-tuya-infrastructure P01 | 2min | 1 tasks | 2 files |
-| Phase 147-tuya-infrastructure P02 | 525589min | 3 tasks | 12 files |
-| Phase 148-tuya-frontend P01 | 239 | 2 tasks | 7 files |
-| Phase 148-tuya-frontend P03 | 15 | 2 tasks | 7 files |
+| v17.1 WebSocket Alignment & Tuya Integration | 145-148 | 10 | 3 days |
+| v18.0 Dark-Only & Mobile-First | 149-154 | TBD | in progress |
+| Phase 149 P01 | 414 | 2 tasks | 9 files |
+| Phase 149 P02 | 5 | 2 tasks | 1 files |
+| Phase 150 P01 | 640s | 2 tasks | 77 files |
+| Phase 150 P02 | 16 | 2 tasks | 92 files |
 
 ## Accumulated Context
 
@@ -62,32 +57,18 @@ Progress: [░░░░░░░░░░] 0%
 
 See PROJECT.md Key Decisions table for full history.
 
-Key context for v17.1:
+Recent decisions affecting v18.0:
 
-- [Phase 144]: useStoveData derives lastUpdatedAt from existing lastPollAt (Date->ms); useNetworkData aliases lastUpdated as lastUpdatedAt for backward compat
-- [Phase 143]: adaptNetatmoWsPayload is standalone pure function; WS handleMessage does not call staleness.update()
-- [Phase 141]: Conditional WS subscription guard (if !isWsConnected return) — prevents spurious subscribe when CLOSED
-- [Phase 141]: capability_tier defaults to color for WS-sourced lights (no tier field in WS payload)
-- v17.1 context: WSTYPE-* changes are the foundation — phases 146-148 depend on TopicDataMap having raspi+tuya entries
-- v17.1 context: UX-03 == RASPI-03 (same requirement, counted once in Phase 146)
-- v17.1 context: Tuya infrastructure (Phase 147) can be planned in parallel with Raspi migration (Phase 146) — no dependency between them
-- [Phase 145]: Add fields to base interfaces only — SonosDeviceDetailResponse, ContactSensor, MotionSensor inherit automatically
-- [Phase 145]: custom_name on DirigeraSensor kept as string (non-nullable) to avoid breaking existing consumers
-- [Phase 145]: TuyaPlugMutation extends TuyaPlug (inheritance) to avoid field duplication
-- [Phase 145]: custom_name and device_type added as optional fields to HueLight and ThermorossiStatusResponse to avoid breaking existing consumers
-- [Phase 145]: HueData.lights stays HueLight[] | null array (D-01 locked) — useLightsData iterates as array
-- [Phase 145]: NetatmoData promoted from type alias to interface with index signature for backward compat
-- [Phase 145]: Inline freshness unions where proxy type width differs from WS envelope width
-- [Phase 146]: Inline WS payload mapping in handleMessage for Raspi (no standalone adapter) — health computed inline via computeRaspiHealth
-- [Phase 146]: LastUpdated placed outside data conditional in RaspiCard — renders when tsMs is set regardless of data state, handles null gracefully
-- [Phase 147-01]: setState/setTimer return TuyaPlugMutation (200 pass-through) not 202 Accepted — Tuya proxy confirms command synchronously
-- [Phase 147-01]: getHistory: Object.entries filter approach to omit undefined params before URLSearchParams construction
-- [Phase 147-tuya-infrastructure]: Health route uses withErrorHandler (not withAuthAndErrorHandler) per D-04 — no auth required for connectivity checks
-- [Phase 147-tuya-infrastructure]: POST state/timer routes return 200 (not 202) — Tuya proxy confirms commands synchronously via data_confirmed field
-- [Phase 148-01]: useTuyaData null-plugs WS guard sets stale=true without crashing (consistent with FritzBox pattern)
-- [Phase 148-01]: useTuyaCommands uses plain fetch (not useRetryableCommand) matching simpler hooks like useDirigeraCommands
-- [Phase 148-tuya-frontend]: TuyaEnergyChart uses next/dynamic with ssr:false matching existing Recharts pattern
-- [Phase 148-tuya-frontend]: TuyaPlugCard countdown uses two useEffects: one sync from plug.countdown_s (WS), one interval tick
+- Theme removal is complete (no light theme preserved) — explicit user request
+- Tablet design deferred to future milestone (custom 900px breakpoint already defined)
+- Scope is pure CSS/layout — no new features or animation redesign
+- [Phase 149]: Hardcode dark class on html element permanently — no runtime theme switching
+- [Phase 149]: Replace inline localStorage theme script with static meta tag (#0f172a)
+- [Phase 149]: Remove all html:not(.dark) blocks rather than converting to dark: prefix utilities — simpler and eliminates dead code
+- [Phase 149]: Remove theme-switching transition entirely — 200ms overhead on every element eliminated
+- [Phase 150]: Two-stage approach for theme prefix removal: global regex for html:not(.dark) (multiline-safe), per-line char-scanner for dark: with fallback global pass
+- [Phase 150]: lib/version.ts dark: occurrences are changelog text strings — left unchanged to preserve data integrity
+- [Phase 150]: useLightsData.ts 'dark: {}' is a TypeScript object key in adaptiveClasses record — not a CSS prefix, left unchanged
 
 ### Pending Todos
 
@@ -109,6 +90,6 @@ None.
 
 ## Session Continuity
 
-Last activity: 2026-03-31 - Completed quick task 260331-eyf: Fix broken menu links
-Stopped at: Completed quick task 260331-eyf
+Last activity: 2026-04-01 - Roadmap created for v18.0
+Stopped at: Completed 150-02-PLAN.md
 Resume file: None

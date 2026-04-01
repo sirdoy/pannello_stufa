@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils/cn';
 export const progressVariants = cva(
   [
     'relative overflow-hidden rounded-full',
-    'bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200/60',
+    'bg-slate-700/50 ',
   ],
   {
     variants: {

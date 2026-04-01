@@ -16,16 +16,16 @@ import { cn } from '@/lib/utils/cn';
  * @example
  * // Simple usage
  * <RadioGroup value={mode} onValueChange={setMode}>
- *   <RadioGroupItem value="auto" label="Automatic" />
- *   <RadioGroupItem value="manual" label="Manual" />
- *   <RadioGroupItem value="semi" label="Semi-Manual" />
+ * <RadioGroupItem value="auto" label="Automatic" />
+ * <RadioGroupItem value="manual" label="Manual" />
+ * <RadioGroupItem value="semi" label="Semi-Manual" />
  * </RadioGroup>
  *
  * @example
  * // With compound syntax
  * <RadioGroup.Root value={selected} onValueChange={setSelected}>
- *   <RadioGroup.Item value="a" label="Option A" />
- *   <RadioGroup.Item value="b" label="Option B" />
+ * <RadioGroup.Item value="a" label="Option A" />
+ * <RadioGroup.Item value="b" label="Option B" />
  * </RadioGroup.Root>
  */
 
@@ -51,7 +51,6 @@ const radioItemVariants = cva(
     // Focus ring - ember glow
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-    '[html:not(.dark)_&]:focus-visible:ring-offset-white',
     // Disabled state
     'disabled:cursor-not-allowed disabled:opacity-50',
     'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
@@ -61,15 +60,15 @@ const radioItemVariants = cva(
       variant: {
         ember: [
           'border-slate-500 data-[state=checked]:border-ember-500',
-          '[html:not(.dark)_&]:border-slate-400 [html:not(.dark)_&]:data-[state=checked]:border-ember-600',
+          ' ]:border-ember-600',
         ],
         ocean: [
           'border-slate-500 data-[state=checked]:border-ocean-500',
-          '[html:not(.dark)_&]:border-slate-400 [html:not(.dark)_&]:data-[state=checked]:border-ocean-600',
+          ' ]:border-ocean-600',
         ],
         sage: [
           'border-slate-500 data-[state=checked]:border-sage-500',
-          '[html:not(.dark)_&]:border-slate-400 [html:not(.dark)_&]:data-[state=checked]:border-sage-600',
+          ' ]:border-sage-600',
         ],
       },
       size: {
@@ -90,9 +89,9 @@ const radioIndicatorVariants = cva(
   {
     variants: {
       variant: {
-        ember: 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600',
-        ocean: 'bg-ocean-500 [html:not(.dark)_&]:bg-ocean-600',
-        sage: 'bg-sage-500 [html:not(.dark)_&]:bg-sage-600',
+        ember: 'bg-ember-500 ',
+        ocean: 'bg-ocean-500 ',
+        sage: 'bg-sage-500 ',
       },
       size: {
         sm: 'h-2 w-2',
@@ -175,7 +174,7 @@ const RadioGroupItem = forwardRef<HTMLButtonElement, RadioGroupItemProps>(({
           htmlFor={id}
           className={cn(
             'text-base font-medium cursor-pointer select-none',
-            'text-slate-200 [html:not(.dark)_&]:text-slate-700',
+            'text-slate-200 ',
             props.disabled && 'opacity-50 cursor-not-allowed'
           )}
         >

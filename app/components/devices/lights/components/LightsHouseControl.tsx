@@ -37,7 +37,7 @@ export default function LightsHouseControl({
   }
 
   return (
-    <div className="mb-4 p-4 rounded-xl bg-slate-800/30 border border-slate-700/50 [html:not(.dark)_&]:bg-slate-100/80 [html:not(.dark)_&]:border-slate-200">
+    <div className="mb-4 p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-xl">🏠</span>

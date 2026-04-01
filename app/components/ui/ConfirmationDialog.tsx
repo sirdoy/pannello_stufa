@@ -34,32 +34,32 @@ export interface ConfirmationDialogProps extends ComponentPropsWithoutRef<typeof
  * @example
  * // Destructive action with danger variant
  * <ConfirmationDialog
- *   isOpen={showDelete}
- *   onClose={() => setShowDelete(false)}
- *   onConfirm={handleDelete}
- *   title="Delete device?"
- *   description="This will permanently remove 'Living Room Thermostat'."
- *   confirmLabel="Delete Device"
- *   variant="danger"
- *   loading={isDeleting}
+ * isOpen={showDelete}
+ * onClose={() => setShowDelete(false)}
+ * onConfirm={handleDelete}
+ * title="Delete device?"
+ * description="This will permanently remove 'Living Room Thermostat'."
+ * confirmLabel="Delete Device"
+ * variant="danger"
+ * loading={isDeleting}
  * />
  *
  * @example
  * // Non-destructive confirmation
  * <ConfirmationDialog
- *   isOpen={showSave}
- *   onClose={() => setShowSave(false)}
- *   onConfirm={handleSave}
- *   title="Save changes?"
- *   description="Your changes will be applied immediately."
- *   confirmLabel="Save"
+ * isOpen={showSave}
+ * onClose={() => setShowSave(false)}
+ * onConfirm={handleSave}
+ * title="Save changes?"
+ * description="Your changes will be applied immediately."
+ * confirmLabel="Save"
  * />
  */
 
 // CVA variants for overlay
 const overlayVariants = cva([
   'fixed inset-0 z-50',
-  'bg-slate-950/70 [html:not(.dark)_&]:bg-slate-900/40',
+  'bg-slate-950/70 ',
   'backdrop-blur-md',
   'data-[state=open]:animate-fade-in',
   'data-[state=closed]:animate-fade-out',
@@ -68,9 +68,9 @@ const overlayVariants = cva([
 // CVA variants for content
 const contentVariants = cva([
   'fixed z-50 p-6',
-  'bg-slate-900/95 [html:not(.dark)_&]:bg-white/95',
+  'bg-slate-900/95 ',
   'backdrop-blur-3xl',
-  'border border-slate-700/50 [html:not(.dark)_&]:border-slate-200',
+  'border border-slate-700/50 ',
   'shadow-card-elevated',
   'focus:outline-none',
   'overflow-y-auto',
@@ -102,10 +102,6 @@ const confirmButtonVariants = cva([], {
         'border-2 border-danger-500/40',
         'hover:bg-danger-500/10',
         'hover:border-danger-500/60',
-        '[html:not(.dark)_&]:text-danger-600',
-        '[html:not(.dark)_&]:border-danger-500/50',
-        '[html:not(.dark)_&]:hover:bg-danger-500/10',
-        '[html:not(.dark)_&]:hover:border-danger-500/70',
       ],
     },
   },
@@ -227,7 +223,7 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
               <h2
                 className={cn(
                   'text-lg font-display font-semibold',
-                  'text-slate-100 [html:not(.dark)_&]:text-slate-900'
+                  'text-slate-100 '
                 )}
               >
                 {title}
@@ -236,7 +232,7 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
               <DialogPrimitive.Description
                 className={cn(
                   'mt-2 text-sm',
-                  'text-slate-400 [html:not(.dark)_&]:text-slate-600'
+                  'text-slate-400 '
                 )}
               >
                 {description}

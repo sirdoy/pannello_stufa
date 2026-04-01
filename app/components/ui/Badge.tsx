@@ -31,54 +31,36 @@ export const badgeVariants = cva(
           'bg-ember-500/15',
           'border-ember-400/25',
           'text-ember-300',
-          '[html:not(.dark)_&]:bg-ember-500/10',
-          '[html:not(.dark)_&]:border-ember-400/30',
-          '[html:not(.dark)_&]:text-ember-700',
         ],
         // Sage - Success/healthy state
         sage: [
           'bg-sage-500/15',
           'border-sage-400/25',
           'text-sage-300',
-          '[html:not(.dark)_&]:bg-sage-500/10',
-          '[html:not(.dark)_&]:border-sage-400/30',
-          '[html:not(.dark)_&]:text-sage-700',
         ],
         // Ocean - Info/starting state
         ocean: [
           'bg-ocean-500/15',
           'border-ocean-400/25',
           'text-ocean-300',
-          '[html:not(.dark)_&]:bg-ocean-500/10',
-          '[html:not(.dark)_&]:border-ocean-400/30',
-          '[html:not(.dark)_&]:text-ocean-700',
         ],
         // Warning - Standby/waiting state
         warning: [
           'bg-warning-500/15',
           'border-warning-400/25',
           'text-warning-300',
-          '[html:not(.dark)_&]:bg-warning-500/10',
-          '[html:not(.dark)_&]:border-warning-400/30',
-          '[html:not(.dark)_&]:text-warning-700',
         ],
         // Danger - Error state
         danger: [
           'bg-danger-500/15',
           'border-danger-400/25',
           'text-danger-300',
-          '[html:not(.dark)_&]:bg-danger-500/10',
-          '[html:not(.dark)_&]:border-danger-400/30',
-          '[html:not(.dark)_&]:text-danger-700',
         ],
         // Neutral - Off/inactive state
         neutral: [
           'bg-slate-500/10',
           'border-slate-400/20',
           'text-slate-400',
-          '[html:not(.dark)_&]:bg-slate-500/8',
-          '[html:not(.dark)_&]:border-slate-400/25',
-          '[html:not(.dark)_&]:text-slate-600',
         ],
       },
       size: {

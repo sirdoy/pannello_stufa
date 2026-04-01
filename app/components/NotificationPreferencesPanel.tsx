@@ -136,7 +136,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
         </div>
       </div>
 
-      <div className="border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 mt-4">
+      <div className="border-t border-slate-700/50 mt-4">
         {/* Master Toggle */}
         {masterField && (
           <PreferenceToggle
@@ -150,7 +150,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
 
         {/* Sub fields (only visible when master is enabled) */}
         {isEnabled && subFields.length > 0 && (
-          <div className="ml-4 pl-4 border-l-2 border-slate-700/50 [html:not(.dark)_&]:border-slate-200 space-y-1">
+          <div className="ml-4 pl-4 border-l-2 border-slate-700/50 space-y-1">
             {subFields.map((field: any) => (
               <PreferenceToggle
                 key={field.key}

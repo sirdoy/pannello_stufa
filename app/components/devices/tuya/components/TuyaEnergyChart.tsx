@@ -14,7 +14,7 @@ const TuyaEnergyChartInner = dynamic(() => import('./TuyaEnergyChartInner'), {
 const activeClass =
   'text-xs rounded-md px-3 py-1 bg-amber-500/80 text-white transition-colors';
 const inactiveClass =
-  'text-xs rounded-md px-3 py-1 bg-slate-700/50 text-slate-400 hover:bg-slate-700 transition-colors [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-500';
+  'text-xs rounded-md px-3 py-1 bg-slate-700/50 text-slate-400 hover:bg-slate-700 transition-colors';
 
 interface TuyaEnergyChartProps {
   deviceId: string;
@@ -57,7 +57,7 @@ export default function TuyaEnergyChart({ deviceId }: TuyaEnergyChartProps) {
       )}
 
       {!loading && error && (
-        <p className="text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500">
+        <p className="text-sm text-slate-400">
           {error}
         </p>
       )}
@@ -70,7 +70,7 @@ export default function TuyaEnergyChart({ deviceId }: TuyaEnergyChartProps) {
       )}
 
       {!loading && !error && data && data.items.length === 0 && (
-        <p className="text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500">
+        <p className="text-sm text-slate-400">
           Nessun dato disponibile
         </p>
       )}

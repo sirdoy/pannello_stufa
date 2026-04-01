@@ -126,7 +126,7 @@ export default function BatteryWarning({
     const name = module.name || module.id?.substring(0, 8) || 'Sconosciuto';
     const stateLabel = module.battery_state ? getBatteryLabel(module.battery_state) : 'Sconosciuto';
     return `${typeName} "${name}" (${stateLabel})`;
-  }).join(', ');
+  }).join(',');
 
   const description = hasCriticalBattery
     ? `Sostituire le batterie immediatamente: ${deviceList}`
@@ -164,8 +164,8 @@ export function BatteryBadge({ batteryState, showLabel = false }: BatteryBadgePr
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
         isCritical
-          ? 'bg-danger-900/40 text-danger-300 border border-danger-500/40 [html:not(.dark)_&]:bg-danger-50 [html:not(.dark)_&]:text-danger-700 [html:not(.dark)_&]:border-danger-200'
-          : 'bg-warning-900/40 text-warning-300 border border-warning-500/40 [html:not(.dark)_&]:bg-warning-50 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-200'
+          ? 'bg-danger-900/40 text-danger-300 border border-danger-500/40'
+          : 'bg-warning-900/40 text-warning-300 border border-warning-500/40'
       }`}
     >
       <span>{icon}</span>
@@ -201,7 +201,7 @@ export function ModuleBatteryList({ modules = [] }: ModuleBatteryListProps) {
         {batteryModules.map(module => (
           <div
             key={module.id}
-            className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-slate-800/30 [html:not(.dark)_&]:bg-slate-100/50"
+            className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-slate-800/30"
           >
             <div className="flex items-center gap-2">
               <span className="text-sm">
@@ -217,13 +217,13 @@ export function ModuleBatteryList({ modules = [] }: ModuleBatteryListProps) {
               )}
               {!module.reachable && (
                 <span
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-700/40 text-slate-400 border border-slate-600/40 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:border-slate-300"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-700/40 text-slate-400 border border-slate-600/40"
                 >
                   Offline
                 </span>
               )}
               {module.battery_state && !['low', 'very_low'].includes(module.battery_state) && (
-                <span className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500">
+                <span className="text-xs text-slate-400">
                   {getBatteryIcon(module.battery_state)} {getBatteryLabel(module.battery_state)}
                 </span>
               )}

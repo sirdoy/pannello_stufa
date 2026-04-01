@@ -26,9 +26,6 @@ const inputVariants = cva(
     'transition-all duration-200',
     'disabled:opacity-50 disabled:cursor-not-allowed',
     // Light mode base
-    '[html:not(.dark)_&]:bg-white/80',
-    '[html:not(.dark)_&]:text-slate-900',
-    '[html:not(.dark)_&]:placeholder:text-slate-400'
   ),
   {
     variants: {
@@ -36,7 +33,6 @@ const inputVariants = cva(
         default: cn(
           'border border-slate-700/50',
           'focus-visible:ring-ember-500/50 focus-visible:border-ember-500/60',
-          '[html:not(.dark)_&]:border-slate-300/60'
         ),
         error: cn(
           'border border-danger-500',
@@ -183,7 +179,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           className={cn(
             'block text-sm font-semibold mb-2 font-display',
             'text-slate-300',
-            '[html:not(.dark)_&]:text-slate-700'
           )}
         >
           {icon && <span className="mr-1.5">{icon}</span>}
@@ -227,9 +222,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                   'text-slate-400 hover:text-slate-200',
                   'hover:bg-slate-700/50',
                   'transition-colors duration-150',
-                  '[html:not(.dark)_&]:text-slate-500',
-                  '[html:not(.dark)_&]:hover:text-slate-700',
-                  '[html:not(.dark)_&]:hover:bg-slate-200/50'
                 )}
               >
                 <X className="h-4 w-4" />
@@ -271,7 +263,6 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           <div
             className={cn(
               'text-sm text-slate-500 ml-auto',
-              '[html:not(.dark)_&]:text-slate-400'
             )}
           >
             {(currentValue as string)?.length || 0}/{maxLength}

@@ -24,7 +24,7 @@ export default function SonosTransportControls({
 }: SonosTransportControlsProps) {
   const isPlaying = playback?.transport_state === 'PLAYING';
   const buttonClass =
-    'p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-200 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:hover:bg-slate-300 [html:not(.dark)_&]:text-slate-700';
+    'p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-200';
 
   return (
     <div className="flex items-center gap-2">

@@ -23,7 +23,7 @@ export const spinnerVariants = cva(
         ember: 'text-ember-500',
         white: 'text-white',
         current: 'text-current',
-        muted: 'text-slate-400 [html:not(.dark)_&]:text-slate-500',
+        muted: 'text-slate-400 ',
       },
     },
     defaultVariants: {

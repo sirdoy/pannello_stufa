@@ -28,8 +28,6 @@ export default function Footer({ className = '', ...props }: FooterProps) {
           'bg-slate-900/95 backdrop-blur-xl',
           'border-t border-slate-700/50',
           'relative z-10',
-          '[html:not(.dark)_&]:bg-white/95',
-          '[html:not(.dark)_&]:border-slate-200/50',
           className,
         )}
         {...props}
@@ -55,16 +53,16 @@ export default function Footer({ className = '', ...props }: FooterProps) {
                   'rounded-xl sm:rounded-none',
                   'bg-slate-800/50 sm:bg-transparent',
                   'hover:bg-slate-700/50 sm:hover:bg-transparent',
-                  '[html:not(.dark)_&]:bg-slate-100/50 [html:not(.dark)_&]:sm:bg-transparent',
-                  '[html:not(.dark)_&]:hover:bg-slate-200/50 [html:not(.dark)_&]:sm:hover:bg-transparent',
+                  ' ',
+                  ' ',
                   'transition-all duration-200',
                   'active:scale-95 sm:active:scale-100',
                   'touch-manipulation',
                   'relative',
                 )}
               >
-                <Text variant="tertiary" size="sm" as="span" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors">Versione</Text>
-                <Text variant="body" size="base" as="strong" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors">
+                <Text variant="tertiary" size="sm" as="span" className="group-hover:text-ember-400 transition-colors">Versione</Text>
+                <Text variant="body" size="base" as="strong" className="group-hover:text-ember-400 transition-colors">
                   {APP_VERSION}
                 </Text>
                 <span className="text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">

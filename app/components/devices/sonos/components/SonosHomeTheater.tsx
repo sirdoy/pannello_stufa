@@ -73,7 +73,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
     `text-xs px-3 py-1 rounded-md transition-colors ${
       active
         ? 'bg-amber-500/80 text-white'
-        : 'bg-slate-700 text-slate-400 hover:bg-slate-600 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-500'
+        : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
     }`;
 
   const formatValue = (v: number) => (v >= 0 ? `+${v}` : `${v}`);
@@ -82,7 +82,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
     <div className="mt-2">
       <button
         onClick={() => setIsExpanded(prev => !prev)}
-        className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700 transition-colors"
+        className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
         aria-label="Home Theater"
       >
         <span>Home Theater</span>
@@ -132,7 +132,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
           {/* Sub gain slider — visible only when sub_enabled */}
           {htData.sub_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 w-24 flex-shrink-0">
+              <span className="text-xs text-slate-400 w-24 flex-shrink-0">
                 Guadagno Sub
               </span>
               <input
@@ -141,7 +141,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
                 max={15}
                 value={localSubGain}
                 onChange={handleSubGainChange}
-                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 accent-emerald-500"
+                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500"
                 aria-label="Guadagno Sub"
               />
               <span className="text-xs text-slate-400 min-w-[28px] text-right">
@@ -153,7 +153,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
           {/* Surround TV volume slider — visible only when surround_enabled */}
           {htData.surround_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 w-24 flex-shrink-0">
+              <span className="text-xs text-slate-400 w-24 flex-shrink-0">
                 Volume Surround TV
               </span>
               <input
@@ -162,7 +162,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
                 max={15}
                 value={localSurroundTv}
                 onChange={handleSurroundTvChange}
-                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 accent-emerald-500"
+                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500"
                 aria-label="Volume Surround TV"
               />
               <span className="text-xs text-slate-400 min-w-[28px] text-right">
@@ -174,7 +174,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
           {/* Surround music volume slider — visible only when surround_enabled */}
           {htData.surround_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500 w-24 flex-shrink-0">
+              <span className="text-xs text-slate-400 w-24 flex-shrink-0">
                 Volume Surround Musica
               </span>
               <input
@@ -183,7 +183,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
                 max={15}
                 value={localSurroundMusic}
                 onChange={handleSurroundMusicChange}
-                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 [html:not(.dark)_&]:bg-slate-200 accent-emerald-500"
+                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500"
                 aria-label="Volume Surround Musica"
               />
               <span className="text-xs text-slate-400 min-w-[28px] text-right">

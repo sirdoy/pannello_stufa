@@ -362,12 +362,12 @@ function NetatmoContent() {
 
               {/* Module Battery Status List */}
               {modulesWithBattery && modulesWithBattery.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+                <div className="mt-4 pt-4 border-t border-slate-700/50">
                   <ModuleBatteryList modules={modulesWithBattery as Module[]} />
                 </div>
               )}
 
-              <div className="mt-4 pt-4 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+              <div className="mt-4 pt-4 border-t border-slate-700/50">
                 <Button
                   variant="subtle"
                   onClick={handleRefresh}

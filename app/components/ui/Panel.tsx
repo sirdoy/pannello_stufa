@@ -61,7 +61,7 @@ export default function Panel({
     >
       {/* Header (se presente title o headerAction) */}
       {(title || headerAction) && (
-        <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-700/50 [html:not(.dark)_&]:border-slate-200">
+        <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-700/50 ">
           {/* Title & Description */}
           {title && (
             <div>

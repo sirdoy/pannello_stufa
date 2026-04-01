@@ -47,9 +47,9 @@ function RoomSelector({ rooms, selectedRoomId, onChange, disabled }: RoomSelecto
         onChange={(e) => onChange(e.target.value || null)}
         disabled={disabled}
         aria-label="Stanza da monitorare"
-        className="w-full px-4 py-3 rounded-xl bg-slate-800/60 [html:not(.dark)_&]:bg-white/80
-                   border border-white/10 [html:not(.dark)_&]:border-slate-200
-                   text-white [html:not(.dark)_&]:text-slate-900
+        className="w-full px-4 py-3 rounded-xl bg-slate-800/60 
+                   border border-white/10 
+                   text-white 
                    focus:ring-2 focus:ring-ember-500/50 focus:border-ember-500
                    disabled:opacity-50 disabled:cursor-not-allowed
                    transition-all"
@@ -118,7 +118,7 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
           disabled={disabled}
           aria-label="Setpoint target"
           className="w-full h-2 rounded-lg appearance-none cursor-pointer
-                     bg-slate-700 [html:not(.dark)_&]:bg-slate-200
+                     bg-slate-700 
                      accent-ember-500
                      disabled:opacity-50 disabled:cursor-not-allowed"
         />
@@ -134,9 +134,9 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
           type="button"
           onClick={handleDecrement}
           disabled={disabled || value <= MIN_TEMP}
-          className="w-10 h-10 rounded-full bg-slate-700/60 [html:not(.dark)_&]:bg-slate-200
-                     text-white [html:not(.dark)_&]:text-slate-900
-                     hover:bg-slate-600 [html:not(.dark)_&]:hover:bg-slate-300
+          className="w-10 h-10 rounded-full bg-slate-700/60 
+                     text-white 
+                     hover:bg-slate-600 
                      disabled:opacity-50 disabled:cursor-not-allowed
                      transition-colors text-xl font-bold"
         >
@@ -153,9 +153,9 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
             disabled={disabled}
             aria-label="Setpoint target in gradi"
             className="w-24 px-3 py-2 text-center text-2xl font-bold rounded-xl
-                       bg-slate-800/60 [html:not(.dark)_&]:bg-white/80
+                       bg-slate-800/60 
                        border border-ember-500/50
-                       text-ember-400 [html:not(.dark)_&]:text-ember-600
+                       text-ember-400 
                        focus:ring-2 focus:ring-ember-500/50
                        disabled:opacity-50 disabled:cursor-not-allowed
                        [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
@@ -168,9 +168,9 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
           type="button"
           onClick={handleIncrement}
           disabled={disabled || value >= MAX_TEMP}
-          className="w-10 h-10 rounded-full bg-slate-700/60 [html:not(.dark)_&]:bg-slate-200
-                     text-white [html:not(.dark)_&]:text-slate-900
-                     hover:bg-slate-600 [html:not(.dark)_&]:hover:bg-slate-300
+          className="w-10 h-10 rounded-full bg-slate-700/60 
+                     text-white 
+                     hover:bg-slate-600 
                      disabled:opacity-50 disabled:cursor-not-allowed
                      transition-colors text-xl font-bold"
         >
@@ -207,11 +207,11 @@ const POWER_LABELS: Record<number, string> = {
  * Color class for each power level
  */
 const POWER_COLORS: Record<number, string> = {
-  1: 'text-blue-400 [html:not(.dark)_&]:text-blue-600',
-  2: 'text-cyan-400 [html:not(.dark)_&]:text-cyan-600',
-  3: 'text-yellow-400 [html:not(.dark)_&]:text-yellow-600',
-  4: 'text-orange-400 [html:not(.dark)_&]:text-orange-600',
-  5: 'text-red-400 [html:not(.dark)_&]:text-red-600',
+  1: 'text-blue-400 ',
+  2: 'text-cyan-400 ',
+  3: 'text-yellow-400 ',
+  4: 'text-orange-400 ',
+  5: 'text-red-400 ',
 };
 
 /**
@@ -248,8 +248,8 @@ function PidPowerPreview({ powerLevel }: PidPowerPreviewProps) {
               key={level}
               className={`w-4 rounded-sm transition-all ${
                 level <= powerLevel
-                  ? 'bg-ember-500 [html:not(.dark)_&]:bg-ember-600'
-                  : 'bg-slate-700/50 [html:not(.dark)_&]:bg-slate-300/50'
+                  ? 'bg-ember-500 '
+                  : 'bg-slate-700/50 '
               }`}
               style={{ height: `${8 + level * 4}px` }}
             />
@@ -284,7 +284,7 @@ interface TemperatureDisplayProps {
 function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }: TemperatureDisplayProps) {
   if (!room) {
     return (
-      <div className="p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
+      <div className="p-4 rounded-xl bg-white/[0.04] ] backdrop-blur-sm border border-white/10">
         <Text variant="tertiary" size="sm">
           Seleziona una stanza per vedere la temperatura
         </Text>
@@ -299,17 +299,17 @@ function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }: TemperatureDis
   const previewPower = computePidPreview(room.temperature, targetSetpoint, kp, ki, kd);
 
   return (
-    <div className="p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-white/10">
+    <div className="p-4 rounded-xl bg-white/[0.04] ] backdrop-blur-sm border border-white/10">
       <div className="flex items-center justify-between">
         <div>
           <Text variant="secondary" size="sm">Temperatura attuale</Text>
-          <Text className="text-2xl text-white [html:not(.dark)_&]:text-slate-900">
+          <Text className="text-2xl text-white ">
             {room.temperature?.toFixed(1) || '--'}°C
           </Text>
         </div>
         <div className="text-right">
           <Text variant="secondary" size="sm">Target PID</Text>
-          <Text className="text-2xl text-ember-400 [html:not(.dark)_&]:text-ember-600">
+          <Text className="text-2xl text-ember-400 ">
             {targetSetpoint?.toFixed(1) || '--'}°C
           </Text>
         </div>
@@ -358,7 +358,7 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center justify-between bg-white/[0.02] [html:not(.dark)_&]:bg-slate-50/50 hover:bg-white/[0.04] transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
       >
         <Text size="sm">
           Impostazioni avanzate (PID)
@@ -386,9 +386,9 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
                 value={kp}
                 onChange={(e) => onChange('kp', parseFloat(e.target.value) || 0)}
                 disabled={disabled}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 [html:not(.dark)_&]:bg-white/80
-                           border border-white/10 [html:not(.dark)_&]:border-slate-200
-                           text-white [html:not(.dark)_&]:text-slate-900 text-sm
+                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 
+                           border border-white/10 
+                           text-white text-sm
                            focus:ring-2 focus:ring-ember-500/50
                            disabled:opacity-50"
               />
@@ -405,9 +405,9 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
                 value={ki}
                 onChange={(e) => onChange('ki', parseFloat(e.target.value) || 0)}
                 disabled={disabled}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 [html:not(.dark)_&]:bg-white/80
-                           border border-white/10 [html:not(.dark)_&]:border-slate-200
-                           text-white [html:not(.dark)_&]:text-slate-900 text-sm
+                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 
+                           border border-white/10 
+                           text-white text-sm
                            focus:ring-2 focus:ring-ember-500/50
                            disabled:opacity-50"
               />
@@ -424,9 +424,9 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
                 value={kd}
                 onChange={(e) => onChange('kd', parseFloat(e.target.value) || 0)}
                 disabled={disabled}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 [html:not(.dark)_&]:bg-white/80
-                           border border-white/10 [html:not(.dark)_&]:border-slate-200
-                           text-white [html:not(.dark)_&]:text-slate-900 text-sm
+                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 
+                           border border-white/10 
+                           text-white text-sm
                            focus:ring-2 focus:ring-ember-500/50
                            disabled:opacity-50"
               />
@@ -653,7 +653,7 @@ export default function PidAutomationPanel() {
       )}
 
       {/* Master Toggle */}
-      <div className="mb-6 p-4 rounded-xl bg-white/[0.05] [html:not(.dark)_&]:bg-white/[0.08] backdrop-blur-xl border border-white/5 [html:not(.dark)_&]:border-white/10">
+      <div className="mb-6 p-4 rounded-xl bg-white/[0.05] ] backdrop-blur-xl border border-white/5 ">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <Text className="mb-1">
@@ -687,7 +687,7 @@ export default function PidAutomationPanel() {
           </div>
 
           {/* Manual Setpoint Input */}
-          <div className="mb-6 p-4 rounded-xl bg-white/[0.04] [html:not(.dark)_&]:bg-white/[0.06] backdrop-blur-sm border border-ember-500/30">
+          <div className="mb-6 p-4 rounded-xl bg-white/[0.04] ] backdrop-blur-sm border border-ember-500/30">
             <ManualSetpointInput
               value={manualSetpoint}
               onChange={handleSetpointChange}
@@ -736,7 +736,7 @@ export default function PidAutomationPanel() {
       )}
 
       {/* Help Info */}
-      <div className="mt-6 p-4 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/60">
+      <div className="mt-6 p-4 bg-slate-800/40 rounded-xl ">
         <Text variant="secondary" size="sm" className="mb-2">
           Come funziona
         </Text>

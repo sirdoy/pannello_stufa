@@ -99,9 +99,9 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
   return (
     <div className="space-y-6">
       {/* Info box */}
-      <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Text variant="secondary" size="sm">
-          Network API endpoints proxy to the Fritz!Box Home Network API at{' '}
+          Network API endpoints proxy to the Fritz!Box Home Network API at{''}
           <code className="text-xs">{EXTERNAL_BASE}</code>. All proxy routes require Auth0 authentication.
           Devices endpoint is rate limited to 10 req/min with 60s cache.
         </Text>
@@ -298,7 +298,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
             onCopyUrl={() => copyUrlToClipboard('/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
             isCopied={copiedUrl === '/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF'}
           />
-          <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
             <Text variant="secondary" size="sm">
               Change the <code className="text-xs">mac</code> parameter to look up different MAC addresses.
             </Text>
@@ -321,7 +321,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <Heading level={2} size="lg" className="mb-4">
           🔐 Auth (External Only)
         </Heading>
-        <div className="bg-amber-900/20 [html:not(.dark)_&]:bg-amber-50 border border-amber-700/50 [html:not(.dark)_&]:border-amber-300 rounded-lg p-4 mb-3">
+        <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4 mb-3">
           <Text variant="secondary" size="sm">
             Auth endpoints hit the external API directly. These may fail due to CORS restrictions — use them as URL references.
           </Text>

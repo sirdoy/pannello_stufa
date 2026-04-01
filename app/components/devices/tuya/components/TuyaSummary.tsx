@@ -27,12 +27,12 @@ export function TuyaSummary({ plugs }: TuyaSummaryProps) {
       </div>
 
       {/* Total power display */}
-      <div className="text-2xl font-bold text-warning-400 [html:not(.dark)_&]:text-warning-600">
+      <div className="text-2xl font-bold text-warning-400">
         {totalPowerW.toFixed(0)} W
       </div>
 
       {/* Power gauge bar */}
-      <div className="h-2 w-full rounded-full bg-slate-700/30 [html:not(.dark)_&]:bg-slate-200">
+      <div className="h-2 w-full rounded-full bg-slate-700/30">
         <div
           className="h-2 rounded-full bg-gradient-to-r from-warning-400 to-warning-600 transition-all duration-500"
           style={{ width: `${gaugePercent}%` }}
@@ -42,7 +42,7 @@ export function TuyaSummary({ plugs }: TuyaSummaryProps) {
       {/* Highest consumer */}
       {highestConsumer && (highestConsumer.power_w ?? 0) > 0 && (
         <p className="text-xs text-slate-400">
-          Consumo max: {highestConsumer.custom_name ?? highestConsumer.device_id}{' '}
+          Consumo max: {highestConsumer.custom_name ?? highestConsumer.device_id}{''}
           ({highestConsumer.power_w?.toFixed(0)} W)
         </p>
       )}

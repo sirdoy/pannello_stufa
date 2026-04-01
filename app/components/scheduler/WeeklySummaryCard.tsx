@@ -59,7 +59,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
             {stats.busiestDay && (
               <div className="flex items-center justify-between text-sm">
                 <Text as="span" variant="secondary">Giorno più utilizzato</Text>
-                <Text as="span" className="text-primary-600 dark:text-primary-400">
+                <Text as="span" className="text-primary-400">
                   {stats.busiestDay} ({formatHours(stats.dailyHours[stats.busiestDay]!)})
                 </Text>
               </div>
@@ -71,23 +71,23 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
       {/* Power distribution */}
       {stats.totalHours > 0 && (
         <>
-          <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4 mb-4">
-            <Heading level={3} size="sm" className="text-neutral-700 dark:text-neutral-300 mb-3">
+          <div className="border-neutral-700 pt-4 mb-4">
+            <Heading level={3} size="sm" className="text-neutral-300 mb-3">
               Distribuzione Potenza
             </Heading>
             <div className="space-y-2">
               {powerPercentages.filter(p => p.hours > 0).map(({ level, hours, percentage }) => (
                 <div key={level} className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400 w-8">
+                  <span className="font-medium text-neutral-400 w-8">
                     ⚡P{level}
                   </span>
-                  <div className="flex-1 h-2 bg-neutral-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-neutral-700 rounded-full overflow-hidden">
                     <div
                       className={`h-full transition-all duration-300 ${getPowerBarClass(level)}`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  <span className="text-xs text-neutral-600 dark:text-neutral-400 w-16 text-right">
+                  <span className="text-neutral-400 w-16">
                     {formatHours(hours)} ({Math.round(percentage)}%)
                   </span>
                 </div>
@@ -97,13 +97,13 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
 
           {/* Weekdays vs Weekend */}
           {(stats.weekdaysTotal > 0 || stats.weekendTotal > 0) && (
-            <div className="border-t border-neutral-200 dark:border-neutral-700 pt-4">
+            <div className="border-neutral-700 pt-4">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   <span>🏢</span>
-                  <span className="text-neutral-600 dark:text-neutral-400">Settimana</span>
+                  <span className="text-neutral-400">Settimana</span>
                 </div>
-                <span className="font-medium text-neutral-900 dark:text-white">
+                <span className="font-medium text-white">
                   {formatHours(stats.weekdaysTotal)} (
                   {Math.round((stats.weekdaysTotal / stats.totalHours) * 100)}%)
                 </span>
@@ -111,9 +111,9 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
               <div className="flex items-center justify-between text-sm mt-2">
                 <div className="flex items-center gap-2">
                   <span>🏖️</span>
-                  <span className="text-neutral-600 dark:text-neutral-400">Weekend</span>
+                  <span className="text-neutral-400">Weekend</span>
                 </div>
-                <span className="font-medium text-neutral-900 dark:text-white">
+                <span className="font-medium text-white">
                   {formatHours(stats.weekendTotal)} (
                   {Math.round((stats.weekendTotal / stats.totalHours) * 100)}%)
                 </span>
@@ -135,11 +135,11 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
 
 function getPowerBarClass(level: number): string {
   const classes: Record<number, string> = {
-    1: 'bg-blue-500 dark:bg-blue-400',
-    2: 'bg-green-500 dark:bg-green-400',
-    3: 'bg-yellow-500 dark:bg-yellow-400',
-    4: 'bg-orange-500 dark:bg-orange-400',
-    5: 'bg-red-500 dark:bg-red-400',
+    1: 'bg-blue-400',
+    2: 'bg-green-400',
+    3: 'bg-yellow-400',
+    4: 'bg-orange-400',
+    5: 'bg-red-400',
   };
   return classes[level] || classes[2]!;
 }

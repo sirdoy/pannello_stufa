@@ -48,7 +48,7 @@ export default function SonosGroupControls({
             }
           }}
           defaultValue=""
-          className="text-xs bg-slate-700/50 text-slate-300 rounded-md border-0 px-2 py-1 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-600"
+          className="text-xs bg-slate-700/50 text-slate-300 rounded-md border-0 px-2 py-1"
           aria-label="Unisci a un gruppo"
         >
           <option value="" disabled>

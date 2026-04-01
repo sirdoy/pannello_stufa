@@ -27,16 +27,16 @@ const headingVariants = cva(
       },
       variant: {
         // Neutral hierarchy
-        default: 'text-slate-100 [html:not(.dark)_&]:text-slate-900',
+        default: 'text-slate-100 ',
         gradient: 'bg-gradient-to-r from-ember-500 to-flame-600 bg-clip-text text-transparent',
-        subtle: 'text-slate-400 [html:not(.dark)_&]:text-slate-600',
+        subtle: 'text-slate-400 ',
         // Accent colors - Ember Noir palette
-        ember: 'text-ember-400 [html:not(.dark)_&]:text-ember-700',
-        ocean: 'text-ocean-300 [html:not(.dark)_&]:text-ocean-700',
-        sage: 'text-sage-400 [html:not(.dark)_&]:text-sage-700',
-        warning: 'text-warning-400 [html:not(.dark)_&]:text-warning-700',
-        danger: 'text-danger-400 [html:not(.dark)_&]:text-danger-700',
-        info: 'text-ocean-300 [html:not(.dark)_&]:text-ocean-800', // alias for ocean (info cards)
+        ember: 'text-ember-400 ',
+        ocean: 'text-ocean-300 ',
+        sage: 'text-sage-400 ',
+        warning: 'text-warning-400 ',
+        danger: 'text-danger-400 ',
+        info: 'text-ocean-300 ', // alias for ocean (info cards)
       },
     },
     defaultVariants: {
@@ -48,12 +48,12 @@ const headingVariants = cva(
 
 // Level to size auto-mapping
 const sizeMapping: Record<number, '3xl' | '2xl' | 'xl' | 'lg' | 'md' | 'sm'> = {
-  1: '3xl',  // 30px-36px
-  2: '2xl',  // 24px-30px
-  3: 'xl',   // 20px-24px
-  4: 'lg',   // 18px
-  5: 'md',   // 16px
-  6: 'sm',   // 14px
+  1: '3xl', // 30px-36px
+  2: '2xl', // 24px-30px
+  3: 'xl', // 20px-24px
+  4: 'lg', // 18px
+  5: 'md', // 16px
+  6: 'sm', // 14px
 };
 
 /**

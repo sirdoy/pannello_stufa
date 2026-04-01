@@ -78,7 +78,7 @@ See git history and `.planning/milestones/` for details.
 
 </details>
 
-### 🚧 v18.0 Dark-Only & Mobile-First (In Progress)
+### v18.0 Dark-Only & Mobile-First (In Progress)
 
 **Milestone Goal:** Eliminate the light theme entirely (dark-only codebase) and ensure every page and design system component is fully usable on a 375px mobile viewport.
 
@@ -115,10 +115,11 @@ Plans:
   1. A codebase search for "dark:" returns zero results in any .tsx/.ts/.css file
   2. A codebase search for "html:not(.dark)" returns zero results
   3. The design system showcase page (/debug/design-system) loads without any theme toggle UI or light-mode examples
-**Plans**: 2 plans
+**Plans**: 3 plans
 Plans:
-- [x] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
-- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
+- [ ] 150-01-PLAN.md — Remove dark: and html:not(.dark) from UI + general components (77 files)
+- [ ] 150-02-PLAN.md — Remove dark: and html:not(.dark) from device components + pages + lib (93 files)
+- [ ] 150-03-PLAN.md — Design system page semantic cleanup + codebase-wide verification
 **UI hint**: yes
 
 ### Phase 151: Design System Mobile-First
@@ -132,8 +133,8 @@ Plans:
   4. The design system showcase page (/debug/design-system) includes a mobile-first patterns section documenting base=mobile, sm:=desktop convention
 **Plans**: 2 plans
 Plans:
-- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
-- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
+- [ ] 151-01-PLAN.md — TBD
+- [ ] 151-02-PLAN.md — TBD
 **UI hint**: yes
 
 ### Phase 152: Pages Audit — Core & Device Pages
@@ -148,8 +149,8 @@ Plans:
   5. The network page (/network) displays charts and tables without overflow at 375px
 **Plans**: 2 plans
 Plans:
-- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
-- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
+- [ ] 152-01-PLAN.md — TBD
+- [ ] 152-02-PLAN.md — TBD
 **UI hint**: yes
 
 ### Phase 153: Pages Audit — Extended Device Pages
@@ -163,8 +164,8 @@ Plans:
   4. All Rooms pages (/rooms, /rooms/status, /rooms/[id]) show room cards and device assignments in a readable single-column layout at 375px
 **Plans**: 2 plans
 Plans:
-- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
-- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
+- [ ] 153-01-PLAN.md — TBD
+- [ ] 153-02-PLAN.md — TBD
 **UI hint**: yes
 
 ### Phase 154: Pages Audit — Admin & Support Pages
@@ -179,8 +180,8 @@ Plans:
   5. The remaining pages (changelog, offline, log) render correctly in a single-column layout at 375px
 **Plans**: 2 plans
 Plans:
-- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
-- [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
+- [ ] 154-01-PLAN.md — TBD
+- [ ] 154-02-PLAN.md — TBD
 **UI hint**: yes
 
 ## Progress
@@ -192,7 +193,7 @@ Plans:
 | 147. Tuya Infrastructure | v17.1 | 2/2 | Complete | 2026-03-30 |
 | 148. Tuya Frontend | v17.1 | 3/3 | Complete | 2026-03-30 |
 | 149. Theme Removal Core | v18.0 | 2/2 | Complete    | 2026-04-01 |
-| 150. Theme Prefix Cleanup | v18.0 | 0/TBD | Not started | - |
+| 150. Theme Prefix Cleanup | v18.0 | 0/3 | Planned | - |
 | 151. Design System Mobile-First | v18.0 | 0/TBD | Not started | - |
 | 152. Pages Audit — Core & Device Pages | v18.0 | 0/TBD | Not started | - |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 0/TBD | Not started | - |

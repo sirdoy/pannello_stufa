@@ -10,14 +10,14 @@ Requirements for Dark-Only & Mobile-First milestone.
 ### Theme Removal
 
 - [ ] **THEME-01**: Light theme CSS variables removed from globals.css (html:not(.dark) block, light body gradient)
-- [ ] **THEME-02**: ThemeContext, ThemeProvider, useTheme hook removed
-- [ ] **THEME-03**: ThemeScript component removed from layout
-- [ ] **THEME-04**: Theme settings page (/settings/theme) removed and nav entry deleted
-- [ ] **THEME-05**: Theme API route (GET/POST /api/user/theme) removed
+- [x] **THEME-02**: ThemeContext, ThemeProvider, useTheme hook removed
+- [x] **THEME-03**: ThemeScript component removed from layout
+- [x] **THEME-04**: Theme settings page (/settings/theme) removed and nav entry deleted
+- [x] **THEME-05**: Theme API route (GET/POST /api/user/theme) removed
 - [ ] **THEME-06**: All `dark:` Tailwind prefixes removed from ~16 files (hardcode dark-only values)
 - [ ] **THEME-07**: All `[html:not(.dark)_&]:` selectors removed from components
-- [ ] **THEME-08**: `class="dark"` hardcoded on `<html>` element, localStorage theme key removed
-- [ ] **THEME-09**: theme-color meta tag hardcoded to dark value (#0f172a)
+- [x] **THEME-08**: `class="dark"` hardcoded on `<html>` element, localStorage theme key removed
+- [x] **THEME-09**: theme-color meta tag hardcoded to dark value (#0f172a)
 - [ ] **THEME-10**: Design system page updated to reflect dark-only (remove theme toggle showcase)
 
 ### Design System Mobile-First
@@ -72,14 +72,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | THEME-01 | Phase 149 | Pending |
-| THEME-02 | Phase 149 | Pending |
-| THEME-03 | Phase 149 | Pending |
-| THEME-04 | Phase 149 | Pending |
-| THEME-05 | Phase 149 | Pending |
+| THEME-02 | Phase 149 | Complete |
+| THEME-03 | Phase 149 | Complete |
+| THEME-04 | Phase 149 | Complete |
+| THEME-05 | Phase 149 | Complete |
 | THEME-06 | Phase 150 | Pending |
 | THEME-07 | Phase 150 | Pending |
-| THEME-08 | Phase 149 | Pending |
-| THEME-09 | Phase 149 | Pending |
+| THEME-08 | Phase 149 | Complete |
+| THEME-09 | Phase 149 | Complete |
 | THEME-10 | Phase 150 | Pending |
 | MOBILE-01 | Phase 151 | Pending |
 | MOBILE-02 | Phase 151 | Pending |

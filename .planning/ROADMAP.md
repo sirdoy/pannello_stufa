@@ -103,7 +103,7 @@ See git history and `.planning/milestones/` for details.
   5. The theme-color meta tag reads #0f172a in every rendered page's head
 **Plans**: 2 plans
 Plans:
-- [ ] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
+- [x] 149-01-PLAN.md — Delete theme files + fix consumers (layout, ClientProviders, settings)
 - [ ] 149-02-PLAN.md — Remove light-mode CSS from globals.css + visual verification
 **UI hint**: yes
 
@@ -191,7 +191,7 @@ Plans:
 | 146. Raspi WS Migration | v17.1 | 2/2 | Complete | 2026-03-30 |
 | 147. Tuya Infrastructure | v17.1 | 2/2 | Complete | 2026-03-30 |
 | 148. Tuya Frontend | v17.1 | 3/3 | Complete | 2026-03-30 |
-| 149. Theme Removal Core | v18.0 | 0/TBD | Not started | - |
+| 149. Theme Removal Core | v18.0 | 1/2 | In Progress|  |
 | 150. Theme Prefix Cleanup | v18.0 | 0/TBD | Not started | - |
 | 151. Design System Mobile-First | v18.0 | 0/TBD | Not started | - |
 | 152. Pages Audit — Core & Device Pages | v18.0 | 0/TBD | Not started | - |

@@ -71,43 +71,43 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| THEME-01 | — | Pending |
-| THEME-02 | — | Pending |
-| THEME-03 | — | Pending |
-| THEME-04 | — | Pending |
-| THEME-05 | — | Pending |
-| THEME-06 | — | Pending |
-| THEME-07 | — | Pending |
-| THEME-08 | — | Pending |
-| THEME-09 | — | Pending |
-| THEME-10 | — | Pending |
-| MOBILE-01 | — | Pending |
-| MOBILE-02 | — | Pending |
-| MOBILE-03 | — | Pending |
-| MOBILE-04 | — | Pending |
-| MOBILE-05 | — | Pending |
-| MOBILE-06 | — | Pending |
-| AUDIT-01 | — | Pending |
-| AUDIT-02 | — | Pending |
-| AUDIT-03 | — | Pending |
-| AUDIT-04 | — | Pending |
-| AUDIT-05 | — | Pending |
-| AUDIT-06 | — | Pending |
-| AUDIT-07 | — | Pending |
-| AUDIT-08 | — | Pending |
-| AUDIT-09 | — | Pending |
-| AUDIT-10 | — | Pending |
-| AUDIT-11 | — | Pending |
-| AUDIT-12 | — | Pending |
-| AUDIT-13 | — | Pending |
-| AUDIT-14 | — | Pending |
-| AUDIT-15 | — | Pending |
+| THEME-01 | Phase 149 | Pending |
+| THEME-02 | Phase 149 | Pending |
+| THEME-03 | Phase 149 | Pending |
+| THEME-04 | Phase 149 | Pending |
+| THEME-05 | Phase 149 | Pending |
+| THEME-06 | Phase 150 | Pending |
+| THEME-07 | Phase 150 | Pending |
+| THEME-08 | Phase 149 | Pending |
+| THEME-09 | Phase 149 | Pending |
+| THEME-10 | Phase 150 | Pending |
+| MOBILE-01 | Phase 151 | Pending |
+| MOBILE-02 | Phase 151 | Pending |
+| MOBILE-03 | Phase 151 | Pending |
+| MOBILE-04 | Phase 151 | Pending |
+| MOBILE-05 | Phase 151 | Pending |
+| MOBILE-06 | Phase 151 | Pending |
+| AUDIT-01 | Phase 152 | Pending |
+| AUDIT-02 | Phase 152 | Pending |
+| AUDIT-03 | Phase 152 | Pending |
+| AUDIT-04 | Phase 152 | Pending |
+| AUDIT-05 | Phase 152 | Pending |
+| AUDIT-06 | Phase 153 | Pending |
+| AUDIT-07 | Phase 153 | Pending |
+| AUDIT-08 | Phase 153 | Pending |
+| AUDIT-09 | Phase 153 | Pending |
+| AUDIT-10 | Phase 153 | Pending |
+| AUDIT-11 | Phase 154 | Pending |
+| AUDIT-12 | Phase 154 | Pending |
+| AUDIT-13 | Phase 154 | Pending |
+| AUDIT-14 | Phase 154 | Pending |
+| AUDIT-15 | Phase 154 | Pending |
 
 **Coverage:**
 - v18.0 requirements: 31 total
-- Mapped to phases: 0
-- Unmapped: 31
+- Mapped to phases: 31
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-04-01 after initial definition*
+*Last updated: 2026-04-01 after roadmap creation*

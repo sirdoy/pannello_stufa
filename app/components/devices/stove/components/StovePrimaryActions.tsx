@@ -64,7 +64,7 @@ export default function StovePrimaryActions({
               icon="🔥"
               onClick={onIgnite}
               disabled={!isOnline || igniteCmd.isExecuting || loading || needsMaintenance}
-              className="w-full h-20 sm:h-24 text-base sm:text-lg font-bold font-display ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white"
+              className="w-full h-20 sm:h-24 text-base sm:text-lg font-bold font-display ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900"
             >
               ACCENDI
             </Button>

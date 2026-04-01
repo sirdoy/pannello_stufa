@@ -90,8 +90,8 @@ export default function LightsRoomControl({
       className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border ${
         !dynamicRoomStyle ? (
           isRoomOn
-            ? 'bg-gradient-to-br from-warning-900/40 via-slate-900/60 to-ember-900/30 border-warning-500/40 shadow-[0_0_30px_rgba(234,179,8,0.2)] [html:not(.dark)_&]:from-warning-100/80 [html:not(.dark)_&]:via-warning-50/90 [html:not(.dark)_&]:to-ember-100/70 [html:not(.dark)_&]:border-warning-300 [html:not(.dark)_&]:shadow-[0_0_20px_rgba(234,179,8,0.15)]'
-            : 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40 [html:not(.dark)_&]:from-slate-100/80 [html:not(.dark)_&]:via-white/90 [html:not(.dark)_&]:to-slate-100/70 [html:not(.dark)_&]:border-slate-200'
+            ? 'bg-gradient-to-br from-warning-900/40 via-slate-900/60 to-ember-900/30 border-warning-500/40 shadow-[0_0_30px_rgba(234,179,8,0.2)]'
+            : 'bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40'
         ) : ''
       }`}
       style={dynamicRoomStyle || {}}
@@ -101,12 +101,12 @@ export default function LightsRoomControl({
         <div className="absolute -top-2 -right-2 z-20">
           <div className="relative">
             <div className={`absolute inset-0 rounded-full blur-lg animate-pulse ${
-              adaptive.badgeGlow || 'bg-warning-500/30 [html:not(.dark)_&]:bg-warning-400/40'
+              adaptive.badgeGlow || 'bg-warning-500/30'
             }`}></div>
             <div className={`relative px-3 py-1.5 rounded-full shadow-lg ring-2 ${
               adaptive.badge
                 ? `${adaptive.badge} ring-current/30`
-                : 'bg-gradient-to-br from-warning-500 to-warning-600 text-white ring-slate-900/50 [html:not(.dark)_&]:ring-white/50'
+                : 'bg-gradient-to-br from-warning-500 to-warning-600 text-white ring-slate-900/50'
             }`}>
               <span className="text-xs font-bold font-display">💡 ACCESO</span>
             </div>
@@ -130,8 +130,8 @@ export default function LightsRoomControl({
             adaptive.statusOn
               ? adaptive.statusOn
               : (lightsOnCount > 0
-                ? 'bg-warning-900/40 text-warning-400 border-warning-500/30 [html:not(.dark)_&]:bg-warning-100/80 [html:not(.dark)_&]:text-warning-700 [html:not(.dark)_&]:border-warning-300'
-                : 'bg-slate-800/50 text-slate-500 border-slate-700/30 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:border-slate-200')
+                ? 'bg-warning-900/40 text-warning-400 border-warning-500/30'
+                : 'bg-slate-800/50 text-slate-500 border-slate-700/30')
           }`}>
             <span>💡</span>
             <span className="font-semibold">{lightsOnCount} accese</span>
@@ -140,8 +140,8 @@ export default function LightsRoomControl({
             adaptive.statusOff
               ? adaptive.statusOff
               : (lightsOffCount > 0
-                ? 'bg-slate-800/50 text-slate-400 border-slate-700/30 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:border-slate-200'
-                : 'bg-slate-800/30 text-slate-600 border-slate-700/20 [html:not(.dark)_&]:bg-slate-50 [html:not(.dark)_&]:text-slate-400 [html:not(.dark)_&]:border-slate-100')
+                ? 'bg-slate-800/50 text-slate-400 border-slate-700/30'
+                : 'bg-slate-800/30 text-slate-600 border-slate-700/20')
           }`}>
             <span>🌙</span>
             <span className="font-semibold">{lightsOffCount} spente</span>
@@ -187,7 +187,7 @@ export default function LightsRoomControl({
             size="lg"
             className={`w-full h-16 sm:h-20 font-display ${
               adaptive.buttonClass
-                || 'ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900 [html:not(.dark)_&]:ring-offset-white'
+                || 'ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900'
             }`}
           >
             Accendi
@@ -214,7 +214,7 @@ export default function LightsRoomControl({
         <div className={`relative overflow-hidden rounded-2xl backdrop-blur-xl border p-4 sm:p-5 ${
           adaptive.brightnessPanel
             ? adaptive.brightnessPanel
-            : 'bg-slate-800/50 border-slate-700/50 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200'
+            : 'bg-slate-800/50 border-slate-700/50'
         }`}>
           <div className="relative z-10 space-y-4">
             <div className="flex items-center justify-between">
@@ -225,7 +225,7 @@ export default function LightsRoomControl({
               <span className={`text-2xl sm:text-3xl font-black font-display ${
                 adaptive.brightnessValue
                   ? adaptive.brightnessValue
-                  : 'text-warning-400 [html:not(.dark)_&]:text-warning-700'
+                  : 'text-warning-400'
               }`}>
                 {localBrightness !== null ? localBrightness : avgBrightness}%
               </span>

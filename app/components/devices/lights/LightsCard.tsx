@@ -152,7 +152,7 @@ export default function LightsCard() {
         />
       )}
 
-      <LastUpdated tsMs={lightsData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
+      <LastUpdated tsMs={lightsData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />
     </DeviceCard>
   );
 }

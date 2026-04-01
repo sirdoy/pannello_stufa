@@ -22,7 +22,7 @@ export default function DirigeraCard() {
       <SmartHomeCard icon="🔌" title="DIRIGERA" colorTheme="ocean">
         <SmartHomeCard.Controls>
           <Banner variant="warning" title="Non raggiungibile" compact={false}>
-            <p className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-600">
+            <p className="text-sm text-slate-300">
               {error}
             </p>
           </Banner>
@@ -39,7 +39,7 @@ export default function DirigeraCard() {
       role="link"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter' || e.key === '') {
           e.preventDefault();
           router.push('/dirigera');
         }
@@ -75,7 +75,7 @@ export default function DirigeraCard() {
           </SmartHomeCard.Controls>
         )}
 
-        <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
+        <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />
       </SmartHomeCard>
     </div>
   );

@@ -42,10 +42,10 @@ export default function StoveAdjustments({
         )}
 
         {/* Ventilazione Control - Ember Noir */}
-        <div data-control="fan" className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 sm:p-6 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+        <div data-control="fan" className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 sm:p-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 flex items-center justify-center border-2 border-ocean-500/50 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:border-ocean-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 flex items-center justify-center border-2 border-ocean-500/50">
               <span className="text-xl sm:text-2xl">💨</span>
             </div>
             <Heading level={4} size="md" className="font-display">Ventilazione</Heading>
@@ -70,10 +70,10 @@ export default function StoveAdjustments({
             <div className="flex flex-col items-center justify-center px-4 sm:px-6">
               <Text variant="label" size="sm" className="mb-1 font-display">Livello</Text>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl sm:text-5xl font-black font-display text-ocean-400 leading-none [html:not(.dark)_&]:text-ocean-600">
+                <span className="text-4xl sm:text-5xl font-black font-display text-ocean-400 leading-none">
                   {fanLevel ?? '-'}
                 </span>
-                <span className="text-xl sm:text-2xl font-bold text-slate-500 [html:not(.dark)_&]:text-slate-400">/6</span>
+                <span className="text-xl sm:text-2xl font-bold text-slate-500">/6</span>
               </div>
             </div>
 
@@ -93,10 +93,10 @@ export default function StoveAdjustments({
         </div>
 
         {/* Potenza Control - Ember Noir */}
-        <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 sm:p-6 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+        <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-5 sm:p-6">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ember-900/50 flex items-center justify-center border-2 border-ember-500/50 [html:not(.dark)_&]:bg-ember-100/80 [html:not(.dark)_&]:border-ember-300">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ember-900/50 flex items-center justify-center border-2 border-ember-500/50">
               <span className="text-xl sm:text-2xl">⚡</span>
             </div>
             <Heading level={4} size="md" className="font-display">Potenza</Heading>
@@ -121,10 +121,10 @@ export default function StoveAdjustments({
             <div className="flex flex-col items-center justify-center px-4 sm:px-6">
               <Text variant="label" size="sm" className="mb-1 font-display">Livello</Text>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl sm:text-5xl font-black font-display text-ember-400 leading-none [html:not(.dark)_&]:text-ember-600">
+                <span className="text-4xl sm:text-5xl font-black font-display text-ember-400 leading-none">
                   {powerLevel ?? '-'}
                 </span>
-                <span className="text-xl sm:text-2xl font-bold text-slate-500 [html:not(.dark)_&]:text-slate-400">/5</span>
+                <span className="text-xl sm:text-2xl font-bold text-slate-500">/5</span>
               </div>
             </div>
 

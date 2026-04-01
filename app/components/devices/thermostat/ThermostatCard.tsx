@@ -358,7 +358,7 @@ export default function ThermostatCard() {
       const typeName = m.type === 'NRV' ? 'Valvola' : m.type === 'NATherm1' ? 'Termostato' : m.type;
       const name = m.name || m.id?.substring(0, 8) || 'Sconosciuto';
       return `${typeName} "${name}"`;
-    }).join(', ');
+    }).join(',');
 
     const batteryDescription = hasCriticalBattery
       ? `Sostituire le batterie immediatamente: ${deviceList}`
@@ -410,7 +410,7 @@ export default function ThermostatCard() {
                   key={room.id}
                   className={cn(
                     "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
-                    "bg-ember-900/40 border-ember-500/40 text-ember-300 [html:not(.dark)_&]:bg-ember-100 [html:not(.dark)_&]:border-ember-300 [html:not(.dark)_&]:text-ember-700"
+                    "bg-ember-900/40 border-ember-500/40 text-ember-300"
                   )}
                   title={`${room.name} - Attivo`}
                 >
@@ -443,7 +443,7 @@ export default function ThermostatCard() {
         <div className="space-y-4 mb-4 sm:mb-6">
                 {/* Offline Room Display */}
                 {selectedRoom.isOffline ? (
-                  <div className="relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40 [html:not(.dark)_&]:from-slate-200/80 [html:not(.dark)_&]:via-slate-100/90 [html:not(.dark)_&]:to-slate-200/70 [html:not(.dark)_&]:border-slate-300">
+                  <div className="relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border bg-gradient-to-br from-slate-800/60 via-slate-900/70 to-slate-800/50 border-slate-600/40">
                     {/* Offline Badge */}
                     <div className="absolute -top-2 -right-2 z-20">
                       <Badge variant="neutral" size="sm" icon={<span>📵</span>}>
@@ -487,8 +487,8 @@ export default function ThermostatCard() {
                 /* Main Temperature Display - Ember Noir style with light mode */
                 <div className={`relative rounded-2xl p-6 sm:p-8 transition-all duration-500 border ${
                   selectedRoom.heating
-                    ? 'bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 border-ember-500/40 shadow-ember-glow [html:not(.dark)_&]:from-ember-100/80 [html:not(.dark)_&]:via-ember-50/90 [html:not(.dark)_&]:to-flame-100/70 [html:not(.dark)_&]:border-ember-300 [html:not(.dark)_&]:shadow-[0_0_20px_rgba(237,111,16,0.15)]'
-                    : 'bg-gradient-to-br from-ocean-900/30 via-slate-900/60 to-ocean-800/20 border-ocean-500/30 [html:not(.dark)_&]:from-ocean-100/80 [html:not(.dark)_&]:via-ocean-50/90 [html:not(.dark)_&]:to-ocean-100/70 [html:not(.dark)_&]:border-ocean-200'
+                    ? 'bg-gradient-to-br from-ember-900/40 via-slate-900/60 to-flame-900/30 border-ember-500/40 shadow-ember-glow'
+                    : 'bg-gradient-to-br from-ocean-900/30 via-slate-900/60 to-ocean-800/20 border-ocean-500/30'
                 }`}>
                   {/* Heating Badge - with light mode */}
                   {selectedRoom.heating && (
@@ -523,32 +523,32 @@ export default function ThermostatCard() {
                     data-component="temperature-display"
                   >
                     {/* Current Temperature Box */}
-                    <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 backdrop-blur-xl border border-ocean-500/30 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200">
+                    <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 backdrop-blur-xl border border-ocean-500/30">
                       <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                        <Text variant="label" size="xs" className="mb-2 font-display text-ocean-300 [html:not(.dark)_&]:text-ocean-600">
+                        <Text variant="label" size="xs" className="mb-2 font-display text-ocean-300">
                           Attuale
                         </Text>
                         <div className="flex items-baseline gap-1">
-                          <Text className="text-4xl sm:text-5xl font-display text-ocean-100 leading-none [html:not(.dark)_&]:text-ocean-700">
+                          <Text className="text-4xl sm:text-5xl font-display text-ocean-100 leading-none">
                             {selectedRoom.temperature}
                           </Text>
-                          <Text as="span" className="text-2xl sm:text-3xl text-ocean-400/70 [html:not(.dark)_&]:text-ocean-500">°</Text>
+                          <Text as="span" className="text-2xl sm:text-3xl text-ocean-400/70">°</Text>
                         </div>
                       </div>
                     </div>
 
                     {/* Target Temperature Box */}
                     {selectedRoom.setpoint && (
-                      <div className="relative overflow-hidden rounded-2xl bg-ocean-900/50 backdrop-blur-xl border border-ocean-500/40 [html:not(.dark)_&]:bg-ocean-100/80 [html:not(.dark)_&]:border-ocean-300">
+                      <div className="relative overflow-hidden rounded-2xl bg-ocean-900/50 backdrop-blur-xl border border-ocean-500/40">
                         <div className="relative z-10 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                          <Text variant="label" size="xs" className="mb-2 font-display text-ocean-300 [html:not(.dark)_&]:text-ocean-600">
+                          <Text variant="label" size="xs" className="mb-2 font-display text-ocean-300">
                             Target
                           </Text>
                           <div className="flex items-baseline gap-1">
-                            <Text className="text-4xl sm:text-5xl font-display text-ocean-200 leading-none [html:not(.dark)_&]:text-ocean-700">
+                            <Text className="text-4xl sm:text-5xl font-display text-ocean-200 leading-none">
                               {selectedRoom.setpoint}
                             </Text>
-                            <Text as="span" className="text-2xl sm:text-3xl text-ocean-400/70 [html:not(.dark)_&]:text-ocean-500">°</Text>
+                            <Text as="span" className="text-2xl sm:text-3xl text-ocean-400/70">°</Text>
                           </div>
                         </div>
                       </div>
@@ -569,10 +569,10 @@ export default function ThermostatCard() {
                             className={cn(
                               "flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all",
                               selectedRoom.heating && isReachable
-                                ? "bg-ember-900/40 border-ember-500/40 text-ember-300 [html:not(.dark)_&]:bg-ember-100 [html:not(.dark)_&]:border-ember-300 [html:not(.dark)_&]:text-ember-700"
+                                ? "bg-ember-900/40 border-ember-500/40 text-ember-300"
                                 : isReachable
-                                ? "bg-slate-800/40 border-slate-600/30 text-slate-300 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:border-slate-300 [html:not(.dark)_&]:text-slate-600"
-                                : "bg-slate-900/40 border-slate-700/30 text-slate-500 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:border-slate-400 [html:not(.dark)_&]:text-slate-500 opacity-60"
+                                ? "bg-slate-800/40 border-slate-600/30 text-slate-300"
+                                : "bg-slate-900/40 border-slate-700/30 text-slate-500 opacity-60"
                             )}
                             title={`${module.name || 'Dispositivo'} - ${isReachable ? (selectedRoom.heating ? 'Attivo' : 'Standby') : 'Offline'}`}
                           >
@@ -600,7 +600,7 @@ export default function ThermostatCard() {
 
                 {/* Quick temperature controls - Ember Noir */}
                 {isOnline && selectedRoom.setpoint && !selectedRoom.isOffline && (
-                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-5 [html:not(.dark)_&]:bg-white/80 [html:not(.dark)_&]:border-slate-200">
+                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-4 sm:p-5">
                     <div className="flex items-center gap-3">
                       <Button
                         variant="subtle"
@@ -658,16 +658,16 @@ export default function ThermostatCard() {
                 const isActive = mode === id;
                 const colorStyles: Record<string, string> = {
                   sage: isActive
-                    ? 'bg-sage-900/50 border-sage-400/60 ring-2 ring-sage-500/30 [html:not(.dark)_&]:bg-sage-100 [html:not(.dark)_&]:border-sage-400 [html:not(.dark)_&]:ring-sage-300/50'
+                    ? 'bg-sage-900/50 border-sage-400/60 ring-2 ring-sage-500/30'
                     : '',
                   warning: isActive
-                    ? 'bg-warning-900/50 border-warning-400/60 ring-2 ring-warning-500/30 [html:not(.dark)_&]:bg-warning-100 [html:not(.dark)_&]:border-warning-400 [html:not(.dark)_&]:ring-warning-300/50'
+                    ? 'bg-warning-900/50 border-warning-400/60 ring-2 ring-warning-500/30'
                     : '',
                   ocean: isActive
-                    ? 'bg-ocean-900/50 border-ocean-400/60 ring-2 ring-ocean-500/30 [html:not(.dark)_&]:bg-ocean-100 [html:not(.dark)_&]:border-ocean-400 [html:not(.dark)_&]:ring-ocean-300/50'
+                    ? 'bg-ocean-900/50 border-ocean-400/60 ring-2 ring-ocean-500/30'
                     : '',
                   slate: isActive
-                    ? 'bg-slate-700/70 border-slate-500/60 ring-2 ring-slate-500/30 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:border-slate-400 [html:not(.dark)_&]:ring-slate-300/50'
+                    ? 'bg-slate-700/70 border-slate-500/60 ring-2 ring-slate-500/30'
                     : '',
                 };
 
@@ -686,8 +686,8 @@ export default function ThermostatCard() {
                     <span className="text-3xl sm:text-4xl mb-1.5">{icon}</span>
                     <span className={`text-xs sm:text-sm font-bold font-display ${
                       isActive
-                        ? 'text-white [html:not(.dark)_&]:text-slate-900'
-                        : 'text-slate-400 [html:not(.dark)_&]:text-slate-600'
+                        ? 'text-white'
+                        : 'text-slate-400'
                     }`}>
                       {label}
                     </span>
@@ -751,8 +751,8 @@ export default function ThermostatCard() {
               {calibrationSuccess !== null && (
                 <div className={`mb-3 p-3 rounded-xl border ${
                   calibrationSuccess
-                    ? 'bg-sage-900/30 border-sage-500/40 text-sage-300 [html:not(.dark)_&]:bg-sage-50/80 [html:not(.dark)_&]:border-sage-300 [html:not(.dark)_&]:text-sage-700'
-                    : 'bg-danger-900/30 border-danger-500/40 text-danger-300 [html:not(.dark)_&]:bg-danger-50/80 [html:not(.dark)_&]:border-danger-300 [html:not(.dark)_&]:text-danger-700'
+                    ? 'bg-sage-900/30 border-sage-500/40 text-sage-300'
+                    : 'bg-danger-900/30 border-danger-500/40 text-danger-300'
                 }`}>
                   <Text size="sm" className="font-display">
                     {calibrationSuccess
@@ -770,7 +770,7 @@ export default function ThermostatCard() {
                 fullWidth
                 size="md"
                 icon={calibrating ? undefined : '🔧'}
-                className="bg-ocean-900/40 border-ocean-500/40 hover:bg-ocean-900/60 hover:border-ocean-400/50 [html:not(.dark)_&]:bg-ocean-50/80 [html:not(.dark)_&]:border-ocean-200 [html:not(.dark)_&]:hover:bg-ocean-100/90 [html:not(.dark)_&]:hover:border-ocean-300 text-ocean-300 [html:not(.dark)_&]:text-ocean-700"
+                className="bg-ocean-900/40 border-ocean-500/40 hover:bg-ocean-900/60 hover:border-ocean-400/50 text-ocean-300"
               >
                 {calibrating ? 'Calibrazione...' : 'Tara Valvole'}
               </Button>
@@ -797,7 +797,7 @@ export default function ThermostatCard() {
         </Button>
       </div>
 
-      <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-800/30 dark:border-slate-700/30" />
+      <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />
     </DeviceCard>
   );
 }

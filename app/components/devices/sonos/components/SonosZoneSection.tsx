@@ -62,10 +62,10 @@ export default function SonosZoneSection({
   };
 
   return (
-    <div className="rounded-2xl bg-slate-800/50 [html:not(.dark)_&]:bg-white p-5 sm:p-6 space-y-4">
+    <div className="rounded-2xl bg-slate-800/50 p-5 sm:p-6 space-y-4">
       {/* Zone header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-800">
+        <h2 className="text-lg font-semibold text-slate-100">
           {zone.label}
         </h2>
         <span className="text-xs text-slate-500">{zone.member_count} speaker</span>
@@ -108,7 +108,7 @@ export default function SonosZoneSection({
       <SonosQueueViewer groupId={zone.group_id} />
 
       {/* Zone volume — affects all speakers in zone */}
-      <div className="border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 pt-3">
+      <div className="border-t border-slate-700/50 pt-3">
         <h3 className="text-sm font-medium text-slate-400 mb-2">Volume Zona</h3>
         <div className="flex items-center gap-3">
           <span className="text-xs text-slate-500 w-8 text-right">{localZoneVolume}%</span>
@@ -118,14 +118,14 @@ export default function SonosZoneSection({
             max={100}
             value={localZoneVolume}
             onChange={handleZoneVolumeChange}
-            className="w-full h-2 rounded-lg bg-slate-700 [html:not(.dark)_&]:bg-slate-200 accent-success-500"
+            className="w-full h-2 rounded-lg bg-slate-700 accent-success-500"
             aria-label="Volume Zona"
           />
         </div>
       </div>
 
       {/* Volume per speaker */}
-      <div className="border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 pt-3">
+      <div className="border-t border-slate-700/50 pt-3">
         <h3 className="text-sm font-medium text-slate-400 mb-2">Volume Speaker</h3>
         {zone.members.map(member => (
           <SonosSpeakerVolume

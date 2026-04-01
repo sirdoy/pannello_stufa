@@ -23,7 +23,7 @@ export default function RaspiCard() {
       <SmartHomeCard icon="🖥️" title="Raspberry Pi" colorTheme="sage">
         <SmartHomeCard.Controls>
           <Banner variant="warning" title="Non raggiungibile" compact={false}>
-            <p className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-600">
+            <p className="text-sm text-slate-300">
               {error}
             </p>
           </Banner>
@@ -40,7 +40,7 @@ export default function RaspiCard() {
       role="link"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter' || e.key === '') {
           e.preventDefault();
           router.push('/raspi');
         }

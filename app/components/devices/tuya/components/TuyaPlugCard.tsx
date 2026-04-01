@@ -78,17 +78,17 @@ export function TuyaPlugCard({
   };
 
   return (
-    <div className="rounded-xl bg-slate-800/50 border border-slate-700 p-4 [html:not(.dark)_&]:bg-white [html:not(.dark)_&]:border-slate-200 space-y-3">
+    <div className="rounded-xl bg-slate-800/50 border border-slate-700 p-4 space-y-3">
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-100 [html:not(.dark)_&]:text-slate-800 truncate pr-2">
+        <span className="text-sm font-semibold text-slate-100 truncate pr-2">
           {displayName}
         </span>
         <div className="flex items-center gap-1.5 shrink-0">
           <span
             className={`h-2 w-2 rounded-full ${freshnessColors[plug.data_freshness]}`}
           />
-          <span className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500">
+          <span className="text-xs text-slate-400">
             {freshnessLabels[plug.data_freshness]}
           </span>
         </div>
@@ -101,8 +101,8 @@ export function TuyaPlugCard({
             ? `${plug.power_w.toFixed(1)} W`
             : '-- W'}
         </p>
-        <p className="text-xs text-slate-400 [html:not(.dark)_&]:text-slate-500">
-          {plug.voltage_v?.toFixed(0) ?? '--'} V /{' '}
+        <p className="text-xs text-slate-400">
+          {plug.voltage_v?.toFixed(0) ?? '--'} V /{''}
           {plug.current_ma?.toFixed(0) ?? '--'} mA
         </p>
       </div>
@@ -122,10 +122,10 @@ export function TuyaPlugCard({
       </button>
 
       {/* Timer section */}
-      <div className="border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 pt-3">
+      <div className="border-t border-slate-700/50 pt-3">
         {hasActiveTimer ? (
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-300 [html:not(.dark)_&]:text-slate-600 font-mono">
+            <span className="text-sm text-slate-300 font-mono">
               {formatCountdown(remaining)}
             </span>
             <button
@@ -144,7 +144,7 @@ export function TuyaPlugCard({
               placeholder="min"
               value={timerMinutes}
               onChange={(e) => setTimerMinutes(e.target.value)}
-              className="w-16 px-2 py-1 rounded-md text-xs bg-slate-700/50 text-slate-200 border border-slate-600 [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:text-slate-700 [html:not(.dark)_&]:border-slate-300"
+              className="w-16 px-2 py-1 rounded-md text-xs bg-slate-700/50 text-slate-200 border border-slate-600"
               aria-label="Minuti timer"
             />
             <button
@@ -161,7 +161,7 @@ export function TuyaPlugCard({
       {/* Expand/collapse energy chart */}
       <button
         onClick={() => setExpanded((prev) => !prev)}
-        className="w-full text-xs text-slate-400 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700 transition-colors text-left"
+        className="w-full text-xs text-slate-400 hover:text-slate-300 transition-colors text-left"
       >
         {expanded ? '▲ Nascondi storico' : '▼ Storico energia'}
       </button>

@@ -22,7 +22,7 @@ export default function SonosSourceSwitch({
   const isLineInActive = currentSource === 'line_in';
 
   const activeClass = 'bg-amber-500/80 text-white';
-  const inactiveClass = 'bg-slate-700/50 text-slate-400 hover:bg-slate-700 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-500';
+  const inactiveClass = 'bg-slate-700/50 text-slate-400 hover:bg-slate-700';
 
   return (
     <div className="inline-flex items-center gap-1 mt-2">

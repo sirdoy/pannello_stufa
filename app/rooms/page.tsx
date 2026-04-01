@@ -217,7 +217,7 @@ export default function RoomsPage() {
       <Card variant="glass" className="p-4 sm:p-6">
         {/* Health stats inline (per D-27) */}
         {health !== null && (
-          <div className="flex items-center gap-6 text-sm text-slate-400 mb-4">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-slate-400 mb-4">
             <span>
               Stanze: <strong className="text-slate-200">{health.room_count}</strong>
             </span>

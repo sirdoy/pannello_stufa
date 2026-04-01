@@ -11,7 +11,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.1 (shipped 2026-03-30)
-**Status:** Active — v18.0 (Phase 149 complete — theme machinery removed, app is dark-only)
+**Status:** Active — v18.0 (Phase 150 complete — all dark:/html:not(.dark) prefixes removed, codebase is purely dark-themed)
 
 ## Current Milestone: v18.0 Dark-Only & Mobile-First
 
@@ -874,4 +874,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 after v18.0 milestone start*
+*Last updated: 2026-04-01 after Phase 150 completion*

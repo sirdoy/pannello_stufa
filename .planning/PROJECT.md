@@ -11,7 +11,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.1 (shipped 2026-03-30)
-**Status:** Active — v18.0 (Phase 151 complete — design system components verified mobile-safe at 375px, ButtonGroup flex-wrap, Mobile-First Patterns docs added)
+**Status:** Active — v18.0 (Phase 152 complete — dashboard, stove, thermostat, lights, network pages all verified at 375px with no overflow)
 
 ## Current Milestone: v18.0 Dark-Only & Mobile-First
 
@@ -874,4 +874,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 after Phase 151 completion*
+*Last updated: 2026-04-01 after Phase 152 completion*

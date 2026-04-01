@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v18.0
 milestone_name: Dark-Only & Mobile-First
 status: executing
-stopped_at: Phase 152 context gathered
-last_updated: "2026-04-01T15:00:24.489Z"
+stopped_at: Completed 152-01-PLAN.md
+last_updated: "2026-04-01T15:14:18.447Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 9
+  completed_plans: 8
   percent: 100
 ---
 
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-01)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 152 — pages-audit-—-core-&-device-pages
+**Current focus:** Phase 152 — pages-audit-core-device-pages
 
 ## Current Position
 
-Phase: 152
-Plan: Not started
+Phase: 152 (pages-audit-core-device-pages) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
 Last activity: 2026-04-01
 
@@ -53,6 +53,7 @@ Progress: [████████████████████] 304/302
 | Phase 150-theme-prefix-cleanup P03 | 20 | 2 tasks | 2 files |
 | Phase 151 P02 | 8min | 2 tasks | 1 files |
 | Phase 151 P01 | 10min | 2 tasks | 2 files |
+| Phase 152-pages-audit-core-device-pages P01 | 5 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,7 @@ Recent decisions affecting v18.0:
 - [Phase 151]: Typography already mobile-safe via sm: responsive variants — no changes needed
 - [Phase 151]: ButtonGroup adds flex-wrap only — no equal-sizing, no vertical stacking per design decision D-02
 - [Phase 151]: All 12 layout DS components confirmed mobile-safe at 375px with no additional changes needed
+- [Phase 152-01]: flex flex-wrap gap-3 on header rows for mobile overflow: minimal targeted fix for the two identified risk points, 5 other pages confirmed mobile-safe without changes
 
 ### Pending Todos
 
@@ -99,5 +101,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-01 - Phase 151 complete, ready to plan Phase 152
-Stopped at: Phase 152 context gathered
-Resume file: .planning/phases/152-pages-audit-core-device-pages/152-CONTEXT.md
+Stopped at: Completed 152-01-PLAN.md
+Resume file: None

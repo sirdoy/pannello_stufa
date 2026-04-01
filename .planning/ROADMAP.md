@@ -149,7 +149,7 @@ Plans:
   5. The network page (/network) displays charts and tables without overflow at 375px
 **Plans**: 2 plans
 Plans:
-- [ ] 152-01-PLAN.md — TBD
+- [x] 152-01-PLAN.md — TBD
 - [ ] 152-02-PLAN.md — TBD
 **UI hint**: yes
 
@@ -195,6 +195,6 @@ Plans:
 | 149. Theme Removal Core | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 150. Theme Prefix Cleanup | v18.0 | 2/3 | Complete    | 2026-04-01 |
 | 151. Design System Mobile-First | v18.0 | 2/2 | Complete    | 2026-04-01 |
-| 152. Pages Audit — Core & Device Pages | v18.0 | 0/TBD | Not started | - |
+| 152. Pages Audit — Core & Device Pages | v18.0 | 1/2 | In Progress|  |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 0/TBD | Not started | - |
 | 154. Pages Audit — Admin & Support Pages | v18.0 | 0/TBD | Not started | - |

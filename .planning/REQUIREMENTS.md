@@ -34,8 +34,8 @@ Requirements for Dark-Only & Mobile-First milestone.
 - [x] **AUDIT-01**: Dashboard home page (/) verified and fixed at 375px
 - [x] **AUDIT-02**: Stove pages (/stove, /stove/errors, /stove/maintenance, /stove/scheduler) verified at 375px
 - [x] **AUDIT-03**: Thermostat pages (/thermostat, /thermostat/schedule) verified at 375px
-- [ ] **AUDIT-04**: Lights pages (/lights, /lights/scenes, /lights/automation) verified at 375px
-- [ ] **AUDIT-05**: Network page (/network) verified at 375px
+- [x] **AUDIT-04**: Lights pages (/lights, /lights/scenes, /lights/automation) verified at 375px
+- [x] **AUDIT-05**: Network page (/network) verified at 375px
 - [ ] **AUDIT-06**: Sonos page (/sonos) verified at 375px
 - [ ] **AUDIT-07**: DIRIGERA page (/dirigera) verified at 375px
 - [ ] **AUDIT-08**: Raspi page (/raspi) verified at 375px
@@ -90,8 +90,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUDIT-01 | Phase 152 | Complete |
 | AUDIT-02 | Phase 152 | Complete |
 | AUDIT-03 | Phase 152 | Complete |
-| AUDIT-04 | Phase 152 | Pending |
-| AUDIT-05 | Phase 152 | Pending |
+| AUDIT-04 | Phase 152 | Complete |
+| AUDIT-05 | Phase 152 | Complete |
 | AUDIT-06 | Phase 153 | Pending |
 | AUDIT-07 | Phase 153 | Pending |
 | AUDIT-08 | Phase 153 | Pending |

@@ -85,7 +85,7 @@ See git history and `.planning/milestones/` for details.
 - [x] **Phase 149: Theme Removal Core** - Remove ThemeContext, ThemeProvider, settings page, API route, and hardcode dark on html element (completed 2026-04-01)
 - [x] **Phase 150: Theme Prefix Cleanup** - Remove all dark: Tailwind prefixes and html:not(.dark) selectors across the codebase (completed 2026-04-01)
 - [x] **Phase 151: Design System Mobile-First** - Fix ButtonGroup wrapping, verify all DS components at 375px, update DS showcase (completed 2026-04-01)
-- [ ] **Phase 152: Pages Audit — Core & Device Pages** - Audit dashboard, stove, thermostat, lights, and network pages at 375px
+- [x] **Phase 152: Pages Audit — Core & Device Pages** - Audit dashboard, stove, thermostat, lights, and network pages at 375px (completed 2026-04-01)
 - [ ] **Phase 153: Pages Audit — Extended Device Pages** - Audit Sonos, DIRIGERA, Raspi, Tuya, and Rooms pages at 375px
 - [ ] **Phase 154: Pages Audit — Admin & Support Pages** - Audit registry, settings, debug, camera, and remaining pages at 375px
 
@@ -150,7 +150,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 152-01-PLAN.md — TBD
-- [ ] 152-02-PLAN.md — TBD
+- [x] 152-02-PLAN.md — TBD
 **UI hint**: yes
 
 ### Phase 153: Pages Audit — Extended Device Pages
@@ -195,6 +195,6 @@ Plans:
 | 149. Theme Removal Core | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 150. Theme Prefix Cleanup | v18.0 | 2/3 | Complete    | 2026-04-01 |
 | 151. Design System Mobile-First | v18.0 | 2/2 | Complete    | 2026-04-01 |
-| 152. Pages Audit — Core & Device Pages | v18.0 | 1/2 | In Progress|  |
+| 152. Pages Audit — Core & Device Pages | v18.0 | 2/2 | Complete   | 2026-04-01 |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 0/TBD | Not started | - |
 | 154. Pages Audit — Admin & Support Pages | v18.0 | 0/TBD | Not started | - |

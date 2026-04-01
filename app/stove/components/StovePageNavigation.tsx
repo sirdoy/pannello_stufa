@@ -44,14 +44,14 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
               className="h-full transition-all duration-300 hover:shadow-sage-glow hover:scale-[1.02] hover:border-sage-500/40"
             >
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-sage-900/50 [html:not(.dark)_&]:bg-sage-100 flex items-center justify-center border border-sage-500/30 [html:not(.dark)_&]:border-sage-300 group-hover:border-sage-500/60 transition-colors flex-shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-sage-900/50 flex items-center justify-center border border-sage-500/30 group-hover:border-sage-500/60 transition-colors flex-shrink-0">
                   <span className="text-3xl">📅</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-sage-400 [html:not(.dark)_&]:group-hover:text-sage-600 transition-colors mb-1"
+                    className="group-hover:text-sage-400 transition-colors mb-1"
                   >
                     Pianificazione
                   </Heading>
@@ -75,14 +75,14 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
               className="h-full transition-all duration-300 hover:shadow-ocean-glow hover:scale-[1.02] hover:border-ocean-500/40"
             >
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-ocean-900/50 [html:not(.dark)_&]:bg-ocean-100 flex items-center justify-center border border-ocean-500/30 [html:not(.dark)_&]:border-ocean-300 group-hover:border-ocean-500/60 transition-colors flex-shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-ocean-900/50 flex items-center justify-center border border-ocean-500/30 group-hover:border-ocean-500/60 transition-colors flex-shrink-0">
                   <span className="text-3xl">🔧</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-ocean-400 [html:not(.dark)_&]:group-hover:text-ocean-600 transition-colors mb-1"
+                    className="group-hover:text-ocean-400 transition-colors mb-1"
                   >
                     Manutenzione
                   </Heading>
@@ -110,14 +110,14 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
               className="h-full transition-all duration-300 hover:shadow-ember-glow hover:scale-[1.02] hover:border-ember-500/40"
             >
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-ember-900/50 [html:not(.dark)_&]:bg-ember-100 flex items-center justify-center border border-ember-500/30 [html:not(.dark)_&]:border-ember-300 group-hover:border-ember-500/60 transition-colors flex-shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-ember-900/50 flex items-center justify-center border border-ember-500/30 group-hover:border-ember-500/60 transition-colors flex-shrink-0">
                   <span className="text-3xl">🚨</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 transition-colors mb-1"
+                    className="group-hover:text-ember-400 transition-colors mb-1"
                   >
                     Storico Allarmi
                   </Heading>

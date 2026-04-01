@@ -117,7 +117,7 @@ export default function DebugLogsPage() {
         {/* Logs List */}
         <div className="space-y-3">
           {logs.length === 0 ? (
-            <Card className="p-6 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 text-center">
+            <Card className="p-6 bg-slate-800/50 text-center">
               <Text variant="tertiary">
                 Nessun log trovato per la categoria &quot;{category}&quot;
               </Text>
@@ -131,10 +131,10 @@ export default function DebugLogsPage() {
                 key={log.id || index}
                 className={`p-4 ${
                   log.message.includes('Errore')
-                    ? 'border-l-4 border-l-ember-500 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-50'
+                    ? 'border-l-4 border-l-ember-500 bg-ember-500/10'
                     : log.message.includes('successo')
-                    ? 'border-l-4 border-l-sage-500 bg-sage-500/10 [html:not(.dark)_&]:bg-sage-50'
-                    : 'bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50'
+                    ? 'border-l-4 border-l-sage-500 bg-sage-500/10'
+                    : 'bg-slate-800/50'
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">
@@ -175,10 +175,10 @@ export default function DebugLogsPage() {
         title="Come Usare il Debug"
       >
         <ul className="space-y-2 ml-4 mt-2">
-          <li><Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">• <strong>Notifiche</strong>: Quando attivi notifiche da mobile, vedrai i log qui</Text></li>
-          <li><Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">• <strong>VAPID_KEY</strong>: Verifica che il campo &quot;VAPID_KEY_exists&quot; sia true</Text></li>
-          <li><Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">• <strong>Auto-refresh</strong>: Attiva mentre testi da mobile</Text></li>
-          <li><Text size="sm" className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">• <strong>Errori</strong>: Evidenziati in rosso con dettagli completi</Text></li>
+          <li><Text size="sm" className="text-ocean-300">• <strong>Notifiche</strong>: Quando attivi notifiche da mobile, vedrai i log qui</Text></li>
+          <li><Text size="sm" className="text-ocean-300">• <strong>VAPID_KEY</strong>: Verifica che il campo &quot;VAPID_KEY_exists&quot; sia true</Text></li>
+          <li><Text size="sm" className="text-ocean-300">• <strong>Auto-refresh</strong>: Attiva mentre testi da mobile</Text></li>
+          <li><Text size="sm" className="text-ocean-300">• <strong>Errori</strong>: Evidenziati in rosso con dettagli completi</Text></li>
         </ul>
       </Banner>
 

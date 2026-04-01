@@ -96,7 +96,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
   return (
     <div className="space-y-6">
       {/* Scheduler Info */}
-      <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Text variant="secondary" size="sm">
           The scheduler cron endpoint (<code className="text-xs">/api/scheduler/check</code>) is called every minute by
           an external cron service (e.g., cron-job.org). It handles all automated tasks: stove scheduling, Netatmo
@@ -158,7 +158,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       </div>
 
       {/* Scheduler Jobs Reference */}
-      <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Heading level={3} size="sm" className="mb-3">
           ⏰ Automated Jobs
         </Heading>
@@ -184,7 +184,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       </div>
 
       {/* Cron Health */}
-      <div className="bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700 [html:not(.dark)_&]:border-slate-300 rounded-lg p-4">
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Heading level={3} size="sm" className="mb-3">
           💚 Cron Health
         </Heading>

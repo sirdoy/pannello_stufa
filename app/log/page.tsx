@@ -189,7 +189,7 @@ export default function LogPage() {
               size="sm"
               icon="🔥"
               onClick={() => setDeviceFilter('stove')}
-              className={deviceFilter !== 'stove' ? 'text-ember-400 [html:not(.dark)_&]:text-ember-600 hover:bg-ember-500/10' : ''}
+              className={deviceFilter !== 'stove' ? 'text-ember-400 hover:bg-ember-500/10' : ''}
             >
               Stufa ({deviceCounts.stove})
             </Button>
@@ -202,7 +202,7 @@ export default function LogPage() {
               size="sm"
               icon="🌡️"
               onClick={() => setDeviceFilter('thermostat')}
-              className={deviceFilter !== 'thermostat' ? 'text-ocean-400 [html:not(.dark)_&]:text-ocean-600 hover:bg-ocean-500/10' : ''}
+              className={deviceFilter !== 'thermostat' ? 'text-ocean-400 hover:bg-ocean-500/10' : ''}
             >
               Termostato ({deviceCounts.thermostat})
             </Button>
@@ -216,8 +216,8 @@ export default function LogPage() {
               icon="💡"
               onClick={() => setDeviceFilter('lights')}
               className={deviceFilter === 'lights'
-                ? 'bg-warning-500/20 text-warning-300 [html:not(.dark)_&]:bg-warning-500/15 [html:not(.dark)_&]:text-warning-700'
-                : 'text-warning-400 [html:not(.dark)_&]:text-warning-700 hover:bg-warning-500/10'}
+                ? 'bg-warning-500/20 text-warning-300'
+                : 'text-warning-400 hover:bg-warning-500/10'}
             >
               Luci ({deviceCounts.lights})
             </Button>
@@ -230,7 +230,7 @@ export default function LogPage() {
               size="sm"
               icon="🎵"
               onClick={() => setDeviceFilter('sonos')}
-              className={deviceFilter !== 'sonos' ? 'text-sage-400 [html:not(.dark)_&]:text-sage-600 hover:bg-sage-500/10' : ''}
+              className={deviceFilter !== 'sonos' ? 'text-sage-400 hover:bg-sage-500/10' : ''}
             >
               Sonos ({deviceCounts.sonos})
             </Button>

@@ -282,10 +282,10 @@ export default function CameraEventsPage() {
                     <button
                       key={event.event_id}
                       onClick={() => setSelectedEvent(event)}
-                      className="w-full flex items-center gap-4 p-3 rounded-xl bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 hover:bg-slate-700/50 [html:not(.dark)_&]:hover:bg-slate-200 hover:ring-2 hover:ring-ocean-500 transition-all text-left group"
+                      className="w-full flex items-center gap-4 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 hover:ring-2 hover:ring-ocean-500 transition-all text-left group"
                     >
                       {/* Snapshot preview */}
-                      <div className="relative w-32 h-20 sm:w-40 sm:h-24 rounded-lg overflow-hidden bg-slate-900 [html:not(.dark)_&]:bg-slate-200 flex-shrink-0">
+                      <div className="relative w-32 h-20 sm:w-40 sm:h-24 rounded-lg overflow-hidden bg-slate-900 flex-shrink-0">
                         {event.snapshot_url ? (
                           <img
                             src={event.snapshot_url}

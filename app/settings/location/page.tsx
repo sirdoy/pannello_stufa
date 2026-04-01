@@ -155,7 +155,7 @@ export default function LocationSettingsPage() {
       {/* Info card */}
       <Card
         variant="glass"
-        className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800"
+        className="p-6 sm:p-8 bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 border-ocean-800"
       >
         <div className="flex gap-3">
           <div className="text-2xl">ℹ️</div>

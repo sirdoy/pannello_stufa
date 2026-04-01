@@ -38,7 +38,7 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
       {/* Fan Control */}
       <Card variant="glass" className="overflow-hidden">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 [html:not(.dark)_&]:bg-ocean-100 flex items-center justify-center border-2 border-ocean-500/50 [html:not(.dark)_&]:border-ocean-300">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 flex items-center justify-center border-2 border-ocean-500/50">
             <span className="text-xl sm:text-2xl">💨</span>
           </div>
           <Heading level={3} size="lg">
@@ -58,10 +58,10 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
               Livello
             </Text>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl sm:text-6xl font-black text-ocean-400 [html:not(.dark)_&]:text-ocean-600">
+              <span className="text-5xl sm:text-6xl font-black text-ocean-400">
                 {fanLevel ?? '-'}
               </span>
-              <span className="text-xl font-bold text-slate-500 [html:not(.dark)_&]:text-slate-400">/6</span>
+              <span className="text-xl font-bold text-slate-500">/6</span>
             </div>
           </div>
           <ControlButton
@@ -76,7 +76,7 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
       {/* Power Control */}
       <Card variant="glass" className="overflow-hidden">
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ember-900/50 [html:not(.dark)_&]:bg-ember-100 flex items-center justify-center border-2 border-ember-500/50 [html:not(.dark)_&]:border-ember-300">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ember-900/50 flex items-center justify-center border-2 border-ember-500/50">
             <span className="text-xl sm:text-2xl">⚡</span>
           </div>
           <Heading level={3} size="lg">
@@ -96,10 +96,10 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
               Livello
             </Text>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl sm:text-6xl font-black text-ember-400 [html:not(.dark)_&]:text-ember-600">
+              <span className="text-5xl sm:text-6xl font-black text-ember-400">
                 {powerLevel ?? '-'}
               </span>
-              <span className="text-xl font-bold text-slate-500 [html:not(.dark)_&]:text-slate-400">/5</span>
+              <span className="text-xl font-bold text-slate-500">/5</span>
             </div>
           </div>
           <ControlButton

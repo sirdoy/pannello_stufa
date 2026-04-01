@@ -253,7 +253,7 @@ export default function NotificationSettingsForm({
 
           {/* DND Time Inputs - only visible when enabled */}
           {hasDndWindow && (
-            <div className="ml-4 pl-4 border-l-2 border-slate-700/50 [html:not(.dark)_&]:border-slate-200 space-y-4">
+            <div className="ml-4 pl-4 border-l-2 border-slate-700/50 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Start Time */}
                 <div>
@@ -303,7 +303,7 @@ export default function NotificationSettingsForm({
               </div>
 
               {/* Timezone Display */}
-              <div className="p-3 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-lg">
+              <div className="p-3 bg-slate-800/50 rounded-lg">
                 <Text variant="secondary" size="sm">
                   <span className="font-medium">Timezone:</span> {detectedTimezone} (auto-detected)
                 </Text>
@@ -337,7 +337,7 @@ export default function NotificationSettingsForm({
         </button>
 
         {showAdvanced && (
-          <div className="mt-6 pt-6 border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 space-y-6">
+          <div className="mt-6 pt-6 border-t border-slate-700/50 space-y-6">
             <Text variant="secondary" size="sm" className="mb-4">
               Limit the number of notifications per time window to prevent spam.
             </Text>
@@ -350,7 +350,7 @@ export default function NotificationSettingsForm({
                   <span>{category.label} Rate Limits</span>
                 </Text>
 
-                <div className="ml-4 pl-4 border-l-2 border-slate-700/50 [html:not(.dark)_&]:border-slate-200 space-y-4">
+                <div className="ml-4 pl-4 border-l-2 border-slate-700/50 space-y-4">
                   {category.types.map((type) => (
                     <div key={type.key} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Controller
@@ -411,7 +411,7 @@ export default function NotificationSettingsForm({
 
       {/* Form-level Errors */}
       {errors.root && (
-        <div className="p-4 bg-ember-500/10 [html:not(.dark)_&]:bg-ember-50 border border-ember-500/30 [html:not(.dark)_&]:border-ember-200 rounded-xl">
+        <div className="p-4 bg-ember-500/10 border border-ember-500/30 rounded-xl">
           <Text variant="ember" size="sm">
             {errors.root.message}
           </Text>

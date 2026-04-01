@@ -46,13 +46,13 @@ function CollapsibleSection({
   const [isOpen, setIsOpen] = useState(defaultOpen ?? false);
 
   return (
-    <div className="border-b border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06] last:border-0">
+    <div className="border-b border-white/[0.06] last:border-0">
       <button
         onClick={() => setIsOpen((v) => !v)}
         className="w-full flex items-center justify-between py-3 px-1 text-left"
       >
         <span className="font-medium text-sm">
-          {title}{' '}
+          {title}{''}
           <span className="text-slate-400">({count})</span>
         </span>
         <ChevronDown

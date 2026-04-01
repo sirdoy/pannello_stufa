@@ -68,7 +68,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
           }`}
           aria-hidden="true"
         >
-          <div className="absolute inset-0 bg-slate-50/40 [html:not(.dark)_&]:bg-slate-900/40 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-slate-50/40 backdrop-blur-[2px]" />
         </div>
       )}
 

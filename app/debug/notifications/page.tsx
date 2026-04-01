@@ -139,18 +139,18 @@ export default function NotificationsDashboard() {
   const getStatusBadge = (status: string): { bg: string; text: string; label: string } => {
     const badges: Record<string, { bg: string; text: string; label: string }> = {
       active: {
-        bg: 'bg-sage-50 [html:not(.dark)_&]:bg-sage-50',
-        text: 'text-sage-600 [html:not(.dark)_&]:text-sage-700',
+        bg: 'bg-sage-50',
+        text: 'text-sage-600',
         label: 'Active',
       },
       stale: {
-        bg: 'bg-warning-50 [html:not(.dark)_&]:bg-warning-50',
-        text: 'text-warning-600 [html:not(.dark)_&]:text-warning-700',
+        bg: 'bg-warning-50',
+        text: 'text-warning-600',
         label: 'Stale',
       },
       unknown: {
-        bg: 'bg-slate-100 [html:not(.dark)_&]:bg-slate-100',
-        text: 'text-slate-600 [html:not(.dark)_&]:text-slate-700',
+        bg: 'bg-slate-100',
+        text: 'text-slate-600',
         label: 'Unknown',
       },
     };
@@ -209,7 +209,7 @@ export default function NotificationsDashboard() {
         </div>
 
         {error && (
-          <div className="mt-4 p-4 rounded-lg bg-ember-50 [html:not(.dark)_&]:bg-ember-50 border border-ember-200 [html:not(.dark)_&]:border-ember-300">
+          <div className="mt-4 p-4 rounded-lg bg-ember-50 border border-ember-200">
             <Text variant="ember" size="sm">
               ⚠️ Error loading dashboard: {error}
             </Text>
@@ -221,7 +221,7 @@ export default function NotificationsDashboard() {
       {stats && !loading && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Today's Notifications */}
-          <Card className="p-6 bg-ocean-50 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-200 [html:not(.dark)_&]:border-ocean-200">
+          <Card className="p-6 bg-ocean-50 border-2 border-ocean-200">
             <Text variant="tertiary" size="xs" className="mb-2">
               Today's Notifications
             </Text>
@@ -236,10 +236,10 @@ export default function NotificationsDashboard() {
           {/* Delivery Rate */}
           <Card className={`p-6 ${
             getDeliveryRateColor(stats.notifications.deliveryRate) === 'sage'
-              ? 'bg-sage-50 [html:not(.dark)_&]:bg-sage-50 border-2 border-sage-300 [html:not(.dark)_&]:border-sage-300'
+              ? 'bg-sage-50 border-2 border-sage-300'
               : getDeliveryRateColor(stats.notifications.deliveryRate) === 'warning'
-              ? 'bg-warning-50 [html:not(.dark)_&]:bg-warning-50 border-2 border-warning-300 [html:not(.dark)_&]:border-warning-300'
-              : 'bg-ember-50 [html:not(.dark)_&]:bg-ember-50 border-2 border-ember-300 [html:not(.dark)_&]:border-ember-300'
+              ? 'bg-warning-50 border-2 border-warning-300'
+              : 'bg-ember-50 border-2 border-ember-300'
           }`}>
             <Text variant="tertiary" size="xs" className="mb-2">
               Delivery Rate
@@ -258,7 +258,7 @@ export default function NotificationsDashboard() {
           </Card>
 
           {/* Active Devices */}
-          <Card className="p-6 bg-slate-50 [html:not(.dark)_&]:bg-slate-50 border-2 border-slate-200 [html:not(.dark)_&]:border-slate-200">
+          <Card className="p-6 bg-slate-50 border-2 border-slate-200">
             <Text variant="tertiary" size="xs" className="mb-2">
               Active Devices
             </Text>
@@ -311,8 +311,8 @@ export default function NotificationsDashboard() {
       {stats && !loading && (
         <Card className={`p-6 ${
           stats.notifications.deliveryRate < 85
-            ? 'bg-warning-50 [html:not(.dark)_&]:bg-warning-50 border-2 border-warning-200 [html:not(.dark)_&]:border-warning-300'
-            : 'bg-slate-50 [html:not(.dark)_&]:bg-slate-50 border border-slate-200 [html:not(.dark)_&]:border-slate-200'
+            ? 'bg-warning-50 border-2 border-warning-200'
+            : 'bg-slate-50 border border-slate-200'
         }`}>
           <div className="flex items-center gap-3 mb-4">
             <span className="text-2xl">🔔</span>
@@ -355,14 +355,14 @@ export default function NotificationsDashboard() {
             </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-white/[0.04] [html:not(.dark)_&]:bg-black/[0.04] border border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06]">
+          <div className="p-4 rounded-lg bg-white/[0.04] border border-white/[0.06]">
             <Text variant="tertiary" size="sm" className="mb-2">
               ℹ️ About Rate Alerting
             </Text>
             <Text variant="secondary" size="xs">
               Automatic alerts are sent when delivery rate drops below 85%. Alerts are rate-limited to max 1 per hour to prevent alert fatigue.
             </Text>
-            <div className="mt-3 pt-3 border-t border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06]">
+            <div className="mt-3 pt-3 border-t border-white/[0.06]">
               <Text variant="tertiary" size="xs">
                 <strong>Endpoint:</strong> POST /api/notifications/check-rate
               </Text>
@@ -404,7 +404,7 @@ export default function NotificationsDashboard() {
                     .map(([code, count]) => (
                       <div
                         key={code}
-                        className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100"
+                        className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50"
                       >
                         <Text size="sm" className="font-mono">
                           {code}
@@ -437,7 +437,7 @@ export default function NotificationsDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06]">
+                <tr className="border-b border-white/[0.06]">
                   <th className="text-left py-3 px-4">
                     <Text variant="tertiary" size="xs" uppercase>
                       Device
@@ -466,7 +466,7 @@ export default function NotificationsDashboard() {
                   return (
                     <tr
                       key={device.id}
-                      className="border-b border-white/[0.04] [html:not(.dark)_&]:border-black/[0.04] hover:bg-white/[0.02] [html:not(.dark)_&]:hover:bg-black/[0.02]"
+                      className="border-b border-white/[0.04] hover:bg-white/[0.02]"
                     >
                       <td className="py-3 px-4">
                         <Text size="sm">

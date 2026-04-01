@@ -145,7 +145,7 @@ function LocationContent() {
       {/* Info card */}
       <Card
         variant="glass"
-        className="p-6 sm:p-8 bg-ocean-50/50 [html:not(.dark)_&]:bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 [html:not(.dark)_&]:border-ocean-200 border-ocean-800"
+        className="p-6 sm:p-8 bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 border-ocean-800"
       >
         <div className="flex gap-3">
           <div className="text-2xl">ℹ️</div>
@@ -296,7 +296,7 @@ function UnifiedDevicesContent() {
 
     } catch (error) {
       console.error('Error saving config:', error);
-      alert('Errore nel salvataggio: ' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
+      alert('Errore nel salvataggio:' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
     } finally {
       setIsSaving(false);
     }
@@ -338,8 +338,8 @@ function UnifiedDevicesContent() {
                 key={device.id}
                 className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 ${
                   isVisible
-                    ? 'border-ember-600/50 [html:not(.dark)_&]:border-ember-300 bg-ember-950/10 [html:not(.dark)_&]:bg-ember-50/30'
-                    : 'border-slate-700/30 [html:not(.dark)_&]:border-slate-200 bg-slate-900/20 [html:not(.dark)_&]:bg-slate-100/50 opacity-60'
+                    ? 'border-ember-600/50 bg-ember-950/10'
+                    : 'border-slate-700/30 bg-slate-900/20 opacity-60'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2 sm:gap-4">
@@ -439,7 +439,7 @@ function UnifiedDevicesContent() {
       )}
 
       {/* Info card */}
-      <Card variant="glass" className="p-4 sm:p-6 bg-ocean-900/10 [html:not(.dark)_&]:bg-ocean-50/50">
+      <Card variant="glass" className="p-4 sm:p-6 bg-ocean-900/10">
         <Heading level={3} size="md" variant="subtle" className="mb-3">
           ℹ️ Come funziona
         </Heading>

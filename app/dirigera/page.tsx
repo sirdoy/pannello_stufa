@@ -78,7 +78,7 @@ export default function DirigeraPage() {
         {data && <DirigeraHealthSection health={data.health} />}
 
         {/* Filter segmented control */}
-        <div className="flex rounded-lg border border-slate-700/50 overflow-hidden [html:not(.dark)_&]:border-slate-200">
+        <div className="flex rounded-lg border border-slate-700/50 overflow-hidden">
           {FILTERS.map(f => (
             <button
               key={f.key}
@@ -87,7 +87,7 @@ export default function DirigeraPage() {
                 'flex-1 px-3 py-1.5 text-sm font-medium transition-colors',
                 filter === f.key
                   ? 'bg-ocean-600/80 text-white'
-                  : 'bg-transparent text-slate-400 hover:text-slate-200 [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-slate-800'
+                  : 'bg-transparent text-slate-400 hover:text-slate-200'
               )}
             >
               {f.label}

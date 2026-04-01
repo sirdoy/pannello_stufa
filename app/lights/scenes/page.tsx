@@ -25,8 +25,8 @@ function SceneCard({ scene, activatingScene, onActivate }: SceneCardProps) {
       disabled={isActivating}
       className={`w-full relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
         isActivating
-          ? 'border-warning-500 bg-warning-50 [html:not(.dark)_&]:bg-warning-50 bg-warning-900/20'
-          : 'border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700 bg-white/60 [html:not(.dark)_&]:bg-white/60 bg-white/[0.03] hover:bg-warning-50 [html:not(.dark)_&]:hover:bg-warning-50 hover:bg-warning-900/20 hover:border-warning-300 [html:not(.dark)_&]:hover:border-warning-300 hover:border-warning-600'
+          ? 'border-warning-500 bg-warning-50 bg-warning-900/20'
+          : 'border-slate-200 border-slate-700 bg-white/60 bg-white/[0.03] hover:bg-warning-50 hover:bg-warning-900/20 hover:border-warning-300 hover:border-warning-600'
       }`}
     >
       <div className="text-4xl mb-3">🎨</div>
@@ -187,7 +187,7 @@ export default function ScenesPage() {
         </div>
 
         {rooms.length > 1 && (
-          <div className="mt-4 pt-4 border-t border-slate-200 [html:not(.dark)_&]:border-slate-200 border-slate-700">
+          <div className="mt-4 pt-4 border-t border-slate-200 border-slate-700">
             <Text variant="secondary" size="xs" className="mb-2">Filtra per stanza:</Text>
             <div className="flex flex-wrap gap-2">
               <Button variant={selectedRoom === 'all' ? 'ember' : 'outline'}

@@ -48,7 +48,7 @@ const BandwidthChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6 h-[380px] flex items-center justify-center">
+      <div className="bg-slate-800/30 rounded-2xl p-6 h-[380px] flex items-center justify-center">
         <Skeleton className="w-full h-full rounded-xl" />
       </div>
     ),
@@ -60,7 +60,7 @@ const BandwidthCorrelationChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6 h-[360px] flex items-center justify-center">
+      <div className="bg-slate-800/30 rounded-2xl p-6 h-[360px] flex items-center justify-center">
         <Skeleton className="w-full h-full rounded-xl" />
       </div>
     ),
@@ -71,7 +71,7 @@ const DeviceCountChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6 h-[320px] flex items-center justify-center">
+      <div className="bg-slate-800/30 rounded-2xl p-6 h-[320px] flex items-center justify-center">
         <Skeleton className="w-full h-full rounded-xl" />
       </div>
     ),
@@ -212,7 +212,7 @@ export default function NetworkPage() {
         <BudgetStatsCard data={budgetStats.data} loading={budgetStats.loading} error={budgetStats.error} />
 
         {/* Tab Navigation */}
-        <div className="flex gap-1 border-b border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06] pb-0">
+        <div className="flex gap-1 border-b border-white/[0.06] pb-0">
           {([
             { key: 'dispositivi' as const, label: 'Dispositivi' },
             { key: 'wifi' as const, label: 'WiFi Clients' },
@@ -226,7 +226,7 @@ export default function NetworkPage() {
                 'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
                 activeTab === tab.key
                   ? 'border-ember-400 text-ember-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 [html:not(.dark)_&]:hover:text-slate-600'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
               )}
             >
               {tab.label}

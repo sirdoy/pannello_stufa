@@ -47,7 +47,7 @@ export default function DurationPicker({ value, onChange }: DurationPickerProps)
         onChange={(e) => onChange(fromSlider(Number(e.target.value)))}
         className="
           w-full h-2 rounded-lg appearance-none cursor-pointer
-          bg-slate-700 [html:not(.dark)_&]:bg-slate-200
+          bg-slate-700 
 
           [&::-webkit-slider-thumb]:appearance-none
           [&::-webkit-slider-thumb]:w-6

@@ -96,7 +96,7 @@ export default function TuyaPage() {
             />
           ))}
           {plugs.length === 0 && (
-            <p className="col-span-full text-sm text-slate-400 [html:not(.dark)_&]:text-slate-500">
+            <p className="col-span-full text-sm text-slate-400">
               Nessun plug rilevato.
             </p>
           )}

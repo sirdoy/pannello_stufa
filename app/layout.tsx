@@ -50,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="theme-color" content="#0f172a" />
     </head>
-    <body className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 flex flex-col" suppressHydrationWarning>
+    <body className="min-h-screen bg-slate-900 text-slate-100 flex flex-col" suppressHydrationWarning>
     {/* Skip to content - Accessibility */}
     <a
       href="#main-content"

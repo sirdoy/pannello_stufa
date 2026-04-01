@@ -68,7 +68,7 @@ export default function ApiDebugPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 [html:not(.dark)_&]:bg-white text-slate-100 [html:not(.dark)_&]:text-slate-900 p-6">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -85,9 +85,9 @@ export default function ApiDebugPage() {
               Test all system components and monitor live API responses
             </Text>
             <Text size="sm" variant="secondary" className="mt-2">
-              Keyboard: <kbd className="px-1.5 py-0.5 bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded text-xs">1-6</kbd> = Switch tabs,{' '}
-              <kbd className="px-1.5 py-0.5 bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded text-xs">⌘R</kbd> = Refresh,{' '}
-              <kbd className="px-1.5 py-0.5 bg-slate-800 [html:not(.dark)_&]:bg-slate-200 rounded text-xs">A</kbd> = Auto-refresh
+              Keyboard: <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">1-6</kbd> = Switch tabs,{''}
+              <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">⌘R</kbd> = Refresh,{''}
+              <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">A</kbd> = Auto-refresh
             </Text>
           </div>
 

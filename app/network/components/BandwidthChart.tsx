@@ -57,7 +57,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const uploadValue = payload.find((p) => p.dataKey === 'upload')?.value ?? 0;
 
   return (
-    <div className="bg-slate-900 [html:not(.dark)_&]:bg-white border border-white/10 [html:not(.dark)_&]:border-black/10 rounded-lg p-3 shadow-xl">
+    <div className="bg-slate-900 border border-white/10 rounded-lg p-3 shadow-xl">
       <Text size="xs" className="mb-2">
         {format(label, 'HH:mm:ss')}
       </Text>
@@ -145,7 +145,7 @@ export default function BandwidthChart({
   };
 
   return (
-    <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6">
+    <div className="bg-slate-800/30 rounded-2xl p-6">
       {/* Header: Title + Tier Toggle + Time Range Selector */}
       <div className="flex items-center justify-between mb-6">
         <Heading level={2} size="lg">

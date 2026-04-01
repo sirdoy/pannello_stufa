@@ -34,7 +34,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0 || !label) return null;
 
   return (
-    <div className="bg-slate-900 [html:not(.dark)_&]:bg-white border border-white/10 [html:not(.dark)_&]:border-black/10 rounded-lg p-3 shadow-xl">
+    <div className="bg-slate-900 border border-white/10 rounded-lg p-3 shadow-xl">
       <Text size="xs" className="mb-2">
         {format(label, 'dd/MM/yyyy')}
       </Text>
@@ -65,7 +65,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
  */
 export default function DeviceCountChart({ data, loading }: DeviceCountChartProps) {
   return (
-    <div className="bg-slate-800/30 [html:not(.dark)_&]:bg-white rounded-2xl p-6">
+    <div className="bg-slate-800/30 rounded-2xl p-6">
       <Heading level={2} size="lg" className="mb-6">
         Dispositivi connessi
       </Heading>

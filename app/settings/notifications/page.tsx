@@ -134,7 +134,7 @@ export default function NotificationsSettingsPage() {
       }
     } catch (error) {
       console.error('Errore disattivazione:', error);
-      alert('Errore: ' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
+      alert('Errore:' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
     } finally {
       setIsDeactivating(false);
     }
@@ -150,7 +150,7 @@ export default function NotificationsSettingsPage() {
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error) {
       console.error('[NotificationsPage] Error saving preferences:', error);
-      alert('Errore salvataggio preferenze: ' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
+      alert('Errore salvataggio preferenze:' + (error instanceof Error ? error.message : 'Errore sconosciuto'));
     }
   };
 
@@ -438,7 +438,7 @@ export default function NotificationsSettingsPage() {
                 size="sm"
                 onClick={handleDeactivate}
                 disabled={isDeactivating}
-                className="text-ember-400 hover:text-ember-300 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:hover:text-ember-700"
+                className="text-ember-400 hover:text-ember-300"
               >
                 {isDeactivating ? 'Disattivazione...' : 'Disattiva Tutti'}
               </Button>
@@ -507,7 +507,7 @@ export default function NotificationsSettingsPage() {
                         </div>
 
                         <Text size="sm" variant="secondary">
-                          Registrato:{' '}
+                          Registrato:{''}
                           {device.createdAt != null ? new Date(device.createdAt).toLocaleString('it-IT', {
                             day: '2-digit',
                             month: 'short',
@@ -610,7 +610,7 @@ export default function NotificationsSettingsPage() {
       {/* Info iOS */}
       <Card
         variant="glass"
-        className="p-6 sm:p-8 bg-ocean-500/10 [html:not(.dark)_&]:bg-ocean-50 border-2 border-ocean-500/30 [html:not(.dark)_&]:border-ocean-200"
+        className="p-6 sm:p-8 bg-ocean-500/10 border-2 border-ocean-500/30"
       >
         <div className="flex gap-4">
           <div className="text-2xl flex-shrink-0">ℹ️</div>

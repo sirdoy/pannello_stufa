@@ -38,15 +38,15 @@ const getStatusStyle = (status: string): StatusStyle => {
   const styles: Record<string, StatusStyle> = {
     active: {
       text: 'Attivo',
-      className: 'bg-sage-500/20 text-sage-400 [html:not(.dark)_&]:bg-sage-100 [html:not(.dark)_&]:text-sage-700',
+      className: 'bg-sage-500/20 text-sage-400',
     },
     stale: {
       text: 'Inattivo',
-      className: 'bg-copper-500/20 text-copper-400 [html:not(.dark)_&]:bg-copper-100 [html:not(.dark)_&]:text-copper-700',
+      className: 'bg-copper-500/20 text-copper-400',
     },
     unknown: {
       text: 'Sconosciuto',
-      className: 'bg-slate-500/20 text-slate-400 [html:not(.dark)_&]:bg-slate-200 [html:not(.dark)_&]:text-slate-600',
+      className: 'bg-slate-500/20 text-slate-400',
     },
   };
   return (styles[status] ?? styles.unknown)!;
@@ -157,7 +157,7 @@ export default function DeviceListItem({
   };
 
   return (
-    <div className="p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-50 border border-slate-700/50 [html:not(.dark)_&]:border-slate-200 rounded-xl" data-testid="device-item">
+    <div className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl" data-testid="device-item">
       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
         {/* Device info */}
         <div className="flex-1 min-w-0">
@@ -216,7 +216,7 @@ export default function DeviceListItem({
 
             {/* Current device badge */}
             {isCurrentDevice && (
-              <span className="px-2 py-0.5 text-xs font-medium bg-ocean-500/20 text-ocean-400 [html:not(.dark)_&]:bg-ocean-100 [html:not(.dark)_&]:text-ocean-700 rounded-full flex-shrink-0">
+              <span className="px-2 py-0.5 text-xs font-medium bg-ocean-500/20 text-ocean-400 rounded-full flex-shrink-0">
                 Questo dispositivo
               </span>
             )}
@@ -233,7 +233,7 @@ export default function DeviceListItem({
               {device.browser || 'Browser'} • {device.os || 'Sistema'}
             </Text>
             <Text variant="tertiary" size="xs">
-              Ultimo utilizzo:{' '}
+              Ultimo utilizzo:{''}
               {device.lastUsed
                 ? formatDistanceToNow(new Date(device.lastUsed), {
                     addSuffix: true,
@@ -265,7 +265,7 @@ export default function DeviceListItem({
             size="sm"
             onClick={handleRemove}
             disabled={isRemoving || isCurrentDevice}
-            className="text-ember-400 hover:text-ember-300 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:hover:text-ember-700"
+            className="text-ember-400 hover:text-ember-300"
             data-testid="remove-device"
           >
             {isRemoving ? 'Rimozione...' : 'Rimuovi'}

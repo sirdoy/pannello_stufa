@@ -177,8 +177,8 @@ export default function TransitionsDebugPage() {
                     border-white/[0.06]
                     hover:bg-white/[0.06]
                     hover:border-white/[0.12]
-                    [html:not(.dark)_&]:bg-black/[0.02]
-                    [html:not(.dark)_&]:border-black/[0.06]
+                    
+                    
                   `
                 }
               `}
@@ -253,7 +253,7 @@ export default function TransitionsDebugPage() {
                 bg-gradient-to-br from-ember-500/5 to-flame-500/5
                 opacity-0 group-hover:opacity-100
                 transition-opacity duration-300
-              " />
+              "/>
 
               <div className="relative flex items-center gap-4">
                 <div className="text-4xl">
@@ -290,13 +290,13 @@ export default function TransitionsDebugPage() {
         title="Browser Support"
       >
         <div className="space-y-2 text-sm mt-2">
-          <Text className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">
+          <Text className="text-ocean-300">
             <strong className="text-ember-400">View Transitions API nativa:</strong> Chrome 111+, Edge 111+, Safari 18+
           </Text>
-          <Text className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">
+          <Text className="text-ocean-300">
             <strong className="text-ember-400">CSS Fallback:</strong> Tutti i browser moderni
           </Text>
-          <Text className="text-ocean-300 [html:not(.dark)_&]:text-ocean-700">
+          <Text className="text-ocean-300">
             <strong className="text-ember-400">Accessibilita:</strong> Rispetta automaticamente prefers-reduced-motion
           </Text>
         </div>

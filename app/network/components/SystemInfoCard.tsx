@@ -36,7 +36,7 @@ export default function SystemInfoCard({ data, loading, stale }: SystemInfoCardP
     return (
       <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
         <Skeleton className="h-6 w-48" />
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Skeleton className="h-24 rounded-xl" />
           <Skeleton className="h-24 rounded-xl" />
           <Skeleton className="h-24 rounded-xl" />
@@ -64,7 +64,7 @@ export default function SystemInfoCard({ data, loading, stale }: SystemInfoCardP
       </div>
 
       {/* Info grid */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <InfoBox
           icon="📡"
           label="Modello"

@@ -212,7 +212,7 @@ export default function NetworkPage() {
         <BudgetStatsCard data={budgetStats.data} loading={budgetStats.loading} error={budgetStats.error} />
 
         {/* Tab Navigation */}
-        <div className="flex gap-1 border-b border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06] pb-0">
+        <div className="flex flex-wrap gap-1 border-b border-white/[0.06] [html:not(.dark)_&]:border-black/[0.06] pb-0">
           {([
             { key: 'dispositivi' as const, label: 'Dispositivi' },
             { key: 'wifi' as const, label: 'WiFi Clients' },

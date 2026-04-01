@@ -108,7 +108,7 @@ export default function LightsPage() {
 
       <Card className="p-6 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6">
             <div><Text variant="label" size="xs" className="mb-1">Stanze</Text><Heading level={3} size="lg">{lightsData.groups.length}</Heading></div>
             <div><Text variant="label" size="xs" className="mb-1">Luci</Text><Heading level={3} size="lg">{lightsData.lights.length}</Heading></div>
             <div><Text variant="label" size="xs" className="mb-1">Scene</Text><Heading level={3} size="lg">{lightsData.scenes.length}</Heading></div>
@@ -230,7 +230,7 @@ export default function LightsPage() {
                                     {hasColor && (
                                       <div className="space-y-1.5">
                                         <Text variant="tertiary" size="xs">Colore</Text>
-                                        <div className="grid grid-cols-5 gap-1.5">
+                                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
                                           {COLOR_PRESETS.map(preset => (
                                             <button key={preset.name} onClick={() => handleLightColorChange(light.light_id, preset)} disabled={changingColor === light.light_id} className="relative w-full aspect-square rounded-lg border-2 border-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-50" style={{ backgroundColor: preset.hex }} title={preset.name}>
                                               {changingColor === light.light_id && <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg"><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>}

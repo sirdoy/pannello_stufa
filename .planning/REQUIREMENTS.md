@@ -36,10 +36,10 @@ Requirements for Dark-Only & Mobile-First milestone.
 - [x] **AUDIT-03**: Thermostat pages (/thermostat, /thermostat/schedule) verified at 375px
 - [x] **AUDIT-04**: Lights pages (/lights, /lights/scenes, /lights/automation) verified at 375px
 - [x] **AUDIT-05**: Network page (/network) verified at 375px
-- [ ] **AUDIT-06**: Sonos page (/sonos) verified at 375px
-- [ ] **AUDIT-07**: DIRIGERA page (/dirigera) verified at 375px
-- [ ] **AUDIT-08**: Raspi page (/raspi) verified at 375px
-- [ ] **AUDIT-09**: Tuya page (/tuya) verified at 375px
+- [x] **AUDIT-06**: Sonos page (/sonos) verified at 375px
+- [x] **AUDIT-07**: DIRIGERA page (/dirigera) verified at 375px
+- [x] **AUDIT-08**: Raspi page (/raspi) verified at 375px
+- [x] **AUDIT-09**: Tuya page (/tuya) verified at 375px
 - [x] **AUDIT-10**: Rooms pages (/rooms, /rooms/status, /rooms/[id]) verified at 375px
 - [ ] **AUDIT-11**: Registry pages (/registry/devices, /registry/types) verified at 375px
 - [ ] **AUDIT-12**: Settings pages (all 7 settings sub-pages) verified at 375px
@@ -92,10 +92,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUDIT-03 | Phase 152 | Complete |
 | AUDIT-04 | Phase 152 | Complete |
 | AUDIT-05 | Phase 152 | Complete |
-| AUDIT-06 | Phase 153 | Pending |
-| AUDIT-07 | Phase 153 | Pending |
-| AUDIT-08 | Phase 153 | Pending |
-| AUDIT-09 | Phase 153 | Pending |
+| AUDIT-06 | Phase 153 | Complete |
+| AUDIT-07 | Phase 153 | Complete |
+| AUDIT-08 | Phase 153 | Complete |
+| AUDIT-09 | Phase 153 | Complete |
 | AUDIT-10 | Phase 153 | Complete |
 | AUDIT-11 | Phase 154 | Pending |
 | AUDIT-12 | Phase 154 | Pending |

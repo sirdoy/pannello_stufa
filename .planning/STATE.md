@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v18.0
 milestone_name: Dark-Only & Mobile-First
-status: executing
-stopped_at: Completed 153-02-PLAN.md
-last_updated: "2026-04-01T15:47:32.263Z"
+status: verifying
+stopped_at: Completed 153-01-PLAN.md
+last_updated: "2026-04-01T15:50:22.568Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
   percent: 100
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 
 Phase: 153 (pages-audit-extended-device-pages) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-01
 
 Progress: [████████████████████] 304/302 plans (100%)
@@ -56,6 +56,7 @@ Progress: [████████████████████] 304/302
 | Phase 152-pages-audit-core-device-pages P01 | 5 | 1 tasks | 2 files |
 | Phase 152-pages-audit-core-device-pages P02 | 8min | 2 tasks | 3 files |
 | Phase 153-pages-audit-extended-device-pages P02 | 5 | 1 tasks | 1 files |
+| Phase 153-pages-audit-extended-device-pages P01 | 395s | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,7 @@ Recent decisions affecting v18.0:
 - [Phase 152-01]: flex flex-wrap gap-3 on header rows for mobile overflow: minimal targeted fix for the two identified risk points, 5 other pages confirmed mobile-safe without changes
 - [Phase 152-02]: Stats summary grid keeps 3 columns on mobile with gap-3 sm:gap-6; color presets drop to 3-col sm:5-col; network tab nav gets flex-wrap; SystemInfoCard skeleton also updated to grid-cols-1 sm:grid-cols-3
 - [Phase 153-02]: rooms/status/page.tsx and rooms/[room_id]/page.tsx confirmed mobile-safe without changes
+- [Phase 153-01]: SonosSleepTimer preset button row gets flex-wrap; all other 13 Sonos sub-components and DIRIGERA/Raspi/Tuya pages confirmed mobile-safe at 375px with 0 further changes
 
 ### Pending Todos
 
@@ -105,5 +107,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-01 - Phase 151 complete, ready to plan Phase 152
-Stopped at: Completed 153-02-PLAN.md
+Stopped at: Completed 153-01-PLAN.md
 Resume file: None

@@ -201,9 +201,9 @@ export default function Navbar() {
     bg-ember-500/15
     text-ember-400
     shadow-ember-glow-sm
-    [html:not(.dark)_&]:bg-ember-500/10
-    [html:not(.dark)_&]:text-ember-700
-    [html:not(.dark)_&]:shadow-none
+    
+    
+    
   `;
 
   const navItemInactive = `
@@ -213,11 +213,11 @@ export default function Navbar() {
     hover:text-slate-100
     border border-white/[0.06]
     hover:border-white/[0.1]
-    [html:not(.dark)_&]:bg-black/[0.03]
-    [html:not(.dark)_&]:text-slate-600
-    [html:not(.dark)_&]:border-black/[0.06]
-    [html:not(.dark)_&]:hover:bg-black/[0.05]
-    [html:not(.dark)_&]:hover:text-slate-900
+    ]
+    
+    ]
+    ]
+    
   `;
 
   return (
@@ -230,8 +230,8 @@ export default function Navbar() {
         backdrop-blur-xl
         border-b border-white/[0.06]
         shadow-card
-        [html:not(.dark)_&]:bg-white/90
-        [html:not(.dark)_&]:border-black/[0.06]
+        
+        ]
       ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16 lg:h-18">
@@ -389,7 +389,7 @@ export default function Navbar() {
                           return (
                             <div key={item.id} className="space-y-1">
                               {/* Header del submenu (non cliccabile) */}
-                              <div className="px-4 py-2 text-sm font-semibold text-slate-400 [html:not(.dark)_&]:text-slate-600 flex items-center gap-2">
+                              <div className="px-4 py-2 text-sm font-semibold text-slate-400 flex items-center gap-2">
                                 <span>{item.icon}</span>
                                 <span>{item.label}</span>
                               </div>
@@ -466,7 +466,7 @@ export default function Navbar() {
                         icon={<LogOut className="w-5 h-5" />}
                         label="Logout"
                         isActive={false}
-                        className="text-flame-400 dark:text-flame-400 [html:not(.dark)_&]:text-flame-600"
+                        className="text-flame-400"
                       />
                     </DropdownContainer>
                   )}
@@ -479,20 +479,18 @@ export default function Navbar() {
                 className="
                   p-2.5
                   rounded-xl
-                  bg-white/[0.04] dark:bg-white/[0.04]
-                  border border-white/[0.06] dark:border-white/[0.06]
-                  hover:bg-white/[0.08] dark:hover:bg-white/[0.08]
+                  bg-white/[0.04]
+                  border border-white/[0.06]
+                  hover:bg-white/[0.08]
                   transition-all duration-200
-                  [html:not(.dark)_&]:bg-black/[0.03]
-                  [html:not(.dark)_&]:border-black/[0.06]
                 "
                 aria-label={mobileMenuOpen ? 'Chiudi menu' : 'Apri menu'}
                 aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? (
-                  <X className="w-6 h-6 text-slate-300 [html:not(.dark)_&]:text-slate-600" />
+                  <X className="w-6 h-6 text-slate-300 " />
                 ) : (
-                  <Menu className="w-6 h-6 text-slate-300 [html:not(.dark)_&]:text-slate-600" />
+                  <Menu className="w-6 h-6 text-slate-300 " />
                 )}
               </button>
             </div>
@@ -511,7 +509,7 @@ export default function Navbar() {
               bg-slate-950/60
               backdrop-blur-md
               z-[9000]
-              [html:not(.dark)_&]:bg-slate-900/40
+              
             "
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
@@ -526,7 +524,7 @@ export default function Navbar() {
             z-[9001]
             overflow-y-auto
             animate-fade-in-down
-            [html:not(.dark)_&]:bg-white/95
+            
           ">
             <div className="px-4 py-5 space-y-4">
 
@@ -570,7 +568,7 @@ export default function Navbar() {
                     if (item.items && item.items.length > 0) {
                       return (
                         <div key={item.route} className="space-y-1">
-                          <div className="px-3 py-2 text-sm font-semibold text-slate-400 [html:not(.dark)_&]:text-slate-600 flex items-center gap-2">
+                          <div className="px-3 py-2 text-sm font-semibold text-slate-400 flex items-center gap-2">
                             <span className="text-base">{item.icon}</span>
                             <span>{item.label}</span>
                           </div>
@@ -615,7 +613,7 @@ export default function Navbar() {
                       return (
                         <div key={item.id} className="space-y-1">
                           {/* Header del submenu (non cliccabile) */}
-                          <div className="px-3 py-2 text-sm font-semibold text-slate-400 [html:not(.dark)_&]:text-slate-600 flex items-center gap-2">
+                          <div className="px-3 py-2 text-sm font-semibold text-slate-400 flex items-center gap-2">
                             <span className="text-base">{item.icon}</span>
                             <span>{item.label}</span>
                           </div>
@@ -671,9 +669,9 @@ export default function Navbar() {
         border-t border-white/[0.06]
         shadow-[0_-4px_24px_rgba(0,0,0,0.15)]
         pb-safe
-        [html:not(.dark)_&]:bg-white/90
-        [html:not(.dark)_&]:border-black/[0.06]
-        [html:not(.dark)_&]:shadow-[0_-4px_24px_rgba(0,0,0,0.08)]
+        
+        ]
+        ,0,0,0.08)]
       ">
         {(() => {
           const quickActions = getMobileQuickActions(navStructure);
@@ -696,8 +694,8 @@ export default function Navbar() {
                       min-h-[56px]
                       transition-all duration-200
                       ${isActiveRoute
-                        ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm [html:not(.dark)_&]:bg-ember-500/10 [html:not(.dark)_&]:text-ember-600 [html:not(.dark)_&]:shadow-none'
-                        : 'text-slate-500 hover:text-slate-300 [html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
+                        ? 'bg-ember-500/15 text-ember-400 shadow-ember-glow-sm '
+                        : 'text-slate-500 hover:text-slate-300 '
                       }
                     `}
                   >

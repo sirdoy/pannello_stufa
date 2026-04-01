@@ -279,7 +279,7 @@ export default function EditSceneModal({
         <div className="space-y-6">
           {/* Scene Name */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               Nome Scena <span className="text-ember-500">*</span>
             </label>
             <Input
@@ -301,10 +301,10 @@ export default function EditSceneModal({
 
           {/* Room Selection (READ-ONLY) */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-2">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
               Stanza <Text as="span" variant="tertiary" size="xs">(non modificabile)</Text>
             </label>
-            <div className="w-full px-4 py-3 bg-slate-100/60 [html:not(.dark)_&]:bg-slate-700/60 backdrop-blur-xl rounded-xl border border-slate-300/50 [html:not(.dark)_&]:border-slate-600/50 text-slate-600 [html:not(.dark)_&]:text-slate-400 cursor-not-allowed">
+            <div className="w-full px-4 py-3 bg-slate-100/60 backdrop-blur-xl rounded-xl border border-slate-300/50 text-slate-600 cursor-not-allowed">
               {roomName}
             </div>
             <Text variant="tertiary" size="xs" className="mt-1">
@@ -322,14 +322,14 @@ export default function EditSceneModal({
 
           {!loadingLights && lights.length > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-slate-700 [html:not(.dark)_&]:text-slate-300 mb-3">
+              <label className="block text-sm font-semibold text-slate-700 mb-3">
                 Configurazione Luci
               </label>
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {lights.map(light => {
                   const config = lightConfigs[light.id] || { on: true, brightness: 100, color: null };
                   return (
-                    <div key={light.id} className="p-4 bg-white/40 [html:not(.dark)_&]:bg-slate-800/40 rounded-xl border border-slate-200/50 [html:not(.dark)_&]:border-slate-700/50">
+                    <div key={light.id} className="p-4 bg-white/40 rounded-xl border border-slate-200/50 ">
                       {/* Light Name + Toggle */}
                       <div className="flex items-center justify-between mb-3">
                         <Text as="span">
@@ -340,7 +340,7 @@ export default function EditSceneModal({
                           className={`w-12 h-6 rounded-full transition-colors ${
                             config.on
                               ? 'bg-flame-500'
-                              : 'bg-slate-300 [html:not(.dark)_&]:bg-slate-600'
+                              : 'bg-slate-300 '
                           }`}
                         >
                           <div className={`w-5 h-5 bg-white rounded-full shadow-md transition-transform ${
@@ -352,7 +352,7 @@ export default function EditSceneModal({
                       {/* Brightness Slider */}
                       {light.dimming && config.on && (
                         <div className="mb-3">
-                          <label className="block text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-1">
+                          <label className="block text-xs text-slate-600 mb-1">
                             Luminosità: {config.brightness}%
                           </label>
                           <input
@@ -361,7 +361,7 @@ export default function EditSceneModal({
                             max="100"
                             value={config.brightness || 100}
                             onChange={(e) => handleBrightnessChange(light.id, Number(e.target.value))}
-                            className="w-full h-2 bg-slate-200 [html:not(.dark)_&]:bg-slate-700 rounded appearance-none cursor-pointer accent-flame-500"
+                            className="w-full h-2 bg-slate-200 rounded appearance-none cursor-pointer accent-flame-500"
                           />
                         </div>
                       )}
@@ -369,7 +369,7 @@ export default function EditSceneModal({
                       {/* Color Picker */}
                       {light.color && config.on && (
                         <div>
-                          <label className="block text-xs text-slate-600 [html:not(.dark)_&]:text-slate-400 mb-1">
+                          <label className="block text-xs text-slate-600 mb-1">
                             Colore (preset comuni)
                           </label>
                           <div className="grid grid-cols-5 gap-2">
@@ -377,7 +377,7 @@ export default function EditSceneModal({
                               <button
                                 key={preset.name}
                                 onClick={() => handleColorChange(light.id, preset.x, preset.y)}
-                                className="p-2 rounded-lg bg-slate-200/50 [html:not(.dark)_&]:bg-slate-700/50 hover:bg-slate-300/50 [html:not(.dark)_&]:hover:bg-slate-600/50 text-xs transition-colors"
+                                className="p-2 rounded-lg bg-slate-200/50 hover:bg-slate-300/50 text-xs transition-colors"
                                 title={preset.name}
                               >
                                 {preset.name[0]}

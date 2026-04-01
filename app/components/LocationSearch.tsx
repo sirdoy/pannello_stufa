@@ -189,7 +189,7 @@ export default function LocationSearch({
         <div className={cn(
           'mb-4 p-3 rounded-lg border',
           'bg-sage-900/20 border-sage-700/30',
-          '[html:not(.dark)_&]:bg-sage-50 [html:not(.dark)_&]:border-sage-200'
+          ' '
         )}>
           <Text variant="tertiary" size="xs" className="mb-1">
             Posizione attuale
@@ -213,7 +213,7 @@ export default function LocationSearch({
           <ul className={cn(
             'absolute z-10 w-full mt-1 rounded-lg border shadow-lg overflow-hidden',
             'bg-slate-800 border-slate-700',
-            '[html:not(.dark)_&]:bg-white [html:not(.dark)_&]:border-slate-200'
+            ' '
           )}>
             {suggestions.map((s) => (
               <li key={s.id}>
@@ -223,7 +223,6 @@ export default function LocationSearch({
                   className={cn(
                     'w-full px-4 py-3 text-left transition-colors flex items-center gap-3',
                     'hover:bg-slate-700',
-                    '[html:not(.dark)_&]:hover:bg-slate-100'
                   )}
                 >
                   <span className="text-ocean-400 flex-shrink-0">📍</span>
@@ -268,7 +267,7 @@ export default function LocationSearch({
         className={cn(
           'mt-4 text-sm flex items-center gap-1',
           'text-slate-400 hover:text-slate-300',
-          '[html:not(.dark)_&]:text-slate-500 [html:not(.dark)_&]:hover:text-slate-700'
+          ' '
         )}
       >
         <span className="text-xs">{showAdvanced ? '▲' : '▼'}</span>
@@ -280,7 +279,6 @@ export default function LocationSearch({
         <div className={cn(
           'mt-3 p-4 rounded-lg space-y-3',
           'bg-slate-800/40',
-          '[html:not(.dark)_&]:bg-slate-100'
         )}>
           <Text variant="secondary" size="sm">
             Inserisci coordinate manualmente

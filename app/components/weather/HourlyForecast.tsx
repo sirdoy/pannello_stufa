@@ -29,7 +29,7 @@ function HourlyCard({ time, weatherCode, temperature, precipProbability }: Hourl
   const formattedTime = time ? time.split('T')[1]?.substring(0, 5) : '--:--';
 
   return (
-    <div className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl min-w-[70px] [html:not(.dark)_&]:bg-slate-100/80">
+    <div className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl min-w-[70px] ">
       <Text variant="tertiary" size="xs" className="mb-2">
         {formattedTime}
       </Text>
@@ -70,12 +70,12 @@ export interface HourlyForecastProps {
  *
  * @example
  * <HourlyForecast
- *   hourly={{
- *     times: ['2026-02-03T14:00', '2026-02-03T15:00', ...],
- *     temperatures: [18, 19, ...],
- *     weatherCodes: [1, 2, ...],
- *     precipProbabilities: [0, 10, ...],
- *   }}
+ * hourly={{
+ * times: ['2026-02-03T14:00', '2026-02-03T15:00', ...],
+ * temperatures: [18, 19, ...],
+ * weatherCodes: [1, 2, ...],
+ * precipProbabilities: [0, 10, ...],
+ * }}
  * />
  */
 export function HourlyForecast({ hourly, maxHours = 12 }: HourlyForecastProps) {

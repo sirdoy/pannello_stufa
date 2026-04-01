@@ -172,7 +172,7 @@ export default function ScheduleManagementModal({
               <Text as="h4" variant="tertiary" size="sm" className="uppercase tracking-wider mb-3">
                 Pianificazione Attiva
               </Text>
-              <div className="p-4 bg-sage-950/30 rounded-2xl border-2 border-sage-700/50 [html:not(.dark)_&]:bg-sage-50/50 [html:not(.dark)_&]:border-sage-300/50">
+              <div className="p-4 bg-sage-950/30 rounded-2xl border-2 border-sage-700/50 ">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full bg-sage-500 shadow-glow-success animate-pulse" />
                   <div className="flex-1">
@@ -234,7 +234,7 @@ export default function ScheduleManagementModal({
                 {inactiveSchedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-slate-600/40 [html:not(.dark)_&]:bg-white/60 [html:not(.dark)_&]:border-slate-300/40"
+                    className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-slate-600/40 "
                   >
                     {editingId === schedule.id ? (
                       <div className="space-y-2">
@@ -267,7 +267,7 @@ export default function ScheduleManagementModal({
                     ) : (
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-3 h-3 rounded-full bg-slate-500 [html:not(.dark)_&]:bg-slate-400" />
+                          <div className="w-3 h-3 rounded-full bg-slate-500 " />
                           <Text as="span" className="truncate">
                             {schedule.name}
                           </Text>

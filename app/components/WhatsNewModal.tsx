@@ -64,7 +64,7 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsN
     >
       <Card
         variant="glass"
-        className="overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] [html:not(.dark)_&]:before:from-black/[0.03] before:to-transparent before:pointer-events-none"
+        className="overflow-hidden relative before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] ] before:to-transparent before:pointer-events-none"
       >
         {/* Header con gradiente */}
         <div className={`relative bg-gradient-to-r ${getVersionColor(currentVersionData.type || 'patch')} p-8 text-white z-10`}>
@@ -117,25 +117,25 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsN
           </ul>
 
           {/* Link al changelog completo */}
-          <div className="mt-6 p-4 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100 rounded-xl">
+          <div className="mt-6 p-4 bg-slate-800/50 rounded-xl">
             <Link
               href="/changelog"
               onClick={onClose}
-              className="flex items-center justify-between group hover:bg-slate-700/50 [html:not(.dark)_&]:hover:bg-slate-200 p-2 rounded-lg transition-colors duration-200"
+              className="flex items-center justify-between group hover:bg-slate-700/50 p-2 rounded-lg transition-colors duration-200"
             >
               <div className="flex items-center gap-2">
                 <Text as="span" className="text-2xl">📋</Text>
-                <Text as="span" variant="secondary" size="sm" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600">
+                <Text as="span" variant="secondary" size="sm" className="group-hover:text-ember-400 ">
                   Vedi changelog completo
                 </Text>
               </div>
-              <Text as="span" variant="tertiary" className="group-hover:text-ember-400 [html:not(.dark)_&]:group-hover:text-ember-600 group-hover:translate-x-1 transition-all duration-200">→</Text>
+              <Text as="span" variant="tertiary" className="group-hover:text-ember-400 group-hover:translate-x-1 transition-all duration-200">→</Text>
             </Link>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="p-6 bg-slate-800/50 [html:not(.dark)_&]:bg-slate-100/80 backdrop-blur-sm border-t border-slate-700/50 [html:not(.dark)_&]:border-slate-200 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between relative z-10">
+        <div className="p-6 bg-slate-800/50 backdrop-blur-sm border-t border-slate-700/50 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between relative z-10">
           <label className="flex items-center gap-2 cursor-pointer group">
             <input
               type="checkbox"
@@ -144,9 +144,9 @@ export default function WhatsNewModal({ isOpen, onClose, dontShowAgain }: WhatsN
                   dontShowAgain();
                 }
               }}
-              className="w-4 h-4 text-ember-600 border-slate-600 [html:not(.dark)_&]:border-slate-300 rounded focus:ring-ember-500"
+              className="w-4 h-4 text-ember-600 border-slate-600 rounded focus:ring-ember-500"
             />
-            <Text as="span" variant="tertiary" size="sm" className="group-hover:text-slate-200 [html:not(.dark)_&]:group-hover:text-slate-900">
+            <Text as="span" variant="tertiary" size="sm" className="group-hover:text-slate-200 ">
               Non mostrare più per questa versione
             </Text>
           </label>

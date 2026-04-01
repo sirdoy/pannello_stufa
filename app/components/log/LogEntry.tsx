@@ -45,7 +45,7 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
   };
 
   return (
-    <li className="border-b border-slate-700/30 [html:not(.dark)_&]:border-slate-200/60 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0 flex items-start gap-3">
+    <li className="border-b border-slate-700/30 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0 flex items-start gap-3">
       {/* Icon */}
       <div className="text-2xl mt-0.5 flex-shrink-0">{getIcon(entry.action, entry.device)}</div>
 
@@ -61,7 +61,7 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
                   alt={entry.user.name || entry.user.email || 'User'}
                   width={24}
                   height={24}
-                  className="w-6 h-6 rounded-full ring-1 ring-white/10 [html:not(.dark)_&]:ring-black/10"
+                  className="w-6 h-6 rounded-full ring-1 ring-white/10 "
                 />
               )}
               <Text variant="body" size="sm">

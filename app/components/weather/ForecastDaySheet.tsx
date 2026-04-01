@@ -76,7 +76,7 @@ interface StatCardProps {
  */
 function StatCard({ icon: Icon, iconColor, label, value, subLabel }: StatCardProps) {
   return (
-    <div className="p-4 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+    <div className="p-4 bg-slate-800/40 rounded-xl ">
       <div className="flex items-center gap-2 mb-1">
         <Icon className={`w-4 h-4 ${iconColor}`} />
         <Text variant="tertiary" size="xs">{label}</Text>
@@ -109,12 +109,12 @@ export interface ForecastDaySheetProps {
  *
  * @example
  * <ForecastDaySheet
- *   day={selectedDay}
- *   isOpen={isModalOpen}
- *   onClose={() => setIsModalOpen(false)}
- *   hourly={hourlyData}
- *   isToday={true}
- *   pressure={1015}
+ * day={selectedDay}
+ * isOpen={isModalOpen}
+ * onClose={() => setIsModalOpen(false)}
+ * hourly={hourlyData}
+ * isToday={true}
+ * pressure={1015}
  * />
  */
 export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday = false, pressure = null }: ForecastDaySheetProps) {
@@ -140,7 +140,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
               {formatTemperature(day.tempMax)}°
             </Text>
           </div>
-          <div className="w-px h-12 bg-slate-700/50 [html:not(.dark)_&]:bg-slate-300/50" />
+          <div className="w-px h-12 bg-slate-700/50 " />
           <div>
             <Text variant="tertiary" size="xs" className="mb-1">Min</Text>
             <Text size="xl" className="text-ocean-400 text-3xl">
@@ -190,7 +190,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
         />
 
         {/* Precipitation */}
-        <div className="p-4 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+        <div className="p-4 bg-slate-800/40 rounded-xl ">
           <div className="flex items-center gap-2 mb-1">
             <Droplets
               className="w-4 h-4 text-ocean-400"
@@ -249,7 +249,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
 
       {/* Hourly forecast - only for today */}
       {isToday && hourly && (
-        <div className="mt-6 pt-4 border-t border-slate-700/30 [html:not(.dark)_&]:border-slate-200/50">
+        <div className="mt-6 pt-4 border-t border-slate-700/30 ">
           <Text variant="secondary" size="sm" className="mb-3">
             Previsioni orarie
           </Text>

@@ -193,6 +193,7 @@ export default function DesignSystemPage() {
                 { icon: '💬', title: 'Dialog Patterns', anchor: 'dialog-patterns' },
                 { icon: '📊', title: 'Data Table', anchor: 'data-table' },
                 { icon: '✅', title: 'Best Practices', anchor: 'critical-best-practices' },
+                { icon: '📱', title: 'Mobile-First', anchor: 'mobile-first-patterns' },
               ].map(({ icon, title, anchor }) => (
                 <a
                   key={anchor}
@@ -2602,6 +2603,156 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
               </div>
             </CardContent>
           </Card>
+        </SectionShowcase>
+
+        {/* Mobile-First Patterns */}
+        <SectionShowcase title="Mobile-First Patterns" icon="📱">
+          <div className="space-y-4">
+
+            {/* Convention explanation */}
+            <Card>
+              <CardContent>
+                <Heading variant="default" size="sm" className="mb-2">
+                  Convention: base = mobile (375px+), sm: = desktop (640px+)
+                </Heading>
+                <Text variant="secondary" size="sm" className="mb-3">
+                  Tailwind CSS is mobile-first by default. Base classes (without prefix) apply to all
+                  screens starting from 0px, targeting mobile at 375px minimum. The <code className="bg-slate-800 px-1 rounded text-xs font-mono">sm:</code> prefix
+                  (640px+) overrides for desktop. <code className="bg-slate-800 px-1 rounded text-xs font-mono">md:</code> (768px) and{' '}
+                  <code className="bg-slate-800 px-1 rounded text-xs font-mono">lg:</code> (1024px) are available for larger screens.
+                </Text>
+                <Text variant="tertiary" size="xs">
+                  Note: a custom <code className="bg-slate-800 px-1 rounded text-xs font-mono">tb:</code> (900px) breakpoint exists in the config but tablet design is deferred to a future milestone.
+                </Text>
+              </CardContent>
+            </Card>
+
+            {/* Breakpoints reference */}
+            <Card>
+              <CardContent>
+                <Heading variant="default" size="sm" className="mb-3">Breakpoints Reference</Heading>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm font-mono">
+                    <thead>
+                      <tr className="border-b border-slate-700">
+                        <th className="text-left py-2 pr-4 text-slate-400 font-normal">Breakpoint</th>
+                        <th className="text-left py-2 pr-4 text-slate-400 font-normal">Value</th>
+                        <th className="text-left py-2 text-slate-400 font-normal">Target</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-slate-300">
+                      <tr className="border-b border-slate-800">
+                        <td className="py-2 pr-4">base</td>
+                        <td className="py-2 pr-4">0px+</td>
+                        <td className="py-2">Mobile (375px min)</td>
+                      </tr>
+                      <tr className="border-b border-slate-800">
+                        <td className="py-2 pr-4">sm:</td>
+                        <td className="py-2 pr-4">640px+</td>
+                        <td className="py-2">Desktop</td>
+                      </tr>
+                      <tr className="border-b border-slate-800">
+                        <td className="py-2 pr-4">md:</td>
+                        <td className="py-2 pr-4">768px+</td>
+                        <td className="py-2">Large desktop</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 pr-4">lg:</td>
+                        <td className="py-2 pr-4">1024px+</td>
+                        <td className="py-2">XL desktop</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Typography examples */}
+            <Card>
+              <CardContent>
+                <Heading variant="default" size="sm" className="mb-3">Typography — Responsive Heading Sizes</Heading>
+                <Text variant="secondary" size="sm" className="mb-3">
+                  Heading variants already use the mobile-first responsive pattern — smaller on mobile, larger on desktop:
+                </Text>
+                <pre className="bg-slate-800/50 rounded p-3 font-mono text-xs text-slate-300 overflow-x-auto">{`text-xl sm:text-2xl     // Heading xl:  20px mobile → 24px desktop
+text-2xl sm:text-3xl    // Heading 2xl: 24px mobile → 30px desktop
+text-3xl sm:text-4xl    // Heading 3xl: 30px mobile → 36px desktop`}</pre>
+                <Text variant="tertiary" size="xs" className="mt-2">
+                  Text component uses fixed sizes (text-xs, text-sm, text-base) — all safe at 375px. No fluid typography needed.
+                </Text>
+              </CardContent>
+            </Card>
+
+            {/* Spacing tokens table */}
+            <Card>
+              <CardContent>
+                <Heading variant="default" size="sm" className="mb-3">Spacing Tokens — Mobile-First</Heading>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm font-mono">
+                    <thead>
+                      <tr className="border-b border-slate-700">
+                        <th className="text-left py-2 pr-4 text-slate-400 font-normal">Context</th>
+                        <th className="text-left py-2 pr-4 text-slate-400 font-normal">Mobile (base)</th>
+                        <th className="text-left py-2 pr-4 text-slate-400 font-normal">Desktop (sm:)</th>
+                        <th className="text-left py-2 text-slate-400 font-normal">Large (lg:)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-slate-300">
+                      <tr className="border-b border-slate-800">
+                        <td className="py-2 pr-4 text-slate-400">Page padding</td>
+                        <td className="py-2 pr-4">px-4 (16px)</td>
+                        <td className="py-2 pr-4">sm:px-6 (24px)</td>
+                        <td className="py-2">lg:px-8 (32px)</td>
+                      </tr>
+                      <tr className="border-b border-slate-800">
+                        <td className="py-2 pr-4 text-slate-400">Card padding</td>
+                        <td className="py-2 pr-4">p-3 (12px)</td>
+                        <td className="py-2 pr-4">sm:p-4 (16px)</td>
+                        <td className="py-2">—</td>
+                      </tr>
+                      <tr className="border-b border-slate-800">
+                        <td className="py-2 pr-4 text-slate-400">Grid gap</td>
+                        <td className="py-2 pr-4">gap-4 (16px)</td>
+                        <td className="py-2 pr-4">sm:gap-5 (20px)</td>
+                        <td className="py-2">lg:gap-6 (24px)</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 pr-4 text-slate-400">Section margin</td>
+                        <td className="py-2 pr-4">mt-6 (24px)</td>
+                        <td className="py-2 pr-4">sm:mt-8 (32px)</td>
+                        <td className="py-2">—</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Before/After code examples */}
+            <Card>
+              <CardContent>
+                <Heading variant="default" size="sm" className="mb-3">Before / After — Mobile-First Patterns</Heading>
+                <div className="space-y-3">
+                  <div>
+                    <Text variant="tertiary" size="xs" className="mb-1">WRONG — desktop-first (requires overriding for mobile)</Text>
+                    <pre className="bg-red-950/30 border border-red-900/30 rounded p-3 font-mono text-xs text-slate-300 overflow-x-auto">{`{/* WRONG - desktop-first (override for mobile) */}
+<div className="text-xl md:text-base">Title</div>
+<div className="p-8 sm:p-4">Card</div>`}</pre>
+                  </div>
+                  <div>
+                    <Text variant="tertiary" size="xs" className="mb-1">RIGHT — mobile-first (base is mobile, override for desktop)</Text>
+                    <pre className="bg-green-950/30 border border-green-900/30 rounded p-3 font-mono text-xs text-slate-300 overflow-x-auto">{`{/* RIGHT - mobile-first (base is mobile, override for desktop) */}
+<div className="text-base sm:text-xl">Title</div>
+<div className="p-4 sm:p-8">Card</div>
+
+{/* RIGHT - grid columns */}
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">`}</pre>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+          </div>
         </SectionShowcase>
 
         {/* Footer */}

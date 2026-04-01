@@ -570,5 +570,18 @@ describe('Button Component', () => {
     test('ButtonGroup is exported', () => {
       expect(ButtonGroup).toBeDefined();
     });
+
+    test('ButtonGroup renders with flex-wrap class', () => {
+      const { container } = render(
+        <ButtonGroup>
+          <Button>A</Button>
+          <Button>B</Button>
+        </ButtonGroup>
+      );
+      const group = container.firstChild as HTMLElement;
+      expect(group.className).toContain('flex-wrap');
+      expect(group.className).toContain('items-center');
+      expect(group.className).toContain('gap-2');
+    });
   });
 });

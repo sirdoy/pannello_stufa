@@ -350,7 +350,7 @@ export interface ButtonGroupProps extends React.HTMLAttributes<HTMLDivElement> {
 function ButtonGroup({ children, className, ...props }: ButtonGroupProps) {
   return (
     <div
-      className={cn('flex items-center gap-2', className)}
+      className={cn('flex flex-wrap items-center gap-2', className)}
       role="group"
       {...props}
     >

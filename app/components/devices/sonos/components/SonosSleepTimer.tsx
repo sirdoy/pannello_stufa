@@ -44,7 +44,7 @@ export default function SonosSleepTimer({ remainingSeconds, onSetTimer }: SonosS
           </button>
         </div>
       )}
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-1">
         {PRESETS.map(preset => (
           <button
             key={preset.seconds}

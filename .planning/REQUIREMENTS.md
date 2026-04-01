@@ -9,7 +9,7 @@ Requirements for Dark-Only & Mobile-First milestone.
 
 ### Theme Removal
 
-- [ ] **THEME-01**: Light theme CSS variables removed from globals.css (html:not(.dark) block, light body gradient)
+- [x] **THEME-01**: Light theme CSS variables removed from globals.css (html:not(.dark) block, light body gradient)
 - [x] **THEME-02**: ThemeContext, ThemeProvider, useTheme hook removed
 - [x] **THEME-03**: ThemeScript component removed from layout
 - [x] **THEME-04**: Theme settings page (/settings/theme) removed and nav entry deleted
@@ -71,7 +71,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| THEME-01 | Phase 149 | Pending |
+| THEME-01 | Phase 149 | Complete |
 | THEME-02 | Phase 149 | Complete |
 | THEME-03 | Phase 149 | Complete |
 | THEME-04 | Phase 149 | Complete |

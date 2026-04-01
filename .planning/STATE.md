@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v18.0
 milestone_name: Dark-Only & Mobile-First
-status: executing
-stopped_at: Completed 149-01-PLAN.md
-last_updated: "2026-04-01T10:31:43.802Z"
+status: verifying
+stopped_at: Completed 149-02-PLAN.md
+last_updated: "2026-04-01T10:36:21.205Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-01)
 
 Phase: 149 (theme-removal-core) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-04-01
 
 Progress: [░░░░░░░░░░] 0%
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | v17.1 WebSocket Alignment & Tuya Integration | 145-148 | 10 | 3 days |
 | v18.0 Dark-Only & Mobile-First | 149-154 | TBD | in progress |
 | Phase 149 P01 | 414 | 2 tasks | 9 files |
+| Phase 149 P02 | 5 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -61,6 +62,8 @@ Recent decisions affecting v18.0:
 - Scope is pure CSS/layout — no new features or animation redesign
 - [Phase 149]: Hardcode dark class on html element permanently — no runtime theme switching
 - [Phase 149]: Replace inline localStorage theme script with static meta tag (#0f172a)
+- [Phase 149]: Remove all html:not(.dark) blocks rather than converting to dark: prefix utilities — simpler and eliminates dead code
+- [Phase 149]: Remove theme-switching transition entirely — 200ms overhead on every element eliminated
 
 ### Pending Todos
 
@@ -83,5 +86,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-01 - Roadmap created for v18.0
-Stopped at: Completed 149-01-PLAN.md
+Stopped at: Completed 149-02-PLAN.md
 Resume file: None

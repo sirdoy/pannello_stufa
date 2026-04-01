@@ -200,8 +200,6 @@ export default function DesignSystemPage() {
                   className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm
                     text-slate-300 hover:text-ember-400
                     bg-white/[0.02] hover:bg-white/[0.06]
-                    [html:not(.dark)_&]:text-slate-600 [html:not(.dark)_&]:hover:text-ember-600
-                    [html:not(.dark)_&]:bg-slate-100 [html:not(.dark)_&]:hover:bg-slate-200
                     transition-colors duration-200"
                 >
                   <span aria-hidden="true">{icon}</span>
@@ -1876,7 +1874,7 @@ export default function DesignSystemPage() {
 
                 <div className="mt-4 space-y-2">
                   <Text variant="label" size="xs">Features:</Text>
-                  <ul className="list-disc list-inside text-slate-400 text-sm space-y-1 [html:not(.dark)_&]:text-slate-600">
+                  <ul className="list-disc list-inside text-slate-400 text-sm space-y-1">
                     <li>Global <Kbd>Cmd+K</Kbd> / <Kbd>Ctrl+K</Kbd> shortcut</li>
                     <li>Fuzzy search filtering</li>
                     <li>Arrow key navigation with wrapping</li>
@@ -2580,7 +2578,7 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
                 <Banner
                   variant="success"
                   title="✅ USE Variant Props"
-                  description="Use variant='ember' NOT className='text-ember-400'. Components handle dark/light mode internally."
+                  description="Use variant='ember' NOT className='text-ember-400'. Components encapsulate correct dark-only tokens internally."
                   compact
                 />
                 <Banner
@@ -2591,20 +2589,14 @@ const label = getWeatherLabel(71); // "Neve leggera"`} />
                 />
                 <Banner
                   variant="warning"
-                  title="⚠️ AVOID Triple Overrides"
-                  description="WRONG: 'text-slate-800 [html:not(.dark)_&]:text-slate-800 text-slate-200'. RIGHT: 'text-slate-200 [html:not(.dark)_&]:text-slate-800'"
-                  compact
-                />
-                <Banner
-                  variant="warning"
-                  title="⚠️ DON'T Mix dark: and [html:not(.dark)_&]:"
-                  description="Use ONLY ONE pattern. Prefer dark-first: 'bg-slate-900 [html:not(.dark)_&]:bg-white'"
+                  title="⚠️ NEVER Override Colors with className"
+                  description="WRONG: className='text-ember-400'. RIGHT: variant='ember'. Components provide the correct dark-only token internally."
                   compact
                 />
                 <Banner
                   variant="ember"
-                  title="🎨 Dark-First Philosophy"
-                  description="Design for dark mode first, then add light mode overrides. Test both modes always."
+                  title="🎨 Dark-Only Philosophy"
+                  description="Design exclusively for dark mode. Use dark-first tokens (text-slate-200, bg-slate-900). No light-mode overrides needed."
                   compact
                 />
               </div>
@@ -2794,7 +2786,7 @@ function ColorSwatch({ name, description, colors, usage }: ColorSwatchProps) {
  */
 function WeatherIconDemo({ code, label, isNight = false }: WeatherIconDemoProps) {
   return (
-    <div className="flex flex-col items-center gap-2 p-3 bg-slate-800/40 rounded-xl [html:not(.dark)_&]:bg-slate-100/80">
+    <div className="flex flex-col items-center gap-2 p-3 bg-slate-800/40 rounded-xl">
       <WeatherIcon code={code} isNight={isNight} size={32} className="text-ocean-400" />
       <Text variant="tertiary" size="xs" className="text-center">{label}</Text>
       <Text mono size="xs" variant="secondary">WMO: {code}</Text>

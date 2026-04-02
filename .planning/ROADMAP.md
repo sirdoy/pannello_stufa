@@ -88,7 +88,7 @@ See git history and `.planning/milestones/` for details.
 - [x] **Phase 152: Pages Audit — Core & Device Pages** - Audit dashboard, stove, thermostat, lights, and network pages at 375px (completed 2026-04-01)
 - [x] **Phase 153: Pages Audit — Extended Device Pages** - Audit Sonos, DIRIGERA, Raspi, Tuya, and Rooms pages at 375px (completed 2026-04-01)
 - [x] **Phase 154: Pages Audit — Admin & Support Pages** - Audit registry, settings, debug, camera, and remaining pages at 375px (completed 2026-04-02)
-- [ ] **Phase 155: Phase 153 Verification Gap Closure** - Create missing VERIFICATION.md for Phase 153 from existing evidence
+- [x] **Phase 155: Phase 153 Verification Gap Closure** - Create missing VERIFICATION.md for Phase 153 from existing evidence (completed 2026-04-02)
 
 ## Phase Details
 
@@ -195,7 +195,7 @@ Plans:
   2. Re-audit of v18.0 shows 31/31 requirements satisfied
 **Plans**: 1 plan
 Plans:
-- [ ] 155-01-PLAN.md — Create Phase 153 VERIFICATION.md + mark AUDIT-06 through AUDIT-10 complete
+- [x] 155-01-PLAN.md — Create Phase 153 VERIFICATION.md + mark AUDIT-06 through AUDIT-10 complete
 
 ## Progress
 
@@ -211,4 +211,4 @@ Plans:
 | 152. Pages Audit — Core & Device Pages | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 2/2 | Complete   | 2026-04-01 |
 | 154. Pages Audit — Admin & Support Pages | v18.0 | 3/3 | Complete    | 2026-04-02 |
-| 155. Phase 153 Verification Gap Closure | v18.0 | 0/1 | Planned | — |
+| 155. Phase 153 Verification Gap Closure | v18.0 | 1/1 | Complete   | 2026-04-02 |

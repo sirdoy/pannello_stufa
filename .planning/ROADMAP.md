@@ -180,8 +180,8 @@ Plans:
   5. The remaining pages (changelog, offline, log) render correctly in a single-column layout at 375px
 **Plans**: 2 plans
 Plans:
-- [ ] 154-01-PLAN.md — TBD
-- [ ] 154-02-PLAN.md — TBD
+- [ ] 154-01-PLAN.md — Registry pages + Settings pages mobile audit (AUDIT-11, AUDIT-12)
+- [ ] 154-02-PLAN.md — Debug pages + Remaining pages mobile audit (AUDIT-13, AUDIT-14 N/A, AUDIT-15)
 **UI hint**: yes
 
 ## Progress
@@ -197,4 +197,4 @@ Plans:
 | 151. Design System Mobile-First | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 152. Pages Audit — Core & Device Pages | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 2/2 | Complete   | 2026-04-01 |
-| 154. Pages Audit — Admin & Support Pages | v18.0 | 0/TBD | Not started | - |
+| 154. Pages Audit — Admin & Support Pages | v18.0 | 0/2 | Not started | - |

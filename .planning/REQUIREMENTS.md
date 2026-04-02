@@ -36,11 +36,11 @@ Requirements for Dark-Only & Mobile-First milestone.
 - [x] **AUDIT-03**: Thermostat pages (/thermostat, /thermostat/schedule) verified at 375px
 - [x] **AUDIT-04**: Lights pages (/lights, /lights/scenes, /lights/automation) verified at 375px
 - [x] **AUDIT-05**: Network page (/network) verified at 375px
-- [ ] **AUDIT-06**: Sonos page (/sonos) verified at 375px
-- [ ] **AUDIT-07**: DIRIGERA page (/dirigera) verified at 375px
-- [ ] **AUDIT-08**: Raspi page (/raspi) verified at 375px
-- [ ] **AUDIT-09**: Tuya page (/tuya) verified at 375px
-- [ ] **AUDIT-10**: Rooms pages (/rooms, /rooms/status, /rooms/[id]) verified at 375px
+- [x] **AUDIT-06**: Sonos page (/sonos) verified at 375px
+- [x] **AUDIT-07**: DIRIGERA page (/dirigera) verified at 375px
+- [x] **AUDIT-08**: Raspi page (/raspi) verified at 375px
+- [x] **AUDIT-09**: Tuya page (/tuya) verified at 375px
+- [x] **AUDIT-10**: Rooms pages (/rooms, /rooms/status, /rooms/[id]) verified at 375px
 - [x] **AUDIT-11**: Registry pages (/registry/devices, /registry/types) verified at 375px
 - [x] **AUDIT-12**: Settings pages (all 7 settings sub-pages) verified at 375px
 - [x] **AUDIT-13**: Debug pages (/debug, /debug/api, /debug/logs, /debug/notifications) verified at 375px
@@ -92,11 +92,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUDIT-03 | Phase 152 | Complete |
 | AUDIT-04 | Phase 152 | Complete |
 | AUDIT-05 | Phase 152 | Complete |
-| AUDIT-06 | Phase 155 (gap closure) | Pending |
-| AUDIT-07 | Phase 155 (gap closure) | Pending |
-| AUDIT-08 | Phase 155 (gap closure) | Pending |
-| AUDIT-09 | Phase 155 (gap closure) | Pending |
-| AUDIT-10 | Phase 155 (gap closure) | Pending |
+| AUDIT-06 | Phase 153 (verified Phase 155) | Complete |
+| AUDIT-07 | Phase 153 (verified Phase 155) | Complete |
+| AUDIT-08 | Phase 153 (verified Phase 155) | Complete |
+| AUDIT-09 | Phase 153 (verified Phase 155) | Complete |
+| AUDIT-10 | Phase 153 (verified Phase 155) | Complete |
 | AUDIT-11 | Phase 154 | Complete |
 | AUDIT-12 | Phase 154 | Complete |
 | AUDIT-13 | Phase 154 | Complete |
@@ -105,10 +105,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 - v18.0 requirements: 31 total
+- Complete: 31/31
 - Mapped to phases: 31
-- Pending (gap closure): 5 (AUDIT-06–10 → Phase 155)
+- Pending (gap closure): 0
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-01*
-*Last updated: 2026-04-01 after roadmap creation*
+*Last updated: 2026-04-02 after Phase 155-01 gap closure (AUDIT-06–10 verified)*

@@ -193,7 +193,9 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. `.planning/phases/153-pages-audit-extended-device-pages/VERIFICATION.md` exists with all 5 requirements marked SATISFIED
   2. Re-audit of v18.0 shows 31/31 requirements satisfied
-**Plans**: TBD
+**Plans**: 1 plan
+Plans:
+- [ ] 155-01-PLAN.md — Create Phase 153 VERIFICATION.md + mark AUDIT-06 through AUDIT-10 complete
 
 ## Progress
 
@@ -209,4 +211,4 @@ Plans:
 | 152. Pages Audit — Core & Device Pages | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 2/2 | Complete   | 2026-04-01 |
 | 154. Pages Audit — Admin & Support Pages | v18.0 | 3/3 | Complete    | 2026-04-02 |
-| 155. Phase 153 Verification Gap Closure | v18.0 | 0/0 | Pending | — |
+| 155. Phase 153 Verification Gap Closure | v18.0 | 0/1 | Planned | — |

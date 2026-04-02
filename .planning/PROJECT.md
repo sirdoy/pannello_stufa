@@ -11,7 +11,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v17.1 (shipped 2026-03-30)
-**Status:** Active — v18.0 (Phase 154 complete — all pages verified at 375px: dashboard, stove, thermostat, lights, network, Sonos, DIRIGERA, Tuya, rooms, registry, settings, debug, camera, changelog, offline)
+**Status:** Active — v18.0 (Phase 155 complete — all 31/31 requirements satisfied, VERIFICATION.md gap for Phase 153 closed)
 
 ## Current Milestone: v18.0 Dark-Only & Mobile-First
 
@@ -874,4 +874,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after Phase 154 completion*
+*Last updated: 2026-04-02 after Phase 155 completion*

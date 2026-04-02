@@ -166,7 +166,7 @@ export default function ChangelogPage() {
 
                 <Card variant="default" hover className="overflow-hidden transition-all duration-300">
                   {/* Header with gradient accent */}
-                  <div className={`p-5 sm:p-6 bg-gradient-to-r ${config.accentClass} border-b border-slate-700/30 
+                  <div className={'p-5 sm:p-6 bg-gradient-to-r ' + config.accentClass + ' border-b border-slate-700/30'}>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <div className="flex items-center gap-3 flex-wrap">
                         <Heading level={2} size="xl">v{version.version}</Heading>
@@ -200,20 +200,21 @@ export default function ChangelogPage() {
                   {/* Changes List */}
                   <div className="p-5 sm:p-6">
                     <ul className="space-y-3">
-                      {version.changes.map((change, changeIndex) => (
+                      {version.changes.map((change, changeIndex) => {
+                        const dotClass = version.type === 'major'
+                          ? 'bg-ember-500/20 text-ember-400 group-hover:bg-ember-500/30'
+                          : version.type === 'minor'
+                            ? 'bg-sage-500/20 text-sage-400 group-hover:bg-sage-500/30'
+                            : 'bg-ocean-500/20 text-ocean-400 group-hover:bg-ocean-500/30';
+                        return (
                         <li key={changeIndex} className="flex items-start gap-3 group">
-                          <span className={`mt-1.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors ${
-                            version.type === 'major'
-                              ? 'bg-ember-500/20 text-ember-400 group-hover:bg-ember-500/30'
-                              : version.type === 'minor'
-                                ? 'bg-sage-500/20 text-sage-400 group-hover:bg-sage-500/30'
-                                : 'bg-ocean-500/20 text-ocean-400 group-hover:bg-ocean-500/30'
-                          }`}>
+                          <span className={'mt-1.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors ' + dotClass}>
                             ✓
                           </span>
                           <Text variant="secondary" className="flex-1 leading-relaxed">{change}</Text>
                         </li>
-                      ))}
+                        );
+                      })}
                     </ul>
                   </div>
                 </Card>
@@ -230,11 +231,7 @@ export default function ChangelogPage() {
           <button
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
-              currentPage === 1
-                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed'
-                : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95'
-            }`}
+            className={'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ' + (currentPage === 1 ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed' : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95')}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -271,11 +268,7 @@ export default function ChangelogPage() {
                 <button
                   key={page}
                   onClick={() => goToPage(page)}
-                  className={`min-w-[40px] h-10 rounded-xl font-medium transition-all duration-200 ${
-                    isCurrentPage
-                      ? 'bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/25'
-                      : 'bg-slate-800/30 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200'
-                  }`}
+                  className={'min-w-[40px] h-10 rounded-xl font-medium transition-all duration-200 ' + (isCurrentPage ? 'bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/25' : 'bg-slate-800/30 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200')}
                 >
                   {page}
                 </button>
@@ -287,11 +280,7 @@ export default function ChangelogPage() {
           <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ${
-              currentPage === totalPages
-                ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed'
-                : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95'
-            }`}
+            className={'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ' + (currentPage === totalPages ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed' : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95')}
           >
             <span className="hidden sm:inline">Successiva</span>
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -210,7 +210,7 @@ export default function OfflinePage() {
           </div>
 
           {/* Temperature Grid */}
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* Room Temperature */}
             <div className="text-center p-3 rounded-lg bg-white/[0.02]">
               <Text variant="tertiary" size="xs" className="mb-1 block">

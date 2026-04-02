@@ -87,7 +87,7 @@ See git history and `.planning/milestones/` for details.
 - [x] **Phase 151: Design System Mobile-First** - Fix ButtonGroup wrapping, verify all DS components at 375px, update DS showcase (completed 2026-04-01)
 - [x] **Phase 152: Pages Audit — Core & Device Pages** - Audit dashboard, stove, thermostat, lights, and network pages at 375px (completed 2026-04-01)
 - [x] **Phase 153: Pages Audit — Extended Device Pages** - Audit Sonos, DIRIGERA, Raspi, Tuya, and Rooms pages at 375px (completed 2026-04-01)
-- [ ] **Phase 154: Pages Audit — Admin & Support Pages** - Audit registry, settings, debug, camera, and remaining pages at 375px
+- [x] **Phase 154: Pages Audit — Admin & Support Pages** - Audit registry, settings, debug, camera, and remaining pages at 375px (completed 2026-04-02)
 
 ## Phase Details
 
@@ -180,7 +180,7 @@ Plans:
   5. The remaining pages (changelog, offline, log) render correctly in a single-column layout at 375px
 **Plans**: 2 plans
 Plans:
-- [ ] 154-01-PLAN.md — Registry pages + Settings pages mobile audit (AUDIT-11, AUDIT-12)
+- [x] 154-01-PLAN.md — Registry pages + Settings pages mobile audit (AUDIT-11, AUDIT-12)
 - [x] 154-02-PLAN.md — Debug pages + Remaining pages mobile audit (AUDIT-13, AUDIT-14 N/A, AUDIT-15)
 **UI hint**: yes
 
@@ -197,4 +197,4 @@ Plans:
 | 151. Design System Mobile-First | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 152. Pages Audit — Core & Device Pages | v18.0 | 2/2 | Complete    | 2026-04-01 |
 | 153. Pages Audit — Extended Device Pages | v18.0 | 2/2 | Complete   | 2026-04-01 |
-| 154. Pages Audit — Admin & Support Pages | v18.0 | 1/2 | In Progress|  |
+| 154. Pages Audit — Admin & Support Pages | v18.0 | 2/2 | Complete   | 2026-04-02 |

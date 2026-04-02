@@ -41,8 +41,8 @@ Requirements for Dark-Only & Mobile-First milestone.
 - [x] **AUDIT-08**: Raspi page (/raspi) verified at 375px
 - [x] **AUDIT-09**: Tuya page (/tuya) verified at 375px
 - [x] **AUDIT-10**: Rooms pages (/rooms, /rooms/status, /rooms/[id]) verified at 375px
-- [ ] **AUDIT-11**: Registry pages (/registry/devices, /registry/types) verified at 375px
-- [ ] **AUDIT-12**: Settings pages (all 7 settings sub-pages) verified at 375px
+- [x] **AUDIT-11**: Registry pages (/registry/devices, /registry/types) verified at 375px
+- [x] **AUDIT-12**: Settings pages (all 7 settings sub-pages) verified at 375px
 - [x] **AUDIT-13**: Debug pages (/debug, /debug/api, /debug/logs, /debug/notifications) verified at 375px
 - [x] **AUDIT-14**: Camera pages (/camera, /camera/events) verified at 375px
 - [x] **AUDIT-15**: Remaining pages (changelog, offline, log) verified at 375px
@@ -97,8 +97,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUDIT-08 | Phase 153 | Complete |
 | AUDIT-09 | Phase 153 | Complete |
 | AUDIT-10 | Phase 153 | Complete |
-| AUDIT-11 | Phase 154 | Pending |
-| AUDIT-12 | Phase 154 | Pending |
+| AUDIT-11 | Phase 154 | Complete |
+| AUDIT-12 | Phase 154 | Complete |
 | AUDIT-13 | Phase 154 | Complete |
 | AUDIT-14 | Phase 154 | Complete |
 | AUDIT-15 | Phase 154 | Complete |

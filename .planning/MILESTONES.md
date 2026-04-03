@@ -1,5 +1,28 @@
 # Project Milestones: Pannello Stufa
 
+## v18.0 Dark-Only & Mobile-First (Shipped: 2026-04-02)
+
+**Delivered:** Light theme completely removed (dark-only codebase) and every page verified at 375px mobile viewport with Playwright automated checks.
+
+**Phases completed:** 149-155 (7 phases, 15 plans)
+
+**Key accomplishments:**
+
+- Dark-only codebase: ThemeContext, ThemeProvider, theme API route, theme settings page all deleted; `class="dark"` hardcoded on `<html>`
+- Zero `dark:` Tailwind prefixes: ~170 files cleaned of dark: variants and html:not(.dark) selectors
+- Design system mobile-first: ButtonGroup flex-wrap, all 12 layout components verified at 375px, mobile-first patterns documentation added
+- All 30+ pages/sub-pages verified at 375px viewport via Playwright scrollWidth checks
+- Targeted responsive fixes: flex-wrap on stove errors, thermostat schedule, lights grids, network tabs, SonosSleepTimer, rooms health stats
+
+**Stats:**
+
+- 15 plans executed across 7 phases (including 1 gap closure phase)
+- 31/31 v18.0 requirements satisfied (100%)
+- 248 files changed (+11,355 insertions, -3,051 deletions, net +8,304 LOC)
+- 2 days (2026-04-01 → 2026-04-02)
+
+---
+
 ## v17.1 WebSocket Alignment & Tuya Integration (Shipped: 2026-03-30)
 
 **Delivered:** All 8 WS topic types aligned with enriched HA proxy shapes, Raspberry Pi migrated to WS-primary transport, and Tuya smart plug provider integrated end-to-end as the 8th device provider.

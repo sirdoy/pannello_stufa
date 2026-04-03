@@ -71,7 +71,7 @@ describe('useCameraData', () => {
   });
 
   // Import hook lazily after mocks are set up
-  let useCameraData: typeof import('../../useCameraData').useCameraData;
+  let useCameraData: typeof import('../useCameraData').useCameraData;
 
   beforeAll(async () => {
     const mod = await import('../useCameraData');

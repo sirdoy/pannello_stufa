@@ -13,7 +13,7 @@ import { cn } from '@/lib/utils/cn';
  * Spacing: small, medium, large (applied via wrapper based on orientation)
  */
 const dividerVariants = cva(
-  // Base classes (minimal - most styling per orientation)
+  '',
   {
     variants: {
       variant: {

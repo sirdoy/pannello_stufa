@@ -222,7 +222,6 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
               'focus-visible:ring-ember-500/50 focus-visible:border-ember-500/60',
               'transition-all duration-200',
             )}
-            aria-label="Search table"
           />
         </div>
       </div>

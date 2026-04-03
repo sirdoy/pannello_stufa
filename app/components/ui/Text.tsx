@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils/cn';
  * Weight: normal, medium, semibold, bold, black
  */
 const textVariants = cva(
-  // Base classes (minimal)
+  '',
   {
     variants: {
       variant: {

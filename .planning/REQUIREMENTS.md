@@ -1,115 +1,166 @@
-# Requirements: Pannello Stufa v18.0
+# Requirements: Pannello Stufa v19.0
 
-**Defined:** 2026-04-01
+**Defined:** 2026-04-03
 **Core Value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
 
-## v18.0 Requirements
+## v19.0 Requirements
 
-Requirements for Dark-Only & Mobile-First milestone.
+Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap phases.
 
-### Theme Removal
+### Path Migration & Common
 
-- [x] **THEME-01**: Light theme CSS variables removed from globals.css (html:not(.dark) block, light body gradient)
-- [x] **THEME-02**: ThemeContext, ThemeProvider, useTheme hook removed
-- [x] **THEME-03**: ThemeScript component removed from layout
-- [x] **THEME-04**: Theme settings page (/settings/theme) removed and nav entry deleted
-- [x] **THEME-05**: Theme API route (GET/POST /api/user/theme) removed
-- [x] **THEME-06**: All `dark:` Tailwind prefixes removed from ~16 files (hardcode dark-only values)
-- [x] **THEME-07**: All `[html:not(.dark)_&]:` selectors removed from components
-- [x] **THEME-08**: `class="dark"` hardcoded on `<html>` element, localStorage theme key removed
-- [x] **THEME-09**: theme-color meta tag hardcoded to dark value (#0f172a)
-- [x] **THEME-10**: Design system page updated to reflect dark-only (remove theme toggle showcase)
+- [ ] **PATH-01**: Tutte le route thermorossi migrate da /api/stove/* a /api/v1/thermorossi/*
+- [ ] **PATH-02**: Frontend (hooks, componenti, debug panels) aggiornato ai nuovi path thermorossi
+- [ ] **COMMON-01**: GET /health ritorna stato aggregato di tutti i provider
+- [ ] **COMMON-02**: GET /api/v1/devices ritorna lista aggregata dispositivi cross-provider
 
-### Design System Mobile-First
+### Auth
 
-- [x] **MOBILE-01**: ButtonGroup component wraps responsively on 375px (flex-wrap)
-- [x] **MOBILE-02**: All DS components verified at 375px viewport width
-- [x] **MOBILE-03**: DS typography scales appropriately for mobile (no horizontal overflow)
-- [x] **MOBILE-04**: DS spacing tokens documented as mobile-first (base = mobile, sm: = desktop)
-- [x] **MOBILE-05**: Design system showcase page (/debug/design-system) updated with mobile-first patterns
-- [x] **MOBILE-06**: Bottom nav bar safe at 375px (4-column grid verified or adjusted)
+- [ ] **AUTH-01**: User può autenticarsi via POST /auth/login con credenziali form-based e ricevere JWT
+- [ ] **AUTH-02**: User può creare API key via POST /auth/api-keys
+- [ ] **AUTH-03**: User può listare le proprie API key via GET /auth/api-keys
+- [ ] **AUTH-04**: User può revocare una API key via DELETE /auth/api-keys/{key_id}
 
-### Pages Mobile Audit
+### Automations
 
-- [x] **AUDIT-01**: Dashboard home page (/) verified and fixed at 375px
-- [x] **AUDIT-02**: Stove pages (/stove, /stove/errors, /stove/maintenance, /stove/scheduler) verified at 375px
-- [x] **AUDIT-03**: Thermostat pages (/thermostat, /thermostat/schedule) verified at 375px
-- [x] **AUDIT-04**: Lights pages (/lights, /lights/scenes, /lights/automation) verified at 375px
-- [x] **AUDIT-05**: Network page (/network) verified at 375px
-- [x] **AUDIT-06**: Sonos page (/sonos) verified at 375px
-- [x] **AUDIT-07**: DIRIGERA page (/dirigera) verified at 375px
-- [x] **AUDIT-08**: Raspi page (/raspi) verified at 375px
-- [x] **AUDIT-09**: Tuya page (/tuya) verified at 375px
-- [x] **AUDIT-10**: Rooms pages (/rooms, /rooms/status, /rooms/[id]) verified at 375px
-- [x] **AUDIT-11**: Registry pages (/registry/devices, /registry/types) verified at 375px
-- [x] **AUDIT-12**: Settings pages (all 7 settings sub-pages) verified at 375px
-- [x] **AUDIT-13**: Debug pages (/debug, /debug/api, /debug/logs, /debug/notifications) verified at 375px
-- [x] **AUDIT-14**: Camera pages (/camera, /camera/events) verified at 375px
-- [x] **AUDIT-15**: Remaining pages (changelog, offline, log) verified at 375px
+- [ ] **AUTO-01**: User può listare le regole di automazione (paginato) via GET /api/v1/automations
+- [ ] **AUTO-02**: User può creare una regola di automazione via POST /api/v1/automations
+- [ ] **AUTO-03**: User può vedere una singola regola via GET /api/v1/automations/{rule_id}
+- [ ] **AUTO-04**: User può aggiornare una regola via PATCH /api/v1/automations/{rule_id}
+- [ ] **AUTO-05**: User può eliminare una regola via DELETE /api/v1/automations/{rule_id}
+- [ ] **AUTO-06**: User può vedere lo storico esecuzioni via GET /api/v1/automations/{rule_id}/executions
+
+### Hue
+
+- [ ] **HUE-01**: GET /api/v1/hue/health ritorna stato connettività bridge
+- [ ] **HUE-02**: GET /api/v1/hue/lights/{light_id} ritorna stato singola luce
+- [ ] **HUE-03**: PUT /api/v1/hue/lights/{light_id}/state controlla singola luce
+- [ ] **HUE-04**: GET /api/v1/hue/groups ritorna lista gruppi
+- [ ] **HUE-05**: GET /api/v1/hue/groups/{group_id} ritorna stato singolo gruppo
+- [ ] **HUE-06**: POST /api/v1/hue/groups/{group_id}/scenes/{scene_id} attiva scena per gruppo
+- [ ] **HUE-07**: PUT /api/v1/hue/groups/{group_id}/action controlla luci del gruppo
+
+### Sonos
+
+- [ ] **SONOS-01**: GET /api/v1/sonos/zones/{group_id}/playback ritorna stato playback corrente
+- [ ] **SONOS-02**: POST /api/v1/sonos/zones/{group_id}/play invia comando play
+- [ ] **SONOS-03**: POST /api/v1/sonos/zones/{group_id}/pause invia comando pause
+- [ ] **SONOS-04**: POST /api/v1/sonos/zones/{group_id}/stop invia comando stop
+- [ ] **SONOS-05**: POST /api/v1/sonos/zones/{group_id}/next passa traccia successiva
+- [ ] **SONOS-06**: POST /api/v1/sonos/zones/{group_id}/previous passa traccia precedente
+- [ ] **SONOS-07**: PUT /api/v1/sonos/zones/{group_id}/volume controlla volume zona
+- [ ] **SONOS-08**: PUT /api/v1/sonos/zones/{group_id}/seek seek a posizione
+- [ ] **SONOS-09**: GET /api/v1/sonos/zones/{group_id}/play-mode ritorna play mode
+- [ ] **SONOS-10**: PUT /api/v1/sonos/zones/{group_id}/play-mode imposta play mode
+- [ ] **SONOS-11**: GET /api/v1/sonos/zones/{group_id}/queue ritorna coda di riproduzione
+- [ ] **SONOS-12**: GET /api/v1/sonos/zones/{group_id}/sleep-timer ritorna stato sleep timer
+- [ ] **SONOS-13**: PUT /api/v1/sonos/zones/{group_id}/sleep-timer imposta sleep timer
+
+### Netatmo
+
+- [ ] **NETA-01**: GET /api/v1/netatmo/getthermstate ritorna stato termostato corrente
+- [ ] **NETA-02**: POST /api/v1/netatmo/valves/calibrate calibra tutte le valvole
+- [ ] **NETA-03**: POST /api/v1/netatmo/valves/{module_id}/calibrate calibra singola valvola
+- [ ] **NETA-04**: GET /api/v1/netatmo/camera/events/{event_id}/snapshot ritorna snapshot evento
+- [ ] **NETA-05**: GET /api/v1/netatmo/camera/{camera_id}/stream ritorna URL stream RTSP
+- [ ] **NETA-06**: GET /api/v1/netatmo/camera/{camera_id}/snapshot ritorna snapshot camera
+- [ ] **NETA-07**: POST /api/v1/netatmo/camera/{camera_id}/monitoring toggle monitoraggio camera
+- [ ] **NETA-08**: POST /api/v1/netatmo/renamehome rinomina un home
+- [ ] **NETA-09**: GET /api/v1/netatmo/gethomedata ritorna snapshot completo home (alias deprecato)
+
+### Fritz!Box
+
+- [ ] **FRITZ-01**: GET /api/v1/fritzbox/telephony/dect ritorna handset DECT registrati
+- [ ] **FRITZ-02**: GET /api/v1/fritzbox/telephony/calls ritorna storico chiamate paginato
+- [ ] **FRITZ-03**: GET /api/v1/fritzbox/telephony/tam ritorna stato segreteria telefonica
+- [ ] **FRITZ-04**: GET /api/v1/fritzbox/history/bandwidth ritorna raw bandwidth history
+- [ ] **FRITZ-05**: GET /api/v1/fritzbox/history/devices ritorna raw device presence history
+- [ ] **FRITZ-06**: GET /api/v1/fritzbox/history/device-events ritorna log eventi join/leave
+- [ ] **FRITZ-07**: GET /api/v1/fritzbox/service-discovery ritorna TR-064 service descriptor
+
+### DIRIGERA
+
+- [ ] **DIR-01**: GET /api/v1/dirigera/history ritorna storico eventi sensori paginato
+- [ ] **DIR-02**: GET /api/v1/dirigera/stats ritorna statistiche aggregazione e retention
+- [ ] **DIR-03**: GET /api/v1/dirigera/telemetry ritorna storico telemetria sensori paginato
 
 ## Future Requirements
 
-### Tablet Design
+### Scheduler
 
-- **TABLET-01**: Custom tablet breakpoint layout (900px+)
-- **TABLET-02**: Tablet-specific navigation pattern
-- **TABLET-03**: Multi-column layouts optimized for tablet
+- **SCHED-XX**: Scheduler endpoints — esclusi da v19.0, da implementare in milestone futuro
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Tablet-specific design | Explicit future milestone, custom breakpoint already defined (900px) |
-| New component variants | Only fix/adjust existing components for mobile, no new features |
-| Animation redesign | Only fix layout, not redesign animations |
-| New pages or features | Pure UI/CSS milestone, no functionality changes |
-| Light theme preservation | User explicitly requested complete removal |
+| Scheduler API endpoints | Escluso esplicitamente dall'utente per questo milestone |
+| WebSocket server-side | Il client WS è già implementato; il server WS è nel HA proxy, non nel frontend Next.js |
+| UI per nuovi endpoint | v19.0 copre solo proxy client + API routes; UI dedicate in milestone futuro se necessario |
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| THEME-01 | Phase 149 | Complete |
-| THEME-02 | Phase 149 | Complete |
-| THEME-03 | Phase 149 | Complete |
-| THEME-04 | Phase 149 | Complete |
-| THEME-05 | Phase 149 | Complete |
-| THEME-06 | Phase 150 | Complete |
-| THEME-07 | Phase 150 | Complete |
-| THEME-08 | Phase 149 | Complete |
-| THEME-09 | Phase 149 | Complete |
-| THEME-10 | Phase 150 | Complete |
-| MOBILE-01 | Phase 151 | Complete |
-| MOBILE-02 | Phase 151 | Complete |
-| MOBILE-03 | Phase 151 | Complete |
-| MOBILE-04 | Phase 151 | Complete |
-| MOBILE-05 | Phase 151 | Complete |
-| MOBILE-06 | Phase 151 | Complete |
-| AUDIT-01 | Phase 152 | Complete |
-| AUDIT-02 | Phase 152 | Complete |
-| AUDIT-03 | Phase 152 | Complete |
-| AUDIT-04 | Phase 152 | Complete |
-| AUDIT-05 | Phase 152 | Complete |
-| AUDIT-06 | Phase 153 (verified Phase 155) | Complete |
-| AUDIT-07 | Phase 153 (verified Phase 155) | Complete |
-| AUDIT-08 | Phase 153 (verified Phase 155) | Complete |
-| AUDIT-09 | Phase 153 (verified Phase 155) | Complete |
-| AUDIT-10 | Phase 153 (verified Phase 155) | Complete |
-| AUDIT-11 | Phase 154 | Complete |
-| AUDIT-12 | Phase 154 | Complete |
-| AUDIT-13 | Phase 154 | Complete |
-| AUDIT-14 | Phase 154 | Complete |
-| AUDIT-15 | Phase 154 | Complete |
+| PATH-01 | — | Pending |
+| PATH-02 | — | Pending |
+| COMMON-01 | — | Pending |
+| COMMON-02 | — | Pending |
+| AUTH-01 | — | Pending |
+| AUTH-02 | — | Pending |
+| AUTH-03 | — | Pending |
+| AUTH-04 | — | Pending |
+| AUTO-01 | — | Pending |
+| AUTO-02 | — | Pending |
+| AUTO-03 | — | Pending |
+| AUTO-04 | — | Pending |
+| AUTO-05 | — | Pending |
+| AUTO-06 | — | Pending |
+| HUE-01 | — | Pending |
+| HUE-02 | — | Pending |
+| HUE-03 | — | Pending |
+| HUE-04 | — | Pending |
+| HUE-05 | — | Pending |
+| HUE-06 | — | Pending |
+| HUE-07 | — | Pending |
+| SONOS-01 | — | Pending |
+| SONOS-02 | — | Pending |
+| SONOS-03 | — | Pending |
+| SONOS-04 | — | Pending |
+| SONOS-05 | — | Pending |
+| SONOS-06 | — | Pending |
+| SONOS-07 | — | Pending |
+| SONOS-08 | — | Pending |
+| SONOS-09 | — | Pending |
+| SONOS-10 | — | Pending |
+| SONOS-11 | — | Pending |
+| SONOS-12 | — | Pending |
+| SONOS-13 | — | Pending |
+| NETA-01 | — | Pending |
+| NETA-02 | — | Pending |
+| NETA-03 | — | Pending |
+| NETA-04 | — | Pending |
+| NETA-05 | — | Pending |
+| NETA-06 | — | Pending |
+| NETA-07 | — | Pending |
+| NETA-08 | — | Pending |
+| NETA-09 | — | Pending |
+| FRITZ-01 | — | Pending |
+| FRITZ-02 | — | Pending |
+| FRITZ-03 | — | Pending |
+| FRITZ-04 | — | Pending |
+| FRITZ-05 | — | Pending |
+| FRITZ-06 | — | Pending |
+| FRITZ-07 | — | Pending |
+| DIR-01 | — | Pending |
+| DIR-02 | — | Pending |
+| DIR-03 | — | Pending |
 
 **Coverage:**
-- v18.0 requirements: 31 total
-- Complete: 31/31
-- Mapped to phases: 31
-- Pending (gap closure): 0
-- Unmapped: 0
+- v19.0 requirements: 52 total
+- Mapped to phases: 0
+- Unmapped: 52 ⚠️
 
 ---
-*Requirements defined: 2026-04-01*
-*Last updated: 2026-04-02 after Phase 155-01 gap closure (AUDIT-06–10 verified)*
+*Requirements defined: 2026-04-03*
+*Last updated: 2026-04-03 after initial definition*

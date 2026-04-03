@@ -1,36 +1,36 @@
 ---
 gsd_state_version: 1.0
-milestone: v18.0
-milestone_name: Dark-Only & Mobile-First
-status: verifying
-stopped_at: Completed 155-01-PLAN.md
-last_updated: "2026-04-02T08:56:16.613Z"
-last_activity: 2026-04-02
+milestone: v19.0
+milestone_name: API Alignment & Full Coverage
+status: planning
+stopped_at: null
+last_updated: "2026-04-03T00:00:00.000Z"
+last_activity: 2026-04-03
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 15
-  completed_plans: 15
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-01)
+See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 155 — phase-153-verification-gap-closure
+**Current focus:** Defining requirements for v19.0
 
 ## Current Position
 
-Phase: 155
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-02
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-04-03 — Milestone v19.0 started
 
-Progress: [████████████████████] 304/302 plans (100%)
+Progress: [░░░░░░░░░░░░░░░░░░░] 0/0 plans (0%)
 
 ## Performance Metrics
 

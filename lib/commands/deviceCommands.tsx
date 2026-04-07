@@ -41,20 +41,20 @@ export interface CommandItem {
 /**
  * Execute stove action with error handling
  */
-async function executeStoveAction(endpoint: string, body: Record<string, unknown> = {}): Promise<unknown> {
+async function executeStoveAction(path: string, method: string = 'POST', body: Record<string, unknown> = {}): Promise<unknown> {
   try {
-    const response = await fetch(`/api/stove/${endpoint}`, {
-      method: 'POST',
+    const response = await fetch(path, {
+      method,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...body, source: 'command_palette' }),
+      ...(method !== 'GET' && { body: JSON.stringify({ ...body, source: 'command_palette' }) }),
     });
     const data = await response.json();
     if (data.error) {
-      console.error(`[CommandPalette] Stove ${endpoint} error:`, data.error);
+      console.error(`[CommandPalette] Stove ${path} error:`, data.error);
     }
     return data;
   } catch (err) {
-    console.error(`[CommandPalette] Stove ${endpoint} failed:`, err);
+    console.error(`[CommandPalette] Stove ${path} failed:`, err);
   }
 }
 
@@ -110,13 +110,13 @@ function getStoveCommands(): CommandGroup {
         label: 'Accendi Stufa',
         icon: <Power className="w-4 h-4" />,
         shortcut: '⌘⇧S',
-        onSelect: async () => { await executeStoveAction('ignite'); },
+        onSelect: async () => { await executeStoveAction('/api/v1/thermorossi/commands/ignit'); },
       },
       {
         id: 'stove-shutdown',
         label: 'Spegni Stufa',
         icon: <PowerOff className="w-4 h-4" />,
-        onSelect: async () => { await executeStoveAction('shutdown'); },
+        onSelect: async () => { await executeStoveAction('/api/v1/thermorossi/commands/shutdown'); },
       },
       {
         id: 'stove-power-up',
@@ -124,11 +124,11 @@ function getStoveCommands(): CommandGroup {
         icon: <Plus className="w-4 h-4" />,
         onSelect: async () => {
           // Get current power level first
-          const statusRes = await fetch('/api/stove/get-power');
+          const statusRes = await fetch('/api/v1/thermorossi/power');
           const statusData = await statusRes.json();
           const currentPower = statusData?.Result ?? 3;
           if (currentPower < 5) {
-            await executeStoveAction('set-power', { level: currentPower + 1 });
+            await executeStoveAction('/api/v1/thermorossi/settings/power', 'POST', { value: currentPower + 1 });
           }
         },
       },
@@ -137,11 +137,11 @@ function getStoveCommands(): CommandGroup {
         label: 'Diminuisci Potenza Stufa',
         icon: <Minus className="w-4 h-4" />,
         onSelect: async () => {
-          const statusRes = await fetch('/api/stove/get-power');
+          const statusRes = await fetch('/api/v1/thermorossi/power');
           const statusData = await statusRes.json();
           const currentPower = statusData?.Result ?? 3;
           if (currentPower > 1) {
-            await executeStoveAction('set-power', { level: currentPower - 1 });
+            await executeStoveAction('/api/v1/thermorossi/settings/power', 'POST', { value: currentPower - 1 });
           }
         },
       },
@@ -150,11 +150,11 @@ function getStoveCommands(): CommandGroup {
         label: 'Aumenta Ventola Stufa',
         icon: <Fan className="w-4 h-4" />,
         onSelect: async () => {
-          const statusRes = await fetch('/api/stove/get-fan');
+          const statusRes = await fetch('/api/v1/thermorossi/fan-level');
           const statusData = await statusRes.json();
           const currentFan = statusData?.Result ?? 3;
           if (currentFan < 6) {
-            await executeStoveAction('set-fan', { level: currentFan + 1 });
+            await executeStoveAction('/api/v1/thermorossi/settings/fan-level', 'POST', { value: currentFan + 1 });
           }
         },
       },
@@ -163,11 +163,11 @@ function getStoveCommands(): CommandGroup {
         label: 'Diminuisci Ventola Stufa',
         icon: <Fan className="w-4 h-4" />,
         onSelect: async () => {
-          const statusRes = await fetch('/api/stove/get-fan');
+          const statusRes = await fetch('/api/v1/thermorossi/fan-level');
           const statusData = await statusRes.json();
           const currentFan = statusData?.Result ?? 3;
           if (currentFan > 1) {
-            await executeStoveAction('set-fan', { level: currentFan - 1 });
+            await executeStoveAction('/api/v1/thermorossi/settings/fan-level', 'POST', { value: currentFan - 1 });
           }
         },
       },

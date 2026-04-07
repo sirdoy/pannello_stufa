@@ -594,7 +594,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
   const url = new URL(event.request.url);
 
   // Cache stove status responses
-  if (url.pathname === '/api/stove/status' && event.request.method === 'GET') {
+  if (url.pathname === '/api/v1/thermorossi/status' && event.request.method === 'GET') {
     event.respondWith(
       fetch(event.request)
         .then(async (response) => {
@@ -715,7 +715,7 @@ self.addEventListener('periodicsync', (event: any) => {
 async function checkStoveStatusBackground(): Promise<void> {
 
   try {
-    const response = await fetch('/api/stove/status');
+    const response = await fetch('/api/v1/thermorossi/status');
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }

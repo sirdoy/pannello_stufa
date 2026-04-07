@@ -53,7 +53,10 @@
   2. Frontend hooks, components, and debug panels call /api/v1/thermorossi/* with no references to old /api/stove/ paths
   3. GET /health returns an aggregated status object covering all registered providers
   4. GET /api/v1/devices returns a unified device list combining all providers
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 156-01-PLAN.md — Create thermorossi routes + aggregate endpoints
+- [ ] 156-02-PLAN.md — Update frontend references + tests
 
 ### Phase 157: Auth Module
 **Goal**: Users can authenticate via JWT and manage API keys through the HA proxy auth endpoints

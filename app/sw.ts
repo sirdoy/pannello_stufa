@@ -244,7 +244,7 @@ async function queueActionForSync(
  */
 function getActionSuccessMessage(endpoint: string): string {
   switch (endpoint) {
-    case 'stove/shutdown':
+    case 'v1/thermorossi/commands/shutdown':
       return 'Stufa spenta con successo';
     default:
       return 'Comando eseguito con successo';
@@ -293,7 +293,7 @@ self.addEventListener('notificationclick', (event) => {
 
   if (clickedAction === NOTIFICATION_ACTION_IDS.STOVE_SHUTDOWN) {
     // User clicked "Spegni stufa" action button
-    event.waitUntil(executeNotificationAction('stove/shutdown', {
+    event.waitUntil(executeNotificationAction('v1/thermorossi/commands/shutdown', {
       source: 'notification-action',
       type: notificationData.type || 'unknown',
     }));
@@ -778,9 +778,9 @@ async function checkStoveStatusBackground(): Promise<void> {
     await cacheDeviceState('stove', data);
 
     // Check for errors or issues that need notification
-    if (data.error || data.errorCode) {
+    if (data.error_code || data.stove_state === 'alarm') {
       await self.registration.showNotification('Errore Stufa', {
-        body: data.errorMessage || `Codice errore: ${data.errorCode}`,
+        body: data.error_description || `Codice errore: ${data.error_code}`,
         icon: '/icons/icon-192.png',
         badge: '/icons/icon-72.png',
         tag: 'stove-error',
@@ -797,18 +797,8 @@ async function checkStoveStatusBackground(): Promise<void> {
       await incrementBadge();
     }
 
-    // Check maintenance needs
-    if (data.maintenance?.needsCleaning) {
-      await self.registration.showNotification('Manutenzione Richiesta', {
-        body: 'La stufa necessita pulizia del braciere',
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-72.png',
-        tag: 'maintenance-alert',
-        data: { url: '/maintenance' },
-      });
-
-      await incrementBadge();
-    }
+    // Note: maintenance status requires a separate API call and is not
+    // included in the /api/v1/thermorossi/status response
 
   } catch (error) {
     console.error('[sw.ts] Background status check failed:', error);

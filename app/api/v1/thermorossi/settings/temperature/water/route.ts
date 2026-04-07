@@ -13,7 +13,14 @@ export const dynamic = 'force-dynamic';
 export const POST = withAuthAndErrorHandler(
   withIdempotency(async (request) => {
     const body = await parseJsonOrThrow(request);
-    const value = body['value'] as number;
+    const value = body['value'];
+
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return Response.json(
+        { success: false, error: 'value must be a finite number' },
+        { status: 400 }
+      );
+    }
 
     const data = await setWaterTemp(value);
 

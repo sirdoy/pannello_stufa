@@ -102,65 +102,65 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PATH-01 | — | Pending |
-| PATH-02 | — | Pending |
-| COMMON-01 | — | Pending |
-| COMMON-02 | — | Pending |
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| AUTO-01 | — | Pending |
-| AUTO-02 | — | Pending |
-| AUTO-03 | — | Pending |
-| AUTO-04 | — | Pending |
-| AUTO-05 | — | Pending |
-| AUTO-06 | — | Pending |
-| HUE-01 | — | Pending |
-| HUE-02 | — | Pending |
-| HUE-03 | — | Pending |
-| HUE-04 | — | Pending |
-| HUE-05 | — | Pending |
-| HUE-06 | — | Pending |
-| HUE-07 | — | Pending |
-| SONOS-01 | — | Pending |
-| SONOS-02 | — | Pending |
-| SONOS-03 | — | Pending |
-| SONOS-04 | — | Pending |
-| SONOS-05 | — | Pending |
-| SONOS-06 | — | Pending |
-| SONOS-07 | — | Pending |
-| SONOS-08 | — | Pending |
-| SONOS-09 | — | Pending |
-| SONOS-10 | — | Pending |
-| SONOS-11 | — | Pending |
-| SONOS-12 | — | Pending |
-| SONOS-13 | — | Pending |
-| NETA-01 | — | Pending |
-| NETA-02 | — | Pending |
-| NETA-03 | — | Pending |
-| NETA-04 | — | Pending |
-| NETA-05 | — | Pending |
-| NETA-06 | — | Pending |
-| NETA-07 | — | Pending |
-| NETA-08 | — | Pending |
-| NETA-09 | — | Pending |
-| FRITZ-01 | — | Pending |
-| FRITZ-02 | — | Pending |
-| FRITZ-03 | — | Pending |
-| FRITZ-04 | — | Pending |
-| FRITZ-05 | — | Pending |
-| FRITZ-06 | — | Pending |
-| FRITZ-07 | — | Pending |
-| DIR-01 | — | Pending |
-| DIR-02 | — | Pending |
-| DIR-03 | — | Pending |
+| PATH-01 | Phase 156 | Pending |
+| PATH-02 | Phase 156 | Pending |
+| COMMON-01 | Phase 156 | Pending |
+| COMMON-02 | Phase 156 | Pending |
+| AUTH-01 | Phase 157 | Pending |
+| AUTH-02 | Phase 157 | Pending |
+| AUTH-03 | Phase 157 | Pending |
+| AUTH-04 | Phase 157 | Pending |
+| AUTO-01 | Phase 158 | Pending |
+| AUTO-02 | Phase 158 | Pending |
+| AUTO-03 | Phase 158 | Pending |
+| AUTO-04 | Phase 158 | Pending |
+| AUTO-05 | Phase 158 | Pending |
+| AUTO-06 | Phase 158 | Pending |
+| HUE-01 | Phase 159 | Pending |
+| HUE-02 | Phase 159 | Pending |
+| HUE-03 | Phase 159 | Pending |
+| HUE-04 | Phase 159 | Pending |
+| HUE-05 | Phase 159 | Pending |
+| HUE-06 | Phase 159 | Pending |
+| HUE-07 | Phase 159 | Pending |
+| SONOS-01 | Phase 160 | Pending |
+| SONOS-02 | Phase 160 | Pending |
+| SONOS-03 | Phase 160 | Pending |
+| SONOS-04 | Phase 160 | Pending |
+| SONOS-05 | Phase 160 | Pending |
+| SONOS-06 | Phase 160 | Pending |
+| SONOS-07 | Phase 160 | Pending |
+| SONOS-08 | Phase 160 | Pending |
+| SONOS-09 | Phase 160 | Pending |
+| SONOS-10 | Phase 160 | Pending |
+| SONOS-11 | Phase 160 | Pending |
+| SONOS-12 | Phase 160 | Pending |
+| SONOS-13 | Phase 160 | Pending |
+| NETA-01 | Phase 161 | Pending |
+| NETA-02 | Phase 161 | Pending |
+| NETA-03 | Phase 161 | Pending |
+| NETA-04 | Phase 161 | Pending |
+| NETA-05 | Phase 161 | Pending |
+| NETA-06 | Phase 161 | Pending |
+| NETA-07 | Phase 161 | Pending |
+| NETA-08 | Phase 161 | Pending |
+| NETA-09 | Phase 161 | Pending |
+| FRITZ-01 | Phase 162 | Pending |
+| FRITZ-02 | Phase 162 | Pending |
+| FRITZ-03 | Phase 162 | Pending |
+| FRITZ-04 | Phase 162 | Pending |
+| FRITZ-05 | Phase 162 | Pending |
+| FRITZ-06 | Phase 162 | Pending |
+| FRITZ-07 | Phase 162 | Pending |
+| DIR-01 | Phase 163 | Pending |
+| DIR-02 | Phase 163 | Pending |
+| DIR-03 | Phase 163 | Pending |
 
 **Coverage:**
 - v19.0 requirements: 52 total
-- Mapped to phases: 0
-- Unmapped: 52 ⚠️
+- Mapped to phases: 52
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after initial definition*
+*Last updated: 2026-04-03 after roadmap creation*

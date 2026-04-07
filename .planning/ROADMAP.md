@@ -55,8 +55,8 @@
   4. GET /api/v1/devices returns a unified device list combining all providers
 **Plans:** 2 plans
 Plans:
-- [ ] 156-01-PLAN.md — Create thermorossi routes + aggregate endpoints
-- [ ] 156-02-PLAN.md — Update frontend references + tests
+- [x] 156-01-PLAN.md — Create thermorossi routes + aggregate endpoints
+- [x] 156-02-PLAN.md — Update frontend references + tests
 
 ### Phase 157: Auth Module
 **Goal**: Users can authenticate via JWT and manage API keys through the HA proxy auth endpoints
@@ -182,7 +182,7 @@ See git history and `.planning/milestones/` for details.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 156. Path Migration & Common Endpoints | v19.0 | 0/TBD | Not started | - |
+| 156. Path Migration & Common Endpoints | v19.0 | 2/2 | Complete    | 2026-04-07 |
 | 157. Auth Module | v19.0 | 0/TBD | Not started | - |
 | 158. Automations Module | v19.0 | 0/TBD | Not started | - |
 | 159. Hue Gap Closure | v19.0 | 0/TBD | Not started | - |

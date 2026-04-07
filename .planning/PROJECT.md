@@ -11,7 +11,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v18.0 (shipped 2026-04-02)
-**Status:** Active — v19.0 API Alignment & Full Coverage
+**Status:** Active — v19.0 API Alignment & Full Coverage (Phase 156 complete: thermorossi path migration + common endpoints)
 
 ## Current Milestone: v19.0 API Alignment & Full Coverage
 

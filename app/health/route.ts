@@ -4,7 +4,7 @@
  * GET /health
  *
  * Returns aggregated health status for all 8 providers via Promise.allSettled fan-out.
- * Unauthenticated — health is a public endpoint.
+ * Protected: Requires Auth0 authentication to prevent provider topology leakage.
  *
  * Response shape:
  * {
@@ -22,7 +22,7 @@
  * }
  */
 
-import { withErrorHandler, success } from '@/lib/core';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
 import { getHealth as getThermorossiHealth } from '@/lib/stove/thermorossiProxy';
 import { getProxyHealth as getNetatmoHealth } from '@/lib/netatmo/netatmoProxy';
 import { getHealth as getHueHealth } from '@/lib/hue/hueProxy';
@@ -38,7 +38,7 @@ export const dynamic = 'force-dynamic';
  * GET /health
  * Returns aggregated provider health across all 8 device providers.
  */
-export const GET = withErrorHandler(async () => {
+export const GET = withAuthAndErrorHandler(async () => {
   const [
     thermorossiResult,
     netatmoResult,

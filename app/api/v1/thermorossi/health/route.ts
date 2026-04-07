@@ -1,7 +1,7 @@
 /**
  * API Route: Thermorossi Proxy Health
  *
- * GET /api/stove/health
+ * GET /api/v1/thermorossi/health
  *
  * Returns current health data from the Thermorossi proxy, including:
  * - Provider status (ok/degraded)
@@ -17,7 +17,7 @@ import { getHealth } from '@/lib/stove/thermorossiProxy';
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/stove/health
+ * GET /api/v1/thermorossi/health
  * Returns proxy health data for dashboard and diagnostics.
  */
 export const GET = withAuthAndErrorHandler(async () => {

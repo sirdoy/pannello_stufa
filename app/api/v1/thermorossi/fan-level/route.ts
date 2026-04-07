@@ -1,14 +1,14 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getStatus } from '@/lib/stove/thermorossiProxy';
+import { getFan } from '@/lib/stove/thermorossiProxy';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/stove/status
- * Returns combined stove telemetry from the HA proxy.
+ * GET /api/v1/thermorossi/fan-level
+ * Returns current fan level from the HA proxy.
  * Protected: Requires Auth0 authentication
  */
 export const GET = withAuthAndErrorHandler(async () => {
-  const data = await getStatus();
+  const data = await getFan();
   return success(data as unknown as Record<string, unknown>);
-}, 'Stove/Status');
+}, 'Stove/GetFan');

@@ -4,7 +4,7 @@ import { setFan } from '@/lib/stove/thermorossiProxy';
 export const dynamic = 'force-dynamic';
 
 /**
- * POST /api/stove/setFan
+ * POST /api/v1/thermorossi/settings/fan-level
  * Sets the fan level via HA proxy.
  * Body: { value: number }
  * Protected: Requires Auth0 authentication

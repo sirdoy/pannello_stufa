@@ -4,7 +4,7 @@ import { sendIgnit } from '@/lib/stove/thermorossiProxy';
 export const dynamic = 'force-dynamic';
 
 /**
- * POST /api/stove/ignite
+ * POST /api/v1/thermorossi/commands/ignit
  * Ignites the stove via HA proxy.
  * Protected: Requires Auth0 authentication
  * Idempotent: Returns cached response for duplicate Idempotency-Key

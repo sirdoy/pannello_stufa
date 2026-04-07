@@ -4,7 +4,7 @@ import { sendShutdown } from '@/lib/stove/thermorossiProxy';
 export const dynamic = 'force-dynamic';
 
 /**
- * POST /api/stove/shutdown
+ * POST /api/v1/thermorossi/commands/shutdown
  * Shuts down the stove via HA proxy.
  * Protected: Requires Auth0 authentication
  * Idempotent: Returns cached response for duplicate Idempotency-Key

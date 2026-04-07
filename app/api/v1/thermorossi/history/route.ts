@@ -4,7 +4,7 @@ import { getHistory } from '@/lib/stove/thermorossiProxy';
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/stove/history
+ * GET /api/v1/thermorossi/history
  * Returns paginated stove telemetry history from the HA proxy.
  * Query params forwarded: start, end, scale, limit, offset
  * Protected: Requires Auth0 authentication

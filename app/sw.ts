@@ -140,7 +140,10 @@ self.addEventListener('push', (event) => {
   } as NotificationOptions & { vibrate?: number[]; actions?: Array<{ action: string; title: string; icon?: string }> };
 
   event.waitUntil(
-    self.registration.showNotification(notificationTitle, notificationOptions)
+    Promise.all([
+      self.registration.showNotification(notificationTitle, notificationOptions),
+      incrementBadge(),
+    ])
   );
 });
 
@@ -638,16 +641,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
   }
 });
 
-// ============================================
-// Enhanced Push Handler with Badge
-// ============================================
-
-// Update push handler to also increment badge
-const originalPushHandler = self.addEventListener;
-self.addEventListener('push', async (event) => {
-  // Increment badge on new notification
-  event.waitUntil(incrementBadge());
-});
+// Badge increment is now handled inside the primary push handler above
 
 // ============================================
 // Message Handler for Client Communication
@@ -684,6 +678,64 @@ self.addEventListener('message', async (event) => {
 
     case 'PROCESS_QUEUE':
       await processCommandQueue();
+      break;
+
+    case 'REGISTER_PERIODIC_SYNC':
+      try {
+        if ('periodicSync' in self.registration) {
+          await self.registration.periodicSync?.register(PERIODIC_SYNC_TAG, {
+            minInterval: data?.interval || 15 * 60 * 1000, // Default 15 minutes
+          });
+          event.ports[0]?.postMessage({ success: true });
+        } else {
+          event.ports[0]?.postMessage({
+            success: false,
+            error: 'Periodic Sync not supported',
+          });
+        }
+      } catch (error) {
+        event.ports[0]?.postMessage({
+          success: false,
+          error: String(error),
+        });
+      }
+      break;
+
+    case 'UNREGISTER_PERIODIC_SYNC':
+      try {
+        if ('periodicSync' in self.registration) {
+          await self.registration.periodicSync?.unregister(PERIODIC_SYNC_TAG);
+          event.ports[0]?.postMessage({ success: true });
+        }
+      } catch (error) {
+        event.ports[0]?.postMessage({
+          success: false,
+          error: String(error),
+        });
+      }
+      break;
+
+    case 'GET_PERIODIC_SYNC_STATUS':
+      try {
+        if ('periodicSync' in self.registration) {
+          const tags = await self.registration.periodicSync?.getTags() ?? [];
+          event.ports[0]?.postMessage({
+            success: true,
+            registered: tags.includes(PERIODIC_SYNC_TAG),
+            tags,
+          });
+        } else {
+          event.ports[0]?.postMessage({
+            success: false,
+            supported: false,
+          });
+        }
+      } catch (error) {
+        event.ports[0]?.postMessage({
+          success: false,
+          error: String(error),
+        });
+      }
       break;
 
     default:
@@ -763,76 +815,7 @@ async function checkStoveStatusBackground(): Promise<void> {
   }
 }
 
-// ============================================
-// Enhanced Message Handler
-// ============================================
-
-// Extend message handler for periodic sync registration
-self.addEventListener('message', async (event) => {
-  const { type, data } = event.data || {};
-
-  switch (type) {
-    case 'REGISTER_PERIODIC_SYNC':
-      try {
-        if ('periodicSync' in self.registration) {
-          await self.registration.periodicSync?.register(PERIODIC_SYNC_TAG, {
-            minInterval: data?.interval || 15 * 60 * 1000, // Default 15 minutes
-          });
-          event.ports[0]?.postMessage({ success: true });
-        } else {
-          event.ports[0]?.postMessage({
-            success: false,
-            error: 'Periodic Sync not supported',
-          });
-        }
-      } catch (error) {
-        event.ports[0]?.postMessage({
-          success: false,
-          error: String(error),
-        });
-      }
-      break;
-
-    case 'UNREGISTER_PERIODIC_SYNC':
-      try {
-        if ('periodicSync' in self.registration) {
-          await self.registration.periodicSync?.unregister(PERIODIC_SYNC_TAG);
-          event.ports[0]?.postMessage({ success: true });
-        }
-      } catch (error) {
-        event.ports[0]?.postMessage({
-          success: false,
-          error: String(error),
-        });
-      }
-      break;
-
-    case 'GET_PERIODIC_SYNC_STATUS':
-      try {
-        if ('periodicSync' in self.registration) {
-          const tags = await self.registration.periodicSync?.getTags() ?? [];
-          event.ports[0]?.postMessage({
-            success: true,
-            registered: tags.includes(PERIODIC_SYNC_TAG),
-            tags,
-          });
-        } else {
-          event.ports[0]?.postMessage({
-            success: false,
-            supported: false,
-          });
-        }
-      } catch (error) {
-        event.ports[0]?.postMessage({
-          success: false,
-          error: String(error),
-        });
-      }
-      break;
-
-    // Keep other cases handled by the original handler
-  }
-});
+// All message cases are now handled in the single message handler above
 
 // ============================================
 // Service Worker Lifecycle

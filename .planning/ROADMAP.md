@@ -69,7 +69,7 @@ Plans:
   4. DELETE /auth/api-keys/{key_id} revokes the specified key and it no longer appears in the list
 **Plans:** 1 plan
 Plans:
-- [ ] 157-01-PLAN.md — Auth proxy client + types + API routes + tests
+- [x] 157-01-PLAN.md — Auth proxy client + types + API routes + tests
 
 ### Phase 158: Automations Module
 **Goal**: Users can manage automation rules and inspect their execution history
@@ -185,7 +185,7 @@ See git history and `.planning/milestones/` for details.
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 156. Path Migration & Common Endpoints | v19.0 | 2/2 | Complete    | 2026-04-07 |
-| 157. Auth Module | v19.0 | 0/1 | Not started | - |
+| 157. Auth Module | v19.0 | 1/1 | Complete    | 2026-04-08 |
 | 158. Automations Module | v19.0 | 0/TBD | Not started | - |
 | 159. Hue Gap Closure | v19.0 | 0/TBD | Not started | - |
 | 160. Sonos Gap Closure | v19.0 | 0/TBD | Not started | - |

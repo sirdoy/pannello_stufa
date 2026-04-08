@@ -35,12 +35,12 @@
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| AUTO-01 | User può listare le regole di automazione (paginato) via GET /api/v1/automations | `getAutomations()` proxy fn + `/api/v1/automations` GET route returning PaginatedResponse<AutomationRule> |
-| AUTO-02 | User può creare una regola via POST /api/v1/automations | `createAutomation()` proxy fn + POST route + FormModal Zod schema |
-| AUTO-03 | User può vedere una singola regola via GET /api/v1/automations/{rule_id} | `getAutomation(id)` proxy fn + `/api/v1/automations/[rule_id]` GET route |
-| AUTO-04 | User può aggiornare una regola via PATCH /api/v1/automations/{rule_id} | `updateAutomation(id, body)` proxy fn using `haPatch` + PATCH route — **requires adding `haPatch` to haClient.ts** |
-| AUTO-05 | User può eliminare una regola via DELETE /api/v1/automations/{rule_id} | `deleteAutomation(id)` proxy fn + DELETE route using `haDelete` |
-| AUTO-06 | User può vedere lo storico esecuzioni via GET /api/v1/automations/{rule_id}/executions | `getExecutions(id, params)` proxy fn + `/api/v1/automations/[rule_id]/executions` GET route |
+| AUTO-01 | User puo listare le regole di automazione (paginato) via GET /api/v1/automations | `getAutomations()` proxy fn + `/api/v1/automations` GET route returning PaginatedResponse<AutomationRule> |
+| AUTO-02 | User puo creare una regola via POST /api/v1/automations | `createAutomation()` proxy fn + POST route + FormModal Zod schema |
+| AUTO-03 | User puo vedere una singola regola via GET /api/v1/automations/{rule_id} | `getAutomation(id)` proxy fn + `/api/v1/automations/[rule_id]` GET route |
+| AUTO-04 | User puo aggiornare una regola via PATCH /api/v1/automations/{rule_id} | `updateAutomation(id, body)` proxy fn using `haPatch` + PATCH route — **requires adding `haPatch` to haClient.ts** |
+| AUTO-05 | User puo eliminare una regola via DELETE /api/v1/automations/{rule_id} | `deleteAutomation(id)` proxy fn + DELETE route using `haDelete` |
+| AUTO-06 | User puo vedere lo storico esecuzioni via GET /api/v1/automations/{rule_id}/executions | `getExecutions(id, params)` proxy fn + `/api/v1/automations/[rule_id]/executions` GET route |
 </phase_requirements>
 
 ---
@@ -53,7 +53,7 @@ The single non-trivial discovery is that `haClient.ts` currently exposes `haGet`
 
 The nav entry for "Automazioni" follows the `GLOBAL_SECTIONS` registry in `lib/devices/deviceTypes.ts`, which already drives both desktop `DropdownItem` and mobile `MenuItem` rendering in `Navbar.tsx`. Adding one object to `GLOBAL_SECTIONS` and one icon mapping in `getIconForPath` is the complete nav change.
 
-**Primary recommendation:** Seven deliverable files across five layers (types, proxy, API routes ×4, hook, pages ×2, nav config). Plan as two waves: Wave 1 = infrastructure (types + proxy + haClient patch + routes), Wave 2 = UI (hook + pages + nav).
+**Primary recommendation:** Seven deliverable files across five layers (types, proxy, API routes x4, hook, pages x2, nav config). Plan as two waves: Wave 1 = infrastructure (types + proxy + haClient patch + routes), Wave 2 = UI (hook + pages + nav).
 
 ---
 
@@ -97,10 +97,16 @@ types/
 
 app/api/v1/automations/
 ├── route.ts                # GET (list, paginated) + POST (create)
+├── __tests__/
+│   └── route.test.ts       # Route tests for GET + POST
 └── [rule_id]/
     ├── route.ts            # GET (single) + PATCH (update) + DELETE
+    ├── __tests__/
+    │   └── route.test.ts   # Route tests for GET + PATCH + DELETE
     └── executions/
-        └── route.ts        # GET (execution history, paginated)
+        ├── route.ts        # GET (execution history, paginated)
+        └── __tests__/
+            └── route.test.ts  # Route tests for GET executions
 
 app/automations/
 ├── page.tsx                # rules list — DataTable + FormModal + ConfirmationDialog
@@ -330,7 +336,7 @@ function useAutomations() {
 | Delete confirmation | Custom confirm UX | ConfirmationDialog component | Handles loading state, danger variant, accessibility |
 | Table pagination | Custom pagination UI | DataTable built-in + manual prev/next buttons (devices page pattern) | DataTable has built-in pagination; server-side pagination uses explicit prev/next buttons as in devices/page.tsx |
 | Toast notifications | Custom notification | `useToast()` hook | Already installed, used in every CRUD page |
-| Error → ApiError mapping | Custom fetch error handling | `withAuthAndErrorHandler` + `haClient` error mapping | haClient maps all RFC 9457 errors, withAuthAndErrorHandler catches and formats |
+| Error -> ApiError mapping | Custom fetch error handling | `withAuthAndErrorHandler` + `haClient` error mapping | haClient maps all RFC 9457 errors, withAuthAndErrorHandler catches and formats |
 | PATCH transport | Modified haPut call | New `haPatch` function in haClient.ts | Mirror of haPut — 10 lines, same error handling |
 
 ---
@@ -458,17 +464,19 @@ async function useExecutions(ruleId: string) {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **AutomationRule field shape from HA backend**
+1. **AutomationRule field shape from HA backend** (RESOLVED)
    - What we know: The frontend proxies whatever HA returns. UI-SPEC defines minimum display fields (name, enabled, last_execution_at).
    - What's unclear: Exact field names and types (especially `id` type: string vs number), and whether triggers/conditions/actions are required on POST.
    - Recommendation: Define conservative types with `unknown` index signature. If first test against HA returns 422, add the missing required fields. Phase depends on Phase 156 being complete.
+   - Resolution: Types defined conservatively with `[key: string]: unknown` index signature in `types/automations.ts`. Plans handle defensively — id typed as `string`, runtime adjustment if HA returns `number`.
 
-2. **Execution history `status` enum values**
+2. **Execution history `status` enum values** (RESOLVED)
    - What we know: UI-SPEC defines three display states: Completata/Fallita/In esecuzione mapped to sage/danger/warning badges.
    - What's unclear: Exact string values in HA response (`success`/`failure`/`running` vs `completed`/`failed`/`in_progress`).
-   - Recommendation: Define as string union in types, add a status → badge variant mapping function in the page component. Adjust values after first live test.
+   - Recommendation: Define as string union in types, add a status -> badge variant mapping function in the page component. Adjust values after first live test.
+   - Resolution: Using `'success' | 'failure' | 'running'` as initial union with a `getExecutionBadge()` switch/case mapping function that includes a `default` branch for unknown values. Adjustable after first live test.
 
 ---
 
@@ -489,16 +497,16 @@ Step 2.6: SKIPPED — Phase 158 is code/config only. All external dependencies (
 | Quick run command | `npm test -- --testPathPattern="automations" --passWithNoTests` |
 | Full suite command | `npm test` |
 
-### Phase Requirements → Test Map
+### Phase Requirements -> Test Map
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| AUTO-01 | GET /api/v1/automations returns PaginatedResponse | unit | `npm test -- --testPathPattern="api/v1/automations" -t "GET"` | ❌ Wave 0 |
-| AUTO-02 | POST /api/v1/automations creates rule | unit | `npm test -- --testPathPattern="api/v1/automations" -t "POST"` | ❌ Wave 0 |
-| AUTO-03 | GET /api/v1/automations/[rule_id] returns single rule | unit | `npm test -- --testPathPattern="automations.*rule_id" -t "GET"` | ❌ Wave 0 |
-| AUTO-04 | PATCH /api/v1/automations/[rule_id] updates rule | unit | `npm test -- --testPathPattern="automations.*rule_id" -t "PATCH"` | ❌ Wave 0 |
-| AUTO-05 | DELETE /api/v1/automations/[rule_id] deletes rule | unit | `npm test -- --testPathPattern="automations.*rule_id" -t "DELETE"` | ❌ Wave 0 |
-| AUTO-06 | GET executions returns PaginatedResponse<AutomationExecution> | unit | `npm test -- --testPathPattern="executions"` | ❌ Wave 0 |
+| AUTO-01 | GET /api/v1/automations returns PaginatedResponse | unit | `npm test -- --testPathPattern="api/v1/automations" -t "GET"` | Wave 0 -> Plan 01 Task 3 |
+| AUTO-02 | POST /api/v1/automations creates rule | unit | `npm test -- --testPathPattern="api/v1/automations" -t "POST"` | Wave 0 -> Plan 01 Task 3 |
+| AUTO-03 | GET /api/v1/automations/[rule_id] returns single rule | unit | `npm test -- --testPathPattern="automations.*rule_id" -t "GET"` | Wave 0 -> Plan 01 Task 3 |
+| AUTO-04 | PATCH /api/v1/automations/[rule_id] updates rule | unit | `npm test -- --testPathPattern="automations.*rule_id" -t "PATCH"` | Wave 0 -> Plan 01 Task 3 |
+| AUTO-05 | DELETE /api/v1/automations/[rule_id] deletes rule | unit | `npm test -- --testPathPattern="automations.*rule_id" -t "DELETE"` | Wave 0 -> Plan 01 Task 3 |
+| AUTO-06 | GET executions returns PaginatedResponse<AutomationExecution> | unit | `npm test -- --testPathPattern="executions"` | Wave 0 -> Plan 01 Task 3 |
 
 ### Sampling Rate
 - **Per task commit:** `npm test -- --testPathPattern="automations" --passWithNoTests`
@@ -506,18 +514,18 @@ Step 2.6: SKIPPED — Phase 158 is code/config only. All external dependencies (
 - **Phase gate:** Full suite green before `/gsd-verify-work`
 
 ### Wave 0 Gaps
-- [ ] `__tests__/lib/automationsProxy.test.ts` — covers proxy function calls for all 6 functions
-- [ ] `app/api/v1/automations/__tests__/route.test.ts` — covers GET + POST (AUTO-01, AUTO-02)
-- [ ] `app/api/v1/automations/[rule_id]/__tests__/route.test.ts` — covers GET + PATCH + DELETE (AUTO-03, AUTO-04, AUTO-05)
-- [ ] `app/api/v1/automations/[rule_id]/executions/__tests__/route.test.ts` — covers GET executions (AUTO-06)
+- [x] `__tests__/lib/automationsProxy.test.ts` — covers proxy function calls for all 6 functions (Plan 01 Task 2)
+- [x] `app/api/v1/automations/__tests__/route.test.ts` — covers GET + POST (AUTO-01, AUTO-02) (Plan 01 Task 3)
+- [x] `app/api/v1/automations/[rule_id]/__tests__/route.test.ts` — covers GET + PATCH + DELETE (AUTO-03, AUTO-04, AUTO-05) (Plan 01 Task 3)
+- [x] `app/api/v1/automations/[rule_id]/executions/__tests__/route.test.ts` — covers GET executions (AUTO-06) (Plan 01 Task 3)
 
-Test pattern: Mock `automationsProxy` module, verify route calls correct proxy function and returns expected response. Matches pattern in `__tests__/lib/thermorossiProxy.test.ts`.
+Test pattern: Mock `automationsProxy` module, verify route calls correct proxy function and returns expected response. Matches pattern in `app/api/hue/lights/[id]/__tests__/route.test.ts`.
 
 ---
 
 ## Security Domain
 
-`security_enforcement` not explicitly set to false in config.json → included.
+`security_enforcement` not explicitly set to false in config.json -> included.
 
 ### Applicable ASVS Categories
 

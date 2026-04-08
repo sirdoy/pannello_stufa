@@ -1,0 +1,1 @@
+export { automationsProxy } from './automationsProxy';

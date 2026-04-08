@@ -257,6 +257,50 @@ export async function haPut<T>(
 }
 
 /**
+ * Generic PATCH request to the HA proxy.
+ *
+ * @param endpoint - Path relative to HA_API_URL (e.g. '/api/v1/automations/123')
+ * @param body     - JSON body to send
+ * @param options  - Optional { timeout } in milliseconds (default 15000)
+ * @returns Parsed JSON response typed as T
+ * @throws ApiError on any failure
+ */
+export async function haPatch<T>(
+  endpoint: string,
+  body: Record<string, unknown> | object,
+  options: HaRequestOptions = {}
+): Promise<T> {
+  const { baseUrl, apiKey } = getEnvConfig();
+  const { timeout = DEFAULT_TIMEOUT_MS } = options;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  try {
+    const response = await fetch(`${baseUrl}${endpoint}`, {
+      method: 'PATCH',
+      headers: {
+        'X-API-Key': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      return await mapResponseError(response);
+    }
+
+    return (await response.json()) as T;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    return mapCaughtError(error);
+  }
+}
+
+/**
  * Generic DELETE request to the HA proxy.
  *
  * @param endpoint - Path relative to HA_API_URL (e.g. '/api/v1/registry/types/custom_sensor')

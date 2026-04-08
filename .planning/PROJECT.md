@@ -10,8 +10,8 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v17.1 (shipped 2026-03-30)
-**Status:** Active — v18.0 (Phase 155 complete — all 31/31 requirements satisfied, VERIFICATION.md gap for Phase 153 closed)
+**Version:** v18.0 (shipped 2026-04-02)
+**Status:** Active — v19.0 API Alignment & Full Coverage (Phase 157 complete: auth module proxy + routes)
 
 ## Current Milestone: v18.0 Dark-Only & Mobile-First
 

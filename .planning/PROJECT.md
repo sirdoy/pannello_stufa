@@ -10,25 +10,18 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v18.0 (shipped 2026-04-02)
-**Status:** Active — v19.0 API Alignment & Full Coverage (Phase 156 complete: thermorossi path migration + common endpoints)
+**Version:** v17.1 (shipped 2026-03-30)
+**Status:** Active — v18.0 (Phase 155 complete — all 31/31 requirements satisfied, VERIFICATION.md gap for Phase 153 closed)
 
-## Current Milestone: v19.0 API Alignment & Full Coverage
+## Current Milestone: v18.0 Dark-Only & Mobile-First
 
-**Goal:** Allineare tutte le route API Next.js alla documentazione HA proxy, implementare tutti gli endpoint mancanti, e aggiungere i moduli auth e automations.
+**Goal:** Rimuovere completamente il tema light e la selezione tema, uniformare design system e tutte le pagine per essere mobile-first (min 375px).
 
 **Target features:**
-- Migrazione path thermorossi: /api/stove/* → /api/v1/thermorossi/*
-- Allineamento path di tutti i provider al formato /api/v1/{provider}/*
-- Endpoint mancanti dirigera (history, stats, telemetry)
-- Endpoint mancanti fritzbox (telephony, raw history)
-- Endpoint mancanti hue (health, singoli, gruppi, controlli)
-- Endpoint mancanti netatmo (thermstate, valve calibration, camera avanzata)
-- Endpoint mancanti sonos (zone-level playback, queue, sleep timer, play-mode)
-- Modulo auth completo (login JWT, API keys CRUD)
-- Modulo automations completo (regole CRUD, execution history)
-- Common endpoints (health unificato, aggregated devices)
-- Scheduler escluso da questo milestone
+- Rimozione completa tema light (CSS, variabili, toggle, logica di selezione)
+- Design system aggiornato come mobile-first (breakpoint, spacing, button groups, layout)
+- Tutte le pagine e sotto-pagine verificate e fixate per viewport 375px+
+- Design system come fonte unica di verità (DS aggiornato prima, poi propagato)
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router

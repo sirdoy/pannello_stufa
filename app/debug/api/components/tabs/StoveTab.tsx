@@ -51,11 +51,11 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
   };
 
   const fetchAllGetEndpoints = () => {
-    fetchGetEndpoint('health', '/api/v1/thermorossi/health');
-    fetchGetEndpoint('status', '/api/v1/thermorossi/status');
-    fetchGetEndpoint('power', '/api/v1/thermorossi/power');
-    fetchGetEndpoint('fan', '/api/v1/thermorossi/fan-level');
-    fetchGetEndpoint('history', '/api/v1/thermorossi/history');
+    fetchGetEndpoint('health', '/api/stove/health');
+    fetchGetEndpoint('status', '/api/stove/status');
+    fetchGetEndpoint('power', '/api/stove/getPower');
+    fetchGetEndpoint('fan', '/api/stove/getFan');
+    fetchGetEndpoint('history', '/api/stove/history');
   };
 
   const callPostEndpoint = async (name: string, url: string, body: any) => {
@@ -125,57 +125,57 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
         <div className="space-y-3">
           <EndpointCard
             name="Proxy Health"
-            url="/api/v1/thermorossi/health"
+            url="/api/stove/health"
             response={getResponses.health}
             loading={loadingGet.health ?? false}
             timing={timings.health}
-            onRefresh={() => fetchGetEndpoint('health', '/api/v1/thermorossi/health')}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/health')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/health'}
+            onRefresh={() => fetchGetEndpoint('health', '/api/stove/health')}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/health')}
+            isCopied={copiedUrl === '/api/stove/health'}
           />
 
           <EndpointCard
             name="Status"
-            url="/api/v1/thermorossi/status"
+            url="/api/stove/status"
             response={getResponses.status}
             loading={loadingGet.status ?? false}
             timing={timings.status}
-            onRefresh={() => fetchGetEndpoint('status', '/api/v1/thermorossi/status')}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/status')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/status'}
+            onRefresh={() => fetchGetEndpoint('status', '/api/stove/status')}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/status')}
+            isCopied={copiedUrl === '/api/stove/status'}
           />
 
           <EndpointCard
             name="Power Level"
-            url="/api/v1/thermorossi/power"
+            url="/api/stove/getPower"
             response={getResponses.power}
             loading={loadingGet.power ?? false}
             timing={timings.power}
-            onRefresh={() => fetchGetEndpoint('power', '/api/v1/thermorossi/power')}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/power')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/power'}
+            onRefresh={() => fetchGetEndpoint('power', '/api/stove/getPower')}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/getPower')}
+            isCopied={copiedUrl === '/api/stove/getPower'}
           />
 
           <EndpointCard
             name="Fan Level"
-            url="/api/v1/thermorossi/fan-level"
+            url="/api/stove/getFan"
             response={getResponses.fan}
             loading={loadingGet.fan ?? false}
             timing={timings.fan}
-            onRefresh={() => fetchGetEndpoint('fan', '/api/v1/thermorossi/fan-level')}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/fan-level')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/fan-level'}
+            onRefresh={() => fetchGetEndpoint('fan', '/api/stove/getFan')}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/getFan')}
+            isCopied={copiedUrl === '/api/stove/getFan'}
           />
 
           <EndpointCard
             name="History"
-            url="/api/v1/thermorossi/history"
+            url="/api/stove/history"
             response={getResponses.history}
             loading={loadingGet.history ?? false}
             timing={timings.history}
-            onRefresh={() => fetchGetEndpoint('history', '/api/v1/thermorossi/history')}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/history')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/history'}
+            onRefresh={() => fetchGetEndpoint('history', '/api/stove/history')}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/history')}
+            isCopied={copiedUrl === '/api/stove/history'}
           />
         </div>
       </div>
@@ -188,66 +188,66 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
         <div className="space-y-3">
           <PostEndpointCard
             name="Ignite Stove"
-            url="/api/v1/thermorossi/commands/ignit"
+            url="/api/stove/ignite"
             response={postResponses.ignite}
             loading={loadingPost.ignite ?? false}
             timing={timings.ignite}
-            onExecute={() => callPostEndpoint('ignite', '/api/v1/thermorossi/commands/ignit', {})}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/commands/ignit')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/commands/ignit'}
+            onExecute={() => callPostEndpoint('ignite', '/api/stove/ignite', {})}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/ignite')}
+            isCopied={copiedUrl === '/api/stove/ignite'}
           />
 
           <PostEndpointCard
             name="Shutdown Stove"
-            url="/api/v1/thermorossi/commands/shutdown"
+            url="/api/stove/shutdown"
             response={postResponses.shutdown}
             loading={loadingPost.shutdown ?? false}
             timing={timings.shutdown}
-            onExecute={() => callPostEndpoint('shutdown', '/api/v1/thermorossi/commands/shutdown', {})}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/commands/shutdown')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/commands/shutdown'}
+            onExecute={() => callPostEndpoint('shutdown', '/api/stove/shutdown', {})}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/shutdown')}
+            isCopied={copiedUrl === '/api/stove/shutdown'}
           />
 
           <PostEndpointCard
             name="Set Power Level"
-            url="/api/v1/thermorossi/settings/power"
+            url="/api/stove/setPower"
             params={[
               { name: 'value', label: 'Power Level (1-5)', type: 'number', min: 1, max: 5, defaultValue: '3' },
             ]}
             response={postResponses.setPower}
             loading={loadingPost.setPower ?? false}
             timing={timings.setPower}
-            onExecute={(values) => callPostEndpoint('setPower', '/api/v1/thermorossi/settings/power', { value: Number(values.value) })}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/settings/power')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/settings/power'}
+            onExecute={(values) => callPostEndpoint('setPower', '/api/stove/setPower', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/setPower')}
+            isCopied={copiedUrl === '/api/stove/setPower'}
           />
 
           <PostEndpointCard
             name="Set Fan Level"
-            url="/api/v1/thermorossi/settings/fan-level"
+            url="/api/stove/setFan"
             params={[
               { name: 'value', label: 'Fan Level (1-6)', type: 'number', min: 1, max: 6, defaultValue: '3' },
             ]}
             response={postResponses.setFan}
             loading={loadingPost.setFan ?? false}
             timing={timings.setFan}
-            onExecute={(values) => callPostEndpoint('setFan', '/api/v1/thermorossi/settings/fan-level', { value: Number(values.value) })}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/settings/fan-level')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/settings/fan-level'}
+            onExecute={(values) => callPostEndpoint('setFan', '/api/stove/setFan', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/setFan')}
+            isCopied={copiedUrl === '/api/stove/setFan'}
           />
 
           <PostEndpointCard
             name="Set Water Temperature"
-            url="/api/v1/thermorossi/settings/temperature/water"
+            url="/api/stove/setWaterTemperature"
             params={[
               { name: 'value', label: 'Temperature (40-80C)', type: 'number', min: 40, max: 80, defaultValue: '50' },
             ]}
             response={postResponses.setWaterTemp}
             loading={loadingPost.setWaterTemp ?? false}
             timing={timings.setWaterTemp}
-            onExecute={(values) => callPostEndpoint('setWaterTemp', '/api/v1/thermorossi/settings/temperature/water', { value: Number(values.value) })}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/settings/temperature/water')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/settings/temperature/water'}
+            onExecute={(values) => callPostEndpoint('setWaterTemp', '/api/stove/setWaterTemperature', { value: Number(values.value) })}
+            onCopyUrl={() => copyUrlToClipboard('/api/stove/setWaterTemperature')}
+            isCopied={copiedUrl === '/api/stove/setWaterTemperature'}
           />
         </div>
       </div>

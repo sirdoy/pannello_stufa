@@ -10,5 +10,6 @@ export type {
   ApiSuccessResponse,
   ApiErrorResponse,
   ApiResponse,
+  StoveStatusResponse,
   PaginatedResponse,
 } from './responses';

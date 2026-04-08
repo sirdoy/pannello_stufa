@@ -30,6 +30,20 @@ export type ApiResponse<T = Record<string, unknown>> =
 
 
 /**
+ * Stove status response
+ * Example: GET /api/stove/status
+ */
+export interface StoveStatusResponse extends ApiSuccessResponse {
+  status: import('../firebase').StoveStatus;
+  power: import('../firebase').StovePowerLevel;
+  temperature: number;
+  maintenance?: {
+    needsCleaning: boolean;
+    hoursSinceLastCleaning: number;
+  };
+}
+
+/**
  * Generic paginated response
  */
 export interface PaginatedResponse<T> extends ApiSuccessResponse {

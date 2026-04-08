@@ -140,10 +140,7 @@ self.addEventListener('push', (event) => {
   } as NotificationOptions & { vibrate?: number[]; actions?: Array<{ action: string; title: string; icon?: string }> };
 
   event.waitUntil(
-    Promise.all([
-      self.registration.showNotification(notificationTitle, notificationOptions),
-      incrementBadge(),
-    ])
+    self.registration.showNotification(notificationTitle, notificationOptions)
   );
 });
 
@@ -244,7 +241,7 @@ async function queueActionForSync(
  */
 function getActionSuccessMessage(endpoint: string): string {
   switch (endpoint) {
-    case 'v1/thermorossi/commands/shutdown':
+    case 'stove/shutdown':
       return 'Stufa spenta con successo';
     default:
       return 'Comando eseguito con successo';
@@ -293,7 +290,7 @@ self.addEventListener('notificationclick', (event) => {
 
   if (clickedAction === NOTIFICATION_ACTION_IDS.STOVE_SHUTDOWN) {
     // User clicked "Spegni stufa" action button
-    event.waitUntil(executeNotificationAction('v1/thermorossi/commands/shutdown', {
+    event.waitUntil(executeNotificationAction('stove/shutdown', {
       source: 'notification-action',
       type: notificationData.type || 'unknown',
     }));
@@ -597,7 +594,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
   const url = new URL(event.request.url);
 
   // Cache stove status responses
-  if (url.pathname === '/api/v1/thermorossi/status' && event.request.method === 'GET') {
+  if (url.pathname === '/api/stove/status' && event.request.method === 'GET') {
     event.respondWith(
       fetch(event.request)
         .then(async (response) => {
@@ -641,7 +638,16 @@ self.addEventListener('fetch', (event: FetchEvent) => {
   }
 });
 
-// Badge increment is now handled inside the primary push handler above
+// ============================================
+// Enhanced Push Handler with Badge
+// ============================================
+
+// Update push handler to also increment badge
+const originalPushHandler = self.addEventListener;
+self.addEventListener('push', async (event) => {
+  // Increment badge on new notification
+  event.waitUntil(incrementBadge());
+});
 
 // ============================================
 // Message Handler for Client Communication
@@ -680,6 +686,92 @@ self.addEventListener('message', async (event) => {
       await processCommandQueue();
       break;
 
+    default:
+  }
+});
+
+// ============================================
+// Periodic Background Sync (v1.62.0+)
+// ============================================
+
+const PERIODIC_SYNC_TAG = 'check-stove-status';
+
+/**
+ * Periodic Background Sync event handler
+ * Triggered at intervals to check stove status even with app closed
+ * Note: Only supported in Chrome/Edge
+ */
+self.addEventListener('periodicsync', (event: any) => {
+
+  if (event.tag === PERIODIC_SYNC_TAG) {
+    event.waitUntil(checkStoveStatusBackground());
+  }
+});
+
+/**
+ * Check stove status in background
+ * Sends notification if there's an issue
+ */
+async function checkStoveStatusBackground(): Promise<void> {
+
+  try {
+    const response = await fetch('/api/stove/status');
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Cache the state for offline viewing
+    await cacheDeviceState('stove', data);
+
+    // Check for errors or issues that need notification
+    if (data.error || data.errorCode) {
+      await self.registration.showNotification('Errore Stufa', {
+        body: data.errorMessage || `Codice errore: ${data.errorCode}`,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-72.png',
+        tag: 'stove-error',
+        requireInteraction: true,
+        data: { url: '/' },
+        vibrate: [200, 100, 200, 100, 200],
+        // Add action buttons for quick shutdown
+        actions: [
+          { action: NOTIFICATION_ACTION_IDS.STOVE_SHUTDOWN, title: 'Spegni stufa' },
+          { action: NOTIFICATION_ACTION_IDS.STOVE_VIEW_DETAILS, title: 'Dettagli' },
+        ],
+      } as NotificationOptions & { vibrate?: number[]; actions?: Array<{ action: string; title: string }> });
+
+      await incrementBadge();
+    }
+
+    // Check maintenance needs
+    if (data.maintenance?.needsCleaning) {
+      await self.registration.showNotification('Manutenzione Richiesta', {
+        body: 'La stufa necessita pulizia del braciere',
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-72.png',
+        tag: 'maintenance-alert',
+        data: { url: '/maintenance' },
+      });
+
+      await incrementBadge();
+    }
+
+  } catch (error) {
+    console.error('[sw.ts] Background status check failed:', error);
+  }
+}
+
+// ============================================
+// Enhanced Message Handler
+// ============================================
+
+// Extend message handler for periodic sync registration
+self.addEventListener('message', async (event) => {
+  const { type, data } = event.data || {};
+
+  switch (type) {
     case 'REGISTER_PERIODIC_SYNC':
       try {
         if ('periodicSync' in self.registration) {
@@ -738,74 +830,9 @@ self.addEventListener('message', async (event) => {
       }
       break;
 
-    default:
+    // Keep other cases handled by the original handler
   }
 });
-
-// ============================================
-// Periodic Background Sync (v1.62.0+)
-// ============================================
-
-const PERIODIC_SYNC_TAG = 'check-stove-status';
-
-/**
- * Periodic Background Sync event handler
- * Triggered at intervals to check stove status even with app closed
- * Note: Only supported in Chrome/Edge
- */
-self.addEventListener('periodicsync', (event: any) => {
-
-  if (event.tag === PERIODIC_SYNC_TAG) {
-    event.waitUntil(checkStoveStatusBackground());
-  }
-});
-
-/**
- * Check stove status in background
- * Sends notification if there's an issue
- */
-async function checkStoveStatusBackground(): Promise<void> {
-
-  try {
-    const response = await fetch('/api/v1/thermorossi/status');
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    // Cache the state for offline viewing
-    await cacheDeviceState('stove', data);
-
-    // Check for errors or issues that need notification
-    if (data.error_code || data.stove_state === 'alarm') {
-      await self.registration.showNotification('Errore Stufa', {
-        body: data.error_description || `Codice errore: ${data.error_code}`,
-        icon: '/icons/icon-192.png',
-        badge: '/icons/icon-72.png',
-        tag: 'stove-error',
-        requireInteraction: true,
-        data: { url: '/' },
-        vibrate: [200, 100, 200, 100, 200],
-        // Add action buttons for quick shutdown
-        actions: [
-          { action: NOTIFICATION_ACTION_IDS.STOVE_SHUTDOWN, title: 'Spegni stufa' },
-          { action: NOTIFICATION_ACTION_IDS.STOVE_VIEW_DETAILS, title: 'Dettagli' },
-        ],
-      } as NotificationOptions & { vibrate?: number[]; actions?: Array<{ action: string; title: string }> });
-
-      await incrementBadge();
-    }
-
-    // Note: maintenance status requires a separate API call and is not
-    // included in the /api/v1/thermorossi/status response
-
-  } catch (error) {
-    console.error('[sw.ts] Background status check failed:', error);
-  }
-}
-
-// All message cases are now handled in the single message handler above
 
 // ============================================
 // Service Worker Lifecycle

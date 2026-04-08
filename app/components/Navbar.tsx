@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNavigationStructureWithPreferences } from '@/lib/devices/deviceRegistry';
-import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown, Lightbulb, ClipboardList, DoorOpen } from 'lucide-react';
+import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown, Lightbulb, ClipboardList, DoorOpen, Zap } from 'lucide-react';
 import {
   DropdownContainer,
   DropdownItem,
@@ -183,6 +183,7 @@ export default function Navbar() {
     if (path.includes('log')) return <Clock className="w-5 h-5" />;
     if (path.includes('registry')) return <ClipboardList className="w-5 h-5" />;
     if (path.includes('rooms')) return <DoorOpen className="w-5 h-5" />;
+    if (path.includes('automations')) return <Zap className="w-5 h-5" />;
     return null;
   };
 

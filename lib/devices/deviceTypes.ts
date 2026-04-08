@@ -323,6 +323,12 @@ export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
       { label: 'Stato stanze', route: '/rooms/status' },
     ],
   },
+  AUTOMAZIONI: {
+    id: 'automations',
+    name: 'Automazioni',
+    icon: '⚡',
+    route: '/automations',
+  },
 };
 
 /** Settings menu item configuration */

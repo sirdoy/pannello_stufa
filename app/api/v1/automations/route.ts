@@ -1,4 +1,4 @@
-import { withAuthAndErrorHandler, success, created, parseQuery } from '@/lib/core';
+import { withAuthAndErrorHandler, success, created, parseQuery, parseJson } from '@/lib/core';
 import { automationsProxy } from '@/lib/automations';
 
 export const dynamic = 'force-dynamic';
@@ -20,7 +20,7 @@ export const GET = withAuthAndErrorHandler(async (request) => {
  * Creates a new automation rule. Requires authentication.
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
-  const body = await request.json();
+  const body = await parseJson(request);
   const data = await automationsProxy.createAutomation(body);
   return created(data as unknown as Record<string, unknown>);
 }, 'Automations/Create');

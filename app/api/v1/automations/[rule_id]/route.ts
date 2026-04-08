@@ -1,4 +1,4 @@
-import { withAuthAndErrorHandler, success, noContent } from '@/lib/core';
+import { withAuthAndErrorHandler, success, noContent, parseJson } from '@/lib/core';
 import { automationsProxy } from '@/lib/automations';
 
 export const dynamic = 'force-dynamic';
@@ -21,7 +21,7 @@ export const GET = withAuthAndErrorHandler(async (_request, context) => {
 export const PATCH = withAuthAndErrorHandler(async (request, context) => {
   const params = await context.params;
   const rule_id = params['rule_id'] ?? '';
-  const body = await request.json();
+  const body = await parseJson(request);
   const data = await automationsProxy.updateAutomation(rule_id, body);
   return success(data as unknown as Record<string, unknown>);
 }, 'Automations/Update');

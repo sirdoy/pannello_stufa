@@ -80,7 +80,10 @@ Plans:
   2. User can create a rule via POST and retrieve it via GET /api/v1/automations/{rule_id}
   3. User can update a rule via PATCH and delete it via DELETE, with the list reflecting changes
   4. GET /api/v1/automations/{rule_id}/executions returns execution history for a rule
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 158-01-PLAN.md — Types + haPatch + proxy client + API routes + tests
+- [ ] 158-02-PLAN.md — Nav entry + rules list page + rule detail page
 
 ### Phase 159: Hue Gap Closure
 **Goal**: All missing Hue endpoints are proxied: bridge health, single light control, group listing, group control, scene activation
@@ -186,7 +189,7 @@ See git history and `.planning/milestones/` for details.
 |-------|-----------|----------------|--------|-----------|
 | 156. Path Migration & Common Endpoints | v19.0 | 2/2 | Complete    | 2026-04-07 |
 | 157. Auth Module | v19.0 | 1/1 | Complete    | 2026-04-08 |
-| 158. Automations Module | v19.0 | 0/TBD | Not started | - |
+| 158. Automations Module | v19.0 | 0/2 | Not started | - |
 | 159. Hue Gap Closure | v19.0 | 0/TBD | Not started | - |
 | 160. Sonos Gap Closure | v19.0 | 0/TBD | Not started | - |
 | 161. Netatmo Gap Closure | v19.0 | 0/TBD | Not started | - |

@@ -94,7 +94,10 @@ Plans:
   2. User can get and control a single light via GET and PUT on /api/v1/hue/lights/{light_id}
   3. User can list groups and get a single group via /api/v1/hue/groups endpoints
   4. User can activate a scene for a group and control all lights in a group via the group action endpoint
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 159-01-PLAN.md — v1 Hue health + single light GET + light state PUT routes with tests
+- [ ] 159-02-PLAN.md — v1 Hue groups list + single group + group action + scene activation routes with tests
 
 ### Phase 160: Sonos Gap Closure
 **Goal**: All zone-level Sonos endpoints are proxied: playback state, transport commands, volume, seek, play-mode, queue, sleep timer
@@ -190,7 +193,7 @@ See git history and `.planning/milestones/` for details.
 | 156. Path Migration & Common Endpoints | v19.0 | 2/2 | Complete    | 2026-04-07 |
 | 157. Auth Module | v19.0 | 1/1 | Complete    | 2026-04-08 |
 | 158. Automations Module | v19.0 | 2/2 | Complete    | 2026-04-08 |
-| 159. Hue Gap Closure | v19.0 | 0/TBD | Not started | - |
+| 159. Hue Gap Closure | v19.0 | 0/2 | Not started | - |
 | 160. Sonos Gap Closure | v19.0 | 0/TBD | Not started | - |
 | 161. Netatmo Gap Closure | v19.0 | 0/TBD | Not started | - |
 | 162. Fritz!Box Gap Closure | v19.0 | 0/TBD | Not started | - |

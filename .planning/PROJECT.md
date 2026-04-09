@@ -11,7 +11,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v18.0 (shipped 2026-04-02)
-**Status:** Active — v19.0 API Alignment & Full Coverage (Phase 161 complete: Netatmo gap closure — all 21 v1 Netatmo endpoints proxied with 4 new proxy functions)
+**Status:** Active — v19.0 API Alignment & Full Coverage (Phase 162 complete: Fritz!Box gap closure — telephony, raw history, service discovery endpoints proxied with 7 new client functions)
 
 ## Current Milestone: v18.0 Dark-Only & Mobile-First
 
@@ -874,4 +874,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-02 after Phase 155 completion*
+*Last updated: 2026-04-09 after Phase 162 completion*

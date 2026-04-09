@@ -135,8 +135,8 @@ Plans:
   4. GET /api/v1/fritzbox/service-discovery returns TR-064 service descriptor XML
 **Plans:** 2 plans
 Plans:
-- [ ] 162-01-PLAN.md — Telephony client functions + API routes (DECT, calls, TAM)
-- [ ] 162-02-PLAN.md — Raw history routes + service discovery with XML parsing
+- [x] 162-01-PLAN.md — Telephony client functions + API routes (DECT, calls, TAM)
+- [x] 162-02-PLAN.md — Raw history routes + service discovery with XML parsing
 
 ### Phase 163: DIRIGERA Gap Closure
 **Goal**: All missing DIRIGERA endpoints are proxied: sensor history, aggregation stats, telemetry
@@ -202,5 +202,5 @@ See git history and `.planning/milestones/` for details.
 | 159. Hue Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 160. Sonos Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 161. Netatmo Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
-| 162. Fritz!Box Gap Closure | v19.0 | 0/2 | Not started | - |
+| 162. Fritz!Box Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 163. DIRIGERA Gap Closure | v19.0 | 0/TBD | Not started | - |

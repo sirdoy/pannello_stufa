@@ -41,6 +41,10 @@ import type {
   CalibrateBatchResponse,
   NetatmoHealthResponse,
   RoomMeasureResponse,
+  NetatmoThermstateResponse,
+  RenameHomeRequest,
+  NetatmoHomedataResponse,
+  CalibrateValveResponse,
 } from '@/types/netatmoProxy';
 
 const DEFAULT_TIMEOUT_MS = 15_000;
@@ -214,6 +218,42 @@ export async function getProxyHealth(): Promise<NetatmoHealthResponse> {
  */
 export async function getProxyRoomMeasure(params: URLSearchParams): Promise<RoomMeasureResponse> {
   return haGet<RoomMeasureResponse>(`/api/v1/netatmo/getroommeasure?${params.toString()}`);
+}
+
+// =============================================================================
+// THERMSTATE / HOME / VALVE SINGLE CALIBRATE WRAPPERS
+// =============================================================================
+
+/**
+ * Get thermostat state (current setpoint and program list) from the proxy.
+ * Calls GET /api/v1/netatmo/getthermstate on the HA proxy.
+ */
+export async function getProxyThermState(params: URLSearchParams): Promise<NetatmoThermstateResponse> {
+  return haGet<NetatmoThermstateResponse>(`/api/v1/netatmo/getthermstate?${params.toString()}`);
+}
+
+/**
+ * Calibrate a single valve by module ID.
+ * Calls POST /api/v1/netatmo/valves/{moduleId}/calibrate on the HA proxy.
+ */
+export async function proxyCalibrateValve(moduleId: string): Promise<CalibrateValveResponse> {
+  return haPost<CalibrateValveResponse>(`/api/v1/netatmo/valves/${moduleId}/calibrate`, {});
+}
+
+/**
+ * Rename a home on Netatmo.
+ * Calls POST /api/v1/netatmo/renamehome on the HA proxy.
+ */
+export async function proxyRenameHome(body: RenameHomeRequest): Promise<ProxyControlResponse> {
+  return haPost<ProxyControlResponse>('/api/v1/netatmo/renamehome', body as unknown as Record<string, unknown>);
+}
+
+/**
+ * Get home security data (cameras, smoke detectors, persons) from the proxy.
+ * Calls GET /api/v1/netatmo/gethomedata on the HA proxy.
+ */
+export async function getProxyHomeData(): Promise<NetatmoHomedataResponse> {
+  return haGet<NetatmoHomedataResponse>('/api/v1/netatmo/gethomedata');
 }
 
 // =============================================================================

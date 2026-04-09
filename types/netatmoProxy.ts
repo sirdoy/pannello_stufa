@@ -380,3 +380,72 @@ export interface NetatmoHealthResponse {
   rate_limit_ceiling: number;
   last_poll_at: number | null;
 }
+
+// =============================================================================
+// THERMSTATE TYPES
+// =============================================================================
+
+/** GET /getthermstate response */
+interface NetatmoSetpoint {
+  setpoint_mode: string;
+  setpoint_temp: number | null;
+  setpoint_endtime: number | null;
+}
+interface NetatmoThermProgram {
+  program_id: string;
+  name: string;
+  selected: number;
+  timetable: Record<string, unknown>[];
+}
+export interface NetatmoThermstateResponse {
+  body: {
+    status: string;
+    setpoint: NetatmoSetpoint;
+    therm_program_list: NetatmoThermProgram[];
+    device_id: string;
+  };
+  status: string;
+  time_exec: number;
+  time_server: number;
+}
+
+// =============================================================================
+// RENAME HOME TYPES
+// =============================================================================
+
+/** POST /renamehome request body */
+export interface RenameHomeRequest {
+  home_id: string;
+  name: string;
+}
+
+// =============================================================================
+// GETHOMEDATA TYPES
+// =============================================================================
+
+/** GET /gethomedata response */
+export interface NetatmoHomedataResponse {
+  body: {
+    homes: Array<{
+      id: string;
+      cameras: Record<string, unknown>[];
+      smokedetectors: Record<string, unknown>[];
+      persons: Record<string, unknown>[];
+    }>;
+    global_info: Record<string, unknown>;
+  };
+  status: string;
+  time_exec: number;
+  time_server: number;
+}
+
+// =============================================================================
+// CALIBRATE VALVE TYPES
+// =============================================================================
+
+/** POST /valves/{module_id}/calibrate response */
+export interface CalibrateValveResponse {
+  status: 'accepted';
+  module_id: string;
+  poll_endpoint: string;
+}

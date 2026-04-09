@@ -108,7 +108,10 @@ Plans:
   2. All six transport commands (play, pause, stop, next, previous, seek) accept requests and return 202 Accepted
   3. Volume can be set via PUT, and play-mode can be read and set via GET/PUT on their respective endpoints
   4. Queue is retrievable via GET, and sleep timer can be read and set via GET/PUT
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 160-01-PLAN.md — v1 Sonos playback GET + transport POST command routes with tests
+- [ ] 160-02-PLAN.md — v1 Sonos volume, seek, queue, play-mode, sleep-timer routes with tests
 
 ### Phase 161: Netatmo Gap Closure
 **Goal**: All missing Netatmo endpoints are proxied: thermostat state, valve calibration, camera advanced features, home management

@@ -198,6 +198,6 @@ See git history and `.planning/milestones/` for details.
 | 158. Automations Module | v19.0 | 2/2 | Complete    | 2026-04-08 |
 | 159. Hue Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 160. Sonos Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
-| 161. Netatmo Gap Closure | v19.0 | 0/TBD | Not started | - |
+| 161. Netatmo Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 162. Fritz!Box Gap Closure | v19.0 | 0/TBD | Not started | - |
 | 163. DIRIGERA Gap Closure | v19.0 | 0/TBD | Not started | - |

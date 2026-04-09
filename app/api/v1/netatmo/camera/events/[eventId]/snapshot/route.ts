@@ -1,0 +1,22 @@
+import { withAuthAndErrorHandler, getPathParam } from '@/lib/core';
+import { getProxyCameraEventSnapshot } from '@/lib/netatmo/netatmoProxy';
+import { NextResponse } from 'next/server';
+
+export const dynamic = 'force-dynamic';
+
+/**
+ * GET /api/v1/netatmo/camera/events/[eventId]/snapshot
+ * Streams binary JPEG snapshot for a specific camera event from proxy.
+ * Protected: Requires Auth0 authentication
+ */
+export const GET = withAuthAndErrorHandler(async (_request, context) => {
+  const eventId = await getPathParam(context, 'eventId');
+  const response = await getProxyCameraEventSnapshot(eventId);
+  return new NextResponse(response.body, {
+    status: 200,
+    headers: {
+      'Content-Type': 'image/jpeg',
+      'Cache-Control': 'public, max-age=3600',
+    },
+  });
+}, 'Netatmo/Camera/EventSnapshot');

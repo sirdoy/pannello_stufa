@@ -11,7 +11,7 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 ## Current State
 
 **Version:** v18.0 (shipped 2026-04-02)
-**Status:** Active — v19.0 API Alignment & Full Coverage (Phase 159 complete: Hue gap closure — all 7 v1 Hue endpoints proxied)
+**Status:** Active — v19.0 API Alignment & Full Coverage (Phase 160 complete: Sonos gap closure — all 13 v1 Sonos zone endpoints proxied)
 
 ## Current Milestone: v18.0 Dark-Only & Mobile-First
 

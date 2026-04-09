@@ -555,6 +555,89 @@ async function getDevicePresenceHistory(params?: URLSearchParams): Promise<Pagin
   return haGet<PaginatedResponse<DevicePresenceRecord>>(`/api/v1/fritzbox/history/devices${query}`);
 }
 
+// --- Service Discovery (v19.0 FRITZ-07) ---
+
+/** A TR-064 service entry parsed from XML */
+interface ServiceEntry {
+  name: string;
+  type: string;
+  url: string;
+}
+
+/** Service discovery response (TR-064 XML parsed to JSON per D-06) */
+interface ServiceDiscoveryResponse {
+  services: ServiceEntry[];
+}
+
+/**
+ * Get TR-064 service discovery -- FRITZ-07 (v19.0).
+ * Per D-06: Parse TR-064 XML to JSON in the client function.
+ * Per D-07: Return structured JSON with service list (name, type, url).
+ *
+ * Cannot use haGet because it calls response.json() which fails on XML.
+ * Uses direct fetch with HA proxy env vars instead.
+ */
+async function getServiceDiscovery(): Promise<ServiceDiscoveryResponse> {
+  const baseUrl = process.env.HA_API_URL;
+  const apiKey = process.env.HA_API_KEY;
+
+  if (!baseUrl || !apiKey) {
+    throw new Error('HA proxy not configured: missing HA_API_URL or HA_API_KEY');
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15_000);
+
+  try {
+    const response = await fetch(`${baseUrl}/api/v1/fritzbox/service-discovery`, {
+      headers: { 'X-API-Key': apiKey },
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(`Service discovery failed: ${response.status} ${response.statusText}`);
+    }
+
+    const contentType = response.headers.get('content-type') ?? '';
+
+    // If the HA proxy returns JSON directly, use it
+    if (contentType.includes('application/json')) {
+      return (await response.json()) as ServiceDiscoveryResponse;
+    }
+
+    // Otherwise parse TR-064 XML
+    const xml = await response.text();
+    return parseServiceDiscoveryXml(xml);
+  } catch (error) {
+    clearTimeout(timeoutId);
+    throw error;
+  }
+}
+
+/**
+ * Parse TR-064 service discovery XML into structured JSON.
+ * Uses simple regex parsing -- TR-064 XML has a fixed, shallow structure.
+ * No external XML parser needed.
+ */
+function parseServiceDiscoveryXml(xml: string): ServiceDiscoveryResponse {
+  const services: ServiceEntry[] = [];
+  // Match <service> blocks containing <serviceType>, <friendlyName>/<serviceName>, and <controlURL>/<SCPDURL>
+  const serviceBlocks = xml.match(/<service>([\s\S]*?)<\/service>/gi) ?? [];
+
+  for (const block of serviceBlocks) {
+    const name = block.match(/<(?:friendlyName|serviceName)>(.*?)<\/(?:friendlyName|serviceName)>/i)?.[1] ?? '';
+    const type = block.match(/<serviceType>(.*?)<\/serviceType>/i)?.[1] ?? '';
+    const url = block.match(/<(?:controlURL|SCPDURL)>(.*?)<\/(?:controlURL|SCPDURL)>/i)?.[1] ?? '';
+    if (type || name) {
+      services.push({ name, type, url });
+    }
+  }
+
+  return { services };
+}
+
 /**
  * Fritz!Box client object — preserves existing route call patterns (fritzboxClient.method())
  */
@@ -587,4 +670,6 @@ export const fritzboxClient = {
   getBandwidthHistoryRaw,
   getDeviceEventsRaw,
   getDevicePresenceHistory,
+  // Phase 162 service discovery:
+  getServiceDiscovery,
 };

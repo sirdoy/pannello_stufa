@@ -110,8 +110,8 @@ Plans:
   4. Queue is retrievable via GET, and sleep timer can be read and set via GET/PUT
 **Plans:** 2 plans
 Plans:
-- [ ] 160-01-PLAN.md — v1 Sonos playback GET + transport POST command routes with tests
-- [ ] 160-02-PLAN.md — v1 Sonos volume, seek, queue, play-mode, sleep-timer routes with tests
+- [x] 160-01-PLAN.md — v1 Sonos playback GET + transport POST command routes with tests
+- [x] 160-02-PLAN.md — v1 Sonos volume, seek, queue, play-mode, sleep-timer routes with tests
 
 ### Phase 161: Netatmo Gap Closure
 **Goal**: All missing Netatmo endpoints are proxied: thermostat state, valve calibration, camera advanced features, home management
@@ -197,7 +197,7 @@ See git history and `.planning/milestones/` for details.
 | 157. Auth Module | v19.0 | 1/1 | Complete    | 2026-04-08 |
 | 158. Automations Module | v19.0 | 2/2 | Complete    | 2026-04-08 |
 | 159. Hue Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
-| 160. Sonos Gap Closure | v19.0 | 0/TBD | Not started | - |
+| 160. Sonos Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 161. Netatmo Gap Closure | v19.0 | 0/TBD | Not started | - |
 | 162. Fritz!Box Gap Closure | v19.0 | 0/TBD | Not started | - |
 | 163. DIRIGERA Gap Closure | v19.0 | 0/TBD | Not started | - |

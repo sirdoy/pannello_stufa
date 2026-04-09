@@ -453,6 +453,54 @@ async function getBudgetStats(): Promise<BudgetStats> {
   return haGet<BudgetStats>('/api/v1/fritzbox/budget-stats');
 }
 
+// --- Telephony (v19.0 FRITZ-01 through FRITZ-03) ---
+
+/** A DECT handset registered with the Fritz!Box */
+interface DectHandset {
+  id: string;
+  name: string;
+  model: string;
+  firmware_version: string;
+  battery_charge_level: number | null;
+  is_registered: boolean;
+}
+
+/** A call log entry from Fritz!Box */
+interface CallRecord {
+  id: string;
+  call_type: string;
+  number: string;
+  name: string | null;
+  duration_seconds: number;
+  timestamp: number;
+  port: string | null;
+}
+
+/** Answering machine (TAM) status response */
+interface TamStatusResponse {
+  enabled: boolean;
+  new_messages: number;
+  total_messages: number;
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/** Get registered DECT handsets -- FRITZ-01 (v19.0). Raw pass-through per D-01. */
+async function getDectHandsets(): Promise<PaginatedResponse<DectHandset>> {
+  return haGet<PaginatedResponse<DectHandset>>('/api/v1/fritzbox/telephony/dect');
+}
+
+/** Get paginated call history -- FRITZ-02 (v19.0). Supports limit/offset per D-03. */
+async function getCallHistory(params?: URLSearchParams): Promise<PaginatedResponse<CallRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<CallRecord>>(`/api/v1/fritzbox/telephony/calls${query}`);
+}
+
+/** Get answering machine status -- FRITZ-03 (v19.0). Raw pass-through per D-01. */
+async function getTamStatus(): Promise<TamStatusResponse> {
+  return haGet<TamStatusResponse>('/api/v1/fritzbox/telephony/tam');
+}
+
 /**
  * Fritz!Box client object — preserves existing route call patterns (fritzboxClient.method())
  */
@@ -477,4 +525,8 @@ export const fritzboxClient = {
   getDevicesDaily,
   getBandwidthAuto,
   getBudgetStats,
+  // Phase 162 telephony additions:
+  getDectHandsets,
+  getCallHistory,
+  getTamStatus,
 };

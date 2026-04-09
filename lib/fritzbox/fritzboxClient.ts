@@ -501,6 +501,60 @@ async function getTamStatus(): Promise<TamStatusResponse> {
   return haGet<TamStatusResponse>('/api/v1/fritzbox/telephony/tam');
 }
 
+// --- Raw History Pass-Through (v19.0 FRITZ-04 through FRITZ-06) ---
+
+/** Raw bandwidth history record (untransformed from HA proxy) */
+interface BandwidthHistoryRawRecord {
+  timestamp: number;
+  bytes_sent: number;
+  bytes_received: number;
+  upstream_rate: number;
+  downstream_rate: number;
+  latency_ms: number | null;
+  connection_uptime: number | null;
+  external_ip: string | null;
+  connection_type: string | null;
+}
+
+/** Get raw bandwidth history -- FRITZ-04 (v19.0). Raw pass-through per D-04. */
+async function getBandwidthHistoryRaw(params?: URLSearchParams): Promise<PaginatedResponse<BandwidthHistoryRawRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<BandwidthHistoryRawRecord>>(`/api/v1/fritzbox/history/bandwidth${query}`);
+}
+
+/** Raw device event record (untransformed from HA proxy) */
+interface DeviceEventRawRecord {
+  timestamp: number;
+  mac: string;
+  name: string;
+  ip: string;
+  event_type: 'connected' | 'disconnected';
+}
+
+/** Get raw device events log -- FRITZ-06 (v19.0). Raw pass-through per D-04. */
+async function getDeviceEventsRaw(params?: URLSearchParams): Promise<PaginatedResponse<DeviceEventRawRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<DeviceEventRawRecord>>(`/api/v1/fritzbox/history/device-events${query}`);
+}
+
+/** Raw device presence record (untransformed from HA proxy) */
+interface DevicePresenceRecord {
+  timestamp: number;
+  mac: string;
+  name: string;
+  ip: string;
+  is_online: boolean;
+}
+
+/**
+ * Get raw device presence history -- FRITZ-05 (v19.0).
+ * Per D-05: endpoint may not exist on HA proxy. If proxy returns 404, this is expected.
+ */
+async function getDevicePresenceHistory(params?: URLSearchParams): Promise<PaginatedResponse<DevicePresenceRecord>> {
+  const query = params?.toString() ? `?${params.toString()}` : '';
+  return haGet<PaginatedResponse<DevicePresenceRecord>>(`/api/v1/fritzbox/history/devices${query}`);
+}
+
 /**
  * Fritz!Box client object — preserves existing route call patterns (fritzboxClient.method())
  */
@@ -529,4 +583,8 @@ export const fritzboxClient = {
   getDectHandsets,
   getCallHistory,
   getTamStatus,
+  // Phase 162 raw history additions:
+  getBandwidthHistoryRaw,
+  getDeviceEventsRaw,
+  getDevicePresenceHistory,
 };

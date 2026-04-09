@@ -1,0 +1,15 @@
+import { withAuthAndErrorHandler, success, getPathParam } from '@/lib/core';
+import { getProxyCameraStream } from '@/lib/netatmo/netatmoProxy';
+
+export const dynamic = 'force-dynamic';
+
+/**
+ * GET /api/v1/netatmo/camera/[cameraId]/stream
+ * Returns camera stream URLs from proxy.
+ * Protected: Requires Auth0 authentication
+ */
+export const GET = withAuthAndErrorHandler(async (_request, context) => {
+  const cameraId = await getPathParam(context, 'cameraId');
+  const data = await getProxyCameraStream(cameraId);
+  return success(data as unknown as Record<string, unknown>);
+}, 'Netatmo/Camera/Stream');

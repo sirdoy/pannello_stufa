@@ -148,7 +148,7 @@ Plans:
   3. GET /api/v1/dirigera/telemetry returns paginated sensor telemetry data
 **Plans:** 1 plan
 Plans:
-- [ ] 163-01-PLAN.md — DIRIGERA history/stats/telemetry proxy client + v1 routes + tests
+- [x] 163-01-PLAN.md — DIRIGERA history/stats/telemetry proxy client + v1 routes + tests
 
 <details>
 <summary>✅ v18.0 Dark-Only & Mobile-First (Phases 149-155) — SHIPPED 2026-04-02</summary>
@@ -205,4 +205,4 @@ See git history and `.planning/milestones/` for details.
 | 160. Sonos Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 161. Netatmo Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 162. Fritz!Box Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
-| 163. DIRIGERA Gap Closure | v19.0 | 0/1 | In progress | - |
+| 163. DIRIGERA Gap Closure | v19.0 | 1/1 | Complete   | 2026-04-14 |

@@ -567,20 +567,13 @@ Project does not have an explicit `security_enforcement` flag in `.planning/conf
 
 No new attack surface beyond what already exists for `/api/dirigera/sensors`. The phase is strictly additive.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should `SensorHistoryParams` live in a dedicated section or next to `SensorHistoryResponse`?**
-   - What we know: CONTEXT.md D-07 scopes them to `types/dirigeraProxy.ts`. Claude's discretion covers placement.
-   - What's unclear: File organization preference.
-   - Recommendation: Place each param interface immediately before its corresponding response type (e.g., `SensorHistoryParams` just before `SensorHistoryResponse`). Locality > separation for small modules; matches the pattern of "Source: docs/api/dirigera.md — Name" comments already in use.
+1. **Should `SensorHistoryParams` live in a dedicated section or next to `SensorHistoryResponse`?** — **RESOLVED:** Place each param interface immediately before its corresponding response type. Adopted in Task 1 of `163-01-PLAN.md` per D-07 placement guidance. Locality > separation for small modules.
 
-2. **One plan or two for this phase?**
-   - What we know: CONTEXT.md Claude's Discretion covers this.
-   - Recommendation: **One plan** split into logical subsections (types → proxy → routes → tests). Surface area is 9 files total (2 edits + 7 new), all tightly coupled, zero cross-plan dependencies.
+2. **One plan or two for this phase?** — **RESOLVED:** One plan (`163-01-PLAN.md`). Surface area is 9 files total (2 edits + 7 new), all tightly coupled, zero cross-plan dependencies. Confirmed in CONTEXT.md Claude's Discretion.
 
-3. **Should the proxy's `buildQueryString` helper be module-local or exported?**
-   - What we know: `thermorossiProxy.getHistory` uses `URLSearchParams` inline. Adding a helper is a light refactor.
-   - Recommendation: Keep it module-local (not exported) to avoid expanding the public surface. If a second DIRIGERA function later needs the same logic, promote then.
+3. **Should the proxy's `buildQueryString` helper be module-local or exported?** — **RESOLVED:** Module-local (not exported). Avoids expanding the public surface; if a second consumer later needs the same logic, promote then. Adopted in Task 1 of `163-01-PLAN.md`.
 
 ## Sources
 

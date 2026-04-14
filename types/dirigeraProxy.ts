@@ -109,6 +109,16 @@ export interface SensorEvent {
   recorded_at: number;   // Unix timestamp (seconds)
 }
 
+// Source: Phase 163 D-07 — query params for GET /api/v1/dirigera/history
+export interface SensorHistoryParams {
+  sensor_id?: string;
+  event_type?: string;
+  start?: number;
+  end?: number;
+  limit?: number;
+  offset?: number;
+}
+
 // Source: docs/api/dirigera.md — SensorHistoryResponse
 export interface SensorHistoryResponse {
   events: SensorEvent[];
@@ -152,6 +162,15 @@ export interface SensorTelemetryReading {
   battery_percentage: number | null;
   light_level: number | null;
   timestamp: number;   // Unix timestamp (seconds)
+}
+
+// Source: Phase 163 D-07 — query params for GET /api/v1/dirigera/telemetry
+export interface SensorTelemetryParams {
+  sensor_id?: string;
+  start?: number;
+  end?: number;
+  limit?: number;
+  offset?: number;
 }
 
 // Source: docs/api/dirigera.md — SensorTelemetryResponse

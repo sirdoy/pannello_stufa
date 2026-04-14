@@ -28,6 +28,11 @@ import type {
   ContactSensorsResponse,
   MotionSensorsResponse,
   SensorSummaryResponse,
+  SensorHistoryParams,
+  SensorHistoryResponse,
+  DirigeraStatsResponse,
+  SensorTelemetryParams,
+  SensorTelemetryResponse,
 } from '@/types/dirigeraProxy';
 
 // =============================================================================
@@ -57,4 +62,47 @@ export async function getMotionSensors(): Promise<MotionSensorsResponse> {
 /** Get fleet-wide sensor summary (totals, open, offline, low battery). */
 export async function getSensorSummary(): Promise<SensorSummaryResponse> {
   return haGet<SensorSummaryResponse>('/api/v1/dirigera/sensors/summary');
+}
+
+// =============================================================================
+// READ WRAPPERS (Phase 163)
+// =============================================================================
+
+/** Get paginated sensor event history from the DIRIGERA proxy. */
+export async function getHistory(
+  params?: SensorHistoryParams
+): Promise<SensorHistoryResponse> {
+  const qs = buildQueryString(params as Record<string, string | number | null | undefined> | undefined);
+  const endpoint = qs ? `/api/v1/dirigera/history?${qs}` : '/api/v1/dirigera/history';
+  return haGet<SensorHistoryResponse>(endpoint);
+}
+
+/** Get DIRIGERA aggregation and retention statistics. */
+export async function getStats(): Promise<DirigeraStatsResponse> {
+  return haGet<DirigeraStatsResponse>('/api/v1/dirigera/stats');
+}
+
+/** Get paginated sensor telemetry (battery, light level) from the DIRIGERA proxy. */
+export async function getTelemetry(
+  params?: SensorTelemetryParams
+): Promise<SensorTelemetryResponse> {
+  const qs = buildQueryString(params as Record<string, string | number | null | undefined> | undefined);
+  const endpoint = qs ? `/api/v1/dirigera/telemetry?${qs}` : '/api/v1/dirigera/telemetry';
+  return haGet<SensorTelemetryResponse>(endpoint);
+}
+
+/**
+ * Serialize a params object to a query string, skipping null/undefined/empty.
+ * Module-local by design (per RESEARCH Open Question 3) — promote to shared if needed.
+ */
+function buildQueryString(
+  params?: Record<string, string | number | null | undefined>
+): string {
+  if (!params) return '';
+  const sp = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value === null || value === undefined || value === '') continue;
+    sp.append(key, String(value));
+  }
+  return sp.toString();
 }

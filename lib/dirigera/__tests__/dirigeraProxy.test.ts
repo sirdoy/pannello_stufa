@@ -12,6 +12,9 @@ import {
   getContactSensors,
   getMotionSensors,
   getSensorSummary,
+  getHistory,
+  getStats,
+  getTelemetry,
 } from '../dirigeraProxy';
 import type {
   DirigeraHealthResponse,
@@ -19,6 +22,9 @@ import type {
   ContactSensorsResponse,
   MotionSensorsResponse,
   SensorSummaryResponse,
+  SensorHistoryResponse,
+  DirigeraStatsResponse,
+  SensorTelemetryResponse,
 } from '@/types/dirigeraProxy';
 
 const mockHaGet = jest.mocked(haGet);
@@ -98,6 +104,53 @@ const mockSummaryResponse: SensorSummaryResponse = {
   is_stale: false,
 };
 
+const mockHistoryResponse: SensorHistoryResponse = {
+  events: [
+    {
+      id: 1,
+      sensor_id: 'abc',
+      sensor_name: 'Door',
+      event_type: 'open',
+      recorded_at: 1773000000,
+    },
+  ],
+  total: 1,
+  limit: 100,
+  offset: 0,
+};
+
+const mockStatsResponse: DirigeraStatsResponse = {
+  aggregation: {
+    last_run_at: 1773244800,
+    last_run_status: 'ok',
+    rows_aggregated_last_run: 248,
+    total_runs: 7,
+    total_rows_aggregated: 1736,
+  },
+  retention: {
+    last_run_at: 1773244800,
+    last_run_status: 'ok',
+    rows_deleted_last_run: 0,
+    total_runs: 7,
+    total_rows_deleted: 42,
+  },
+};
+
+const mockTelemetryResponse: SensorTelemetryResponse = {
+  telemetry: [
+    {
+      id: 1,
+      sensor_id: 'xyz',
+      battery_percentage: 90,
+      light_level: 42,
+      timestamp: 1773000000,
+    },
+  ],
+  total: 1,
+  limit: 100,
+  offset: 0,
+};
+
 // ---------------------------------------------------------------------------
 
 describe('dirigeraProxy', () => {
@@ -138,5 +191,53 @@ describe('dirigeraProxy', () => {
     const result = await getSensorSummary();
     expect(mockHaGet).toHaveBeenCalledWith('/api/v1/dirigera/sensors/summary');
     expect(result.total_sensors).toBe(6);
+  });
+
+  // -------------------------------------------------------------------------
+  // Phase 163: history / stats / telemetry
+  // -------------------------------------------------------------------------
+
+  it('getHistory() with no params calls /api/v1/dirigera/history', async () => {
+    mockHaGet.mockResolvedValueOnce(mockHistoryResponse);
+    const result = await getHistory();
+    expect(mockHaGet).toHaveBeenCalledWith('/api/v1/dirigera/history');
+    expect(result.total).toBe(1);
+    expect(result.events[0]?.event_type).toBe('open');
+  });
+
+  it('getHistory() with params serializes query string, skipping null/undefined/empty', async () => {
+    mockHaGet.mockResolvedValueOnce(mockHistoryResponse);
+    await getHistory({
+      sensor_id: 'abc',
+      event_type: 'open',
+      limit: 50,
+      offset: undefined,
+      start: undefined,
+    });
+    expect(mockHaGet).toHaveBeenCalledWith(
+      '/api/v1/dirigera/history?sensor_id=abc&event_type=open&limit=50'
+    );
+  });
+
+  it('getStats() calls /api/v1/dirigera/stats', async () => {
+    mockHaGet.mockResolvedValueOnce(mockStatsResponse);
+    const result = await getStats();
+    expect(mockHaGet).toHaveBeenCalledWith('/api/v1/dirigera/stats');
+    expect(result.aggregation.total_runs).toBe(7);
+  });
+
+  it('getTelemetry() with no params calls /api/v1/dirigera/telemetry', async () => {
+    mockHaGet.mockResolvedValueOnce(mockTelemetryResponse);
+    const result = await getTelemetry();
+    expect(mockHaGet).toHaveBeenCalledWith('/api/v1/dirigera/telemetry');
+    expect(result.telemetry[0]?.battery_percentage).toBe(90);
+  });
+
+  it('getTelemetry() with params serializes query string', async () => {
+    mockHaGet.mockResolvedValueOnce(mockTelemetryResponse);
+    await getTelemetry({ sensor_id: 'xyz', limit: 25 });
+    expect(mockHaGet).toHaveBeenCalledWith(
+      '/api/v1/dirigera/telemetry?sensor_id=xyz&limit=25'
+    );
   });
 });

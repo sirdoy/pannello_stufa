@@ -68,7 +68,7 @@ describe('useStoveCommands', () => {
     status: 'accepted',
     previous_state: 'off',
     suggested_poll_delay_s: 15,
-    poll_endpoint: '/api/stove/status',
+    poll_endpoint: '/api/v1/thermorossi/status',
     requested_value: null,
   };
 
@@ -184,7 +184,7 @@ describe('useStoveCommands', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/stove/ignite'),
+      expect.stringContaining('/api/v1/thermorossi/commands/ignit'),
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ source: 'manual' }),
@@ -243,7 +243,7 @@ describe('useStoveCommands', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/stove/shutdown'),
+      expect.stringContaining('/api/v1/thermorossi/commands/shutdown'),
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ source: 'manual' }),
@@ -257,7 +257,7 @@ describe('useStoveCommands', () => {
       status: 'accepted',
       previous_state: 'working',
       suggested_poll_delay_s: 5,
-      poll_endpoint: '/api/stove/status',
+      poll_endpoint: '/api/v1/thermorossi/status',
       requested_value: 4,
     };
     mockExecute.mockResolvedValue({
@@ -281,7 +281,7 @@ describe('useStoveCommands', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/stove/setFan'),
+      expect.stringContaining('/api/v1/thermorossi/settings/fan-level'),
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ value: 4, source: 'manual' }),
@@ -295,7 +295,7 @@ describe('useStoveCommands', () => {
       status: 'accepted',
       previous_state: 'working',
       suggested_poll_delay_s: 5,
-      poll_endpoint: '/api/stove/status',
+      poll_endpoint: '/api/v1/thermorossi/status',
       requested_value: 4,
     };
     mockExecute.mockResolvedValue({
@@ -328,7 +328,7 @@ describe('useStoveCommands', () => {
       status: 'accepted',
       previous_state: 'working',
       suggested_poll_delay_s: 5,
-      poll_endpoint: '/api/stove/status',
+      poll_endpoint: '/api/v1/thermorossi/status',
       requested_value: 3,
     };
     mockExecute.mockResolvedValue({
@@ -352,7 +352,7 @@ describe('useStoveCommands', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/stove/setPower'),
+      expect.stringContaining('/api/v1/thermorossi/settings/power'),
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ value: 3, source: 'manual' }),
@@ -366,7 +366,7 @@ describe('useStoveCommands', () => {
       status: 'accepted',
       previous_state: 'working',
       suggested_poll_delay_s: 5,
-      poll_endpoint: '/api/stove/status',
+      poll_endpoint: '/api/v1/thermorossi/status',
       requested_value: 3,
     };
     mockExecute.mockResolvedValue({

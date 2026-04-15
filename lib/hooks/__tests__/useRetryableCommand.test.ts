@@ -91,19 +91,19 @@ describe('useRetryableCommand', () => {
       mockRetryFetch.mockResolvedValue(mockResponse);
 
       await act(async () => {
-        await result.current.execute('/api/stove/ignite', {
+        await result.current.execute('/api/v1/thermorossi/commands/ignit', {
           method: 'POST',
           body: JSON.stringify({ command: 'ignite' }),
         });
       });
 
       expect(mockIdempotencyManager.registerKey).toHaveBeenCalledWith(
-        '/api/stove/ignite',
+        '/api/v1/thermorossi/commands/ignit',
         { command: 'ignite' }
       );
 
       expect(mockRetryFetch).toHaveBeenCalledWith(
-        '/api/stove/ignite',
+        '/api/v1/thermorossi/commands/ignit',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ command: 'ignite' }),
@@ -123,7 +123,7 @@ describe('useRetryableCommand', () => {
 
       let response: Response | null = null;
       await act(async () => {
-        response = await result.current.execute('/api/stove/ignite');
+        response = await result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
       expect(response).toBeNull();
@@ -140,7 +140,7 @@ describe('useRetryableCommand', () => {
       mockRetryFetch.mockRejectedValue(retryError);
 
       await act(async () => {
-        await result.current.execute('/api/stove/ignite');
+        await result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
       await waitFor(() => {
@@ -172,7 +172,7 @@ describe('useRetryableCommand', () => {
       mockRetryFetch.mockRejectedValueOnce(retryError);
 
       await act(async () => {
-        await result.current.execute('/api/stove/ignite');
+        await result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
       expect(result.current.lastError).toBe(retryError);
@@ -202,7 +202,7 @@ describe('useRetryableCommand', () => {
       mockRetryFetch.mockResolvedValue(mockResponse);
 
       await act(async () => {
-        await result.current.execute('/api/stove/ignite');
+        await result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
       expect(mockSuccess).not.toHaveBeenCalled();
@@ -220,7 +220,7 @@ describe('useRetryableCommand', () => {
       mockRetryFetch.mockResolvedValue(mockResponse);
 
       await act(async () => {
-        await result.current.execute('/api/stove/ignite');
+        await result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
       expect(mockDeduplicationManager.clear).toHaveBeenCalledWith('stove:ignite');
@@ -238,7 +238,7 @@ describe('useRetryableCommand', () => {
 
       // First execution fails
       await act(async () => {
-        await result.current.execute('/api/stove/ignite', {
+        await result.current.execute('/api/v1/thermorossi/commands/ignit', {
           method: 'POST',
           body: JSON.stringify({ command: 'ignite' }),
         });
@@ -271,7 +271,7 @@ describe('useRetryableCommand', () => {
       mockRetryFetch.mockRejectedValue(retryError);
 
       await act(async () => {
-        await result.current.execute('/api/stove/ignite');
+        await result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
       expect(result.current.lastError).toBe(retryError);
@@ -303,7 +303,7 @@ describe('useRetryableCommand', () => {
 
       let executePromise: Promise<Response | null>;
       act(() => {
-        executePromise = result.current.execute('/api/stove/ignite');
+        executePromise = result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
       // Should be executing
@@ -326,7 +326,7 @@ describe('useRetryableCommand', () => {
       mockRetryFetch.mockRejectedValue(retryError);
 
       await act(async () => {
-        await result.current.execute('/api/stove/ignite');
+        await result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
       await waitFor(() => {

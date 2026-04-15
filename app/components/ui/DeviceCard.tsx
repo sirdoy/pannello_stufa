@@ -65,6 +65,7 @@ export interface DeviceCardProps extends Omit<SmartHomeCardProps, 'headerActions
   infoBoxes?: InfoBoxItem[];
   infoBoxesTitle?: string;
   footerActions?: FooterAction[];
+  footerContent?: ReactNode;
   toast?: ToastNotification;
   onToastClose?: () => void;
   // New props (v3.0 API)
@@ -91,6 +92,7 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
     infoBoxes = [],
     infoBoxesTitle,
     footerActions = [],
+    footerContent,
     toast,
     onToastClose,
     className = '',
@@ -259,6 +261,9 @@ const DeviceCard = forwardRef<HTMLDivElement, DeviceCardProps>(function DeviceCa
           ))}
         </SmartHomeCard.Controls>
       )}
+
+      {/* Footer content slot (rendered after footerActions, before loading overlay) */}
+      {footerContent}
 
       {/* Loading Overlay */}
       <LoadingOverlay

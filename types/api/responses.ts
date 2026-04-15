@@ -4,13 +4,9 @@
 
 import type { ErrorCode } from './errors';
 
-/** Successful API response */
-export interface ApiSuccessResponse<T = Record<string, unknown>> {
-  success: true;
-  message?: string;
-  /** Data is spread at top level for backward compatibility */
-  [key: string]: unknown;
-}
+/** Successful API response (T is merged at the top level for backward compatibility) */
+export type ApiSuccessResponse<T extends Record<string, unknown> = Record<string, unknown>> =
+  { success: true; message?: string } & T;
 
 /** Error API response */
 export interface ApiErrorResponse {
@@ -24,7 +20,7 @@ export interface ApiErrorResponse {
 }
 
 /** Generic API response union */
-export type ApiResponse<T = Record<string, unknown>> =
+export type ApiResponse<T extends Record<string, unknown> = Record<string, unknown>> =
   | ApiSuccessResponse<T>
   | ApiErrorResponse;
 
@@ -33,7 +29,7 @@ export type ApiResponse<T = Record<string, unknown>> =
  * Stove status response
  * Example: GET /api/v1/thermorossi/status
  */
-export interface StoveStatusResponse extends ApiSuccessResponse {
+export type StoveStatusResponse = ApiSuccessResponse<{
   status: import('../firebase').StoveStatus;
   power: import('../firebase').StovePowerLevel;
   temperature: number;
@@ -41,15 +37,15 @@ export interface StoveStatusResponse extends ApiSuccessResponse {
     needsCleaning: boolean;
     hoursSinceLastCleaning: number;
   };
-}
+}>;
 
 /**
  * Generic paginated response
  */
-export interface PaginatedResponse<T> extends ApiSuccessResponse {
+export type PaginatedResponse<T> = ApiSuccessResponse<{
   items: T[];
   total: number;
   page: number;
   pageSize: number;
   hasMore: boolean;
-}
+}>;

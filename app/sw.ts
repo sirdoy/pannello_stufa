@@ -139,9 +139,10 @@ self.addEventListener('push', (event) => {
     }),
   } as NotificationOptions & { vibrate?: number[]; actions?: Array<{ action: string; title: string; icon?: string }> };
 
-  event.waitUntil(
-    self.registration.showNotification(notificationTitle, notificationOptions)
-  );
+  event.waitUntil(Promise.all([
+    self.registration.showNotification(notificationTitle, notificationOptions),
+    incrementBadge(),
+  ]));
 });
 
 /**
@@ -636,17 +637,6 @@ self.addEventListener('fetch', (event: FetchEvent) => {
         })
     );
   }
-});
-
-// ============================================
-// Enhanced Push Handler with Badge
-// ============================================
-
-// Update push handler to also increment badge
-const originalPushHandler = self.addEventListener;
-self.addEventListener('push', async (event) => {
-  // Increment badge on new notification
-  event.waitUntil(incrementBadge());
 });
 
 // ============================================

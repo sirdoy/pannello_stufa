@@ -169,8 +169,8 @@ Plans:
   3. Both StoveTab debug panels (45 refs each) rewritten to canonical paths
   4. Legacy stove test files deleted or retargeted; Jest + smoke suite green
 **Plans:** 2 plans
-- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+- [x] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [x] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 165: Milestone Hygiene & Spec Alignment
 **Goal**: v19.0 artifacts (SUMMARY commit hashes, VERIFICATION claims, deferred tsc errors, Nyquist VALIDATION drafts) reflect reality
@@ -183,8 +183,8 @@ Plans:
   3. 163 deferred-items.md tsc errors (AutomationCreate cast + 3 thermorossi settings NextResponse) resolved or formally deferred with issue link
   4. Phases 156-162 VALIDATION.md upgraded from draft to nyquist_compliant (or PARTIAL explicitly accepted)
 **Plans:** 2 plans
-- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+- [x] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [x] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 166: Hue Frontend Cutover
 **Goal**: Production Hue UI consumes /api/v1/hue/* exclusively; Firebase adminDbPush logging triggers on real user commands
@@ -326,7 +326,7 @@ See git history and `.planning/milestones/` for details.
 | 161. Netatmo Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 162. Fritz!Box Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 163. DIRIGERA Gap Closure | v19.0 | 1/1 | Complete   | 2026-04-14 |
-| 164. Phase 156 Regression Fix | v19.0 | 0/? | Pending    | — |
+| 164. Phase 156 Regression Fix | v19.0 | 2/2 | Complete   | 2026-04-15 |
 | 165. Milestone Hygiene & Spec Alignment | v19.0 | 0/? | Pending    | — |
 | 166. Hue Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 167. Sonos Frontend Cutover | v19.0 | 0/? | Pending    | — |

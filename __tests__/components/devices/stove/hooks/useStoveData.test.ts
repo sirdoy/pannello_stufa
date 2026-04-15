@@ -138,7 +138,7 @@ describe('useStoveData', () => {
     );
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/stove/status'));
+      expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/thermorossi/status'));
     });
   });
 

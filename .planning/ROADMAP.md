@@ -41,6 +41,14 @@
 - [ ] **Phase 161: Netatmo Gap Closure** - Thermostat state, valve calibration, camera advanced, home management
 - [ ] **Phase 162: Fritz!Box Gap Closure** - Telephony, raw history, service discovery endpoints
 - [ ] **Phase 163: DIRIGERA Gap Closure** - History, stats, telemetry endpoints
+- [ ] **Phase 164: Phase 156 Regression Fix** - Delete legacy /api/stove/, fix routes/sw/command palette/debug panels
+- [ ] **Phase 165: Milestone Hygiene & Spec Alignment** - SUMMARY commit hashes, /health auth spec, 163 deferred tsc, Nyquist validations
+- [ ] **Phase 166: Hue Frontend Cutover** - Migrate useLightsData/useLightsCommands + 2 pages to /api/v1/hue/*
+- [ ] **Phase 167: Sonos Frontend Cutover** - Migrate 5 Sonos hooks + components to /api/v1/sonos/*
+- [ ] **Phase 168: Netatmo Frontend Cutover** - Migrate Netatmo UI to /api/v1/netatmo/*
+- [ ] **Phase 169: DIRIGERA Frontend Cutover** - Migrate useDirigeraData to /api/v1/dirigera/*
+- [ ] **Phase 170: Auth UI** - Login form + API-keys management page (AUTH-01..04 consumers)
+- [ ] **Phase 171: Fritz!Box Consumer UI** - Telephony/raw-history/service-discovery consumers (FRITZ-01..07)
 
 ## Phase Details
 
@@ -150,6 +158,102 @@ Plans:
 Plans:
 - [x] 163-01-PLAN.md — DIRIGERA history/stats/telemetry proxy client + v1 routes + tests
 
+### Phase 164: Phase 156 Regression Fix
+**Goal**: Legacy /api/stove/* surface fully removed; all frontend consumers (routes constants, service worker, command palette, debug panels, tests) target canonical /api/v1/thermorossi/*
+**Depends on**: Phase 163
+**Requirements**: PATH-01, PATH-02
+**Gap Closure**: Closes v19.0 MILESTONE-AUDIT gaps (regressed PATH-01/PATH-02, flows "Command palette stove actions" + "Service worker stove cache")
+**Success Criteria** (what must be TRUE):
+  1. `app/api/stove/` directory no longer exists and no file references `/api/stove/` outside archived planning docs
+  2. `lib/routes.ts` STOVE_ROUTES, `app/sw.ts`, and `lib/commands/deviceCommands.tsx` all point to `/api/v1/thermorossi/*` with camelCase action paths and `{ value }` body shape
+  3. Both StoveTab debug panels (45 refs each) rewritten to canonical paths
+  4. Legacy stove test files deleted or retargeted; Jest + smoke suite green
+**Plans:** TBD
+
+### Phase 165: Milestone Hygiene & Spec Alignment
+**Goal**: v19.0 artifacts (SUMMARY commit hashes, VERIFICATION claims, deferred tsc errors, Nyquist VALIDATION drafts) reflect reality
+**Depends on**: Phase 164
+**Requirements**: COMMON-01 (spec reconciliation), COMMON-02 (doc alignment)
+**Gap Closure**: Closes v19.0 audit tech-debt (phases 156/159/160/163) + partial-Nyquist block
+**Success Criteria** (what must be TRUE):
+  1. 159-01-SUMMARY and 160-01-SUMMARY commit hashes match `git log`
+  2. `/health` auth behaviour (withAuthAndErrorHandler) and VERIFICATION.md agree; spec divergence resolved explicitly
+  3. 163 deferred-items.md tsc errors (AutomationCreate cast + 3 thermorossi settings NextResponse) resolved or formally deferred with issue link
+  4. Phases 156-162 VALIDATION.md upgraded from draft to nyquist_compliant (or PARTIAL explicitly accepted)
+**Plans:** TBD
+
+### Phase 166: Hue Frontend Cutover
+**Goal**: Production Hue UI consumes /api/v1/hue/* exclusively; Firebase adminDbPush logging triggers on real user commands
+**Depends on**: Phase 164
+**Requirements**: HUE-01, HUE-02, HUE-03, HUE-04, HUE-05, HUE-06, HUE-07
+**Gap Closure**: Closes v19.0 audit HUE integration gap (phase 159 orphan)
+**Success Criteria** (what must be TRUE):
+  1. `useLightsData` and `useLightsCommands` hit only `/api/v1/hue/*` routes
+  2. `app/lights/page.tsx` and `app/lights/scenes/page.tsx` no longer reference `/api/hue/*`
+  3. Manual toggle from `/lights` produces a row in Firebase Hue command log
+  4. Jest + Playwright smoke green
+**Plans:** TBD
+
+### Phase 167: Sonos Frontend Cutover
+**Goal**: All Sonos hooks and components consume /api/v1/sonos/* zone endpoints
+**Depends on**: Phase 164
+**Requirements**: SONOS-01, SONOS-02, SONOS-03, SONOS-04, SONOS-05, SONOS-06, SONOS-07, SONOS-08, SONOS-09, SONOS-10, SONOS-11, SONOS-12, SONOS-13
+**Gap Closure**: Closes v19.0 audit SONOS integration gap (phase 160 orphan)
+**Success Criteria** (what must be TRUE):
+  1. `useSonosData`, `useSonosFullData`, `useSonosCommands`, `useSonosQueue`, `useSonosHistory` all target `/api/v1/sonos/*`
+  2. Zero `/api/sonos/` references in `app/` and `components/`
+  3. Zone playback, transport, queue, play-mode, sleep-timer all functional in browser smoke
+  4. Jest + Playwright smoke green
+**Plans:** TBD
+
+### Phase 168: Netatmo Frontend Cutover
+**Goal**: Netatmo UI consumes /api/v1/netatmo/** exclusively
+**Depends on**: Phase 164
+**Requirements**: NETA-01, NETA-02, NETA-03, NETA-04, NETA-05, NETA-06, NETA-07, NETA-08, NETA-09
+**Gap Closure**: Closes v19.0 audit NETA integration gap (phase 161 orphan)
+**Success Criteria** (what must be TRUE):
+  1. Thermostat state, valve calibration (bulk + per-module), camera (events snapshot, stream, snapshot, monitoring toggle), renamehome, gethomedata all served from `/api/v1/netatmo/**`
+  2. Zero `/api/netatmo/` references in production code (debug panel may remain if explicitly scoped)
+  3. Manual thermostat setpoint + valve calibrate exercised against canonical routes
+  4. Jest + Playwright smoke green
+**Plans:** TBD
+
+### Phase 169: DIRIGERA Frontend Cutover
+**Goal**: useDirigeraData consumes /api/v1/dirigera/* history, stats, telemetry
+**Depends on**: Phase 164
+**Requirements**: DIR-01, DIR-02, DIR-03
+**Gap Closure**: Closes v19.0 audit DIR integration gap (phase 163 orphan)
+**Success Criteria** (what must be TRUE):
+  1. `useDirigeraData` hits `/api/v1/dirigera/history`, `/stats`, `/telemetry`
+  2. Zero `/api/dirigera/` references outside debug/archived paths
+  3. Dirigera page renders history/stats/telemetry end-to-end in smoke run
+  4. Jest + Playwright smoke green
+**Plans:** TBD
+
+### Phase 170: Auth UI
+**Goal**: Users can log in via form UI and manage API keys end-to-end
+**Depends on**: Phase 164
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04
+**Gap Closure**: Closes v19.0 audit AUTH integration gap (phase 157 orphan — zero UI consumer)
+**Success Criteria** (what must be TRUE):
+  1. Login page POSTs form credentials to `/auth/login` and stores JWT
+  2. API-keys management page lists existing keys (GET), creates new (POST), revokes (DELETE)
+  3. Revoked keys disappear from list after refresh
+  4. Jest + Playwright smoke covers the happy path
+**Plans:** TBD
+
+### Phase 171: Fritz!Box Consumer UI
+**Goal**: Telephony, raw history, and service-discovery endpoints have production UI consumers outside debug panels
+**Depends on**: Phase 164
+**Requirements**: FRITZ-01, FRITZ-02, FRITZ-03, FRITZ-04, FRITZ-05, FRITZ-06, FRITZ-07
+**Gap Closure**: Closes v19.0 audit FRITZ integration gap (phase 162 orphan)
+**Success Criteria** (what must be TRUE):
+  1. DECT handsets + call history + TAM state rendered in a Telephony page/section
+  2. Raw bandwidth history, device presence history, device-events log surfaced in network section (chart or table)
+  3. Service-discovery TR-064 descriptor visible in an admin/debug-elevated surface
+  4. Jest + Playwright smoke covers each new route
+**Plans:** TBD
+
 <details>
 <summary>✅ v18.0 Dark-Only & Mobile-First (Phases 149-155) — SHIPPED 2026-04-02</summary>
 
@@ -194,7 +298,7 @@ See git history and `.planning/milestones/` for details.
 
 ## Progress
 
-**Execution Order:** 156 → 157 → 158 → 159 → 160 → 161 → 162 → 163
+**Execution Order:** 156 → 157 → 158 → 159 → 160 → 161 → 162 → 163 → 164 → 165 → 166 → 167 → 168 → 169 → 170 → 171
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -206,3 +310,11 @@ See git history and `.planning/milestones/` for details.
 | 161. Netatmo Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 162. Fritz!Box Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 163. DIRIGERA Gap Closure | v19.0 | 1/1 | Complete   | 2026-04-14 |
+| 164. Phase 156 Regression Fix | v19.0 | 0/? | Pending    | — |
+| 165. Milestone Hygiene & Spec Alignment | v19.0 | 0/? | Pending    | — |
+| 166. Hue Frontend Cutover | v19.0 | 0/? | Pending    | — |
+| 167. Sonos Frontend Cutover | v19.0 | 0/? | Pending    | — |
+| 168. Netatmo Frontend Cutover | v19.0 | 0/? | Pending    | — |
+| 169. DIRIGERA Frontend Cutover | v19.0 | 0/? | Pending    | — |
+| 170. Auth UI | v19.0 | 0/? | Pending    | — |
+| 171. Fritz!Box Consumer UI | v19.0 | 0/? | Pending    | — |

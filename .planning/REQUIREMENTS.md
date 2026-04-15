@@ -96,71 +96,73 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 |---------|--------|
 | Scheduler API endpoints | Escluso esplicitamente dall'utente per questo milestone |
 | WebSocket server-side | Il client WS è già implementato; il server WS è nel HA proxy, non nel frontend Next.js |
-| UI per nuovi endpoint | v19.0 copre solo proxy client + API routes; UI dedicate in milestone futuro se necessario |
+| ~~UI per nuovi endpoint~~ | ~~Deferred~~ — scope expanded 2026-04-15 post-audit: phases 166-171 added to wire UI consumers for all v1 endpoints (frontend cutovers + Auth UI + Fritz!Box consumer UI) |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PATH-01 | Phase 156 | Pending |
-| PATH-02 | Phase 156 | Pending |
-| COMMON-01 | Phase 156 | Pending |
-| COMMON-02 | Phase 156 | Pending |
-| AUTH-01 | Phase 157 | Pending |
-| AUTH-02 | Phase 157 | Pending |
-| AUTH-03 | Phase 157 | Pending |
-| AUTH-04 | Phase 157 | Pending |
+| PATH-01 | Phase 156 → 164 (regression fix) | Pending |
+| PATH-02 | Phase 156 → 164 (regression fix) | Pending |
+| COMMON-01 | Phase 156 → 165 (spec alignment) | Pending |
+| COMMON-02 | Phase 156 → 165 (spec alignment) | Pending |
+| AUTH-01 | Phase 157 + 170 (UI) | Pending |
+| AUTH-02 | Phase 157 + 170 (UI) | Pending |
+| AUTH-03 | Phase 157 + 170 (UI) | Pending |
+| AUTH-04 | Phase 157 + 170 (UI) | Pending |
 | AUTO-01 | Phase 158 | Pending |
 | AUTO-02 | Phase 158 | Pending |
 | AUTO-03 | Phase 158 | Pending |
 | AUTO-04 | Phase 158 | Pending |
 | AUTO-05 | Phase 158 | Pending |
 | AUTO-06 | Phase 158 | Pending |
-| HUE-01 | Phase 159 | Pending |
-| HUE-02 | Phase 159 | Pending |
-| HUE-03 | Phase 159 | Pending |
-| HUE-04 | Phase 159 | Pending |
-| HUE-05 | Phase 159 | Pending |
-| HUE-06 | Phase 159 | Pending |
-| HUE-07 | Phase 159 | Pending |
-| SONOS-01 | Phase 160 | Pending |
-| SONOS-02 | Phase 160 | Pending |
-| SONOS-03 | Phase 160 | Pending |
-| SONOS-04 | Phase 160 | Pending |
-| SONOS-05 | Phase 160 | Pending |
-| SONOS-06 | Phase 160 | Pending |
-| SONOS-07 | Phase 160 | Pending |
-| SONOS-08 | Phase 160 | Pending |
-| SONOS-09 | Phase 160 | Pending |
-| SONOS-10 | Phase 160 | Pending |
-| SONOS-11 | Phase 160 | Pending |
-| SONOS-12 | Phase 160 | Pending |
-| SONOS-13 | Phase 160 | Pending |
-| NETA-01 | Phase 161 | Pending |
-| NETA-02 | Phase 161 | Pending |
-| NETA-03 | Phase 161 | Pending |
-| NETA-04 | Phase 161 | Pending |
-| NETA-05 | Phase 161 | Pending |
-| NETA-06 | Phase 161 | Pending |
-| NETA-07 | Phase 161 | Pending |
-| NETA-08 | Phase 161 | Pending |
-| NETA-09 | Phase 161 | Pending |
-| FRITZ-01 | Phase 162 | Pending |
-| FRITZ-02 | Phase 162 | Pending |
-| FRITZ-03 | Phase 162 | Pending |
-| FRITZ-04 | Phase 162 | Pending |
-| FRITZ-05 | Phase 162 | Pending |
-| FRITZ-06 | Phase 162 | Pending |
-| FRITZ-07 | Phase 162 | Pending |
-| DIR-01 | Phase 163 | Pending |
-| DIR-02 | Phase 163 | Pending |
-| DIR-03 | Phase 163 | Pending |
+| HUE-01 | Phase 159 + 166 (frontend cutover) | Pending |
+| HUE-02 | Phase 159 + 166 (frontend cutover) | Pending |
+| HUE-03 | Phase 159 + 166 (frontend cutover) | Pending |
+| HUE-04 | Phase 159 + 166 (frontend cutover) | Pending |
+| HUE-05 | Phase 159 + 166 (frontend cutover) | Pending |
+| HUE-06 | Phase 159 + 166 (frontend cutover) | Pending |
+| HUE-07 | Phase 159 + 166 (frontend cutover) | Pending |
+| SONOS-01 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-02 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-03 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-04 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-05 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-06 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-07 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-08 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-09 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-10 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-11 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-12 | Phase 160 + 167 (frontend cutover) | Pending |
+| SONOS-13 | Phase 160 + 167 (frontend cutover) | Pending |
+| NETA-01 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-02 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-03 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-04 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-05 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-06 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-07 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-08 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-09 | Phase 161 + 168 (frontend cutover) | Pending |
+| FRITZ-01 | Phase 162 + 171 (consumer UI) | Pending |
+| FRITZ-02 | Phase 162 + 171 (consumer UI) | Pending |
+| FRITZ-03 | Phase 162 + 171 (consumer UI) | Pending |
+| FRITZ-04 | Phase 162 + 171 (consumer UI) | Pending |
+| FRITZ-05 | Phase 162 + 171 (consumer UI) | Pending |
+| FRITZ-06 | Phase 162 + 171 (consumer UI) | Pending |
+| FRITZ-07 | Phase 162 + 171 (consumer UI) | Pending |
+| DIR-01 | Phase 163 + 169 (frontend cutover) | Pending |
+| DIR-02 | Phase 163 + 169 (frontend cutover) | Pending |
+| DIR-03 | Phase 163 + 169 (frontend cutover) | Pending |
 
 **Coverage:**
 - v19.0 requirements: 52 total
 - Mapped to phases: 52
 - Unmapped: 0
+- Backend satisfied (audit 2026-04-15): 47/52 (PATH-01/02 regressed — reassigned to Phase 164)
+- End-to-end wired (audit 2026-04-15): 6/52 (AUTO-01..06 only — remaining groups reassigned to phases 164-171)
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-03 after roadmap creation*
+*Last updated: 2026-04-15 post-audit — added gap closure phases 164-171*

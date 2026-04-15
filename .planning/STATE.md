@@ -4,14 +4,14 @@ milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: executing
 stopped_at: Phase 163 execution complete
-last_updated: "2026-04-14T13:01:13.532Z"
-last_activity: 2026-04-09
+last_updated: "2026-04-15T07:22:56.216Z"
+last_activity: 2026-04-15 -- Phase 164 execution started
 progress:
-  total_phases: 8
+  total_phases: 16
   completed_phases: 8
-  total_plans: 14
+  total_plans: 16
   completed_plans: 14
-  percent: 100
+  percent: 88
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 160 — Sonos Gap Closure
+**Current focus:** Phase 164 — phase-156-regression-fix
 
 ## Current Position
 
-Phase: 163
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-09
+Phase: 164 (phase-156-regression-fix) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 164
+Last activity: 2026-04-15 -- Phase 164 execution started
 
 Progress: [░░░░░░░░░░░░░░░░░░░] 0/0 plans (0%)
 

@@ -643,41 +643,111 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 // Message Handler for Client Communication
 // ============================================
 
-self.addEventListener('message', async (event) => {
+self.addEventListener('message', (event) => {
   const { type, data } = event.data || {};
+  event.waitUntil((async () => {
+    switch (type) {
+      case 'CLEAR_BADGE':
+        await saveBadgeCount(0);
+        await updateBadge(0);
+        break;
 
-  switch (type) {
-    case 'CLEAR_BADGE':
-      await saveBadgeCount(0);
-      await updateBadge(0);
-      break;
-
-    case 'GET_CACHED_STATE':
-      try {
-        const db = await openDB();
-        const transaction = db.transaction('deviceState', 'readonly');
-        const store = transaction.objectStore('deviceState');
-        const request = store.get(data?.deviceId);
-        request.onsuccess = () => {
-          event.ports[0]?.postMessage({
-            success: true,
-            data: request.result,
+      case 'GET_CACHED_STATE':
+        try {
+          const db = await openDB();
+          const transaction = db.transaction('deviceState', 'readonly');
+          const store = transaction.objectStore('deviceState');
+          await new Promise<void>((resolve) => {
+            const request = store.get(data?.deviceId);
+            request.onsuccess = () => {
+              event.ports[0]?.postMessage({
+                success: true,
+                data: request.result,
+              });
+              resolve();
+            };
+            request.onerror = () => {
+              event.ports[0]?.postMessage({
+                success: false,
+                error: String(request.error),
+              });
+              resolve();
+            };
           });
-        };
-      } catch (error) {
-        event.ports[0]?.postMessage({
-          success: false,
-          error: String(error),
-        });
-      }
-      break;
+        } catch (error) {
+          event.ports[0]?.postMessage({
+            success: false,
+            error: String(error),
+          });
+        }
+        break;
 
-    case 'PROCESS_QUEUE':
-      await processCommandQueue();
-      break;
+      case 'PROCESS_QUEUE':
+        await processCommandQueue();
+        break;
 
-    default:
-  }
+      case 'REGISTER_PERIODIC_SYNC':
+        try {
+          if ('periodicSync' in self.registration) {
+            await self.registration.periodicSync?.register(PERIODIC_SYNC_TAG, {
+              minInterval: data?.interval || 15 * 60 * 1000, // Default 15 minutes
+            });
+            event.ports[0]?.postMessage({ success: true });
+          } else {
+            event.ports[0]?.postMessage({
+              success: false,
+              error: 'Periodic Sync not supported',
+            });
+          }
+        } catch (error) {
+          event.ports[0]?.postMessage({
+            success: false,
+            error: String(error),
+          });
+        }
+        break;
+
+      case 'UNREGISTER_PERIODIC_SYNC':
+        try {
+          if ('periodicSync' in self.registration) {
+            await self.registration.periodicSync?.unregister(PERIODIC_SYNC_TAG);
+            event.ports[0]?.postMessage({ success: true });
+          }
+        } catch (error) {
+          event.ports[0]?.postMessage({
+            success: false,
+            error: String(error),
+          });
+        }
+        break;
+
+      case 'GET_PERIODIC_SYNC_STATUS':
+        try {
+          if ('periodicSync' in self.registration) {
+            const tags = await self.registration.periodicSync?.getTags() ?? [];
+            event.ports[0]?.postMessage({
+              success: true,
+              registered: tags.includes(PERIODIC_SYNC_TAG),
+              tags,
+            });
+          } else {
+            event.ports[0]?.postMessage({
+              success: false,
+              supported: false,
+            });
+          }
+        } catch (error) {
+          event.ports[0]?.postMessage({
+            success: false,
+            error: String(error),
+          });
+        }
+        break;
+
+      default:
+        // Unknown message type - no-op
+    }
+  })());
 });
 
 // ============================================
@@ -752,77 +822,6 @@ async function checkStoveStatusBackground(): Promise<void> {
     console.error('[sw.ts] Background status check failed:', error);
   }
 }
-
-// ============================================
-// Enhanced Message Handler
-// ============================================
-
-// Extend message handler for periodic sync registration
-self.addEventListener('message', async (event) => {
-  const { type, data } = event.data || {};
-
-  switch (type) {
-    case 'REGISTER_PERIODIC_SYNC':
-      try {
-        if ('periodicSync' in self.registration) {
-          await self.registration.periodicSync?.register(PERIODIC_SYNC_TAG, {
-            minInterval: data?.interval || 15 * 60 * 1000, // Default 15 minutes
-          });
-          event.ports[0]?.postMessage({ success: true });
-        } else {
-          event.ports[0]?.postMessage({
-            success: false,
-            error: 'Periodic Sync not supported',
-          });
-        }
-      } catch (error) {
-        event.ports[0]?.postMessage({
-          success: false,
-          error: String(error),
-        });
-      }
-      break;
-
-    case 'UNREGISTER_PERIODIC_SYNC':
-      try {
-        if ('periodicSync' in self.registration) {
-          await self.registration.periodicSync?.unregister(PERIODIC_SYNC_TAG);
-          event.ports[0]?.postMessage({ success: true });
-        }
-      } catch (error) {
-        event.ports[0]?.postMessage({
-          success: false,
-          error: String(error),
-        });
-      }
-      break;
-
-    case 'GET_PERIODIC_SYNC_STATUS':
-      try {
-        if ('periodicSync' in self.registration) {
-          const tags = await self.registration.periodicSync?.getTags() ?? [];
-          event.ports[0]?.postMessage({
-            success: true,
-            registered: tags.includes(PERIODIC_SYNC_TAG),
-            tags,
-          });
-        } else {
-          event.ports[0]?.postMessage({
-            success: false,
-            supported: false,
-          });
-        }
-      } catch (error) {
-        event.ports[0]?.postMessage({
-          success: false,
-          error: String(error),
-        });
-      }
-      break;
-
-    // Keep other cases handled by the original handler
-  }
-});
 
 // ============================================
 // Service Worker Lifecycle

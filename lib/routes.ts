@@ -44,13 +44,13 @@ const GLOBAL_UI_ROUTES = {
 
 // Stove control endpoints
 export const STOVE_ROUTES = {
-  status: `${API_BASE}/stove/status`,
-  ignite: `${API_BASE}/stove/ignite`,
-  shutdown: `${API_BASE}/stove/shutdown`,
-  getFan: `${API_BASE}/stove/getFan`,
-  getPower: `${API_BASE}/stove/getPower`,
-  setFan: `${API_BASE}/stove/setFan`,
-  setPower: `${API_BASE}/stove/setPower`,
+  status: `${API_BASE}/v1/thermorossi/status`,
+  ignite: `${API_BASE}/v1/thermorossi/commands/ignit`,
+  shutdown: `${API_BASE}/v1/thermorossi/commands/shutdown`,
+  getFan: `${API_BASE}/v1/thermorossi/fan-level`,
+  getPower: `${API_BASE}/v1/thermorossi/power`,
+  setFan: `${API_BASE}/v1/thermorossi/settings/fan-level`,
+  setPower: `${API_BASE}/v1/thermorossi/settings/power`,
 } as const;
 
 // Scheduler endpoints

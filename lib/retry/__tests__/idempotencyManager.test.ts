@@ -22,15 +22,15 @@ describe('IdempotencyManager', () => {
 
   describe('registerKey', () => {
     it('returns a new key for a fresh endpoint+body combination', async () => {
-      const key = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
+      const key = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
 
       expect(key).toBeTruthy();
       expect(key).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
     });
 
     it('returns the SAME key when called again with same endpoint+body within TTL', async () => {
-      const firstKey = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
-      const secondKey = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
+      const firstKey = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
+      const secondKey = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
 
       expect(secondKey).toBe(firstKey);
     });
@@ -39,27 +39,27 @@ describe('IdempotencyManager', () => {
       const now = Date.now();
       jest.setSystemTime(now);
 
-      const firstKey = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
+      const firstKey = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
 
       // Advance time past TTL (1 hour + 1ms)
       jest.setSystemTime(now + 3600001);
 
-      const secondKey = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
+      const secondKey = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
 
       expect(secondKey).not.toBe(firstKey);
       expect(secondKey).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
     });
 
     it('returns different keys for different endpoints', async () => {
-      const key1 = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
-      const key2 = await manager.registerKey('/api/stove/shutdown', { temperature: 20 });
+      const key1 = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
+      const key2 = await manager.registerKey('/api/v1/thermorossi/commands/shutdown', { temperature: 20 });
 
       expect(key1).not.toBe(key2);
     });
 
     it('returns different keys for different bodies', async () => {
-      const key1 = await manager.registerKey('/api/stove/ignite', { level: 1 });
-      const key2 = await manager.registerKey('/api/stove/ignite', { level: 2 });
+      const key1 = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { level: 1 });
+      const key2 = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { level: 2 });
 
       expect(key1).not.toBe(key2);
     });
@@ -68,16 +68,16 @@ describe('IdempotencyManager', () => {
       const now = Date.now();
       jest.setSystemTime(now);
 
-      const firstKey = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
+      const firstKey = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
 
       // Just before expiry - should still return same key
       jest.setSystemTime(now + 3599999);
-      const sameKey = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
+      const sameKey = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
       expect(sameKey).toBe(firstKey);
 
       // After expiry - should return new key
       jest.setSystemTime(now + 3600001);
-      const newKey = await manager.registerKey('/api/stove/ignite', { temperature: 20 });
+      const newKey = await manager.registerKey('/api/v1/thermorossi/commands/ignit', { temperature: 20 });
       expect(newKey).not.toBe(firstKey);
     });
   });
@@ -88,8 +88,8 @@ describe('IdempotencyManager', () => {
       jest.setSystemTime(now);
 
       // Register two keys
-      await manager.registerKey('/api/stove/ignite', { a: 1 });
-      await manager.registerKey('/api/stove/shutdown', { b: 2 });
+      await manager.registerKey('/api/v1/thermorossi/commands/ignit', { a: 1 });
+      await manager.registerKey('/api/v1/thermorossi/commands/shutdown', { b: 2 });
 
       // Advance past TTL
       jest.setSystemTime(now + 3600001);
@@ -103,8 +103,8 @@ describe('IdempotencyManager', () => {
       jest.setSystemTime(now);
 
       // Register two keys
-      await manager.registerKey('/api/stove/ignite', { a: 1 });
-      await manager.registerKey('/api/stove/shutdown', { b: 2 });
+      await manager.registerKey('/api/v1/thermorossi/commands/ignit', { a: 1 });
+      await manager.registerKey('/api/v1/thermorossi/commands/shutdown', { b: 2 });
 
       // Advance only 30 minutes (keys still valid)
       jest.setSystemTime(now + 1800000);
@@ -118,13 +118,13 @@ describe('IdempotencyManager', () => {
       jest.setSystemTime(now);
 
       // Register first key
-      await manager.registerKey('/api/stove/ignite', { a: 1 });
+      await manager.registerKey('/api/v1/thermorossi/commands/ignit', { a: 1 });
 
       // Advance 30 minutes
       jest.setSystemTime(now + 1800000);
 
       // Register second key (will expire 30min later than first)
-      await manager.registerKey('/api/stove/shutdown', { b: 2 });
+      await manager.registerKey('/api/v1/thermorossi/commands/shutdown', { b: 2 });
 
       // Advance to just past first key's expiry (60min from start)
       jest.setSystemTime(now + 3600001);
@@ -133,7 +133,7 @@ describe('IdempotencyManager', () => {
       expect(count).toBe(1); // Only first key expired
 
       // Second key should still work
-      const key = await manager.registerKey('/api/stove/shutdown', { b: 2 });
+      const key = await manager.registerKey('/api/v1/thermorossi/commands/shutdown', { b: 2 });
       expect(key).toBeTruthy();
     });
 

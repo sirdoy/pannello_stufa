@@ -92,6 +92,7 @@ export default function LightsCard() {
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
       footerActions={footerActions}
+      footerContent={<LastUpdated tsMs={lightsData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />}
     >
       {/* Quick All-House Control */}
       <LightsHouseControl
@@ -151,8 +152,6 @@ export default function LightsCard() {
           title="Nessuna stanza disponibile"
         />
       )}
-
-      <LastUpdated tsMs={lightsData.lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />
     </DeviceCard>
   );
 }

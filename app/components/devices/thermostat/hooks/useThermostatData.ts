@@ -152,6 +152,17 @@ export function useThermostatData(): UseThermostatDataReturn {
     checkConnection();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Ensure status is fetched once after topology loads, independent of WS state.
+  // Without this, a WS-connected mount with no initial snapshot leaves status=null → no temperature shown.
+  const initialStatusFetchedRef = useRef(false);
+  useEffect(() => {
+    if (initialStatusFetchedRef.current) return;
+    if (!topology) return;
+    initialStatusFetchedRef.current = true;
+    fetchStatus();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topology]);
+
   async function fetchStatus(retryCount = 0): Promise<void> {
     const MAX_RETRIES = 1;
     const RETRY_DELAY_MS = 1500;

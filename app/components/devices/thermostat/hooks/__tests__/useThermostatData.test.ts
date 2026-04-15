@@ -226,6 +226,12 @@ describe('useThermostatData — WebSocket subscription', () => {
 
     const { result } = renderHook(() => useThermostatData());
 
+    // Let topology checkConnection + initial fetchStatus settle first so the
+    // WS message is the last writer of status (matches production ordering).
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    });
+
     // Extract handleMessage from subscribe call
     const handleMessage = mockSubscribe.mock.calls[0]?.[1];
     expect(handleMessage).toBeDefined();
@@ -288,7 +294,7 @@ describe('useThermostatData — WebSocket subscription', () => {
     expect(result.current.status?.lowBatteryModules?.[0]?.type).toBe('NRV');
   });
 
-  it('Test 14: null WS payload (adapter returns null) does not update status', async () => {
+  it('Test 14: null WS payload (adapter returns null) does not update status from WS path', async () => {
     mockUseWebSocketContext.mockReturnValue({
       subscribe: mockSubscribe,
       unsubscribe: mockUnsubscribe,
@@ -297,6 +303,14 @@ describe('useThermostatData — WebSocket subscription', () => {
 
     const { result } = renderHook(() => useThermostatData());
 
+    // Let topology checkConnection + initial fetchStatus settle. Status will be
+    // populated by HTTP initial fetch (home_id/home_name shape, no rooms).
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    });
+
+    const statusAfterInitialFetch = result.current.status;
+
     const handleMessage = mockSubscribe.mock.calls[0]?.[1];
 
     await act(async () => {
@@ -304,8 +318,9 @@ describe('useThermostatData — WebSocket subscription', () => {
       handleMessage({ status: 'ok' });
     });
 
-    // Status should remain null (initial state)
-    expect(result.current.status).toBeNull();
+    // WS path must NOT overwrite status on null-adapted payloads.
+    expect(result.current.status).toBe(statusAfterInitialFetch);
+    expect(result.current.status?.rooms).toBeUndefined();
   });
 
   it('Test 15: Polling interval is null when isWsConnected=true', () => {

@@ -127,15 +127,20 @@ function getStoveCommands(): CommandGroup {
         label: 'Aumenta Potenza Stufa',
         icon: <Plus className="w-4 h-4" />,
         onSelect: async () => {
-          const statusRes = await fetch('/api/v1/thermorossi/power');
-          const statusData = await statusRes.json();
-          const currentPower = statusData?.power_level ?? 3;
-          if (currentPower < 5) {
-            await executeStoveAction(
-              '/api/v1/thermorossi/settings/power',
-              'POST',
-              { value: currentPower + 1 }
-            );
+          try {
+            const statusRes = await fetch('/api/v1/thermorossi/power');
+            if (!statusRes.ok) return;
+            const statusData = await statusRes.json();
+            const currentPower = statusData?.power_level ?? 3;
+            if (currentPower < 5) {
+              await executeStoveAction(
+                '/api/v1/thermorossi/settings/power',
+                'POST',
+                { value: currentPower + 1 }
+              );
+            }
+          } catch (err) {
+            console.error('[CommandPalette] stove-power-up failed:', err);
           }
         },
       },
@@ -144,15 +149,20 @@ function getStoveCommands(): CommandGroup {
         label: 'Diminuisci Potenza Stufa',
         icon: <Minus className="w-4 h-4" />,
         onSelect: async () => {
-          const statusRes = await fetch('/api/v1/thermorossi/power');
-          const statusData = await statusRes.json();
-          const currentPower = statusData?.power_level ?? 3;
-          if (currentPower > 1) {
-            await executeStoveAction(
-              '/api/v1/thermorossi/settings/power',
-              'POST',
-              { value: currentPower - 1 }
-            );
+          try {
+            const statusRes = await fetch('/api/v1/thermorossi/power');
+            if (!statusRes.ok) return;
+            const statusData = await statusRes.json();
+            const currentPower = statusData?.power_level ?? 3;
+            if (currentPower > 1) {
+              await executeStoveAction(
+                '/api/v1/thermorossi/settings/power',
+                'POST',
+                { value: currentPower - 1 }
+              );
+            }
+          } catch (err) {
+            console.error('[CommandPalette] stove-power-down failed:', err);
           }
         },
       },
@@ -161,15 +171,20 @@ function getStoveCommands(): CommandGroup {
         label: 'Aumenta Ventola Stufa',
         icon: <Fan className="w-4 h-4" />,
         onSelect: async () => {
-          const statusRes = await fetch('/api/v1/thermorossi/fan-level');
-          const statusData = await statusRes.json();
-          const currentFan = statusData?.fan_level ?? 3;
-          if (currentFan < 6) {
-            await executeStoveAction(
-              '/api/v1/thermorossi/settings/fan-level',
-              'POST',
-              { value: currentFan + 1 }
-            );
+          try {
+            const statusRes = await fetch('/api/v1/thermorossi/fan-level');
+            if (!statusRes.ok) return;
+            const statusData = await statusRes.json();
+            const currentFan = statusData?.fan_level ?? 3;
+            if (currentFan < 6) {
+              await executeStoveAction(
+                '/api/v1/thermorossi/settings/fan-level',
+                'POST',
+                { value: currentFan + 1 }
+              );
+            }
+          } catch (err) {
+            console.error('[CommandPalette] stove-fan-up failed:', err);
           }
         },
       },
@@ -178,15 +193,20 @@ function getStoveCommands(): CommandGroup {
         label: 'Diminuisci Ventola Stufa',
         icon: <Fan className="w-4 h-4" />,
         onSelect: async () => {
-          const statusRes = await fetch('/api/v1/thermorossi/fan-level');
-          const statusData = await statusRes.json();
-          const currentFan = statusData?.fan_level ?? 3;
-          if (currentFan > 1) {
-            await executeStoveAction(
-              '/api/v1/thermorossi/settings/fan-level',
-              'POST',
-              { value: currentFan - 1 }
-            );
+          try {
+            const statusRes = await fetch('/api/v1/thermorossi/fan-level');
+            if (!statusRes.ok) return;
+            const statusData = await statusRes.json();
+            const currentFan = statusData?.fan_level ?? 3;
+            if (currentFan > 1) {
+              await executeStoveAction(
+                '/api/v1/thermorossi/settings/fan-level',
+                'POST',
+                { value: currentFan - 1 }
+              );
+            }
+          } catch (err) {
+            console.error('[CommandPalette] stove-fan-down failed:', err);
           }
         },
       },
@@ -255,16 +275,21 @@ function getLightsCommands(): CommandGroup {
         icon: <Lightbulb className="w-4 h-4" />,
         shortcut: '⌘⇧L',
         onSelect: async () => {
-          // Get all rooms and toggle each
-          const roomsRes = await fetch('/api/hue/rooms');
-          const roomsData = await roomsRes.json();
-          const rooms = roomsData.rooms || [];
+          try {
+            // Get all rooms and toggle each
+            const roomsRes = await fetch('/api/hue/rooms');
+            if (!roomsRes.ok) return;
+            const roomsData = await roomsRes.json();
+            const rooms = roomsData.rooms || [];
 
-          for (const room of rooms) {
-            const groupedLightId = room.services?.find((s: any) => s.rtype === 'grouped_light')?.rid;
-            if (groupedLightId) {
-              await executeLightsAction(`rooms/${groupedLightId}`, 'PUT', { on: { on: true } });
+            for (const room of rooms) {
+              const groupedLightId = room.services?.find((s: { rtype?: string; rid?: string }) => s.rtype === 'grouped_light')?.rid;
+              if (groupedLightId) {
+                await executeLightsAction(`rooms/${groupedLightId}`, 'PUT', { on: { on: true } });
+              }
             }
+          } catch (err) {
+            console.error('[CommandPalette] lights-all-on failed:', err);
           }
         },
       },
@@ -273,15 +298,20 @@ function getLightsCommands(): CommandGroup {
         label: 'Spegni Tutte le Luci',
         icon: <Moon className="w-4 h-4" />,
         onSelect: async () => {
-          const roomsRes = await fetch('/api/hue/rooms');
-          const roomsData = await roomsRes.json();
-          const rooms = roomsData.rooms || [];
+          try {
+            const roomsRes = await fetch('/api/hue/rooms');
+            if (!roomsRes.ok) return;
+            const roomsData = await roomsRes.json();
+            const rooms = roomsData.rooms || [];
 
-          for (const room of rooms) {
-            const groupedLightId = room.services?.find((s: any) => s.rtype === 'grouped_light')?.rid;
-            if (groupedLightId) {
-              await executeLightsAction(`rooms/${groupedLightId}`, 'PUT', { on: { on: false } });
+            for (const room of rooms) {
+              const groupedLightId = room.services?.find((s: { rtype?: string; rid?: string }) => s.rtype === 'grouped_light')?.rid;
+              if (groupedLightId) {
+                await executeLightsAction(`rooms/${groupedLightId}`, 'PUT', { on: { on: false } });
+              }
             }
+          } catch (err) {
+            console.error('[CommandPalette] lights-all-off failed:', err);
           }
         },
       },

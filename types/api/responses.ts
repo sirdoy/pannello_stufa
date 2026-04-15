@@ -31,7 +31,7 @@ export type ApiResponse<T = Record<string, unknown>> =
 
 /**
  * Stove status response
- * Example: GET /api/stove/status
+ * Example: GET /api/v1/thermorossi/status
  */
 export interface StoveStatusResponse extends ApiSuccessResponse {
   status: import('../firebase').StoveStatus;

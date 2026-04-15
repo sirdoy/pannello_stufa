@@ -39,7 +39,7 @@ export class IdempotencyManager {
    * If the same endpoint+body combination already has a non-expired key,
    * returns the existing key. Otherwise, generates and stores a new key.
    *
-   * @param endpoint - The API endpoint (e.g., '/api/stove/ignite')
+   * @param endpoint - The API endpoint (e.g., '/api/v1/thermorossi/commands/ignit')
    * @param body - The request body object
    * @returns The idempotency key (existing or newly generated)
    */

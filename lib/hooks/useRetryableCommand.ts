@@ -71,7 +71,7 @@ interface StoredCommand {
  * });
  *
  * // Execute command
- * await execute('/api/stove/ignite', {
+ * await execute('/api/v1/thermorossi/commands/ignit', {
  *   method: 'POST',
  *   body: JSON.stringify({ command: 'ignite' })
  * });

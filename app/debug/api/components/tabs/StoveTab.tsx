@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { EndpointCard, PostEndpointCard } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Badge from '@/app/components/ui/Badge';
@@ -10,14 +10,16 @@ interface StoveTabProps {
   refreshTrigger: number;
 }
 
+type ConnectionStatus = 'connected' | 'disconnected' | null;
+
 export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps) {
-  const [getResponses, setGetResponses] = useState<Record<string, any>>({});
-  const [postResponses, setPostResponses] = useState<Record<string, any>>({});
+  const [getResponses, setGetResponses] = useState<Record<string, unknown>>({});
+  const [postResponses, setPostResponses] = useState<Record<string, unknown>>({});
   const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
   const [loadingPost, setLoadingPost] = useState<Record<string, boolean>>({});
   const [timings, setTimings] = useState<Record<string, number>>({});
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
-  const [connectionStatus, setConnectionStatus] = useState<any>(null);
+  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>(null);
 
   const copyUrlToClipboard = async (url: string) => {
     try {
@@ -29,7 +31,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
     }
   };
 
-  const fetchGetEndpoint = async (name: string, url: string) => {
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -48,17 +50,17 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  };
+  }, []);
 
-  const fetchAllGetEndpoints = () => {
+  const fetchAllGetEndpoints = useCallback(() => {
     fetchGetEndpoint('health', '/api/v1/thermorossi/health');
     fetchGetEndpoint('status', '/api/v1/thermorossi/status');
     fetchGetEndpoint('power', '/api/v1/thermorossi/power');
     fetchGetEndpoint('fan', '/api/v1/thermorossi/fan-level');
     fetchGetEndpoint('history', '/api/v1/thermorossi/history');
-  };
+  }, [fetchGetEndpoint]);
 
-  const callPostEndpoint = async (name: string, url: string, body: any) => {
+  const callPostEndpoint = async (name: string, url: string, body: Record<string, unknown>) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {

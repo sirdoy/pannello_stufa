@@ -211,9 +211,9 @@ async function queueActionForSync(
       lastError: null,
     };
 
-    store.add(command);
-
     await new Promise<void>((resolve, reject) => {
+      const addReq = store.add(command);
+      addReq.onerror = () => reject(addReq.error);
       transaction.oncomplete = () => resolve();
       transaction.onerror = () => reject(transaction.error);
     });
@@ -258,15 +258,17 @@ async function openAppUrl(url: string): Promise<void> {
     includeUncontrolled: true,
   });
 
-  // If app is already open, focus it and navigate
-  for (const client of clientList) {
-    if (client.url.includes(self.location.origin) && 'focus' in client) {
-      await client.focus();
-      if ('navigate' in client) {
-        await (client as WindowClient).navigate(url);
-      }
-      return;
+  // If app is already open, prefer a visible tab over a hidden one
+  const visible = clientList.find(
+    (c) => c.url.includes(self.location.origin) && (c as WindowClient).visibilityState === 'visible'
+  );
+  const target = visible ?? clientList.find((c) => c.url.includes(self.location.origin));
+  if (target && 'focus' in target) {
+    await (target as WindowClient).focus();
+    if ('navigate' in target) {
+      await (target as WindowClient).navigate(url);
     }
+    return;
   }
 
   // Otherwise open new window

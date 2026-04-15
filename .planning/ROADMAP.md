@@ -41,7 +41,7 @@
 - [ ] **Phase 161: Netatmo Gap Closure** - Thermostat state, valve calibration, camera advanced, home management
 - [ ] **Phase 162: Fritz!Box Gap Closure** - Telephony, raw history, service discovery endpoints
 - [ ] **Phase 163: DIRIGERA Gap Closure** - History, stats, telemetry endpoints
-- [ ] **Phase 164: Phase 156 Regression Fix** - Delete legacy /api/stove/, fix routes/sw/command palette/debug panels
+- [x] **Phase 164: Phase 156 Regression Fix** - Delete legacy /api/stove/, fix routes/sw/command palette/debug panels
 - [ ] **Phase 165: Milestone Hygiene & Spec Alignment** - SUMMARY commit hashes, /health auth spec, 163 deferred tsc, Nyquist validations
 - [ ] **Phase 166: Hue Frontend Cutover** - Migrate useLightsData/useLightsCommands + 2 pages to /api/v1/hue/*
 - [ ] **Phase 167: Sonos Frontend Cutover** - Migrate 5 Sonos hooks + components to /api/v1/sonos/*

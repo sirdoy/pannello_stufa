@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 
 ## Current Position
 
-Phase: 164 (phase-156-regression-fix) — EXECUTING
-Plan: 1 of 2
-Status: Executing Phase 164
+Phase: 164 (phase-156-regression-fix) — COMPLETE
+Plan: 2 of 2
+Status: Phase 164 complete
 Last activity: 2026-04-15 -- Phase 164 execution started
 
 Progress: [░░░░░░░░░░░░░░░░░░░] 0/0 plans (0%)

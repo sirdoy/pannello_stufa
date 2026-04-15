@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useToast } from '@/app/hooks/useToast';
 import { retryFetch, isTransientError, RetryError } from '@/lib/retry/retryClient';
 import { deduplicationManager, createRequestKey } from '@/lib/retry/deduplicationManager';
@@ -93,11 +93,13 @@ export function useRetryableCommand(options: CommandOptions): CommandResult {
   // Store the last failed command for retry
   const lastCommandRef = useRef<StoredCommand | null>(null);
   const hadErrorRef = useRef(false);
+  // Ref to hold the current retry function so execute()'s toast action always calls the latest instance
+  const retryRef = useRef<() => Promise<Response | null>>(() => Promise.resolve(null));
 
   /**
    * Execute a device command with full retry infrastructure
    */
-  const execute = async (url: string, fetchOptions?: RequestInit): Promise<Response | null> => {
+  const execute = useCallback(async (url: string, fetchOptions?: RequestInit): Promise<Response | null> => {
       // 1. Deduplication check
       const dedupKey = createRequestKey(device, action);
       if (deduplicationManager.isDuplicate(dedupKey)) {
@@ -161,7 +163,7 @@ export function useRetryableCommand(options: CommandOptions): CommandResult {
             action: {
               label: 'Riprova',
               onClick: () => {
-                retry();
+                retryRef.current();
               },
             },
           });
@@ -176,7 +178,7 @@ export function useRetryableCommand(options: CommandOptions): CommandResult {
             action: {
               label: 'Riprova',
               onClick: () => {
-                retry();
+                retryRef.current();
               },
             },
           });
@@ -188,12 +190,12 @@ export function useRetryableCommand(options: CommandOptions): CommandResult {
         // Clear dedup after completion (success or failure)
         deduplicationManager.clear(dedupKey);
       }
-  };
+  }, [device, action, showSuccessOnRecovery, success, showError]);
 
   /**
    * Manually retry the last failed command
    */
-  const retry = async (): Promise<Response | null> => {
+  const retry = useCallback(async (): Promise<Response | null> => {
     if (!lastCommandRef.current) {
       return null;
     }
@@ -206,17 +208,21 @@ export function useRetryableCommand(options: CommandOptions): CommandResult {
 
     // Execute the stored command
     return execute(url, options);
-  };
+  }, [execute]);
+
+  // Keep retryRef pointing at the current retry function so execute()'s
+  // toast action calls the most recent instance.
+  retryRef.current = retry;
 
   /**
    * Clear all error state
    */
-  const clearError = () => {
+  const clearError = useCallback(() => {
     setLastError(null);
     setAttemptCount(0);
     setIsRetrying(false);
     hadErrorRef.current = false;
-  };
+  }, []);
 
   return {
     execute,

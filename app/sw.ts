@@ -241,7 +241,7 @@ async function queueActionForSync(
  */
 function getActionSuccessMessage(endpoint: string): string {
   switch (endpoint) {
-    case 'stove/shutdown':
+    case 'v1/thermorossi/commands/shutdown':
       return 'Stufa spenta con successo';
     default:
       return 'Comando eseguito con successo';
@@ -290,7 +290,7 @@ self.addEventListener('notificationclick', (event) => {
 
   if (clickedAction === NOTIFICATION_ACTION_IDS.STOVE_SHUTDOWN) {
     // User clicked "Spegni stufa" action button
-    event.waitUntil(executeNotificationAction('stove/shutdown', {
+    event.waitUntil(executeNotificationAction('v1/thermorossi/commands/shutdown', {
       source: 'notification-action',
       type: notificationData.type || 'unknown',
     }));
@@ -594,7 +594,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
   const url = new URL(event.request.url);
 
   // Cache stove status responses
-  if (url.pathname === '/api/stove/status' && event.request.method === 'GET') {
+  if (url.pathname === '/api/v1/thermorossi/status' && event.request.method === 'GET') {
     event.respondWith(
       fetch(event.request)
         .then(async (response) => {
@@ -715,7 +715,7 @@ self.addEventListener('periodicsync', (event: any) => {
 async function checkStoveStatusBackground(): Promise<void> {
 
   try {
-    const response = await fetch('/api/stove/status');
+    const response = await fetch('/api/v1/thermorossi/status');
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }

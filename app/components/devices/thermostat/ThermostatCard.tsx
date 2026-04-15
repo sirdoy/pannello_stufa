@@ -394,6 +394,7 @@ export default function ThermostatCard() {
       banners={banners}
       infoBoxes={infoBoxes}
       infoBoxesTitle="Informazioni"
+      footerContent={<LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />}
     >
       {/* Active Devices List - Shows only actively heating rooms */}
       {activeRooms.length > 0 && (
@@ -796,8 +797,6 @@ export default function ThermostatCard() {
           Vedi Tutte le Stanze →
         </Button>
       </div>
-
-      <LastUpdated tsMs={lastUpdatedAt} className="mt-3 pt-2 border-t border-slate-700/30" />
     </DeviceCard>
   );
 }

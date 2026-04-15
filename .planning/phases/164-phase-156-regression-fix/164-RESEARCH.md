@@ -582,22 +582,22 @@ None — all required test infrastructure exists. Tests require only string-lite
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Canonical GET response shape for `/api/v1/thermorossi/power` and `/fan-level`**
    - What we know: Both canonical routes import `getPower`/`getFan` from `lib/stove/thermorossiProxy.ts` and wrap with `success(data)`. Legacy routes did the same.
    - What's unclear: Whether the response field name is `Result` (legacy WiNet shape preserved) or changed in proxy migration.
-   - Recommendation: Before writing the plan, have a task read `lib/stove/thermorossiProxy.ts` to confirm `ThermorossiPowerResponse` field name. If it's not `Result`, update `deviceCommands.tsx` read logic at the same time.
+   - **RESOLVED:** Plan 01 Task 3 `<read_first>` mandates reading `app/api/v1/thermorossi/power/route.ts` and `lib/stove/thermorossiProxy.ts` before editing `deviceCommands.tsx`. If canonical field name differs from `Result`, the executor updates `statusData?.Result ?? 3` read logic at the same edit site.
 
 2. **Serwist precache invalidation behavior on sw.ts edit**
    - What we know: Serwist is installed and configured.
    - What's unclear: Exact behavior — content-hash precache (auto-invalidates) vs stable precache (manual bump).
-   - Recommendation: Planner reads `next.config.ts` / Serwist plugin config before writing the SW edit plan. If unclear, add a `SW_CACHE_VERSION` bump as defensive measure.
+   - **RESOLVED:** Plan 01 Task 4 `<read_first>` mandates reading `next.config.ts` to detect content-hash vs stable precache manifest. Content-hash path = no additional action; stable manifest = belt-and-suspenders `SW_CACHE_VERSION` constant bump in `app/sw.ts`.
 
 3. **Whether `/api/stove/shutdown` queued commands in IndexedDB can be migrated**
    - What we know: The SW `queueActionForSync` stores commands with `endpoint: string` field.
    - What's unclear: Whether existing queue entries with `'stove/shutdown'` should be rewritten at SW activation.
-   - Recommendation: Accept queue loss (per A5). Migration logic adds complexity and queue entries have low persistence.
+   - **RESOLVED:** Accept queue loss per Assumption A5. No migration logic planned. Queue entries have limited lifetime and low persistence; the project's core value (notifications always arrive) is preserved, while command-queue resilience across path migrations is an explicit non-goal.
 
 ---
 

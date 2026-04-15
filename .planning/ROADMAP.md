@@ -168,7 +168,9 @@ Plans:
   2. `lib/routes.ts` STOVE_ROUTES, `app/sw.ts`, and `lib/commands/deviceCommands.tsx` all point to `/api/v1/thermorossi/*` with camelCase action paths and `{ value }` body shape
   3. Both StoveTab debug panels (45 refs each) rewritten to canonical paths
   4. Legacy stove test files deleted or retargeted; Jest + smoke suite green
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 165: Milestone Hygiene & Spec Alignment
 **Goal**: v19.0 artifacts (SUMMARY commit hashes, VERIFICATION claims, deferred tsc errors, Nyquist VALIDATION drafts) reflect reality
@@ -180,7 +182,9 @@ Plans:
   2. `/health` auth behaviour (withAuthAndErrorHandler) and VERIFICATION.md agree; spec divergence resolved explicitly
   3. 163 deferred-items.md tsc errors (AutomationCreate cast + 3 thermorossi settings NextResponse) resolved or formally deferred with issue link
   4. Phases 156-162 VALIDATION.md upgraded from draft to nyquist_compliant (or PARTIAL explicitly accepted)
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 166: Hue Frontend Cutover
 **Goal**: Production Hue UI consumes /api/v1/hue/* exclusively; Firebase adminDbPush logging triggers on real user commands
@@ -192,7 +196,9 @@ Plans:
   2. `app/lights/page.tsx` and `app/lights/scenes/page.tsx` no longer reference `/api/hue/*`
   3. Manual toggle from `/lights` produces a row in Firebase Hue command log
   4. Jest + Playwright smoke green
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 167: Sonos Frontend Cutover
 **Goal**: All Sonos hooks and components consume /api/v1/sonos/* zone endpoints
@@ -204,7 +210,9 @@ Plans:
   2. Zero `/api/sonos/` references in `app/` and `components/`
   3. Zone playback, transport, queue, play-mode, sleep-timer all functional in browser smoke
   4. Jest + Playwright smoke green
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 168: Netatmo Frontend Cutover
 **Goal**: Netatmo UI consumes /api/v1/netatmo/** exclusively
@@ -216,7 +224,9 @@ Plans:
   2. Zero `/api/netatmo/` references in production code (debug panel may remain if explicitly scoped)
   3. Manual thermostat setpoint + valve calibrate exercised against canonical routes
   4. Jest + Playwright smoke green
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 169: DIRIGERA Frontend Cutover
 **Goal**: useDirigeraData consumes /api/v1/dirigera/* history, stats, telemetry
@@ -228,7 +238,9 @@ Plans:
   2. Zero `/api/dirigera/` references outside debug/archived paths
   3. Dirigera page renders history/stats/telemetry end-to-end in smoke run
   4. Jest + Playwright smoke green
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 170: Auth UI
 **Goal**: Users can log in via form UI and manage API keys end-to-end
@@ -240,7 +252,9 @@ Plans:
   2. API-keys management page lists existing keys (GET), creates new (POST), revokes (DELETE)
   3. Revoked keys disappear from list after refresh
   4. Jest + Playwright smoke covers the happy path
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 ### Phase 171: Fritz!Box Consumer UI
 **Goal**: Telephony, raw history, and service-discovery endpoints have production UI consumers outside debug panels
@@ -252,7 +266,9 @@ Plans:
   2. Raw bandwidth history, device presence history, device-events log surfaced in network section (chart or table)
   3. Service-discovery TR-064 descriptor visible in an admin/debug-elevated surface
   4. Jest + Playwright smoke covers each new route
-**Plans:** TBD
+**Plans:** 2 plans
+- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
+- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
 
 <details>
 <summary>✅ v18.0 Dark-Only & Mobile-First (Phases 149-155) — SHIPPED 2026-04-02</summary>

@@ -58,8 +58,8 @@ Each POST command includes `suggested_poll_delay_s: 1` in the response body. All
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | Create playback GET route + test (SONOS-01) | 6a565666 | route.ts + __tests__/route.test.ts (playback) |
-| 2 | Create 5 transport POST routes + tests (SONOS-02–06) | c613758a | 5x route.ts + 5x __tests__/route.test.ts |
+| 1 | Create playback GET route + test (SONOS-01) | ec790563 | route.ts + __tests__/route.test.ts (playback) |
+| 2 | Create 5 transport POST routes + tests (SONOS-02–06) | aba3dc54 | 5x route.ts + 5x __tests__/route.test.ts |
 
 ## Test Results
 
@@ -77,7 +77,7 @@ Each POST command includes `suggested_poll_delay_s: 1` in the response body. All
 - **Issue:** Initial test files used `data.data.suggested_poll_delay_s` assuming nested response, but `success()` spreads data at the top level: `{ success: true, ...data }`
 - **Fix:** Changed assertion to `data.suggested_poll_delay_s` in all 5 POST test files
 - **Files modified:** All 5 `__tests__/route.test.ts` POST test files
-- **Commit:** c613758a (corrected before commit)
+- **Commit:** aba3dc54 (corrected before commit)
 
 ## Known Stubs
 
@@ -98,5 +98,5 @@ Files verified present:
 - app/api/v1/sonos/zones/[groupId]/previous/route.ts: FOUND
 
 Commits verified:
-- 6a565666: FOUND (Task 1 — playback GET route)
-- c613758a: FOUND (Task 2 — 5 POST transport routes)
+- ec790563: FOUND (Task 1 — playback GET route)
+- aba3dc54: FOUND (Task 2 — 5 POST transport routes)

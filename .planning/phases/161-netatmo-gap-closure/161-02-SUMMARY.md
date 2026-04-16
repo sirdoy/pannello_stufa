@@ -58,8 +58,8 @@ metrics:
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | Camera events, event snapshot, status routes + tests | 2e38e63a | 6 files |
-| 2 | Camera stream, snapshot, monitoring routes + tests | fd784b74 | 6 files |
+| 1 | Camera events, event snapshot, status routes + tests | c0618512 | 6 files |
+| 2 | Camera stream, snapshot, monitoring routes + tests | b8df17d6 | 6 files |
 
 ## What Was Built
 
@@ -82,7 +82,7 @@ metrics:
 - **Issue:** The plan instructed `new Response(new Blob(['fake-jpeg']), { status: 200 })` in the snapshot test, but jsdom does not expose `Response` globally
 - **Fix:** Replaced with a plain mock object `{ body: null, status: 200 }` — the route only pipes `response.body` to `NextResponse`, so the mock value is sufficient for the assertion
 - **Files modified:** `app/api/v1/netatmo/camera/events/[eventId]/snapshot/__tests__/route.test.ts`
-- **Commit:** 2e38e63a
+- **Commit:** c0618512
 
 ## Verification
 
@@ -96,6 +96,6 @@ All 6 route files + 6 test files exist. All 13 tests pass. All routes reject wit
 ## Self-Check: PASSED
 
 - All 12 created files exist on disk
-- Commit 2e38e63a verified: `git log --oneline | grep 2e38e63a`
-- Commit fd784b74 verified: `git log --oneline | grep fd784b74`
+- Commit c0618512 verified: `git log --oneline | grep c0618512`
+- Commit b8df17d6 verified: `git log --oneline | grep b8df17d6`
 - 13/13 tests green

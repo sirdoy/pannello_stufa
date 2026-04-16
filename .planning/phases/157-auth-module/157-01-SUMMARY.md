@@ -124,7 +124,7 @@ None — all new surface is internal Next.js API routes guarded by Auth0 session
 ## Self-Check: PASSED
 
 All 9 files created and verified present. Both task commits found:
-- `0bc55b18` feat(157-01): auth proxy client and types
-- `1f5fff98` feat(157-01): auth API route handlers and tests
+- `9838abb2` feat(157-01): auth proxy client and types
+- `688cfe17` feat(157-01): auth API route handlers and tests
 
 20 tests passing (4 test suites). No regressions detected in 186-test expanded run.

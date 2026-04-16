@@ -39,7 +39,7 @@ v1 Hue API routes for bridge health read, single light read, and light state com
 
 | Task | Name | Commit | Files |
 |------|------|--------|-------|
-| 1 | Create v1 Hue health, single light, and light state routes with tests | 84b03c1b | 6 created |
+| 1 | Create v1 Hue health, single light, and light state routes with tests | bbaa5a4f | 6 created |
 
 ## What Was Built
 
@@ -90,5 +90,5 @@ None — all 3 routes implement `withAuthAndErrorHandler` (T-159-01 mitigated). 
 - app/api/v1/hue/health/__tests__/route.test.ts: FOUND
 - app/api/v1/hue/lights/[lightId]/__tests__/route.test.ts: FOUND
 - app/api/v1/hue/lights/[lightId]/state/__tests__/route.test.ts: FOUND
-- Commit 84b03c1b: FOUND
+- Commit bbaa5a4f: FOUND
 - All 6 tests: PASSED

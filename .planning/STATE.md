@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
-status: completed
-stopped_at: Phase 165 context gathered
-last_updated: "2026-04-15T14:31:19.129Z"
-last_activity: 2026-04-15 -- Phase 144 marked shipped (local main)
+status: executing
+stopped_at: Phase 166 context gathered
+last_updated: "2026-04-16T07:30:08.778Z"
+last_activity: 2026-04-16 -- Phase 165 execution started
 progress:
   total_phases: 16
-  completed_phases: 9
-  total_plans: 16
-  completed_plans: 16
+  completed_phases: 10
+  total_plans: 18
+  completed_plans: 18
   percent: 100
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 164 — phase-156-regression-fix
+**Current focus:** Phase 165 — Milestone Hygiene & Spec Alignment
 
 ## Current Position
 
-Phase: 164 (phase-156-regression-fix) — COMPLETE
-Plan: 2 of 2
-Status: Phase 164 complete
-Last activity: 2026-04-15 -- Phase 144 marked shipped (local main)
+Phase: 165 (Milestone Hygiene & Spec Alignment) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 165
+Last activity: 2026-04-16 -- Phase 165 execution started
 
 Progress: [░░░░░░░░░░░░░░░░░░░] 0/0 plans (0%)
 
@@ -80,5 +80,5 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-03 — Roadmap created for v19.0 API Alignment & Full Coverage
-Stopped at: Phase 165 context gathered
-Resume file: .planning/phases/165-milestone-hygiene/165-CONTEXT.md
+Stopped at: Phase 166 context gathered
+Resume file: .planning/phases/166-hue-frontend-cutover/166-CONTEXT.md

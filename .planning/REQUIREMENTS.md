@@ -11,7 +11,7 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 
 - [ ] **PATH-01**: Tutte le route thermorossi migrate da /api/stove/* a /api/v1/thermorossi/*
 - [ ] **PATH-02**: Frontend (hooks, componenti, debug panels) aggiornato ai nuovi path thermorossi
-- [ ] **COMMON-01**: GET /health ritorna stato aggregato di tutti i provider
+- [ ] **COMMON-01**: GET /health ritorna stato aggregato di tutti i provider -- *auth: none (public probe) -- canonical endpoint is `/api/health` (simple ping for OnlineStatusContext/uptime monitors); `/health` aggregator remains authenticated per CR-003 topology-leak guard*
 - [ ] **COMMON-02**: GET /api/v1/devices ritorna lista aggregata dispositivi cross-provider
 
 ### Auth

@@ -23,7 +23,7 @@ re_verification: false
 |---|-------|--------|----------|
 | 1 | GET /api/v1/thermorossi/status returns stove telemetry (200) | VERIFIED | `app/api/v1/thermorossi/status/route.ts` exports GET, imports `getStatus` from thermorossiProxy, returns `success(data)` |
 | 2 | POST /api/v1/thermorossi/commands/ignit returns 202 Accepted | VERIFIED | `app/api/v1/thermorossi/commands/ignit/route.ts` exports POST via `withIdempotency`, calls `sendIgnit()`, returns `success(data, null, HTTP_STATUS.ACCEPTED)` |
-| 3 | GET /health returns providers object with 8 provider keys | VERIFIED | `app/health/route.ts` uses `Promise.allSettled` over all 8 providers; builds `providers` object with keys: thermorossi, netatmo, hue, sonos, dirigera, tuya, raspi, fritzbox |
+| 3 | GET /health returns providers object with 8 provider keys | VERIFIED | `app/health/route.ts` uses `Promise.allSettled` over all 8 providers; builds `providers` object with keys: thermorossi, netatmo, hue, sonos, dirigera, tuya, raspi, fritzbox (authenticated via withAuthAndErrorHandler; see note in REQUIREMENTS.md COMMON-01 -- OnlineStatusContext uses unauthenticated /api/health not /health) |
 | 4 | GET /api/v1/devices returns items array with provider_type field | VERIFIED | `app/api/v1/devices/route.ts` calls `fritzboxClient.getDevices()`, maps to items with `provider_type: 'fritzbox'`, returns paginated envelope |
 | 5 | Old /api/stove/* directories no longer exist on disk | VERIFIED | `test -d app/api/stove` returns false; directory confirmed deleted |
 | 6 | No frontend file references /api/stove/ (excluding lib/version.ts changelog) | VERIFIED | Full codebase grep returns 0 matches across all .ts/.tsx files (excluding node_modules, .next, lib/version.ts) |
@@ -49,7 +49,7 @@ re_verification: false
 | `app/api/v1/thermorossi/settings/power/route.ts` | Stove set-power POST endpoint | VERIFIED | Exists, exports POST, has `force-dynamic` |
 | `app/api/v1/thermorossi/settings/fan-level/route.ts` | Stove set-fan POST endpoint | VERIFIED | Exists, exports POST, has `force-dynamic` |
 | `app/api/v1/thermorossi/settings/temperature/water/route.ts` | Stove set-water-temp POST endpoint | VERIFIED | Exists, exports POST, has `force-dynamic` |
-| `app/health/route.ts` | Aggregated health endpoint (unauthenticated) | VERIFIED | Exists, uses `withErrorHandler`, `Promise.allSettled` over 8 providers, returns ok/degraded/down |
+| `app/health/route.ts` | Aggregated health endpoint (authenticated) | VERIFIED | Exists, uses `withAuthAndErrorHandler`, `Promise.allSettled` over 8 providers, returns ok/degraded/down |
 | `app/api/v1/devices/route.ts` | Aggregated devices endpoint (authenticated) | VERIFIED | Exists, uses `withAuthAndErrorHandler`, maps fritzbox devices with `provider_type` field |
 | `lib/commands/deviceCommands.tsx` | Command palette stove actions with correct API paths | VERIFIED | 10 occurrences of `/api/v1/thermorossi/`, zero of `/api/stove/`; uses `{ value: }` body key (not `{ level: }`) |
 | `app/sw.ts` | Service worker with updated stove status path | VERIFIED | Exactly 2 occurrences of `/api/v1/thermorossi/status`, zero of `/api/stove/` |
@@ -94,7 +94,7 @@ Step 7b: SKIPPED — no runnable server available without `npm run dev`; all che
 |-------------|------------|-------------|--------|----------|
 | PATH-01 | 156-01 | Tutte le route thermorossi migrate da /api/stove/* a /api/v1/thermorossi/* | SATISFIED | 10 route files exist at canonical paths; `app/api/stove/` deleted; all 10 import from thermorossiProxy |
 | PATH-02 | 156-02 | Frontend (hooks, componenti, debug panels) aggiornato ai nuovi path thermorossi | SATISFIED | Zero `/api/stove/` refs in any .ts/.tsx (excl. version.ts); STOVE_ROUTES updated; sw.ts updated; debug panels updated |
-| COMMON-01 | 156-01 | GET /health ritorna stato aggregato di tutti i provider | SATISFIED | `app/health/route.ts` implements unauthenticated 8-provider fan-out returning `{ status, providers }` |
+| COMMON-01 | 156-01 | GET /health ritorna stato aggregato di tutti i provider | SATISFIED | `app/health/route.ts` implements 8-provider fan-out returning `{ status, providers }` (aggregator authenticated per CR-003 for topology-leak prevention; canonical unauthenticated probe is /api/health -- see REQUIREMENTS.md note) |
 | COMMON-02 | 156-01 | GET /api/v1/devices ritorna lista aggregata dispositivi cross-provider | SATISFIED | `app/api/v1/devices/route.ts` implements authenticated fritzbox device list with `provider_type` discriminator |
 
 No orphaned requirements — all 4 requirements declared in REQUIREMENTS.md for Phase 156 are covered by plan declarations and verified in the codebase.

@@ -134,3 +134,5 @@ None — no new security surface beyond what T-163-01..T-163-05 already enumerat
 - [x] `app/api/dirigera/*` untouched (D-02 honored)
 - [x] `PaginatedResponse<T>` NOT used (D-08 honored)
 - [x] `SensorHistoryParams`/`SensorTelemetryParams` NOT exported from `types/common.ts` (D-07 honored)
+
+**Phase 165 addendum (2026-04-16):** Deferred items resolved. `deferred-items.md` removed. `npx tsc --noEmit` clean.

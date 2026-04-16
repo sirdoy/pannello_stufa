@@ -1,4 +1,4 @@
-import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow, HTTP_STATUS } from '@/lib/core';
+import { withAuthAndErrorHandler, withIdempotency, success, parseJsonOrThrow, HTTP_STATUS, badRequest } from '@/lib/core';
 import { setPower } from '@/lib/stove/thermorossiProxy';
 
 export const dynamic = 'force-dynamic';
@@ -16,10 +16,7 @@ export const POST = withAuthAndErrorHandler(
     const value = body['value'];
 
     if (typeof value !== 'number' || !Number.isFinite(value)) {
-      return Response.json(
-        { success: false, error: 'value must be a finite number' },
-        { status: 400 }
-      );
+      return badRequest('value must be a finite number');
     }
 
     const data = await setPower(value);

@@ -7,13 +7,19 @@ jest.mock('@/lib/automations');
 jest.mock('@/lib/auth0', () => ({
   auth0: { getSession: jest.fn() },
 }));
+jest.mock('@/lib/core/requestParser', () => ({
+  ...jest.requireActual('@/lib/core/requestParser'),
+  parseJson: jest.fn(),
+}));
 
 import { GET, POST } from '../route';
 import { automationsProxy } from '@/lib/automations';
 import { auth0 } from '@/lib/auth0';
+import { parseJson } from '@/lib/core/requestParser';
 
 const mockGetSession = jest.mocked(auth0.getSession);
 const mockAutomationsProxy = jest.mocked(automationsProxy);
+const mockParseJson = jest.mocked(parseJson);
 
 const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
@@ -81,6 +87,8 @@ describe('POST /api/v1/automations', () => {
     mockGetSession.mockResolvedValue(mockSession as any);
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
+    // Default: parseJson returns a valid body for POST tests
+    mockParseJson.mockResolvedValue({ name: 'Test Rule' } as any);
   });
 
   it('returns 401 when not authenticated', async () => {
@@ -123,6 +131,19 @@ describe('POST /api/v1/automations', () => {
 
     await POST(request as any, {} as any);
 
-    expect(mockAutomationsProxy.createAutomation).toHaveBeenCalledWith(expect.any(Object));
+    expect(mockAutomationsProxy.createAutomation).toHaveBeenCalledWith({ name: 'Test Rule' });
+  });
+
+  it('returns 400 when body is missing required name field', async () => {
+    mockParseJson.mockResolvedValue({ enabled: true } as any);
+    const request = new Request('http://localhost:3000/api/v1/automations', {
+      method: 'POST',
+      body: JSON.stringify({ enabled: true }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const response = await POST(request as any, {} as any);
+
+    expect(response.status).toBe(400);
   });
 });

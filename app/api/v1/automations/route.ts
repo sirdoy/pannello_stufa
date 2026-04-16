@@ -1,5 +1,12 @@
-import { withAuthAndErrorHandler, success, created, parseQuery, parseJson } from '@/lib/core';
+import { z } from 'zod';
+import { withAuthAndErrorHandler, success, created, badRequest, parseQuery, parseJson } from '@/lib/core';
 import { automationsProxy } from '@/lib/automations';
+
+const automationCreateSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().nullable().optional(),
+  enabled: z.boolean().optional(),
+});
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +28,10 @@ export const GET = withAuthAndErrorHandler(async (request) => {
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
   const body = await parseJson(request);
-  const data = await automationsProxy.createAutomation(body);
+  const result = automationCreateSchema.safeParse(body);
+  if (!result.success) {
+    return badRequest(result.error.issues.map(i => i.message).join(', '));
+  }
+  const data = await automationsProxy.createAutomation(result.data);
   return created(data as unknown as Record<string, unknown>);
 }, 'Automations/Create');

@@ -1,8 +1,11 @@
 ---
 phase: 162
 slug: fritz-box-gap-closure
-status: draft
+status: partial_accepted
 nyquist_compliant: false
+accepted_as: partial
+accepted_by: phase-165-hygiene
+accepted_date: 2026-04-15
 wave_0_complete: false
 created: 2026-04-09
 ---
@@ -79,3 +82,22 @@ created: 2026-04-09
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## Resolution (Phase 165 Hygiene Closeout)
+
+**Resolved:** 2026-04-15
+**Verdict:** `partial_accepted` -- `nyquist_compliant: false`
+
+**Tests present (covering phase requirements):**
+- `app/api/v1/fritzbox/telephony/**/__tests__/route.test.ts` -- DECT, calls, TAM routes (FRITZ-01..03)
+- `app/api/v1/fritzbox/history/**/__tests__/route.test.ts` -- raw bandwidth, device, device-events history (FRITZ-04..06)
+- `app/api/v1/fritzbox/service-discovery/__tests__/route.test.ts` -- TR-064 service descriptor (FRITZ-07)
+
+**Tests acceptably missing:**
+- Consumer UI for telephony/raw-history/service-discovery -- tracked in Phase 171 (Fritz!Box Consumer UI).
+
+**Accepted-as:** partial. Backend + XML parsing tested; consumer UI tracked in Phase 171.
+
+**Reference:** Phase 165 CONTEXT D-11, D-12. v19.0 audit `nyquist.partial_phases` entry.

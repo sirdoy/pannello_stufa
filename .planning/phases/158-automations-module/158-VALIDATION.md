@@ -1,8 +1,11 @@
 ---
 phase: 158
 slug: automations-module
-status: draft
+status: partial_accepted
 nyquist_compliant: false
+accepted_as: partial
+accepted_by: phase-165-hygiene
+accepted_date: 2026-04-15
 wave_0_complete: false
 created: 2026-04-08
 ---
@@ -77,3 +80,23 @@ created: 2026-04-08
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## Resolution (Phase 165 Hygiene Closeout)
+
+**Resolved:** 2026-04-15
+**Verdict:** `partial_accepted` -- `nyquist_compliant: false`
+
+**Tests present (covering phase requirements):**
+- `app/api/v1/automations/__tests__/route.test.ts` -- CRUD list/create routes (AUTO-01, AUTO-02)
+- `app/api/v1/automations/[rule_id]/__tests__/route.test.ts` -- single rule GET/PATCH/DELETE (AUTO-03..05)
+- `app/api/v1/automations/[rule_id]/executions/__tests__/route.test.ts` -- execution history (AUTO-06)
+- Phase 158 includes frontend pages (nav entry + rules list + rule detail)
+
+**Tests acceptably missing:**
+- None significant -- this is a full-stack phase with both API and UI wired.
+
+**Accepted-as:** partial. Only `draft` frontmatter marker needed upgrade; phase is functionally complete.
+
+**Reference:** Phase 165 CONTEXT D-11, D-12. v19.0 audit `nyquist.partial_phases` entry.

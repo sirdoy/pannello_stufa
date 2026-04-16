@@ -1,8 +1,11 @@
 ---
 phase: 159
 slug: hue-gap-closure
-status: draft
+status: partial_accepted
 nyquist_compliant: false
+accepted_as: partial
+accepted_by: phase-165-hygiene
+accepted_date: 2026-04-15
 wave_0_complete: false
 created: 2026-04-09
 ---
@@ -72,3 +75,23 @@ created: 2026-04-09
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## Resolution (Phase 165 Hygiene Closeout)
+
+**Resolved:** 2026-04-15
+**Verdict:** `partial_accepted` -- `nyquist_compliant: false`
+
+**Tests present (covering phase requirements):**
+- `app/api/v1/hue/health/__tests__/route.test.ts` -- bridge health (HUE-01)
+- `app/api/v1/hue/lights/[lightId]/__tests__/route.test.ts` -- single light GET (HUE-02)
+- `app/api/v1/hue/lights/[lightId]/state/__tests__/route.test.ts` -- light state PUT (HUE-03)
+- `app/api/v1/hue/groups/__tests__/route.test.ts` -- groups list + single group + group action + scene activation (HUE-04..07)
+
+**Tests acceptably missing:**
+- Hook/UI migration to new v1 routes -- tracked in Phase 166 (Hue Frontend Cutover). Not a Nyquist gap for a backend-boundary phase.
+
+**Accepted-as:** partial. Backend tested; frontend integration tracked in Phase 166.
+
+**Reference:** Phase 165 CONTEXT D-11, D-12. v19.0 audit `nyquist.partial_phases` entry.

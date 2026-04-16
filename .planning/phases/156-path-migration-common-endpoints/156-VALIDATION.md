@@ -1,8 +1,11 @@
 ---
 phase: 156
 slug: path-migration-common-endpoints
-status: draft
+status: partial_accepted
 nyquist_compliant: false
+accepted_as: partial
+accepted_by: phase-165-hygiene
+accepted_date: 2026-04-15
 wave_0_complete: false
 created: 2026-04-07
 ---
@@ -75,3 +78,23 @@ created: 2026-04-07
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## Resolution (Phase 165 Hygiene Closeout)
+
+**Resolved:** 2026-04-15
+**Verdict:** `partial_accepted` -- `nyquist_compliant: false`
+
+**Tests present (covering phase requirements):**
+- `app/api/v1/thermorossi/**/__tests__/route.test.ts` -- canonical path-migration routes (PATH-01)
+- `__tests__/components/devices/stove/hooks/useStoveData.test.ts` -- hook targets canonical paths (PATH-02)
+- `app/health/route.ts` / `app/api/v1/devices/route.ts` -- aggregator routes exist, smoke-tested during verification (COMMON-01, COMMON-02)
+
+**Tests acceptably missing:**
+- Integration tests for `/health` aggregator fan-out -- deferred to phases 166-171 frontend cutovers where consumer UIs create observable test entry points. Not a Nyquist gap for a backend-boundary phase.
+- E2E test for service-worker legacy-path cache eviction -- manual verification already documented in 156-VALIDATION.md Manual-Only Verifications table.
+
+**Accepted-as:** partial. PATH-01/PATH-02 regression closed in Phase 164; COMMON-01 spec divergence reconciled in Phase 165 plan-01. Backend behaviour matches spec.
+
+**Reference:** Phase 165 CONTEXT D-11, D-12. v19.0 audit `nyquist.partial_phases` entry.

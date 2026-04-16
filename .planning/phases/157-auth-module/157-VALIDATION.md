@@ -1,8 +1,11 @@
 ---
 phase: 157
 slug: auth-module
-status: draft
+status: partial_accepted
 nyquist_compliant: false
+accepted_as: partial
+accepted_by: phase-165-hygiene
+accepted_date: 2026-04-15
 wave_0_complete: false
 created: 2026-04-08
 ---
@@ -75,3 +78,20 @@ created: 2026-04-08
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## Resolution (Phase 165 Hygiene Closeout)
+
+**Resolved:** 2026-04-15
+**Verdict:** `partial_accepted` -- `nyquist_compliant: false`
+
+**Tests present (covering phase requirements):**
+- `app/api/auth/**/__tests__/route.test.ts` -- auth proxy client, login, api-keys CRUD routes (AUTH-01..04)
+
+**Tests acceptably missing:**
+- Login form + API-keys management UI E2E -- tracked in Phase 170 (Auth UI). Not a Nyquist gap for this backend-only phase.
+
+**Accepted-as:** partial. Backend routes tested; UI consumer deferred to Phase 170 per roadmap.
+
+**Reference:** Phase 165 CONTEXT D-11, D-12. v19.0 audit `nyquist.partial_phases` entry.

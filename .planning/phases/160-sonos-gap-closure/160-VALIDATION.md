@@ -1,8 +1,11 @@
 ---
 phase: 160
 slug: sonos-gap-closure
-status: draft
+status: partial_accepted
 nyquist_compliant: false
+accepted_as: partial
+accepted_by: phase-165-hygiene
+accepted_date: 2026-04-15
 wave_0_complete: false
 created: 2026-04-09
 ---
@@ -76,3 +79,22 @@ created: 2026-04-09
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## Resolution (Phase 165 Hygiene Closeout)
+
+**Resolved:** 2026-04-15
+**Verdict:** `partial_accepted` -- `nyquist_compliant: false`
+
+**Tests present (covering phase requirements):**
+- `app/api/v1/sonos/zones/[groupId]/playback/__tests__/route.test.ts` -- playback GET (SONOS-01)
+- `app/api/v1/sonos/zones/[groupId]/{play,pause,stop,next,previous}/__tests__/route.test.ts` -- transport POSTs (SONOS-02..06)
+- `app/api/v1/sonos/zones/[groupId]/{volume,seek,queue,play-mode,sleep-timer}/__tests__/route.test.ts` -- remaining endpoints (SONOS-07..13)
+
+**Tests acceptably missing:**
+- Hook/UI migration to new v1 zone routes -- tracked in Phase 167 (Sonos Frontend Cutover).
+
+**Accepted-as:** partial. Backend tested; frontend integration tracked in Phase 167.
+
+**Reference:** Phase 165 CONTEXT D-11, D-12. v19.0 audit `nyquist.partial_phases` entry.

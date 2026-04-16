@@ -1,8 +1,11 @@
 ---
 phase: 161
 slug: netatmo-gap-closure
-status: draft
+status: partial_accepted
 nyquist_compliant: false
+accepted_as: partial
+accepted_by: phase-165-hygiene
+accepted_date: 2026-04-15
 wave_0_complete: false
 created: 2026-04-09
 ---
@@ -77,3 +80,20 @@ created: 2026-04-09
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## Resolution (Phase 165 Hygiene Closeout)
+
+**Resolved:** 2026-04-15
+**Verdict:** `partial_accepted` -- `nyquist_compliant: false`
+
+**Tests present (covering phase requirements):**
+- `app/api/v1/netatmo/**/__tests__/route.test.ts` -- thermostat state, valve calibration, camera endpoints, home management (NETA-01..09, 30+ tests per 161-01-SUMMARY)
+
+**Tests acceptably missing:**
+- UI migration to v1 netatmo routes -- tracked in Phase 168 (Netatmo Frontend Cutover).
+
+**Accepted-as:** partial. Backend tested with 30+ route tests; frontend integration tracked in Phase 168.
+
+**Reference:** Phase 165 CONTEXT D-11, D-12. v19.0 audit `nyquist.partial_phases` entry.

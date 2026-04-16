@@ -183,8 +183,12 @@ Plans:
   3. 163 deferred-items.md tsc errors (AutomationCreate cast + 3 thermorossi settings NextResponse) resolved or formally deferred with issue link
   4. Phases 156-162 VALIDATION.md upgraded from draft to nyquist_compliant (or PARTIAL explicitly accepted)
 **Plans:** 2 plans
-- [x] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [x] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+Plans:
+- [ ] 165-01-PLAN.md — SUMMARY hash sweep + /health spec reconciliation + 4 tsc fixes + deferred-items cleanup
+- [ ] 165-02-PLAN.md — VALIDATION.md promotion (156-162) + audit closeout
+
+
+
 
 ### Phase 166: Hue Frontend Cutover
 **Goal**: Production Hue UI consumes /api/v1/hue/* exclusively; Firebase adminDbPush logging triggers on real user commands

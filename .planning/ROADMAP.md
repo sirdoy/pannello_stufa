@@ -184,8 +184,8 @@ Plans:
   4. Phases 156-162 VALIDATION.md upgraded from draft to nyquist_compliant (or PARTIAL explicitly accepted)
 **Plans:** 2 plans
 Plans:
-- [ ] 165-01-PLAN.md — SUMMARY hash sweep + /health spec reconciliation + 4 tsc fixes + deferred-items cleanup
-- [ ] 165-02-PLAN.md — VALIDATION.md promotion (156-162) + audit closeout
+- [x] 165-01-PLAN.md — SUMMARY hash sweep + /health spec reconciliation + 4 tsc fixes + deferred-items cleanup
+- [x] 165-02-PLAN.md — VALIDATION.md promotion (156-162) + audit closeout
 
 
 
@@ -200,9 +200,14 @@ Plans:
   2. `app/lights/page.tsx` and `app/lights/scenes/page.tsx` no longer reference `/api/hue/*`
   3. Manual toggle from `/lights` produces a row in Firebase Hue command log
   4. Jest + Playwright smoke green
-**Plans:** 2 plans
-- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+**Plans:** 3 plans
+Plans:
+- [ ] 166-01-PLAN.md — Create v1 lights list + scenes list routes with tests
+- [ ] 166-02-PLAN.md — Rewrite all frontend URLs (hooks, pages, modals, debug panels, registry)
+- [ ] 166-03-PLAN.md — Delete legacy app/api/hue/ tree + final grep sweep
+
+
+
 
 ### Phase 167: Sonos Frontend Cutover
 **Goal**: All Sonos hooks and components consume /api/v1/sonos/* zone endpoints
@@ -331,8 +336,8 @@ See git history and `.planning/milestones/` for details.
 | 162. Fritz!Box Gap Closure | v19.0 | 2/2 | Complete    | 2026-04-09 |
 | 163. DIRIGERA Gap Closure | v19.0 | 1/1 | Complete   | 2026-04-14 |
 | 164. Phase 156 Regression Fix | v19.0 | 2/2 | Complete   | 2026-04-15 |
-| 165. Milestone Hygiene & Spec Alignment | v19.0 | 0/? | Pending    | — |
-| 166. Hue Frontend Cutover | v19.0 | 0/? | Pending    | — |
+| 165. Milestone Hygiene & Spec Alignment | v19.0 | 2/2 | Complete   | 2026-04-16 |
+| 166. Hue Frontend Cutover | v19.0 | 0/3 | Planned    | — |
 | 167. Sonos Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 168. Netatmo Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 169. DIRIGERA Frontend Cutover | v19.0 | 0/? | Pending    | — |

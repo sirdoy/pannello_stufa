@@ -4,7 +4,7 @@
  * Encapsulates all Philips Hue lights state management:
  * - WebSocket primary channel: subscribes to 'hue' topic (MIG-07)
  * - HTTP polling fallback (60s, alwaysActive:false) when WS is unavailable (MIG-08)
- * - Connection checking via /api/hue/status (data_freshness-based staleness)
+ * - Connection checking via /api/v1/hue/health (data_freshness-based staleness)
  * - Data fetching (groups, lights, scenes) using proxy-native flat shapes
  * - Derived state computation
  * - Dynamic styling based on room light colors
@@ -133,7 +133,7 @@ export function useLightsData(): UseLightsDataReturn {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/hue/status');
+      const response = await fetch('/api/v1/hue/health');
       if (!response.ok) {
         // 503 = Bridge UNREACHABLE
         setConnected(false);
@@ -157,7 +157,7 @@ export function useLightsData(): UseLightsDataReturn {
   // Standalone fetchScenes for fire-and-forget from WS handleMessage (D-14)
   async function fetchScenes() {
     try {
-      const res = await fetch('/api/hue/scenes');
+      const res = await fetch('/api/v1/hue/scenes');
       if (!res.ok) return;
       const data = await res.json() as { scenes?: HueScene[] };
       setScenes(data.scenes ?? []);
@@ -213,9 +213,9 @@ export function useLightsData(): UseLightsDataReturn {
     try {
       setError(null);
       const [groupsRes, lightsRes, scenesRes] = await Promise.all([
-        fetch('/api/hue/rooms'),
-        fetch('/api/hue/lights'),
-        fetch('/api/hue/scenes'),
+        fetch('/api/v1/hue/groups'),
+        fetch('/api/v1/hue/lights'),
+        fetch('/api/v1/hue/scenes'),
       ]);
       const [groupsData, lightsData, scenesData] = await Promise.all([
         groupsRes.json() as Promise<{ groups?: HueGroup[]; reconnect?: boolean; error?: string; success?: boolean }>,

@@ -60,8 +60,8 @@ export default function ScenesPage() {
     try {
       setError(null);
       const [scenesRes, roomsRes] = await Promise.all([
-        fetch('/api/hue/scenes'),
-        fetch('/api/hue/rooms'),
+        fetch('/api/v1/hue/scenes'),
+        fetch('/api/v1/hue/groups'),
       ]);
       const [scenesData, roomsData]: any[] = await Promise.all([
         scenesRes.json(),
@@ -87,7 +87,7 @@ export default function ScenesPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/hue/status');
+      const response = await fetch('/api/v1/hue/health');
       const data = await response.json();
       if (data.connected) { setConnected(true); await fetchData(); }
       else { setConnected(false); }
@@ -111,7 +111,7 @@ export default function ScenesPage() {
       setActivatingScene(sceneId);
       setError(null);
       setSuccess(null);
-      const response = await fetch(`/api/hue/groups/${groupId}/scenes/${sceneId}`, { method: 'POST' });
+      const response = await fetch(`/api/v1/hue/groups/${groupId}/scenes/${sceneId}`, { method: 'POST' });
       if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
       setSuccess(`Scena "${sceneName}" attivata con successo`);
       setTimeout(() => setSuccess(null), 3000);

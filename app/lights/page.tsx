@@ -23,7 +23,7 @@ export default function LightsPage() {
     try {
       lightsData.setRefreshing(true);
       lightsData.setError(null);
-      const res = await fetch(`/api/hue/lights/${lightId}`, {
+      const res = await fetch(`/api/v1/hue/lights/${lightId}/state`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ on }),
       });
@@ -39,7 +39,7 @@ export default function LightsPage() {
     try {
       lightsData.setRefreshing(true);
       lightsData.setError(null);
-      const res = await fetch(`/api/hue/lights/${lightId}`, {
+      const res = await fetch(`/api/v1/hue/lights/${lightId}/state`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bri: Math.round(pct * 254 / 100) }),
       });
@@ -55,7 +55,7 @@ export default function LightsPage() {
     try {
       setChangingColor(lightId);
       lightsData.setError(null);
-      const res = await fetch(`/api/hue/lights/${lightId}`, {
+      const res = await fetch(`/api/v1/hue/lights/${lightId}/state`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ xy: [preset.xy.x, preset.xy.y] }),
       });

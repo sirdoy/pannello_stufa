@@ -91,7 +91,7 @@ export default function EditSceneModal({
       setLoadingLights(true);
       setError('');
 
-      const response = await fetch('/api/hue/lights');
+      const response = await fetch('/api/v1/hue/lights');
       const data = await response.json();
 
       if (data.error) throw new Error(data.error);

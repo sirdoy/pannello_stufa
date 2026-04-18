@@ -82,7 +82,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
       lightsData.setLoadingMessage(on ? 'Accensione luci...' : 'Spegnimento luci...');
       lightsData.setRefreshing(true);
       lightsData.setError(null);
-      const response = await hueRoomCmd.execute(`/api/hue/rooms/${groupId}`, {
+      const response = await hueRoomCmd.execute(`/api/v1/hue/groups/${groupId}/action`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ on }),  // v1 flat: { on: true }, NOT { on: { on: true } }
@@ -118,7 +118,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
       lightsData.setError(null);
       // Convert percent (0-100) to bri (0-254)
       const bri254 = Math.round(parseFloat(brightness) * 254 / 100);
-      const response = await hueRoomCmd.execute(`/api/hue/rooms/${groupId}`, {
+      const response = await hueRoomCmd.execute(`/api/v1/hue/groups/${groupId}/action`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bri: bri254 }),  // v1 flat: { bri: 200 }, NOT { dimming: { brightness: 78 } }
@@ -144,15 +144,15 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
 
   /**
    * Activate a scene
-   * POST /api/hue/groups/{groupId}/scenes/{sceneId} — new path from Phase 107
+   * POST /api/v1/hue/groups/{groupId}/scenes/{sceneId}
    */
   const handleSceneActivate = async (sceneId: string, groupId: string) => {
     try {
       lightsData.setLoadingMessage('Attivazione scena...');
       lightsData.setRefreshing(true);
       lightsData.setError(null);
-      // POST /api/hue/groups/{groupId}/scenes/{sceneId} — new path from Phase 107
-      const response = await hueSceneCmd.execute(`/api/hue/groups/${groupId}/scenes/${sceneId}`, {
+      // POST /api/v1/hue/groups/{groupId}/scenes/{sceneId}
+      const response = await hueSceneCmd.execute(`/api/v1/hue/groups/${groupId}/scenes/${sceneId}`, {
         method: 'POST',
       });
       if (response) {
@@ -185,7 +185,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
       // Iterate groups by group_id (NOT grouped_light service lookup)
       await Promise.all(
         lightsData.groups.map((group) =>
-          hueRoomCmd.execute(`/api/hue/rooms/${group.group_id}`, {
+          hueRoomCmd.execute(`/api/v1/hue/groups/${group.group_id}/action`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ on }),  // v1 flat

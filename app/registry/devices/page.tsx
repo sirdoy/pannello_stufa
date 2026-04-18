@@ -146,7 +146,7 @@ async function fetchProviderDevices(provider: string): Promise<ProviderDevice[]>
   try {
     switch (provider) {
       case 'hue': {
-        const res = await fetch('/api/hue/lights');
+        const res = await fetch('/api/v1/hue/lights');
         if (!res.ok) return [];
         const json = (await res.json()) as { lights: { light_id: string; name: string }[] };
         return (json.lights ?? []).map(l => ({ device_id: l.light_id, name: l.name }));

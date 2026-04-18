@@ -59,7 +59,7 @@ describe('HueTab (/debug)', () => {
     const button = screen.getByRole('button', { name: /Execute Control Light/i });
     fireEvent.click(button);
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/hue/lights/'),
+      expect.stringContaining('/api/v1/hue/lights/'),
       expect.objectContaining({ method: 'PUT' })
     );
   });
@@ -69,7 +69,7 @@ describe('HueTab (/debug)', () => {
     const button = screen.getByRole('button', { name: /Execute Control Room/i });
     fireEvent.click(button);
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/hue/rooms/'),
+      expect.stringContaining('/api/v1/hue/groups/'),
       expect.objectContaining({ method: 'PUT' })
     );
   });
@@ -79,7 +79,7 @@ describe('HueTab (/debug)', () => {
     const button = screen.getByRole('button', { name: /Execute Activate Scene/i });
     fireEvent.click(button);
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/hue/groups/test-id/scenes/test-id'),
+      expect.stringContaining('/api/v1/hue/groups/test-id/scenes/test-id'),
       expect.objectContaining({ method: 'POST' })
     );
   });

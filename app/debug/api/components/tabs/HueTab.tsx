@@ -51,10 +51,10 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
   };
 
   const fetchAllGetEndpoints = () => {
-    fetchGetEndpoint('status', '/api/hue/status');
-    fetchGetEndpoint('lights', '/api/hue/lights');
-    fetchGetEndpoint('rooms', '/api/hue/rooms');
-    fetchGetEndpoint('scenes', '/api/hue/scenes');
+    fetchGetEndpoint('status', '/api/v1/hue/health');
+    fetchGetEndpoint('lights', '/api/v1/hue/lights');
+    fetchGetEndpoint('rooms', '/api/v1/hue/groups');
+    fetchGetEndpoint('scenes', '/api/v1/hue/scenes');
   };
 
   const callPostEndpoint = async (name: string, url: string, body: any) => {
@@ -149,48 +149,48 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
         <div className="space-y-3">
           <EndpointCard
             name="Bridge Status"
-            url="/api/hue/status"
+            url="/api/v1/hue/health"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource"
             response={getResponses.status}
             loading={loadingGet.status ?? false}
             timing={timings.status}
-            onRefresh={() => fetchGetEndpoint('status', '/api/hue/status')}
+            onRefresh={() => fetchGetEndpoint('status', '/api/v1/hue/health')}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource')}
             isCopied={copiedUrl === 'https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource'}
           />
 
           <EndpointCard
             name="Lights"
-            url="/api/hue/lights"
+            url="/api/v1/hue/lights"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/light"
             response={getResponses.lights}
             loading={loadingGet.lights ?? false}
             timing={timings.lights}
-            onRefresh={() => fetchGetEndpoint('lights', '/api/hue/lights')}
+            onRefresh={() => fetchGetEndpoint('lights', '/api/v1/hue/lights')}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/light')}
             isCopied={copiedUrl === 'https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/light'}
           />
 
           <EndpointCard
             name="Rooms"
-            url="/api/hue/rooms"
+            url="/api/v1/hue/groups"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/room"
             response={getResponses.rooms}
             loading={loadingGet.rooms ?? false}
             timing={timings.rooms}
-            onRefresh={() => fetchGetEndpoint('rooms', '/api/hue/rooms')}
+            onRefresh={() => fetchGetEndpoint('rooms', '/api/v1/hue/groups')}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/room')}
             isCopied={copiedUrl === 'https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/room'}
           />
 
           <EndpointCard
             name="Scenes"
-            url="/api/hue/scenes"
+            url="/api/v1/hue/scenes"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene"
             response={getResponses.scenes}
             loading={loadingGet.scenes ?? false}
             timing={timings.scenes}
-            onRefresh={() => fetchGetEndpoint('scenes', '/api/hue/scenes')}
+            onRefresh={() => fetchGetEndpoint('scenes', '/api/v1/hue/scenes')}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene')}
             isCopied={copiedUrl === 'https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene'}
           />
@@ -205,7 +205,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
         <div className="space-y-3">
           <PostEndpointCard
             name="Control Light"
-            url="/api/hue/lights/[id]"
+            url="/api/v1/hue/lights/[id]/state"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/light/{id}"
             params={[
               { name: 'lightId', label: 'Light ID', type: 'text', defaultValue: '' },
@@ -216,7 +216,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             loading={loadingPost.controlLight ?? false}
             timing={timings.controlLight}
             onExecute={(values) =>
-              callPutEndpoint('controlLight', `/api/hue/lights/${values.lightId}`, {
+              callPutEndpoint('controlLight', `/api/v1/hue/lights/${values.lightId}/state`, {
                 on: values.on === 'true',
                 bri: Math.round(Number(values.bri) * 254 / 100),
               })
@@ -227,7 +227,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
 
           <PostEndpointCard
             name="Control Room"
-            url="/api/hue/rooms/[id]"
+            url="/api/v1/hue/groups/[id]/action"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/grouped_light/{id}"
             params={[
               { name: 'roomId', label: 'Room ID', type: 'text', defaultValue: '' },
@@ -238,7 +238,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             loading={loadingPost.controlRoom ?? false}
             timing={timings.controlRoom}
             onExecute={(values) =>
-              callPutEndpoint('controlRoom', `/api/hue/rooms/${values.roomId}`, {
+              callPutEndpoint('controlRoom', `/api/v1/hue/groups/${values.roomId}/action`, {
                 on: values.on === 'true',
                 bri: Math.round(Number(values.bri) * 254 / 100),
               })
@@ -249,7 +249,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
 
           <PostEndpointCard
             name="Activate Scene"
-            url="/api/hue/groups/[groupId]/scenes/[sceneId]"
+            url="/api/v1/hue/groups/[groupId]/scenes/[sceneId]"
             externalUrl="https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene/{id}"
             params={[
               { name: 'groupId', label: 'Group ID', type: 'text', defaultValue: '' },
@@ -258,7 +258,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             response={postResponses.activateScene}
             loading={loadingPost.activateScene ?? false}
             timing={timings.activateScene}
-            onExecute={(values) => callPostEndpoint('activateScene', `/api/hue/groups/${values.groupId}/scenes/${values.sceneId}`, {})}
+            onExecute={(values) => callPostEndpoint('activateScene', `/api/v1/hue/groups/${values.groupId}/scenes/${values.sceneId}`, {})}
             onCopyUrl={() => copyUrlToClipboard('https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene/{id}')}
             isCopied={copiedUrl === 'https://api.meethue.com/bridge/{bridgeId}/clip/v2/resource/scene/{id}'}
           />

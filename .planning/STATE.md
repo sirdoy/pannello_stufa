@@ -4,8 +4,8 @@ milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: executing
 stopped_at: Phase 166 context gathered
-last_updated: "2026-04-16T07:45:52.196Z"
-last_activity: 2026-04-16 -- Phase 166 planning complete
+last_updated: "2026-04-18T07:25:58.904Z"
+last_activity: 2026-04-18 -- Phase 166 execution started
 progress:
   total_phases: 16
   completed_phases: 10
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 165 — Milestone Hygiene & Spec Alignment
+**Current focus:** Phase 166 — hue-frontend-cutover
 
 ## Current Position
 
-Phase: 165 (Milestone Hygiene & Spec Alignment) — EXECUTING
-Plan: 1 of 2
-Status: Ready to execute
-Last activity: 2026-04-16 -- Phase 166 planning complete
+Phase: 166 (hue-frontend-cutover) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 166
+Last activity: 2026-04-18 -- Phase 166 execution started
 
 Progress: [░░░░░░░░░░░░░░░░░░░] 0/0 plans (0%)
 

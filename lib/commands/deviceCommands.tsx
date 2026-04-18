@@ -87,7 +87,7 @@ async function executeThermostatAction(endpoint: string, body: Record<string, un
  */
 async function executeLightsAction(endpoint: string, method: string = 'PUT', body: Record<string, unknown> = {}): Promise<unknown> {
   try {
-    const response = await fetch(`/api/hue/${endpoint}`, {
+    const response = await fetch(`/api/v1/hue/${endpoint}`, {
       method,
       headers: { 'Content-Type': 'application/json' },
       ...(method !== 'GET' && { body: JSON.stringify(body) }),
@@ -276,16 +276,16 @@ function getLightsCommands(): CommandGroup {
         shortcut: '⌘⇧L',
         onSelect: async () => {
           try {
-            // Get all rooms and toggle each
-            const roomsRes = await fetch('/api/hue/rooms');
+            // Get all groups and toggle each
+            const roomsRes = await fetch('/api/v1/hue/groups');
             if (!roomsRes.ok) return;
             const roomsData = await roomsRes.json();
-            const rooms = roomsData.rooms || [];
+            const rooms = roomsData.groups || [];
 
             for (const room of rooms) {
               const groupedLightId = room.services?.find((s: { rtype?: string; rid?: string }) => s.rtype === 'grouped_light')?.rid;
               if (groupedLightId) {
-                await executeLightsAction(`rooms/${groupedLightId}`, 'PUT', { on: { on: true } });
+                await executeLightsAction(`groups/${groupedLightId}/action`, 'PUT', { on: { on: true } });
               }
             }
           } catch (err) {
@@ -299,15 +299,15 @@ function getLightsCommands(): CommandGroup {
         icon: <Moon className="w-4 h-4" />,
         onSelect: async () => {
           try {
-            const roomsRes = await fetch('/api/hue/rooms');
+            const roomsRes = await fetch('/api/v1/hue/groups');
             if (!roomsRes.ok) return;
             const roomsData = await roomsRes.json();
-            const rooms = roomsData.rooms || [];
+            const rooms = roomsData.groups || [];
 
             for (const room of rooms) {
               const groupedLightId = room.services?.find((s: { rtype?: string; rid?: string }) => s.rtype === 'grouped_light')?.rid;
               if (groupedLightId) {
-                await executeLightsAction(`rooms/${groupedLightId}`, 'PUT', { on: { on: false } });
+                await executeLightsAction(`groups/${groupedLightId}/action`, 'PUT', { on: { on: false } });
               }
             }
           } catch (err) {

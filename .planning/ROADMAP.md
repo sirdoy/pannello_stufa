@@ -204,7 +204,7 @@ Plans:
 Plans:
 - [x] 166-01-PLAN.md — Create v1 lights list + scenes list routes with tests
 - [x] 166-02-PLAN.md — Rewrite all frontend URLs (hooks, pages, modals, debug panels, registry)
-- [ ] 166-03-PLAN.md — Delete legacy app/api/hue/ tree + final grep sweep
+- [x] 166-03-PLAN.md — Delete legacy app/api/hue/ tree + final grep sweep
 
 
 
@@ -337,7 +337,7 @@ See git history and `.planning/milestones/` for details.
 | 163. DIRIGERA Gap Closure | v19.0 | 1/1 | Complete   | 2026-04-14 |
 | 164. Phase 156 Regression Fix | v19.0 | 2/2 | Complete   | 2026-04-15 |
 | 165. Milestone Hygiene & Spec Alignment | v19.0 | 2/2 | Complete   | 2026-04-16 |
-| 166. Hue Frontend Cutover | v19.0 | 2/3 | In Progress|  |
+| 166. Hue Frontend Cutover | v19.0 | 3/3 | Complete   | 2026-04-18 |
 | 167. Sonos Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 168. Netatmo Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 169. DIRIGERA Frontend Cutover | v19.0 | 0/? | Pending    | — |

@@ -618,31 +618,38 @@ npm run test:e2e
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **How to resolve the `homesdata` shape mismatch?**
    - What we know: CONTEXT D-14 asserts shapes are identical; they are not. `useThermostatData.checkConnection()` reads `data.home_id`; v1 response has `data.body.homes[0].id`.
    - What's unclear: Should the planner (a) rewrite `useThermostatData` to unwrap `body.homes[0]`, or (b) rewrite v1 `/api/v1/netatmo/homesdata/route.ts` to emit the flattened shape + Firebase side-effect?
    - Recommendation: Option (b) preserves Firebase-topology side-effect that `homestatus` enrichment depends on; is less invasive to consumers (just URL swap); maintains existing E2E behavior. Cost: v1 route is no longer a "thin proxy" (Phase 161 invariant). **Flag to user before writing plans.**
+   - **RESOLVED:** Plan 02 Task 2 Edit 2A rewrites `useThermostatData.checkConnection()` to unwrap `data.body?.homes?.[0]` and flatten it into the `NetatmoTopology` shape the rest of the hook expects. Option (a) was chosen over option (b) to preserve the v1 route's thin-proxy invariant (Phase 161). Trade-off: the Firebase topology side-effect (legacy home_id/topology persistence) is NOT ported to v1; accept documented UI regression (see Q2 resolution + WARNING 5 resolution).
+   - **Additional resolution:** Plan 02 adds a new Task 2E (or extends Task 2) to rewrite `lib/hooks/useRoomStatus.ts:80-89` to map v1 `/homestatus` field names: `setpoint ← therm_setpoint_temperature`, `heating ← (heating_power_request ?? 0) > 0`. Consumer grep confirmed `mode` and `endtime` are dereferenced by `app/thermostat/schedule/page.tsx:33`, `ActiveOverrideBadge.tsx:35,40`, and `ManualOverrideSheet.tsx:146` — set both fields to `null` with an inline comment rather than drop from `RoomListItem` (consumers gracefully handle `null` via existing falsy guards).
 
 2. **How to resolve the `homestatus` shape mismatch?**
    - Similar question for enriched fields (`setpoint`, `heating`, `room_type`, `lowBatteryModules`, `stoveSync`).
    - Recommendation: Same route-wrapper preservation approach — modify v1 `/api/v1/netatmo/homestatus/route.ts` to include topology enrichment and Firebase reads. Cost: same as Q1.
+   - **RESOLVED:** Plan 02 Task 2 Edit 2B rewrites `useThermostatData.fetchStatus()` to map v1 rooms (`therm_setpoint_temperature → setpoint`, `heating_power_request > 0 → heating`) and DROPS the Firebase topology/stoveSync side-effect entirely (option (a) again, preserving thin-proxy invariant). **Documented UI regression:** `stoveSync` badges in `RoomCard.tsx`/`ThermostatCard.tsx` will silently report `false` after cutover because v1 `/homestatus` does not enrich rooms with the stove-sync Firebase lookup. Logged in `168-DEFERRED.md` for a follow-up phase (port topology write-read into v1 routes if the badge signal is missed in production).
 
 3. **How to preserve camera snapshot `<img>` compatibility?**
    - Recommendation: Modify `/api/v1/netatmo/camera/[cameraId]/snapshot/route.ts` to emit 302 redirect (copy logic from legacy `camera/snapshot/route.ts`). One-line change, no consumer rewrite, no shape drift.
+   - **RESOLVED:** Plan 02 Task 1 Edit 1D rewrites `app/api/v1/netatmo/camera/[cameraId]/snapshot/route.ts` to emit `NextResponse.redirect(snapshot_url, { status: 302, headers: { 'Cache-Control': 'no-cache, no-store' } })`. Consumers using `<img src={CAMERA_ROUTES.snapshot(id)}>` continue to render without client-side rewrite.
 
 4. **Scope of legacy test file deletion in Plan 03?**
    - 11 legacy test files under `__tests__/app/api/netatmo/**` and `__tests__/api/netatmo/**`. Delete outright, or retarget each to its v1 handler?
    - Recommendation: Delete outright. V1 routes have their own co-located `__tests__/route.test.ts` per Phase 161's output pattern; legacy tests are redundant coverage.
+   - **RESOLVED:** Plan 03 Task 1 Step 4 runs `rm -rf __tests__/api/netatmo/` and `rm -rf __tests__/app/api/netatmo/` alongside the route-tree deletion. Total 13 legacy test files removed. Coverage preserved via Phase 161's co-located v1 route tests.
 
 5. **Is `lib/netatmo/netatmoCameraApi.ts:6` comment update required?**
    - Comment says `See: app/api/netatmo/camera/`. After tree deletion this points to nothing.
    - Recommendation: Include as micro-edit in Plan 02 (co-located with CameraCard JSDoc per D-06).
+   - **RESOLVED:** Plan 02 Task 3 extended to cover `lib/netatmo/netatmoCameraApi.ts:6` JSDoc — rewrite `* See: app/api/netatmo/camera/` → `* See: app/api/v1/netatmo/camera/`. Prevents Plan 03's repo-wide grep sweep from matching on this comment string and failing the Wave 3 gate.
 
 6. **Command palette: fix the latent hyphen bug?**
    - `deviceCommands.tsx:228,234,240` send `'set-therm-mode'` to `/api/netatmo/set-therm-mode` which has never existed. Cutover is natural time to fix.
    - Recommendation: YES — fix both URL prefix AND endpoint name together in Plan 02.
+   - **RESOLVED:** Plan 02 Task 1 Edit 1C fixes both: `executeThermostatAction` body rewritten to `fetch(\`/api/v1/netatmo/${endpoint}\`, ...)` (prefix) AND the 3 callers at lines 228, 234, 240 rewritten from `'set-therm-mode'` to `'setthermmode'` (hyphen bug). Acceptance criteria enforce both via grep (zero `'set-therm-mode'` + exactly 3 `'setthermmode'`).
 
 ---
 

@@ -235,9 +235,10 @@ Plans:
   2. Zero `/api/netatmo/` references in production code (debug panel may remain if explicitly scoped)
   3. Manual thermostat setpoint + valve calibrate exercised against canonical routes
   4. Jest + Playwright smoke green
-**Plans:** 2 plans
-- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+**Plans:** 3 plans
+- [ ] 168-01-PLAN.md — Rewrite both debug NetatmoTab files (42 URL swaps each, drop schedules tile, rewrite calibrate to valves/calibrate)
+- [ ] 168-02-PLAN.md — Rewrite production consumer surface (routes.ts, useThermostatData shape-unwrap, useScheduleData endpoint-collapse, deviceCommands hyphen-bug fix, camera monitoring path-segment + body change, v1 snapshot route 302 redirect, sw.ts dead-branch delete, 3 test files)
+- [ ] 168-03-PLAN.md — Delete legacy app/api/netatmo/ tree + 2 legacy __tests__/ dirs; repo-wide grep sweep; Jest + Playwright smoke regression
 
 ### Phase 169: DIRIGERA Frontend Cutover
 **Goal**: useDirigeraData consumes /api/v1/dirigera/* history, stats, telemetry
@@ -341,7 +342,7 @@ See git history and `.planning/milestones/` for details.
 | 165. Milestone Hygiene & Spec Alignment | v19.0 | 2/2 | Complete   | 2026-04-16 |
 | 166. Hue Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-18 |
 | 167. Sonos Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-20 |
-| 168. Netatmo Frontend Cutover | v19.0 | 0/? | Pending    | — |
+| 168. Netatmo Frontend Cutover | v19.0 | 0/3 | Pending    | — |
 | 169. DIRIGERA Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 170. Auth UI | v19.0 | 0/? | Pending    | — |
 | 171. Fritz!Box Consumer UI | v19.0 | 0/? | Pending    | — |

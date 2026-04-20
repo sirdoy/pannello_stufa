@@ -46,8 +46,8 @@ created: 2026-04-20
 | 168-02-04 | 02 | 2 | — | — | `app/sw.ts` has no `/api/netatmo/` branch | grep | `! grep -n "/api/netatmo/" app/sw.ts` | ✅ | ⬜ pending |
 | 168-02-05 | 02 | 2 | — | — | `app/thermostat/page.test.tsx` mocks match v1 endpoints | grep + jest | `grep -n "/api/v1/netatmo/homesdata" app/thermostat/page.test.tsx && npx jest app/thermostat/page.test.tsx` | ✅ | ⬜ pending |
 | 168-02-06 | 02 | 2 | — | — | Command palette `deviceCommands.tsx` POSTs to v1 setthermmode (fix hyphen bug) | grep | `grep -n "/api/v1/netatmo/setthermmode" lib/commands/deviceCommands.tsx` | ✅ | ⬜ pending |
-| 168-02-07 | 02 | 2 | NETA-09 | — | `useThermostatData` consumes v1 routes | grep | `grep -nE "/api/v1/netatmo/(homesdata\|homestatus)" hooks/useThermostatData.ts` | ✅ | ⬜ pending |
-| 168-02-08 | 02 | 2 | — | — | `useScheduleData.ts` derives schedules from `homesdata.body.homes[0].schedules` | grep | `grep -n "homesdata" hooks/useScheduleData.ts` | ✅ | ⬜ pending |
+| 168-02-07 | 02 | 2 | NETA-09 | — | `useThermostatData` consumes v1 routes | grep | `grep -nE "/api/v1/netatmo/(homesdata\|homestatus)" app/components/devices/thermostat/hooks/useThermostatData.ts` | ✅ | ⬜ pending |
+| 168-02-08 | 02 | 2 | — | — | `useScheduleData.ts` derives schedules from `homesdata.body.homes[0].schedules` | grep | `grep -n "homesdata" lib/hooks/useScheduleData.ts` | ✅ | ⬜ pending |
 | 168-03-01 | 03 | 3 | — | — | Entire `app/api/netatmo/` tree deleted | fs | `! test -d app/api/netatmo` | ✅ | ⬜ pending |
 | 168-03-02 | 03 | 3 | NETA-01..NETA-09 | — | Repo-wide grep sweep returns zero legacy refs outside `.planning/` | grep | `! grep -rn "/api/netatmo/" app/ lib/ types/ hooks/ components/` | ✅ | ⬜ pending |
 | 168-03-03 | 03 | 3 | NETA-01..NETA-09 | — | Jest full suite green | jest | `npm test -- --ci --bail` | ✅ | ⬜ pending |

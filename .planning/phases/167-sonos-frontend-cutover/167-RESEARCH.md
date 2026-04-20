@@ -1059,17 +1059,15 @@ describe('/api/v1/sonos/speakers/[uid]/volume', () => {
 | A4 | `suggested_poll_delay_s: 1` is the right default (not 0 or 2) for all new speaker command routes | Per-Route Implementation Sketches | Very low risk — every Phase 160 v1 route uses `: 1` literal, hooks already treat it as the primary timing signal, changing it would break the 1-second poll-after-command UX. |
 | A5 | The legacy `app/api/sonos/history/route.ts` query-param list (`type, speaker_uid, group_id, start, end, limit, offset`) is the full contract; CONTEXT D-04's mention of `cursor?` is an extension that does NOT exist in the current proxy signature | Per-Route Implementation Sketch D-04 | Medium risk — if the planner adds `cursor` without extending `getHistory` signature in `lib/sonos/sonosProxy.ts:254-262`, TypeScript build fails. Recommendation: omit `cursor` from the new route. User should confirm whether to extend proxy or match legacy exactly. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should `cursor?` query param be added to `/api/v1/sonos/history` or omitted?**
+1. **Q1 [RESOLVED]: Should `cursor?` query param be added to `/api/v1/sonos/history` or omitted?**
    - What we know: CONTEXT D-04 lists `cursor?` as a pass-through param. Current proxy signature (`lib/sonos/sonosProxy.ts:254-262`) does NOT accept `cursor`. Legacy route (`app/api/sonos/history/route.ts:12-24`) does NOT pass it through. `useSonosHistory.ts:47-53` does NOT send it.
-   - What's unclear: Is CONTEXT D-04 specifying an intentional contract extension, or is it copying from the HA proxy spec (`docs/api/sonos.md`) where cursor MAY exist?
-   - Recommendation: Match legacy exactly (7 params, no cursor). If the HA proxy spec includes cursor, add it in a future phase that also extends the proxy signature. Flag for user confirmation if planner wants to include.
+   - **RESOLVED:** Omit `cursor` from the new route. Match legacy contract exactly (7 params: `type, speaker_uid, group_id, start, end, limit, offset`). Adding `cursor` without extending `getHistory` signature in `lib/sonos/sonosProxy.ts` would break TypeScript build. Plan 01 Task 1 implements this resolution — the route passes through only the 7 legacy params, and the acceptance criteria explicitly assert `cursor` is NOT forwarded. If a future phase needs cursor pagination, that phase extends the proxy + route together.
 
-2. **Test file pattern: one per verb (`volume_get.test.ts` + `volume_put.test.ts`) or combined (`volume/route.test.ts` with both GET and PUT tests)?**
-   - What we know: Phase 160's `play-mode` and `sleep-timer` routes combine GET+PUT handlers in one `route.ts` but Phase 160 test files under `__tests__/route.test.ts` combine tests for both handlers in one describe block.
-   - What's unclear: Nothing — precedent is clear.
-   - Recommendation: Combined test file per route.ts. One `__tests__/route.test.ts` per leaf route directory, covering both GET and PUT.
+2. **Q2 [RESOLVED]: Test file pattern — one per verb (`volume_get.test.ts` + `volume_put.test.ts`) or combined (`volume/route.test.ts` with both GET and PUT tests)?**
+   - What we know: Phase 160's `play-mode` and `sleep-timer` routes combine GET+PUT handlers in one `route.ts`; Phase 160 test files under `__tests__/route.test.ts` combine tests for both handlers in one describe block.
+   - **RESOLVED:** Combined test file per route.ts. One `__tests__/route.test.ts` per leaf route directory, covering both GET and PUT in the same file. Plan 01 Task 2 (combined GET+PUT speaker endpoints: volume, eq, home-theater) applies this resolution.
 
 ## Environment Availability
 

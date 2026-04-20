@@ -36,19 +36,21 @@ created: 2026-04-20
 
 ## Per-Task Verification Map
 
+> **Requirement attribution note:** SONOS-01..SONOS-13 are zone-level backend endpoints already shipped by Phase 160 (zones/{group_id}/* routes). Plan 01 creates the ADJACENT v1 surface (health, devices, zones-list, history, speakers/*) needed to unlock the frontend cutover — these tasks are marked `enabler` rather than owning any single SONOS-XX requirement. Plan 02's hook rewrite is where SONOS-01..13 actually get consumed end-to-end via the new `/api/v1/sonos/*` paths; those rows carry the requirement IDs.
+
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 167-01-01 | 01 | 1 | SONOS-01 | T-167-01 | `/api/v1/sonos/health` requires X-API-Key via `withAuthAndErrorHandler` | unit | `npm test -- app/api/v1/sonos/health/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-02 | 01 | 1 | SONOS-02 | T-167-01 | `/api/v1/sonos/devices` requires auth; returns `{ devices: [] }` envelope | unit | `npm test -- app/api/v1/sonos/devices/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-03 | 01 | 1 | SONOS-03 | T-167-01 | `/api/v1/sonos/zones` requires auth; returns `{ zones: [] }` envelope | unit | `npm test -- app/api/v1/sonos/zones/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-04 | 01 | 1 | SONOS-04, SONOS-08 | T-167-01 | `speakers/[uid]/volume` GET+PUT auth; PUT returns 202+suggested_poll_delay_s | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/volume/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-05 | 01 | 1 | SONOS-08 | T-167-01 | `speakers/[uid]/mute` PUT auth; 202 response | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/mute/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-06 | 01 | 1 | SONOS-12 | T-167-01 | `speakers/[uid]/eq` GET+PUT auth; 202 on PUT | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/eq/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-07 | 01 | 1 | SONOS-12 | T-167-01 | `speakers/[uid]/home-theater` GET+PUT auth; 202 on PUT | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/home-theater/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-08 | 01 | 1 | SONOS-12 | T-167-01 | `speakers/[uid]/source` POST auth; 202 response | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/source/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-09 | 01 | 1 | SONOS-13 | T-167-01 | `speakers/[uid]/join` POST auth; 202 response | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/join/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-10 | 01 | 1 | SONOS-13 | T-167-01 | `speakers/[uid]/unjoin` POST auth; 202 response | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/unjoin/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
-| 167-01-11 | 01 | 1 | SONOS-07 | T-167-01 | `/api/v1/sonos/history` GET auth; passes through type/start/end/limit query params | unit | `npm test -- app/api/v1/sonos/history/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-01 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `/api/v1/sonos/health` requires X-API-Key via `withAuthAndErrorHandler` | unit | `npm test -- app/api/v1/sonos/health/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-02 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `/api/v1/sonos/devices` requires auth; returns `{ devices: [] }` envelope | unit | `npm test -- app/api/v1/sonos/devices/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-03 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `/api/v1/sonos/zones` requires auth; returns `{ zones: [] }` envelope | unit | `npm test -- app/api/v1/sonos/zones/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-04 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `speakers/[uid]/volume` GET+PUT auth; PUT returns 202+suggested_poll_delay_s | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/volume/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-05 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `speakers/[uid]/mute` PUT auth; 202 response | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/mute/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-06 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `speakers/[uid]/eq` GET+PUT auth; 202 on PUT | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/eq/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-07 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `speakers/[uid]/home-theater` GET+PUT auth; 202 on PUT | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/home-theater/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-08 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `speakers/[uid]/source` POST auth; 202 response | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/source/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-09 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `speakers/[uid]/join` POST auth; 202 response | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/join/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-10 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `speakers/[uid]/unjoin` POST auth; 202 response | unit | `npm test -- app/api/v1/sonos/speakers/[uid]/unjoin/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
+| 167-01-11 | 01 | 1 | enabler (unlocks SONOS-01..13 cutover) | T-167-01 | `/api/v1/sonos/history` GET auth; passes through type/start/end/limit query params | unit | `npm test -- app/api/v1/sonos/history/__tests__/route.test.ts` | ❌ W0 | ⬜ pending |
 | 167-02-01 | 02 | 2 | SONOS-01, SONOS-03, SONOS-04 | T-167-02 | useSonosData fetches only `/api/v1/sonos/*` | unit | `npm test -- app/components/devices/sonos/hooks/__tests__/useSonosData.test.ts` | ✅ | ⬜ pending |
 | 167-02-02 | 02 | 2 | SONOS-02, SONOS-04, SONOS-12 | T-167-02 | useSonosFullData fetches only `/api/v1/sonos/*` | unit | `npm test -- app/components/devices/sonos/hooks/__tests__/useSonosFullData.test.ts` | ✅ | ⬜ pending |
 | 167-02-03 | 02 | 2 | SONOS-05, SONOS-06, SONOS-08, SONOS-09, SONOS-10, SONOS-11, SONOS-12, SONOS-13 | T-167-02 | useSonosCommands posts/puts only to `/api/v1/sonos/*` | unit | `npm test -- app/components/devices/sonos/hooks/__tests__/useSonosCommands.test.ts` | ✅ | ⬜ pending |

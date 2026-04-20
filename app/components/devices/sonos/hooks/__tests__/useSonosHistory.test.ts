@@ -46,7 +46,7 @@ describe('useSonosHistory', () => {
 
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const calledUrl = mockFetch.mock.calls[0]![0] as string;
-    expect(calledUrl).toMatch(/\/api\/sonos\/history\?type=volume/);
+    expect(calledUrl).toMatch(/\/api\/v1\/sonos\/history\?type=volume/);
     expect(calledUrl).toMatch(/&start=/);
     expect(calledUrl).toMatch(/&end=/);
     expect(calledUrl).toMatch(/&limit=200/);

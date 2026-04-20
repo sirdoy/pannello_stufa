@@ -107,67 +107,67 @@ function makeFetchMock(overrides?: {
   };
 
   return (url: string) => {
-    if (url === '/api/sonos/devices') {
+    if (url === '/api/v1/sonos/devices') {
       return Promise.resolve({
         ok: opts.devicesOk,
         json: () => Promise.resolve({ devices: [mockDevice1, mockDevice2] }),
       });
     }
-    if (url === '/api/sonos/zones') {
+    if (url === '/api/v1/sonos/zones') {
       return Promise.resolve({
         ok: opts.zonesOk,
         json: () => Promise.resolve({ zones: [mockZone1, mockZone2] }),
       });
     }
-    if (url === '/api/sonos/zones/RINCON_A/playback') {
+    if (url === '/api/v1/sonos/zones/RINCON_A/playback') {
       return Promise.resolve({
         ok: opts.playback1Ok,
         json: () => Promise.resolve(mockPlayback1),
       });
     }
-    if (url === '/api/sonos/zones/RINCON_C/playback') {
+    if (url === '/api/v1/sonos/zones/RINCON_C/playback') {
       return Promise.resolve({
         ok: opts.playback2Ok,
         json: () => Promise.resolve(mockPlayback2),
       });
     }
-    if (url === '/api/sonos/speakers/RINCON_A/volume') {
+    if (url === '/api/v1/sonos/speakers/RINCON_A/volume') {
       return Promise.resolve({
         ok: opts.volumeOk,
         json: () => Promise.resolve(mockVolume1),
       });
     }
-    if (url === '/api/sonos/speakers/RINCON_B/volume') {
+    if (url === '/api/v1/sonos/speakers/RINCON_B/volume') {
       return Promise.resolve({
         ok: opts.volumeOk,
         json: () => Promise.resolve(mockVolume2),
       });
     }
-    if (url === '/api/sonos/speakers/RINCON_C/volume') {
+    if (url === '/api/v1/sonos/speakers/RINCON_C/volume') {
       return Promise.resolve({
         ok: opts.volumeOk,
         json: () => Promise.resolve(mockVolume3),
       });
     }
-    if (url === '/api/sonos/zones/RINCON_A/play-mode') {
+    if (url === '/api/v1/sonos/zones/RINCON_A/play-mode') {
       return Promise.resolve({
         ok: opts.playModeOk,
         json: () => Promise.resolve(mockPlayMode1),
       });
     }
-    if (url === '/api/sonos/zones/RINCON_C/play-mode') {
+    if (url === '/api/v1/sonos/zones/RINCON_C/play-mode') {
       return Promise.resolve({
         ok: opts.playModeOk,
         json: () => Promise.resolve(mockPlayMode2),
       });
     }
-    if (url === '/api/sonos/zones/RINCON_A/sleep-timer') {
+    if (url === '/api/v1/sonos/zones/RINCON_A/sleep-timer') {
       return Promise.resolve({
         ok: opts.sleepTimerOk,
         json: () => Promise.resolve(mockSleepTimer1),
       });
     }
-    if (url === '/api/sonos/zones/RINCON_C/sleep-timer') {
+    if (url === '/api/v1/sonos/zones/RINCON_C/sleep-timer') {
       return Promise.resolve({
         ok: opts.sleepTimerOk,
         json: () => Promise.resolve(mockSleepTimer2),
@@ -353,7 +353,7 @@ describe('useSonosFullData', () => {
     expect(result.current.error).toBeNull();
   });
 
-  it('Test 11: populates devices array from /api/sonos/devices fetch', async () => {
+  it('Test 11: populates devices array from /api/v1/sonos/devices fetch', async () => {
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
     const { result } = renderHook(() => useSonosFullData());
     await waitFor(() => expect(result.current.loading).toBe(false));

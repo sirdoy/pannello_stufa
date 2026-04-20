@@ -238,7 +238,7 @@ describe('useSonosQueue', () => {
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_TEST/queue?limit=20&offset=0'
+      '/api/v1/sonos/zones/RINCON_TEST/queue?limit=20&offset=0'
     );
 
     await act(async () => {
@@ -246,7 +246,7 @@ describe('useSonosQueue', () => {
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_TEST/queue?limit=20&offset=20'
+      '/api/v1/sonos/zones/RINCON_TEST/queue?limit=20&offset=20'
     );
   });
 });

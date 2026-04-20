@@ -93,14 +93,14 @@ function makeSuccessFetch(opts?: {
   };
 
   return (url: string) => {
-    if (url === '/api/sonos/health') {
+    if (url === '/api/v1/sonos/health') {
       return Promise.resolve({ ok: true, json: () => Promise.resolve(health) });
     }
-    if (url === '/api/sonos/zones') {
+    if (url === '/api/v1/sonos/zones') {
       return Promise.resolve({ ok: true, json: () => Promise.resolve({ zones }) });
     }
-    // Match playback URLs like /api/sonos/zones/RINCON_A/playback
-    const playbackMatch = (url as string).match(/\/api\/sonos\/zones\/([^/]+)\/playback/);
+    // Match playback URLs like /api/v1/sonos/zones/RINCON_A/playback
+    const playbackMatch = (url as string).match(/\/api\/v1\/sonos\/zones\/([^/]+)\/playback/);
     if (playbackMatch) {
       const groupId = playbackMatch[1];
       const pb = groupId ? playbacks[groupId] : undefined;
@@ -361,7 +361,7 @@ describe('useSonosData', () => {
       });
 
       const fetchCalls = (global.fetch as jest.Mock).mock.calls.map(([url]) => url as string);
-      const playbackCall = fetchCalls.find(url => /\/api\/sonos\/zones\/.*\/playback/.test(url));
+      const playbackCall = fetchCalls.find(url => /\/api\/v1\/sonos\/zones\/.*\/playback/.test(url));
       expect(playbackCall).toBeDefined();
     });
 
@@ -395,7 +395,7 @@ describe('useSonosData', () => {
       });
 
       const fetchCalls = (global.fetch as jest.Mock).mock.calls.map(([url]) => url as string);
-      const healthCall = fetchCalls.find(url => url === '/api/sonos/health');
+      const healthCall = fetchCalls.find(url => url === '/api/v1/sonos/health');
       expect(healthCall).toBeDefined();
     });
 

@@ -72,7 +72,7 @@ describe('useSonosCommands', () => {
     useSonosCommands = mod.useSonosCommands;
   });
 
-  it('Test 1: handlePlay calls POST /api/sonos/zones/{groupId}/play, polls after delay', async () => {
+  it('Test 1: handlePlay calls POST /api/v1/sonos/zones/{groupId}/play, polls after delay', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -82,13 +82,13 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockTransportCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/play',
+      '/api/v1/sonos/zones/RINCON_A/play',
       expect.objectContaining({ method: 'POST' })
     );
     expect(mockFetchData).toHaveBeenCalled();
   });
 
-  it('Test 2: handlePause calls POST /api/sonos/zones/{groupId}/pause', async () => {
+  it('Test 2: handlePause calls POST /api/v1/sonos/zones/{groupId}/pause', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -98,12 +98,12 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockTransportCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/pause',
+      '/api/v1/sonos/zones/RINCON_A/pause',
       expect.objectContaining({ method: 'POST' })
     );
   });
 
-  it('Test 3: handleStop calls POST /api/sonos/zones/{groupId}/stop', async () => {
+  it('Test 3: handleStop calls POST /api/v1/sonos/zones/{groupId}/stop', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -113,12 +113,12 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockTransportCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/stop',
+      '/api/v1/sonos/zones/RINCON_A/stop',
       expect.objectContaining({ method: 'POST' })
     );
   });
 
-  it('Test 4: handleNext calls POST /api/sonos/zones/{groupId}/next', async () => {
+  it('Test 4: handleNext calls POST /api/v1/sonos/zones/{groupId}/next', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -128,12 +128,12 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockTransportCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/next',
+      '/api/v1/sonos/zones/RINCON_A/next',
       expect.objectContaining({ method: 'POST' })
     );
   });
 
-  it('Test 5: handlePrevious calls POST /api/sonos/zones/{groupId}/previous', async () => {
+  it('Test 5: handlePrevious calls POST /api/v1/sonos/zones/{groupId}/previous', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -143,12 +143,12 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockTransportCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/previous',
+      '/api/v1/sonos/zones/RINCON_A/previous',
       expect.objectContaining({ method: 'POST' })
     );
   });
 
-  it('Test 6: handleSetVolume calls PUT /api/sonos/speakers/{uid}/volume with body { volume: N }', async () => {
+  it('Test 6: handleSetVolume calls PUT /api/v1/sonos/speakers/{uid}/volume with body { volume: N }', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -158,7 +158,7 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockVolumeCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/speakers/RINCON_A/volume',
+      '/api/v1/sonos/speakers/RINCON_A/volume',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ volume: 75 }),
@@ -167,7 +167,7 @@ describe('useSonosCommands', () => {
     expect(mockFetchData).toHaveBeenCalled();
   });
 
-  it('Test 7: handleSetMute calls PUT /api/sonos/speakers/{uid}/mute with body { mute: boolean }', async () => {
+  it('Test 7: handleSetMute calls PUT /api/v1/sonos/speakers/{uid}/mute with body { mute: boolean }', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -177,7 +177,7 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockVolumeCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/speakers/RINCON_A/mute',
+      '/api/v1/sonos/speakers/RINCON_A/mute',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ mute: true }),
@@ -229,7 +229,7 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/play-mode',
+      '/api/v1/sonos/zones/RINCON_A/play-mode',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ mode: 'SHUFFLE' }),
@@ -248,7 +248,7 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/sleep-timer',
+      '/api/v1/sonos/zones/RINCON_A/sleep-timer',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ duration: 1800 }),
@@ -267,7 +267,7 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/sleep-timer',
+      '/api/v1/sonos/zones/RINCON_A/sleep-timer',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ duration: 0 }),
@@ -275,7 +275,7 @@ describe('useSonosCommands', () => {
     );
   });
 
-  it('Test 13: handleSetEq calls PUT /api/sonos/speakers/{uid}/eq with EQ body', async () => {
+  it('Test 13: handleSetEq calls PUT /api/v1/sonos/speakers/{uid}/eq with EQ body', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -285,7 +285,7 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/speakers/RINCON_A/eq',
+      '/api/v1/sonos/speakers/RINCON_A/eq',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ bass: 3, treble: -2 }),
@@ -294,7 +294,7 @@ describe('useSonosCommands', () => {
     expect(mockFetchData).toHaveBeenCalled();
   });
 
-  it('Test 14: handleUnjoinGroup calls POST /api/sonos/speakers/{uid}/unjoin', async () => {
+  it('Test 14: handleUnjoinGroup calls POST /api/v1/sonos/speakers/{uid}/unjoin', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -304,13 +304,13 @@ describe('useSonosCommands', () => {
     });
 
     expect(mockExtendedCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/speakers/RINCON_A/unjoin',
+      '/api/v1/sonos/speakers/RINCON_A/unjoin',
       expect.objectContaining({ method: 'POST' })
     );
     expect(mockFetchData).toHaveBeenCalled();
   });
 
-  it('Test 15: handleSetZoneVolume calls PUT /api/sonos/zones/{groupId}/volume with body { volume: N }', async () => {
+  it('Test 15: handleSetZoneVolume calls PUT /api/v1/sonos/zones/{groupId}/volume with body { volume: N }', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -318,7 +318,7 @@ describe('useSonosCommands', () => {
       await result.current.handleSetZoneVolume('RINCON_A', 60);
     });
     expect(mockVolumeCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/volume',
+      '/api/v1/sonos/zones/RINCON_A/volume',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ volume: 60 }),
@@ -327,7 +327,7 @@ describe('useSonosCommands', () => {
     expect(mockFetchData).toHaveBeenCalled();
   });
 
-  it('Test 16: handleSeek calls PUT /api/sonos/zones/{groupId}/seek with body { position: "HH:MM:SS" }', async () => {
+  it('Test 16: handleSeek calls PUT /api/v1/sonos/zones/{groupId}/seek with body { position: "HH:MM:SS" }', async () => {
     const { result } = renderHook(() =>
       useSonosCommands({ fetchData: mockFetchData, setError: mockSetError })
     );
@@ -335,7 +335,7 @@ describe('useSonosCommands', () => {
       await result.current.handleSeek('RINCON_A', '00:02:30');
     });
     expect(mockVolumeCmd.execute).toHaveBeenCalledWith(
-      '/api/sonos/zones/RINCON_A/seek',
+      '/api/v1/sonos/zones/RINCON_A/seek',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ position: '00:02:30' }),

@@ -44,7 +44,7 @@
 - [x] **Phase 164: Phase 156 Regression Fix** - Delete legacy /api/stove/, fix routes/sw/command palette/debug panels
 - [ ] **Phase 165: Milestone Hygiene & Spec Alignment** - SUMMARY commit hashes, /health auth spec, 163 deferred tsc, Nyquist validations
 - [x] **Phase 166: Hue Frontend Cutover** - Migrate useLightsData/useLightsCommands + 2 pages to /api/v1/hue/* (completed 2026-04-18)
-- [ ] **Phase 167: Sonos Frontend Cutover** - Migrate 5 Sonos hooks + components to /api/v1/sonos/*
+- [x] **Phase 167: Sonos Frontend Cutover** - Migrate 5 Sonos hooks + components to /api/v1/sonos/* (completed 2026-04-20)
 - [ ] **Phase 168: Netatmo Frontend Cutover** - Migrate Netatmo UI to /api/v1/netatmo/*
 - [ ] **Phase 169: DIRIGERA Frontend Cutover** - Migrate useDirigeraData to /api/v1/dirigera/*
 - [ ] **Phase 170: Auth UI** - Login form + API-keys management page (AUTH-01..04 consumers)
@@ -219,7 +219,7 @@ Plans:
   2. Zero `/api/sonos/` references in `app/` and `components/`
   3. Zone playback, transport, queue, play-mode, sleep-timer all functional in browser smoke
   4. Jest + Playwright smoke green
-**Plans:** 3 plans
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 167-01-PLAN.md — Create 11 new v1 Sonos route wrappers (health, devices, zones, history, speakers/[uid]/{volume,mute,eq,home-theater,source,join,unjoin}) + co-located Jest tests
 - [x] 167-02-PLAN.md — Rewrite 5 hooks + 4 test files: 63 URL swaps /api/sonos/ -> /api/v1/sonos/ including WS side-fetches and regex matchers
@@ -340,7 +340,7 @@ See git history and `.planning/milestones/` for details.
 | 164. Phase 156 Regression Fix | v19.0 | 2/2 | Complete   | 2026-04-15 |
 | 165. Milestone Hygiene & Spec Alignment | v19.0 | 2/2 | Complete   | 2026-04-16 |
 | 166. Hue Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-18 |
-| 167. Sonos Frontend Cutover | v19.0 | 3/3 | Complete   | 2026-04-20 |
+| 167. Sonos Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-20 |
 | 168. Netatmo Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 169. DIRIGERA Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 170. Auth UI | v19.0 | 0/? | Pending    | — |

@@ -219,9 +219,11 @@ Plans:
   2. Zero `/api/sonos/` references in `app/` and `components/`
   3. Zone playback, transport, queue, play-mode, sleep-timer all functional in browser smoke
   4. Jest + Playwright smoke green
-**Plans:** 2 plans
-- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+**Plans:** 3 plans
+Plans:
+- [x] 167-01-PLAN.md — Create 11 new v1 Sonos route wrappers (health, devices, zones, history, speakers/[uid]/{volume,mute,eq,home-theater,source,join,unjoin}) + co-located Jest tests
+- [ ] 167-02-PLAN.md — Rewrite 5 hooks + 4 test files: 63 URL swaps /api/sonos/ -> /api/v1/sonos/ including WS side-fetches and regex matchers
+- [ ] 167-03-PLAN.md — Delete app/api/sonos/ legacy tree + repo-wide grep sweep + Jest/Playwright smoke regression
 
 ### Phase 168: Netatmo Frontend Cutover
 **Goal**: Netatmo UI consumes /api/v1/netatmo/** exclusively
@@ -338,7 +340,7 @@ See git history and `.planning/milestones/` for details.
 | 164. Phase 156 Regression Fix | v19.0 | 2/2 | Complete   | 2026-04-15 |
 | 165. Milestone Hygiene & Spec Alignment | v19.0 | 2/2 | Complete   | 2026-04-16 |
 | 166. Hue Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-18 |
-| 167. Sonos Frontend Cutover | v19.0 | 0/? | Pending    | — |
+| 167. Sonos Frontend Cutover | v19.0 | 1/3 | In Progress|  |
 | 168. Netatmo Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 169. DIRIGERA Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 170. Auth UI | v19.0 | 0/? | Pending    | — |

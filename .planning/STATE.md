@@ -4,14 +4,14 @@ milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: executing
 stopped_at: Phase 167 context gathered
-last_updated: "2026-04-20T07:11:45.397Z"
-last_activity: 2026-04-18
+last_updated: "2026-04-20T07:43:23.733Z"
+last_activity: 2026-04-20 -- Phase 167 execution started
 progress:
   total_phases: 16
   completed_phases: 11
-  total_plans: 21
+  total_plans: 24
   completed_plans: 21
-  percent: 100
+  percent: 88
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 166 — hue-frontend-cutover
+**Current focus:** Phase 167 — Sonos Frontend Cutover
 
 ## Current Position
 
-Phase: 167
-Plan: Not started
-Status: Executing Phase 166
-Last activity: 2026-04-18
+Phase: 167 (Sonos Frontend Cutover) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 167
+Last activity: 2026-04-20 -- Phase 167 execution started
 
 Progress: [░░░░░░░░░░░░░░░░░░░] 0/0 plans (0%)
 

@@ -105,9 +105,21 @@ export function useThermostatData(): UseThermostatDataReturn {
       setError(null);
 
       const response = await fetch(NETATMO_ROUTES.homesData);
-      const data = await response.json() as Record<string, unknown>;
+      const data = await response.json() as {
+        body?: {
+          homes?: Array<{
+            id?: string;
+            name?: string;
+            rooms?: unknown[];
+            modules?: unknown[];
+            schedules?: unknown[];
+          }>;
+        };
+        error?: string;
+        reconnect?: boolean;
+      };
 
-      if (data['reconnect']) {
+      if (data.reconnect) {
         // Token expired/invalid - retry once in case token was just refreshed
         if (retryCount < MAX_RETRIES) {
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
@@ -115,16 +127,27 @@ export function useThermostatData(): UseThermostatDataReturn {
         }
         // All retries exhausted - show reconnect UI
         setConnected(false);
-        setError(data['error'] as string);
+        setError(data.error ?? null);
         return;
       }
 
-      if (!data['error'] && data['home_id']) {
+      const home = data.body?.homes?.[0];
+
+      if (!data.error && home?.id) {
         setConnected(true);
-        setTopology(data as unknown as NetatmoTopology);
+        // Flatten v1 raw-proxy shape into the NetatmoTopology shape the rest of the hook expects.
+        // v1 /homesdata response is { body: { homes: [{ id, name, rooms, modules, schedules }] } };
+        // legacy was { home_id, home_name, rooms, modules } flat — flatten body.homes[0] here.
+        setTopology({
+          home_id: home.id,
+          home_name: home.name ?? '',
+          rooms: home.rooms ?? [],
+          modules: home.modules ?? [],
+          schedules: home.schedules ?? [],
+        } as unknown as NetatmoTopology);
       } else {
         // Other error - retry once for transient issues
-        if (retryCount < MAX_RETRIES && !data['reconnect']) {
+        if (retryCount < MAX_RETRIES && !data.reconnect) {
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
           return checkConnection(retryCount + 1);
         }
@@ -171,9 +194,22 @@ export function useThermostatData(): UseThermostatDataReturn {
       setError(null);
 
       const response = await fetch(NETATMO_ROUTES.homeStatus);
-      const data = await response.json() as Record<string, unknown>;
+      const data = await response.json() as {
+        rooms?: Array<{
+          home_id?: string;
+          room_id?: string;
+          room_name?: string;
+          temperature?: number;
+          therm_setpoint_temperature?: number;
+          heating_power_request?: number;
+          timestamp?: number;
+        }>;
+        data_freshness?: string;
+        error?: string;
+        reconnect?: boolean;
+      };
 
-      if (data['reconnect']) {
+      if (data.reconnect) {
         // Token issue during polling - retry once before disconnecting
         if (retryCount < MAX_RETRIES) {
           await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
@@ -183,9 +219,9 @@ export function useThermostatData(): UseThermostatDataReturn {
         return;
       }
 
-      if (data['error']) {
+      if (data.error) {
         // Rate limiting error - don't show to user, just skip this poll
-        const errMsg = data['error'] as string;
+        const errMsg = data.error;
         if (errMsg.includes('concurrency limited')) {
           console.warn('⚠️ Netatmo rate limit - skipping this poll');
           return;
@@ -193,7 +229,28 @@ export function useThermostatData(): UseThermostatDataReturn {
         throw new Error(errMsg);
       }
 
-      setStatus(data as unknown as NetatmoStatus);
+      // Map v1 rooms to the legacy shape the rest of the hook consumes.
+      // setpoint ← therm_setpoint_temperature; heating ← (heating_power_request > 0).
+      // v1 /homestatus does NOT expose `mode`, `modules`, `lowBatteryModules`,
+      // `hasLowBattery`, `hasCriticalBattery`, `updated_at` (legacy enrichment fields).
+      // Consumer impact documented in 168-DEFERRED.md (stoveSync/battery regressions) —
+      // RoomCard reads hasLowBattery/hasCriticalBattery via `|| false` fallback (safe).
+      const mappedRooms = (data.rooms ?? []).map(r => ({
+        room_id: r.room_id,
+        room_name: r.room_name,
+        temperature: r.temperature,
+        setpoint: r.therm_setpoint_temperature,
+        heating: (r.heating_power_request ?? 0) > 0,
+        // Preserve raw v1 fields for any consumer that reads them directly
+        therm_setpoint_temperature: r.therm_setpoint_temperature,
+        heating_power_request: r.heating_power_request,
+        timestamp: r.timestamp,
+      }));
+
+      setStatus({
+        rooms: mappedRooms,
+        data_freshness: data.data_freshness ?? null,
+      } as unknown as NetatmoStatus);
       setLastUpdatedAt(Date.now());
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);

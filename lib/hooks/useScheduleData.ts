@@ -71,7 +71,10 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
     let retryScheduled = false;
 
     try {
-      const res = await fetch(NETATMO_ROUTES.schedules);
+      // Phase 168 D-04: v1 /homesdata embeds schedules in body.homes[0].schedules
+      // (legacy /schedules endpoint dropped; no v1 equivalent). We fetch homesdata
+      // here and unwrap the schedules array from the raw-proxy response body.
+      const res = await fetch(NETATMO_ROUTES.homesData);
 
       // Parse response body
       let data: Record<string, unknown>;
@@ -118,9 +121,12 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
         );
       }
 
-      setSchedules((data.schedules as Schedule[]) || []);
-      setHomeId((data.home_id as string) || null);
-      setSource(data._source as string);
+      // Unwrap v1 raw-proxy shape: { body: { homes: [{ id, schedules, ... }] } }
+      const home = (data as { body?: { homes?: Array<{ id?: string; schedules?: Schedule[] }> } }).body?.homes?.[0];
+      setSchedules(home?.schedules ?? []);
+      setHomeId(home?.id ?? null);
+      // v1 routes don't emit _source; always treat as 'api' (was 'cache' | 'api' in legacy)
+      setSource('api');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       console.error('[useScheduleData] Fetch error:', err);

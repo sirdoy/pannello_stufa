@@ -152,10 +152,13 @@ async function fetchProviderDevices(provider: string): Promise<ProviderDevice[]>
         return (json.lights ?? []).map(l => ({ device_id: l.light_id, name: l.name }));
       }
       case 'netatmo': {
-        const res = await fetch('/api/netatmo/homesdata');
+        const res = await fetch('/api/v1/netatmo/homesdata');
         if (!res.ok) return [];
-        const json = (await res.json()) as { success: boolean; modules: { id: string; name: string }[] };
-        return (json.modules ?? []).map(m => ({ device_id: m.id, name: m.name }));
+        const json = (await res.json()) as {
+          body?: { homes?: Array<{ modules?: { id: string; name: string }[] }> };
+        };
+        const modules = json.body?.homes?.[0]?.modules ?? [];
+        return modules.map(m => ({ device_id: m.id, name: m.name }));
       }
       case 'fritzbox': {
         const res = await fetch('/api/fritzbox/devices');

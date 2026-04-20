@@ -44,7 +44,7 @@ export function useSonosHistory(): UseSonosHistoryReturn {
       const start = new Date(now - TIME_RANGE_MS[timeRange]).toISOString();
       const end = new Date(now).toISOString();
 
-      let url = `/api/sonos/history?type=${historyType}&start=${start}&end=${end}&limit=200`;
+      let url = `/api/v1/sonos/history?type=${historyType}&start=${start}&end=${end}&limit=200`;
       if (speakerFilter) {
         url += `&speaker_uid=${speakerFilter}`;
       }

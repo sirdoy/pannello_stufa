@@ -49,12 +49,12 @@ export function useSonosData(): UseSonosDataReturn {
       setError(null);
 
       // Fetch health
-      const healthRes = await fetch('/api/sonos/health');
+      const healthRes = await fetch('/api/v1/sonos/health');
       if (!healthRes.ok) throw new Error('Health endpoint failed');
       const health = (await healthRes.json()) as SonosHealthResponse;
 
       // Fetch zones (wrapped in { zones: [...] })
-      const zonesRes = await fetch('/api/sonos/zones');
+      const zonesRes = await fetch('/api/v1/sonos/zones');
       if (!zonesRes.ok) throw new Error('Zones endpoint failed');
       const zonesBody = (await zonesRes.json()) as { zones: SonosZoneResponse[] };
       const zones = zonesBody.zones;
@@ -62,7 +62,7 @@ export function useSonosData(): UseSonosDataReturn {
       // Fetch playback for up to 5 zones in parallel
       const playbackResults = await Promise.allSettled(
         zones.slice(0, 5).map((z) =>
-          fetch(`/api/sonos/zones/${z.group_id}/playback`).then((r) => {
+          fetch(`/api/v1/sonos/zones/${z.group_id}/playback`).then((r) => {
             if (!r.ok) throw new Error('playback failed');
             return r.json() as Promise<SonosPlaybackResponse>;
           })
@@ -107,7 +107,7 @@ export function useSonosData(): UseSonosDataReturn {
   // Standalone health fetch for fire-and-forget from WS handler (D-06)
   async function fetchHealth() {
     try {
-      const healthRes = await fetch('/api/sonos/health');
+      const healthRes = await fetch('/api/v1/sonos/health');
       if (!healthRes.ok) return;
       const health = (await healthRes.json()) as SonosHealthResponse;
       setData(prev => prev ? { ...prev, health } : null);
@@ -121,7 +121,7 @@ export function useSonosData(): UseSonosDataReturn {
     try {
       const playbackResults = await Promise.allSettled(
         zones.slice(0, 5).map((z) =>
-          fetch(`/api/sonos/zones/${z.group_id}/playback`).then((r) => {
+          fetch(`/api/v1/sonos/zones/${z.group_id}/playback`).then((r) => {
             if (!r.ok) throw new Error('playback failed');
             return r.json() as Promise<SonosPlaybackResponse>;
           })

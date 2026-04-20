@@ -27,7 +27,7 @@ export function useSonosQueue(groupId: string): UseSonosQueueReturn {
     setError(null);
     try {
       const res = await fetch(
-        `/api/sonos/zones/${groupId}/queue?limit=${QUEUE_PAGE_SIZE}&offset=${pageOffset}`
+        `/api/v1/sonos/zones/${groupId}/queue?limit=${QUEUE_PAGE_SIZE}&offset=${pageOffset}`
       );
       if (!res.ok) throw new Error('Queue non disponibile');
       const data = (await res.json()) as SonosQueueResponse;

@@ -81,7 +81,7 @@ export default function CameraDashboard() {
 
       // Build snapshot URLs — the API route redirects to the Netatmo CDN snapshot URL.
       // Append a timestamp when bustCache=true (explicit refresh) to bypass browser cache.
-      const cacheParam = bustCache ? `&t=${Date.now()}` : '';
+      const cacheParam = bustCache ? `?t=${Date.now()}` : '';
       const urls: Record<string, string> = {};
       for (const camera of statusData.cameras ?? []) {
         urls[camera.camera_id] = CAMERA_ROUTES.snapshot(camera.camera_id) + cacheParam;
@@ -152,11 +152,10 @@ export default function CameraDashboard() {
     setMonitoringStates(prev => ({ ...prev, [cameraId]: newValue })); // optimistic
     setMonitoringLoading(prev => ({ ...prev, [cameraId]: true }));
     try {
-      const res = await fetch(CAMERA_ROUTES.monitoring, {
+      const res = await fetch(CAMERA_ROUTES.monitoring(cameraId), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          camera_id: cameraId,
           monitoring: newValue ? 'on' : 'off',
         }),
       });

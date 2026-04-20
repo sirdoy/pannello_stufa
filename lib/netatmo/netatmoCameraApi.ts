@@ -3,7 +3,7 @@
  * Display utility functions for Netatmo Security camera event and device type names.
  *
  * API proxy routes and data fetching are handled server-side.
- * See: app/api/netatmo/camera/
+ * See: app/api/v1/netatmo/camera/
  */
 
 // ============================================================================

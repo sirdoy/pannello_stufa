@@ -618,27 +618,8 @@ self.addEventListener('fetch', (event: FetchEvent) => {
     );
   }
 
-  // Cache thermostat status responses
-  if (url.pathname === '/api/netatmo/status' && event.request.method === 'GET') {
-    event.respondWith(
-      fetch(event.request)
-        .then(async (response) => {
-          if (response.ok) {
-            const clone = response.clone();
-            try {
-              const data = await clone.json();
-              await cacheDeviceState('thermostat', data);
-            } catch {
-              // Ignore parsing errors
-            }
-          }
-          return response;
-        })
-        .catch((error) => {
-          throw error;
-        })
-    );
-  }
+  // Netatmo status caching removed — legacy path never existed (no v1 equivalent).
+  // If thermostat offline caching is reintroduced, target the canonical /api/v1/netatmo/homestatus path.
 });
 
 // ============================================

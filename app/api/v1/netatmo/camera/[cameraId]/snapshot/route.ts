@@ -7,9 +7,8 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/netatmo/camera/[cameraId]/snapshot
  * Redirects (302) to the live Netatmo CDN snapshot URL so <img src=...> consumers
- * render the JPEG directly. This mirrors the legacy /api/netatmo/camera/snapshot
- * behavior (Phase 168 Q3 decision — preserve <img> compatibility without forcing
- * a consumer rewrite).
+ * render the JPEG directly. This preserves the legacy camera snapshot behavior
+ * (Phase 168 Q3 decision — keep <img> compatibility without forcing a consumer rewrite).
  *
  * Protected: Requires Auth0 authentication (auth gate runs before the redirect).
  */

@@ -87,7 +87,7 @@ export default function CameraCard() {
     // Bust snapshot cache by appending a new timestamp — forces a fresh image load
     if (selectedCameraId) {
       setSnapshotError(false);
-      setSnapshotUrl(CAMERA_ROUTES.snapshot(selectedCameraId) + `&t=${Date.now()}`);
+      setSnapshotUrl(CAMERA_ROUTES.snapshot(selectedCameraId) + `?t=${Date.now()}`);
     }
     await refresh();
     setRefreshing(false);
@@ -108,11 +108,10 @@ export default function CameraCard() {
     setMonitoringOn(newValue); // optimistic
     setMonitoringLoading(true);
     try {
-      const res = await fetch(CAMERA_ROUTES.monitoring, {
+      const res = await fetch(CAMERA_ROUTES.monitoring(selectedCameraId), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          camera_id: selectedCameraId,
           monitoring: newValue ? 'on' : 'off',
         }),
       });
@@ -267,7 +266,7 @@ export default function CameraCard() {
             <Text variant="secondary" size="sm">Live non disponibile</Text>
           </div>
         ) : (
-          // Snapshot mode — URL points to /api/netatmo/camera/snapshot which redirects to Netatmo CDN
+          // Snapshot mode — URL points to /api/v1/netatmo/camera/[cameraId]/snapshot which 302-redirects to Netatmo CDN
           <>
             {snapshotUrl && !snapshotError ? (
               <img

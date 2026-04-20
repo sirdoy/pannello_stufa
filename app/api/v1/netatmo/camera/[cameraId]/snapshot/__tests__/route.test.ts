@@ -35,17 +35,19 @@ describe('GET /api/v1/netatmo/camera/[cameraId]/snapshot', () => {
     expect(data.code).toBe('UNAUTHORIZED');
   });
 
-  it('should return 200 with snapshot URL', async () => {
+  it('should return 302 redirect to Netatmo CDN snapshot URL', async () => {
     const mockData = { snapshot_url: 'https://example.com/snap.jpg' };
     mockGetCameraSnapshot.mockResolvedValue(mockData as any);
 
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/cam_001/snapshot');
 
     const response = await GET(request as any, mockContext as any);
-    const data = await response.json();
 
-    expect(response.status).toBe(200);
-    expect(data.success).toBe(true);
+    // 302 redirect preserves <img src> compatibility — browser follows the redirect
+    // to the Netatmo CDN URL and loads the JPEG directly (Phase 168 Q3 decision).
+    expect(response.status).toBe(302);
+    expect(response.headers.get('location')).toBe('https://example.com/snap.jpg');
+    expect(response.headers.get('cache-control')).toBe('no-cache, no-store');
     expect(mockGetCameraSnapshot).toHaveBeenCalledWith('cam_001');
   });
 });

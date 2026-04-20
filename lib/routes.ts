@@ -61,29 +61,35 @@ const SCHEDULER_ROUTES = {
 // Netatmo endpoints
 export const NETATMO_ROUTES = {
   // Topology
-  homesData: `${API_BASE}/netatmo/homesdata`,
+  homesData: `${API_BASE}/v1/netatmo/homesdata`,
 
   // Status & data
-  homeStatus: `${API_BASE}/netatmo/homestatus`,
-  schedules: `${API_BASE}/netatmo/schedules`,
-  switchHomeSchedule: `${API_BASE}/netatmo/switchhomeschedule`,
+  homeStatus: `${API_BASE}/v1/netatmo/homestatus`,
+  // schedules key removed — v1 schedules are embedded in homesdata.body.homes[0].schedules
+  // (see lib/hooks/useScheduleData.ts rewrite in Phase 168 Plan 02)
+  switchHomeSchedule: `${API_BASE}/v1/netatmo/switchhomeschedule`,
 
   // Control
-  setRoomThermpoint: `${API_BASE}/netatmo/setroomthermpoint`,
-  setThermMode: `${API_BASE}/netatmo/setthermmode`,
-  calibrate: `${API_BASE}/netatmo/calibrate`,
+  setRoomThermpoint: `${API_BASE}/v1/netatmo/setroomthermpoint`,
+  setThermMode: `${API_BASE}/v1/netatmo/setthermmode`,
+  calibrate: `${API_BASE}/v1/netatmo/valves/calibrate`,   // D-04: v1 bulk-calibrate lives under /valves/
 } as const;
 
 // Camera endpoints (Netatmo Security)
 export const CAMERA_ROUTES = {
-  status: `${API_BASE}/netatmo/camera/status`,
-  allEvents: `${API_BASE}/netatmo/camera/events`,
-  monitoring: `${API_BASE}/netatmo/camera/monitoring`,
-  // Use query parameter instead of path segment to avoid Turbopack routing issues
-  // with MAC address IDs containing colons (e.g., 70:ee:50:3b:1f:4f).
-  stream: (cameraId: string): string => `${API_BASE}/netatmo/camera/stream?cameraId=${encodeURIComponent(cameraId)}`,
-  snapshot: (cameraId: string): string => `${API_BASE}/netatmo/camera/snapshot?cameraId=${encodeURIComponent(cameraId)}`,
-  eventSnapshot: (eventId: string): string => `${API_BASE}/netatmo/camera/events/${encodeURIComponent(eventId)}/snapshot`,
+  status: `${API_BASE}/v1/netatmo/camera/status`,
+  allEvents: `${API_BASE}/v1/netatmo/camera/events`,
+  // monitoring now requires cameraId in path (v1 shape) — CONSUMERS MUST CALL IT AS A FUNCTION
+  // Previously: monitoring: string (bare constant). Now: monitoring(cameraId).
+  monitoring: (cameraId: string): string =>
+    `${API_BASE}/v1/netatmo/camera/${encodeURIComponent(cameraId)}/monitoring`,
+  // stream + snapshot: path-segment shape (query-param legacy was a Turbopack workaround that v1 does NOT require).
+  stream: (cameraId: string): string =>
+    `${API_BASE}/v1/netatmo/camera/${encodeURIComponent(cameraId)}/stream`,
+  snapshot: (cameraId: string): string =>
+    `${API_BASE}/v1/netatmo/camera/${encodeURIComponent(cameraId)}/snapshot`,
+  eventSnapshot: (eventId: string): string =>
+    `${API_BASE}/v1/netatmo/camera/events/${encodeURIComponent(eventId)}/snapshot`,
 } as const;
 
 // Logging endpoints

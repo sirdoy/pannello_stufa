@@ -67,7 +67,7 @@ async function executeStoveAction(
  */
 async function executeThermostatAction(endpoint: string, body: Record<string, unknown> = {}): Promise<unknown> {
   try {
-    const response = await fetch(`/api/netatmo/${endpoint}`, {
+    const response = await fetch(`/api/v1/netatmo/${endpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -225,19 +225,19 @@ function getThermostatCommands(): CommandGroup {
         id: 'thermo-mode-schedule',
         label: 'Modalita Automatica',
         icon: <Calendar className="w-4 h-4" />,
-        onSelect: async () => { await executeThermostatAction('set-therm-mode', { mode: 'schedule' }); },
+        onSelect: async () => { await executeThermostatAction('setthermmode', { mode: 'schedule' }); },
       },
       {
         id: 'thermo-mode-away',
         label: 'Modalita Away',
         icon: <Home className="w-4 h-4" />,
-        onSelect: async () => { await executeThermostatAction('set-therm-mode', { mode: 'away' }); },
+        onSelect: async () => { await executeThermostatAction('setthermmode', { mode: 'away' }); },
       },
       {
         id: 'thermo-mode-hg',
         label: 'Modalita Antigelo',
         icon: <Snowflake className="w-4 h-4" />,
-        onSelect: async () => { await executeThermostatAction('set-therm-mode', { mode: 'hg' }); },
+        onSelect: async () => { await executeThermostatAction('setthermmode', { mode: 'hg' }); },
       },
       {
         id: 'thermo-temp-up',

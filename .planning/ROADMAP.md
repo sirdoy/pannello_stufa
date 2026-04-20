@@ -236,7 +236,7 @@ Plans:
   3. Manual thermostat setpoint + valve calibrate exercised against canonical routes
   4. Jest + Playwright smoke green
 **Plans:** 3 plans
-- [ ] 168-01-PLAN.md — Rewrite both debug NetatmoTab files (42 URL swaps each, drop schedules tile, rewrite calibrate to valves/calibrate)
+- [x] 168-01-PLAN.md — Rewrite both debug NetatmoTab files (42 URL swaps each, drop schedules tile, rewrite calibrate to valves/calibrate)
 - [ ] 168-02-PLAN.md — Rewrite production consumer surface (routes.ts, useThermostatData shape-unwrap, useScheduleData endpoint-collapse, deviceCommands hyphen-bug fix, camera monitoring path-segment + body change, v1 snapshot route 302 redirect, sw.ts dead-branch delete, 3 test files)
 - [ ] 168-03-PLAN.md — Delete legacy app/api/netatmo/ tree + 2 legacy __tests__/ dirs; repo-wide grep sweep; Jest + Playwright smoke regression
 
@@ -342,7 +342,7 @@ See git history and `.planning/milestones/` for details.
 | 165. Milestone Hygiene & Spec Alignment | v19.0 | 2/2 | Complete   | 2026-04-16 |
 | 166. Hue Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-18 |
 | 167. Sonos Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-20 |
-| 168. Netatmo Frontend Cutover | v19.0 | 0/3 | Pending    | — |
+| 168. Netatmo Frontend Cutover | v19.0 | 1/3 | In Progress|  |
 | 169. DIRIGERA Frontend Cutover | v19.0 | 0/? | Pending    | — |
 | 170. Auth UI | v19.0 | 0/? | Pending    | — |
 | 171. Fritz!Box Consumer UI | v19.0 | 0/? | Pending    | — |

@@ -15,9 +15,23 @@ import { NETATMO_ROUTES } from '@/lib/routes';
 const MAX_RETRIES = 5;
 const RETRY_DELAY_MS = 3_000;
 
+/**
+ * Consumer-facing room list item shape (what setRooms emits).
+ *
+ * Mapped from v1 /homestatus raw-proxy response rooms:
+ * - setpoint ← therm_setpoint_temperature (nullable)
+ * - heating ← (heating_power_request ?? 0) > 0
+ * - mode: ALWAYS null (v1 does not expose room mode — legacy enriched it from Firebase topology).
+ * - endtime: ALWAYS null (v1 does not expose override endtime).
+ *
+ * Consumer impact documented in 168-RESEARCH.md Open Q1 RESOLVED + 168-DEFERRED.md
+ * (stoveSync/topology regression). Downstream consumers (ActiveOverrideBadge,
+ * ManualOverrideSheet, thermostat/schedule/page) already guard via `mode === 'manual'`
+ * and `endtime ?` ternaries — null-fallback is safe without consumer rewrites.
+ */
 interface RoomListItem {
-  room_id: string;
-  room_name: string;
+  id: string;
+  name: string;
   temperature: number | null;
   setpoint: number | null;
   mode: string | null;
@@ -47,7 +61,21 @@ export function useRoomStatus(): { rooms: unknown[]; loading: boolean; error: st
 
     try {
       const res = await fetch(NETATMO_ROUTES.homeStatus);
-      const data = await res.json() as Record<string, unknown>;
+      // Phase 168 D-04: /api/v1/netatmo/homestatus returns raw-proxy shape
+      // (no legacy enrichment for mode/endtime/modules/battery fields).
+      const data = await res.json() as {
+        rooms?: Array<{
+          room_id: string;
+          room_name: string;
+          temperature: number | null;
+          therm_setpoint_temperature: number | null;
+          heating_power_request: number | null;
+          timestamp?: number;
+        }>;
+        code?: string;
+        message?: string;
+        error?: string;
+      };
 
       if (!res.ok) {
         // Handle transient "topology not yet ready" (503 SERVICE_UNAVAILABLE)
@@ -70,22 +98,29 @@ export function useRoomStatus(): { rooms: unknown[]; loading: boolean; error: st
         }
 
         throw new Error(
-          (data.message as string) ||
-          (data.error as string) ||
+          data.message ||
+          data.error ||
           'Failed to fetch rooms'
         );
       }
 
-      // Transform to room selector format
-      const typedRooms: RoomListItem[] = (data.rooms as RoomListItem[]) || [];
-      const roomList = typedRooms.map((room) => ({
-        id: room.room_id,
-        name: room.room_name,
-        temperature: room.temperature,
-        setpoint: room.setpoint,
-        mode: room.mode,
-        heating: room.heating,
-        endtime: room.endtime, // UNIX timestamp (seconds) when manual override ends
+      // Transform v1 /homestatus rooms directly to the { id, name, ... } shape consumers expect.
+      // v1 response does NOT include legacy fields (mode, endtime) — set to null; consumers
+      // already null-guard via `r.mode === 'manual'` and `room.endtime ? ...` ternaries.
+      // See 168-RESEARCH.md Open Q1 RESOLVED + 168-DEFERRED.md for the stoveSync/topology regression.
+      const typedRooms = data.rooms ?? [];
+      const roomList: RoomListItem[] = typedRooms.map((r) => ({
+        id: r.room_id,
+        name: r.room_name,
+        temperature: r.temperature,
+        // v1: therm_setpoint_temperature → legacy consumer field: setpoint
+        setpoint: r.therm_setpoint_temperature ?? null,
+        // v1 does not emit mode; null-fallback (consumers guard via `=== 'manual'`).
+        mode: null,
+        // v1: heating_power_request (0..100) → legacy: heating (boolean). Any non-zero power = heating.
+        heating: (r.heating_power_request ?? 0) > 0,
+        // v1 does not emit endtime; null-fallback (consumers guard with truthy check).
+        endtime: null,
       }));
 
       setRooms(roomList);

@@ -4,14 +4,14 @@ milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: executing
 stopped_at: Phase 167 context gathered
-last_updated: "2026-04-20T13:34:32.550Z"
-last_activity: 2026-04-20
+last_updated: "2026-04-20T21:25:02.160Z"
+last_activity: 2026-04-20 -- Phase 168 execution started
 progress:
   total_phases: 16
   completed_phases: 12
-  total_plans: 24
+  total_plans: 27
   completed_plans: 24
-  percent: 100
+  percent: 89
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 167 — sonos-frontend-cutover
+**Current focus:** Phase 168 — netatmo-frontend-cutover
 
 ## Current Position
 
-Phase: 168
-Plan: Not started
-Status: Executing Phase 167
-Last activity: 2026-04-20
+Phase: 168 (netatmo-frontend-cutover) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 168
+Last activity: 2026-04-20 -- Phase 168 execution started
 
 Progress: [░░░░░░░░░░░░░░░░░░░] 0/0 plans (0%)
 

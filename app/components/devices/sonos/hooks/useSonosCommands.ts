@@ -39,7 +39,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handlePlay = async (groupId: string) => {
     try {
       params.setError(null);
-      const response = await sonosTransportCmd.execute(`/api/sonos/zones/${groupId}/play`, { method: 'POST' });
+      const response = await sonosTransportCmd.execute(`/api/v1/sonos/zones/${groupId}/play`, { method: 'POST' });
       if (response) {
         if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
         const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
@@ -54,7 +54,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handlePause = async (groupId: string) => {
     try {
       params.setError(null);
-      const response = await sonosTransportCmd.execute(`/api/sonos/zones/${groupId}/pause`, { method: 'POST' });
+      const response = await sonosTransportCmd.execute(`/api/v1/sonos/zones/${groupId}/pause`, { method: 'POST' });
       if (response) {
         if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
         const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
@@ -69,7 +69,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleStop = async (groupId: string) => {
     try {
       params.setError(null);
-      const response = await sonosTransportCmd.execute(`/api/sonos/zones/${groupId}/stop`, { method: 'POST' });
+      const response = await sonosTransportCmd.execute(`/api/v1/sonos/zones/${groupId}/stop`, { method: 'POST' });
       if (response) {
         if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
         const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
@@ -84,7 +84,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleNext = async (groupId: string) => {
     try {
       params.setError(null);
-      const response = await sonosTransportCmd.execute(`/api/sonos/zones/${groupId}/next`, { method: 'POST' });
+      const response = await sonosTransportCmd.execute(`/api/v1/sonos/zones/${groupId}/next`, { method: 'POST' });
       if (response) {
         if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
         const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
@@ -99,7 +99,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handlePrevious = async (groupId: string) => {
     try {
       params.setError(null);
-      const response = await sonosTransportCmd.execute(`/api/sonos/zones/${groupId}/previous`, { method: 'POST' });
+      const response = await sonosTransportCmd.execute(`/api/v1/sonos/zones/${groupId}/previous`, { method: 'POST' });
       if (response) {
         if (!response.ok) throw new Error(`Comando fallito: ${response.status}`);
         const data = await response.json() as SonosCommandOkResponse & { suggested_poll_delay_s: number };
@@ -114,7 +114,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSetVolume = async (uid: string, volume: number) => {
     try {
       params.setError(null);
-      const response = await sonosVolumeCmd.execute(`/api/sonos/speakers/${uid}/volume`, {
+      const response = await sonosVolumeCmd.execute(`/api/v1/sonos/speakers/${uid}/volume`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ volume } satisfies SetVolumeRequest),
@@ -133,7 +133,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSetMute = async (uid: string, mute: boolean) => {
     try {
       params.setError(null);
-      const response = await sonosVolumeCmd.execute(`/api/sonos/speakers/${uid}/mute`, {
+      const response = await sonosVolumeCmd.execute(`/api/v1/sonos/speakers/${uid}/mute`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mute } satisfies SetMuteRequest),
@@ -152,7 +152,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSetPlayMode = async (groupId: string, mode: SonosPlayMode) => {
     try {
       params.setError(null);
-      const response = await sonosExtendedCmd.execute(`/api/sonos/zones/${groupId}/play-mode`, {
+      const response = await sonosExtendedCmd.execute(`/api/v1/sonos/zones/${groupId}/play-mode`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mode } satisfies SetPlayModeRequest),
@@ -171,7 +171,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSetSleepTimer = async (groupId: string, duration: number) => {
     try {
       params.setError(null);
-      const response = await sonosExtendedCmd.execute(`/api/sonos/zones/${groupId}/sleep-timer`, {
+      const response = await sonosExtendedCmd.execute(`/api/v1/sonos/zones/${groupId}/sleep-timer`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ duration } satisfies SetSleepTimerRequest),
@@ -190,7 +190,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSetEq = async (uid: string, eq: SetEqRequest) => {
     try {
       params.setError(null);
-      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/eq`, {
+      const response = await sonosExtendedCmd.execute(`/api/v1/sonos/speakers/${uid}/eq`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(eq satisfies SetEqRequest),
@@ -209,7 +209,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSetHomeTheater = async (uid: string, settings: SetHomeTheaterRequest) => {
     try {
       params.setError(null);
-      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/home-theater`, {
+      const response = await sonosExtendedCmd.execute(`/api/v1/sonos/speakers/${uid}/home-theater`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings satisfies SetHomeTheaterRequest),
@@ -228,7 +228,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSwitchSource = async (uid: string, source: 'tv' | 'line_in') => {
     try {
       params.setError(null);
-      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/source`, {
+      const response = await sonosExtendedCmd.execute(`/api/v1/sonos/speakers/${uid}/source`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ source } satisfies SwitchSourceRequest),
@@ -247,7 +247,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleJoinGroup = async (uid: string, targetUid: string) => {
     try {
       params.setError(null);
-      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/join`, {
+      const response = await sonosExtendedCmd.execute(`/api/v1/sonos/speakers/${uid}/join`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ target_uid: targetUid } satisfies JoinRequest),
@@ -266,7 +266,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleUnjoinGroup = async (uid: string) => {
     try {
       params.setError(null);
-      const response = await sonosExtendedCmd.execute(`/api/sonos/speakers/${uid}/unjoin`, {
+      const response = await sonosExtendedCmd.execute(`/api/v1/sonos/speakers/${uid}/unjoin`, {
         method: 'POST',
       });
       if (response) {
@@ -283,7 +283,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSetZoneVolume = async (groupId: string, volume: number) => {
     try {
       params.setError(null);
-      const response = await sonosVolumeCmd.execute(`/api/sonos/zones/${groupId}/volume`, {
+      const response = await sonosVolumeCmd.execute(`/api/v1/sonos/zones/${groupId}/volume`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ volume } satisfies SetVolumeRequest),
@@ -302,7 +302,7 @@ export function useSonosCommands(params: UseSonosCommandsParams): UseSonosComman
   const handleSeek = async (groupId: string, position: string) => {
     try {
       params.setError(null);
-      const response = await sonosVolumeCmd.execute(`/api/sonos/zones/${groupId}/seek`, {
+      const response = await sonosVolumeCmd.execute(`/api/v1/sonos/zones/${groupId}/seek`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ position } satisfies SetSeekRequest),

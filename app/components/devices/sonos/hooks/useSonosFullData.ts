@@ -39,13 +39,13 @@ export function useSonosFullData(): UseSonosFullDataReturn {
       setError(null);
 
       // 0. Fetch devices list
-      const devicesRes = await fetch('/api/sonos/devices');
+      const devicesRes = await fetch('/api/v1/sonos/devices');
       if (!devicesRes.ok) throw new Error('Devices endpoint failed');
       const devicesBody = (await devicesRes.json()) as { devices: SonosDeviceResponse[] };
       const devices = devicesBody.devices;
 
       // 1. Fetch zones (wrapped in { zones: [...] })
-      const zonesRes = await fetch('/api/sonos/zones');
+      const zonesRes = await fetch('/api/v1/sonos/zones');
       if (!zonesRes.ok) throw new Error('Zones endpoint failed');
       const zonesBody = (await zonesRes.json()) as { zones: SonosZoneResponse[] };
       const zones = zonesBody.zones;
@@ -53,7 +53,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
       // 2. Fetch playback for ALL zones in parallel using Promise.allSettled
       const playbackResults = await Promise.allSettled(
         zones.map(z =>
-          fetch(`/api/sonos/zones/${z.group_id}/playback`).then(r => {
+          fetch(`/api/v1/sonos/zones/${z.group_id}/playback`).then(r => {
             if (!r.ok) throw new Error('playback failed');
             return r.json() as Promise<SonosPlaybackResponse>;
           })
@@ -70,7 +70,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
       // 4. Fetch volumes for ALL speakers using Promise.allSettled
       const volumeResults = await Promise.allSettled(
         allUids.map(uid =>
-          fetch(`/api/sonos/speakers/${uid}/volume`).then(r => {
+          fetch(`/api/v1/sonos/speakers/${uid}/volume`).then(r => {
             if (!r.ok) throw new Error('volume failed');
             return r.json() as Promise<SonosVolumeResponse>;
           })
@@ -85,7 +85,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
       const [eqResults, htResults] = await Promise.all([
         Promise.allSettled(
           allUids.map(uid =>
-            fetch(`/api/sonos/speakers/${uid}/eq`).then(r => {
+            fetch(`/api/v1/sonos/speakers/${uid}/eq`).then(r => {
               if (!r.ok) throw new Error('eq failed');
               return r.json() as Promise<SonosEqResponse>;
             })
@@ -93,7 +93,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
         ),
         Promise.allSettled(
           allUids.map(uid =>
-            fetch(`/api/sonos/speakers/${uid}/home-theater`).then(r => {
+            fetch(`/api/v1/sonos/speakers/${uid}/home-theater`).then(r => {
               if (!r.ok) throw new Error('home-theater failed');
               return r.json() as Promise<SonosHomeTheaterResponse>;
             })
@@ -113,7 +113,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
       const [playModeResults, sleepTimerResults] = await Promise.all([
         Promise.allSettled(
           zones.map(z =>
-            fetch(`/api/sonos/zones/${z.group_id}/play-mode`).then(r => {
+            fetch(`/api/v1/sonos/zones/${z.group_id}/play-mode`).then(r => {
               if (!r.ok) throw new Error('play-mode failed');
               return r.json() as Promise<SonosPlayModeResponse>;
             })
@@ -121,7 +121,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
         ),
         Promise.allSettled(
           zones.map(z =>
-            fetch(`/api/sonos/zones/${z.group_id}/sleep-timer`).then(r => {
+            fetch(`/api/v1/sonos/zones/${z.group_id}/sleep-timer`).then(r => {
               if (!r.ok) throw new Error('sleep-timer failed');
               return r.json() as Promise<SonosSleepTimerResponse>;
             })

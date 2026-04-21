@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { EndpointCard, PostEndpointCard } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Badge from '@/app/components/ui/Badge';
@@ -29,7 +29,10 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
     }
   };
 
-  const fetchGetEndpoint = async (name: string, url: string) => {
+  // Wrapped in useCallback so the reference stays stable across renders —
+  // otherwise the effects below would fire on every render (infinite loop).
+  // The callback only closes over setState setters, which are stable.
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -48,15 +51,18 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  };
+  }, []);
 
-  const fetchAllGetEndpoints = () => {
+  // Wrapped in useCallback so it is safe to list as an effect dependency
+  // without causing an infinite re-render loop. fetchGetEndpoint is stable
+  // (also wrapped in useCallback above).
+  const fetchAllGetEndpoints = useCallback(() => {
     fetchGetEndpoint('health', '/api/v1/netatmo/health');
     fetchGetEndpoint('homesdata', '/api/v1/netatmo/homesdata');
     fetchGetEndpoint('homestatus', '/api/v1/netatmo/homestatus');
     fetchGetEndpoint('valves', '/api/v1/netatmo/valves');
     fetchGetEndpoint('cameraStatus', '/api/v1/netatmo/camera/status');
-  };
+  }, [fetchGetEndpoint]);
 
   const callPostEndpoint = async (name: string, url: string, body: any) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));

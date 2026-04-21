@@ -4,7 +4,7 @@ milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: verifying
 stopped_at: Completed 168-03-PLAN.md — Phase 168 Netatmo frontend cutover complete (all 3 waves shipped)
-last_updated: "2026-04-21T09:29:56.052Z"
+last_updated: "2026-04-21T09:43:03.545Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 16
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 
 ## Current Position
 
-Phase: 168 (netatmo-frontend-cutover) — EXECUTING
-Plan: 3 of 3 (Wave 3 — legacy tree deletion pending)
+Phase: 169
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-04-21
 

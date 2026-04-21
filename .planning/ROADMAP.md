@@ -237,7 +237,7 @@ Plans:
   4. Jest + Playwright smoke green
 **Plans:** 3 plans
 - [x] 168-01-PLAN.md — Rewrite both debug NetatmoTab files (42 URL swaps each, drop schedules tile, rewrite calibrate to valves/calibrate)
-- [ ] 168-02-PLAN.md — Rewrite production consumer surface (routes.ts, useThermostatData shape-unwrap, useScheduleData endpoint-collapse, deviceCommands hyphen-bug fix, camera monitoring path-segment + body change, v1 snapshot route 302 redirect, sw.ts dead-branch delete, 3 test files)
+- [x] 168-02-PLAN.md — Rewrite production consumer surface (routes.ts, useThermostatData shape-unwrap, useScheduleData endpoint-collapse, deviceCommands hyphen-bug fix, camera monitoring path-segment + body change, v1 snapshot route 302 redirect, sw.ts dead-branch delete, 3 test files)
 - [ ] 168-03-PLAN.md — Delete legacy app/api/netatmo/ tree + 2 legacy __tests__/ dirs; repo-wide grep sweep; Jest + Playwright smoke regression
 
 ### Phase 169: DIRIGERA Frontend Cutover

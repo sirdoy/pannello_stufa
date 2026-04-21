@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: executing
-stopped_at: Phase 167 context gathered
-last_updated: "2026-04-20T21:25:02.160Z"
-last_activity: 2026-04-20 -- Phase 168 execution started
+stopped_at: Completed 168-02-PLAN.md — Netatmo production consumer cutover to /api/v1/netatmo/*
+last_updated: "2026-04-21T10:20:00.000Z"
+last_activity: 2026-04-21 -- Phase 168 Plan 02 complete (production consumer cutover)
 progress:
   total_phases: 16
   completed_phases: 12
   total_plans: 27
-  completed_plans: 24
-  percent: 89
+  completed_plans: 26
+  percent: 96
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 168 (netatmo-frontend-cutover) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 168
-Last activity: 2026-04-20 -- Phase 168 execution started
+Plan: 3 of 3 (Wave 3 — legacy tree deletion pending)
+Status: Plan 168-02 complete; Plan 168-03 pending
+Last activity: 2026-04-21 -- Phase 168 Plan 02 complete (production consumer cutover)
 
-Progress: [░░░░░░░░░░░░░░░░░░░] 0/0 plans (0%)
+Progress: [██████████████░░░░░] 2/3 plans (67%)
 
 ## Performance Metrics
 
@@ -58,6 +58,9 @@ Recent decisions affecting v19.0:
 - Scheduler endpoints explicitly excluded from v19.0 (future milestone)
 - v19.0 covers proxy client + API routes only; no dedicated UI pages
 - All endpoints follow established pattern: proxy client function -> API route -> (optional hook)
+- [Plan 168-02] Netatmo v1 camera snapshot emits 302 redirect (NextResponse.redirect) to preserve <img src> compat without client rewrite (Q3)
+- [Plan 168-02] Legacy /schedules endpoint DROPPED (D-04); schedules now extracted from /homesdata body.homes[0].schedules in useScheduleData
+- [Plan 168-02] jest.setup.ts NextResponseMock gained static .redirect() (Rule 1 fix — auto-applied when Task 4 Jest matrix caught Task 1 regression)
 
 ### Pending Todos
 
@@ -79,6 +82,6 @@ None.
 
 ## Session Continuity
 
-Last activity: 2026-04-03 — Roadmap created for v19.0 API Alignment & Full Coverage
-Stopped at: Phase 167 context gathered
-Resume file: .planning/phases/167-sonos-frontend-cutover/167-CONTEXT.md
+Last activity: 2026-04-21 — Phase 168 Plan 02 complete (Netatmo production consumer cutover to v1)
+Stopped at: Completed 168-02-PLAN.md; Plan 168-03 (legacy tree deletion) pending
+Resume file: .planning/phases/168-netatmo-frontend-cutover/168-03-PLAN.md

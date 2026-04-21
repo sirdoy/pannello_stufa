@@ -1,100 +1,49 @@
 /**
  * CameraMonitoringToggle tests
  *
- * Tests the monitoring toggle behavior wired into CameraCard and CameraDashboard.
- * Verifies: initial state, API call format, disabled states, optimistic rollback.
+ * Tests the monitoring toggle behavior via the shared `useCameraMonitoringToggle`
+ * hook that powers CameraCard and (an analogous inlined version in)
+ * CameraDashboard. Verifies: initial state, API call format, disabled states,
+ * optimistic rollback.
+ *
+ * Note: after Phase 168 review (WR-02), the inline harness was replaced with a
+ * direct `renderHook` invocation of the production hook so drift between
+ * production and test code becomes a compile error or a real test failure
+ * rather than a silent pass.
  */
 
-import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 
-// ---------------------------------------------------------------------------
-// Shared helpers — test the toggle logic via a minimal harness component
-// ---------------------------------------------------------------------------
+import { useCameraMonitoringToggle } from '@/app/components/devices/camera/hooks/useCameraMonitoringToggle';
 
-interface UseMonitoringToggleOptions {
-  initialOn: boolean;
-  cameraId: string;
-  isStale?: boolean;
-}
-
-/**
- * Minimal harness that mimics the toggle logic used in both CameraCard and
- * CameraDashboard without importing the full heavyweight components.
- */
-function MonitoringToggleHarness({ initialOn, cameraId, isStale = false }: UseMonitoringToggleOptions) {
-  const [monitoringOn, setMonitoringOn] = React.useState(initialOn);
-  const [monitoringLoading, setMonitoringLoading] = React.useState(false);
-
-  async function handleMonitoringToggle(newValue: boolean) {
-    if (monitoringLoading || isStale) return;
-    const previousValue = monitoringOn;
-    setMonitoringOn(newValue); // optimistic
-    setMonitoringLoading(true);
-    try {
-      const res = await fetch(`/api/v1/netatmo/camera/${encodeURIComponent(cameraId)}/monitoring`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          monitoring: newValue ? 'on' : 'off',
-        }),
-      });
-      if (!res.ok) {
-        setMonitoringOn(previousValue); // rollback
-      }
-    } catch {
-      setMonitoringOn(previousValue); // rollback
-    } finally {
-      setMonitoringLoading(false);
-    }
-  }
-
-  return (
-    <div>
-      <span data-testid="monitoring-state">{monitoringOn ? 'on' : 'off'}</span>
-      <span data-testid="loading-state">{monitoringLoading ? 'loading' : 'idle'}</span>
-      <button
-        data-testid="toggle-btn"
-        disabled={isStale || monitoringLoading}
-        onClick={() => handleMonitoringToggle(!monitoringOn)}
-      >
-        Toggle
-      </button>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
-
-describe('CameraMonitoringToggle — toggle logic', () => {
+describe('useCameraMonitoringToggle — shared toggle logic', () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
-  it('Test 1: renders with initial state — on maps to checked', () => {
-    render(
-      <MonitoringToggleHarness initialOn={true} cameraId="cam-1" />
+  it('Test 1: initial state — initialOn: true maps to on', () => {
+    const { result } = renderHook(() =>
+      useCameraMonitoringToggle({ initialOn: true }),
     );
-    expect(screen.getByTestId('monitoring-state').textContent).toBe('on');
+    expect(result.current.monitoringOn).toBe(true);
+    expect(result.current.monitoringLoading).toBe(false);
   });
 
-  it('Test 1b: renders with initial state — off (status !== on) maps to unchecked', () => {
-    render(
-      <MonitoringToggleHarness initialOn={false} cameraId="cam-1" />
-    );
-    expect(screen.getByTestId('monitoring-state').textContent).toBe('off');
+  it('Test 1b: initial state — initialOn: false (default) maps to off', () => {
+    const { result } = renderHook(() => useCameraMonitoringToggle());
+    expect(result.current.monitoringOn).toBe(false);
   });
 
-  it('Test 2: clicking toggle sends POST with monitoring: off when currently on', async () => {
+  it('Test 2: toggling from on sends POST with monitoring: off and correct URL', async () => {
     const mockFetch = jest.fn().mockResolvedValue({ ok: true });
     global.fetch = mockFetch as unknown as typeof fetch;
 
-    render(<MonitoringToggleHarness initialOn={true} cameraId="cam-1" />);
+    const { result } = renderHook(() =>
+      useCameraMonitoringToggle({ initialOn: true }),
+    );
 
     await act(async () => {
-      fireEvent.click(screen.getByTestId('toggle-btn'));
+      await result.current.handleToggle('cam-1', false);
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
@@ -103,18 +52,21 @@ describe('CameraMonitoringToggle — toggle logic', () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ monitoring: 'off' }),
-      })
+      }),
     );
+    expect(result.current.monitoringOn).toBe(false);
   });
 
-  it('Test 2b: clicking toggle sends POST with monitoring: on when currently off', async () => {
+  it('Test 2b: toggling from off sends POST with monitoring: on', async () => {
     const mockFetch = jest.fn().mockResolvedValue({ ok: true });
     global.fetch = mockFetch as unknown as typeof fetch;
 
-    render(<MonitoringToggleHarness initialOn={false} cameraId="cam-1" />);
+    const { result } = renderHook(() =>
+      useCameraMonitoringToggle({ initialOn: false }),
+    );
 
     await act(async () => {
-      fireEvent.click(screen.getByTestId('toggle-btn'));
+      await result.current.handleToggle('cam-1', true);
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
@@ -122,55 +74,95 @@ describe('CameraMonitoringToggle — toggle logic', () => {
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ monitoring: 'on' }),
-      })
+      }),
     );
+    expect(result.current.monitoringOn).toBe(true);
   });
 
-  it('Test 3: toggle is disabled when isStale (UNREACHABLE)', () => {
-    render(
-      <MonitoringToggleHarness initialOn={true} cameraId="cam-1" isStale={true} />
+  it('Test 3: toggle is a no-op when disabled=true (UNREACHABLE)', async () => {
+    const mockFetch = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = mockFetch as unknown as typeof fetch;
+
+    const { result } = renderHook(() =>
+      useCameraMonitoringToggle({ initialOn: true, disabled: true }),
     );
-    expect(screen.getByTestId('toggle-btn')).toBeDisabled();
+
+    await act(async () => {
+      await result.current.handleToggle('cam-1', false);
+    });
+
+    // fetch should not have been called
+    expect(mockFetch).not.toHaveBeenCalled();
+    // state stays unchanged
+    expect(result.current.monitoringOn).toBe(true);
   });
 
-  it('Test 4: toggle is disabled during API call (monitoringLoading)', async () => {
+  it('Test 3b: toggle is a no-op when cameraId is null', async () => {
+    const mockFetch = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = mockFetch as unknown as typeof fetch;
+
+    const { result } = renderHook(() =>
+      useCameraMonitoringToggle({ initialOn: false }),
+    );
+
+    await act(async () => {
+      await result.current.handleToggle(null, true);
+    });
+
+    expect(mockFetch).not.toHaveBeenCalled();
+    expect(result.current.monitoringOn).toBe(false);
+  });
+
+  it('Test 4: monitoringLoading is true during in-flight request', async () => {
     // Fetch that never resolves so we can inspect the loading state
     let resolveHook!: () => void;
     const mockFetch = jest.fn().mockReturnValue(
       new Promise<{ ok: boolean }>(resolve => {
         resolveHook = () => resolve({ ok: true });
-      })
+      }),
     );
     global.fetch = mockFetch as unknown as typeof fetch;
 
-    render(<MonitoringToggleHarness initialOn={false} cameraId="cam-1" />);
+    const { result } = renderHook(() =>
+      useCameraMonitoringToggle({ initialOn: false }),
+    );
 
+    let togglePromise!: Promise<void>;
     act(() => {
-      fireEvent.click(screen.getByTestId('toggle-btn'));
+      togglePromise = result.current.handleToggle('cam-1', true);
     });
 
-    // Button should now be disabled while loading
-    expect(screen.getByTestId('toggle-btn')).toBeDisabled();
+    // Loading should be true while request is in flight
+    await waitFor(() => {
+      expect(result.current.monitoringLoading).toBe(true);
+    });
+    // Optimistic update applied immediately
+    expect(result.current.monitoringOn).toBe(true);
 
     // Resolve the fetch to avoid open handles
     await act(async () => {
       resolveHook();
+      await togglePromise;
     });
+
+    expect(result.current.monitoringLoading).toBe(false);
   });
 
   it('Test 5: on API failure (non-ok response), toggle reverts to previous state', async () => {
     const mockFetch = jest.fn().mockResolvedValue({ ok: false });
     global.fetch = mockFetch as unknown as typeof fetch;
 
-    render(<MonitoringToggleHarness initialOn={true} cameraId="cam-1" />);
+    const { result } = renderHook(() =>
+      useCameraMonitoringToggle({ initialOn: true }),
+    );
 
     await act(async () => {
-      fireEvent.click(screen.getByTestId('toggle-btn'));
+      await result.current.handleToggle('cam-1', false);
     });
 
-    // State should have been reverted back to 'on' after rollback
+    // State should have been rolled back to 'on' after non-ok response
     await waitFor(() => {
-      expect(screen.getByTestId('monitoring-state').textContent).toBe('on');
+      expect(result.current.monitoringOn).toBe(true);
     });
   });
 
@@ -178,14 +170,32 @@ describe('CameraMonitoringToggle — toggle logic', () => {
     const mockFetch = jest.fn().mockRejectedValue(new Error('Network error'));
     global.fetch = mockFetch as unknown as typeof fetch;
 
-    render(<MonitoringToggleHarness initialOn={true} cameraId="cam-1" />);
+    const { result } = renderHook(() =>
+      useCameraMonitoringToggle({ initialOn: true }),
+    );
 
     await act(async () => {
-      fireEvent.click(screen.getByTestId('toggle-btn'));
+      await result.current.handleToggle('cam-1', false);
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('monitoring-state').textContent).toBe('on');
+      expect(result.current.monitoringOn).toBe(true);
     });
+  });
+
+  it('Test 6: URL-encodes cameraId in the POST URL path', async () => {
+    const mockFetch = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = mockFetch as unknown as typeof fetch;
+
+    const { result } = renderHook(() => useCameraMonitoringToggle());
+
+    await act(async () => {
+      await result.current.handleToggle('cam with spaces', true);
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      '/api/v1/netatmo/camera/cam%20with%20spaces/monitoring',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 });

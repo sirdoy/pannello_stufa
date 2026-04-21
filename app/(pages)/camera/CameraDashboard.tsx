@@ -146,6 +146,10 @@ export default function CameraDashboard() {
     }
   }
 
+  // Per-row monitoring toggle. Replicates the optimistic/rollback behavior of
+  // useCameraMonitoringToggle but keyed by cameraId because this dashboard
+  // tracks state for every row simultaneously. (See WR-02: the single-camera
+  // version is unit-tested via the shared hook.)
   async function handleMonitoringToggle(cameraId: string, newValue: boolean) {
     if (monitoringLoading[cameraId] ?? false) return;
     const previousValue = monitoringStates[cameraId] ?? false;

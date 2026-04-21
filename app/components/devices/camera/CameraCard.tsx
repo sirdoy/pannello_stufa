@@ -10,6 +10,16 @@ import { Text, Button, Switch } from '../../ui';
 import { getCameraTypeName } from '@/lib/netatmo/netatmoCameraApi';
 import HlsPlayer from './HlsPlayer';
 import { useCameraData } from './hooks/useCameraData';
+import { useCameraMonitoringToggle } from './hooks/useCameraMonitoringToggle';
+
+/**
+ * Build a snapshot URL for a camera, optionally appending a cache-busting
+ * timestamp. Keeping both the mount-effect and the explicit-refresh path
+ * aligned on a single helper prevents drift (see WR-03).
+ */
+function buildSnapshotUrl(cameraId: string, bust = false): string {
+  return CAMERA_ROUTES.snapshot(cameraId) + (bust ? `?t=${Date.now()}` : '');
+}
 
 /**
  * CameraCard - Camera summary view for homepage
@@ -27,8 +37,14 @@ export default function CameraCard() {
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [streamLoading, setStreamLoading] = useState(false);
   const [streamError, setStreamError] = useState(false);
-  const [monitoringOn, setMonitoringOn] = useState<boolean>(false);
-  const [monitoringLoading, setMonitoringLoading] = useState(false);
+
+  const isStale = dataFreshness === 'UNREACHABLE' || stale;
+
+  // Monitoring toggle logic is extracted to a shared hook so the behavior is
+  // exercised by unit tests (see useCameraMonitoringToggle.test) rather than a
+  // duplicated harness.
+  const { monitoringOn, monitoringLoading, setMonitoringOn, handleToggle: handleMonitoringToggleFn } =
+    useCameraMonitoringToggle({ disabled: dataFreshness === 'UNREACHABLE' });
 
   // Auto-select first camera
   useEffect(() => {
@@ -39,11 +55,13 @@ export default function CameraCard() {
   }, [cameras, selectedCameraId]);
 
   // Set snapshot URL when camera is selected — the API route proxies the binary JPEG server-side
-  // so we can use the URL directly as <img src> without CORS issues
+  // so we can use the URL directly as <img src> without CORS issues.
+  // A single helper is used by both this effect and handleRefresh to keep the
+  // URL generation logic in one place (see WR-03).
   useEffect(() => {
     if (selectedCameraId) {
       setSnapshotError(false);
-      setSnapshotUrl(CAMERA_ROUTES.snapshot(selectedCameraId));
+      setSnapshotUrl(buildSnapshotUrl(selectedCameraId));
     }
   }, [selectedCameraId]);
 
@@ -53,7 +71,7 @@ export default function CameraCard() {
     if (camera) {
       setMonitoringOn(camera.status === 'on');
     }
-  }, [selectedCameraId, cameras]);
+  }, [selectedCameraId, cameras, setMonitoringOn]);
 
   async function fetchStreamUrl(cameraId: string) {
     setStreamLoading(true);
@@ -83,12 +101,13 @@ export default function CameraCard() {
   }
 
   async function handleRefresh() {
+    // Guard against no-op refresh when no camera is selected (WR-03: avoids
+    // the confusing UX where `refreshing` briefly toggles with no work done).
+    if (!selectedCameraId) return;
     setRefreshing(true);
     // Bust snapshot cache by appending a new timestamp — forces a fresh image load
-    if (selectedCameraId) {
-      setSnapshotError(false);
-      setSnapshotUrl(CAMERA_ROUTES.snapshot(selectedCameraId) + `?t=${Date.now()}`);
-    }
+    setSnapshotError(false);
+    setSnapshotUrl(buildSnapshotUrl(selectedCameraId, true));
     await refresh();
     setRefreshing(false);
   }
@@ -103,30 +122,10 @@ export default function CameraCard() {
   }
 
   async function handleMonitoringToggle(newValue: boolean) {
-    if (!selectedCameraId || monitoringLoading || dataFreshness === 'UNREACHABLE') return;
-    const previousValue = monitoringOn;
-    setMonitoringOn(newValue); // optimistic
-    setMonitoringLoading(true);
-    try {
-      const res = await fetch(CAMERA_ROUTES.monitoring(selectedCameraId), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          monitoring: newValue ? 'on' : 'off',
-        }),
-      });
-      if (!res.ok) {
-        setMonitoringOn(previousValue); // rollback
-      }
-    } catch {
-      setMonitoringOn(previousValue); // rollback
-    } finally {
-      setMonitoringLoading(false);
-    }
+    await handleMonitoringToggleFn(selectedCameraId, newValue);
   }
 
   const selectedCamera = cameras.find(c => c.camera_id === selectedCameraId);
-  const isStale = dataFreshness === 'UNREACHABLE' || stale;
 
   // Get status badge based on camera state
   const getStatusBadge = () => {
@@ -302,6 +301,7 @@ export default function CameraCard() {
           <Button.Icon
             icon={<RefreshCw className={`w-4 h-4 text-white ${refreshing ? 'animate-spin' : ''}`} />}
             onClick={handleRefresh}
+            disabled={!selectedCameraId || refreshing}
             variant="ghost"
             size="sm"
             aria-label="Aggiorna snapshot"

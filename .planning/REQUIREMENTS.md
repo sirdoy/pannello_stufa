@@ -58,15 +58,15 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 
 ### Netatmo
 
-- [ ] **NETA-01**: GET /api/v1/netatmo/getthermstate ritorna stato termostato corrente
-- [ ] **NETA-02**: POST /api/v1/netatmo/valves/calibrate calibra tutte le valvole
-- [ ] **NETA-03**: POST /api/v1/netatmo/valves/{module_id}/calibrate calibra singola valvola
-- [ ] **NETA-04**: GET /api/v1/netatmo/camera/events/{event_id}/snapshot ritorna snapshot evento
-- [ ] **NETA-05**: GET /api/v1/netatmo/camera/{camera_id}/stream ritorna URL stream RTSP
-- [ ] **NETA-06**: GET /api/v1/netatmo/camera/{camera_id}/snapshot ritorna snapshot camera
-- [ ] **NETA-07**: POST /api/v1/netatmo/camera/{camera_id}/monitoring toggle monitoraggio camera
-- [ ] **NETA-08**: POST /api/v1/netatmo/renamehome rinomina un home
-- [ ] **NETA-09**: GET /api/v1/netatmo/gethomedata ritorna snapshot completo home (alias deprecato)
+- [x] **NETA-01**: GET /api/v1/netatmo/getthermstate ritorna stato termostato corrente
+- [x] **NETA-02**: POST /api/v1/netatmo/valves/calibrate calibra tutte le valvole
+- [x] **NETA-03**: POST /api/v1/netatmo/valves/{module_id}/calibrate calibra singola valvola
+- [x] **NETA-04**: GET /api/v1/netatmo/camera/events/{event_id}/snapshot ritorna snapshot evento
+- [x] **NETA-05**: GET /api/v1/netatmo/camera/{camera_id}/stream ritorna URL stream RTSP
+- [x] **NETA-06**: GET /api/v1/netatmo/camera/{camera_id}/snapshot ritorna snapshot camera
+- [x] **NETA-07**: POST /api/v1/netatmo/camera/{camera_id}/monitoring toggle monitoraggio camera
+- [x] **NETA-08**: POST /api/v1/netatmo/renamehome rinomina un home
+- [x] **NETA-09**: GET /api/v1/netatmo/gethomedata ritorna snapshot completo home (alias deprecato)
 
 ### Fritz!Box
 
@@ -136,15 +136,15 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 | SONOS-11 | Phase 160 + 167 (frontend cutover) | Pending |
 | SONOS-12 | Phase 160 + 167 (frontend cutover) | Pending |
 | SONOS-13 | Phase 160 + 167 (frontend cutover) | Pending |
-| NETA-01 | Phase 161 + 168 (frontend cutover) | Pending |
-| NETA-02 | Phase 161 + 168 (frontend cutover) | Pending |
-| NETA-03 | Phase 161 + 168 (frontend cutover) | Pending |
-| NETA-04 | Phase 161 + 168 (frontend cutover) | Pending |
-| NETA-05 | Phase 161 + 168 (frontend cutover) | Pending |
-| NETA-06 | Phase 161 + 168 (frontend cutover) | Pending |
-| NETA-07 | Phase 161 + 168 (frontend cutover) | Pending |
-| NETA-08 | Phase 161 + 168 (frontend cutover) | Pending |
-| NETA-09 | Phase 161 + 168 (frontend cutover) | Pending |
+| NETA-01 | Phase 161 + 168 (frontend cutover) | Complete |
+| NETA-02 | Phase 161 + 168 (frontend cutover) | Complete |
+| NETA-03 | Phase 161 + 168 (frontend cutover) | Complete |
+| NETA-04 | Phase 161 + 168 (frontend cutover) | Complete |
+| NETA-05 | Phase 161 + 168 (frontend cutover) | Complete |
+| NETA-06 | Phase 161 + 168 (frontend cutover) | Complete |
+| NETA-07 | Phase 161 + 168 (frontend cutover) | Complete |
+| NETA-08 | Phase 161 + 168 (frontend cutover) | Complete |
+| NETA-09 | Phase 161 + 168 (frontend cutover) | Complete |
 | FRITZ-01 | Phase 162 + 171 (consumer UI) | Pending |
 | FRITZ-02 | Phase 162 + 171 (consumer UI) | Pending |
 | FRITZ-03 | Phase 162 + 171 (consumer UI) | Pending |

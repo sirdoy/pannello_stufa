@@ -44,10 +44,17 @@ export default function CameraDashboard() {
 
   const fetchedRef = useRef<boolean>(false);
 
+  // Mount-only effect: guarded by fetchedRef so StrictMode double-invoke is
+  // a no-op. The eslint-disable is intentional — `fetchData` is defined below
+  // and closes over `selectedCameraId`, but we ONLY want the initial fetch
+  // here; explicit refreshes go through `handleRefresh` which calls
+  // `fetchData` directly (no stale-closure risk because we always pass the
+  // latest arguments). See WR-05.
   useEffect(() => {
     if (fetchedRef.current) return;
     fetchedRef.current = true;
-    fetchData();
+    void fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchData(bustCache = false): Promise<void> {
@@ -131,7 +138,9 @@ export default function CameraDashboard() {
 
   async function handleRefresh() {
     setRefreshing(true);
-    fetchedRef.current = false;
+    // fetchedRef is a mount-only guard for the initial-fetch effect; since
+    // handleRefresh calls fetchData directly (not via the effect) we don't
+    // need to reset it. See WR-05.
     setStreamUrl(null);
     await fetchData(true); // bustCache=true: append timestamp to snapshot URLs
     setRefreshing(false);

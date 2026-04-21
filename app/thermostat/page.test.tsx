@@ -15,14 +15,14 @@ jest.mock('next/navigation', () => ({
   useSearchParams: jest.fn(),
 }));
 
-// Mock NETATMO_ROUTES
-jest.mock('@/lib/routes', () => ({
-  NETATMO_ROUTES: {
-    homesData: '/api/v1/netatmo/homesdata',
-    homeStatus: '/api/v1/netatmo/homestatus',
-    setThermMode: '/api/v1/netatmo/setthermmode',
-  },
-}));
+// Use the real lib/routes so the mock stays forward-compatible with future
+// additions (WR-07). Previously this mock listed only three NETATMO_ROUTES
+// fields and omitted CAMERA_ROUTES, causing silent `undefined` reads in any
+// code path that grew to use the missing fields.
+jest.mock('@/lib/routes', () => {
+  const actual = jest.requireActual('@/lib/routes');
+  return { ...actual };
+});
 
 // Mock UI components to avoid complex rendering
 jest.mock('@/app/components/ui', () => {

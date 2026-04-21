@@ -282,6 +282,28 @@ function NextResponseMock(body: any, init?: { status?: number; headers?: Headers
 // Add static json method
 (NextResponseMock as any).json = jest.fn().mockImplementation(nextResponseJsonImpl);
 
+// Static redirect method — mirrors Next.js NextResponse.redirect(url, init?)
+// Used by the v1 camera snapshot route (Phase 168 Plan 02 Q3: 302 redirect preserves <img src> compat)
+// Signature accepts either a status number or an init object with { status, headers }.
+const nextResponseRedirectImpl = (
+  url: string | URL,
+  init?: number | { status?: number; headers?: HeadersInit }
+) => {
+  const status = typeof init === 'number' ? init : init?.status ?? 307;
+  const extraHeaders = typeof init === 'number' ? undefined : init?.headers;
+  const headers = new Headers(extraHeaders || {});
+  headers.set('location', url.toString());
+  const response = {
+    status,
+    ok: status >= 200 && status < 300,
+    headers,
+    json: async () => ({}),
+    clone: function () { return { ...this }; },
+  };
+  return response;
+};
+(NextResponseMock as any).redirect = jest.fn().mockImplementation(nextResponseRedirectImpl);
+
 jest.mock('next/server', () => ({
   __esModule: true,
   NextResponse: NextResponseMock,
@@ -295,6 +317,10 @@ afterEach(() => {
   // Restore NextResponse.json implementation after clearAllMocks
   if ((NextResponseMock as any).json.mockImplementation) {
     (NextResponseMock as any).json.mockImplementation(nextResponseJsonImpl);
+  }
+  // Restore NextResponse.redirect implementation after clearAllMocks
+  if ((NextResponseMock as any).redirect.mockImplementation) {
+    (NextResponseMock as any).redirect.mockImplementation(nextResponseRedirectImpl);
   }
 
   localStorageMock.getItem?.mockClear();

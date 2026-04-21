@@ -245,15 +245,25 @@ describe('useThermostatData — WebSocket subscription', () => {
   });
 
   it('Test 13b: WS low-battery modules enriched with name/type from topology', async () => {
-    // Simulate topology loaded via fetch (includes module name/type)
+    // Phase 168 Plan 02: checkConnection unwraps v1 raw-proxy shape body.homes[0].
+    // The topology fetch mock returns the v1 shape so the hook flattens it correctly
+    // and downstream lowBatteryModules enrichment can read modules[].name/type.
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({
-        home_id: 'h1',
-        home_name: 'Home',
-        modules: [
-          { id: 'mod1', type: 'NRV', name: 'Valvola Camera' },
-        ],
+        body: {
+          homes: [
+            {
+              id: 'h1',
+              name: 'Home',
+              rooms: [],
+              modules: [
+                { id: 'mod1', type: 'NRV', name: 'Valvola Camera' },
+              ],
+              schedules: [],
+            },
+          ],
+        },
       }),
     }) as jest.Mock;
 

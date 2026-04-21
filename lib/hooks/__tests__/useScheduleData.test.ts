@@ -65,14 +65,21 @@ function makeErrorResponse(status: number, message: string): Response {
   } as unknown as Response;
 }
 
+// Phase 168 Plan 02 D-04: legacy /schedules endpoint dropped. useScheduleData now
+// reads NETATMO_ROUTES.homesData (v1 /api/v1/netatmo/homesdata) and extracts the
+// schedules array from the raw-proxy shape: { body: { homes: [{ id, schedules }] } }.
 const SCHEDULES_PAYLOAD = {
-  success: true,
-  schedules: [
-    { id: 's1', name: 'Default', selected: true },
-    { id: 's2', name: 'Night', selected: false },
-  ],
-  home_id: 'home123',
-  _source: 'api',
+  body: {
+    homes: [
+      {
+        id: 'home123',
+        schedules: [
+          { id: 's1', name: 'Default', selected: true },
+          { id: 's2', name: 'Night', selected: false },
+        ],
+      },
+    ],
+  },
 };
 
 // ---------------------------------------------------------------------------

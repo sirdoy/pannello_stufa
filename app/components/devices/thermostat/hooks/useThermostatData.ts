@@ -267,7 +267,14 @@ export function useThermostatData(): UseThermostatDataReturn {
     }
   }
 
-  // WS subscription: subscribe to 'netatmo' topic when connection is OPEN (Phase 141 conditional guard pattern)
+  // WS subscription: subscribe to 'netatmo' topic when connection is OPEN (Phase 141 conditional guard pattern).
+  //
+  // NOTE (WR-04): `subscribe` and `unsubscribe` MUST be stable references from
+  // WebSocketContext (i.e. wrapped in `useCallback` inside the provider).
+  // Otherwise this effect will tear down and re-subscribe on every provider
+  // re-render, producing a reconnect loop. Topology changes do NOT invalidate
+  // this effect — we read `topologyRef.current` inside `handleMessage` so
+  // WS enrichment always picks up the latest topology without re-subscribing.
   useEffect(() => {
     if (!isWsConnected) return; // guard — prevent dead subscriptions when CLOSED
 

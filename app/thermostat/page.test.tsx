@@ -18,9 +18,9 @@ jest.mock('next/navigation', () => ({
 // Mock NETATMO_ROUTES
 jest.mock('@/lib/routes', () => ({
   NETATMO_ROUTES: {
-    homesData: '/api/netatmo/homes-data',
-    homeStatus: '/api/netatmo/home-status',
-    setThermMode: '/api/netatmo/set-therm-mode',
+    homesData: '/api/v1/netatmo/homesdata',
+    homeStatus: '/api/v1/netatmo/homestatus',
+    setThermMode: '/api/v1/netatmo/setthermmode',
   },
 }));
 
@@ -143,7 +143,7 @@ describe('NetatmoPage - setState-in-render fix', () => {
 
     // Wait for loading to complete
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/netatmo/homes-data');
+      expect(global.fetch).toHaveBeenCalledWith('/api/v1/netatmo/homesdata');
     });
 
     // Should still show skeleton (not connected state)
@@ -173,21 +173,28 @@ describe('NetatmoPage - setState-in-render fix', () => {
   });
 
   test('should not redirect when connected', async () => {
-    // Mock API to return successful connection
+    // Mock API to return successful connection in v1 raw-proxy shape
+    // (Phase 168 Plan 02: useThermostatData.checkConnection unwraps body.homes[0])
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         json: async () => ({
-          home_id: '123',
-          home_name: 'Test Home',
-          rooms: [],
-          modules: [],
+          body: {
+            homes: [
+              {
+                id: '123',
+                name: 'Test Home',
+                rooms: [],
+                modules: [],
+                schedules: [],
+              },
+            ],
+          },
         }),
       })
       .mockResolvedValueOnce({
         json: async () => ({
-          mode: 'schedule',
           rooms: [],
-          modules: [],
+          data_freshness: 'LIVE',
         }),
       });
 

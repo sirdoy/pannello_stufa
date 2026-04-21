@@ -80,54 +80,52 @@ describe('ThermostatCard - Schedule Section', () => {
     // Mock initial connection check (connected)
     mockedFetch.mockImplementation((url) => {
       const urlString = typeof url === 'string' ? url : url.toString();
-      if (urlString.includes('/api/netatmo/homesdata')) {
+      if (urlString.includes('/api/v1/netatmo/homesdata')) {
+        // v1 raw-proxy shape (Phase 168 Plan 02 cutover)
         return Promise.resolve({
           ok: true,
           json: async () => ({
-            home_id: 'home-123',
-            home_name: 'Casa',
-            rooms: [
-              {
-                id: 'room-1',
-                name: 'Soggiorno',
-                modules: ['module-1'],
-              },
-            ],
-            modules: [
-              {
-                id: 'module-1',
-                type: 'NATherm1',
-                name: 'Termostato Soggiorno',
-              },
-            ],
+            body: {
+              homes: [
+                {
+                  id: 'home-123',
+                  name: 'Casa',
+                  rooms: [
+                    {
+                      id: 'room-1',
+                      name: 'Soggiorno',
+                      modules: ['module-1'],
+                    },
+                  ],
+                  modules: [
+                    {
+                      id: 'module-1',
+                      type: 'NATherm1',
+                      name: 'Termostato Soggiorno',
+                    },
+                  ],
+                  schedules: [],
+                },
+              ],
+            },
           }),
         } as Response);
       }
-      if (urlString.includes('/api/netatmo/homestatus')) {
+      if (urlString.includes('/api/v1/netatmo/homestatus')) {
+        // v1 raw-proxy shape — rooms with v1 field names (therm_setpoint_temperature, heating_power_request)
         return Promise.resolve({
           ok: true,
           json: async () => ({
-            mode: 'schedule',
             rooms: [
               {
                 room_id: 'room-1',
+                room_name: 'Soggiorno',
                 temperature: 20,
-                setpoint: 21,
-                mode: 'schedule',
-                heating: false,
+                therm_setpoint_temperature: 21,
+                heating_power_request: 0,
               },
             ],
-            modules: [
-              {
-                id: 'module-1',
-                type: 'NATherm1',
-                battery_state: 'full',
-                reachable: true,
-              },
-            ],
-            lowBatteryModules: [],
-            hasLowBattery: false,
-            hasCriticalBattery: false,
+            data_freshness: 'LIVE',
           }),
         } as Response);
       }
@@ -151,27 +149,38 @@ describe('ThermostatCard - Schedule Section', () => {
 
     mockedFetch.mockImplementation((url, options) => {
       const urlString = typeof url === 'string' ? url : url.toString();
-      if (urlString.includes('/api/netatmo/homesdata')) {
+      if (urlString.includes('/api/v1/netatmo/homesdata')) {
+        // v1 raw-proxy shape (Phase 168 Plan 02 cutover)
         return Promise.resolve({
           ok: true,
           json: async () => ({
-            home_id: 'home-123',
-            home_name: 'Casa',
-            rooms: [{ id: 'room-1', name: 'Soggiorno', modules: ['module-1'] }],
-            modules: [{ id: 'module-1', type: 'NATherm1', name: 'Termostato Soggiorno' }],
+            body: {
+              homes: [
+                {
+                  id: 'home-123',
+                  name: 'Casa',
+                  rooms: [{ id: 'room-1', name: 'Soggiorno', modules: ['module-1'] }],
+                  modules: [{ id: 'module-1', type: 'NATherm1', name: 'Termostato Soggiorno' }],
+                  schedules: [],
+                },
+              ],
+            },
           }),
         } as Response);
       }
-      if (urlString.includes('/api/netatmo/homestatus')) {
+      if (urlString.includes('/api/v1/netatmo/homestatus')) {
+        // v1 raw-proxy shape — rooms with v1 field names
         return Promise.resolve({
           ok: true,
           json: async () => ({
-            mode: 'schedule',
-            rooms: [{ room_id: 'room-1', temperature: 20, setpoint: 21, mode: 'schedule', heating: false }],
-            modules: [{ id: 'module-1', type: 'NATherm1', battery_state: 'full', reachable: true }],
-            lowBatteryModules: [],
-            hasLowBattery: false,
-            hasCriticalBattery: false,
+            rooms: [{
+              room_id: 'room-1',
+              room_name: 'Soggiorno',
+              temperature: 20,
+              therm_setpoint_temperature: 21,
+              heating_power_request: 0,
+            }],
+            data_freshness: 'LIVE',
           }),
         } as Response);
       }
@@ -208,15 +217,12 @@ describe('ThermostatCard - Schedule Section', () => {
     // Since Radix Select uses onValueChange, we trigger via the test mock's execute path.
     // We directly assert the routes constant points to the correct endpoint.
     const { NETATMO_ROUTES } = await import('@/lib/routes');
-    expect(NETATMO_ROUTES.switchHomeSchedule).toBe('/api/netatmo/switchhomeschedule');
-    expect((NETATMO_ROUTES as any).schedules).toBe('/api/netatmo/schedules');
-
-    // Verify no POST to schedules route was made (it's GET-only now)
-    const schedulePostCall = mockedFetch.mock.calls.find(([url, opts]) => {
-      const urlStr = typeof url === 'string' ? url : url.toString();
-      return urlStr.includes('/api/netatmo/schedules') && (opts as RequestInit)?.method === 'POST';
-    });
-    expect(schedulePostCall).toBeUndefined();
+    expect(NETATMO_ROUTES.switchHomeSchedule).toBe('/api/v1/netatmo/switchhomeschedule');
+    // NOTE: Phase 168 Plan 02 (D-04) dropped the legacy `schedules` key from NETATMO_ROUTES.
+    // Schedules are now embedded in /api/v1/netatmo/homesdata response body. The
+    // previous negative assertion (no POST to /schedules) is vacuous now — the endpoint
+    // does not exist at all. Coverage of the "schedules flow through homesdata" invariant
+    // lives in useScheduleData tests.
   });
 
   test('shows schedule selector when connected and schedules available', async () => {

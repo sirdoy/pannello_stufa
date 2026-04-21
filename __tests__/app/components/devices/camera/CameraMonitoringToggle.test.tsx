@@ -32,11 +32,10 @@ function MonitoringToggleHarness({ initialOn, cameraId, isStale = false }: UseMo
     setMonitoringOn(newValue); // optimistic
     setMonitoringLoading(true);
     try {
-      const res = await fetch('/api/netatmo/camera/monitoring', {
+      const res = await fetch(`/api/v1/netatmo/camera/${encodeURIComponent(cameraId)}/monitoring`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          camera_id: cameraId,
           monitoring: newValue ? 'on' : 'off',
         }),
       });
@@ -99,11 +98,11 @@ describe('CameraMonitoringToggle — toggle logic', () => {
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/netatmo/camera/monitoring',
+      '/api/v1/netatmo/camera/cam-1/monitoring',
       expect.objectContaining({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ camera_id: 'cam-1', monitoring: 'off' }),
+        body: JSON.stringify({ monitoring: 'off' }),
       })
     );
   });
@@ -119,10 +118,10 @@ describe('CameraMonitoringToggle — toggle logic', () => {
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
-      '/api/netatmo/camera/monitoring',
+      '/api/v1/netatmo/camera/cam-1/monitoring',
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ camera_id: 'cam-1', monitoring: 'on' }),
+        body: JSON.stringify({ monitoring: 'on' }),
       })
     );
   });

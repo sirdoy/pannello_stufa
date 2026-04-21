@@ -19,8 +19,12 @@ import { NETATMO_ROUTES } from '@/lib/routes';
  * @returns {Object|null} activeSchedule - Currently active schedule (where selected=true)
  * @returns {boolean} loading - Whether initial fetch is in progress
  * @returns {string|null} error - Error message if fetch failed
- * @returns {string|null} source - Data source: 'cache' | 'api' | null
  * @returns {Function} refetch - Manually trigger schedule data refresh
+ *
+ * @note The legacy `source` field ('cache' | 'api') was removed in Phase 168
+ * because v1 routes no longer emit `_source` metadata. Consumers that
+ * previously branched on `source === 'cache'` should just render the data
+ * unconditionally.
  *
  * @example
  * const { schedules, activeSchedule, loading, error, refetch } = useScheduleData();
@@ -47,12 +51,11 @@ interface Schedule {
   [key: string]: unknown;
 }
 
-export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Schedule | null; homeId: string | null; loading: boolean; error: string | null; source: string | null; refetch: () => Promise<void> } {
+export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Schedule | null; homeId: string | null; loading: boolean; error: string | null; refetch: () => Promise<void> } {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [homeId, setHomeId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [source, setSource] = useState<string | null>(null); // 'cache' | 'api'
 
   // Track retry count across calls without triggering re-renders
   const retryCountRef = useRef(0);
@@ -125,8 +128,8 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
       const home = (data as { body?: { homes?: Array<{ id?: string; schedules?: Schedule[] }> } }).body?.homes?.[0];
       setSchedules(home?.schedules ?? []);
       setHomeId(home?.id ?? null);
-      // v1 routes don't emit _source; always treat as 'api' (was 'cache' | 'api' in legacy)
-      setSource('api');
+      // Note: legacy `source` state removed in Phase 168 review (WR-06) —
+      // v1 routes don't emit _source, and no consumer branched on it.
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unknown error');
       console.error('[useScheduleData] Fetch error:', err);
@@ -170,7 +173,6 @@ export function useScheduleData(): { schedules: Schedule[]; activeSchedule: Sche
     homeId,
     loading,
     error,
-    source,
     refetch,
   };
 }

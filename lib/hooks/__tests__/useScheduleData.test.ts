@@ -113,7 +113,6 @@ describe('useScheduleData', () => {
 
     expect(result.current.schedules).toHaveLength(2);
     expect(result.current.homeId).toBe('home123');
-    expect(result.current.source).toBe('api');
     expect(result.current.error).toBeNull();
   });
 

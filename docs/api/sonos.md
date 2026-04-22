@@ -39,6 +39,7 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 | `POST` | `/api/v1/sonos/speakers/{uid}/unjoin` | Remove a speaker from its current group |
 | `GET` | `/api/v1/sonos/zones/{group_id}/sleep-timer` | Get zone sleep timer remaining seconds |
 | `PUT` | `/api/v1/sonos/zones/{group_id}/sleep-timer` | Set or cancel zone sleep timer |
+| `POST` | `/api/v1/sonos/speakers/{uid}/test` | Physically identify a speaker (play chime) |
 | `GET` | `/api/v1/sonos/history` | Volume or playback history with auto-granularity |
 
 ---
@@ -79,6 +80,8 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
   - [POST /speakers/{uid}/unjoin](#post-speakersuidunjoin)
   - [GET /zones/{group_id}/sleep-timer](#get-zonesgroup_idsleep-timer)
   - [PUT /zones/{group_id}/sleep-timer](#put-zonesgroup_idsleep-timer)
+- [Device Identification](#device-identification)
+  - [POST /speakers/{uid}/test](#post-speakersuidtest)
 - [History](#history)
   - [GET /history](#get-history)
 - [Next.js Fetch Snippets](#nextjs-fetch-snippets)
@@ -1761,6 +1764,60 @@ curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/sleep-
 
 ---
 
+## Device Identification
+
+### POST /speakers/{uid}/test
+
+Physically identify a Sonos speaker by playing a short chime. Saves the current volume, sets volume to 25 (or keeps original if higher than 15), plays the Sonos built-in buzzer (`x-rincon-buzzer:0`), waits 2 seconds, then restores the original volume.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Path Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `uid` | string | Speaker UID (e.g. `"RINCON_C4A81B3D567801400"`) |
+
+**Request body:** None
+
+**Response (200):**
+
+```json
+{
+  "device_id": "RINCON_C4A81B3D567801400",
+  "action": "chime",
+  "success": true
+}
+```
+
+```typescript
+interface DeviceTestResponse {
+  device_id: string;
+  action: string;    // "chime" for Sonos speakers
+  success: boolean;
+}
+```
+
+**curl:**
+
+```bash
+curl -X POST YOUR_BASE_URL/api/v1/sonos/speakers/RINCON_C4A81B3D567801400/test \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+**Error responses:**
+
+| Status | Condition |
+|--------|-----------|
+| `401 Unauthorized` | Missing or invalid authentication token |
+| `404 Not Found` | Speaker UID not found |
+| `502 Bad Gateway` | SoCo command failed |
+| `503 Service Unavailable` | Speakers UNREACHABLE or data not yet available |
+
+> **Note:** The endpoint blocks for ~2 seconds while the chime plays. Volume is always restored to the original level after the test.
+
+---
+
 ## History
 
 ### GET /history
@@ -2229,3 +2286,18 @@ Use `GET /health` to check freshness before running a dashboard refresh:
 - `LIVE` -- data is current (within 90 seconds)
 - `STALE` -- speakers were reachable at least once but polling has lapsed
 - HTTP 503 -- speakers have been consistently unreachable (3+ poll failures)
+
+---
+
+## Real-Time (WebSocket)
+
+For real-time push updates without polling, subscribe to the Sonos topics on the WebSocket endpoint.
+
+See [WebSocket API - sonos topic](./websocket.md#sonos) for the full payload schema, TypeScript interfaces, and subscription example.
+
+| Topic | Description | Snapshot on Subscribe |
+|-------|-------------|----------------------|
+| `sonos` | Full speaker list with state | Yes |
+| `sonos_transport` | Playback state changes | No (push on mutation) |
+| `sonos_volume` | Volume/mute changes | No (push on mutation) |
+| `sonos_topology` | Speaker/group topology changes | No (push on mutation) |

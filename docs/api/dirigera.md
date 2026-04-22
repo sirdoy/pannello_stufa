@@ -611,3 +611,14 @@ curl -s "YOUR_BASE_URL/api/v1/dirigera/telemetry?sensor_id=YOUR_SENSOR_ID&start=
 **Statistics / Open-Close Counts**
 - **AreaChart** -- cumulative open/close count over time. Per D-13.
 - **StatCards** -- display total_open, total_close, daily_average as metric cards. Per D-12.
+
+---
+
+## Real-Time (WebSocket)
+
+For real-time push updates without polling, subscribe to the `dirigera` topic on the WebSocket endpoint.
+
+See [WebSocket API - dirigera topic](./websocket.md#dirigera) for the full payload schema, TypeScript interfaces, and subscription example.
+
+**Topic:** `dirigera`
+**Snapshot on subscribe:** Yes -- current sensor readings

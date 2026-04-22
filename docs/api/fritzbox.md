@@ -1446,3 +1446,14 @@ curl "YOUR_BASE_URL/api/v1/history/devices?hours=24&limit=100" \
 | Network Services and Telephony | Table | `port_mappings[]`, `call_log[]` -> rows | Separate tables for port forwards and call log; call log sorted by date descending |
 | Historical Data | LineChart or AreaChart | `data_points[]` -> time series; x-axis: timestamp, y-axis: value (bandwidth, device count) | API returns auto-granularity data -- chart component must handle variable time intervals (raw within 48h, hourly within 30d, daily beyond) |
 | Debug | DataCard | `service_discovery`, `budget_stats` -> labeled fields | Developer-only view; render raw JSON as formatted key-value pairs |
+
+---
+
+## Real-Time (WebSocket)
+
+For real-time push updates without polling, subscribe to the `fritzbox` topic on the WebSocket endpoint.
+
+See [WebSocket API - fritzbox topic](./websocket.md#fritzbox) for the full payload schema, TypeScript interfaces, and subscription example.
+
+**Topic:** `fritzbox`
+**Snapshot on subscribe:** Yes -- current devices, bandwidth, and WAN state

@@ -279,3 +279,14 @@ console.log(`CPU: ${data.cpu_temperature}°C, Uptime: ${Math.floor(data.uptime_s
 - **StatCards** -- display cpu_percent, memory_percent, cpu_temperature as individual metric cards with threshold coloring (green < 70%, amber 70-90%, red > 90%). Per D-12.
 - **ProgressBar** -- storage usage per mount point showing used/total with percentage. Per D-12.
 - **DataCard** -- system info (hostname, os_version, uptime formatted as days/hours, python_version) as labeled fields. Per D-11.
+
+---
+
+## Real-Time (WebSocket)
+
+For real-time push updates without polling, subscribe to the `raspi` topic on the WebSocket endpoint.
+
+See [WebSocket API - raspi topic](./websocket.md#raspi) for the full payload schema, TypeScript interfaces, and subscription example.
+
+**Topic:** `raspi`
+**Snapshot on subscribe:** Yes -- current system metrics

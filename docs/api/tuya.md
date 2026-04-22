@@ -17,6 +17,7 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 | `GET` | `/api/v1/tuya/plugs/{device_id}` | Single plug state |
 | `POST` | `/api/v1/tuya/plugs/{device_id}/state` | Toggle plug on/off |
 | `POST` | `/api/v1/tuya/plugs/{device_id}/timer` | Set countdown timer |
+| `POST` | `/api/v1/tuya/plugs/{device_id}/test` | Physically identify a plug (toggle ON 3s then OFF) |
 | `GET` | `/api/v1/tuya/plugs/{device_id}/history` | Energy history with auto-granularity |
 
 ---
@@ -32,6 +33,7 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
   - [Re-poll Pattern](#re-poll-pattern)
   - [POST /plugs/{device_id}/state](#post-plugsdevice_idstate)
   - [POST /plugs/{device_id}/timer](#post-plugsdevice_idtimer)
+  - [POST /plugs/{device_id}/test](#post-plugsdevice_idtest)
 - [History](#history)
   - [Auto-Granularity](#auto-granularity)
   - [GET /plugs/{device_id}/history](#get-plugsdevice_idhistory)
@@ -384,6 +386,58 @@ curl -s -X POST \
 
 ---
 
+### POST /plugs/{device_id}/test
+
+Physically identify a Tuya plug by toggling it ON for 3 seconds then OFF. Useful to confirm which physical plug corresponds to a given device ID.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Path Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `device_id` | string | Tuya device ID |
+
+**Request body:** None
+
+**Response (200):**
+
+```json
+{
+  "device_id": "bfabcdef1234567890ab",
+  "action": "toggle_3s",
+  "success": true
+}
+```
+
+```typescript
+interface DeviceTestResponse {
+  device_id: string;
+  action: string;    // "toggle_3s" for Tuya plugs
+  success: boolean;
+}
+```
+
+**curl:**
+
+```bash
+curl -X POST \
+  -H "X-API-Key: YOUR_KEY" \
+  http://localhost:8000/api/v1/tuya/plugs/bfabcdef1234567890ab/test
+```
+
+**Error responses:**
+
+| Status | Condition |
+|--------|-----------|
+| `401 Unauthorized` | Missing or invalid authentication token |
+| `404 Not Found` | `device_id` not found in cache |
+| `503 Service Unavailable` | Plug unreachable or Tuya client not initialized |
+
+> **Note:** The endpoint blocks for ~3 seconds while the plug is ON. Anything connected to the plug will briefly power on.
+
+---
+
 ## History
 
 ### Auto-Granularity
@@ -616,7 +670,7 @@ Display live power consumption from `GET /plugs/{device_id}`. Update via WebSock
 
 ```typescript
 // Subscribe to live updates
-ws.send(JSON.stringify({ type: "subscribe", topics: ["tuya"] }));
+ws.send(JSON.stringify({ action: "subscribe", topics: ["tuya"] }));
 
 // Handle incoming data
 ws.onmessage = (event) => {
@@ -759,36 +813,13 @@ async function sendTimerAndConfirm(deviceId: string, seconds: number) {
 }
 ```
 
-### WebSocket Subscription for Live Updates
+---
 
-Subscribe to real-time Tuya events via the WebSocket `/ws/live` endpoint:
+## Real-Time (WebSocket)
 
-```typescript
-const ws = new WebSocket("wss://YOUR_HOST/ws/live");
+For real-time push updates without polling, subscribe to the `tuya` topic on the WebSocket endpoint.
 
-ws.onopen = () => {
-  // Authenticate first
-  ws.send(JSON.stringify({ type: "auth", token: JWT_TOKEN }));
-};
+See [WebSocket API - tuya topic](./websocket.md#tuya) for the full payload schema, TypeScript interfaces, and subscription example.
 
-ws.onmessage = (event) => {
-  const msg = JSON.parse(event.data);
-
-  if (msg.type === "auth_ok") {
-    // Subscribe to Tuya provider updates
-    ws.send(JSON.stringify({ type: "subscribe", topics: ["tuya"] }));
-  }
-
-  if (msg.topic === "tuya" && msg.type === "snapshot") {
-    // Full state on subscribe
-    updateAllPlugs(msg.data);
-  }
-
-  if (msg.topic === "tuya" && msg.type === "delta") {
-    // Only changed plugs
-    updateChangedPlugs(msg.data);
-  }
-};
-```
-
-See [WebSocket API](./websocket.md) for full connection lifecycle, authentication, and topic reference.
+**Topic:** `tuya`
+**Snapshot on subscribe:** Yes -- current smart plug states

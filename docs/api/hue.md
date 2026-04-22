@@ -21,6 +21,7 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 | `POST` | `/api/v1/hue/groups/{group_id}/scenes/{scene_id}` | Activate a scene for a group |
 | `PUT` | `/api/v1/hue/lights/{light_id}/state` | Control a single light (on/off, brightness, color) |
 | `PUT` | `/api/v1/hue/groups/{group_id}/action` | Apply action to all lights in a group |
+| `POST` | `/api/v1/hue/lights/{light_id}/test` | Physically identify a light (15-second flash cycle) |
 | `GET` | `/api/v1/hue/history` | Paginated light state history with auto-granularity |
 
 ---
@@ -42,6 +43,7 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
   - [Polling After Commands](#polling-after-commands)
   - [PUT /lights/{light_id}/state](#put-lightslight_idstate)
   - [PUT /groups/{group_id}/action](#put-groupsgroup_idaction)
+  - [POST /lights/{light_id}/test](#post-lightslight_idtest)
 - [History](#history)
   - [GET /history](#get-history)
 - [Bridge Setup Guide](#bridge-setup-guide)
@@ -644,6 +646,58 @@ curl -X PUT YOUR_BASE_URL/api/v1/hue/groups/1/action \
 
 ---
 
+### POST /lights/{light_id}/test
+
+Physically identify a Hue light by triggering a 15-second flash cycle (`alert: lselect`). The light blinks repeatedly for ~15 seconds then returns to its previous state automatically (Bridge behavior).
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Path Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `light_id` | string | Bridge-assigned light ID (e.g. `"1"`, `"5"`) |
+
+**Request body:** None
+
+**Response (200):**
+
+```json
+{
+  "device_id": "1",
+  "action": "flash_15s",
+  "success": true
+}
+```
+
+```typescript
+interface DeviceTestResponse {
+  device_id: string;
+  action: string;    // "flash_15s" for Hue lights
+  success: boolean;
+}
+```
+
+**curl:**
+
+```bash
+curl -X POST YOUR_BASE_URL/api/v1/hue/lights/1/test \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+**Error responses:**
+
+| Status | Condition |
+|--------|-----------|
+| `401 Unauthorized` | Missing or invalid authentication token |
+| `404 Not Found` | `light_id` not found in cache |
+| `409 Conflict` | Light is unreachable (`reachable: false`) |
+| `502 Bad Gateway` | Bridge returned an API error |
+| `503 Service Unavailable` | Bridge UNREACHABLE or Hue client not initialized |
+| `504 Gateway Timeout` | Bridge request timed out |
+
+---
+
 ## History
 
 ### GET /history
@@ -1087,3 +1141,14 @@ if (health.data_freshness === "STALE") {
 ### Handling Unreachable Lights
 
 Before sending a PUT /lights/{id}/state command, check `reachable` in the light state. If `reachable` is false, the API returns 409 Conflict with `error: "light_unreachable"`. Group actions (PUT /groups/{id}/action) do not return 409 -- unreachable members are silently skipped by the Bridge.
+
+---
+
+## Real-Time (WebSocket)
+
+For real-time push updates without polling, subscribe to the `hue` topic on the WebSocket endpoint.
+
+See [WebSocket API - hue topic](./websocket.md#hue) for the full payload schema, TypeScript interfaces, and subscription example.
+
+**Topic:** `hue`
+**Snapshot on subscribe:** Yes -- current lights and groups state

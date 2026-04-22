@@ -1574,3 +1574,14 @@ curl -s YOUR_BASE_URL/api/v1/netatmo/camera/events/EVENT_ID/snapshot \
 | Read: Camera | Card + List | Camera: snapshot image + status badge. Events: `events[]` -> chronological list with type, timestamp, thumbnail | Show latest snapshot prominently; event list below with type icons |
 | Control Endpoints | Form (Toggle, Select, Slider) | Heating mode -> Toggle (on/off). Schedule -> Select (dropdown from schedules list). Setpoint -> Slider (range 5-30 C, step 0.5). Valve calibration -> Button with StatusBadge for calibration state | Slider for temperature setpoint; show current measured temp next to setpoint for context |
 | Historical Data | LineChart | `data_points[]` -> time series; x-axis: timestamp, y-axis: temperature/humidity/CO2 | API returns auto-granularity data -- chart must handle variable time intervals. Add metric selector (temperature, humidity, CO2, noise) |
+
+---
+
+## Real-Time (WebSocket)
+
+For real-time push updates without polling, subscribe to the `netatmo` topic on the WebSocket endpoint.
+
+See [WebSocket API - netatmo topic](./websocket.md#netatmo) for the full payload schema, TypeScript interfaces, and subscription example.
+
+**Topic:** `netatmo`
+**Snapshot on subscribe:** Yes -- current room measurements

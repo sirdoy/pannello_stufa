@@ -14,6 +14,7 @@ This API exposes real-time and historical data from your home network via a modu
 | [Netatmo](./netatmo.md) | `/api/v1/netatmo` | Energy (thermostat control, room temperatures, schedules), valve calibration (NRV status and calibration), and security camera (status, streams, snapshots, monitoring, events) — 21 endpoints |
 | [DIRIGERA](./dirigera.md) | `/api/v1/dirigera` | IKEA smart home — contact and motion sensors, telemetry, history — 8 endpoints |
 | [Thermorossi](./thermorossi.md) | `/api/v1/thermorossi` | Pellet stove — state monitoring, history, and remote controls — 10 endpoints |
+| [Thermorossi Scheduler](./scheduler.md) | `/api/v1/thermorossi` | Weekly heating scheduler — schedule CRUD, mode control, override, next-action, execution log — 13 endpoints |
 | [Hue](./hue.md) | `/api/v1/hue` | Philips Hue — lights, groups, scenes, light control, and history — 10 endpoints |
 | [Sonos](./sonos.md) | `/api/v1/sonos` | Sonos speakers — discovery, playback, volume, EQ, home theater, grouping, queue, history — 28 endpoints |
 | [Raspberry Pi](./raspberry-pi.md) | `/api/v1/raspi` | System stats — CPU, RAM, disk, temperature, uptime, network — 5 endpoints |
@@ -38,9 +39,17 @@ See also: [Netatmo Setup Guide](../NETATMO_SETUP.md)
 
 | Protocol | Path | Description |
 |----------|------|-------------|
-| [WebSocket](./websocket.md) | `/ws/live` | Real-time push — provider data via topic subscription, delta detection, reconnection — 6 topics |
+| [WebSocket](./websocket.md) | `/ws/live` | Real-time push — provider data via topic subscription, delta detection, reconnection — 12 topics |
 
 > **New to WebSocket?** See the [WebSocket Real-Time API](./websocket.md) guide for endpoint details, TypeScript interfaces, and a ready-to-use `useProviderData` React hook.
+
+---
+
+## Guides
+
+| Guide | Description |
+|-------|-------------|
+| [Frontend Integration Guide](./frontend-integration.md) | Step-by-step tutorial for building a dynamic, capability-driven automation editor in a new Next.js 14+ (App Router) project — covers auth, capabilities fetching, condition builder, action configurator, rule submission, WebSocket live feedback, and testing. |
 
 ---
 

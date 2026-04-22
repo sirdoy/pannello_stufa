@@ -639,3 +639,14 @@ WiNet is a Thermorossi-proprietary cloud protocol. Field names and command names
 | `SetPower` (POST /settings/power) | HIGH | Live-verified 2026-03-18 | WiNet returned `{"Success": true}` |
 | `SetFanLevel` (POST /settings/fan-level) | HIGH | Live-verified 2026-03-18 | WiNet returned `{"Success": true}` |
 | `SetWaterTemperature` (POST /settings/temperature/water) | HIGH | Live-verified 2026-03-18 | WiNet returned `{"Success": false, "Error": 501}` (stove was OFF, valid range: 5-80) |
+
+---
+
+## Real-Time (WebSocket)
+
+For real-time push updates without polling, subscribe to the `thermorossi` topic on the WebSocket endpoint.
+
+See [WebSocket API - thermorossi topic](./websocket.md#thermorossi) for the full payload schema, TypeScript interfaces, and subscription example.
+
+**Topic:** `thermorossi`
+**Snapshot on subscribe:** Yes -- current stove state

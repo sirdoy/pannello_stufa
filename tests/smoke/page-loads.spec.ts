@@ -88,11 +88,15 @@ test.describe('Page Loads', () => {
     });
 
     test('/dirigera loads and shows data', async ({ page }) => {
-      // E2E-10: DIRIGERA hub page loads
+      // E2E-10: DIRIGERA hub page loads with Stats / Events / Telemetry panels
       const { errors, cleanup } = collectConsoleErrors(page);
       await page.goto('/dirigera');
       await page.waitForLoadState('networkidle');
       await expect(page.locator('main')).toBeAttached({ timeout: 15000 });
+      // Phase 169: assert the 3 new panels render (heading text always present regardless of data state)
+      await expect(page.getByText('Statistiche', { exact: true })).toBeVisible({ timeout: 15000 });
+      await expect(page.getByText('Eventi recenti', { exact: true })).toBeVisible({ timeout: 15000 });
+      await expect(page.getByText('Telemetria', { exact: true })).toBeVisible({ timeout: 15000 });
       cleanup();
       expect(errors, `Console errors on /dirigera: ${errors.join(', ')}`).toHaveLength(0);
     });

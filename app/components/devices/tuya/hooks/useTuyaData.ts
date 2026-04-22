@@ -39,7 +39,8 @@ export function useTuyaData(): UseTuyaDataReturn {
         throw new Error('Tuya endpoint failed');
       }
 
-      const data = await res.json() as TuyaPlug[];
+      const body = await res.json() as { plugs?: TuyaPlug[] };
+      const data = Array.isArray(body.plugs) ? body.plugs : [];
 
       // Set stale if any plug has non-LIVE freshness
       const isStale = data.some(p => p.data_freshness !== 'LIVE');
@@ -65,8 +66,8 @@ export function useTuyaData(): UseTuyaDataReturn {
     const handleMessage = (raw: unknown) => {
       const wsData = raw as TuyaData;
 
-      // Guard against null plugs in WS payload
-      if (wsData.plugs === null) {
+      // Guard against null or non-array plugs in WS payload
+      if (!Array.isArray(wsData.plugs)) {
         setStale(true);
         setLoading(false);
         return;

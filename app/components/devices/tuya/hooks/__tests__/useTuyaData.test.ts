@@ -72,7 +72,7 @@ function makeFetchMock(overrides?: { ok?: boolean; data?: TuyaPlug[] }) {
   return () =>
     Promise.resolve({
       ok: opts.ok,
-      json: () => Promise.resolve(opts.data),
+      json: () => Promise.resolve({ success: true, plugs: opts.data }),
     });
 }
 

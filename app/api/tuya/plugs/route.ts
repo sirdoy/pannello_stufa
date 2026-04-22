@@ -9,6 +9,6 @@ export const dynamic = 'force-dynamic';
  * Protected: Requires Auth0 authentication.
  */
 export const GET = withAuthAndErrorHandler(async () => {
-  const data = await getPlugs();
-  return success(data as unknown as Record<string, unknown>);
+  const plugs = await getPlugs();
+  return success({ plugs });
 }, 'Tuya/Plugs/List');

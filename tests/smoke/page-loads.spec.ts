@@ -86,6 +86,16 @@ test.describe('Page Loads', () => {
       cleanup();
       expect(errors, `Console errors on /raspi: ${errors.join(', ')}`).toHaveLength(0);
     });
+
+    test('/dirigera loads and shows data', async ({ page }) => {
+      // E2E-10: DIRIGERA hub page loads
+      const { errors, cleanup } = collectConsoleErrors(page);
+      await page.goto('/dirigera');
+      await page.waitForLoadState('networkidle');
+      await expect(page.locator('main')).toBeAttached({ timeout: 15000 });
+      cleanup();
+      expect(errors, `Console errors on /dirigera: ${errors.join(', ')}`).toHaveLength(0);
+    });
   });
 
   test.describe('Support Pages', () => {

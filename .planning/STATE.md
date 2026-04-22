@@ -4,12 +4,12 @@ milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: verifying
 stopped_at: Phase 169 context gathered
-last_updated: "2026-04-22T16:25:29.596Z"
+last_updated: "2026-04-22T18:46:08.617Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 16
   completed_phases: 12
-  total_plans: 24
+  total_plans: 27
   completed_plans: 27
   percent: 100
 ---
@@ -87,3 +87,5 @@ None.
 Last activity: 2026-04-21 — Phase 168 Plan 02 complete (Netatmo production consumer cutover to v1)
 Stopped at: Phase 169 context gathered
 Resume file: --resume-file
+
+**Planned Phase:** 169 (dirigera-frontend-cutover) — 3 plans — 2026-04-22T18:46:08.530Z

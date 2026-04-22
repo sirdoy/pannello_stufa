@@ -94,7 +94,9 @@ All copy in Italian, matching existing DIRIGERA page tone ("DIRIGERA non raggiun
 | Element | Copy |
 |---------|------|
 | Stats panel heading | "Statistiche" |
-| Stats panel stat labels | "Eventi totali" / "Giorni di retention" / "Sensore più attivo" / "Eventi ultime 24h" |
+| Stats panel section labels | Two subsections: "Aggregazione" + "Retention" |
+| Aggregazione tile labels | "Righe aggregate totali" (`aggregation.total_rows_aggregated`) / "Ultimo run" (relative time from `aggregation.last_run_at`) / "Righe ultimo run" (`aggregation.rows_aggregated_last_run`) / "Stato ultimo run" (`aggregation.last_run_status` ?? "n/d") |
+| Retention tile labels | "Righe eliminate totali" (`retention.total_rows_deleted`) / "Ultimo run" (relative time from `retention.last_run_at`) / "Righe eliminate ultimo run" (`retention.rows_deleted_last_run`) / "Stato ultimo run" (`retention.last_run_status` ?? "n/d") |
 | Stats empty state | "Statistiche non disponibili" |
 | Stats error state | "Impossibile caricare le statistiche" |
 | Recent Events heading | "Eventi recenti" |
@@ -143,7 +145,7 @@ Each of the three panels (Stats, Recent Events, Telemetry) goes through the same
 ### Responsive
 
 - `/dirigera` page stacks all sections vertically on mobile (single column, `flex flex-col gap-8`).
-- Stats panel: 2×2 grid on mobile (`grid-cols-2`), 4×1 row on `sm:` and up (`sm:grid-cols-4`).
+- Stats panel: rendered as two labelled subsections ("Aggregazione" + "Retention"), each a 2×2 tile grid on mobile (`grid-cols-2`) that becomes 4×1 on `sm:` and up (`sm:grid-cols-4`). The subsections stack vertically with `gap-6` between them.
 - Tables: horizontal scroll container on mobile (`overflow-x-auto`), full-width on `sm:` and up. Column order locked — no column hiding or reordering.
 
 ---

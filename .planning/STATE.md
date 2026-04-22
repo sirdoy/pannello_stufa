@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
-status: verifying
-stopped_at: Phase 169 context gathered
-last_updated: "2026-04-22T18:46:08.617Z"
-last_activity: 2026-04-21
+status: executing
+stopped_at: "Completed 169-01-PLAN.md: 5 v1 dirigera routes + hook URL cutover"
+last_updated: "2026-04-22T19:42:00.980Z"
+last_activity: 2026-04-22 -- Phase --phase execution started
 progress:
   total_phases: 16
   completed_phases: 12
   total_plans: 27
-  completed_plans: 27
+  completed_plans: 28
   percent: 100
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 168 — netatmo-frontend-cutover
+**Current focus:** Phase --phase — 169
 
 ## Current Position
 
-Phase: 169
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-04-21
+Phase: --phase (169) — EXECUTING
+Plan: 1 of --name
+Status: Executing Phase --phase
+Last activity: 2026-04-22 -- Phase --phase execution started
 
-Progress: [██████████████░░░░░] 2/3 plans (67%)
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Progress: [██████████████░░░░░] 2/3 plans 
 | v17.1 WebSocket Alignment & Tuya Integration | 145-148 | 10 | 3 days |
 | v18.0 Dark-Only & Mobile-First | 149-155 | 15 | 2 days |
 | Phase 168-netatmo-frontend-cutover P03 | 67min | 1 tasks | 33 files |
+| Phase 169-dirigera-frontend-cutover P01 | 40 | 5 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,8 @@ Recent decisions affecting v19.0:
 - [Plan 168-02] Legacy /schedules endpoint DROPPED (D-04); schedules now extracted from /homesdata body.homes[0].schedules in useScheduleData
 - [Plan 168-02] jest.setup.ts NextResponseMock gained static .redirect() (Rule 1 fix — auto-applied when Task 4 Jest matrix caught Task 1 regression)
 - [Phase 168-netatmo-frontend-cutover]: [Plan 168-03] Legacy app/api/netatmo/ tree deleted (33 files: 18 route.ts + 2 co-located tests + 13 legacy __tests__/ files). Zero /api/netatmo/ refs remain in production; 26 netatmo Jest suites (98 tests) green. Phase 168 complete: all 9 NETA-XX wired via /api/v1/netatmo/** only.
+- Full passthrough vs explicit spread for v1 dirigera routes: health+sensors/summary use passthrough, sensors/contact/motion use explicit { sensors, count, is_stale } spread (D-02)
+- WS subscribe/unsubscribe('dirigera',...) topic strings left byte-for-byte unchanged in URL swap (Pitfall 2)
 
 ### Pending Todos
 
@@ -85,7 +88,7 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-21 — Phase 168 Plan 02 complete (Netatmo production consumer cutover to v1)
-Stopped at: Phase 169 context gathered
-Resume file: --resume-file
+Stopped at: Completed 169-01-PLAN.md: 5 v1 dirigera routes + hook URL cutover
+Resume file: None
 
 **Planned Phase:** 169 (dirigera-frontend-cutover) — 3 plans — 2026-04-22T18:46:08.530Z

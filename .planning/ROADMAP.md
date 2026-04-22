@@ -46,7 +46,7 @@
 - [x] **Phase 166: Hue Frontend Cutover** - Migrate useLightsData/useLightsCommands + 2 pages to /api/v1/hue/* (completed 2026-04-18)
 - [x] **Phase 167: Sonos Frontend Cutover** - Migrate 5 Sonos hooks + components to /api/v1/sonos/* (completed 2026-04-20)
 - [x] **Phase 168: Netatmo Frontend Cutover** - Migrate Netatmo UI to /api/v1/netatmo/* (completed 2026-04-21)
-- [ ] **Phase 169: DIRIGERA Frontend Cutover** - Migrate useDirigeraData to /api/v1/dirigera/*
+- [x] **Phase 169: DIRIGERA Frontend Cutover** - Migrate useDirigeraData to /api/v1/dirigera/*
 - [ ] **Phase 170: Auth UI** - Login form + API-keys management page (AUTH-01..04 consumers)
 - [ ] **Phase 171: Fritz!Box Consumer UI** - Telephony/raw-history/service-discovery consumers (FRITZ-01..07)
 
@@ -250,9 +250,10 @@ Plans:
   2. Zero `/api/dirigera/` references outside debug/archived paths
   3. Dirigera page renders history/stats/telemetry end-to-end in smoke run
   4. Jest + Playwright smoke green
-**Plans:** 2 plans
-- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+**Plans:** 3 plans
+- [x] 169-01-PLAN.md — Create 5 v1 wrapper routes (health, sensors, sensors/summary, sensors/contact, sensors/motion) + co-located tests; swap useDirigeraData, useDirigeraFullData, useDirigeraData.test.ts to v1 URLs; add /dirigera case to page-loads.spec.ts
+- [x] 169-02-PLAN.md — Create useDirigeraHistory, useDirigeraStats, useDirigeraTelemetry hooks + tests; create DirigeraStatsPanel, DirigeraHistoryPanel, DirigeraTelemetryPanel components; wire all three into /dirigera page; extend Playwright smoke to assert 3 panel headings (DIR-01, DIR-02, DIR-03)
+- [x] 169-03-PLAN.md — Delete legacy app/api/dirigera/ tree (5 files); [BLOCKING] pre- and post-deletion v1-intact gates (wc -l == 8); repo-wide grep sweep; Jest + Playwright smoke regression
 
 ### Phase 170: Auth UI
 **Goal**: Users can log in via form UI and manage API keys end-to-end

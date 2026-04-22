@@ -118,8 +118,8 @@ describe('useDirigeraData', () => {
       });
 
       const fetchMock = global.fetch as jest.Mock;
-      expect(fetchMock).toHaveBeenCalledWith('/api/dirigera/health');
-      expect(fetchMock).toHaveBeenCalledWith('/api/dirigera/sensors/summary');
+      expect(fetchMock).toHaveBeenCalledWith('/api/v1/dirigera/health');
+      expect(fetchMock).toHaveBeenCalledWith('/api/v1/dirigera/sensors/summary');
     });
 
     it('returns data with health and summary after successful fetch', async () => {
@@ -306,7 +306,7 @@ describe('useDirigeraData', () => {
       });
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/dirigera/health');
+        expect(global.fetch).toHaveBeenCalledWith('/api/v1/dirigera/health');
       });
     });
 

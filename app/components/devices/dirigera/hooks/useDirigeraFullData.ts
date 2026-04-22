@@ -14,9 +14,9 @@ import type {
 export type SensorFilter = 'all' | 'contact' | 'motion';
 
 const FILTER_ENDPOINTS: Record<SensorFilter, string> = {
-  all: '/api/dirigera/sensors',
-  contact: '/api/dirigera/sensors/contact',
-  motion: '/api/dirigera/sensors/motion',
+  all: '/api/v1/dirigera/sensors',
+  contact: '/api/v1/dirigera/sensors/contact',
+  motion: '/api/v1/dirigera/sensors/motion',
 };
 
 export interface DirigeraFullData {
@@ -52,7 +52,7 @@ export function useDirigeraFullData(filter: SensorFilter): UseDirigeraFullDataRe
     try {
       setError(null);
       const [healthRes, sensorsRes] = await Promise.all([
-        fetch('/api/dirigera/health'),
+        fetch('/api/v1/dirigera/health'),
         fetch(FILTER_ENDPOINTS[filter]),
       ]);
 

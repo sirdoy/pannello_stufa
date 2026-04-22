@@ -48,8 +48,8 @@ export function useDirigeraData(): UseDirigeraDataReturn {
     try {
       setError(null);
       const [healthRes, summaryRes] = await Promise.all([
-        fetch('/api/dirigera/health'),
-        fetch('/api/dirigera/sensors/summary'),
+        fetch('/api/v1/dirigera/health'),
+        fetch('/api/v1/dirigera/sensors/summary'),
       ]);
 
       if (!healthRes.ok || !summaryRes.ok) {
@@ -78,7 +78,7 @@ export function useDirigeraData(): UseDirigeraDataReturn {
 
   async function fetchHealth() {
     try {
-      const healthRes = await fetch('/api/dirigera/health');
+      const healthRes = await fetch('/api/v1/dirigera/health');
       if (!healthRes.ok) return;
       const health = (await healthRes.json()) as DirigeraHealthResponse;
       // D-14: do not update stale from health when WS is connected

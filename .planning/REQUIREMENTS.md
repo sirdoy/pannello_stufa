@@ -80,9 +80,12 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 
 ### DIRIGERA
 
-- [ ] **DIR-01**: GET /api/v1/dirigera/history ritorna storico eventi sensori paginato
-- [ ] **DIR-02**: GET /api/v1/dirigera/stats ritorna statistiche aggregazione e retention
-- [ ] **DIR-03**: GET /api/v1/dirigera/telemetry ritorna storico telemetria sensori paginato
+- [x] **DIR-01
+**: GET /api/v1/dirigera/history ritorna storico eventi sensori paginato
+- [x] **DIR-02
+**: GET /api/v1/dirigera/stats ritorna statistiche aggregazione e retention
+- [x] **DIR-03
+**: GET /api/v1/dirigera/telemetry ritorna storico telemetria sensori paginato
 
 ## Future Requirements
 

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: executing
-stopped_at: "Completed 169-01-PLAN.md: 5 v1 dirigera routes + hook URL cutover"
-last_updated: "2026-04-22T19:42:00.980Z"
+stopped_at: "Completed 169-02-PLAN.md: 3 hooks + 3 panels + page wiring + smoke test (DIR-01/02/03 closed)"
+last_updated: "2026-04-22T20:54:34.696Z"
 last_activity: 2026-04-22 -- Phase --phase execution started
 progress:
   total_phases: 16
   completed_phases: 12
   total_plans: 27
-  completed_plans: 28
+  completed_plans: 29
   percent: 100
 ---
 
@@ -48,6 +48,7 @@ Progress: [██████████] 100%
 | v18.0 Dark-Only & Mobile-First | 149-155 | 15 | 2 days |
 | Phase 168-netatmo-frontend-cutover P03 | 67min | 1 tasks | 33 files |
 | Phase 169-dirigera-frontend-cutover P01 | 40 | 5 tasks | 14 files |
+| Phase 169-dirigera-frontend-cutover P02 | 57 | 7 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting v19.0:
 - [Phase 168-netatmo-frontend-cutover]: [Plan 168-03] Legacy app/api/netatmo/ tree deleted (33 files: 18 route.ts + 2 co-located tests + 13 legacy __tests__/ files). Zero /api/netatmo/ refs remain in production; 26 netatmo Jest suites (98 tests) green. Phase 168 complete: all 9 NETA-XX wired via /api/v1/netatmo/** only.
 - Full passthrough vs explicit spread for v1 dirigera routes: health+sensors/summary use passthrough, sensors/contact/motion use explicit { sensors, count, is_stale } spread (D-02)
 - WS subscribe/unsubscribe('dirigera',...) topic strings left byte-for-byte unchanged in URL swap (Pitfall 2)
+- Three independent hooks per D-07 (useDirigeraStats/History/Telemetry) — not folded into useDirigeraFullData; replace-on-poll/append-on-loadMore per Pitfall 6
+- Panel headings use semantic <h2> with token classes (not Heading design-system component) to avoid unverified import dependency
 
 ### Pending Todos
 
@@ -88,7 +91,7 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-21 — Phase 168 Plan 02 complete (Netatmo production consumer cutover to v1)
-Stopped at: Completed 169-01-PLAN.md: 5 v1 dirigera routes + hook URL cutover
+Stopped at: Completed 169-02-PLAN.md: 3 hooks + 3 panels + page wiring + smoke test (DIR-01/02/03 closed)
 Resume file: None
 
 **Planned Phase:** 169 (dirigera-frontend-cutover) — 3 plans — 2026-04-22T18:46:08.530Z

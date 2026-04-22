@@ -344,6 +344,6 @@ See git history and `.planning/milestones/` for details.
 | 166. Hue Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-18 |
 | 167. Sonos Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-20 |
 | 168. Netatmo Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-21 |
-| 169. DIRIGERA Frontend Cutover | v19.0 | 0/? | Pending    | — |
+| 169. DIRIGERA Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-22 |
 | 170. Auth UI | v19.0 | 0/? | Pending    | — |
 | 171. Fritz!Box Consumer UI | v19.0 | 0/? | Pending    | — |

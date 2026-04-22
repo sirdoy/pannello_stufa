@@ -155,9 +155,9 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 | FRITZ-05 | Phase 162 + 171 (consumer UI) | Pending |
 | FRITZ-06 | Phase 162 + 171 (consumer UI) | Pending |
 | FRITZ-07 | Phase 162 + 171 (consumer UI) | Pending |
-| DIR-01 | Phase 163 + 169 (frontend cutover) | Pending |
-| DIR-02 | Phase 163 + 169 (frontend cutover) | Pending |
-| DIR-03 | Phase 163 + 169 (frontend cutover) | Pending |
+| DIR-01 | Phase 163 + 169 (frontend cutover) | Complete |
+| DIR-02 | Phase 163 + 169 (frontend cutover) | Complete |
+| DIR-03 | Phase 163 + 169 (frontend cutover) | Complete |
 
 **Coverage:**
 - v19.0 requirements: 52 total

@@ -11,8 +11,14 @@ import { Banner } from '@/app/components/ui';
 import { cn } from '@/lib/utils/cn';
 import { useDirigeraFullData } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
 import type { SensorFilter } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
+import { useDirigeraStats } from '@/app/components/devices/dirigera/hooks/useDirigeraStats';
+import { useDirigeraHistory } from '@/app/components/devices/dirigera/hooks/useDirigeraHistory';
+import { useDirigeraTelemetry } from '@/app/components/devices/dirigera/hooks/useDirigeraTelemetry';
 import DirigeraHealthSection from '@/app/components/devices/dirigera/components/DirigeraHealthSection';
 import DirigeraSensorList from '@/app/components/devices/dirigera/components/DirigeraSensorList';
+import DirigeraStatsPanel from '@/app/components/devices/dirigera/components/DirigeraStatsPanel';
+import DirigeraHistoryPanel from '@/app/components/devices/dirigera/components/DirigeraHistoryPanel';
+import DirigeraTelemetryPanel from '@/app/components/devices/dirigera/components/DirigeraTelemetryPanel';
 
 const FILTERS: { key: SensorFilter; label: string }[] = [
   { key: 'all', label: 'Tutti' },
@@ -33,6 +39,9 @@ export default function DirigeraPage() {
   const router = useRouter();
   const [filter, setFilter] = useState<SensorFilter>('all');
   const { data, loading, stale, error } = useDirigeraFullData(filter);
+  const stats = useDirigeraStats();
+  const history = useDirigeraHistory({ limit: 50 });
+  const telemetry = useDirigeraTelemetry({ limit: 50 });
 
   // Loading guard — only on initial load or filter change (no cached data)
   if (loading && !data) {
@@ -97,6 +106,36 @@ export default function DirigeraPage() {
 
         {/* Sensor list */}
         {data && <DirigeraSensorList sensors={data.sensors} filter={filter} />}
+
+        {/* Stats panel — aggregation + retention from /api/v1/dirigera/stats */}
+        <DirigeraStatsPanel
+          data={stats.data}
+          loading={stats.loading}
+          error={stats.error}
+          stale={stats.stale}
+        />
+
+        {/* History panel — recent sensor events from /api/v1/dirigera/history */}
+        <DirigeraHistoryPanel
+          items={history.items}
+          total={history.total}
+          loading={history.loading}
+          isLoadingMore={history.isLoadingMore}
+          error={history.error}
+          stale={history.stale}
+          loadMore={history.loadMore}
+        />
+
+        {/* Telemetry panel — sensor readings from /api/v1/dirigera/telemetry */}
+        <DirigeraTelemetryPanel
+          items={telemetry.items}
+          total={telemetry.total}
+          loading={telemetry.loading}
+          isLoadingMore={telemetry.isLoadingMore}
+          error={telemetry.error}
+          stale={telemetry.stale}
+          loadMore={telemetry.loadMore}
+        />
       </div>
     </PageLayout>
   );

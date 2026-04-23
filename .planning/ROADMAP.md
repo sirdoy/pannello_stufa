@@ -265,9 +265,10 @@ Plans:
   2. API-keys management page lists existing keys (GET), creates new (POST), revokes (DELETE)
   3. Revoked keys disappear from list after refresh
   4. Jest + Playwright smoke covers the happy path
-**Plans:** 2 plans
-- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+**Plans:** 3 plans
+- [ ] 170-01-PLAN.md — Extend /api/auth/login with body + ha_auth cookie; add POST /api/auth/logout (AUTH-01 foundation)
+- [ ] 170-02-PLAN.md — useLogin + useApiKeys hooks and /login page with Zod + rate-limit lockout (AUTH-01 client)
+- [ ] 170-03-PLAN.md — /settings/api-keys page + plaintext reveal + navbar entry + Playwright smoke/feature specs (AUTH-02, AUTH-03, AUTH-04)
 
 ### Phase 171: Fritz!Box Consumer UI
 **Goal**: Telephony, raw history, and service-discovery endpoints have production UI consumers outside debug panels

@@ -26,6 +26,10 @@ export interface UseRaspiDataReturn {
   lastUpdatedAt: number | null;
 }
 
+function isValidNumber(v: unknown): v is number {
+  return typeof v === 'number' && Number.isFinite(v);
+}
+
 export function computeRaspiHealth(d: RaspiData): RaspiHealth {
   if (d.diskPercent > 90 || d.memoryPercent > 95) return 'error';
   if (
@@ -74,11 +78,15 @@ export function useRaspiData(): UseRaspiDataReturn {
         sysRes.json() as Promise<SystemResponse>,
       ]);
 
+      if (!isValidNumber(cpu.cpu_percent) || !isValidNumber(mem.percent) || !isValidNumber(disk.percent)) {
+        throw new Error('Invalid Raspberry Pi payload (missing numeric fields)');
+      }
+
       const newData: RaspiData = {
         cpuPercent: cpu.cpu_percent,
         memoryPercent: mem.percent,
         diskPercent: disk.percent,
-        cpuTemperature: sys.cpu_temperature,
+        cpuTemperature: isValidNumber(sys.cpu_temperature) ? sys.cpu_temperature : null,
       };
 
       dataRef.current = newData;
@@ -101,12 +109,19 @@ export function useRaspiData(): UseRaspiDataReturn {
 
     const handleMessage = (raw: unknown) => {
       const wsData = raw as WsRaspiData;
+      const memPercent = (wsData?.memory as { percent?: unknown } | undefined)?.percent;
+      const diskPercent = (wsData?.disk as { percent?: unknown } | undefined)?.percent;
+      const temperature = (wsData?.system as { temperature?: unknown } | undefined)?.temperature;
+
+      if (!isValidNumber(wsData?.cpu_percent) || !isValidNumber(memPercent) || !isValidNumber(diskPercent)) {
+        return; // drop malformed payload, keep last known good data
+      }
 
       const newData: RaspiData = {
         cpuPercent: wsData.cpu_percent,
-        memoryPercent: (wsData.memory as { percent: number }).percent,
-        diskPercent: (wsData.disk as { percent: number }).percent,
-        cpuTemperature: (wsData.system as { temperature: number | null }).temperature ?? null,
+        memoryPercent: memPercent,
+        diskPercent: diskPercent,
+        cpuTemperature: isValidNumber(temperature) ? temperature : null,
       };
 
       dataRef.current = newData;

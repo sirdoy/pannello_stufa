@@ -291,6 +291,35 @@ describe('useRaspiData', () => {
     });
   });
 
+  it('drops malformed WS payload (missing cpu_percent) without crashing', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useRaspiData());
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+    const goodData = result.current.data;
+
+    const handler = mockSubscribe.mock.calls[0]?.[1] as (data: unknown) => void;
+    const malformed = { ...mockWsPayload, cpu_percent: undefined as unknown as number };
+    act(() => { handler(malformed); });
+
+    // Data untouched — last known good preserved
+    expect(result.current.data).toEqual(goodData);
+  });
+
+  it('sets stale=true when fetch returns payload with missing cpu_percent', async () => {
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock({
+      cpu: { data_freshness: 'LIVE' } as unknown as CpuResponse,
+    }));
+
+    const { result } = renderHook(() => useRaspiData());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.data).toBeNull();
+    expect(result.current.stale).toBe(true);
+    expect(result.current.error).toBe('Raspberry Pi non raggiungibile');
+  });
+
   it('sets lastUpdatedAt on WS message', async () => {
     setWsConnected(true);
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());

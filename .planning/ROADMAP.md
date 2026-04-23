@@ -281,8 +281,9 @@ Plans:
   3. Service-discovery TR-064 descriptor visible in an admin/debug-elevated surface
   4. Jest + Playwright smoke covers each new route
 **Plans:** 2 plans
-- [ ] 164-01-PLAN.md — Delete legacy /api/stove/ tree; rewire routes, command palette, service worker, debug panels, JSDoc to canonical /api/v1/thermorossi/*
-- [ ] 164-02-PLAN.md — Retarget 4 test files to canonical paths; final repo-wide grep sweep proving zero /api/stove/ refs
+Plans:
+- [ ] 171-01-PLAN.md — /telefonia page (3 hooks + 3 components + page + CommandPalette nav-telephony) closing FRITZ-01, FRITZ-02, FRITZ-03 + D-17
+- [ ] 171-02-PLAN.md — /network Storico grezzo tab + /debug Service Discovery tab (4 hooks + 4 components + 2 page wirings + Jest + Playwright smoke) closing FRITZ-04, FRITZ-05, FRITZ-06, FRITZ-07
 
 <details>
 <summary>✅ v18.0 Dark-Only & Mobile-First (Phases 149-155) — SHIPPED 2026-04-02</summary>

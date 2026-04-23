@@ -11,6 +11,7 @@ import {
   Flame,
   Lightbulb,
   Camera,
+  Phone,
   Bug,
   RefreshCw,
 } from 'lucide-react';
@@ -112,6 +113,12 @@ export default function CommandPaletteProvider({ children, commands: customComma
           label: 'Videocamera',
           icon: <Camera className="w-4 h-4" />,
           onSelect: () => router.push('/camera'),
+        },
+        {
+          id: 'nav-telephony',
+          label: 'Telefonia',
+          icon: <Phone className="w-4 h-4" />,
+          onSelect: () => router.push('/telefonia'),
         },
         {
           id: 'nav-settings',

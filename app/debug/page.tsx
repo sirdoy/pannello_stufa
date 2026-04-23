@@ -27,7 +27,7 @@ import Text from '@/app/components/ui/Text';
 import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import PageLayout from '@/app/components/ui/PageLayout';
-import { Flame, Thermometer, Lightbulb, Cloud, Database, Clock, FileText, Bell, Palette, RefreshCw, Wifi } from 'lucide-react';
+import { Flame, Thermometer, Lightbulb, Cloud, Database, Clock, FileText, Bell, Palette, RefreshCw, Wifi, Network } from 'lucide-react';
 
 // API Tab Components
 import StoveTab from '@/app/debug/components/tabs/StoveTab';
@@ -37,6 +37,7 @@ import WeatherTab from '@/app/debug/components/tabs/WeatherTab';
 import FirebaseTab from '@/app/debug/components/tabs/FirebaseTab';
 import SchedulerTab from '@/app/debug/components/tabs/SchedulerTab';
 import NetworkTab from '@/app/debug/components/tabs/NetworkTab';
+import FritzboxServiceDiscoveryTab from '@/app/debug/components/tabs/FritzboxServiceDiscoveryTab';
 
 // ============================================================================
 // LOG CONTENT - Debug Logs
@@ -388,6 +389,7 @@ function DebugPageContent() {
               <Tabs.Trigger value="log" icon={<FileText size={18} />}>Log</Tabs.Trigger>
               <Tabs.Trigger value="notifiche" icon={<Bell size={18} />}>Notifiche</Tabs.Trigger>
               <Tabs.Trigger value="network" icon={<Wifi size={18} />}>Network</Tabs.Trigger>
+              <Tabs.Trigger value="service-discovery" icon={<Network size={18} />}>Service Discovery</Tabs.Trigger>
             </Tabs.List>
 
             <Tabs.Content value="stufa">
@@ -425,6 +427,11 @@ function DebugPageContent() {
             <Tabs.Content value="network">
               <div className="mt-6">
                 <NetworkTab autoRefresh={autoRefresh} refreshTrigger={refreshTrigger} />
+              </div>
+            </Tabs.Content>
+            <Tabs.Content value="service-discovery">
+              <div className="mt-6">
+                <FritzboxServiceDiscoveryTab />
               </div>
             </Tabs.Content>
           </Tabs>

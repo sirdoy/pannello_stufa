@@ -125,4 +125,65 @@ test.describe('Page Loads', () => {
       expect(errors, `Console errors on /debug: ${errors.join(', ')}`).toHaveLength(0);
     });
   });
+
+  // Phase 170-03: Auth UI smoke matrix + active-nav assertions.
+  // See .planning/phases/170-auth-ui/170-VALIDATION.md row 170-03-06.
+  test.describe('Auth UI', () => {
+    test('/login loads', async ({ page }) => {
+      const { errors, cleanup } = collectConsoleErrors(page);
+      await page.goto('/login');
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page.locator('main')).toBeAttached({ timeout: 15000 });
+      await expect(
+        page.getByRole('heading', { name: /accedi/i, level: 1 })
+      ).toBeVisible({ timeout: 15000 });
+      cleanup();
+      expect(errors, `Console errors on /login: ${errors.join(', ')}`).toHaveLength(0);
+    });
+
+    test('/settings/api-keys loads', async ({ page }) => {
+      const { errors, cleanup } = collectConsoleErrors(page);
+      await page.goto('/settings/api-keys');
+      await page.waitForLoadState('domcontentloaded');
+      await expect(page.locator('main')).toBeAttached({ timeout: 15000 });
+      // SESSION_EXPIRED banner is expected (no HA cookie in smoke).
+      // useApiKeys sets state but does NOT console.error, so 0 errors.
+      cleanup();
+      expect(
+        errors,
+        `Console errors on /settings/api-keys: ${errors.join(', ')}`
+      ).toHaveLength(0);
+    });
+
+    // Active-nav assertion: /registry/types lights Registro, NOT API Keys.
+    // Opens the hamburger menu so nav items are in the DOM/visible.
+    test('active nav: /registry/types lights Registro but not API Keys', async ({
+      page,
+    }) => {
+      await page.goto('/registry/types');
+      await page.waitForLoadState('domcontentloaded');
+      // Open hamburger menu to expose global nav links.
+      await page.getByRole('button', { name: /apri menu/i }).click();
+      await expect(
+        page.locator('a[href="/registry/types"][aria-current="page"]')
+      ).toBeVisible();
+      await expect(
+        page.locator('a[href="/settings/api-keys"][aria-current="page"]')
+      ).toHaveCount(0);
+    });
+
+    test('active nav: /settings/api-keys lights API Keys but not Registro', async ({
+      page,
+    }) => {
+      await page.goto('/settings/api-keys');
+      await page.waitForLoadState('domcontentloaded');
+      await page.getByRole('button', { name: /apri menu/i }).click();
+      await expect(
+        page.locator('a[href="/settings/api-keys"][aria-current="page"]')
+      ).toBeVisible();
+      await expect(
+        page.locator('a[href="/registry/types"][aria-current="page"]')
+      ).toHaveCount(0);
+    });
+  });
 });

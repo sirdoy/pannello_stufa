@@ -172,6 +172,7 @@ export function MenuItem({
       href={href}
       onClick={onClick}
       style={{ animationDelay: `${animationDelay}ms` } as CSSProperties}
+      aria-current={isActive ? 'page' : undefined}
       className={`group flex items-center gap-3 px-4 ${paddingClass} ${roundingClass} text-sm ${fontClass} transition-all duration-300 relative overflow-hidden hover:scale-[1.02] ${
         isActive ? activeClasses : inactiveClasses
       } ${className}`}

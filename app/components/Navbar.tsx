@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNavigationStructureWithPreferences } from '@/lib/devices/deviceRegistry';
-import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown, Lightbulb, ClipboardList, DoorOpen, Zap } from 'lucide-react';
+import { Home, Calendar, AlertCircle, Clock, Settings, User, LogOut, Menu, X, ChevronDown, Lightbulb, ClipboardList, DoorOpen, Zap, KeyRound } from 'lucide-react';
 import {
   DropdownContainer,
   DropdownItem,
@@ -168,10 +168,20 @@ export default function Navbar() {
 
   const isActive = (path: string) => pathname === path;
 
-  // Prefix-based active check for global sections (Registro, Stanze, etc.)
-  // Derives prefix from first path segment: /registry/types → /registry
+  // Prefix-based active check for global sections.
+  //
+  // Single-segment routes (e.g. /registry, /rooms, /automations): match on
+  // the first path segment — /registry/types should light Registro.
+  //
+  // Two-segment routes (e.g. /settings/api-keys): require exact match OR a
+  // deeper sub-route match so sibling /settings/* pages don't over-light.
+  // Without this fix /settings/thermostat would also light API Keys.
   const isGlobalActive = (route: string) => {
-    const prefix = '/' + route.split('/')[1];
+    const segments = route.split('/').filter(Boolean);
+    if (segments.length >= 2) {
+      return pathname === route || pathname.startsWith(route + '/');
+    }
+    const prefix = '/' + segments[0];
     return pathname === prefix || pathname.startsWith(prefix + '/');
   };
 
@@ -184,6 +194,7 @@ export default function Navbar() {
     if (path.includes('registry')) return <ClipboardList className="w-5 h-5" />;
     if (path.includes('rooms')) return <DoorOpen className="w-5 h-5" />;
     if (path.includes('automations')) return <Zap className="w-5 h-5" />;
+    if (path.includes('api-keys')) return <KeyRound className="w-5 h-5" />;
     return null;
   };
 
@@ -322,6 +333,7 @@ export default function Navbar() {
                 <Link
                   key={item.route}
                   href={item.route}
+                  aria-current={isGlobalActive(item.route) ? 'page' : undefined}
                   className={`
                     ${navItemBase}
                     ${isGlobalActive(item.route) ? navItemActive : navItemInactive}
@@ -517,7 +529,9 @@ export default function Navbar() {
           />
 
           {/* Mobile Menu Panel */}
-          <div className="
+          <nav
+            aria-label="Menu mobile"
+            className="
             fixed left-0 right-0 bottom-20
             top-[calc(4rem+env(safe-area-inset-top))]
             bg-slate-900/95
@@ -525,7 +539,7 @@ export default function Navbar() {
             z-[9001]
             overflow-y-auto
             animate-fade-in-down
-            
+
           ">
             <div className="px-4 py-5 space-y-4">
 
@@ -658,7 +672,7 @@ export default function Navbar() {
                 />
               </MenuSection>
             </div>
-          </div>
+          </nav>
         </>
       )}
 

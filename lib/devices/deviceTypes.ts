@@ -329,6 +329,12 @@ export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
     icon: '⚡',
     route: '/automations',
   },
+  API_KEYS: {
+    id: 'api-keys',
+    name: 'API Keys',
+    icon: '🔑',
+    route: '/settings/api-keys',
+  },
 };
 
 /** Settings menu item configuration */

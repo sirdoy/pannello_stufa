@@ -58,7 +58,30 @@ const customJestConfig: Config = {
     '<rootDir>/out/',
     '<rootDir>/__tests__/__utils__/',
     '<rootDir>/tests/',   // Playwright .spec.ts files
+    '<rootDir>/.claude/', // GSD worktree copies (duplicate mocks + haste collisions)
+    '<rootDir>/.planning/', // GSD planning artifacts
   ],
+
+  // Haste-map ignores: prevent duplicate manual mock + package.json collisions
+  // when GSD worktrees live under .claude/worktrees/agent-*/. testPathIgnorePatterns
+  // alone is not enough — haste still indexes for module resolution.
+  modulePathIgnorePatterns: [
+    '<rootDir>/.claude/',
+    '<rootDir>/.planning/',
+    '<rootDir>/.next/',
+  ],
+
+  // Watch-mode ignores: keep editor-based iteration snappy.
+  watchPathIgnorePatterns: [
+    '<rootDir>/.claude/',
+    '<rootDir>/.planning/',
+    '<rootDir>/.next/',
+    '<rootDir>/node_modules/',
+  ],
+
+  // Cap worker count: 2 in CI (matches test:ci script), 50% of cores locally.
+  // Override with `--maxWorkers=N` on the CLI when needed.
+  maxWorkers: process.env.CI ? 2 : '50%',
 
   // Module file extensions
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],

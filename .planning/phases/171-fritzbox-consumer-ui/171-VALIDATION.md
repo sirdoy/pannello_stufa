@@ -39,23 +39,23 @@ created: 2026-04-23
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 171-01-01 | 01 | 1 | FRITZ-01 | — | DECT handsets fetched via authed /api route, rendered without XSS (JSX escaping) | unit | `npm run test:components -- app/telefonia/components/__tests__/DectHandsetsTable.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-01-02 | 01 | 1 | FRITZ-01 | — | useFritzDectHandsets hook: success/error/paused/stale | unit | `npm run test:unit -- app/telefonia/hooks/__tests__/useFritzDectHandsets.test.ts` | ❌ W0 | ⬜ pending |
-| 171-01-03 | 01 | 1 | FRITZ-02 | — | Call history paginated, duration/locale rendered, call_type badge mapping | unit | `npm run test:components -- app/telefonia/components/__tests__/CallHistoryTable.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-01-04 | 01 | 1 | FRITZ-02 | — | useFritzCallHistory hook: limit/offset forwarded, pagination reset on shrink | unit | `npm run test:unit -- app/telefonia/hooks/__tests__/useFritzCallHistory.test.ts` | ❌ W0 | ⬜ pending |
-| 171-01-05 | 01 | 1 | FRITZ-03 | — | TAM card renders enabled/disabled, new-message badge, stale banner | unit | `npm run test:components -- app/telefonia/components/__tests__/TamStatusCard.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-01-06 | 01 | 1 | FRITZ-03 | — | useFritzTamStatus hook: success/error/paused/stale | unit | `npm run test:unit -- app/telefonia/hooks/__tests__/useFritzTamStatus.test.ts` | ❌ W0 | ⬜ pending |
-| 171-01-07 | 01 | 2 | FRITZ-01…03 | — | /telefonia page loads, heading renders, sections render, no console errors | unit | `npm run test:pages -- app/telefonia/__tests__/page.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-01-08 | 01 | 2 | D-17 | — | CommandPalette `nav-telephony` navigates to `/telefonia` | unit | `npm run test:components -- app/components/layout/__tests__/CommandPaletteProvider.test.tsx` | ✅ (extend) | ⬜ pending |
-| 171-02-01 | 02 | 1 | FRITZ-04 | — | Raw bandwidth table renders paginated data, timestamps as seconds→ms | unit | `npm run test:components -- app/network/components/__tests__/RawBandwidthTable.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-02-02 | 02 | 1 | FRITZ-04 | — | useFritzBandwidthHistoryRaw hook: paused/stale/error | unit | `npm run test:unit -- app/network/hooks/__tests__/useFritzBandwidthHistoryRaw.test.ts` | ❌ W0 | ⬜ pending |
-| 171-02-03 | 02 | 1 | FRITZ-05 | — | DevicePresenceTable degrades gracefully on 404 → EmptyState, never throws | unit | `npm run test:components -- app/network/components/__tests__/DevicePresenceTable.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-02-04 | 02 | 1 | FRITZ-05 | — | useFritzDevicePresenceHistory hook handles 404 → empty list, sets error=false | unit | `npm run test:unit -- app/network/hooks/__tests__/useFritzDevicePresenceHistory.test.ts` | ❌ W0 | ⬜ pending |
-| 171-02-05 | 02 | 1 | FRITZ-06 | — | Raw device events log renders connected/disconnected badges + time range | unit | `npm run test:components -- app/network/components/__tests__/RawDeviceEventsTable.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-02-06 | 02 | 1 | FRITZ-06 | — | useFritzDeviceEventsRaw hook: time range/mac forwarding, paused semantics | unit | `npm run test:unit -- app/network/hooks/__tests__/useFritzDeviceEventsRaw.test.ts` | ❌ W0 | ⬜ pending |
-| 171-02-07 | 02 | 2 | D-07, D-08, D-09 | — | /network Storico tab renders sub-sections, time range selector drives all three | unit | `npm run test:pages -- app/network/__tests__/storico-tab.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-02-08 | 02 | 2 | FRITZ-07 | XSS on TR-064 values | Service discovery tab renders table, URL is copy-capable, JSX escapes values | unit | `npm run test:components -- app/debug/components/tabs/__tests__/FritzboxServiceDiscoveryTab.test.tsx` | ❌ W0 | ⬜ pending |
-| 171-02-09 | 02 | 2 | FRITZ-07 | — | useFritzServiceDiscovery (or inline fetch) success/error + manual refresh | unit | `npm run test:unit -- app/debug/hooks/__tests__/useFritzServiceDiscovery.test.ts` | ❌ W0 | ⬜ pending |
+| 171-01-01 | 01 | 1 | FRITZ-01 | — | DECT handsets fetched via authed /api route, rendered without XSS (JSX escaping) | unit | `npm test -- app/telefonia/components/__tests__/DectHandsetsTable.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-01-02 | 01 | 1 | FRITZ-01 | — | useFritzDectHandsets hook: success/error/paused/stale | unit | `npm test -- app/telefonia/hooks/__tests__/useFritzDectHandsets.test.ts` | ❌ W0 | ⬜ pending |
+| 171-01-03 | 01 | 1 | FRITZ-02 | — | Call history paginated, duration/locale rendered, call_type badge mapping | unit | `npm test -- app/telefonia/components/__tests__/CallHistoryTable.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-01-04 | 01 | 1 | FRITZ-02 | — | useFritzCallHistory hook: limit/offset forwarded, pagination reset on shrink | unit | `npm test -- app/telefonia/hooks/__tests__/useFritzCallHistory.test.ts` | ❌ W0 | ⬜ pending |
+| 171-01-05 | 01 | 1 | FRITZ-03 | — | TAM card renders enabled/disabled, new-message badge, stale banner | unit | `npm test -- app/telefonia/components/__tests__/TamStatusCard.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-01-06 | 01 | 1 | FRITZ-03 | — | useFritzTamStatus hook: success/error/paused/stale | unit | `npm test -- app/telefonia/hooks/__tests__/useFritzTamStatus.test.ts` | ❌ W0 | ⬜ pending |
+| 171-01-07 | 01 | 2 | FRITZ-01…03 | — | /telefonia page loads, heading renders, sections render, no console errors | unit | `npm test -- app/telefonia/__tests__/page.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-01-08 | 01 | 2 | D-17 | — | CommandPalette `nav-telephony` navigates to `/telefonia` | unit | `npm test -- app/components/layout/__tests__/CommandPaletteProvider.test.tsx` | ✅ (extend) | ⬜ pending |
+| 171-02-01 | 02 | 1 | FRITZ-04 | — | Raw bandwidth table renders paginated data, timestamps as seconds→ms | unit | `npm test -- app/network/components/__tests__/RawBandwidthTable.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-02-02 | 02 | 1 | FRITZ-04 | — | useFritzBandwidthHistoryRaw hook: paused/stale/error | unit | `npm test -- app/network/hooks/__tests__/useFritzBandwidthHistoryRaw.test.ts` | ❌ W0 | ⬜ pending |
+| 171-02-03 | 02 | 1 | FRITZ-05 | — | DevicePresenceTable degrades gracefully on 404 → EmptyState, never throws | unit | `npm test -- app/network/components/__tests__/DevicePresenceTable.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-02-04 | 02 | 1 | FRITZ-05 | — | useFritzDevicePresenceHistory hook handles 404 → empty list, sets error=false | unit | `npm test -- app/network/hooks/__tests__/useFritzDevicePresenceHistory.test.ts` | ❌ W0 | ⬜ pending |
+| 171-02-05 | 02 | 1 | FRITZ-06 | — | Raw device events log renders connected/disconnected badges + time range | unit | `npm test -- app/network/components/__tests__/RawDeviceEventsTable.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-02-06 | 02 | 1 | FRITZ-06 | — | useFritzDeviceEventsRaw hook: time range/mac forwarding, paused semantics | unit | `npm test -- app/network/hooks/__tests__/useFritzDeviceEventsRaw.test.ts` | ❌ W0 | ⬜ pending |
+| 171-02-07 | 02 | 2 | D-07, D-08, D-09 | — | /network Storico tab renders sub-sections, time range selector drives all three | unit | `npm test -- app/network/__tests__/storico-tab.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-02-08 | 02 | 2 | FRITZ-07 | XSS on TR-064 values | Service discovery tab renders table, URL is copy-capable, JSX escapes values | unit | `npm test -- app/debug/components/tabs/__tests__/FritzboxServiceDiscoveryTab.test.tsx` | ❌ W0 | ⬜ pending |
+| 171-02-09 | 02 | 2 | FRITZ-07 | — | useFritzServiceDiscovery (or inline fetch) success/error + manual refresh | unit | `npm test -- app/debug/hooks/__tests__/useFritzServiceDiscovery.test.ts` | ❌ W0 | ⬜ pending |
 | 171-02-10 | 02 | 3 | FRITZ-01…07 | — | Playwright smoke: /telefonia loads, /network Storico tab toggles, /debug Service Discovery tab toggles, no console errors | smoke | `npx playwright test tests/smoke/page-loads.spec.ts -g "171"` | ✅ (extend) | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*

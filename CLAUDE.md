@@ -5,8 +5,14 @@
 ## Commands
 
 ```bash
-npm run dev    # localhost:3000
-npm test       # Run tests
+npm run dev             # localhost:3000
+npm test                # Run full suite (release gates only — see rule 8)
+npm run test:changed    # Tests for files touched vs HEAD
+npm run test:quick      # --bail fast iteration
+npm run test:unit       # lib + hooks + utils (no jsdom component render)
+npm run test:api        # API route tests
+npm run test:components # UI component tests
+npm run test:pages      # Pages / route tests
 ```
 
 ## Rules
@@ -18,6 +24,7 @@ npm test       # Run tests
 5. **ALWAYS** create/update unit tests
 6. **USE** design system → `/debug/design-system`
 7. **NEVER** commit/push without explicit request
+8. **USE** scoped test subsets in verification — NEVER `npm test` alone from agents or PLAN.md `<verify><automated>` blocks. Prefer `npm test -- <specific paths>` or the scoped scripts: `test:changed`, `test:quick`, `test:unit`, `test:api`, `test:components`, `test:pages`. The full suite is reserved for release gates and CI (`test:ci`).
 
 ## Docs
 

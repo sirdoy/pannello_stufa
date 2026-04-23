@@ -186,4 +186,50 @@ test.describe('Page Loads', () => {
       ).toHaveCount(0);
     });
   });
+
+  // Phase 171: Fritz!Box Consumer UI smoke matrix (telephony + raw history + service discovery).
+  // See .planning/phases/171-fritzbox-consumer-ui/171-VALIDATION.md tasks 171-01-* and 171-02-10.
+  test.describe('Fritz!Box Consumer UI (Phase 171)', () => {
+    test('/telefonia loads and renders heading', async ({ page }) => {
+      const { errors, cleanup } = collectConsoleErrors(page);
+      await page.goto('/telefonia');
+      await page.waitForLoadState('networkidle');
+      await expect(
+        page.getByRole('heading', { name: /Telefonia/i, level: 1 })
+      ).toBeVisible({ timeout: 15000 });
+      cleanup();
+      expect(errors, `Console errors on /telefonia: ${errors.join(', ')}`).toHaveLength(0);
+    });
+
+    test('/network Storico grezzo tab renders sub-sections', async ({ page }) => {
+      const { errors, cleanup } = collectConsoleErrors(page);
+      await page.goto('/network');
+      await page.waitForLoadState('networkidle');
+      // Click the Storico grezzo tab trigger (native <button>, text-based selector).
+      await page.getByRole('button', { name: /Storico grezzo/i }).click();
+      // Assert the bandwidth sub-section heading becomes visible once the tab is active.
+      await expect(page.getByRole('heading', { name: /Bandwidth grezzo/i })).toBeVisible({
+        timeout: 15000,
+      });
+      cleanup();
+      expect(
+        errors,
+        `Console errors on /network Storico grezzo: ${errors.join(', ')}`
+      ).toHaveLength(0);
+    });
+
+    test('/debug Service Discovery tab renders heading', async ({ page }) => {
+      const { errors, cleanup } = collectConsoleErrors(page);
+      await page.goto('/debug?tab=service-discovery');
+      await page.waitForLoadState('networkidle');
+      await expect(
+        page.getByRole('heading', { name: /Service Discovery/i, level: 2 })
+      ).toBeVisible({ timeout: 15000 });
+      cleanup();
+      expect(
+        errors,
+        `Console errors on /debug Service Discovery: ${errors.join(', ')}`
+      ).toHaveLength(0);
+    });
+  });
 });

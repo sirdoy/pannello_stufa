@@ -33,6 +33,9 @@ import { useFritzBandwidthTiers } from './hooks/useFritzBandwidthTiers';
 import { useFritzWifiNetworks } from './hooks/useFritzWifiNetworks';
 import { useFritzBudgetStats } from './hooks/useFritzBudgetStats';
 import { useFritzDeviceCountHistory } from './hooks/useFritzDeviceCountHistory';
+import { useFritzBandwidthHistoryRaw } from './hooks/useFritzBandwidthHistoryRaw';
+import { useFritzDevicePresenceHistory } from './hooks/useFritzDevicePresenceHistory';
+import { useFritzDeviceEventsRaw } from './hooks/useFritzDeviceEventsRaw';
 import WanStatusCard from './components/WanStatusCard';
 import DeviceListTable from './components/DeviceListTable';
 import CorrelationInsight from './components/CorrelationInsight';
@@ -42,6 +45,7 @@ import WifiClientsTable from './components/WifiClientsTable';
 import NetworkServicesCard from './components/NetworkServicesCard';
 import BudgetStatsCard from './components/BudgetStatsCard';
 import WifiNetworksTable from './components/WifiNetworksTable';
+import RawHistoryTab from './components/RawHistoryTab';
 
 const BandwidthChart = dynamic(
   () => import('./components/BandwidthChart'),
@@ -81,7 +85,7 @@ const DeviceCountChart = dynamic(
 import { STOVE_ROUTES } from '@/lib/routes';
 import type { DeviceCategory } from '@/types/firebase/network';
 
-type NetworkTab = 'dispositivi' | 'wifi' | 'servizi' | 'reti-wifi';
+type NetworkTab = 'dispositivi' | 'wifi' | 'servizi' | 'reti-wifi' | 'storico';
 
 export default function NetworkPage() {
   const router = useRouter();
@@ -95,6 +99,9 @@ export default function NetworkPage() {
   // Tab state
   const [activeTab, setActiveTab] = useState<NetworkTab>('dispositivi');
 
+  // Storico grezzo (raw history) tab scope — shared across three sub-sections (D-09)
+  const [storicoHours, setStoricoHours] = useState<'1h' | '24h' | '7d'>('24h');
+
   // New hooks (Phase 134)
   const systemInfo = useFritzSystemInfo();
   const wifiClients = useFritzWifiClients({ paused: activeTab !== 'wifi' });
@@ -103,6 +110,12 @@ export default function NetworkPage() {
   const wifiNetworks = useFritzWifiNetworks({ paused: activeTab !== 'reti-wifi' });
   const budgetStats = useFritzBudgetStats();
   const deviceCountHistory = useFritzDeviceCountHistory();
+
+  // Phase 171: Raw history hooks for Storico grezzo tab (FRITZ-04/05/06).
+  // Lazy-loaded per D-10: `paused: activeTab !== 'storico'` keeps them idle until activated.
+  const bandwidthRaw = useFritzBandwidthHistoryRaw({ paused: activeTab !== 'storico', hours: storicoHours });
+  const devicePresence = useFritzDevicePresenceHistory({ paused: activeTab !== 'storico' });
+  const deviceEventsRaw = useFritzDeviceEventsRaw({ paused: activeTab !== 'storico', hours: storicoHours });
 
   // Stove power level polling (lightweight, independent)
   const stovePowerRef = useRef<number | null>(null);
@@ -218,6 +231,7 @@ export default function NetworkPage() {
             { key: 'wifi' as const, label: 'WiFi Clients' },
             { key: 'servizi' as const, label: 'Servizi di Rete' },
             { key: 'reti-wifi' as const, label: 'Reti WiFi' },
+            { key: 'storico' as const, label: 'Storico grezzo' },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -266,6 +280,15 @@ export default function NetworkPage() {
             networks={wifiNetworks.networks}
             loading={wifiNetworks.loading}
             stale={wifiNetworks.stale}
+          />
+        )}
+        {activeTab === 'storico' && (
+          <RawHistoryTab
+            bandwidth={bandwidthRaw}
+            presence={devicePresence}
+            events={deviceEventsRaw}
+            hours={storicoHours}
+            onHoursChange={setStoricoHours}
           />
         )}
 

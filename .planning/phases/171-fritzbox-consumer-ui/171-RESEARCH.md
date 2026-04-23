@@ -1049,27 +1049,31 @@ test.describe('Fritz!Box Consumer UI (Phase 171)', () => {
 
 **If this table looks small:** That's accurate. Almost every claim in this research was verified by reading a source file in this session. The uncertain areas (A1, A3) are runtime behaviors that cannot be confirmed without executing the app against a real Fritz!Box, so they're explicit.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Call-type enum: exact values returned by the HA proxy.**
    - What we know: `fritzboxClient.CallRecord.call_type: string` (raw pass-through).
    - What's unclear: Whether values are `'in'/'out'/'missed'` (our assumption) or numeric (`'1'/'2'/'3'`) per TR-064 `X_AVM-DE_OnTel1`, or localized German/English strings from the proxy.
    - Recommendation: Wave 0 task — implementer runs `curl /api/fritzbox/telephony/calls?limit=3` against dev environment OR inspects the existing phase 162 route test fixture. Lock mapping before writing Badge logic. Component test has a "fallback to neutral Badge for unrecognized types" case.
+   - **RESOLVED:** Plans handle this via the fallback-to-neutral Badge pattern in `CallHistoryTable.tsx` (Pitfall 5 — `default: return { variant: 'neutral', icon: <Phone size={14} />, label: 'Sconosciuto' }`). Unknown `call_type` values render as a neutral "Sconosciuto" badge without throwing. Acceptable resolution — live enum confirmation is a nice-to-have, not a blocker.
 
 2. **`useAdaptivePolling` behavior on `interval: null → 60000` transition.**
    - What we know: `immediate: true` fires once on mount (line 78+ of `lib/hooks/useAdaptivePolling.ts`).
    - What's unclear: Whether unpausing (interval flipping from `null`) re-triggers the `immediate` fetch, or just resumes interval-based polling.
    - Recommendation: Plan task should explicitly include a Playwright smoke assertion "switch to Storico grezzo tab → data visible within 3s (not 65s)". If this fails, add a `useEffect(() => { if (!paused) void fetchData(); }, [paused])` to each lazy hook.
+   - **RESOLVED:** Defensive paused→active re-fetch effect MUST be present in every paused-aware hook. Pattern: `useEffect(() => { if (!paused) void fetchData(); }, [paused]);` placed after the `useAdaptivePolling` call. This prevents the "switch tab, see stale skeleton for up to 60s" UX bug regardless of `useAdaptivePolling`'s re-immediate semantics. Applied to: `useFritzBandwidthHistoryRaw`, `useFritzDevicePresenceHistory`, `useFritzDeviceEventsRaw` (Plan 02 Task 1) AND `useFritzDectHandsets`, `useFritzCallHistory`, `useFritzTamStatus` (Plan 01 Task 1 — defensive; these are only paused when their host page is unmounted, but the effect is a zero-cost safety net).
 
 3. **Duration humanization exact format.**
    - What we know: Requirement says "durata (humanized `mm:ss` or `hh:mm:ss`)".
    - What's unclear: Exact format when duration < 60s (e.g., `0:45` vs `45s`), and what happens when duration is 0 (never answered).
    - Recommendation: Use a small utility `humanizeDuration(seconds: number)` with `hh:mm:ss` format when `>= 3600`, `mm:ss` otherwise, `—` when 0. Colocate in `app/telefonia/lib/formatDuration.ts` with its own unit test.
+   - **RESOLVED:** Inline the `formatDuration(sec: number)` helper inside `CallHistoryTable.tsx` (the sole consumer). Logic: `0 → '—'`; `sec >= 3600 → 'h:mm:ss'`; else `'mm:ss'`. Test cases in `CallHistoryTable.test.tsx` (Plan 01 Task 2 test c) cover `3725 → "1:02:05"`, `125 → "02:05"`, `0 → em-dash`. Colocation with the only consumer reduces indirection; separate utility file is unnecessary overhead.
 
 4. **Service Discovery tab keyboard shortcut.**
    - What we know: `/debug` page's `handleKeyDown` handles keys 1–9 for the first 9 tabs.
    - What's unclear: Whether to extend the handler to support key '0' for the 10th tab or skip the shortcut for Service Discovery.
    - Recommendation: Skip the shortcut (discoverability is via mouse / keyboard-tab navigation). Claude's Discretion.
+   - **RESOLVED:** No keyboard shortcut for the Service Discovery tab. Rationale: keys `1`-`9` are already allocated to the existing 9 tabs; adding a 10th shortcut (e.g., `0`) is not a regression because no prior `0` shortcut exists. Tab remains fully accessible via mouse click, keyboard Tab-navigation (Radix Tabs handles arrow keys natively), and URL deep-link `?tab=service-discovery`. Plan 02 Task 4 correctly leaves the `tabs` array at `app/debug/page.tsx:309` unchanged (9 entries ending in `'network'`).
 
 ## Environment Availability
 

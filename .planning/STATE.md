@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
-status: planning
+status: executing
 stopped_at: Phase 170 UI-SPEC approved
-last_updated: "2026-04-23T09:42:09.760Z"
-last_activity: 2026-04-22
+last_updated: "2026-04-23T09:51:44.728Z"
+last_activity: 2026-04-23 -- Phase --phase execution started
 progress:
   total_phases: 16
   completed_phases: 13
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase --phase — 169
+**Current focus:** Phase --phase — 170
 
 ## Current Position
 
-Phase: 170
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-22
+Phase: --phase (170) — EXECUTING
+Plan: 1 of --name
+Status: Executing Phase --phase
+Last activity: 2026-04-23 -- Phase --phase execution started
 
 Progress: [██████████] 100%
 

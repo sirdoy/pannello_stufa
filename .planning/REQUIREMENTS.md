@@ -16,10 +16,10 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 
 ### Auth
 
-- [ ] **AUTH-01**: User può autenticarsi via POST /auth/login con credenziali form-based e ricevere JWT
-- [ ] **AUTH-02**: User può creare API key via POST /auth/api-keys
-- [ ] **AUTH-03**: User può listare le proprie API key via GET /auth/api-keys
-- [ ] **AUTH-04**: User può revocare una API key via DELETE /auth/api-keys/{key_id}
+- [x] **AUTH-01**: User può autenticarsi via POST /auth/login con credenziali form-based e ricevere JWT
+- [x] **AUTH-02**: User può creare API key via POST /auth/api-keys
+- [x] **AUTH-03**: User può listare le proprie API key via GET /auth/api-keys
+- [x] **AUTH-04**: User può revocare una API key via DELETE /auth/api-keys/{key_id}
 
 ### Automations
 
@@ -109,10 +109,10 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 | PATH-02 | Phase 156 → 164 (regression fix) | Pending |
 | COMMON-01 | Phase 156 → 165 (spec alignment) | Pending |
 | COMMON-02 | Phase 156 → 165 (spec alignment) | Pending |
-| AUTH-01 | Phase 157 + 170 (UI) | Pending |
-| AUTH-02 | Phase 157 + 170 (UI) | Pending |
-| AUTH-03 | Phase 157 + 170 (UI) | Pending |
-| AUTH-04 | Phase 157 + 170 (UI) | Pending |
+| AUTH-01 | Phase 157 + 170 (UI) | Complete |
+| AUTH-02 | Phase 157 + 170 (UI) | Complete |
+| AUTH-03 | Phase 157 + 170 (UI) | Complete |
+| AUTH-04 | Phase 157 + 170 (UI) | Complete |
 | AUTO-01 | Phase 158 | Pending |
 | AUTO-02 | Phase 158 | Pending |
 | AUTO-03 | Phase 158 | Pending |

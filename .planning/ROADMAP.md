@@ -266,9 +266,9 @@ Plans:
   3. Revoked keys disappear from list after refresh
   4. Jest + Playwright smoke covers the happy path
 **Plans:** 3 plans
-- [ ] 170-01-PLAN.md — Extend /api/auth/login with body + ha_auth cookie; add POST /api/auth/logout (AUTH-01 foundation)
-- [ ] 170-02-PLAN.md — useLogin + useApiKeys hooks and /login page with Zod + rate-limit lockout (AUTH-01 client)
-- [ ] 170-03-PLAN.md — /settings/api-keys page + plaintext reveal + navbar entry + Playwright smoke/feature specs (AUTH-02, AUTH-03, AUTH-04)
+- [x] 170-01-PLAN.md — Extend /api/auth/login with body + ha_auth cookie; add POST /api/auth/logout (AUTH-01 foundation)
+- [x] 170-02-PLAN.md — useLogin + useApiKeys hooks and /login page with Zod + rate-limit lockout (AUTH-01 client)
+- [x] 170-03-PLAN.md — /settings/api-keys page + plaintext reveal + navbar entry + Playwright smoke/feature specs (AUTH-02, AUTH-03, AUTH-04)
 
 ### Phase 171: Fritz!Box Consumer UI
 **Goal**: Telephony, raw history, and service-discovery endpoints have production UI consumers outside debug panels
@@ -346,5 +346,5 @@ See git history and `.planning/milestones/` for details.
 | 167. Sonos Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-20 |
 | 168. Netatmo Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-21 |
 | 169. DIRIGERA Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-22 |
-| 170. Auth UI | v19.0 | 0/? | Pending    | — |
+| 170. Auth UI | v19.0 | 3/3 | Complete    | 2026-04-23 |
 | 171. Fritz!Box Consumer UI | v19.0 | 0/? | Pending    | — |

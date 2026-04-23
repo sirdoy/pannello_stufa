@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: planning
-stopped_at: Phase 170 context gathered
-last_updated: "2026-04-23T08:07:28.993Z"
+stopped_at: Phase 170 UI-SPEC approved
+last_updated: "2026-04-23T08:59:58.793Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 16
@@ -93,7 +93,7 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-21 — Phase 168 Plan 02 complete (Netatmo production consumer cutover to v1)
-Stopped at: Phase 170 context gathered
+Stopped at: Phase 170 UI-SPEC approved
 Resume file: --resume-file
 
 **Planned Phase:** 169 (dirigera-frontend-cutover) — 3 plans — 2026-04-22T18:46:08.530Z

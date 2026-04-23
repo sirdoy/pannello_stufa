@@ -282,8 +282,8 @@ Plans:
   4. Jest + Playwright smoke covers each new route
 **Plans:** 2 plans
 Plans:
-- [ ] 171-01-PLAN.md — /telefonia page (3 hooks + 3 components + page + CommandPalette nav-telephony) closing FRITZ-01, FRITZ-02, FRITZ-03 + D-17
-- [ ] 171-02-PLAN.md — /network Storico grezzo tab + /debug Service Discovery tab (4 hooks + 4 components + 2 page wirings + Jest + Playwright smoke) closing FRITZ-04, FRITZ-05, FRITZ-06, FRITZ-07
+- [x] 171-01-PLAN.md — /telefonia page (3 hooks + 3 components + page + CommandPalette nav-telephony) closing FRITZ-01, FRITZ-02, FRITZ-03 + D-17
+- [x] 171-02-PLAN.md — /network Storico grezzo tab + /debug Service Discovery tab (4 hooks + 4 components + 2 page wirings + Jest + Playwright smoke) closing FRITZ-04, FRITZ-05, FRITZ-06, FRITZ-07
 
 <details>
 <summary>✅ v18.0 Dark-Only & Mobile-First (Phases 149-155) — SHIPPED 2026-04-02</summary>
@@ -348,4 +348,4 @@ See git history and `.planning/milestones/` for details.
 | 168. Netatmo Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-21 |
 | 169. DIRIGERA Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-22 |
 | 170. Auth UI | v19.0 | 3/3 | Complete    | 2026-04-23 |
-| 171. Fritz!Box Consumer UI | v19.0 | 0/? | Pending    | — |
+| 171. Fritz!Box Consumer UI | v19.0 | 2/2 | Complete    | 2026-04-23 |

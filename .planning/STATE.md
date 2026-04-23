@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
-status: ready_to_plan
-stopped_at: "Completed 169-03-PLAN.md: legacy app/api/dirigera/ deleted, Phase 169 complete"
-last_updated: "2026-04-22T22:01:09.746Z"
-last_activity: 2026-04-22 -- Phase --phase execution started
+status: planning
+stopped_at: Phase 170 context gathered
+last_updated: "2026-04-23T08:07:28.993Z"
+last_activity: 2026-04-22
 progress:
   total_phases: 16
-  completed_phases: 14
+  completed_phases: 13
   total_plans: 27
   completed_plans: 30
-  percent: 88
+  percent: 100
 ---
 
 # Project State
@@ -93,7 +93,7 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-21 — Phase 168 Plan 02 complete (Netatmo production consumer cutover to v1)
-Stopped at: Completed 169-03-PLAN.md: legacy app/api/dirigera/ deleted, Phase 169 complete
-Resume file: None
+Stopped at: Phase 170 context gathered
+Resume file: --resume-file
 
 **Planned Phase:** 169 (dirigera-frontend-cutover) — 3 plans — 2026-04-22T18:46:08.530Z

@@ -4,12 +4,12 @@ milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: planning
 stopped_at: Phase 170 UI-SPEC approved
-last_updated: "2026-04-23T08:59:58.793Z"
+last_updated: "2026-04-23T09:42:09.760Z"
 last_activity: 2026-04-22
 progress:
   total_phases: 16
   completed_phases: 13
-  total_plans: 27
+  total_plans: 30
   completed_plans: 30
   percent: 100
 ---
@@ -96,4 +96,4 @@ Last activity: 2026-04-21 — Phase 168 Plan 02 complete (Netatmo production con
 Stopped at: Phase 170 UI-SPEC approved
 Resume file: --resume-file
 
-**Planned Phase:** 169 (dirigera-frontend-cutover) — 3 plans — 2026-04-22T18:46:08.530Z
+**Planned Phase:** 170 (auth-ui) — 3 plans — 2026-04-23T09:42:09.740Z

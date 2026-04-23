@@ -1099,27 +1099,31 @@ test.describe('Auth UI — full happy path (mocked)', () => {
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Auth0 `useUser()` vs server-side `auth0.getSession()` for page guard on `/settings/api-keys`?**
    - What we know: `app/settings/thermostat/page.tsx:16` uses `useUser()` client-side with an `isLoading` check + `router.push('/auth/login')` redirect on `user === null`. Pattern proven.
    - What's unclear: Whether phase 170 should prefer this or switch to a server-component page with `auth0.getSession(request)` for earlier redirect.
    - Recommendation: Match the existing pattern (`useUser()`). Consistency beats micro-optimization here. Plan-phase can revisit.
+   - **— RESOLVED:** Use client-side Auth0 `useUser()` pattern matching `app/settings/thermostat/page.tsx:16` (loading state + redirect on `!user`). This is what Plan 03 implements.
 
 2. **Where is `getNavigationStructureWithPreferences` and does it need a new category for `/settings/api-keys`?**
    - What we know: `app/components/Navbar.tsx:6` imports from `@/lib/devices/deviceRegistry`.
    - What's unclear: Whether the function already has a "settings" submenu slot that would accept a new entry, or whether it needs extension.
    - Recommendation: Planner reads `lib/devices/deviceRegistry.ts` during plan creation; one 30-second grep resolves this. Plan should include explicit `lib/devices/deviceRegistry.ts` modification in file list if needed.
+   - **— RESOLVED:** Extend `lib/devices/deviceTypes.ts` `GLOBAL_SECTIONS` array — the single data source feeds both desktop nav (`Navbar.tsx` line 321 region) and mobile drawer (line 561 region). No changes to `deviceRegistry.ts` or `getNavigationStructureWithPreferences` required. Assumption A6 confirmed by pattern-mapper.
 
 3. **Should the phase 157 `login/route.test.ts` tests be modified in-place or extended with new `describe` blocks?**
    - What we know: Three existing tests cover the env-var-only flow (`test 1: success`, `test 2: 401 propagation`, `test 3: missing env`).
    - What's unclear: CONTEXT D-15 says "extended, not rewritten". Best practice: keep existing describe block verbatim, add a second `describe('POST /api/auth/login — body + cookie [phase 170]', () => {...})` block.
    - Recommendation: The latter (two describe blocks) — preserves git blame for phase 157 tests and makes the delta obvious.
+   - **— RESOLVED:** Use two describe blocks — preserves git blame for phase 157 tests and makes the phase 170 delta obvious. This is what Plan 01 implements.
 
 4. **Is `navigator.clipboard.writeText()` available in Playwright's Chromium without an explicit permission grant?**
    - What we know: Playwright default Chromium context does not auto-grant clipboard-write permissions.
    - What's unclear: Whether the test `await context.grantPermissions(['clipboard-read', 'clipboard-write'])` is needed in `tests/features/auth-ui.spec.ts` for the copy-button verification. [CITED: Playwright docs — permissions context]
    - Recommendation: Plan-phase includes a permission grant in `beforeEach` OR asserts the copy-button click triggers UI state change (checkmark icon) without verifying clipboard content. The latter is cleaner and matches the existing `CopyableIp.test.tsx` approach (asserts `aria-label` change, not clipboard contents).
+   - **— RESOLVED:** Playwright will NOT `grantPermissions(['clipboard-write'])` in the feature spec; we assert UI state change (icon swap from Copy → Check after click) per `CopyableIp.test.tsx` pattern. Clipboard contents are verified via the manual UAT item in VALIDATION.md.
 
 ---
 

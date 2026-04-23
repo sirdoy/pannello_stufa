@@ -89,11 +89,12 @@ None.
 | 260328-jyf | Align WS types with HA proxy types | 2026-03-28 | 635f6337 | [260328-jyf-align-ws-types-with-ha-proxy-types-same-](./quick/260328-jyf-align-ws-types-with-ha-proxy-types-same-/) |
 | 260331-dwi | Fix CameraCard not rendering with WS active | 2026-03-31 | 221f4efb | [260331-dwi-con-ws-attivo-non-si-vede-la-card-di-net](./quick/260331-dwi-con-ws-attivo-non-si-vede-la-card-di-net/) |
 | 260331-eyf | Fix broken /monitoring navbar link and notification URLs | 2026-03-31 | ad2b9507 | [260331-eyf-fix-menu-links-and-add-missing-pages-to-](./quick/260331-eyf-fix-menu-links-and-add-missing-pages-to-/) |
+| 260423-n6i | Fix jest config performance (worktree ignores, maxWorkers cap, scoped scripts, CLAUDE.md rule 8) | 2026-04-23 | 79b758a6 | [260423-n6i-fix-jest-config-performance-and-resource](./quick/260423-n6i-fix-jest-config-performance-and-resource/) |
 
 ## Session Continuity
 
-Last activity: 2026-04-21 — Phase 168 Plan 02 complete (Netatmo production consumer cutover to v1)
-Stopped at: Phase 170 UI-SPEC approved
+Last activity: 2026-04-23 — Completed quick task 260423-n6i (jest config performance fix)
+Stopped at: Phase 170 complete + jest performance fix shipped
 Resume file: --resume-file
 
 **Planned Phase:** 170 (auth-ui) — 3 plans — 2026-04-23T09:42:09.740Z

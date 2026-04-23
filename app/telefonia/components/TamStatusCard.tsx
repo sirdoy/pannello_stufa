@@ -23,8 +23,10 @@ interface TamStatusCardProps {
 /**
  * TamStatusCard — FRITZ-03 presentational card for answering machine (Segreteria) status.
  *
- * Composes ONLY existing primitives from @/app/components/ui. No ErrorAlert (Pitfall 4).
- * No dangerouslySetInnerHTML (threat T-171-01 — XSS mitigation).
+ * Composes ONLY existing primitives from @/app/components/ui. Uses
+ * Banner variant="error" for error states per Pitfall 4 (not the legacy
+ * alert primitive). Never renders untrusted HTML — JSX default escaping
+ * covers threat T-171-01 (XSS on Fritz!Box-supplied strings).
  */
 export default function TamStatusCard({
   status,

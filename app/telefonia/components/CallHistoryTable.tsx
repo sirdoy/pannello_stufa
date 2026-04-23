@@ -74,9 +74,11 @@ function formatDuration(sec: number): ReactNode {
 /**
  * CallHistoryTable — FRITZ-02 presentational card for call history.
  *
- * Server-paginated 50/page with Prev/Next controls. No ErrorAlert (Pitfall 4),
- * no dangerouslySetInnerHTML (threat T-171-01). Pitfall 5 (unknown call_type
- * fallback) and Pitfall 6 (timestamp seconds→ms) are both applied.
+ * Server-paginated 50/page with Prev/Next controls. Uses Banner
+ * variant="error" per Pitfall 4 (not the legacy alert primitive) and
+ * never renders untrusted HTML — JSX default escaping covers threat
+ * T-171-01. Pitfall 5 (unknown call_type fallback) and Pitfall 6
+ * (timestamp seconds→ms) are both applied.
  */
 export default function CallHistoryTable({
   calls,

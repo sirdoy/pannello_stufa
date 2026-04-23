@@ -24,8 +24,9 @@ interface DectHandsetsTableProps {
 /**
  * DectHandsetsTable — FRITZ-01 presentational card for DECT handsets.
  *
- * Composes only existing primitives. No ErrorAlert (Pitfall 4), no
- * dangerouslySetInnerHTML (threat T-171-01).
+ * Composes only existing primitives. Uses Banner variant="error" for
+ * error states per Pitfall 4 (not the legacy alert primitive). Never
+ * renders untrusted HTML — JSX default escaping covers threat T-171-01.
  */
 export default function DectHandsetsTable({
   handsets,

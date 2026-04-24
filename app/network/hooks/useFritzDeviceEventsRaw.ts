@@ -5,7 +5,7 @@ import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 
 /**
- * Raw device-event record returned by /api/fritzbox/history/device-events.
+ * Raw device-event record returned by /api/v1/fritzbox/history/device-events.
  * Shape mirrors lib/fritzbox/fritzboxClient.ts:526-532.
  * NOTE: `timestamp` is Unix SECONDS — multiply by 1000 before constructing a Date.
  */
@@ -37,7 +37,7 @@ interface UseFritzDeviceEventsRawReturn {
 /**
  * useFritzDeviceEventsRaw (FRITZ-06)
  *
- * Polls /api/fritzbox/history/device-events with hours + limit/offset pagination.
+ * Polls /api/v1/fritzbox/history/device-events with hours + limit/offset pagination.
  * Never sends a `mac` filter param here (the UI has no per-device filter on Storico tab).
  * - Defensive paused→active re-fetch for lazy-loaded tab UX.
  * - Pitfall 2 guard: resets `page` when total shrinks past current page.
@@ -63,7 +63,7 @@ export function useFritzDeviceEventsRaw(
         limit: String(PAGE_SIZE),
         offset: String(page * PAGE_SIZE),
       });
-      const res = await fetch(`/api/fritzbox/history/device-events?${params.toString()}`);
+      const res = await fetch(`/api/v1/fritzbox/history/device-events?${params.toString()}`);
       if (!res.ok) {
         setStale(true);
         setItems([]);

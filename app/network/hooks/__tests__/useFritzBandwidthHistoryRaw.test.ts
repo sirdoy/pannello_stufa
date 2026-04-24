@@ -91,7 +91,7 @@ describe('useFritzBandwidthHistoryRaw', () => {
     });
 
     const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
-    expect(fetchUrl).toContain('/api/fritzbox/history/bandwidth');
+    expect(fetchUrl).toContain('/api/v1/fritzbox/history/bandwidth');
     expect(fetchUrl).toContain('hours=168');
     expect(fetchUrl).toContain('limit=100');
     expect(fetchUrl).toContain('offset=0');

@@ -43,7 +43,7 @@ describe('useFritzTamStatus', () => {
     });
 
     const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
-    expect(fetchUrl).toBe('/api/fritzbox/telephony/tam');
+    expect(fetchUrl).toBe('/api/v1/fritzbox/telephony/tam');
     expect(result.current.status).toEqual(mockTam);
     expect(result.current.stale).toBe(false);
   });

@@ -19,7 +19,7 @@ interface UseFritzTamStatusOptions {
 /**
  * useFritzTamStatus
  *
- * Polls /api/fritzbox/telephony/tam (FRITZ-03).
+ * Polls /api/v1/fritzbox/telephony/tam (FRITZ-03).
  * Single-object response (no pagination). Follows the canonical
  * Fritz!Box polling pattern with paused/visibility gating.
  * Defensive paused->active re-fetch (Open Question #2 RESOLVED).
@@ -40,7 +40,7 @@ export function useFritzTamStatus(options: UseFritzTamStatusOptions = {}): {
 
   const fetchData = async (): Promise<void> => {
     try {
-      const res = await fetch('/api/fritzbox/telephony/tam');
+      const res = await fetch('/api/v1/fritzbox/telephony/tam');
       if (!res.ok) {
         setStale(true);
         setStatus(null);

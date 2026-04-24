@@ -23,7 +23,7 @@ interface UseFritzCallHistoryOptions {
 /**
  * useFritzCallHistory
  *
- * Polls /api/fritzbox/telephony/calls (FRITZ-02).
+ * Polls /api/v1/fritzbox/telephony/calls (FRITZ-02).
  * Server-paginated (50/page) via limit/offset URLSearchParams.
  * Pitfall 2: resets page to 0 if current offset is beyond a shrunken total_count.
  * Defensive paused->active re-fetch (Open Question #2 RESOLVED).
@@ -53,7 +53,7 @@ export function useFritzCallHistory(options: UseFritzCallHistoryOptions = {}): {
         limit: String(PAGE_SIZE),
         offset: String(page * PAGE_SIZE),
       });
-      const res = await fetch(`/api/fritzbox/telephony/calls?${params.toString()}`);
+      const res = await fetch(`/api/v1/fritzbox/telephony/calls?${params.toString()}`);
       if (!res.ok) {
         setStale(true);
         setCalls([]);

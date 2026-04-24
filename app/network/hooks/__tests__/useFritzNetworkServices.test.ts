@@ -75,10 +75,10 @@ describe('useFritzNetworkServices', () => {
     });
 
     const urls = fetchSpy.mock.calls.map((call: unknown[]) => call[0] as string);
-    expect(urls).toContain('/api/fritzbox/network/dhcp/reservations?limit=1000');
-    expect(urls).toContain('/api/fritzbox/network/port-forwarding?limit=1000');
-    expect(urls).toContain('/api/fritzbox/network/upnp');
-    expect(urls).toContain('/api/fritzbox/network/mesh');
+    expect(urls).toContain('/api/v1/fritzbox/network/dhcp/reservations?limit=1000');
+    expect(urls).toContain('/api/v1/fritzbox/network/port-forwarding?limit=1000');
+    expect(urls).toContain('/api/v1/fritzbox/network/upnp');
+    expect(urls).toContain('/api/v1/fritzbox/network/mesh');
   });
 
   it('parses json.reservations for DHCP data', async () => {

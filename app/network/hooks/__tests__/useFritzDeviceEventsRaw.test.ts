@@ -104,7 +104,7 @@ describe('useFritzDeviceEventsRaw', () => {
     });
 
     const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
-    expect(fetchUrl).toContain('/api/fritzbox/history/device-events');
+    expect(fetchUrl).toContain('/api/v1/fritzbox/history/device-events');
     expect(fetchUrl).not.toContain('mac=');
   });
 });

@@ -20,7 +20,7 @@ interface UseFritzDectHandsetsOptions {
 /**
  * useFritzDectHandsets
  *
- * Polls /api/fritzbox/telephony/dect (FRITZ-01).
+ * Polls /api/v1/fritzbox/telephony/dect (FRITZ-01).
  * Clones the canonical Fritz!Box polling hook pattern (useFritzWifiClients):
  * - 60s visible cadence, 300s hidden cadence
  * - paused: true stops polling (interval = null)
@@ -45,7 +45,7 @@ export function useFritzDectHandsets(options: UseFritzDectHandsetsOptions = {}):
 
   const fetchData = async (): Promise<void> => {
     try {
-      const res = await fetch('/api/fritzbox/telephony/dect');
+      const res = await fetch('/api/v1/fritzbox/telephony/dect');
       if (!res.ok) {
         setStale(true);
         setHandsets([]);

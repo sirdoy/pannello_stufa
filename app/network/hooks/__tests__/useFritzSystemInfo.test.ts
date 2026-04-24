@@ -40,7 +40,7 @@ describe('useFritzSystemInfo', () => {
     expect(result.current.stale).toBe(false);
   });
 
-  it('fetches from /api/fritzbox/system', async () => {
+  it('fetches from /api/v1/fritzbox/system', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ system: mockSystemData }),
@@ -49,7 +49,7 @@ describe('useFritzSystemInfo', () => {
     renderHook(() => useFritzSystemInfo());
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/fritzbox/system');
+      expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/system');
     });
   });
 

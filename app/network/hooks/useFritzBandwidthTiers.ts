@@ -85,7 +85,7 @@ export function useFritzBandwidthTiers(): {
 
     if (tier === 'auto') {
       setLoading(true);
-      fetch('/api/fritzbox/history/bandwidth/auto?days=7')
+      fetch('/api/v1/fritzbox/history/bandwidth/auto?days=7')
         .then((r) => r.json())
         .then((json: unknown) => {
           const data = json as { auto: { items: AggregatedRecord[] } };
@@ -108,8 +108,8 @@ export function useFritzBandwidthTiers(): {
 
     const endpoint =
       tier === 'hourly'
-        ? '/api/fritzbox/history/bandwidth/hourly?days=7'
-        : '/api/fritzbox/history/bandwidth/daily?days=30';
+        ? '/api/v1/fritzbox/history/bandwidth/hourly?days=7'
+        : '/api/v1/fritzbox/history/bandwidth/daily?days=30';
 
     setLoading(true);
 

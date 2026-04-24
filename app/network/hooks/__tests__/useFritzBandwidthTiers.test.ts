@@ -97,7 +97,7 @@ describe('useFritzBandwidthTiers', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/fritzbox/history/bandwidth/hourly?days=7');
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/hourly?days=7');
   });
 
   it('fetches /daily?days=30 for daily tier', async () => {
@@ -116,7 +116,7 @@ describe('useFritzBandwidthTiers', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/fritzbox/history/bandwidth/daily?days=30');
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/daily?days=30');
   });
 
   it('transforms bps to Mbps and seconds to ms for hourly data', async () => {
@@ -210,7 +210,7 @@ describe('useFritzBandwidthTiers', () => {
     { timestamp: 1700003600, granularity: 'hourly', avg_downstream_rate: 15_000_000, avg_upstream_rate: 3_000_000 },
   ];
 
-  it('fetches /api/fritzbox/history/bandwidth/auto?days=7 for auto tier', async () => {
+  it('fetches /api/v1/fritzbox/history/bandwidth/auto?days=7 for auto tier', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
@@ -226,7 +226,7 @@ describe('useFritzBandwidthTiers', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/fritzbox/history/bandwidth/auto?days=7');
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/auto?days=7');
   });
 
   it('maps timestamp (not hour_timestamp) to chart points for auto tier', async () => {

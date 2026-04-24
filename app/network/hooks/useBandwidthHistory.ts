@@ -46,7 +46,7 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
    */
   const loadHistoryFromServer = async () => {
     try {
-      const response = await fetch('/api/fritzbox/bandwidth-history?range=7d');
+      const response = await fetch('/api/v1/fritzbox/bandwidth-history?range=7d');
       if (!response.ok) {
         return;
       }

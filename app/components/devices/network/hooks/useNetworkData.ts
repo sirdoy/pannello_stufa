@@ -81,7 +81,7 @@ export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataR
   useEffect(() => {
     const loadHistory = async () => {
       try {
-        const res = await fetch('/api/fritzbox/bandwidth-history?range=1h');
+        const res = await fetch('/api/v1/fritzbox/bandwidth-history?range=1h');
         if (!res.ok) return;
 
         const json = await res.json() as {
@@ -133,7 +133,7 @@ export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataR
 
         const results = await Promise.allSettled(
           batch.map(async (device) => {
-            const response = await fetch(`/api/fritzbox/vendor-lookup?mac=${encodeURIComponent(device.mac)}`);
+            const response = await fetch(`/api/v1/fritzbox/vendor-lookup?mac=${encodeURIComponent(device.mac)}`);
             if (!response.ok) return null;
 
             const data = await response.json() as {
@@ -273,9 +273,9 @@ export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataR
       setError(null);
 
       const [bwRes, devRes, wanRes] = await Promise.all([
-        fetch('/api/fritzbox/bandwidth'),
-        fetch('/api/fritzbox/devices'),
-        fetch('/api/fritzbox/wan'),
+        fetch('/api/v1/fritzbox/bandwidth'),
+        fetch('/api/v1/fritzbox/devices'),
+        fetch('/api/v1/fritzbox/wan'),
       ]);
 
       // Handle individual response errors

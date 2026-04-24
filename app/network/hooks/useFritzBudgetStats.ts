@@ -32,7 +32,7 @@ export function useFritzBudgetStats(): {
   const [error, setError] = useState(false);
 
   useEffect(() => {
-    fetch('/api/fritzbox/budget-stats')
+    fetch('/api/v1/fritzbox/budget-stats')
       .then((res) => res.json())
       .then((json: unknown) => {
         const body = json as { stats: BudgetStats };

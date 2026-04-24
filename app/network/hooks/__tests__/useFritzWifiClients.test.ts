@@ -60,7 +60,7 @@ describe('useFritzWifiClients', () => {
     });
 
     const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
-    expect(fetchUrl).toContain('/api/fritzbox/wifi/clients');
+    expect(fetchUrl).toContain('/api/v1/fritzbox/wifi/clients');
     expect(fetchUrl).not.toContain('band=');
     expect(fetchUrl).toContain('limit=1000');
   });

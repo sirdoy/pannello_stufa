@@ -57,7 +57,7 @@ describe('useFritzDectHandsets', () => {
     });
 
     const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
-    expect(fetchUrl).toBe('/api/fritzbox/telephony/dect');
+    expect(fetchUrl).toBe('/api/v1/fritzbox/telephony/dect');
     expect(result.current.handsets).toHaveLength(2);
     expect(result.current.total).toBe(2);
     expect(result.current.stale).toBe(false);

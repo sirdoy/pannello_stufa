@@ -59,7 +59,7 @@ describe('useFritzCallHistory', () => {
     });
 
     const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
-    expect(fetchUrl).toContain('/api/fritzbox/telephony/calls');
+    expect(fetchUrl).toContain('/api/v1/fritzbox/telephony/calls');
     expect(fetchUrl).toContain('limit=50');
     expect(fetchUrl).toContain('offset=0');
     expect(result.current.calls).toHaveLength(2);

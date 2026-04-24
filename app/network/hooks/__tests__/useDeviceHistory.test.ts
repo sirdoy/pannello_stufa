@@ -45,7 +45,7 @@ describe('useDeviceHistory', () => {
     });
 
     // Verify fetch was called with correct params
-    expect(mockFetch).toHaveBeenCalledWith('/api/fritzbox/history?range=24h');
+    expect(mockFetch).toHaveBeenCalledWith('/api/v1/fritzbox/history?range=24h');
     expect(result.current.events).toEqual(mockEvents);
     expect(result.current.isEmpty).toBe(false);
   });
@@ -64,7 +64,7 @@ describe('useDeviceHistory', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(mockFetch).toHaveBeenCalledWith('/api/fritzbox/history?range=24h');
+    expect(mockFetch).toHaveBeenCalledWith('/api/v1/fritzbox/history?range=24h');
 
     // Change time range
     result.current.setTimeRange('7d');
@@ -72,7 +72,7 @@ describe('useDeviceHistory', () => {
     rerender();
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/fritzbox/history?range=7d');
+      expect(mockFetch).toHaveBeenCalledWith('/api/v1/fritzbox/history?range=7d');
     });
   });
 
@@ -90,7 +90,7 @@ describe('useDeviceHistory', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(mockFetch).toHaveBeenCalledWith('/api/fritzbox/history?range=24h');
+    expect(mockFetch).toHaveBeenCalledWith('/api/v1/fritzbox/history?range=24h');
 
     // Set device filter
     result.current.setDeviceFilter('AA:BB:CC:DD:EE:FF');
@@ -98,7 +98,7 @@ describe('useDeviceHistory', () => {
     rerender();
 
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith('/api/fritzbox/history?range=24h&device=AA%3ABB%3ACC%3ADD%3AEE%3AFF');
+      expect(mockFetch).toHaveBeenCalledWith('/api/v1/fritzbox/history?range=24h&device=AA%3ABB%3ACC%3ADD%3AEE%3AFF');
     });
   });
 

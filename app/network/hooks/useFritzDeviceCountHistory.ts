@@ -38,7 +38,7 @@ function aggregateToDailyTotals(items: DeviceDailyRecord[]): DeviceCountPoint[] 
  * useFritzDeviceCountHistory
  *
  * On-demand fetch for device count history with daily aggregation.
- * Fetches /api/fritzbox/history/devices/daily?days=N on mount and when days changes.
+ * Fetches /api/v1/fritzbox/history/devices/daily?days=N on mount and when days changes.
  * Aggregates 24 hourly records per day into daily peak totals.
  *
  * @returns { days, setDays, chartData, loading }
@@ -55,7 +55,7 @@ export function useFritzDeviceCountHistory(): {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/fritzbox/history/devices/daily?days=${days}`)
+    fetch(`/api/v1/fritzbox/history/devices/daily?days=${days}`)
       .then((res) => res.json())
       .then((json: unknown) => {
         const body = json as { deviceCounts: { items: DeviceDailyRecord[]; total: number } };

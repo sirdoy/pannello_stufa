@@ -28,7 +28,7 @@ describe('useFritzBudgetStats', () => {
     expect(result.current.error).toBe(false);
   });
 
-  it('fetches /api/fritzbox/budget-stats on mount', async () => {
+  it('fetches /api/v1/fritzbox/budget-stats on mount', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ stats: mockBudgetStats }),
@@ -40,7 +40,7 @@ describe('useFritzBudgetStats', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/fritzbox/budget-stats');
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/budget-stats');
     // React strict mode may call effects twice in development
     expect(global.fetch).toHaveBeenCalled();
   });

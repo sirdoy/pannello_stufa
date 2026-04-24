@@ -24,7 +24,7 @@ interface UseFritzWifiClientsOptions {
 /**
  * useFritzWifiClients
  *
- * Polls /api/fritzbox/wifi/clients with optional band filter.
+ * Polls /api/v1/fritzbox/wifi/clients with optional band filter.
  * Supports pausing (when tab/card is not visible) via paused prop.
  * Re-fetches when band changes without waiting for next poll interval.
  *
@@ -58,7 +58,7 @@ export function useFritzWifiClients(options: UseFritzWifiClientsOptions = {}): {
       }
       params.set('limit', '1000');
 
-      const res = await fetch(`/api/fritzbox/wifi/clients?${params.toString()}`);
+      const res = await fetch(`/api/v1/fritzbox/wifi/clients?${params.toString()}`);
       if (!res.ok) {
         setStale(true);
         return;

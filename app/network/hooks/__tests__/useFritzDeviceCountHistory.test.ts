@@ -40,7 +40,7 @@ describe('useFritzDeviceCountHistory', () => {
     expect(result.current.chartData).toEqual([]);
   });
 
-  it('fetches /api/fritzbox/history/devices/daily?days=30 on mount', async () => {
+  it('fetches /api/v1/fritzbox/history/devices/daily?days=30 on mount', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
@@ -54,7 +54,7 @@ describe('useFritzDeviceCountHistory', () => {
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      '/api/fritzbox/history/devices/daily?days=30',
+      '/api/v1/fritzbox/history/devices/daily?days=30',
     );
   });
 
@@ -153,7 +153,7 @@ describe('useFritzDeviceCountHistory', () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        '/api/fritzbox/history/devices/daily?days=7',
+        '/api/v1/fritzbox/history/devices/daily?days=7',
       );
     });
   });

@@ -39,7 +39,7 @@ export function useDeviceHistory(): UseDeviceHistoryReturn {
         params.append('device', deviceFilter);
       }
 
-      const response = await fetch(`/api/fritzbox/history?${params}`);
+      const response = await fetch(`/api/v1/fritzbox/history?${params}`);
       const data = await response.json();
 
       if (data.success && data.events) {

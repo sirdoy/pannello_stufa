@@ -61,7 +61,7 @@ describe('useFritzWifiNetworks', () => {
     expect(result.current.stale).toBe(false);
   });
 
-  it('fetches /api/fritzbox/wifi/networks and returns WiFiNetworkModel[]', async () => {
+  it('fetches /api/v1/fritzbox/wifi/networks and returns WiFiNetworkModel[]', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ networks: mockWifiStatusResponse }),
@@ -73,7 +73,7 @@ describe('useFritzWifiNetworks', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/fritzbox/wifi/networks');
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/wifi/networks');
     expect(result.current.networks).toHaveLength(2);
     expect(result.current.networks[0]?.band).toBe('2.4GHz');
     expect(result.current.stale).toBe(false);

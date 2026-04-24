@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 /**
- * TR-064 service entry returned by /api/fritzbox/service-discovery.
+ * TR-064 service entry returned by /api/v1/fritzbox/service-discovery.
  * Shape mirrors lib/fritzbox/fritzboxClient.ts:561-565.
  */
 export interface ServiceEntry {
@@ -34,7 +34,7 @@ export function useFritzServiceDiscovery(): UseFritzServiceDiscoveryReturn {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/fritzbox/service-discovery');
+      const res = await fetch('/api/v1/fritzbox/service-discovery');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = (await res.json()) as { discovery: { services: ServiceEntry[] } };
       setServices(json.discovery.services ?? []);

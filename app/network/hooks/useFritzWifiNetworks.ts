@@ -21,7 +21,7 @@ interface UseFritzWifiNetworksOptions {
 /**
  * useFritzWifiNetworks
  *
- * Polls /api/fritzbox/wifi/networks with optional paused flag.
+ * Polls /api/v1/fritzbox/wifi/networks with optional paused flag.
  * When paused, stops polling (interval: null).
  * Adjusts poll rate based on page visibility (60s visible, 300s hidden).
  *
@@ -44,7 +44,7 @@ export function useFritzWifiNetworks(options: UseFritzWifiNetworksOptions = {}):
 
   const fetchData = async () => {
     try {
-      const res = await fetch('/api/fritzbox/wifi/networks');
+      const res = await fetch('/api/v1/fritzbox/wifi/networks');
       if (!res.ok) {
         setStale(true);
         return;

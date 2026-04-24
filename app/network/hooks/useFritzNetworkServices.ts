@@ -99,10 +99,10 @@ export function useFritzNetworkServices(options: UseFritzNetworkServicesOptions 
   const fetchData = async () => {
     try {
       const results = await Promise.allSettled([
-        fetch('/api/fritzbox/network/dhcp/reservations?limit=1000'),
-        fetch('/api/fritzbox/network/port-forwarding?limit=1000'),
-        fetch('/api/fritzbox/network/upnp'),
-        fetch('/api/fritzbox/network/mesh'),
+        fetch('/api/v1/fritzbox/network/dhcp/reservations?limit=1000'),
+        fetch('/api/v1/fritzbox/network/port-forwarding?limit=1000'),
+        fetch('/api/v1/fritzbox/network/upnp'),
+        fetch('/api/v1/fritzbox/network/mesh'),
       ]);
 
       let hasError = false;

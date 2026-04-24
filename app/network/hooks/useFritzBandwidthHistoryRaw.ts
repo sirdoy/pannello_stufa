@@ -5,7 +5,7 @@ import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 
 /**
- * Raw bandwidth record returned by /api/fritzbox/history/bandwidth.
+ * Raw bandwidth record returned by /api/v1/fritzbox/history/bandwidth.
  * Shape mirrors lib/fritzbox/fritzboxClient.ts:507-517 exactly.
  * NOTE: `timestamp` is Unix SECONDS — multiply by 1000 before constructing a Date.
  */
@@ -41,7 +41,7 @@ interface UseFritzBandwidthHistoryRawReturn {
 /**
  * useFritzBandwidthHistoryRaw (FRITZ-04)
  *
- * Polls /api/fritzbox/history/bandwidth with hours + limit/offset pagination.
+ * Polls /api/v1/fritzbox/history/bandwidth with hours + limit/offset pagination.
  * - 60s cadence when visible, 300s when hidden (useAdaptivePolling + useVisibility).
  * - Pauses entirely when `paused: true` (tab inactive).
  * - Defensively re-fetches on paused→active transition (lazy-loaded tab UX).
@@ -69,7 +69,7 @@ export function useFritzBandwidthHistoryRaw(
         limit: String(PAGE_SIZE),
         offset: String(page * PAGE_SIZE),
       });
-      const res = await fetch(`/api/fritzbox/history/bandwidth?${params.toString()}`);
+      const res = await fetch(`/api/v1/fritzbox/history/bandwidth?${params.toString()}`);
       if (!res.ok) {
         setStale(true);
         setItems([]);

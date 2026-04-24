@@ -17,7 +17,7 @@ export interface SystemInfoData {
 /**
  * useFritzSystemInfo
  *
- * Polls /api/fritzbox/system for Fritz!Box system information.
+ * Polls /api/v1/fritzbox/system for Fritz!Box system information.
  * Adapts polling interval based on tab visibility (60s visible, 300s hidden).
  *
  * @returns { data, loading, stale }
@@ -36,7 +36,7 @@ export function useFritzSystemInfo(): {
 
   const fetchData = async () => {
     try {
-      const res = await fetch('/api/fritzbox/system');
+      const res = await fetch('/api/v1/fritzbox/system');
       if (!res.ok) {
         setStale(true);
         return;

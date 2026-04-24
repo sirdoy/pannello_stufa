@@ -5,7 +5,7 @@ import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 
 /**
- * Raw device presence record returned by /api/fritzbox/history/devices.
+ * Raw device presence record returned by /api/v1/fritzbox/history/devices.
  * Shape mirrors lib/fritzbox/fritzboxClient.ts:541-547.
  * NOTE: `timestamp` is Unix SECONDS — multiply by 1000 before constructing a Date.
  */
@@ -36,7 +36,7 @@ interface UseFritzDevicePresenceHistoryReturn {
 /**
  * useFritzDevicePresenceHistory (FRITZ-05)
  *
- * Polls /api/fritzbox/history/devices (presence log). Per phase 162 D-05, the HA proxy
+ * Polls /api/v1/fritzbox/history/devices (presence log). Per phase 162 D-05, the HA proxy
  * may NOT expose this endpoint — when it returns 404 the hook sets `notFound: true` and
  * NEVER throws. Consumers render a friendly "endpoint unavailable" message in that state.
  *
@@ -65,7 +65,7 @@ export function useFritzDevicePresenceHistory(
         limit: String(PAGE_SIZE),
         offset: String(page * PAGE_SIZE),
       });
-      const res = await fetch(`/api/fritzbox/history/devices?${params.toString()}`);
+      const res = await fetch(`/api/v1/fritzbox/history/devices?${params.toString()}`);
       if (!res.ok) {
         setStale(true);
         setItems([]);

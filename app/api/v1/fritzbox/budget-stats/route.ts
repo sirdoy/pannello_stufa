@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/budget-stats
+ * GET /api/v1/fritzbox/budget-stats
  * Returns data budget consumption statistics from Fritz!Box.
  * Raw pass-through from HA proxy — no field transformation.
  * Protected: Requires Auth0 authentication

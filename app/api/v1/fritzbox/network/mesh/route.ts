@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/network/mesh
+ * GET /api/v1/fritzbox/network/mesh
  * Returns mesh topology from Fritz!Box as a flat object.
  * NOT paginated — returns { schema_version, node_count, link_count, nodes[], links[], is_stale, fetched_at }.
  * Protected: Requires Auth0 authentication

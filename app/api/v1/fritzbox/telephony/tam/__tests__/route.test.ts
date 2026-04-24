@@ -1,6 +1,6 @@
 /**
  * Tests for Fritz!Box Telephony TAM Route
- * GET /api/fritzbox/telephony/tam
+ * GET /api/v1/fritzbox/telephony/tam
  */
 
 // Mock dependencies before imports
@@ -20,7 +20,7 @@ const mockFritzboxClient = jest.mocked(fritzboxClient);
 const mockGetCachedData = jest.mocked(getCachedData);
 const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
-describe('GET /api/fritzbox/telephony/tam', () => {
+describe('GET /api/v1/fritzbox/telephony/tam', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
   const mockData = {
@@ -33,7 +33,7 @@ describe('GET /api/fritzbox/telephony/tam', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/telephony/tam');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/telephony/tam');
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession as any);
     // Default: rate limit allows

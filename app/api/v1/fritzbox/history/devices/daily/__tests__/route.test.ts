@@ -1,6 +1,6 @@
 /**
  * Tests for Fritz!Box History Devices Daily Route
- * GET /api/fritzbox/history/devices/daily
+ * GET /api/v1/fritzbox/history/devices/daily
  */
 
 // Mock dependencies before imports
@@ -20,7 +20,7 @@ const mockFritzboxClient = jest.mocked(fritzboxClient);
 const mockGetCachedData = jest.mocked(getCachedData);
 const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
-describe('GET /api/fritzbox/history/devices/daily', () => {
+describe('GET /api/v1/fritzbox/history/devices/daily', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
   const mockData = {
@@ -40,7 +40,7 @@ describe('GET /api/fritzbox/history/devices/daily', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/history/devices/daily');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history/devices/daily');
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession as any);
     // Default: rate limit allows

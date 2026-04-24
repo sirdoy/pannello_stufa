@@ -5,7 +5,7 @@ import type { DeviceHistoryTimeRange } from '@/app/components/devices/network/ty
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/history
+ * GET /api/v1/fritzbox/history
  * Retrieves device connection/disconnection events from Firebase RTDB.
  * Events are state changes only (connected/disconnected), not raw snapshots.
  * Protected: Requires Auth0 authentication

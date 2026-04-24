@@ -1,5 +1,5 @@
 /**
- * Tests for /api/fritzbox/history endpoint
+ * Tests for /api/v1/fritzbox/history endpoint
  *
  * Verifies device event history query with time range and device filtering
  * Phase 65: Device History Timeline
@@ -21,7 +21,7 @@ import type { DeviceEvent } from '@/app/components/devices/network/types';
 const mockGetSession = jest.mocked(auth0.getSession);
 const mockGetDeviceEvents = jest.mocked(getDeviceEvents);
 
-describe('GET /api/fritzbox/history', () => {
+describe('GET /api/v1/fritzbox/history', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
@@ -63,7 +63,7 @@ describe('GET /api/fritzbox/history', () => {
   test('default range (24h) returns events within 24h window', async () => {
     mockGetDeviceEvents.mockResolvedValue(mockEvents);
 
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/history');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history');
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
@@ -88,7 +88,7 @@ describe('GET /api/fritzbox/history', () => {
   test('range=7d calculates correct startTime', async () => {
     mockGetDeviceEvents.mockResolvedValue(mockEvents);
 
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/history?range=7d');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history?range=7d');
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
@@ -104,7 +104,7 @@ describe('GET /api/fritzbox/history', () => {
   test('range=1h calculates correct startTime', async () => {
     mockGetDeviceEvents.mockResolvedValue(mockEvents);
 
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/history?range=1h');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history?range=1h');
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
@@ -120,7 +120,7 @@ describe('GET /api/fritzbox/history', () => {
   test('device filter returns only events for that MAC', async () => {
     mockGetDeviceEvents.mockResolvedValue(mockEvents);
 
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/history?device=AA:BB:CC:DD:EE:FF');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history?device=AA:BB:CC:DD:EE:FF');
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
@@ -136,7 +136,7 @@ describe('GET /api/fritzbox/history', () => {
   test('no events returns empty array with totalCount 0', async () => {
     mockGetDeviceEvents.mockResolvedValue([]);
 
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/history');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history');
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 
@@ -149,7 +149,7 @@ describe('GET /api/fritzbox/history', () => {
   test('invalid range defaults to 24h', async () => {
     mockGetDeviceEvents.mockResolvedValue(mockEvents);
 
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/history?range=invalid');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history?range=invalid');
     const response = await GET(mockRequest as any, {} as any);
     const data = await response.json();
 

@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/history/bandwidth/auto
+ * GET /api/v1/fritzbox/history/bandwidth/auto
  * Returns paginated bandwidth with auto-granularity from Fritz!Box.
  * Server-side switch: days<=7 returns hourly records, days>7 returns daily records.
  * Forwards optional days, limit and offset query params to the HA proxy.

@@ -5,7 +5,7 @@ import type { BandwidthTimeRange } from '@/app/components/devices/network/types'
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/bandwidth-history
+ * GET /api/v1/fritzbox/bandwidth-history
  * Proxies historical bandwidth data from external Fritz!Box API
  * Protected: Requires Auth0 authentication
  *

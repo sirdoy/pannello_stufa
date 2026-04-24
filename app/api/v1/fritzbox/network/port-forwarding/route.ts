@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/network/port-forwarding
+ * GET /api/v1/fritzbox/network/port-forwarding
  * Returns paginated list of static port forwarding rules from Fritz!Box.
  * Forwards optional limit and offset query params to the HA proxy.
  * Protected: Requires Auth0 authentication

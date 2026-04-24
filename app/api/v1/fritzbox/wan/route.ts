@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/wan
+ * GET /api/v1/fritzbox/wan
  * Retrieves WAN connection status from Fritz!Box
  * Protected: Requires Auth0 authentication
  * Rate limited: 10 requests per minute

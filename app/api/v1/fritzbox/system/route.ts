@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/system
+ * GET /api/v1/fritzbox/system
  * Returns Fritz!Box system info: model, firmware version, uptime.
  * Raw pass-through from HA proxy — no field transformation.
  * Protected: Requires Auth0 authentication

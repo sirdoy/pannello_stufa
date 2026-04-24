@@ -1,6 +1,6 @@
 /**
  * Tests for Fritz!Box Telephony DECT Route
- * GET /api/fritzbox/telephony/dect
+ * GET /api/v1/fritzbox/telephony/dect
  */
 
 // Mock dependencies before imports
@@ -20,7 +20,7 @@ const mockFritzboxClient = jest.mocked(fritzboxClient);
 const mockGetCachedData = jest.mocked(getCachedData);
 const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
-describe('GET /api/fritzbox/telephony/dect', () => {
+describe('GET /api/v1/fritzbox/telephony/dect', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
   const mockData = {
@@ -41,7 +41,7 @@ describe('GET /api/fritzbox/telephony/dect', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/telephony/dect');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/telephony/dect');
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession as any);
     // Default: rate limit allows

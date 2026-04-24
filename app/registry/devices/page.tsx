@@ -161,7 +161,7 @@ async function fetchProviderDevices(provider: string): Promise<ProviderDevice[]>
         return modules.map(m => ({ device_id: m.id, name: m.name }));
       }
       case 'fritzbox': {
-        const res = await fetch('/api/fritzbox/devices');
+        const res = await fetch('/api/v1/fritzbox/devices');
         if (!res.ok) return [];
         const json = (await res.json()) as { success: boolean; devices: { mac: string; name: string; ip: string }[] };
         return (json.devices ?? [])

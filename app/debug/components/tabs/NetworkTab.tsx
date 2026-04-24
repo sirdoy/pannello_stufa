@@ -67,13 +67,13 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
   };
 
   const fetchAllGetEndpoints = () => {
-    fetchGetEndpoint('health', '/api/fritzbox/health');
-    fetchGetEndpoint('devices', '/api/fritzbox/devices');
-    fetchGetEndpoint('bandwidth', '/api/fritzbox/bandwidth');
-    fetchGetEndpoint('wan', '/api/fritzbox/wan');
-    fetchGetEndpoint('deviceHistory', '/api/fritzbox/history?range=24h');
-    fetchGetEndpoint('vendorLookup', '/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF');
-    fetchGetEndpoint('categoryOverride', '/api/fritzbox/category-override');
+    fetchGetEndpoint('health', '/api/v1/fritzbox/health');
+    fetchGetEndpoint('devices', '/api/v1/fritzbox/devices');
+    fetchGetEndpoint('bandwidth', '/api/v1/fritzbox/bandwidth');
+    fetchGetEndpoint('wan', '/api/v1/fritzbox/wan');
+    fetchGetEndpoint('deviceHistory', '/api/v1/fritzbox/history?range=24h');
+    fetchGetEndpoint('vendorLookup', '/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF');
+    fetchGetEndpoint('categoryOverride', '/api/v1/fritzbox/category-override');
   };
 
   // Initial fetch
@@ -115,12 +115,12 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <div className="space-y-3">
           <EndpointCard
             name="Health Check"
-            url="/api/fritzbox/health"
+            url="/api/v1/fritzbox/health"
             externalUrl={`${EXTERNAL_BASE}/health`}
             response={getResponses.health}
             loading={loadingGet.health ?? false}
             timing={timings.health}
-            onRefresh={() => fetchGetEndpoint('health', '/api/fritzbox/health')}
+            onRefresh={() => fetchGetEndpoint('health', '/api/v1/fritzbox/health')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/health`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/health`}
           />
@@ -135,23 +135,23 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <div className="space-y-3">
           <EndpointCard
             name="Devices (Proxy)"
-            url="/api/fritzbox/devices"
+            url="/api/v1/fritzbox/devices"
             externalUrl={`${EXTERNAL_BASE}/api/v1/devices`}
             response={getResponses.devices}
             loading={loadingGet.devices ?? false}
             timing={timings.devices}
-            onRefresh={() => fetchGetEndpoint('devices', '/api/fritzbox/devices')}
+            onRefresh={() => fetchGetEndpoint('devices', '/api/v1/fritzbox/devices')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/devices`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/devices`}
           />
           <EndpointCard
             name="Fritz!Box Devices"
-            url="/api/fritzbox/devices"
+            url="/api/v1/fritzbox/devices"
             externalUrl={`${EXTERNAL_BASE}/api/v1/fritzbox/devices`}
             response={getResponses.devices}
             loading={loadingGet.devices ?? false}
             timing={timings.devices}
-            onRefresh={() => fetchGetEndpoint('devices', '/api/fritzbox/devices')}
+            onRefresh={() => fetchGetEndpoint('devices', '/api/v1/fritzbox/devices')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/fritzbox/devices`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/fritzbox/devices`}
           />
@@ -166,23 +166,23 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <div className="space-y-3">
           <EndpointCard
             name="Bandwidth (Deprecated)"
-            url="/api/fritzbox/bandwidth"
+            url="/api/v1/fritzbox/bandwidth"
             externalUrl={`${EXTERNAL_BASE}/api/v1/bandwidth`}
             response={getResponses.bandwidth}
             loading={loadingGet.bandwidth ?? false}
             timing={timings.bandwidth}
-            onRefresh={() => fetchGetEndpoint('bandwidth', '/api/fritzbox/bandwidth')}
+            onRefresh={() => fetchGetEndpoint('bandwidth', '/api/v1/fritzbox/bandwidth')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/bandwidth`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/bandwidth`}
           />
           <EndpointCard
             name="Fritz!Box Bandwidth"
-            url="/api/fritzbox/bandwidth"
+            url="/api/v1/fritzbox/bandwidth"
             externalUrl={`${EXTERNAL_BASE}/api/v1/fritzbox/bandwidth`}
             response={getResponses.bandwidth}
             loading={loadingGet.bandwidth ?? false}
             timing={timings.bandwidth}
-            onRefresh={() => fetchGetEndpoint('bandwidth', '/api/fritzbox/bandwidth')}
+            onRefresh={() => fetchGetEndpoint('bandwidth', '/api/v1/fritzbox/bandwidth')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/fritzbox/bandwidth`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/fritzbox/bandwidth`}
           />
@@ -197,23 +197,23 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <div className="space-y-3">
           <EndpointCard
             name="WAN Status (Deprecated)"
-            url="/api/fritzbox/wan"
+            url="/api/v1/fritzbox/wan"
             externalUrl={`${EXTERNAL_BASE}/api/v1/wan`}
             response={getResponses.wan}
             loading={loadingGet.wan ?? false}
             timing={timings.wan}
-            onRefresh={() => fetchGetEndpoint('wan', '/api/fritzbox/wan')}
+            onRefresh={() => fetchGetEndpoint('wan', '/api/v1/fritzbox/wan')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/wan`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/wan`}
           />
           <EndpointCard
             name="Fritz!Box WAN"
-            url="/api/fritzbox/wan"
+            url="/api/v1/fritzbox/wan"
             externalUrl={`${EXTERNAL_BASE}/api/v1/fritzbox/wan`}
             response={getResponses.wan}
             loading={loadingGet.wan ?? false}
             timing={timings.wan}
-            onRefresh={() => fetchGetEndpoint('wan', '/api/fritzbox/wan')}
+            onRefresh={() => fetchGetEndpoint('wan', '/api/v1/fritzbox/wan')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/fritzbox/wan`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/fritzbox/wan`}
           />
@@ -228,34 +228,34 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <div className="space-y-3">
           <EndpointCard
             name="Bandwidth History (1h)"
-            url="/api/fritzbox/bandwidth-history?range=1h"
+            url="/api/v1/fritzbox/bandwidth-history?range=1h"
             externalUrl={`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=1`}
             response={getResponses.bwHistory1h}
             loading={loadingGet.bwHistory1h ?? false}
             timing={timings.bwHistory1h}
-            onRefresh={() => fetchGetEndpoint('bwHistory1h', '/api/fritzbox/bandwidth-history?range=1h')}
+            onRefresh={() => fetchGetEndpoint('bwHistory1h', '/api/v1/fritzbox/bandwidth-history?range=1h')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=1`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=1`}
           />
           <EndpointCard
             name="Bandwidth History (24h)"
-            url="/api/fritzbox/bandwidth-history?range=24h"
+            url="/api/v1/fritzbox/bandwidth-history?range=24h"
             externalUrl={`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=24`}
             response={getResponses.bwHistory24h}
             loading={loadingGet.bwHistory24h ?? false}
             timing={timings.bwHistory24h}
-            onRefresh={() => fetchGetEndpoint('bwHistory24h', '/api/fritzbox/bandwidth-history?range=24h')}
+            onRefresh={() => fetchGetEndpoint('bwHistory24h', '/api/v1/fritzbox/bandwidth-history?range=24h')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=24`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=24`}
           />
           <EndpointCard
             name="Bandwidth History (7d)"
-            url="/api/fritzbox/bandwidth-history?range=7d"
+            url="/api/v1/fritzbox/bandwidth-history?range=7d"
             externalUrl={`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=168`}
             response={getResponses.bwHistory7d}
             loading={loadingGet.bwHistory7d ?? false}
             timing={timings.bwHistory7d}
-            onRefresh={() => fetchGetEndpoint('bwHistory7d', '/api/fritzbox/bandwidth-history?range=7d')}
+            onRefresh={() => fetchGetEndpoint('bwHistory7d', '/api/v1/fritzbox/bandwidth-history?range=7d')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=168`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/bandwidth?hours=168`}
           />
@@ -270,12 +270,12 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <div className="space-y-3">
           <EndpointCard
             name="Device History (24h)"
-            url="/api/fritzbox/history?range=24h"
+            url="/api/v1/fritzbox/history?range=24h"
             externalUrl={`${EXTERNAL_BASE}/api/v1/history/devices?hours=24&limit=100&offset=0`}
             response={getResponses.deviceHistory}
             loading={loadingGet.deviceHistory ?? false}
             timing={timings.deviceHistory}
-            onRefresh={() => fetchGetEndpoint('deviceHistory', '/api/fritzbox/history?range=24h')}
+            onRefresh={() => fetchGetEndpoint('deviceHistory', '/api/v1/fritzbox/history?range=24h')}
             onCopyUrl={() => copyUrlToClipboard(`${EXTERNAL_BASE}/api/v1/history/devices?hours=24&limit=100&offset=0`)}
             isCopied={copiedUrl === `${EXTERNAL_BASE}/api/v1/history/devices?hours=24&limit=100&offset=0`}
           />
@@ -290,13 +290,13 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <div className="space-y-3">
           <EndpointCard
             name="Vendor Lookup"
-            url="/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF"
+            url="/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF"
             response={getResponses.vendorLookup}
             loading={loadingGet.vendorLookup ?? false}
             timing={timings.vendorLookup}
-            onRefresh={() => fetchGetEndpoint('vendorLookup', '/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
-            onCopyUrl={() => copyUrlToClipboard('/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
-            isCopied={copiedUrl === '/api/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF'}
+            onRefresh={() => fetchGetEndpoint('vendorLookup', '/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
+            onCopyUrl={() => copyUrlToClipboard('/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
+            isCopied={copiedUrl === '/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF'}
           />
           <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
             <Text variant="secondary" size="sm">
@@ -305,13 +305,13 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
           </div>
           <EndpointCard
             name="Category Override"
-            url="/api/fritzbox/category-override"
+            url="/api/v1/fritzbox/category-override"
             response={getResponses.categoryOverride}
             loading={loadingGet.categoryOverride ?? false}
             timing={timings.categoryOverride}
-            onRefresh={() => fetchGetEndpoint('categoryOverride', '/api/fritzbox/category-override')}
-            onCopyUrl={() => copyUrlToClipboard('/api/fritzbox/category-override')}
-            isCopied={copiedUrl === '/api/fritzbox/category-override'}
+            onRefresh={() => fetchGetEndpoint('categoryOverride', '/api/v1/fritzbox/category-override')}
+            onCopyUrl={() => copyUrlToClipboard('/api/v1/fritzbox/category-override')}
+            isCopied={copiedUrl === '/api/v1/fritzbox/category-override'}
           />
         </div>
       </div>

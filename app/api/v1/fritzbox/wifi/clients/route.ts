@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/wifi/clients
+ * GET /api/v1/fritzbox/wifi/clients
  * Returns paginated list of WiFi clients connected to Fritz!Box.
  * Forwards optional band, limit, offset query params to the HA proxy.
  * Protected: Requires Auth0 authentication

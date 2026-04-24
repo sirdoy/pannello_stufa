@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/history/bandwidth
+ * GET /api/v1/fritzbox/history/bandwidth
  * Returns raw bandwidth history from Fritz!Box (untransformed pass-through).
  * Distinct from hourly/daily/auto sub-routes which return aggregated data.
  * Protected: Requires Auth0 authentication

@@ -4,7 +4,7 @@ import { fritzboxClient } from '@/lib/fritzbox';
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/health
+ * GET /api/v1/fritzbox/health
  * Checks HomeAssistant Network API connectivity
  * Protected: Requires Auth0 authentication
  *

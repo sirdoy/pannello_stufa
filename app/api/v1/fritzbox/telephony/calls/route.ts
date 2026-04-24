@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/telephony/calls
+ * GET /api/v1/fritzbox/telephony/calls
  * Returns paginated call history from Fritz!Box.
  * Forwards optional limit and offset query params to the HA proxy.
  * Protected: Requires Auth0 authentication

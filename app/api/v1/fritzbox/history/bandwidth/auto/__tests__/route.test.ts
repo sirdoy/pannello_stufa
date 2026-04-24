@@ -1,6 +1,6 @@
 /**
  * Tests for Fritz!Box History Bandwidth Auto-Granularity Route
- * GET /api/fritzbox/history/bandwidth/auto
+ * GET /api/v1/fritzbox/history/bandwidth/auto
  */
 
 // Mock dependencies before imports
@@ -20,7 +20,7 @@ const mockFritzboxClient = jest.mocked(fritzboxClient);
 const mockGetCachedData = jest.mocked(getCachedData);
 const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
-describe('GET /api/fritzbox/history/bandwidth/auto', () => {
+describe('GET /api/v1/fritzbox/history/bandwidth/auto', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
   const mockData = {
@@ -46,7 +46,7 @@ describe('GET /api/fritzbox/history/bandwidth/auto', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/history/bandwidth/auto');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history/bandwidth/auto');
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession as any);
     // Default: rate limit allows

@@ -1,6 +1,6 @@
 /**
  * Tests for Fritz!Box Bandwidth Route
- * GET /api/fritzbox/bandwidth
+ * GET /api/v1/fritzbox/bandwidth
  */
 
 // Mock dependencies before imports
@@ -20,7 +20,7 @@ const mockFritzboxClient = jest.mocked(fritzboxClient);
 const mockGetCachedData = jest.mocked(getCachedData);
 const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
-describe('GET /api/fritzbox/bandwidth', () => {
+describe('GET /api/v1/fritzbox/bandwidth', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
   const mockBandwidth = {
@@ -32,7 +32,7 @@ describe('GET /api/fritzbox/bandwidth', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/bandwidth');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/bandwidth');
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession as any);
     // Default: rate limit allows

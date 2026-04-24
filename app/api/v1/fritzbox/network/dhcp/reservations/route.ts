@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/network/dhcp/reservations
+ * GET /api/v1/fritzbox/network/dhcp/reservations
  * Returns paginated list of static DHCP reservations from Fritz!Box.
  * Forwards optional limit and offset query params to the HA proxy.
  * Protected: Requires Auth0 authentication

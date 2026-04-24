@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/telephony/dect
+ * GET /api/v1/fritzbox/telephony/dect
  * Returns paginated list of registered DECT handsets from Fritz!Box.
  * Protected: Requires Auth0 authentication
  * Rate limited: 10 requests per minute per user

@@ -1,6 +1,6 @@
 /**
  * Tests for Fritz!Box Health Check Route
- * GET /api/fritzbox/health
+ * GET /api/v1/fritzbox/health
  */
 
 // Mock dependencies before imports
@@ -19,13 +19,13 @@ import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 const mockGetSession = jest.mocked(auth0.getSession);
 const mockFritzboxClient = jest.mocked(fritzboxClient);
 
-describe('GET /api/fritzbox/health', () => {
+describe('GET /api/v1/fritzbox/health', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockRequest = new Request('http://localhost:3000/api/fritzbox/health');
+    mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/health');
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession as any);
     // Mock console methods to suppress output

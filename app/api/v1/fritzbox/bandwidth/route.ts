@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/bandwidth
+ * GET /api/v1/fritzbox/bandwidth
  * Retrieves bandwidth statistics from Fritz!Box
  * Protected: Requires Auth0 authentication
  * Rate limited: 10 requests per minute

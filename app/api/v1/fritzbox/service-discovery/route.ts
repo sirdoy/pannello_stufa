@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/service-discovery
+ * GET /api/v1/fritzbox/service-discovery
  * Returns TR-064 service discovery data from Fritz!Box, parsed as JSON.
  * The HA proxy may return XML or JSON; the client function handles both.
  * Protected: Requires Auth0 authentication

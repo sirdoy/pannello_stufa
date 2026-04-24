@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/network/upnp
+ * GET /api/v1/fritzbox/network/upnp
  * Returns UPnP status from Fritz!Box as a flat object.
  * NOT paginated — returns { enabled, upnp_ports[], is_stale, fetched_at }.
  * Protected: Requires Auth0 authentication

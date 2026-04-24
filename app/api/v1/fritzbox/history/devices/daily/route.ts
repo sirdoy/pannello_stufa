@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/history/devices/daily
+ * GET /api/v1/fritzbox/history/devices/daily
  * Returns paginated daily device count history (24 rows per day, one per hour_bucket 0-23).
  * Raw pass-through from HA proxy — no field transformation.
  * Protected: Requires Auth0 authentication

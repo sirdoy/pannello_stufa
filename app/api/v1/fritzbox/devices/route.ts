@@ -4,14 +4,14 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/devices
+ * GET /api/v1/fritzbox/devices
  * Retrieves network device list from Fritz!Box
  * Protected: Requires Auth0 authentication
  * Rate limited: 10 requests per minute
  * Cached: 60-second TTL
  *
  * Device event tracking (connected/disconnected) is now handled by the HA proxy,
- * not by Firebase-based state comparison. See /api/fritzbox/history for events.
+ * not by Firebase-based state comparison. See /api/v1/fritzbox/history for events.
  *
  * Success: { devices: [...] }
  * Errors:

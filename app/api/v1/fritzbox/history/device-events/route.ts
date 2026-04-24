@@ -4,7 +4,7 @@ import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fri
 export const dynamic = 'force-dynamic';
 
 /**
- * GET /api/fritzbox/history/device-events
+ * GET /api/v1/fritzbox/history/device-events
  * Returns raw device event log from Fritz!Box (untransformed pass-through).
  * Protected: Requires Auth0 authentication
  * Rate limited: 10 requests per minute per user

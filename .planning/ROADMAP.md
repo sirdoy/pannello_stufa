@@ -49,6 +49,8 @@
 - [x] **Phase 169: DIRIGERA Frontend Cutover** - Migrate useDirigeraData to /api/v1/dirigera/*
 - [ ] **Phase 170: Auth UI** - Login form + API-keys management page (AUTH-01..04 consumers)
 - [ ] **Phase 171: Fritz!Box Consumer UI** - Telephony/raw-history/service-discovery consumers (FRITZ-01..07)
+- [ ] **Phase 172: Fritz!Box v1 Path Migration** - Move app/api/fritzbox/** to app/api/v1/fritzbox/**; rewire hooks, routes.ts, debug panels, registry/devices; close v19.0 audit FRITZ namespace gap
+- [ ] **Phase 173: Cross-Provider Device Aggregator** - Expand /api/v1/devices to fan out across all 7 providers with provider_type discriminator; close v19.0 audit COMMON-02 partial gap
 
 ## Phase Details
 
@@ -285,6 +287,30 @@ Plans:
 - [x] 171-01-PLAN.md — /telefonia page (3 hooks + 3 components + page + CommandPalette nav-telephony) closing FRITZ-01, FRITZ-02, FRITZ-03 + D-17
 - [x] 171-02-PLAN.md — /network Storico grezzo tab + /debug Service Discovery tab (4 hooks + 4 components + 2 page wirings + Jest + Playwright smoke) closing FRITZ-04, FRITZ-05, FRITZ-06, FRITZ-07
 
+### Phase 172: Fritz!Box v1 Path Migration
+**Goal**: All Fritz!Box routes migrated from /api/fritzbox/* to canonical /api/v1/fritzbox/*; every production consumer and debug surface updated to canonical paths
+**Depends on**: Phase 171
+**Requirements**: FRITZ-01, FRITZ-02, FRITZ-03, FRITZ-04, FRITZ-05, FRITZ-06, FRITZ-07
+**Gap Closure**: Closes v19.0 audit FRITZ namespace mismatch (REQUIREMENTS.md spec `/api/v1/fritzbox/*` vs as-built `/api/fritzbox/*`); plus `app/registry/devices/page.tsx:164` legacy ref
+**Success Criteria** (what must be TRUE):
+  1. `app/api/fritzbox/` directory no longer exists; every route served from `app/api/v1/fritzbox/**`
+  2. All 7 consumer hooks (useFritzDectHandsets, useFritzCallHistory, useFritzTamStatus, useFritzBandwidthHistoryRaw, useFritzDevicePresenceHistory, useFritzDeviceEventsRaw, useFritzServiceDiscovery) hit `/api/v1/fritzbox/*`
+  3. `lib/routes.ts`, `app/sw.ts`, debug panels, and `app/registry/devices/page.tsx:164` all target canonical paths
+  4. Repo-wide grep for `/api/fritzbox/` outside `.planning/` archive returns zero matches; Jest + Playwright smoke green
+**Plans:** TBD
+
+### Phase 173: Cross-Provider Device Aggregator
+**Goal**: GET /api/v1/devices returns a unified device list sourced from all registered providers (Fritz!Box, Hue, Sonos, Netatmo, DIRIGERA, Raspberry Pi, Tuya), each item carrying a `provider_type` discriminator
+**Depends on**: Phase 172
+**Requirements**: COMMON-02
+**Gap Closure**: Closes v19.0 audit COMMON-02 partial (current impl sources only Fritz!Box)
+**Success Criteria** (what must be TRUE):
+  1. `/api/v1/devices` fans out across all 7 providers via `Promise.allSettled` and merges results
+  2. Each returned item has `provider_type` matching its source provider
+  3. Partial provider failure (one provider throws) does not fail the whole response — failed providers contribute zero items but aggregate still returns 200
+  4. Unit tests cover each provider contribution shape + one failed-provider scenario
+**Plans:** TBD
+
 <details>
 <summary>✅ v18.0 Dark-Only & Mobile-First (Phases 149-155) — SHIPPED 2026-04-02</summary>
 
@@ -329,7 +355,7 @@ See git history and `.planning/milestones/` for details.
 
 ## Progress
 
-**Execution Order:** 156 → 157 → 158 → 159 → 160 → 161 → 162 → 163 → 164 → 165 → 166 → 167 → 168 → 169 → 170 → 171
+**Execution Order:** 156 → 157 → 158 → 159 → 160 → 161 → 162 → 163 → 164 → 165 → 166 → 167 → 168 → 169 → 170 → 171 → 172 → 173
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -349,3 +375,5 @@ See git history and `.planning/milestones/` for details.
 | 169. DIRIGERA Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-22 |
 | 170. Auth UI | v19.0 | 3/3 | Complete    | 2026-04-23 |
 | 171. Fritz!Box Consumer UI | v19.0 | 2/2 | Complete    | 2026-04-23 |
+| 172. Fritz!Box v1 Path Migration | v19.0 | 0/0 | Not started | - |
+| 173. Cross-Provider Device Aggregator | v19.0 | 0/0 | Not started | - |

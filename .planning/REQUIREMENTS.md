@@ -70,13 +70,13 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 
 ### Fritz!Box
 
-- [x] **FRITZ-01**: GET /api/v1/fritzbox/telephony/dect ritorna handset DECT registrati
-- [x] **FRITZ-02**: GET /api/v1/fritzbox/telephony/calls ritorna storico chiamate paginato
-- [x] **FRITZ-03**: GET /api/v1/fritzbox/telephony/tam ritorna stato segreteria telefonica
-- [x] **FRITZ-04**: GET /api/v1/fritzbox/history/bandwidth ritorna raw bandwidth history
-- [x] **FRITZ-05**: GET /api/v1/fritzbox/history/devices ritorna raw device presence history
-- [x] **FRITZ-06**: GET /api/v1/fritzbox/history/device-events ritorna log eventi join/leave
-- [x] **FRITZ-07**: GET /api/v1/fritzbox/service-discovery ritorna TR-064 service descriptor
+- [ ] **FRITZ-01**: GET /api/v1/fritzbox/telephony/dect ritorna handset DECT registrati
+- [ ] **FRITZ-02**: GET /api/v1/fritzbox/telephony/calls ritorna storico chiamate paginato
+- [ ] **FRITZ-03**: GET /api/v1/fritzbox/telephony/tam ritorna stato segreteria telefonica
+- [ ] **FRITZ-04**: GET /api/v1/fritzbox/history/bandwidth ritorna raw bandwidth history
+- [ ] **FRITZ-05**: GET /api/v1/fritzbox/history/devices ritorna raw device presence history
+- [ ] **FRITZ-06**: GET /api/v1/fritzbox/history/device-events ritorna log eventi join/leave
+- [ ] **FRITZ-07**: GET /api/v1/fritzbox/service-discovery ritorna TR-064 service descriptor
 
 ### DIRIGERA
 
@@ -108,7 +108,7 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 | PATH-01 | Phase 156 → 164 (regression fix) | Pending |
 | PATH-02 | Phase 156 → 164 (regression fix) | Pending |
 | COMMON-01 | Phase 156 → 165 (spec alignment) | Pending |
-| COMMON-02 | Phase 156 → 165 (spec alignment) | Pending |
+| COMMON-02 | Phase 156 → 165 (spec alignment) → 173 (cross-provider aggregator) | Pending |
 | AUTH-01 | Phase 157 + 170 (UI) | Complete |
 | AUTH-02 | Phase 157 + 170 (UI) | Complete |
 | AUTH-03 | Phase 157 + 170 (UI) | Complete |
@@ -148,13 +148,13 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 | NETA-07 | Phase 161 + 168 (frontend cutover) | Complete |
 | NETA-08 | Phase 161 + 168 (frontend cutover) | Complete |
 | NETA-09 | Phase 161 + 168 (frontend cutover) | Complete |
-| FRITZ-01 | Phase 162 + 171 (consumer UI) | Complete |
-| FRITZ-02 | Phase 162 + 171 (consumer UI) | Complete |
-| FRITZ-03 | Phase 162 + 171 (consumer UI) | Complete |
-| FRITZ-04 | Phase 162 + 171 (consumer UI) | Complete |
-| FRITZ-05 | Phase 162 + 171 (consumer UI) | Complete |
-| FRITZ-06 | Phase 162 + 171 (consumer UI) | Complete |
-| FRITZ-07 | Phase 162 + 171 (consumer UI) | Complete |
+| FRITZ-01 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
+| FRITZ-02 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
+| FRITZ-03 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
+| FRITZ-04 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
+| FRITZ-05 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
+| FRITZ-06 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
+| FRITZ-07 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
 | DIR-01 | Phase 163 + 169 (frontend cutover) | Complete |
 | DIR-02 | Phase 163 + 169 (frontend cutover) | Complete |
 | DIR-03 | Phase 163 + 169 (frontend cutover) | Complete |
@@ -163,9 +163,9 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 - v19.0 requirements: 52 total
 - Mapped to phases: 52
 - Unmapped: 0
-- Backend satisfied (audit 2026-04-15): 47/52 (PATH-01/02 regressed — reassigned to Phase 164)
-- End-to-end wired (audit 2026-04-15): 6/52 (AUTO-01..06 only — remaining groups reassigned to phases 164-171)
+- Audit 2026-04-24: 44/52 satisfied, 1/52 partial (COMMON-02), 7/52 unsatisfied (FRITZ-01..07 namespace mismatch)
+- Gap closure phases: 172 (FRITZ v1 path migration), 173 (cross-provider device aggregator)
 
 ---
 *Requirements defined: 2026-04-03*
-*Last updated: 2026-04-15 post-audit — added gap closure phases 164-171*
+*Last updated: 2026-04-24 post-audit — added gap closure phases 172, 173*

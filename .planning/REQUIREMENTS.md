@@ -70,13 +70,13 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 
 ### Fritz!Box
 
-- [ ] **FRITZ-01**: GET /api/v1/fritzbox/telephony/dect ritorna handset DECT registrati
-- [ ] **FRITZ-02**: GET /api/v1/fritzbox/telephony/calls ritorna storico chiamate paginato
-- [ ] **FRITZ-03**: GET /api/v1/fritzbox/telephony/tam ritorna stato segreteria telefonica
-- [ ] **FRITZ-04**: GET /api/v1/fritzbox/history/bandwidth ritorna raw bandwidth history
-- [ ] **FRITZ-05**: GET /api/v1/fritzbox/history/devices ritorna raw device presence history
-- [ ] **FRITZ-06**: GET /api/v1/fritzbox/history/device-events ritorna log eventi join/leave
-- [ ] **FRITZ-07**: GET /api/v1/fritzbox/service-discovery ritorna TR-064 service descriptor
+- [x] **FRITZ-01**: GET /api/v1/fritzbox/telephony/dect ritorna handset DECT registrati
+- [x] **FRITZ-02**: GET /api/v1/fritzbox/telephony/calls ritorna storico chiamate paginato
+- [x] **FRITZ-03**: GET /api/v1/fritzbox/telephony/tam ritorna stato segreteria telefonica
+- [x] **FRITZ-04**: GET /api/v1/fritzbox/history/bandwidth ritorna raw bandwidth history
+- [x] **FRITZ-05**: GET /api/v1/fritzbox/history/devices ritorna raw device presence history
+- [x] **FRITZ-06**: GET /api/v1/fritzbox/history/device-events ritorna log eventi join/leave
+- [x] **FRITZ-07**: GET /api/v1/fritzbox/service-discovery ritorna TR-064 service descriptor
 
 ### DIRIGERA
 
@@ -148,13 +148,13 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 | NETA-07 | Phase 161 + 168 (frontend cutover) | Complete |
 | NETA-08 | Phase 161 + 168 (frontend cutover) | Complete |
 | NETA-09 | Phase 161 + 168 (frontend cutover) | Complete |
-| FRITZ-01 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
-| FRITZ-02 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
-| FRITZ-03 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
-| FRITZ-04 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
-| FRITZ-05 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
-| FRITZ-06 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
-| FRITZ-07 | Phase 162 + 171 + 172 (v1 path migration) | Pending |
+| FRITZ-01 | Phase 162 + 171 + 172 (v1 path migration) | Complete |
+| FRITZ-02 | Phase 162 + 171 + 172 (v1 path migration) | Complete |
+| FRITZ-03 | Phase 162 + 171 + 172 (v1 path migration) | Complete |
+| FRITZ-04 | Phase 162 + 171 + 172 (v1 path migration) | Complete |
+| FRITZ-05 | Phase 162 + 171 + 172 (v1 path migration) | Complete |
+| FRITZ-06 | Phase 162 + 171 + 172 (v1 path migration) | Complete |
+| FRITZ-07 | Phase 162 + 171 + 172 (v1 path migration) | Complete |
 | DIR-01 | Phase 163 + 169 (frontend cutover) | Complete |
 | DIR-02 | Phase 163 + 169 (frontend cutover) | Complete |
 | DIR-03 | Phase 163 + 169 (frontend cutover) | Complete |

@@ -299,9 +299,9 @@ Plans:
   4. Repo-wide grep for `/api/fritzbox/` outside `.planning/` archive returns zero matches; Jest + Playwright smoke green
 **Plans:** 3 plans
 Plans:
-- [ ] 172-01-PLAN.md — Atomic `git mv app/api/fritzbox app/api/v1/fritzbox` (28 routes + 20 tests) + co-located Jest regression check
-- [ ] 172-02-PLAN.md — Retarget 17 production consumer hooks + 14 hook tests: `/api/fritzbox/` → `/api/v1/fritzbox/` across telefonia, network, components/devices, debug
-- [ ] 172-03-PLAN.md — Retarget 3 remaining surfaces (network page, registry devices page, debug NetworkTab 37 URLs) + repo-wide grep guardrail + scoped Jest + Playwright smoke
+- [x] 172-01-PLAN.md — Atomic `git mv app/api/fritzbox app/api/v1/fritzbox` (28 routes + 20 tests) + co-located Jest regression check
+- [x] 172-02-PLAN.md — Retarget 17 production consumer hooks + 14 hook tests: `/api/fritzbox/` → `/api/v1/fritzbox/` across telefonia, network, components/devices, debug
+- [x] 172-03-PLAN.md — Retarget 3 remaining surfaces (network page, registry devices page, debug NetworkTab 37 URLs) + repo-wide grep guardrail + scoped Jest + Playwright smoke
 
 ### Phase 173: Cross-Provider Device Aggregator
 **Goal**: GET /api/v1/devices returns a unified device list sourced from all registered providers (Fritz!Box, Hue, Sonos, Netatmo, DIRIGERA, Raspberry Pi, Tuya), each item carrying a `provider_type` discriminator
@@ -379,5 +379,5 @@ See git history and `.planning/milestones/` for details.
 | 169. DIRIGERA Frontend Cutover | v19.0 | 3/3 | Complete    | 2026-04-22 |
 | 170. Auth UI | v19.0 | 3/3 | Complete    | 2026-04-23 |
 | 171. Fritz!Box Consumer UI | v19.0 | 2/2 | Complete    | 2026-04-23 |
-| 172. Fritz!Box v1 Path Migration | v19.0 | 0/3 | Planned     | - |
+| 172. Fritz!Box v1 Path Migration | v19.0 | 3/3 | Complete    | 2026-04-24 |
 | 173. Cross-Provider Device Aggregator | v19.0 | 0/0 | Not started | - |

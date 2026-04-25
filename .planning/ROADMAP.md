@@ -313,7 +313,12 @@ Plans:
   2. Each returned item has `provider_type` matching its source provider
   3. Partial provider failure (one provider throws) does not fail the whole response — failed providers contribute zero items but aggregate still returns 200
   4. Unit tests cover each provider contribution shape + one failed-provider scenario
-**Plans:** TBD
+**Plans:** 4 plans
+Plans:
+- [ ] 173-01-PLAN.md — Create types/devices.ts (ProviderType union + Device + DeviceAggregatorError + DeviceAggregatorResponse)
+- [ ] 173-02-PLAN.md — Rewrite app/api/v1/devices/route.ts as multi-provider Promise.allSettled aggregator with errors[] + ?provider_type= filter
+- [ ] 173-03-PLAN.md — Co-located Jest suite (~20 cases) covering 8-provider fan-out, partial failure, filter, clamp, sort, auth
+- [ ] 173-04-PLAN.md — Update docs/api/README.md §GET /api/v1/devices for new contract (slim Device, ?provider_type=, errors[], partial-failure 200)
 
 <details>
 <summary>✅ v18.0 Dark-Only & Mobile-First (Phases 149-155) — SHIPPED 2026-04-02</summary>
@@ -380,4 +385,4 @@ See git history and `.planning/milestones/` for details.
 | 170. Auth UI | v19.0 | 3/3 | Complete    | 2026-04-23 |
 | 171. Fritz!Box Consumer UI | v19.0 | 2/2 | Complete    | 2026-04-23 |
 | 172. Fritz!Box v1 Path Migration | v19.0 | 3/3 | Complete    | 2026-04-24 |
-| 173. Cross-Provider Device Aggregator | v19.0 | 0/0 | Not started | - |
+| 173. Cross-Provider Device Aggregator | v19.0 | 0/4 | Planning    | - |

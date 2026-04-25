@@ -694,22 +694,25 @@ Per the Nyquist rule (sample at >=2x the failure rate), the **minimum independen
 | A4 | Hue `room_name` is the right room source (not e.g. `room_id` resolved against a separate rooms call) | D-06, Pattern 5 | If `room_name` is null in production, items get no room. `[VERIFIED: types/hueProxy.ts:69 — room_name is on HueLight directly]`. Acceptable. |
 | A5 | DIRIGERA `is_reachable` is the right signal for status (not `data_freshness`) | D-09, Pattern 5 | `[VERIFIED: types/dirigeraProxy.ts:42-53]` — DirigeraSensor has both. `is_reachable` is the per-device signal, `data_freshness` is provider-wide. Use `is_reachable`. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Netatmo module type filter (A1).**
    - What we know: `NetatmoProxyModule` has `type: string` field; common Netatmo types are `NATherm1` (thermostat), `NRV` (valve), `NACamera`/`NOC` (cameras — but those are in `cameras[]`, not modules).
    - What's unclear: Whether the proxy's `homesdata` exposes any other module types we should include or exclude (e.g., relays, weather modules).
    - Recommendation: Filter inclusively `m.type === 'NATherm1' || m.type === 'NRV'`. Log unknown types via `console.warn` for diagnostic. Or: remove the filter entirely and emit all modules (with `type` field reflecting the raw Netatmo type) — simpler and future-proof.
+   - **RESOLVED:** filter to `'NATherm1'` (thermostat) and `'NRV'` (valve); skip other module types. A1 risk accepted — if an unknown module type appears in production, it is silently ignored. Future enhancement: log unknown types via `console.warn` for visibility.
 
 2. **Status field for single-item providers (A2).**
    - What we know: D-11/D-12 say "status from getHealth() result". D-13 says failed providers go in `errors[]`.
    - What's unclear: Are Raspi/Thermorossi exempt from `errors[]`? My recommendation: yes (they always emit one item; status reflects health).
    - Recommendation: Lock in PLAN.md as a comment near the mapper.
+   - **RESOLVED:** Raspi and Thermorossi mappers always emit exactly one item. On rejection, the item is emitted with `status=0` and the failure is NOT pushed to `errors[]`. Locked in Plan 02 `mapRaspi`/`mapThermorossi`.
 
 3. **Whether to extract mappers to `lib/devices/aggregator/`.**
    - What we know: Each mapper is ~10-25 LOC. Total inline ≈ 80-150 LOC. Plus the orchestrator ≈ 60 LOC. Route file ≈ 250 LOC if inline.
    - What's unclear: Project preference for size threshold.
    - Recommendation: Inline first. Extract only if route exceeds 250 LOC OR if mapper unit tests are desired (cleaner test surface). The Netatmo mapper alone is a good candidate for extraction because it has 2 inputs and a non-trivial filter.
+   - **RESOLVED:** keep all 8 mappers inline in `app/api/v1/devices/route.ts`. Re-evaluate extraction to `lib/devices/aggregator/mappers.ts` only if the file exceeds ~250 LOC after implementation. Locked in Plan 02.
 
 ## Environment Availability
 

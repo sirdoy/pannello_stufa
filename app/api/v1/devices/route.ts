@@ -20,7 +20,7 @@
  * Protected: Requires Auth0 authentication via `withAuthAndErrorHandler`.
  */
 
-import { withAuthAndErrorHandler, success } from '@/lib/core';
+import { withAuthAndErrorHandler, success, parseQuery } from '@/lib/core';
 import { fritzboxClient } from '@/lib/fritzbox';
 import { getLights } from '@/lib/hue/hueProxy';
 import { getDevices as getSonosDevices } from '@/lib/sonos/sonosProxy';
@@ -206,7 +206,7 @@ function mapThermorossi(
  * status=0 on rejection and do NOT contribute to `errors[]`.
  */
 export const GET = withAuthAndErrorHandler(async (request) => {
-  const sp = request.nextUrl.searchParams;
+  const sp = parseQuery(request);
 
   // --- Limit clamp (D-18): 1..1000 default 100, NaN-safe ---
   const rawLimit = sp.has('limit') ? Number(sp.get('limit')) : 100;

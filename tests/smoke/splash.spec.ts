@@ -160,7 +160,7 @@ test.describe('SPLASH-01..05 — splash overlay', () => {
     }
   });
 
-  test('SPLASH-04 no re-trigger on in-session route change (Home → Stanze → Automazioni → Home)', async ({ page }) => {
+  test('SPLASH-04 no re-trigger on in-session route change (Home → Rooms → Automations → Home)', async ({ page }) => {
     await signIn(page, TEST_USER.email, TEST_USER.password);
     await dismissVersionEnforcerIfPresent(page);
 
@@ -168,17 +168,17 @@ test.describe('SPLASH-01..05 — splash overlay', () => {
     await expect(page.getByTestId('splash-overlay')).toBeVisible({ timeout: 1500 });
     await expect(page.getByTestId('splash-overlay')).toBeHidden({ timeout: 2300 });
 
-    // Home → Stanze.
-    await page.goto('/stanze');
+    // Home → Rooms.
+    await page.goto('/rooms');
     await page.waitForLoadState('networkidle');
     await expect(page.getByTestId('splash-overlay')).toBeHidden({ timeout: 200 });
 
-    // Stanze → Automazioni.
-    await page.goto('/automazioni');
+    // Rooms → Automations.
+    await page.goto('/automations');
     await page.waitForLoadState('networkidle');
     await expect(page.getByTestId('splash-overlay')).toBeHidden({ timeout: 200 });
 
-    // Automazioni → Home.
+    // Automations → Home.
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     await expect(page.getByTestId('splash-overlay')).toBeHidden({ timeout: 200 });

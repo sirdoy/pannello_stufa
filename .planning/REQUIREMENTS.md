@@ -13,12 +13,15 @@
 
 ### Design System (Ember Glass tokens)
 
-- [ ] **DS-01**: Project exposes Ember Glass design tokens as CSS variables — `--glass-bg`, `--glass-blur`, `--glass-border`, `--glass-shadow`, `--accent` (oklch), `--text-1`, `--text-2`, `--r-card`, `--pad-card`, `--font-display`, `--font-body`
+- [x] **DS-01
+**: Project exposes Ember Glass design tokens as CSS variables — `--glass-bg`, `--glass-blur`, `--glass-border`, `--glass-shadow`, `--accent` (oklch), `--text-1`, `--text-2`, `--r-card`, `--pad-card`, `--font-display`, `--font-body`
 - [ ] **DS-02**: Tokens drive all surfaces — no hardcoded glass/blur/accent colors remain in component files (verifiable via grep)
 - [ ] **DS-03**: Accent color supports oklch hue shifting (default copper); 6 preset hues available (copper, rose, violet, blue, green, amber) selectable from a developer toolbar in `/debug`
-- [ ] **DS-04**: Typography pair active — Outfit for `var(--font-display)` (numbers/headlines), Inter for `var(--font-body)` (text); both self-hosted via existing `next/font` pipeline (no Google CDN roundtrip)
+- [x] **DS-04
+**: Typography pair active — Outfit for `var(--font-display)` (numbers/headlines), Inter for `var(--font-body)` (text); both self-hosted via existing `next/font` pipeline (no Google CDN roundtrip)
 - [ ] **DS-05**: Optional ambient background glow (radial gradient under app shell) is togglable per user preference and persists in localStorage
-- [ ] **DS-06**: All glass surfaces apply `backdrop-filter: blur(var(--glass-blur)) saturate(180%)` with WebKit fallback; degrades gracefully on browsers without `backdrop-filter` support
+- [x] **DS-06
+**: All glass surfaces apply `backdrop-filter: blur(var(--glass-blur)) saturate(180%)` with WebKit fallback; degrades gracefully on browsers without `backdrop-filter` support
 - [ ] **DS-07**: Card press animation (`scale(0.97)` with cubic-bezier `.34,1.56,.64,1`, 220ms) is a shared utility used by all interactive glass surfaces
 
 ### Splash Animation (post-Auth0)

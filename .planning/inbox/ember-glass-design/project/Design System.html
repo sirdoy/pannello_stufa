@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Assistant — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: oklch(0.68 0.17 45);
+    --accent-coral:  oklch(0.7 0.17 25);
+    --accent-amber:  oklch(0.76 0.15 75);
+    --accent-sage:   oklch(0.68 0.12 150);
+    --accent-ocean:  oklch(0.65 0.14 230);
+    --accent-violet: oklch(0.65 0.17 290);
+    --accent-rose:   oklch(0.68 0.17 0);
+
+    --bg-0: #070606;
+    --bg-1: #0a0908;
+    --bg-2: #120f0e;
+    --text-1: #f5f5f4;
+    --text-2: rgba(245,245,244,0.55);
+    --text-3: rgba(245,245,244,0.35);
+
+    --info: #5eafff;
+    --warn: #ffb84a;
+    --danger: #ff6676;
+    --success: oklch(0.7 0.14 150);
+    --violet: #b080ff;
+    --yellow: #f5c84a;
+
+    --glass-bg: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+    --glass-shadow: 0 8px 32px rgba(0,0,0,0.18), inset 0 0 0 0.5px rgba(255,255,255,0.03);
+
+    --r-card: 24px;
+    --r-pill: 999px;
+    --r-button: 12px;
+    --r-input: 9px;
+
+    --font-display: "Outfit", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    color: var(--text-1);
+    background:
+      radial-gradient(1100px 700px at 18% 12%, rgba(237,111,16,0.10), transparent 55%),
+      radial-gradient(900px 700px at 86% 88%, rgba(94,175,255,0.07), transparent 55%),
+      var(--bg-0);
+    min-height: 100vh;
+    padding: 56px 40px 80px;
+    line-height: 1.5;
+  }
+
+  .wrap { max-width: 1240px; margin: 0 auto; }
+
+  /* ───── Page header ───── */
+  .ph {
+    margin-bottom: 56px;
+    padding-bottom: 32px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08);
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+    flex-wrap: wrap;
+  }
+  .ph-meta { font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: 1.2px; font-weight: 600; }
+  .ph h1 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: clamp(40px, 5vw, 64px); letter-spacing: -1.6px;
+    margin: 8px 0 12px; line-height: 1;
+  }
+  .ph p { font-size: 15px; color: var(--text-2); max-width: 620px; margin: 0; }
+  .ph .badge {
+    padding: 8px 14px; border-radius: 999px;
+    background: color-mix(in oklab, var(--accent) 18%, transparent);
+    border: 0.5px solid color-mix(in oklab, var(--accent) 30%, transparent);
+    color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: 0.4px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .ph .badge::before { content: ""; width: 6px; height: 6px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+  /* ───── Sections ───── */
+  section { margin-bottom: 64px; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 20px; }
+  .sec-head .num {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-3); letter-spacing: 1.2px;
+  }
+  .sec-head h2 {
+    font-family: var(--font-display); font-weight: 600;
+    font-size: 26px; letter-spacing: -0.6px; margin: 0;
+  }
+  .sec-head .sub { color: var(--text-2); font-size: 13px; margin-left: auto; }
+
+  /* ───── Grids ───── */
+  .grid { display: grid; gap: 14px; }
+  .g-2 { grid-template-columns: repeat(2, 1fr); }
+  .g-3 { grid-template-columns: repeat(3, 1fr); }
+  .g-4 { grid-template-columns: repeat(4, 1fr); }
+  .g-5 { grid-template-columns: repeat(5, 1fr); }
+  .g-6 { grid-template-columns: repeat(6, 1fr); }
+  .g-7 { grid-template-columns: repeat(7, 1fr); }
+
+  @media (max-width: 920px) {
+    .g-7, .g-6, .g-5, .g-4 { grid-template-columns: repeat(3, 1fr); }
+    .g-3 { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ───── Glass panel ───── */
+  .panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 0.5px solid var(--glass-border);
+    border-radius: var(--r-card);
+    padding: 22px;
+  }
+
+  /* ───── Color swatches ───── */
+  .swatch {
+    border-radius: 16px; padding: 16px;
+    border: 0.5px solid rgba(255,255,255,0.08);
+    aspect-ratio: 1 / 1;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .swatch .name { font-size: 12px; font-weight: 600; }
+  .swatch .val {
+    font-family: var(--font-mono); font-size: 10px;
+    opacity: 0.7; word-break: break-all;
+  }
+  .swatch.dark { color: #fff; }
+  .swatch.light { color: #1a0f08; }
+
+  /* ───── Type specimens ───── */
+  .type-row {
+    padding: 18px 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: baseline;
+  }
+  .type-row:last-child { border-bottom: none; }
+  .type-meta { font-family: var(--font-mono); font-size: 11px; color: var(--text-2); }
+  .type-meta b { color: var(--text-1); font-weight: 500; display: block; margin-bottom: 4px; }
+  .type-display .label { font-size: 11px; color: var(--text-3); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+  /* ───── Token rows ───── */
+  .tk-row {
+    padding: 12px 0;
+    border-bottom: 0.5px solid rgba(255,255,255,0.05);
+    display: grid; grid-template-columns: 200px 1fr 80px; gap: 16px; align-items: center;
+  }
+  .tk-row:last-child { border-bottom: none; }
+  .tk-name { font-family: var(--font-mono); font-size: 12px; color: #fff; }
+  .tk-val { font-family: var(--font-mono); font-size: 11px; color: var(--text-2); }
+  .tk-vis { display: flex; justify-content: flex-end; }
+
+  /* ───── Component preview ───── */
+  .comp-preview {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(237,111,16,0.06), transparent 50%),
+      var(--bg-1);
+    border-radius: 18px;
+    border: 0.5px solid rgba(255,255,255,0.06);
+    padding: 32px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 160px;
+    flex-wrap: wrap; gap: 14px;
+  }
+
+  /* ───── Buttons (live demos) ───── */
+  .btn {
+    height: 44px; padding: 0 18px;
+    border-radius: var(--r-button); border: none;
+    font-family: var(--font-display); font-weight: 600; font-size: 14px;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: transform .15s, box-shadow .2s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: var(--accent); color: #1a0f08;
+    box-shadow: 0 4px 24px color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+  .btn-secondary {
+    background: rgba(255,255,255,0.06); color: #fff;
+    border: 0.5px solid rgba(255,255,255,0.1);
+  }
+  .btn-ghost { background: transparent; color: var(--text-2); }
+  .btn-danger {
+    background: rgba(255,77,92,0.14); color: var(--danger);
+    border: 0.5px solid rgba(255,77,92,0.28);
+  }
+  .btn-icon {
+    width: 40px; height: 40px; padding: 0; border-radius: 999px;
+    background: rgba(255,255,255,0.06); color: #fff;
+    border: 0.5px solid rgba(255,255,255,0.08);
+  }
+
+  /* ───── Pills / badges ───── */
+  .pill {
+    padding: 5px 11px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.3px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .pill-accent { background: color-mix(in oklab, var(--accent) 16%, transparent); color: var(--accent); border: 0.5px solid color-mix(in oklab, var(--accent) 25%, transparent); }
+  .pill-info   { background: color-mix(in oklab, var(--info) 16%, transparent); color: var(--info); border: 0.5px solid color-mix(in oklab, var(--info) 25%, transparent); }
+  .pill-warn   { background: color-mix(in oklab, var(--warn) 16%, transparent); color: var(--warn); border: 0.5px solid color-mix(in oklab, var(--warn) 25%, transparent); }
+  .pill-danger { background: color-mix(in oklab, var(--danger) 16%, transparent); color: var(--danger); border: 0.5px solid color-mix(in oklab, var(--danger) 25%, transparent); }
+  .pill-violet { background: color-mix(in oklab, var(--violet) 16%, transparent); color: var(--violet); border: 0.5px solid color-mix(in oklab, var(--violet) 25%, transparent); }
+  .pill-muted  { background: rgba(255,255,255,0.06); color: var(--text-2); border: 0.5px solid rgba(255,255,255,0.08); }
+
+  /* ───── Glass cards live mock ───── */
+  .gc {
+    background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 10%, rgba(255,255,255,0.04)) 0%, rgba(255,255,255,0.03) 100%);
+    border: 0.5px solid color-mix(in oklab, var(--accent) 22%, rgba(255,255,255,0.06));
+    border-radius: var(--r-card);
+    padding: 16px;
+    aspect-ratio: 1 / 1;
+    display: flex; flex-direction: column; justify-content: space-between;
+    backdrop-filter: blur(20px);
+  }
+  .gc.cool { background: linear-gradient(135deg, color-mix(in oklab, var(--info) 10%, rgba(255,255,255,0.04)) 0%, rgba(255,255,255,0.03) 100%); border-color: color-mix(in oklab, var(--info) 22%, rgba(255,255,255,0.06)); }
+  .gc.warn { background: linear-gradient(135deg, color-mix(in oklab, var(--warn) 10%, rgba(255,255,255,0.04)) 0%, rgba(255,255,255,0.03) 100%); border-color: color-mix(in oklab, var(--warn) 22%, rgba(255,255,255,0.06)); }
+  .gc-head { display: flex; align-items: center; gap: 8px; }
+  .gc-icon {
+    width: 28px; height: 28px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    background: color-mix(in oklab, var(--accent) 22%, transparent);
+    color: var(--accent);
+    border: 0.5px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  }
+  .gc.cool .gc-icon { background: color-mix(in oklab, var(--info) 22%, transparent); color: var(--info); border-color: color-mix(in oklab, var(--info) 30%, transparent); }
+  .gc.warn .gc-icon { background: color-mix(in oklab, var(--warn) 22%, transparent); color: var(--warn); border-color: color-mix(in oklab, var(--warn) 30%, transparent); }
+  .gc-label { font-size: 12px; font-weight: 600; color: var(--text-2); letter-spacing: 0.2px; flex: 1; }
+  .gc-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+  .gc-val { font-family: var(--font-display); font-size: 32px; font-weight: 600; line-height: 1; letter-spacing: -1px; }
+  .gc-sub { font-size: 11px; color: var(--text-2); margin-top: 6px; }
+
+  /* ───── Toggle ───── */
+  .toggle {
+    width: 44px; height: 26px; border-radius: 999px;
+    background: rgba(255,255,255,0.1);
+    position: relative; cursor: pointer;
+    transition: background .2s;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: ""; position: absolute; top: 3px; left: 3px;
+    width: 20px; height: 20px; border-radius: 999px;
+    background: #fff; transition: transform .22s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .toggle.on::after { transform: translateX(18px); }
+
+  /* ───── Spacing visualizer ───── */
+  .sp-block {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    padding: 12px;
+  }
+  .sp-bar {
+    background: var(--accent);
+    border-radius: 4px;
+    height: 12px;
+  }
+  .sp-name { font-family: var(--font-mono); font-size: 10px; color: var(--text-2); }
+
+  /* ───── Radius visualizer ───── */
+  .r-block {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .r-shape {
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, color-mix(in oklab, var(--accent) 30%, transparent), rgba(255,255,255,0.06));
+    border: 0.5px solid color-mix(in oklab, var(--accent) 30%, transparent);
+  }
+
+  /* ───── Shadow visualizer ───── */
+  .sh-block {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    padding: 14px;
+  }
+  .sh-shape {
+    width: 72px; height: 48px; border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 0.5px solid rgba(255,255,255,0.08);
+  }
+
+  /* ───── Iconography grid ───── */
+  .ico-cell {
+    aspect-ratio: 1 / 1; padding: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px;
+  }
+  .ico-cell svg { color: #fff; }
+  .ico-cell .nm { font-family: var(--font-mono); font-size: 9px; color: var(--text-2); }
+
+  /* ───── Form inputs preview ───── */
+  .input {
+    width: 100%; height: 38px; border-radius: 9px;
+    background: rgba(255,255,255,0.05);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    color: #fff; padding: 0 11px; font-size: 13px;
+    font-family: inherit; outline: none;
+  }
+  .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent); }
+
+  /* ───── Segmented ───── */
+  .seg {
+    display: inline-grid; grid-auto-flow: column; gap: 3px;
+    padding: 3px; border-radius: 9px;
+    background: rgba(255,255,255,0.05);
+    border: 0.5px solid rgba(255,255,255,0.08);
+  }
+  .seg button {
+    padding: 7px 14px; border-radius: 7px; border: none;
+    background: transparent; color: var(--text-2);
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: inherit;
+  }
+  .seg button.on { background: rgba(255,255,255,0.12); color: #fff; }
+
+  /* ───── Tab bar mock ───── */
+  .tabbar {
+    width: 100%; max-width: 360px;
+    border-radius: 28px;
+    background: rgba(18,15,14,0.75);
+    backdrop-filter: blur(30px) saturate(180%);
+    border: 0.5px solid rgba(255,255,255,0.1);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    padding: 6px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+  }
+  .tab {
+    padding: 10px 0 8px; border-radius: 22px; border: none;
+    background: transparent; color: rgba(255,255,255,0.55);
+    cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 600;
+  }
+  .tab.on { background: color-mix(in oklab, var(--accent) 18%, transparent); color: var(--accent); }
+
+  /* ───── Density chips ───── */
+  .density-chip {
+    flex: 1; min-width: 0; padding: 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 0.5px solid rgba(255,255,255,0.08);
+    text-align: center;
+  }
+  .density-chip b { font-size: 13px; }
+  .density-chip span { display: block; font-family: var(--font-mono); font-size: 11px; color: var(--text-2); margin-top: 4px; }
+
+  /* ───── Code blocks ───── */
+  pre {
+    background: rgba(0,0,0,0.4);
+    border: 0.5px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: var(--font-mono); font-size: 12px; color: var(--text-1);
+    margin: 12px 0 0; overflow-x: auto; line-height: 1.6;
+  }
+  pre .com { color: var(--text-3); }
+  pre .key { color: var(--info); }
+  pre .str { color: var(--accent); }
+
+  /* ───── TOC ───── */
+  .toc {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 8px; margin-top: 24px;
+  }
+  .toc a {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 0.5px solid rgba(255,255,255,0.06);
+    color: var(--text-1); text-decoration: none;
+    font-size: 13px;
+  }
+  .toc a:hover { background: rgba(255,255,255,0.06); border-color: color-mix(in oklab, var(--accent) 30%, transparent); }
+  .toc a span { font-family: var(--font-mono); font-size: 10px; color: var(--text-3); }
+
+  /* ───── Misc ───── */
+  .small { font-size: 12px; color: var(--text-2); }
+  .mono { font-family: var(--font-mono); }
+
+  /* Status dot animation */
+  @keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 0 0 currentColor; }
+    50% { box-shadow: 0 0 0 6px transparent; }
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 999px; background: var(--success);
+    box-shadow: 0 0 12px var(--success);
+    animation: pulse-dot 2s infinite;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Header -->
+  <div class="ph">
+    <div>
+      <div class="ph-meta">Home Assistant · Design system v3.0</div>
+      <h1>Ember Glass</h1>
+      <p>Dark-first system con accenti caldi, vetro stratificato e tipografia espressiva. Costruito per pannelli smart home — mobile e desktop. Token, componenti e linee guida per mantenere coerenza visiva su tutta l'app.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 10px;">
+      <div class="badge">v3.0 · Production</div>
+      <div class="small mono">aggiornato 27 apr 2026</div>
+    </div>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <a href="#foundation"><span>01</span> Fondamenti</a>
+    <a href="#colors"><span>02</span> Colori</a>
+    <a href="#type"><span>03</span> Tipografia</a>
+    <a href="#spacing"><span>04</span> Spazi & raggi</a>
+    <a href="#elevation"><span>05</span> Elevazione</a>
+    <a href="#icons"><span>06</span> Iconografia</a>
+    <a href="#components"><span>07</span> Componenti</a>
+    <a href="#patterns"><span>08</span> Pattern</a>
+    <a href="#motion"><span>09</span> Motion</a>
+  </div>
+
+  <div style="height: 56px;"></div>
+
+  <!-- 01 — Foundation -->
+  <section id="foundation">
+    <div class="sec-head">
+      <div class="num">01</div>
+      <h2>Fondamenti</h2>
+      <div class="sub">principi e direzione</div>
+    </div>
+
+    <div class="grid g-3">
+      <div class="panel">
+        <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 8px;">Dark-first</div>
+        <p class="small" style="margin: 0;">Pannelli sempre scuri. La luminosità arriva dagli accenti, dai gradienti e dai bagliori — non dal background. Riduce la fatica visiva durante l'uso prolungato e fa risaltare gli stati attivi.</p>
+      </div>
+      <div class="panel">
+        <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 8px;">Glass &amp; layers</div>
+        <p class="small" style="margin: 0;">Superfici trasparenti con blur 20–30px e bordi 0.5px. Ogni layer eredita la luce dall'ambiente. Niente fondi pieni: i pannelli sono finestre verso il backdrop.</p>
+      </div>
+      <div class="panel">
+        <div style="font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-bottom: 8px;">Tipografia espressiva</div>
+        <p class="small" style="margin: 0;">Outfit display per numeri grandi e titoli (—1px tracking). Inter per il corpo. Numeri sempre tabular-nums per stabilità visiva nei valori live.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 — Colors -->
+  <section id="colors">
+    <div class="sec-head">
+      <div class="num">02</div>
+      <h2>Colori</h2>
+      <div class="sub">oklch · color-mix · semantic</div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Accent presets</h3>
+    <div class="grid g-7" style="margin-bottom: 32px;">
+      <div class="swatch dark" style="background: oklch(0.68 0.17 45);"><div class="name">Copper</div><div class="val">oklch(0.68 0.17 45)</div></div>
+      <div class="swatch dark" style="background: oklch(0.7 0.17 25);"><div class="name">Coral</div><div class="val">oklch(0.7 0.17 25)</div></div>
+      <div class="swatch light" style="background: oklch(0.76 0.15 75);"><div class="name">Amber</div><div class="val">oklch(0.76 0.15 75)</div></div>
+      <div class="swatch dark" style="background: oklch(0.68 0.12 150);"><div class="name">Sage</div><div class="val">oklch(0.68 0.12 150)</div></div>
+      <div class="swatch dark" style="background: oklch(0.65 0.14 230);"><div class="name">Ocean</div><div class="val">oklch(0.65 0.14 230)</div></div>
+      <div class="swatch dark" style="background: oklch(0.65 0.17 290);"><div class="name">Violet</div><div class="val">oklch(0.65 0.17 290)</div></div>
+      <div class="swatch dark" style="background: oklch(0.68 0.17 0);"><div class="name">Rose</div><div class="val">oklch(0.68 0.17 0)</div></div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Semantici dispositivi</h3>
+    <div class="grid g-6" style="margin-bottom: 32px;">
+      <div class="swatch dark" style="background: #ed6f10;"><div class="name">Stufa · Accent</div><div class="val">#ed6f10</div></div>
+      <div class="swatch dark" style="background: #5eafff;"><div class="name">Clima · Info</div><div class="val">#5eafff</div></div>
+      <div class="swatch light" style="background: #f5c84a;"><div class="name">Luci · Yellow</div><div class="val">#f5c84a</div></div>
+      <div class="swatch dark" style="background: #b080ff;"><div class="name">Sonos · Violet</div><div class="val">#b080ff</div></div>
+      <div class="swatch light" style="background: #ffb84a;"><div class="name">Prese · Warn</div><div class="val">#ffb84a</div></div>
+      <div class="swatch dark" style="background: #ff6676;"><div class="name">Errori · Danger</div><div class="val">#ff6676</div></div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Surface scale</h3>
+    <div class="grid g-5" style="margin-bottom: 32px;">
+      <div class="swatch dark" style="background: #070606;"><div class="name">bg-0</div><div class="val">#070606</div></div>
+      <div class="swatch dark" style="background: #0a0908;"><div class="name">bg-1</div><div class="val">#0a0908</div></div>
+      <div class="swatch dark" style="background: #120f0e;"><div class="name">bg-2</div><div class="val">#120f0e</div></div>
+      <div class="swatch dark" style="background: rgba(255,255,255,0.04); backdrop-filter: blur(20px);"><div class="name">glass-bg</div><div class="val">rgba(255,255,255,0.04)</div></div>
+      <div class="swatch dark" style="background: rgba(255,255,255,0.08); backdrop-filter: blur(20px);"><div class="name">glass-strong</div><div class="val">rgba(255,255,255,0.08)</div></div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Testo</h3>
+    <div class="panel">
+      <div class="tk-row"><div class="tk-name">--text-1</div><div class="tk-val">#f5f5f4 · stone-100</div><div class="tk-vis"><div style="width:32px;height:32px;border-radius:8px;background:#f5f5f4;"></div></div></div>
+      <div class="tk-row"><div class="tk-name">--text-2</div><div class="tk-val">rgba(245,245,244,0.55)</div><div class="tk-vis"><div style="width:32px;height:32px;border-radius:8px;background:rgba(245,245,244,0.55);"></div></div></div>
+      <div class="tk-row"><div class="tk-name">--text-3</div><div class="tk-val">rgba(245,245,244,0.35)</div><div class="tk-vis"><div style="width:32px;height:32px;border-radius:8px;background:rgba(245,245,244,0.35);"></div></div></div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 32px 0 12px; color: var(--text-2);">Pattern d'uso · color-mix tinting</h3>
+    <div class="panel" style="padding: 24px;">
+      <p class="small" style="margin: 0 0 14px;">Per generare varianti tonali coerenti, usa sempre <code class="mono">color-mix(in oklab, &lt;color&gt; X%, transparent)</code> invece di hardcoded hex.</p>
+      <pre><span class="com">/* Card tinted background */</span>
+background: linear-gradient(135deg,
+  color-mix(in oklab, var(--accent) <span class="str">10%</span>, rgba(255,255,255,0.04)),
+  rgba(255,255,255,0.03));
+border: <span class="str">0.5px</span> solid color-mix(in oklab, var(--accent) <span class="str">22%</span>, rgba(255,255,255,0.06));
+
+<span class="com">/* Icon container */</span>
+background: color-mix(in oklab, var(--accent) <span class="str">22%</span>, transparent);
+color: var(--accent);
+
+<span class="com">/* Soft glow */</span>
+box-shadow: 0 0 24px color-mix(in oklab, var(--accent) <span class="str">35%</span>, transparent);</pre>
+    </div>
+  </section>
+
+  <!-- 03 — Type -->
+  <section id="type">
+    <div class="sec-head">
+      <div class="num">03</div>
+      <h2>Tipografia</h2>
+      <div class="sub">Outfit · Inter · JetBrains Mono</div>
+    </div>
+
+    <div class="panel">
+      <div class="type-row">
+        <div class="type-meta"><b>Display XL</b>Outfit 600 · 68 / 1<br>tracking -3px</div>
+        <div class="type-display"><div class="label">Numeri grandi (termostato)</div><div style="font-family: var(--font-display); font-size: 68px; font-weight: 600; line-height: 1; letter-spacing: -3px;">21<span style="font-size: 28px; opacity: 0.5;">°</span></div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Display L</b>Outfit 600 · 54 / 1<br>tracking -2px</div>
+        <div class="type-display"><div class="label">Sheet header value</div><div style="font-family: var(--font-display); font-size: 54px; font-weight: 600; line-height: 1; letter-spacing: -2px;">22<span style="font-size: 22px; opacity: 0.5;">°C</span></div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Display M</b>Outfit 600 · 36 / 1<br>tracking -1.2px</div>
+        <div class="type-display"><div class="label">Card valore</div><div style="font-family: var(--font-display); font-size: 36px; font-weight: 600; line-height: 1; letter-spacing: -1.2px;">142 <span style="font-size: 14px; color: var(--text-2);">Mbps</span></div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Heading</b>Outfit 600 · 30 / 1.05<br>tracking -0.8px</div>
+        <div class="type-display"><div class="label">Tab title</div><div style="font-family: var(--font-display); font-size: 30px; font-weight: 600; letter-spacing: -0.8px;">Automazioni</div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Title</b>Outfit 600 · 22 / 1.2<br>tracking -0.4px</div>
+        <div class="type-display"><div class="label">Sheet title</div><div style="font-family: var(--font-display); font-size: 22px; font-weight: 600; letter-spacing: -0.4px;">Modifica automazione</div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Body L</b>Inter 500 · 15 / 1.4</div>
+        <div class="type-display"><div class="label">Riga lista / nome</div><div style="font-size: 15px; font-weight: 500;">Tavolo da pranzo</div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Body</b>Inter 400 · 13 / 1.5</div>
+        <div class="type-display"><div class="label">Testo standard</div><div style="font-size: 13px;">Quando tutti escono di casa, spegni tutto e abbassa il riscaldamento al minimo.</div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Caption</b>Inter 500 · 11 / 1.4<br>color text-2</div>
+        <div class="type-display"><div class="label">Sottotitolo</div><div style="font-size: 11px; color: var(--text-2); font-weight: 500;">Ultima esecuzione · 2h fa</div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Eyebrow</b>Inter 600 · 11 / 1<br>uppercase · tracking 0.8px</div>
+        <div class="type-display"><div class="label">Section label</div><div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-2);">Modalità globale</div></div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><b>Mono</b>JetBrains Mono 400 · 12<br>tabular</div>
+        <div class="type-display"><div class="label">Cron / token</div><div class="mono" style="font-size: 12px;">0 22 * * 1-5</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 — Spacing & radii -->
+  <section id="spacing">
+    <div class="sec-head">
+      <div class="num">04</div>
+      <h2>Spazi &amp; raggi</h2>
+      <div class="sub">scale 4px · radii a tre livelli</div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Spacing scale (4px base)</h3>
+    <div class="panel" style="display: flex; gap: 4px; align-items: flex-end; padding: 28px 22px;">
+      <div class="sp-block"><div class="sp-bar" style="width: 4px;"></div><div class="sp-name">4 · xs</div></div>
+      <div class="sp-block"><div class="sp-bar" style="width: 8px;"></div><div class="sp-name">8 · sm</div></div>
+      <div class="sp-block"><div class="sp-bar" style="width: 12px;"></div><div class="sp-name">12 · md</div></div>
+      <div class="sp-block"><div class="sp-bar" style="width: 16px;"></div><div class="sp-name">16 · base</div></div>
+      <div class="sp-block"><div class="sp-bar" style="width: 20px;"></div><div class="sp-name">20 · lg</div></div>
+      <div class="sp-block"><div class="sp-bar" style="width: 24px;"></div><div class="sp-name">24 · xl</div></div>
+      <div class="sp-block"><div class="sp-bar" style="width: 32px;"></div><div class="sp-name">32 · 2xl</div></div>
+      <div class="sp-block"><div class="sp-bar" style="width: 40px;"></div><div class="sp-name">40 · 3xl</div></div>
+      <div class="sp-block"><div class="sp-bar" style="width: 56px;"></div><div class="sp-name">56 · 4xl</div></div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 32px 0 12px; color: var(--text-2);">Densità · padding card</h3>
+    <div class="panel" style="display: flex; gap: 12px;">
+      <div class="density-chip"><b>Compatta</b><span>14px / 12px gap</span></div>
+      <div class="density-chip"><b>Media</b><span>16px / 14px gap</span></div>
+      <div class="density-chip"><b>Comoda</b><span>20px / 16px gap</span></div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 32px 0 12px; color: var(--text-2);">Radii</h3>
+    <div class="panel" style="display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; padding: 28px;">
+      <div class="r-block"><div class="r-shape" style="border-radius: 6px;"></div><div class="sp-name">6 · input piccolo</div></div>
+      <div class="r-block"><div class="r-shape" style="border-radius: 9px;"></div><div class="sp-name">9 · input</div></div>
+      <div class="r-block"><div class="r-shape" style="border-radius: 12px;"></div><div class="sp-name">12 · button</div></div>
+      <div class="r-block"><div class="r-shape" style="border-radius: 16px;"></div><div class="sp-name">16 · panel</div></div>
+      <div class="r-block"><div class="r-shape" style="border-radius: 20px;"></div><div class="sp-name">20 · sheet inner</div></div>
+      <div class="r-block"><div class="r-shape" style="border-radius: 24px;"></div><div class="sp-name">24 · card · r-card</div></div>
+      <div class="r-block"><div class="r-shape" style="border-radius: 28px;"></div><div class="sp-name">28 · tab bar</div></div>
+      <div class="r-block"><div class="r-shape" style="border-radius: 999px;"></div><div class="sp-name">999 · pill</div></div>
+    </div>
+  </section>
+
+  <!-- 05 — Elevation -->
+  <section id="elevation">
+    <div class="sec-head">
+      <div class="num">05</div>
+      <h2>Elevazione &amp; vetro</h2>
+      <div class="sub">shadow + blur layers</div>
+    </div>
+
+    <div class="panel" style="display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; padding: 36px 22px; background: var(--bg-1);">
+      <div class="sh-block">
+        <div class="sh-shape" style="box-shadow: none;"></div>
+        <div class="sp-name">flat</div>
+        <div class="small mono" style="font-size: 9px;">none</div>
+      </div>
+      <div class="sh-block">
+        <div class="sh-shape" style="box-shadow: 0 8px 32px rgba(0,0,0,0.18), inset 0 0 0 0.5px rgba(255,255,255,0.03);"></div>
+        <div class="sp-name">card</div>
+        <div class="small mono" style="font-size: 9px;">--glass-shadow</div>
+      </div>
+      <div class="sh-block">
+        <div class="sh-shape" style="box-shadow: 0 12px 40px rgba(0,0,0,0.4), inset 1px 1px 0 rgba(255,255,255,0.06);"></div>
+        <div class="sp-name">tab bar</div>
+        <div class="small mono" style="font-size: 9px;">elevated</div>
+      </div>
+      <div class="sh-block">
+        <div class="sh-shape" style="box-shadow: 0 4px 24px color-mix(in oklab, var(--accent) 40%, transparent);"></div>
+        <div class="sp-name">accent glow</div>
+        <div class="small mono" style="font-size: 9px;">primary CTA</div>
+      </div>
+      <div class="sh-block">
+        <div class="sh-shape" style="box-shadow: 0 0 20px color-mix(in oklab, var(--accent) 60%, transparent), 0 0 40px color-mix(in oklab, var(--accent) 30%, transparent);"></div>
+        <div class="sp-name">flame glow</div>
+        <div class="small mono" style="font-size: 9px;">stove on</div>
+      </div>
+      <div class="sh-block">
+        <div class="sh-shape" style="box-shadow: 0 -10px 40px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.05);"></div>
+        <div class="sp-name">sheet</div>
+        <div class="small mono" style="font-size: 9px;">bottom sheet</div>
+      </div>
+    </div>
+
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 32px 0 12px; color: var(--text-2);">Blur scale</h3>
+    <div class="grid g-4" style="background: linear-gradient(135deg, var(--accent) 0%, var(--info) 100%); padding: 32px; border-radius: 18px;">
+      <div style="background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 14px; padding: 18px; border: 0.5px solid rgba(255,255,255,0.12); text-align: center;"><div style="font-weight: 600; color: #fff;">8px</div><div class="mono" style="font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 4px;">subtle</div></div>
+      <div style="background: rgba(255,255,255,0.06); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 14px; padding: 18px; border: 0.5px solid rgba(255,255,255,0.12); text-align: center;"><div style="font-weight: 600; color: #fff;">20px</div><div class="mono" style="font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 4px;">card</div></div>
+      <div style="background: rgba(255,255,255,0.06); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border-radius: 14px; padding: 18px; border: 0.5px solid rgba(255,255,255,0.12); text-align: center;"><div style="font-weight: 600; color: #fff;">24px</div><div class="mono" style="font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 4px;">default</div></div>
+      <div style="background: rgba(255,255,255,0.06); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); border-radius: 14px; padding: 18px; border: 0.5px solid rgba(255,255,255,0.12); text-align: center;"><div style="font-weight: 600; color: #fff;">30px sat</div><div class="mono" style="font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 4px;">tab/header</div></div>
+    </div>
+  </section>
+
+  <!-- 06 — Iconography -->
+  <section id="icons">
+    <div class="sec-head">
+      <div class="num">06</div>
+      <h2>Iconografia</h2>
+      <div class="sub">stroke 1.75 · 24×24 · rounded</div>
+    </div>
+
+    <div class="panel">
+      <p class="small" style="margin: 0 0 16px;">Tutte le icone seguono lo stesso template: viewBox 24×24, stroke-width 1.75, rounded caps/joins. Niente fill (eccetto play/pause). Prop <code class="mono">sw</code> regola lo stroke per gerarchie diverse, prop <code class="mono">size</code> il quadrato.</p>
+      <div class="grid g-7" id="iconGrid"></div>
+    </div>
+  </section>
+
+  <!-- 07 — Components -->
+  <section id="components">
+    <div class="sec-head">
+      <div class="num">07</div>
+      <h2>Componenti</h2>
+      <div class="sub">building blocks</div>
+    </div>
+
+    <!-- Buttons -->
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Pulsanti</h3>
+    <div class="comp-preview" style="margin-bottom: 24px;">
+      <button class="btn btn-primary">Crea automazione</button>
+      <button class="btn btn-secondary">Annulla</button>
+      <button class="btn btn-ghost">Salta</button>
+      <button class="btn btn-danger">Elimina</button>
+      <button class="btn btn-icon" aria-label="add">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+    </div>
+
+    <!-- Pills -->
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Pill / badge</h3>
+    <div class="comp-preview" style="margin-bottom: 24px;">
+      <span class="pill pill-accent">⏰ 0 22 * * *</span>
+      <span class="pill pill-info">5 zone</span>
+      <span class="pill pill-warn">3 attive</span>
+      <span class="pill pill-danger">Errore E2</span>
+      <span class="pill pill-violet">2 azioni</span>
+      <span class="pill pill-muted">2h fa</span>
+      <span class="pill pill-info"><span class="live-dot" style="background: var(--info); box-shadow: 0 0 10px var(--info); animation: pulse-dot 2s infinite;"></span>LIVE</span>
+    </div>
+
+    <!-- Toggles -->
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Toggle</h3>
+    <div class="comp-preview" style="margin-bottom: 24px; gap: 32px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="toggle on" id="t1"></div>
+        <span class="small">On</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <div class="toggle" id="t2"></div>
+        <span class="small">Off</span>
+      </div>
+    </div>
+
+    <!-- Inputs -->
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Input &amp; segmented</h3>
+    <div class="comp-preview" style="margin-bottom: 24px; flex-direction: column; align-items: stretch; gap: 16px;">
+      <input class="input" placeholder="Nome automazione" />
+      <div class="seg" style="align-self: flex-start;">
+        <button class="on">&gt;</button>
+        <button>≥</button>
+        <button>&lt;</button>
+        <button>≤</button>
+      </div>
+      <div class="seg" style="align-self: flex-start;">
+        <button class="on">Manuale</button>
+        <button>Home</button>
+      </div>
+    </div>
+
+    <!-- Cards -->
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Glass cards</h3>
+    <div class="grid g-3" style="margin-bottom: 24px;">
+      <div class="gc">
+        <div class="gc-head">
+          <div class="gc-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 3 4.5 3 7a3 3 0 11-6 0c0-1 .5-2 1-3-2 1-4 3.5-4 7a6 6 0 0012 0c0-5-4-8-6-11z"/></svg>
+          </div>
+          <div class="gc-label">Stufa</div>
+          <div class="gc-dot"></div>
+        </div>
+        <div>
+          <div class="gc-val">22<span style="font-size: 16px; opacity: 0.5;">°C</span></div>
+          <div class="gc-sub">Fiamma 3 · Ventola 2</div>
+        </div>
+      </div>
+      <div class="gc cool">
+        <div class="gc-head">
+          <div class="gc-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.76V4a2 2 0 10-4 0v10.76a4 4 0 104 0z"/></svg>
+          </div>
+          <div class="gc-label">Clima</div>
+          <div class="gc-dot" style="background: #5eafff; box-shadow: 0 0 12px #5eafff;"></div>
+        </div>
+        <div>
+          <div class="gc-val">21<span style="font-size: 16px; opacity: 0.5;">°</span></div>
+          <div class="gc-sub">3 di 5 attive</div>
+        </div>
+      </div>
+      <div class="gc warn">
+        <div class="gc-head">
+          <div class="gc-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7V17h8v-2.3A7 7 0 0012 2z"/></svg>
+          </div>
+          <div class="gc-label">Luci</div>
+          <div class="gc-dot" style="background: #ffb84a; box-shadow: 0 0 12px #ffb84a;"></div>
+        </div>
+        <div>
+          <div class="gc-val">5<span style="font-size: 14px; color: var(--text-2);"> / 12</span></div>
+          <div class="gc-sub">Soggiorno · Cucina · Studio</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <h3 style="font-family: var(--font-display); font-size: 16px; font-weight: 600; margin: 0 0 12px; color: var(--text-2);">Tab bar</h3>
+    <div class="comp-preview" style="background: var(--bg-1); padding: 32px;">
+      <div class="tabbar">
+        <button class="tab on">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4v-7H9v7H5a2 2 0 01-2-2V10z"/></svg>
+          Casa
+        </button>
+        <button class="tab">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Stanze
+        </button>
+        <button class="tab">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          Automazioni
+        </button>
+        <button class="tab">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/></svg>
+          Altro
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 — Patterns -->
+  <section id="patterns">
+    <div class="sec-head">
+      <div class="num">08</div>
+      <h2>Pattern di stato</h2>
+      <div class="sub">on/off, live, errore</div>
+    </div>
+
+    <div class="grid g-3">
+      <div class="panel">
+        <div style="font-weight: 600; margin-bottom: 12px;">Stato ON</div>
+        <p class="small" style="margin: 0 0 14px;">Tinted background + bordo colorato + dot con glow. Toggle accent. Usa il colore semantico del dispositivo, non sempre l'accent globale.</p>
+        <div style="background: linear-gradient(135deg, color-mix(in oklab, var(--info) 12%, rgba(255,255,255,0.04)), rgba(255,255,255,0.03)); border: 0.5px solid color-mix(in oklab, var(--info) 25%, rgba(255,255,255,0.06)); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px;">
+          <div style="width: 8px; height: 8px; border-radius: 999px; background: var(--info); box-shadow: 0 0 12px var(--info);"></div>
+          <div style="font-size: 13px; flex: 1;">Termovalvola attiva</div>
+          <div class="toggle on" style="background: var(--info);"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div style="font-weight: 600; margin-bottom: 12px;">Stato OFF</div>
+        <p class="small" style="margin: 0 0 14px;">Background neutro, bordo tenue, testo a text-2. Niente glow, niente colore semantico — il dispositivo "scompare" visivamente.</p>
+        <div style="background: rgba(255,255,255,0.03); border: 0.5px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 10px;">
+          <div style="width: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,0.18);"></div>
+          <div style="font-size: 13px; flex: 1; color: var(--text-2);">Termovalvola spenta</div>
+          <div class="toggle"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div style="font-weight: 600; margin-bottom: 12px;">Stato errore</div>
+        <p class="small" style="margin: 0 0 14px;">Tinted danger 12% + bordo danger 25%. Usa pill rossa per errori critici. Mai testo rosso a tutta superficie — distrugge la gerarchia.</p>
+        <div style="background: color-mix(in oklab, var(--danger) 12%, rgba(255,255,255,0.04)); border: 0.5px solid color-mix(in oklab, var(--danger) 25%, transparent); border-radius: 12px; padding: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <span class="pill pill-danger">Errore E2</span>
+            <span class="small">Stufa offline</span>
+          </div>
+          <div class="small" style="margin: 0;">Comunicazione persa con il gateway. Riprova fra 30s.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 — Motion -->
+  <section id="motion">
+    <div class="sec-head">
+      <div class="num">09</div>
+      <h2>Motion</h2>
+      <div class="sub">durate · easing · entrance</div>
+    </div>
+
+    <div class="grid g-3">
+      <div class="panel">
+        <div style="font-weight: 600; margin-bottom: 8px;">Durate</div>
+        <div class="tk-row" style="grid-template-columns: 120px 1fr;"><div class="tk-name">fast</div><div class="tk-val">150ms · tap, hover</div></div>
+        <div class="tk-row" style="grid-template-columns: 120px 1fr;"><div class="tk-name">base</div><div class="tk-val">220ms · toggle, tab</div></div>
+        <div class="tk-row" style="grid-template-columns: 120px 1fr;"><div class="tk-name">slow</div><div class="tk-val">320ms · sheet open</div></div>
+        <div class="tk-row" style="grid-template-columns: 120px 1fr;"><div class="tk-name">ambient</div><div class="tk-val">12s · backdrop drift</div></div>
+      </div>
+      <div class="panel">
+        <div style="font-weight: 600; margin-bottom: 8px;">Easing</div>
+        <div class="tk-row" style="grid-template-columns: 120px 1fr;"><div class="tk-name">standard</div><div class="tk-val">cubic-bezier(.4,0,.2,1)</div></div>
+        <div class="tk-row" style="grid-template-columns: 120px 1fr;"><div class="tk-name">spring</div><div class="tk-val">cubic-bezier(.34,1.56,.64,1)</div></div>
+        <div class="tk-row" style="grid-template-columns: 120px 1fr;"><div class="tk-name">linear</div><div class="tk-val">linear · ambient/loops</div></div>
+      </div>
+      <div class="panel">
+        <div style="font-weight: 600; margin-bottom: 8px;">Pattern</div>
+        <p class="small" style="margin: 0;"><b>Card pop</b> — al cambio tab, le card entrano con <code class="mono">opacity 0→1</code> + <code class="mono">translateY 12→0</code> + <code class="mono">scale .96→1</code> in 320ms, stagger 40ms.</p>
+        <p class="small" style="margin: 8px 0 0;"><b>Splash</b> — logo fiamma scala 0.8→1 in 600ms, poi fade-out 400ms mentre la dashboard scala 1.04→1.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div style="margin-top: 80px; padding-top: 28px; border-top: 0.5px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+    <div class="small">Home Assistant · Ember Glass design system</div>
+    <div class="small mono">tokens · components · patterns</div>
+  </div>
+
+</div>
+
+<script>
+  // Toggle interactivity
+  document.getElementById('t1').addEventListener('click', e => e.currentTarget.classList.toggle('on'));
+  document.getElementById('t2').addEventListener('click', e => e.currentTarget.classList.toggle('on'));
+
+  // Render icons
+  const ICONS = {
+    Flame: '<path d="M12 2c1 3 3 4.5 3 7a3 3 0 11-6 0c0-1 .5-2 1-3-2 1-4 3.5-4 7a6 6 0 0012 0c0-5-4-8-6-11z"/>',
+    Thermo: '<path d="M14 14.76V4a2 2 0 10-4 0v10.76a4 4 0 104 0z"/>',
+    Bulb: '<path d="M9 18h6M10 22h4M12 2a7 7 0 00-4 12.7V17h8v-2.3A7 7 0 0012 2z"/>',
+    Sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>',
+    Moon: '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>',
+    Cloud: '<path d="M18 10a5 5 0 00-9.58-1.5A4 4 0 006 16h12a4 4 0 000-6z"/>',
+    Music: '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>',
+    Camera: '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
+    Wifi: '<path d="M5 12.55a11 11 0 0114 0M8.5 16.05a6 6 0 017 0M2 8.82a15 15 0 0120 0"/><circle cx="12" cy="20" r="0.5" fill="currentColor"/>',
+    Cpu: '<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>',
+    Plug: '<path d="M9 2v6M15 2v6M7 8h10l-1 8a4 4 0 01-4 4 4 4 0 01-4-4L7 8z"/>',
+    Home: '<path d="M3 10l9-7 9 7v10a2 2 0 01-2 2h-4v-7H9v7H5a2 2 0 01-2-2V10z"/>',
+    Grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+    Settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>',
+    Bell: '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>',
+    Power: '<path d="M18.36 6.64a9 9 0 11-12.73 0M12 2v10"/>',
+    Play: '<path d="M6 4l14 8-14 8V4z" fill="currentColor"/>',
+    Pause: '<path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor"/>',
+    Calendar: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    Alert: '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0zM12 9v4M12 17h.01"/>',
+    Droplet: '<path d="M12 2s6 6 6 11a6 6 0 01-12 0c0-5 6-11 6-11z"/>',
+    Wind: '<path d="M9.59 4.59A2 2 0 1111 8H2m10.59 11.41A2 2 0 1014 16H2m15.73-8.27A2.5 2.5 0 1119.5 12H2"/>',
+    Zap: '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>',
+    Clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+    Shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+    Volume: '<path d="M11 5L6 9H2v6h4l5 4V5zM19 12a4 4 0 00-2-3.46M15 8.5a7 7 0 010 7"/>',
+    Tv: '<rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8M12 18v3"/>',
+    Blind: '<path d="M3 4h18M4 4v12M20 4v12M4 8h16M4 12h16M4 16h16M12 16v4"/>',
+    Check: '<path d="M20 6L9 17l-5-5"/>',
+    Plus: '<path d="M12 5v14M5 12h14"/>',
+    X: '<path d="M18 6L6 18M6 6l12 12"/>',
+    ChevR: '<path d="M9 6l6 6-6 6"/>',
+    More: '<circle cx="5" cy="12" r="1.3" fill="currentColor"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/><circle cx="19" cy="12" r="1.3" fill="currentColor"/>',
+  };
+  const grid = document.getElementById('iconGrid');
+  Object.entries(ICONS).forEach(([name, path]) => {
+    grid.insertAdjacentHTML('beforeend',
+      `<div class="ico-cell"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${path}</svg><div class="nm">${name}</div></div>`);
+  });
+</script>
+
+</body>
+</html>

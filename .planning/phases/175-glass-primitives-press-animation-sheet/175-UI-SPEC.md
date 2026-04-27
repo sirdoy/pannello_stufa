@@ -1,7 +1,8 @@
 ---
 phase: 175
 slug: glass-primitives-press-animation-sheet
-status: draft
+status: approved
+reviewed_at: 2026-04-27
 shadcn_initialized: false
 preset: none
 created: 2026-04-27

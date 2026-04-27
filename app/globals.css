@@ -1569,3 +1569,26 @@
     scrollbar-width: none;  /* Firefox */
   }
 }
+
+/* Phase 176 — Splash badge status dot pulse (bundle splash.jsx:85). */
+@keyframes pulse {
+  0%   { transform: scale(1);   opacity: 1; }
+  50%  { transform: scale(1.4); opacity: 0.6; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* Phase 176 — FlameViz inner-flame breathing animation (bundle cards.jsx:120, 126).
+   Used by both the outer flame body (1.8s ease-in-out infinite) and the inner flame tip
+   (1.4s ease-in-out infinite alternate). The keyframe shape is shared; the duration
+   and alternate flag are set inline in FlameViz.tsx. */
+@keyframes flamePulse {
+  0%, 100% { transform: translateX(-50%) scaleY(1);    opacity: 1;    }
+  50%      { transform: translateX(-50%) scaleY(1.05); opacity: 0.92; }
+}
+
+/* Phase 176 — extend reduced-motion guard for splash badge dot + FlameViz inner flames.
+   See CONTEXT.md D-17/D-18 (reduced-motion contract) and UI-SPEC §"CSS Keyframes". */
+@media (prefers-reduced-motion: reduce) {
+  [data-testid="splash-badge"] > div:first-child { animation: none !important; }
+  [data-flame-viz="true"] > div { animation: none !important; }
+}

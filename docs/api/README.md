@@ -345,16 +345,21 @@ curl YOUR_BASE_URL/health
 
 ### GET /api/v1/devices
 
-Aggregated device list across all registered providers. Returns devices from every active provider in a single paginated response. Each device includes a `provider_type` field identifying its source.
+Aggregated device list across all 8 registered providers (Fritz!Box, Hue, Sonos, Netatmo, DIRIGERA, Tuya, Raspberry Pi, Thermorossi). The route fans out to every provider in parallel via `Promise.allSettled`, normalizes each provider's items into a unified shape, and returns a sorted paginated list. Each item carries a `provider_type` discriminator identifying its source.
 
 **Authentication:** Required (JWT Bearer or API Key)
+
+**Partial-failure behavior:** Provider listing failures do NOT fail the whole response. When all providers succeed, the response carries `errors: []`. Multi-item providers (Fritz!Box, Hue, Sonos, Netatmo, DIRIGERA, Tuya) that reject contribute zero items and are listed in `errors[]`. Single-item providers (Raspberry Pi, Thermorossi) that reject still emit a single item with `status: 0` and are NOT listed in `errors[]`. HTTP status remains **200** even when `errors[]` is non-empty.
 
 **Query Parameters:**
 
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
-| `limit` | integer | 100 | Items per page (1-1000) |
-| `offset` | integer | 0 | Items to skip |
+| `provider_type` | string | — | Restrict response to a single provider (e.g. `?provider_type=hue`). One of: `fritzbox`, `hue`, `sonos`, `netatmo`, `dirigera`, `tuya`, `raspi`, `thermorossi`. Invalid values return an empty list with no errors. When set, only the requested provider is contacted (skips fan-out to others). |
+| `limit` | integer | 100 | Items per page. Clamped silently to the range 1–1000. |
+| `offset` | integer | 0 | Items to skip. Negative values clamp to 0. Offset beyond `total_count` returns an empty `items` array with `total_count` still reflecting the merged total. |
+
+**Sort order:** Items are sorted by `provider_type` ASC (alphabetical), then by `name` ASC using Italian locale (`localeCompare(b, 'it')`). Sort is deterministic across requests so pagination is stable.
 
 **Response:**
 
@@ -362,47 +367,124 @@ Aggregated device list across all registered providers. Returns devices from eve
 {
   "items": [
     {
-      "ip": "192.168.178.25",
-      "name": "iPhone-Federico",
-      "mac": "AA:BB:CC:DD:EE:FF",
-      "status": 1,
-      "provider_type": "fritzbox"
+      "id": "dirigera:sens-1",
+      "name": "Porta Ingresso",
+      "provider_type": "dirigera",
+      "type": "contact_sensor",
+      "room": "Ingresso",
+      "status": 1
     },
     {
-      "ip": "192.168.178.30",
-      "name": "MacBook-Pro",
-      "mac": "11:22:33:44:55:66",
-      "status": 1,
-      "provider_type": "fritzbox"
+      "id": "fritzbox:AA:BB:CC:DD:EE:FF",
+      "name": "iPhone-Federico",
+      "provider_type": "fritzbox",
+      "type": "network_device",
+      "ip": "192.168.178.25",
+      "mac": "AA:BB:CC:DD:EE:FF",
+      "status": 1
+    },
+    {
+      "id": "hue:1",
+      "name": "Lampada Sala",
+      "provider_type": "hue",
+      "type": "light",
+      "room": "Sala",
+      "status": 1
+    },
+    {
+      "id": "raspi:host",
+      "name": "Raspberry Pi",
+      "provider_type": "raspi",
+      "type": "host",
+      "status": 1
+    },
+    {
+      "id": "thermorossi:stove",
+      "name": "Stufa",
+      "provider_type": "thermorossi",
+      "type": "stove",
+      "status": 1
     }
   ],
   "total_count": 14,
   "limit": 100,
-  "offset": 0
+  "offset": 0,
+  "errors": []
 }
 ```
 
+**Response with a partial provider failure** (Fritz!Box rejected, others succeeded):
+
+```json
+{
+  "items": [
+    { "id": "hue:1", "name": "Lampada Sala", "provider_type": "hue", "type": "light", "room": "Sala", "status": 1 },
+    { "id": "raspi:host", "name": "Raspberry Pi", "provider_type": "raspi", "type": "host", "status": 1 }
+  ],
+  "total_count": 2,
+  "limit": 100,
+  "offset": 0,
+  "errors": [
+    { "provider_type": "fritzbox", "message": "Fritz!Box unreachable" }
+  ]
+}
+```
+
+**TypeScript:**
+
 ```typescript
+type ProviderType =
+  | 'fritzbox'
+  | 'hue'
+  | 'sonos'
+  | 'netatmo'
+  | 'dirigera'
+  | 'tuya'
+  | 'raspi'
+  | 'thermorossi';
+
+/**
+ * Aggregated cross-provider device representation.
+ * Required: id, name, provider_type. Optional fields are OMITTED (not null) when absent.
+ */
 interface Device {
-  ip: string;
+  /** Composite id: `{provider_type}:{native_id}` (globally unique). */
+  id: string;
   name: string;
-  mac: string;
-  status: 0 | 1; // 1=online, 0=offline
-  provider_type: string | null;
+  provider_type: ProviderType;
+  /** e.g. 'light', 'speaker', 'thermostat', 'plug', 'network_device', 'host', 'stove'. */
+  type?: string;
+  ip?: string;
+  mac?: string;
+  /** 1 = online, 0 = offline. */
+  status?: 0 | 1;
+  room?: string;
 }
 
-interface PaginatedResponse<T> {
-  items: T[];
+interface DeviceAggregatorError {
+  provider_type: ProviderType;
+  message: string;
+}
+
+interface DeviceAggregatorResponse {
+  items: Device[];
   total_count: number;
   limit: number;
   offset: number;
+  /** Empty when all providers succeeded. Multi-item providers that rejected listed here. */
+  errors: DeviceAggregatorError[];
 }
 ```
 
 **curl:**
 
 ```bash
+# All providers
 curl "YOUR_BASE_URL/api/v1/devices?limit=50&offset=0" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# Filter to a single provider (skips fan-out to the others)
+curl "YOUR_BASE_URL/api/v1/devices?provider_type=hue" \
   -H "Authorization: Bearer YOUR_TOKEN"
 ```
 

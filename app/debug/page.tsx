@@ -367,6 +367,13 @@ function DebugPageContent() {
               <Palette size={18} className="mr-2" />
               Design System
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => window.location.href = '/debug/design-system-v2'}
+            >
+              <Palette size={18} className="mr-2" />
+              Design System v2
+            </Button>
           </div>
         </div>
 

@@ -53,7 +53,7 @@ export default function AmbientBg(): React.ReactElement | null {
           width: 320,
           height: 320,
           borderRadius: 999,
-          filter: 'blur(60px)',
+          filter: 'blur(60px)', // AUDIT-EXCEPTION (DS-02): canonical blur from design bundle (UI-SPEC §Ambient)
           opacity: 0.5,
           background:
             'radial-gradient(circle, color-mix(in oklab, var(--accent) 60%, transparent) 0%, transparent 70%)',
@@ -69,11 +69,10 @@ export default function AmbientBg(): React.ReactElement | null {
           width: 360,
           height: 360,
           borderRadius: 999,
-          filter: 'blur(70px)',
+          filter: 'blur(70px)', // AUDIT-EXCEPTION (DS-02): canonical blur from design bundle (UI-SPEC §Ambient)
           opacity: 0.4,
-          // AUDIT-EXCEPTION (DS-02): #301010 lifted verbatim from design bundle app.jsx:184
           background:
-            'radial-gradient(circle, color-mix(in oklab, var(--accent) 40%, #301010) 0%, transparent 70%)',
+            'radial-gradient(circle, color-mix(in oklab, var(--accent) 40%, #301010) 0%, transparent 70%)', // AUDIT-EXCEPTION (DS-02): #301010 lifted verbatim from design bundle app.jsx:184
           animation: 'ambientB 18s ease-in-out infinite',
         }}
       />
@@ -86,10 +85,9 @@ export default function AmbientBg(): React.ReactElement | null {
           width: 260,
           height: 260,
           borderRadius: 999,
-          filter: 'blur(80px)',
+          filter: 'blur(80px)', // AUDIT-EXCEPTION (DS-02): canonical blur from design bundle (UI-SPEC §Ambient)
           opacity: 0.4,
-          // AUDIT-EXCEPTION (DS-02): static cool-blue counterpoint per UI-SPEC §Color
-          background: 'radial-gradient(circle, rgba(94, 175, 255, 0.25) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(94, 175, 255, 0.25) 0%, transparent 70%)', // AUDIT-EXCEPTION (DS-02): static cool-blue counterpoint per UI-SPEC §Color
           animation: 'ambientC 22s ease-in-out infinite',
         }}
       />

@@ -338,7 +338,8 @@ export default function DesignSystemV2Page(): React.ReactElement {
               ['--glass-border', 'rgba(255, 255, 255, 0.08)'],
               ['--glass-shadow', '0 8px 32px ...'],
               ['--accent', `${ACCENT_PRESETS[activeHue]} (${HUE_DISPLAY_NAMES[activeHue]})`],
-              ['--text-1', '#f5f5f4'],
+              ['--text-1', '#f5f5f4'], // AUDIT-EXCEPTION (DS-02): documentary text echoing the token's source value, not a styling literal
+
               ['--text-2', 'rgba(245, 245, 244, 0.55)'],
               ['--r-card', '24px'],
               ['--pad-card', '16px'],

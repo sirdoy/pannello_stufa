@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: executing
-stopped_at: Completed 173-02-PLAN.md
-last_updated: "2026-04-27T07:26:29.778Z"
+stopped_at: Completed 173-04-PLAN.md
+last_updated: "2026-04-27T07:29:47.127Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 18
   completed_phases: 16
   total_plans: 39
-  completed_plans: 40
+  completed_plans: 41
   percent: 100
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-03)
 ## Current Position
 
 Phase: 173 (Cross-Provider Device Aggregator) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-04-27
 
@@ -51,6 +51,7 @@ Progress: [██████████] 100%
 | Phase 169-dirigera-frontend-cutover P02 | 57 | 7 tasks | 11 files |
 | Phase 169-dirigera-frontend-cutover P03 | 15 | 5 tasks | 5 files |
 | Phase 173 P02 | 4 | 1 tasks | 1 files |
+| Phase 173 P04 | 3 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,7 @@ Recent decisions affecting v19.0:
 - Three independent hooks per D-07 (useDirigeraStats/History/Telemetry) — not folded into useDirigeraFullData; replace-on-poll/append-on-loadMore per Pitfall 6
 - Panel headings use semantic <h2> with token classes (not Heading design-system component) to avoid unverified import dependency
 - git rm -r app/api/dirigera/ atomically deleted all 5 legacy route.ts files; v1 surface (8 routes) intact pre and post
+- [Plan 173-04] Documentation update shipped in Phase 173 (D-21 closed); errors[] (D-13) and ?provider_type= filter (D-20) documented with examples
 
 ### Pending Todos
 
@@ -95,7 +97,7 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-23 — Completed quick task 260423-n6i (jest config performance fix)
-Stopped at: Completed 173-02-PLAN.md
+Stopped at: Completed 173-04-PLAN.md
 Resume file: None
 
 **Planned Phase:** 173 (Cross-Provider Device Aggregator) — 4 plans — 2026-04-25T10:25:14.484Z

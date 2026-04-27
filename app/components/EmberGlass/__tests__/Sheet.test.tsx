@@ -186,14 +186,19 @@ describe('Sheet (EmberGlass primitive)', () => {
   });
 
   describe('ARIA / a11y', () => {
-    test('dialog has aria-modal="true" (Radix-provided)', () => {
+    test('dialog exposes modal semantics via Radix (role + open data-state + aria-labelledby)', () => {
       render(
         <Sheet open={true} onClose={onCloseMock} title="Demo">
           <div>body</div>
         </Sheet>
       );
       const dialog = screen.getByRole('dialog');
-      expect(dialog).toHaveAttribute('aria-modal', 'true');
+      // Radix v1.1.14 indicates modal-open dialog via role="dialog" + data-state="open"
+      // (focus trap + ESC are runtime-enforced, not attribute-driven). aria-labelledby
+      // is auto-wired to the rendered <DialogPrimitive.Title>.
+      expect(dialog).toHaveAttribute('role', 'dialog');
+      expect(dialog).toHaveAttribute('data-state', 'open');
+      expect(dialog.getAttribute('aria-labelledby')).toBeTruthy();
     });
 
     test('close button has data-sheet-close="true" attribute', () => {

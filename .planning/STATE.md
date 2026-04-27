@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: completed
-stopped_at: Completed 174-01-PLAN.md
-last_updated: "2026-04-27T09:46:21.908Z"
-last_activity: 2026-04-27 — ROADMAP.md written for v20.0 (9 phases, 174-182, 50/50 reqs mapped)
+stopped_at: Completed 174-02-PLAN.md
+last_updated: "2026-04-27T10:30:00.000Z"
+last_activity: 2026-04-27 — Plan 174-02 complete (AmbientBg client provider + inline pre-paint script in layout.tsx, 7 unit tests)
 progress:
   total_phases: 9
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
-  percent: 33
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State

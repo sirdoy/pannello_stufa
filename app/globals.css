@@ -362,6 +362,31 @@
   .ember-ambient-blob { animation: none !important; }
 }
 
+/* ===== EMBER GLASS PRIMITIVES (Phase 175 — DS-07, SHEET-01) ===== */
+/* Press animation transition shape (DS-07). Transform itself is JS-driven
+   (Pressable component sets it inline). This class exists so reduced-motion
+   overrides have one canonical token AND any future static :active consumers
+   can use it. */
+.press-anim {
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1);
+}
+
+/* Focus-visible accent outline for Pressable hosts that are natively focusable
+   (Pressable adds data-pressable-focusable='true') AND for the Sheet close
+   button (data-sheet-close='true'). Inline styles cannot express :focus-visible,
+   so this lives globally. */
+[data-pressable-focusable="true"]:focus-visible,
+[data-sheet-close="true"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Reduced-motion override for .press-anim (Sheet's 400ms transition is
+   intentionally NOT collapsed in Phase 175 — see 175-UI-SPEC.md). */
+@media (prefers-reduced-motion: reduce) {
+  .press-anim { transition: transform 50ms linear; }
+}
+
 /* ===== BASE STYLES ===== */
 @layer base {
   html {

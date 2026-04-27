@@ -1054,21 +1054,21 @@ Planner uses this to size waves:
 
 **All other claims in this research are VERIFIED via direct file reads or CITED to bundle/CONTEXT lines.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the demo page's sheet close button use the Italian `Chiudi` (matches `BottomSheet.tsx:140`) or English `Close` (matches `app/components/ui/Sheet.tsx:178`)?**
    - What we know: bundle uses no aria-label (just `<IconX>`). Project predominantly Italian UI.
    - What's unclear: which convention dominates for the new EmberGlass namespace.
-   - Recommendation: Use `Chiudi` for consistency with BottomSheet.tsx. Single grep target for future i18n.
+   - **RESOLVED:** Use `Chiudi` for consistency with BottomSheet.tsx. Single grep target for future i18n. Locked in UI-SPEC §Copywriting.
 
 2. **Does Phase 178's stacked sheets (Stove + Climate + ...) need any nesting support?**
    - What we know: D-13 says z-index 200/201; only one sheet open at a time per UX.
    - What's unclear: any pathological case where two sheets stack.
-   - Recommendation: Out of scope. If 178 hits this, add a higher-z-index variant in 178.
+   - **RESOLVED:** Out of scope for Phase 175. If Phase 178 hits this case, it can add a higher-z-index variant then; this primitive does NOT support nested sheets.
 
 3. **Should the demo Sheet section render long-enough content to trigger inner scroll, AND have above-the-fold content forcing the page to scroll, so SC-#4 scroll-lock can actually be smoke-tested at /debug/design-system-v2?**
    - What we know: Phase 174's page (`page.tsx`) is ~420 LOC of stacked sections — already scrollable on a 375×812 viewport.
-   - Recommendation: Inject 600px of dummy content INSIDE the Sheet body (so internal scroll can be eyeballed) AND rely on the existing page height for outer scroll-lock testing. Demo code in §"Code Examples" already does this.
+   - **RESOLVED:** Inject 600px of dummy content INSIDE the Sheet body (so internal scroll can be eyeballed) AND rely on the existing page height for outer scroll-lock testing. Demo code in §"Code Examples" already does this.
 
 ## Sources
 

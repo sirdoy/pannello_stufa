@@ -1,16 +1,16 @@
-import { Outfit, Space_Grotesk } from 'next/font/google';
+import { Outfit, Inter } from 'next/font/google';
 
 export const outfit = Outfit({
   subsets: ['latin'],
-  variable: '--font-display',
+  variable: '--font-display-outfit',
   display: 'swap',
   preload: true,
   adjustFontFallback: true,
 });
 
-export const spaceGrotesk = Space_Grotesk({
+export const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-body',
+  variable: '--font-body-inter',
   display: 'swap',
   preload: true,
   adjustFontFallback: true,

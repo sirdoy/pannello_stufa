@@ -4,8 +4,8 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: executing
 stopped_at: Phase 176 UI-SPEC approved
-last_updated: "2026-04-27T14:58:30.255Z"
-last_activity: 2026-04-27 -- Phase 176 planning complete
+last_updated: "2026-04-27T14:59:51.244Z"
+last_activity: 2026-04-27 -- Phase 176 execution started
 progress:
   total_phases: 9
   completed_phases: 2
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 175 — Glass Primitives — Press Animation & Sheet
+**Current focus:** Phase 176 — Post-Auth0 Splash Animation
 
 ## Current Position
 
-Phase: 175 (Glass Primitives — Press Animation & Sheet) — EXECUTING
-Plan: 1 of 3
-Status: Ready to execute
-Last activity: 2026-04-27 -- Phase 176 planning complete
+Phase: 176 (Post-Auth0 Splash Animation) — EXECUTING
+Plan: 1 of 4
+Status: Executing Phase 176
+Last activity: 2026-04-27 -- Phase 176 execution started
 
 Progress: [██████████] 100%
 

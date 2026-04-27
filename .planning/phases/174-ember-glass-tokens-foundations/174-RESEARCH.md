@@ -818,26 +818,26 @@ grep -rEn 'oklch\(' \
 |---|-------|---------|---------------|
 | A1 | The exact `@keyframes ambientA/B/C` transform sequences (drift + scale) match design intent | Code Examples §1 | Visual mismatch with design bundle; trivial to fix by reading `Design System.html` once during implementation. Recommend planner instructs implementer to verify against `.planning/inbox/ember-glass-design/project/Design System.html`. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Existing `@theme` font declarations — edit or override?**
    - What we know: `globals.css:209-211` declares `--font-display: 'Outfit', ...` and `--font-body: 'Space Grotesk', ...` inside `@theme`. New `:root` block (D-01) declares same names with `var(--font-display-outfit)` references.
    - What's unclear: D-03 says "additive, no removal" of legacy tokens, but the conflicting font declarations in `@theme` are NOT semantic Ember Noir tokens — they're font-family bindings. Strictly additive interpretation = leave them and rely on cascade order. Cleaner interpretation = remove them from `@theme` and let the `:root` block be the single source.
-   - Recommendation: **Cascade override (leave `@theme` alone)**. Reasoning: D-03 is explicit about additive policy; cascade override works correctly; later cleanup phase can remove the duplicate `@theme` lines. Document this decision in PLAN.md.
+   - RESOLVED: **Cascade override (leave `@theme` alone)**. Reasoning: D-03 is explicit about additive policy; cascade override works correctly; later cleanup phase can remove the duplicate `@theme` lines. Document this decision in PLAN.md.
 
 2. **Picker → AmbientBg communication mechanism**
    - What we know: Picker page is at `/debug/design-system-v2`; AmbientBg lives in `app/layout.tsx`. They are sibling-mounted — no parent-child prop path.
    - What's unclear: How should picker toggle update AmbientBg state without a full reload?
    - Options: (a) Custom DOM event (`window.dispatchEvent(new CustomEvent('ember-glass-ambient-change', {detail: bool}))`), (b) `storage` event (fires only across tabs, not same tab), (c) Tiny shared Zustand store, (d) React Context + portal.
-   - Recommendation: **(a) Custom event** — zero deps, decoupled, works for both picker and any future toggle source.
+   - RESOLVED: **(a) Custom event** — zero deps, decoupled, works for both picker and any future toggle source.
 
 3. **Should the inline pre-paint script live in layout.tsx or a separate component?**
    - What we know: Phase 149 historically had it inline in layout.tsx; design bundle doesn't dictate.
-   - Discretion (per CONTEXT.md). Recommendation: **Inline in layout.tsx** — short (~10 lines), single call site, easier to reason about cascade with `<head>` adjacent meta tags.
+   - Discretion (per CONTEXT.md). RESOLVED: **Inline in layout.tsx** — short (~10 lines), single call site, easier to reason about cascade with `<head>` adjacent meta tags.
 
 4. **Where to surface the picker entry from `/debug/page.tsx`?**
    - What we know: D-06 says picker is also linked from `/debug/page.tsx`. Existing /debug page has a "Design System" button at line 363-369 that links to `/debug/design-system`.
-   - Recommendation: Add a sibling "Design System v2" button right next to it, same shape, linking to `/debug/design-system-v2`. No tab refactor.
+   - RESOLVED: Add a sibling "Design System v2" button right next to it, same shape, linking to `/debug/design-system-v2`. No tab refactor.
 
 ## State of the Art
 

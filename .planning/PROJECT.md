@@ -10,18 +10,24 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v18.0 (shipped 2026-04-02)
-**Status:** Active — v19.0 API Alignment & Full Coverage (Phase 166 complete: Hue frontend cutover — all consumers on /api/v1/hue/*, legacy app/api/hue/ deleted)
+**Version:** v19.0 (shipped 2026-04-27)
+**Status:** Active — v20.0 Ember Glass Redesign (defining requirements)
 
-## Current Milestone: v18.0 Dark-Only & Mobile-First
+## Current Milestone: v20.0 Ember Glass Redesign
 
-**Goal:** Rimuovere completamente il tema light e la selezione tema, uniformare design system e tutte le pagine per essere mobile-first (min 375px).
+**Goal:** Migrare l'intera UI da "Ember Noir" a "Ember Glass" (estetica iOS 18 glass/blur), redisegnare dashboard a card quadrate equi-dimensionate list-based, redisegnare tab Stanze e Automazioni, aggiungere splash animation post-Auth0, e rilasciare pagina Design System di riferimento.
 
 **Target features:**
-- Rimozione completa tema light (CSS, variabili, toggle, logica di selezione)
-- Design system aggiornato come mobile-first (breakpoint, spacing, button groups, layout)
-- Tutte le pagine e sotto-pagine verificate e fixate per viewport 375px+
-- Design system come fonte unica di verità (DS aggiornato prima, poi propagato)
+- Design system "Ember Glass": token glass (bg/blur/border/shadow), accent oklch + 6 preset, font pairing Outfit (display) + Inter (body), ambient glow opzionale
+- Splash animation post-Auth0: logo fiamma → wordmark → fade in dashboard (~2s)
+- Dashboard a card quadrate equi-dimensionate (10 card list-based: Stove, Climate, Lights, Sonos, Weather, Camera, Network, Raspi, Tuya, Plugs)
+- Sheet modali ridisegnati per ogni dispositivo (Stove, Climate w/ zone+dial, Lights w/ scene+room, Sonos w/ player, Plugs report-only)
+- Tab Stanze data-driven: chip-grid 3×2 + sheet per-stanza con card dispositivo espanse
+- Editor Automazioni completo: trigger picker + condizioni AND/OR annidabili (≤2 livelli) + azioni multiple riordinabili + cooldown
+- Bottom tab bar glass (4 sezioni)
+- Pagina riferimento Design System (`/debug/design-system-v2`)
+
+**Source design bundle:** `.planning/inbox/ember-glass-design/` (README + chats/chat1.md + 7 .jsx component prototipi, ~4800 LOC)
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -874,4 +880,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-18 after Phase 166 completion*
+*Last updated: 2026-04-27 — milestone v20.0 Ember Glass Redesign started*

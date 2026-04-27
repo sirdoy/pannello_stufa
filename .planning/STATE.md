@@ -1,36 +1,36 @@
 ---
 gsd_state_version: 1.0
-milestone: v19.0
-milestone_name: API Alignment & Full Coverage
-status: milestone_complete
-stopped_at: Milestone v19.0 archived
-last_updated: "2026-04-27T08:00:00.000Z"
+milestone: v20.0
+milestone_name: Ember Glass Redesign
+status: defining_requirements
+stopped_at: ""
+last_updated: "2026-04-27T08:30:00.000Z"
 last_activity: 2026-04-27
 progress:
-  total_phases: 18
-  completed_phases: 18
-  total_plans: 39
-  completed_plans: 42
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-03)
+See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v19.0 shipped 2026-04-27 — planning next milestone
+**Current focus:** v20.0 Ember Glass Redesign — defining requirements
 
 ## Current Position
 
-Phase: —
+Phase: Not started (defining requirements)
 Plan: —
-Status: Milestone v19.0 archived
-Last activity: 2026-04-27 (milestone close)
+Status: Defining requirements
+Last activity: 2026-04-27 — Milestone v20.0 started
 
-Progress: [██████████] 100%
+Progress: [          ] 0%
 
 ## Performance Metrics
 

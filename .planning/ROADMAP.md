@@ -92,10 +92,10 @@
   4. Subsequent client-side route changes within the same session never re-trigger the splash (verified via in-app navigation between Home / Stanze / Automazioni).
   5. The dashboard's first device-data fetches start during the splash window so cards either render immediately or within their normal stale-data envelope after the splash unmounts.
 **Plans**: 4 plans
-- [ ] 176-01-flameviz-and-keyframes-PLAN.md — FlameViz primitive (verbatim port from bundle cards.jsx) + globals.css keyframes (pulse, flamePulse) + barrel export + jest unit tests (SPLASH-02) [Wave 1]
-- [ ] 176-02-splash-presentational-PLAN.md — Splash presentational component (4-phase state machine + reduced-motion variant) + useReducedMotion SSR-safe hook + barrel export + jest fake-timer tests (SPLASH-02, SPLASH-03) [Wave 2]
-- [ ] 176-03-splashgate-orchestrator-PLAN.md — SplashGate orchestrator (useUser + sessionStorage + useReducedMotion + ready state) + ClientProviders wiring + barrel export + jest unit tests with mocked Auth0 (SPLASH-01, SPLASH-04, SPLASH-05) [Wave 3]
-- [ ] 176-04-playwright-smoke-PLAN.md — tests/smoke/splash.spec.ts (5 specs covering all SPLASH-01..05 end-to-end) + /debug/design-system-v2 Replay splash button + manual verification checkpoint (SPLASH-01, SPLASH-02, SPLASH-03, SPLASH-04, SPLASH-05) [Wave 4]
+- [x] 176-01-flameviz-and-keyframes-PLAN.md — FlameViz primitive (verbatim port from bundle cards.jsx) + globals.css keyframes (pulse, flamePulse) + barrel export + jest unit tests (SPLASH-02) [Wave 1]
+- [x] 176-02-splash-presentational-PLAN.md — Splash presentational component (4-phase state machine + reduced-motion variant) + useReducedMotion SSR-safe hook + barrel export + jest fake-timer tests (SPLASH-02, SPLASH-03) [Wave 2]
+- [x] 176-03-splashgate-orchestrator-PLAN.md — SplashGate orchestrator (useUser + sessionStorage + useReducedMotion + ready state) + ClientProviders wiring + barrel export + jest unit tests with mocked Auth0 (SPLASH-01, SPLASH-04, SPLASH-05) [Wave 3]
+- [x] 176-04-playwright-smoke-PLAN.md — tests/smoke/splash.spec.ts (5 specs covering all SPLASH-01..05 end-to-end) + /debug/design-system-v2 Replay splash button + manual verification checkpoint (SPLASH-01, SPLASH-02, SPLASH-03, SPLASH-04, SPLASH-05) [Wave 4]
 **UI hint**: yes
 
 ### Phase 177: Equal-Size Dashboard Glass Cards
@@ -179,7 +179,7 @@
 |-------|----------------|--------|-----------|
 | 174. Ember Glass Tokens & Foundations | 0/0 | Not started | - |
 | 175. Glass Primitives — Press Animation & Sheet | 3/3 | Complete   | 2026-04-27 |
-| 176. Post-Auth0 Splash Animation | 0/0 | Not started | - |
+| 176. Post-Auth0 Splash Animation | 4/4 | Complete   | 2026-04-27 |
 | 177. Equal-Size Dashboard Glass Cards | 0/0 | Not started | - |
 | 178. Per-Device Modal Sheets | 0/0 | Not started | - |
 | 179. Rooms Tab Redesign | 0/0 | Not started | - |

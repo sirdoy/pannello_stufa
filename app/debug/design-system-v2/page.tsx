@@ -24,6 +24,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Pressable, Sheet } from '@/app/components/EmberGlass';
 
 // AUDIT-EXCEPTION (DS-02): the 6 oklch literal strings below are the source-of-truth
 // preset map (D-05). Every other visual value on this page is a token reference.
@@ -69,6 +70,7 @@ function setAmbient(on: boolean): void {
 export default function DesignSystemV2Page(): React.ReactElement {
   const [activeHue, setActiveHue] = useState<HueName>('copper');
   const [ambientOn, setAmbientOn] = useState<boolean>(false);
+  const [sheetOpen, setSheetOpen] = useState<boolean>(false);
 
   // Sync local state from persisted storage on mount. The inline pre-paint script
   // already applied --accent and dataset.ambient; this useEffect just rehydrates
@@ -415,6 +417,176 @@ export default function DesignSystemV2Page(): React.ReactElement {
             }}
           />
         </div>
+      </section>
+
+      {/* Section 05 — Press primitive demo (Phase 175 / DS-07) */}
+      <section aria-labelledby="sec-05-heading" style={{ marginBottom: 48 }}>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase',
+            color: 'var(--text-2)',
+          }}
+        >
+          05 / PRESS
+        </p>
+        <h2
+          id="sec-05-heading"
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 24,
+            fontWeight: 600,
+            color: 'var(--text-1)',
+            margin: '4px 0 8px 0',
+          }}
+        >
+          Animazione di pressione
+        </h2>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 16,
+            color: 'var(--text-2)',
+            marginBottom: 16,
+          }}
+        >
+          Tap o clicca per vedere scale(0.97) ↔ scale(1) con cubic-bezier(.34,1.56,.64,1) su 220ms
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          <Pressable
+            as="div"
+            data-testid="press-card-demo"
+            className="glass-surface"
+            style={{
+              aspectRatio: '1 / 1',
+              display: 'grid',
+              placeItems: 'center',
+              touchAction: 'manipulation',
+            }}
+          >
+            <span
+              style={{
+                fontSize: 16,
+                fontFamily: 'var(--font-display)',
+                fontWeight: 600,
+                color: 'var(--text-1)',
+              }}
+            >
+              Card
+            </span>
+          </Pressable>
+          <Pressable
+            as="button"
+            type="button"
+            className="glass-surface press-anim"
+            style={{
+              height: 56,
+              border: 0,
+              color: 'var(--text-1)',
+              fontFamily: 'var(--font-display)',
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: 'pointer',
+              touchAction: 'manipulation',
+            }}
+            aria-label="Esempio bottone pressabile"
+          >
+            Pressable button
+          </Pressable>
+          <Pressable
+            as="div"
+            className="glass-surface"
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 999,
+              justifySelf: 'center',
+              touchAction: 'manipulation',
+            }}
+          />
+        </div>
+      </section>
+
+      {/* Section 06 — Sheet primitive demo (Phase 175 / SHEET-01) */}
+      <section aria-labelledby="sec-06-heading" style={{ marginBottom: 48 }}>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase',
+            color: 'var(--text-2)',
+          }}
+        >
+          06 / SHEET
+        </p>
+        <h2
+          id="sec-06-heading"
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 24,
+            fontWeight: 600,
+            color: 'var(--text-1)',
+            margin: '4px 0 8px 0',
+          }}
+        >
+          Sheet primitivo
+        </h2>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 16,
+            color: 'var(--text-2)',
+            marginBottom: 16,
+          }}
+        >
+          Apri lo sheet di esempio per testare le tre vie di chiusura: Esc, tap fuori, e bottone X
+        </p>
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
+          style={{
+            height: 56,
+            padding: '0 24px',
+            borderRadius: 16,
+            border: 'none',
+            background: 'rgba(255,255,255,0.06)',
+            color: 'var(--text-1)',
+            fontFamily: 'var(--font-display)',
+            fontSize: 16,
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          Apri sheet demo
+        </button>
+        <Sheet open={sheetOpen} onClose={() => setSheetOpen(false)} title="Demo sheet">
+          {[
+            { primary: 'Riga 1', secondary: 'Contenuto fittizio' },
+            { primary: 'Riga 2', secondary: 'Contenuto fittizio' },
+            { primary: 'Riga di esempio lunga abbastanza da scrollare', secondary: 'Contenuto fittizio' },
+          ].map((row, i) => (
+            <div
+              key={i}
+              style={{
+                padding: '14px 0',
+                borderBottom: '0.5px solid var(--glass-border)',
+              }}
+            >
+              <div style={{ fontSize: 16, color: 'var(--text-1)', fontWeight: 600 }}>
+                {row.primary}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2 }}>
+                {row.secondary}
+              </div>
+            </div>
+          ))}
+          <div aria-hidden="true" style={{ height: 600 }} />
+        </Sheet>
       </section>
     </main>
   );

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v20.0
 milestone_name: Ember Glass Redesign
-status: completed
-stopped_at: Phase 175 context gathered
-last_updated: "2026-04-27T12:31:01.834Z"
-last_activity: 2026-04-27 — Phase 174 complete (3 plans, 6/6 DS requirements, /debug/design-system-v2 page shipped)
+status: executing
+stopped_at: Phase 175 UI-SPEC approved
+last_updated: "2026-04-27T13:09:43.089Z"
+last_activity: 2026-04-27 -- Phase 175 execution started
 progress:
   total_phases: 9
   completed_phases: 1
-  total_plans: 3
+  total_plans: 6
   completed_plans: 3
-  percent: 100
+  percent: 50
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v20.0 Ember Glass Redesign — Phase 174 complete (foundation tokens + AmbientBg + design-system-v2 page); ready for Phase 175 planning
+**Current focus:** Phase 175 — Glass Primitives — Press Animation & Sheet
 
 ## Current Position
 
-Phase: 174 — COMPLETE (3/3 plans)
-Plan: 174-03 complete
-Status: Phase 174 done; ready for `/gsd-plan-phase 175`
-Last activity: 2026-04-27 — Phase 174 complete (3 plans, 6/6 DS requirements, /debug/design-system-v2 page shipped)
+Phase: 175 (Glass Primitives — Press Animation & Sheet) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 175
+Last activity: 2026-04-27 -- Phase 175 execution started
 
 Progress: [██████████] 100%
 
@@ -109,7 +109,7 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-27 — Wrote ROADMAP.md for v20.0 Ember Glass Redesign (9 phases, 174-182, 50/50 reqs mapped)
-Stopped at: Phase 175 context gathered
+Stopped at: Phase 175 UI-SPEC approved
 Resume file: --resume-file
 
 **Next Action:** `/gsd-plan-phase 174` (Ember Glass Tokens & Foundations)
@@ -157,4 +157,4 @@ Items acknowledged and deferred at v19.0 milestone close on 2026-04-27. Carried 
 
 These are idea slugs scaffolded but never executed. Promote individually post-close if needed.
 
-**Planned Phase:** 174 (Ember Glass Tokens & Foundations) — 3 plans — 2026-04-27T09:42:22.269Z
+**Planned Phase:** 175 (Glass Primitives — Press Animation & Sheet) — 3 plans — 2026-04-27T13:08:57.254Z

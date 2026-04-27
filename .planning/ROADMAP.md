@@ -75,7 +75,10 @@
   3. The Sheet primitive can be dismissed via Escape key, tap on backdrop, and tap on the close button, and exposes a grabber + title bar in its header.
   4. Body scroll is locked while the Sheet is open and restored to the original scroll position on close.
   5. A Sheet preview rendered in isolation passes manual smoke at 375px (mobile) and 1024px (desktop) without layout regressions.
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 175-01-pressable-primitive-PLAN.md — Pressable component + usePressed hook + .press-anim CSS utility + jest unit tests (DS-07) [Wave 1]
+- [ ] 175-02-sheet-primitive-PLAN.md — Sheet primitive (Radix Dialog facade) + scroll-lock recipe + jest unit tests (SHEET-01) [Wave 1]
+- [ ] 175-03-barrel-demo-smoke-PLAN.md — EmberGlass barrel index.ts + design-system-v2 page Sections 05-06 + Playwright smoke specs (DS-07, SHEET-01) [Wave 2]
 **UI hint**: yes
 
 ### Phase 176: Post-Auth0 Splash Animation

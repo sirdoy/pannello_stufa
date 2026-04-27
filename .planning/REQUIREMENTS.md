@@ -29,11 +29,11 @@
 
 ### Splash Animation (post-Auth0)
 
-- [ ] **SPLASH-01**: After successful Auth0 sign-in (or session restore), the app renders a splash screen before mounting the dashboard
-- [ ] **SPLASH-02**: Splash sequence runs ~2s total: flame logo scales in → wordmark "Home" + subtitle "Connessione al gateway…" → "Autenticato · Auth0" badge in lower area → fade-out while dashboard scales in
-- [ ] **SPLASH-03**: Splash respects `prefers-reduced-motion: reduce` — collapses to a 200ms fade with no scale/transform
-- [ ] **SPLASH-04**: Splash never re-runs on subsequent in-session route changes; appears only on initial app entry per session
-- [ ] **SPLASH-05**: Splash unmount does not block the dashboard's first data fetch — fetches start during the splash window, results render when both ready
+- [x] **SPLASH-01**: After successful Auth0 sign-in (or session restore), the app renders a splash screen before mounting the dashboard
+- [x] **SPLASH-02**: Splash sequence runs ~2s total: flame logo scales in → wordmark "Home" + subtitle "Connessione al gateway…" → "Autenticato · Auth0" badge in lower area → fade-out while dashboard scales in
+- [x] **SPLASH-03**: Splash respects `prefers-reduced-motion: reduce` — collapses to a 200ms fade with no scale/transform
+- [x] **SPLASH-04**: Splash never re-runs on subsequent in-session route changes; appears only on initial app entry per session
+- [x] **SPLASH-05**: Splash unmount does not block the dashboard's first data fetch — fetches start during the splash window, results render when both ready
 
 ### Dashboard (equal-size glass cards)
 
@@ -139,11 +139,11 @@ All v20.0 requirements map to phases starting at Phase 174 (continuing numbering
 | DS-05 | Phase 174 | Complete |
 | DS-06 | Phase 174 | Complete |
 | DS-07 | Phase 175 | Pending |
-| SPLASH-01 | Phase 176 | Pending |
-| SPLASH-02 | Phase 176 | Pending |
-| SPLASH-03 | Phase 176 | Pending |
-| SPLASH-04 | Phase 176 | Pending |
-| SPLASH-05 | Phase 176 | Pending |
+| SPLASH-01 | Phase 176 | Complete |
+| SPLASH-02 | Phase 176 | Complete |
+| SPLASH-03 | Phase 176 | Complete |
+| SPLASH-04 | Phase 176 | Complete |
+| SPLASH-05 | Phase 176 | Complete |
 | DASH-01 | Phase 177 | Pending |
 | DASH-02 | Phase 177 | Pending |
 | DASH-03 | Phase 177 | Pending |

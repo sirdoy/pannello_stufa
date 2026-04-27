@@ -24,7 +24,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Pressable, Sheet } from '@/app/components/EmberGlass';
+import { Pressable, Sheet, SplashGate } from '@/app/components/EmberGlass';
 
 // AUDIT-EXCEPTION (DS-02): the 6 oklch literal strings below are the source-of-truth
 // preset map (D-05). Every other visual value on this page is a token reference.
@@ -71,6 +71,9 @@ export default function DesignSystemV2Page(): React.ReactElement {
   const [activeHue, setActiveHue] = useState<HueName>('copper');
   const [ambientOn, setAmbientOn] = useState<boolean>(false);
   const [sheetOpen, setSheetOpen] = useState<boolean>(false);
+  // Phase 176 (Claude's Discretion per UI-SPEC §"Copywriting Contract"): Replay splash demo.
+  // Increment forces a remount of <SplashGate forceShow> so the splash plays again.
+  const [replayKey, setReplayKey] = useState<number>(0);
 
   // Sync local state from persisted storage on mount. The inline pre-paint script
   // already applied --accent and dataset.ambient; this useEffect just rehydrates
@@ -587,6 +590,77 @@ export default function DesignSystemV2Page(): React.ReactElement {
           ))}
           <div aria-hidden="true" style={{ height: 600 }} />
         </Sheet>
+      </section>
+
+      {/* Section 07 — Splash demo (Phase 176 / SPLASH-01..05, Claude's Discretion).
+          Replay button clears sessionStorage flag and remounts an inner <SplashGate forceShow>
+          to allow visual regression iteration. The inner SplashGate's overlay is position:fixed
+          at z-index 1000, so it visually covers the page when triggered (intended demo behavior). */}
+      <section aria-labelledby="sec-07-heading" style={{ marginBottom: 48 }}>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '1.2px',
+            textTransform: 'uppercase',
+            color: 'var(--text-2)',
+          }}
+        >
+          07 / SPLASH
+        </p>
+        <h2
+          id="sec-07-heading"
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 24,
+            fontWeight: 600,
+            color: 'var(--text-1)',
+            margin: '4px 0 8px 0',
+          }}
+        >
+          Splash post-Auth0
+        </h2>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 16,
+            color: 'var(--text-2)',
+            marginBottom: 16,
+          }}
+        >
+          Pulisce sessionStorage e ri-monta lo splash per il regression test visivo
+        </p>
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              sessionStorage.removeItem('ember-glass-splash-shown');
+            } catch {
+              /* T-174-03-04 mirror: incognito / sessionStorage disabled — silently noop. */
+            }
+            setReplayKey((k) => k + 1);
+          }}
+          style={{
+            height: 56,
+            padding: '0 24px',
+            borderRadius: 16,
+            border: 'none',
+            background: 'rgba(255,255,255,0.06)',
+            color: 'var(--text-1)',
+            fontFamily: 'var(--font-display)',
+            fontSize: 16,
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          Replay splash
+        </button>
+        {replayKey > 0 && (
+          <SplashGate key={replayKey} forceShow>
+            <div aria-hidden="true" />
+          </SplashGate>
+        )}
       </section>
     </main>
   );

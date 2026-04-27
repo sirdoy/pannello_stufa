@@ -126,7 +126,9 @@
       "Bash(du -sh:*)",
       "Bash(git merge:*)",
       "Bash(rm -f __TRACKED_VAR__/.claude/cache/gsd-update-check.json ./.claude/cache/gsd-update-check.json)",
-      "Bash([ -f \"$HOME/.claude/gsd-local-patches/backup-meta.json\" ])"
+      "Bash([ -f \"$HOME/.claude/gsd-local-patches/backup-meta.json\" ])",
+      "Skill(gsd-audit-milestone)",
+      "Skill(gsd-audit-milestone:*)"
     ],
     "deny": [],
     "ask": []

@@ -1,12 +1,13 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
-import { outfit, spaceGrotesk } from './fonts';
+import { outfit, inter } from './fonts';
 import { WebVitals } from './_components/WebVitals';
 import Navbar from './components/Navbar';
 import { Footer } from './components/ui';
 import ClientProviders from './components/ClientProviders';
 import VersionEnforcer from './components/VersionEnforcer';
 import AppleSplashScreens from './components/AppleSplashScreens';
+import AmbientBg from './components/EmberGlass/AmbientBg';
 
 export const metadata: Metadata = {
   title: 'Pannello Stufa',
@@ -33,8 +34,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="it" data-scroll-behavior="smooth" className={`${outfit.variable} ${spaceGrotesk.variable} dark`} suppressHydrationWarning>
+    <html lang="it" data-scroll-behavior="smooth" className={`${outfit.variable} ${inter.variable} dark`} suppressHydrationWarning>
     <head>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `(function(){try{var a=localStorage.getItem('ember-glass-accent');var amb=localStorage.getItem('ember-glass-ambient');if(a){document.documentElement.style.setProperty('--accent',a);}if(amb==='true'){document.documentElement.dataset.ambient='on';}}catch(e){}})();`
+        }}
+      />
       <meta name="view-transition" content="same-origin" />
       {/* Preconnect: critical API domains */}
       <link rel="preconnect" href="https://pannellostufa-default-rtdb.europe-west1.firebasedatabase.app" />
@@ -51,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" content="#0f172a" />
     </head>
     <body className="min-h-screen bg-slate-900 text-slate-100 flex flex-col" suppressHydrationWarning>
+    <AmbientBg />
     {/* Skip to content - Accessibility */}
     <a
       href="#main-content"

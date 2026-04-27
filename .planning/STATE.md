@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v19.0
 milestone_name: API Alignment & Full Coverage
 status: milestone_complete
-stopped_at: Completed 173-03-PLAN.md
-last_updated: "2026-04-27T07:31:20.104Z"
+stopped_at: Milestone v19.0 archived
+last_updated: "2026-04-27T08:00:00.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 18
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-03)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 173 — Cross-Provider Device Aggregator
+**Current focus:** v19.0 shipped 2026-04-27 — planning next milestone
 
 ## Current Position
 
-Phase: 173
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-04-27
+Phase: —
+Plan: —
+Status: Milestone v19.0 archived
+Last activity: 2026-04-27 (milestone close)
 
 Progress: [██████████] 100%
 
@@ -103,3 +103,46 @@ Stopped at: Completed 173-03-PLAN.md
 Resume file: None
 
 **Planned Phase:** 173 (Cross-Provider Device Aggregator) — 4 plans — 2026-04-25T10:25:14.484Z
+
+## Deferred Items
+
+Items acknowledged and deferred at v19.0 milestone close on 2026-04-27.
+
+### Debug Sessions (7 — orphan `.resolved` state files)
+
+| Slug | Status |
+|------|--------|
+| build-errors-integration-tests.resolved | investigating |
+| build-errors-pages.resolved | investigating |
+| build-errors-tests-groupB.resolved | investigating |
+| build-errors-ui-tests.resolved | fixing |
+| device-activation-permission-denied.resolved | verifying |
+| netatmo-invalid-token.resolved | verifying |
+| permission-denied-panel-commands.resolved | checkpoint |
+
+### UAT Gaps (3 partial — v19.0 audit accepted)
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| 166 | partial | 1 pending: Firebase adminDbPush log write (live env) |
+| 169 | partial | 1 pending: /dirigera panels render (Playwright BYPASS_AUTH) |
+| 170 | partial | 4 pending: cookie httpOnly, plaintext API key auth, revoke 401, clipboard |
+
+### Verification Gaps (8)
+
+| Phase | Status | Notes |
+|-------|--------|-------|
+| 05 | gaps_found | Pre-v19.0 historical |
+| 39 | gaps_found | Pre-v19.0 historical |
+| 42 | gaps_found | Pre-v19.0 historical |
+| 50 | human_needed | Pre-v19.0 historical |
+| 158 | human_needed | v19.0 — code-verified, 3 browser smoke pending |
+| 166 | human_needed | v19.0 — code-verified, live env pending |
+| 169 | human_needed | v19.0 — code-verified, Playwright BYPASS_AUTH blocked |
+| 170 | human_needed | v19.0 — code-verified, browser/live UAT pending |
+
+### Quick Tasks (39 missing — backlog of unexecuted ideas in `.planning/quick/`)
+
+001..014, 15..32, 260319-kd7, 260322-t5k, 260325-ds8, 260328-jyf, 260331-dwi, 260331-eyf, 260423-n6i
+
+These are idea slugs scaffolded but never executed. Promote individually post-close if needed.

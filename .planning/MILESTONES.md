@@ -1,5 +1,49 @@
 # Project Milestones: Pannello Stufa
 
+## v19.0 API Alignment & Full Coverage (Shipped: 2026-04-27)
+
+**Delivered:** All 8 device providers fully unified on canonical `/api/v1/{provider}/*` namespace, every documented HA proxy endpoint exposed (auth, automations, Hue, Sonos, Netatmo, Fritz!Box, DIRIGERA gap closures), and every new endpoint wired through to a production UI consumer — closing the 52-requirement contract at 100% with audit-passed verification.
+
+**Phases completed:** 156-173 (18 phases, 39 plans)
+
+**Key accomplishments:**
+
+- Path canonicalization: thermorossi `/api/stove/*` → `/api/v1/thermorossi/*` (Phase 156), Fritz!Box `/api/fritzbox/**` → `/api/v1/fritzbox/**` (Phase 172, 28 routes + 20 tests via `git mv`); zero legacy refs repo-wide
+- 7 gap-closure proxy phases adding ~80 missing endpoints: Hue health/lights/groups/scenes (159), Sonos zone playback/transport/queue/play-mode/sleep-timer (160), Netatmo thermostat-state/valve-calibration/camera-advanced/home-mgmt (161), Fritz!Box telephony/raw-history/service-discovery (162), DIRIGERA history/stats/telemetry (163), auth login/api-keys CRUD (157), automations CRUD + execution history (158)
+- 6 frontend cutover phases wiring every gap-closure endpoint to production UI: Hue (166), Sonos (167), Netatmo (168), DIRIGERA (169), Auth UI login + /settings/api-keys (170), Fritz!Box `/telefonia` + raw-history tab + service-discovery debug (171)
+- Cross-provider device aggregator: `/api/v1/devices` rewritten as Promise.allSettled fan-out across all 7 providers with `provider_type` discriminator and partial-failure resilience (Phase 173)
+- Audit-driven gap closure: 2 audit rounds (2026-04-24 `gaps_found` → 2026-04-27 `passed`); phases 165, 172, 173 added post-audit to close milestone hygiene, FRITZ namespace mismatch, and COMMON-02 partial gap
+
+**Stats:**
+
+- 39 plans executed across 18 phases
+- 52/52 v19.0 requirements satisfied (100%)
+- 617 files changed (+76,466 insertions, -5,192 deletions, net +71,274 LOC)
+- 343 git commits with atomic changes
+- 25 days (2026-04-03 → 2026-04-27)
+
+**Git range:** `feat(156)` (c029f86b) → `docs(173)` (9488536d)
+
+**Archives:**
+
+- [Roadmap](milestones/v19.0-ROADMAP.md)
+- [Requirements](milestones/v19.0-REQUIREMENTS.md)
+- [Audit](milestones/v19.0-MILESTONE-AUDIT.md)
+
+**Tech debt (accepted):**
+
+- REQUIREMENTS.md traceability `Pending` checkboxes (bookkeeping; underlying VERIFICATION evidence green)
+- Human UAT: 8 scenarios across phases 158, 166, 169, 170 (require browser/live HA proxy)
+- Nyquist drafts: 9 phases (164-172) at status `draft`
+- Phase 165 has no VERIFICATION.md (planning-artifact phase, no source code to verify)
+- 7 orphan `.resolved` debug-session state files
+- 39 missing quick-task scaffolds in `.planning/quick/` (idea backlog)
+- Known deferred items at close: 60 (see STATE.md Deferred Items)
+
+**What's next:** All 8 device providers unified on canonical v1 namespace with full UI coverage. API-alignment milestone complete. Ready for next milestone (Scheduler API or new initiative).
+
+---
+
 ## v18.0 Dark-Only & Mobile-First (Shipped: 2026-04-02)
 
 **Delivered:** Light theme completely removed (dark-only codebase) and every page verified at 375px mobile viewport with Playwright automated checks.

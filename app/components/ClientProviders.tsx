@@ -9,6 +9,7 @@ import PWAInitializer from './PWAInitializer';
 import AxeDevtools from './AxeDevtools';
 import CommandPaletteProvider from './layout/CommandPaletteProvider';
 import InstallPrompt from '@/app/components/pwa/InstallPrompt';
+import { SplashGate } from '@/app/components/EmberGlass';
 import { ReactNode } from 'react';
 import { WebSocketContext } from '@/app/context/WebSocketContext';
 import { useWebSocketManager } from '@/lib/hooks/useWebSocketManager';
@@ -58,7 +59,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
                   <AxeDevtools />
                   <PWAInitializer />
                   <OfflineBanner fixed showPendingCount />
-                  {children}
+                  <SplashGate>{children}</SplashGate>
                   <InstallPrompt />
                 </CommandPaletteProvider>
               </ToastProvider>

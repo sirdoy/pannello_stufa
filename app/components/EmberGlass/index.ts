@@ -7,3 +7,5 @@ export { FlameViz } from './FlameViz';
 export type { FlameVizProps } from './FlameViz';
 export { Splash } from './Splash';
 export type { SplashProps } from './Splash';
+export { SplashGate } from './SplashGate';
+export type { SplashGateProps } from './SplashGate';

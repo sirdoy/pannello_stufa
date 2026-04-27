@@ -109,7 +109,7 @@ Requirements for API Alignment & Full Coverage milestone. Each maps to roadmap p
 | PATH-01 | Phase 156 → 164 (regression fix) | Pending |
 | PATH-02 | Phase 156 → 164 (regression fix) | Pending |
 | COMMON-01 | Phase 156 → 165 (spec alignment) | Pending |
-| COMMON-02 | Phase 156 → 165 (spec alignment) → 173 (cross-provider aggregator) | Pending |
+| COMMON-02 | Phase 156 → 165 (spec alignment) → 173 (cross-provider aggregator) | Complete |
 | AUTH-01 | Phase 157 + 170 (UI) | Complete |
 | AUTH-02 | Phase 157 + 170 (UI) | Complete |
 | AUTH-03 | Phase 157 + 170 (UI) | Complete |

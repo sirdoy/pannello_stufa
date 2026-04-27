@@ -121,24 +121,66 @@
 
 ## Traceability
 
-Filled by roadmapper. All v20.0 requirements above map to phases starting at Phase 174 (continuing numbering from v19.0).
+All v20.0 requirements map to phases starting at Phase 174 (continuing numbering from v19.0).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DS-01..07 | TBD | Pending |
-| SPLASH-01..05 | TBD | Pending |
-| DASH-01..12 | TBD | Pending |
-| SHEET-01..06 | TBD | Pending |
-| ROOMS-01..05 | TBD | Pending |
-| AUTO-01..08 | TBD | Pending |
-| NAV-01..04 | TBD | Pending |
-| DSREF-01..03 | TBD | Pending |
+| DS-01 | Phase 174 | Pending |
+| DS-02 | Phase 174 | Pending |
+| DS-03 | Phase 174 | Pending |
+| DS-04 | Phase 174 | Pending |
+| DS-05 | Phase 174 | Pending |
+| DS-06 | Phase 174 | Pending |
+| DS-07 | Phase 175 | Pending |
+| SPLASH-01 | Phase 176 | Pending |
+| SPLASH-02 | Phase 176 | Pending |
+| SPLASH-03 | Phase 176 | Pending |
+| SPLASH-04 | Phase 176 | Pending |
+| SPLASH-05 | Phase 176 | Pending |
+| DASH-01 | Phase 177 | Pending |
+| DASH-02 | Phase 177 | Pending |
+| DASH-03 | Phase 177 | Pending |
+| DASH-04 | Phase 177 | Pending |
+| DASH-05 | Phase 177 | Pending |
+| DASH-06 | Phase 177 | Pending |
+| DASH-07 | Phase 177 | Pending |
+| DASH-08 | Phase 177 | Pending |
+| DASH-09 | Phase 177 | Pending |
+| DASH-10 | Phase 177 | Pending |
+| DASH-11 | Phase 177 | Pending |
+| DASH-12 | Phase 177 | Pending |
+| SHEET-01 | Phase 175 | Pending |
+| SHEET-02 | Phase 178 | Pending |
+| SHEET-03 | Phase 178 | Pending |
+| SHEET-04 | Phase 178 | Pending |
+| SHEET-05 | Phase 178 | Pending |
+| SHEET-06 | Phase 178 | Pending |
+| ROOMS-01 | Phase 179 | Pending |
+| ROOMS-02 | Phase 179 | Pending |
+| ROOMS-03 | Phase 179 | Pending |
+| ROOMS-04 | Phase 179 | Pending |
+| ROOMS-05 | Phase 179 | Pending |
+| AUTO-01 | Phase 180 | Pending |
+| AUTO-02 | Phase 180 | Pending |
+| AUTO-03 | Phase 180 | Pending |
+| AUTO-04 | Phase 180 | Pending |
+| AUTO-05 | Phase 180 | Pending |
+| AUTO-06 | Phase 180 | Pending |
+| AUTO-07 | Phase 180 | Pending |
+| AUTO-08 | Phase 180 | Pending |
+| NAV-01 | Phase 181 | Pending |
+| NAV-02 | Phase 181 | Pending |
+| NAV-03 | Phase 181 | Pending |
+| NAV-04 | Phase 181 | Pending |
+| DSREF-01 | Phase 182 | Pending |
+| DSREF-02 | Phase 182 | Pending |
+| DSREF-03 | Phase 182 | Pending |
 
 **Coverage:**
 - v20.0 requirements: 50 total
-- Mapped to phases: 0 (pending roadmapper)
-- Unmapped: 50 ⚠️ (will be 0 after roadmap)
+- Mapped to phases: 50 ✓
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-27*
-*Last updated: 2026-04-27 — milestone v20.0 start*
+*Last updated: 2026-04-27 — roadmap traceability filled*

@@ -2,12 +2,13 @@
 gsd_state_version: 1.0
 milestone: v20.0
 milestone_name: Ember Glass Redesign
-status: defining_requirements
+status: roadmap_complete
 stopped_at: ""
-last_updated: "2026-04-27T08:30:00.000Z"
+last_updated: "2026-04-27T10:00:00.000Z"
 last_activity: 2026-04-27
+next_phase: 174
 progress:
-  total_phases: 0
+  total_phases: 9
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -21,16 +22,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v20.0 Ember Glass Redesign — defining requirements
+**Current focus:** v20.0 Ember Glass Redesign — roadmap complete, ready for Phase 174 planning
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 174 (next — not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-27 — Milestone v20.0 started
+Status: Roadmap complete; awaiting `/gsd-plan-phase 174`
+Last activity: 2026-04-27 — ROADMAP.md written for v20.0 (9 phases, 174-182, 50/50 reqs mapped)
 
-Progress: [          ] 0%
+Progress: [          ] 0% (0/9 phases)
 
 ## Performance Metrics
 
@@ -38,6 +39,7 @@ Progress: [          ] 0%
 
 - Total plans completed (all milestones): 467
 - v18.0 average: 2.1 plans/phase (15 plans / 7 phases)
+- v19.0 average: 2.2 plans/phase (39 plans / 18 phases)
 
 **By Milestone (recent):**
 
@@ -46,13 +48,24 @@ Progress: [          ] 0%
 | v17.0 WebSocket Real-Time Transport | 139-144 | 11 | 3 days |
 | v17.1 WebSocket Alignment & Tuya Integration | 145-148 | 10 | 3 days |
 | v18.0 Dark-Only & Mobile-First | 149-155 | 15 | 2 days |
-| Phase 168-netatmo-frontend-cutover P03 | 67min | 1 tasks | 33 files |
-| Phase 169-dirigera-frontend-cutover P01 | 40 | 5 tasks | 14 files |
-| Phase 169-dirigera-frontend-cutover P02 | 57 | 7 tasks | 11 files |
-| Phase 169-dirigera-frontend-cutover P03 | 15 | 5 tasks | 5 files |
-| Phase 173 P02 | 4 | 1 tasks | 1 files |
-| Phase 173 P04 | 3 | 1 tasks | 1 files |
-| Phase 173 P03 | 6 | 1 tasks | 2 files |
+| v19.0 API Alignment & Full Coverage | 156-173 | 39 | 25 days |
+| v20.0 Ember Glass Redesign | 174-182 | TBD | in progress |
+
+## v20.0 Phase Map
+
+| Phase | Slug | Reqs | Depends on |
+|-------|------|------|------------|
+| 174 | ember-glass-tokens | DS-01..06 (6) | — |
+| 175 | glass-primitives | DS-07, SHEET-01 (2) | 174 |
+| 176 | splash-animation | SPLASH-01..05 (5) | 174 |
+| 177 | dashboard-cards | DASH-01..12 (12) | 174, 175 |
+| 178 | device-sheets | SHEET-02..06 (5) | 175, 177 |
+| 179 | rooms-tab | ROOMS-01..05 (5) | 175, 178 |
+| 180 | automations-editor | AUTO-01..08 (8) | 175 |
+| 181 | nav-glass | NAV-01..04 (4) | 174, 178 |
+| 182 | design-system-reference-v2 | DSREF-01..03 (3) | 174-181 |
+
+**Coverage:** 50/50 v20.0 requirements mapped (100%).
 
 ## Accumulated Context
 
@@ -60,22 +73,17 @@ Progress: [          ] 0%
 
 See PROJECT.md Key Decisions table for full history.
 
-Recent decisions affecting v19.0:
+Recent decisions affecting v20.0 scope (carried over from v19.0 close):
 
 - Scheduler endpoints explicitly excluded from v19.0 (future milestone)
 - v19.0 covers proxy client + API routes only; no dedicated UI pages
 - All endpoints follow established pattern: proxy client function -> API route -> (optional hook)
-- [Plan 168-02] Netatmo v1 camera snapshot emits 302 redirect (NextResponse.redirect) to preserve <img src> compat without client rewrite (Q3)
-- [Plan 168-02] Legacy /schedules endpoint DROPPED (D-04); schedules now extracted from /homesdata body.homes[0].schedules in useScheduleData
-- [Plan 168-02] jest.setup.ts NextResponseMock gained static .redirect() (Rule 1 fix — auto-applied when Task 4 Jest matrix caught Task 1 regression)
-- [Phase 168-netatmo-frontend-cutover]: [Plan 168-03] Legacy app/api/netatmo/ tree deleted (33 files: 18 route.ts + 2 co-located tests + 13 legacy __tests__/ files). Zero /api/netatmo/ refs remain in production; 26 netatmo Jest suites (98 tests) green. Phase 168 complete: all 9 NETA-XX wired via /api/v1/netatmo/** only.
-- Full passthrough vs explicit spread for v1 dirigera routes: health+sensors/summary use passthrough, sensors/contact/motion use explicit { sensors, count, is_stale } spread (D-02)
-- WS subscribe/unsubscribe('dirigera',...) topic strings left byte-for-byte unchanged in URL swap (Pitfall 2)
-- Three independent hooks per D-07 (useDirigeraStats/History/Telemetry) — not folded into useDirigeraFullData; replace-on-poll/append-on-loadMore per Pitfall 6
-- Panel headings use semantic <h2> with token classes (not Heading design-system component) to avoid unverified import dependency
-- git rm -r app/api/dirigera/ atomically deleted all 5 legacy route.ts files; v1 surface (8 routes) intact pre and post
-- [Plan 173-04] Documentation update shipped in Phase 173 (D-21 closed); errors[] (D-13) and ?provider_type= filter (D-20) documented with examples
-- [Plan 173-03] Route uses parseQuery(request) instead of request.nextUrl.searchParams to keep handlers testable with plain Request objects (matches automations canonical pattern)
+- v20.0 is UI-only: zero backend/API route changes; v19.0 surface is final
+- Light theme remains explicitly out of scope (v18.0 lockdown); Ember Glass is dark-only
+- Recharts charts on /network /analytics /tuya kept as-is for v20.0 (only containing pages adopt glass)
+- Orchestrator pattern (StoveCard/LightsCard, v7.0) preserved; only presentational layer changes
+- Splash branding (logo/wordmark glyphs) reuses existing flame mark; only the animation is new
+- Mobile gesture library (swipe-to-dismiss sheets) deferred; tap/Escape/backdrop sufficient for v20.0
 
 ### Pending Todos
 
@@ -98,15 +106,15 @@ None.
 
 ## Session Continuity
 
-Last activity: 2026-04-23 — Completed quick task 260423-n6i (jest config performance fix)
-Stopped at: Completed 173-03-PLAN.md
+Last activity: 2026-04-27 — Wrote ROADMAP.md for v20.0 Ember Glass Redesign (9 phases, 174-182, 50/50 reqs mapped)
+Stopped at: Roadmap complete; ready for `/gsd-plan-phase 174`
 Resume file: None
 
-**Planned Phase:** 173 (Cross-Provider Device Aggregator) — 4 plans — 2026-04-25T10:25:14.484Z
+**Next Action:** `/gsd-plan-phase 174` (Ember Glass Tokens & Foundations)
 
 ## Deferred Items
 
-Items acknowledged and deferred at v19.0 milestone close on 2026-04-27.
+Items acknowledged and deferred at v19.0 milestone close on 2026-04-27. Carried into v20.0 unchanged.
 
 ### Debug Sessions (7 — orphan `.resolved` state files)
 

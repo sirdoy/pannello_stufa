@@ -35,7 +35,7 @@
 <details open>
 <summary>🚧 v20.0 Ember Glass Redesign (Phases 174-182) — IN PROGRESS</summary>
 
-- [ ] Phase 174: Ember Glass Tokens & Foundations (0/3 plans) — planned
+- [x] Phase 174: Ember Glass Tokens & Foundations (3/3 plans) — complete 2026-04-27
 - [ ] Phase 175: Glass Primitives — Press Animation & Sheet (0/0 plans) — not started
 - [ ] Phase 176: Post-Auth0 Splash Animation (0/0 plans) — not started
 - [ ] Phase 177: Equal-Size Dashboard Glass Cards (0/0 plans) — not started
@@ -60,9 +60,9 @@
   4. Ambient radial-gradient glow is togglable via a user preference, persists in `localStorage`, and survives a hard reload.
   5. Glass surfaces apply `backdrop-filter: blur() saturate(180%)` with `-webkit-backdrop-filter` fallback; on a browser that does not support `backdrop-filter` (feature query `@supports not`), surfaces fall back to a solid translucent background instead of becoming illegible.
 **Plans**: 3 plans
-- [ ] 174-01-token-foundations-PLAN.md — Ember Glass token block on :root + Inter font swap + .glass-surface utility + @supports fallback + ambient keyframes (DS-01, DS-04, DS-06) [Wave 1]
-- [ ] 174-02-ambient-bg-prepaint-PLAN.md — AmbientBg client provider + inline pre-paint script in app/layout.tsx for accent + ambient hydration without flash (DS-03, DS-05) [Wave 1]
-- [ ] 174-03-design-system-v2-page-PLAN.md — /debug/design-system-v2 page (6-hue picker + ambient toggle + token grid + glass demo) + 3 Playwright smoke specs + DS-02 audit + /debug nav link (DS-02, DS-03, DS-04, DS-05) [Wave 2]
+- [x] 174-01-token-foundations-PLAN.md — Ember Glass token block on :root + Inter font swap + .glass-surface utility + @supports fallback + ambient keyframes (DS-01, DS-04, DS-06) [Wave 1]
+- [x] 174-02-ambient-bg-prepaint-PLAN.md — AmbientBg client provider + inline pre-paint script in app/layout.tsx for accent + ambient hydration without flash (DS-03, DS-05) [Wave 1]
+- [x] 174-03-design-system-v2-page-PLAN.md — /debug/design-system-v2 page (6-hue picker + ambient toggle + token grid + glass demo) + 3 Playwright smoke specs + DS-02 audit + /debug nav link (DS-02, DS-03, DS-04, DS-05) [Wave 2]
 **UI hint**: yes
 
 ### Phase 175: Glass Primitives — Press Animation & Sheet

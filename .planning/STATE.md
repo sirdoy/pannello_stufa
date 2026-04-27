@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: completed
-stopped_at: Completed 174-02-PLAN.md
-last_updated: "2026-04-27T10:30:00.000Z"
-last_activity: 2026-04-27 — Plan 174-02 complete (AmbientBg client provider + inline pre-paint script in layout.tsx, 7 unit tests)
+stopped_at: Completed 174-03-PLAN.md
+last_updated: "2026-04-27T10:00:22.980Z"
+last_activity: 2026-04-27 — ROADMAP.md written for v20.0 (9 phases, 174-182, 50/50 reqs mapped)
 progress:
   total_phases: 9
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** v20.0 Ember Glass Redesign — roadmap complete, ready for Phase 174 planning
+**Current focus:** v20.0 Ember Glass Redesign — Phase 174 complete (foundation tokens + AmbientBg + design-system-v2 page); ready for Phase 175 planning
 
 ## Current Position
 
-Phase: 174 (next — not started)
-Plan: —
-Status: Roadmap complete; awaiting `/gsd-plan-phase 174`
-Last activity: 2026-04-27 — ROADMAP.md written for v20.0 (9 phases, 174-182, 50/50 reqs mapped)
+Phase: 174 — COMPLETE (3/3 plans)
+Plan: 174-03 complete
+Status: Phase 174 done; ready for `/gsd-plan-phase 175`
+Last activity: 2026-04-27 — Phase 174 complete (3 plans, 6/6 DS requirements, /debug/design-system-v2 page shipped)
 
-Progress: [███░░░░░░░] 33%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -50,6 +50,7 @@ Progress: [███░░░░░░░] 33%
 | v19.0 API Alignment & Full Coverage | 156-173 | 39 | 25 days |
 | v20.0 Ember Glass Redesign | 174-182 | TBD | in progress |
 | Phase 174 P01 | 3min | 2 tasks | 2 files |
+| Phase 174 P03 | 25min | 3 tasks | 7 files |
 
 ## v20.0 Phase Map
 
@@ -84,6 +85,7 @@ Recent decisions affecting v20.0 scope (carried over from v19.0 close):
 - Orchestrator pattern (StoveCard/LightsCard, v7.0) preserved; only presentational layer changes
 - Splash branding (logo/wordmark glyphs) reuses existing flame mark; only the animation is new
 - Mobile gesture library (swipe-to-dismiss sheets) deferred; tap/Escape/backdrop sufficient for v20.0
+- Phase 174-03: Hand-rolled <button role='switch'> + 6-swatch picker dispatch CustomEvent ember-glass-ambient-change to AmbientBg
 
 ### Pending Todos
 
@@ -107,8 +109,8 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-27 — Wrote ROADMAP.md for v20.0 Ember Glass Redesign (9 phases, 174-182, 50/50 reqs mapped)
-Stopped at: Completed 174-01-PLAN.md
-Resume file: None
+Stopped at: Completed 174-03-PLAN.md
+Resume file: Playwright runtime deferred (Auth0 storageState stale)
 
 **Next Action:** `/gsd-plan-phase 174` (Ember Glass Tokens & Foundations)
 

@@ -15,11 +15,14 @@
 
 - [x] **DS-01
 **: Project exposes Ember Glass design tokens as CSS variables — `--glass-bg`, `--glass-blur`, `--glass-border`, `--glass-shadow`, `--accent` (oklch), `--text-1`, `--text-2`, `--r-card`, `--pad-card`, `--font-display`, `--font-body`
-- [ ] **DS-02**: Tokens drive all surfaces — no hardcoded glass/blur/accent colors remain in component files (verifiable via grep)
-- [ ] **DS-03**: Accent color supports oklch hue shifting (default copper); 6 preset hues available (copper, rose, violet, blue, green, amber) selectable from a developer toolbar in `/debug`
+- [x] **DS-02
+**: Tokens drive all surfaces — no hardcoded glass/blur/accent colors remain in component files (verifiable via grep)
+- [x] **DS-03
+**: Accent color supports oklch hue shifting (default copper); 6 preset hues available (copper, rose, violet, blue, green, amber) selectable from a developer toolbar in `/debug`
 - [x] **DS-04
 **: Typography pair active — Outfit for `var(--font-display)` (numbers/headlines), Inter for `var(--font-body)` (text); both self-hosted via existing `next/font` pipeline (no Google CDN roundtrip)
-- [ ] **DS-05**: Optional ambient background glow (radial gradient under app shell) is togglable per user preference and persists in localStorage
+- [x] **DS-05
+**: Optional ambient background glow (radial gradient under app shell) is togglable per user preference and persists in localStorage
 - [x] **DS-06
 **: All glass surfaces apply `backdrop-filter: blur(var(--glass-blur)) saturate(180%)` with WebKit fallback; degrades gracefully on browsers without `backdrop-filter` support
 - [ ] **DS-07**: Card press animation (`scale(0.97)` with cubic-bezier `.34,1.56,.64,1`, 220ms) is a shared utility used by all interactive glass surfaces
@@ -86,7 +89,8 @@
 
 - [ ] **DSREF-01**: New route `/debug/design-system-v2` renders a single-page reference for Ember Glass — colors (accent + neutrals + tones), typography pairs, spacing/radius scale, shadow/blur values, and live component samples (GlassCard, CardHead, StatusDot, InlineToggle, CircBtn, Stepper, Slider, BigSlider, RadialDial, Sheet preview, MiniStat, FlameViz, PlayingBars)
 - [ ] **DSREF-02**: Page is the **single source of truth** — every visual primitive used by dashboard/sheets/rooms/automations appears here with copy-paste-ready code snippet (or token reference) per sample
-- [ ] **DSREF-03**: Page exposes the developer accent picker (DS-03) inline so designers can preview hue shifts against all primitives at once
+- [x] **DSREF-03**: Page exposes the developer accent picker (DS-03
+) inline so designers can preview hue shifts against all primitives at once
 
 ---
 
@@ -128,12 +132,12 @@ All v20.0 requirements map to phases starting at Phase 174 (continuing numbering
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DS-01 | Phase 174 | Pending |
-| DS-02 | Phase 174 | Pending |
-| DS-03 | Phase 174 | Pending |
-| DS-04 | Phase 174 | Pending |
-| DS-05 | Phase 174 | Pending |
-| DS-06 | Phase 174 | Pending |
+| DS-01 | Phase 174 | Complete |
+| DS-02 | Phase 174 | Complete |
+| DS-03 | Phase 174 | Complete |
+| DS-04 | Phase 174 | Complete |
+| DS-05 | Phase 174 | Complete |
+| DS-06 | Phase 174 | Complete |
 | DS-07 | Phase 175 | Pending |
 | SPLASH-01 | Phase 176 | Pending |
 | SPLASH-02 | Phase 176 | Pending |

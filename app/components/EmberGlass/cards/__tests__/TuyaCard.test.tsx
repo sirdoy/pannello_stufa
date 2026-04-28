@@ -118,9 +118,21 @@ describe('TuyaCard (Phase 177 — DASH-10)', () => {
       plugs: [],
       loading: false, error: null, stale: false, lastUpdatedAt: 1,
     });
-    const { getByTestId, queryByText } = render(<TuyaCard />);
-    expect(queryByText(/Controlli in arrivo/i)).toBeNull();
+    const { getByTestId, queryByText, queryByRole } = render(<TuyaCard />);
+    // Sheet uses forceMount → body is in DOM but dialog content has translateY(110%)
+    // when closed. We assert the dialog visibility transition via the inline transform.
+    const dialogBefore = document.querySelector('[role="dialog"]') as HTMLElement | null;
+    if (dialogBefore) {
+      expect(dialogBefore.getAttribute('style') ?? '').toContain('translateY(110%)');
+    } else {
+      expect(dialogBefore).toBeNull();
+    }
     fireEvent.click(getByTestId('tuya-card'));
+    // After click → dialog should be present and translated to 0
+    const dialogAfter = queryByRole('dialog');
+    expect(dialogAfter).not.toBeNull();
+    expect(dialogAfter!.getAttribute('style') ?? '').toContain('translateY(0)');
+    // Placeholder body content matches expected copy.
     expect(queryByText(/Controlli in arrivo/i)).toBeInTheDocument();
   });
 

@@ -1587,8 +1587,19 @@
 }
 
 /* Phase 176 — extend reduced-motion guard for splash badge dot + FlameViz inner flames.
-   See CONTEXT.md D-17/D-18 (reduced-motion contract) and UI-SPEC §"CSS Keyframes". */
+   See CONTEXT.md D-17/D-18 (reduced-motion contract) and UI-SPEC §"CSS Keyframes".
+   Phase 177 — PlayingBars (Sonos 3-bar animation) reduced-motion guard appended below. */
 @media (prefers-reduced-motion: reduce) {
   [data-testid="splash-badge"] > div:first-child { animation: none !important; }
   [data-flame-viz="true"] > div { animation: none !important; }
+  [data-testid="playing-bars"] > div { animation: none !important; }
 }
+
+/* Phase 177 — PlayingBars (Sonos 3-bar animation) keyframes (DASH-05 enabling).
+   Bundle source: .planning/inbox/ember-glass-design/project/components/cards.jsx:267-269.
+   Each bar oscillates between a baseline and a peak height using a different
+   profile per index so the three bars never appear in lock-step. Consumed by
+   <PlayingBars /> at app/components/EmberGlass/PlayingBars.tsx. */
+@keyframes sonosBar0 { 0%, 100% { height: 4px; } 50% { height: 9px; } }
+@keyframes sonosBar1 { 0%, 100% { height: 6px; } 50% { height: 4px; } }
+@keyframes sonosBar2 { 0%, 100% { height: 5px; } 50% { height: 8px; } }

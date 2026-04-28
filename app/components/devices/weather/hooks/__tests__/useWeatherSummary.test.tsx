@@ -33,14 +33,17 @@ const okForecast = {
 };
 
 const mockUnsubscribe = jest.fn();
+const originalFetch = global.fetch;
 
 beforeEach(() => {
-  jest.resetAllMocks();
-  mockUnsubscribe.mockClear();
+  mockedSubscribe.mockReset();
+  mockUnsubscribe.mockReset();
+  // Default fetch stub — individual tests override via mockResolvedValueOnce / mockRejectedValueOnce.
+  global.fetch = jest.fn() as unknown as typeof fetch;
 });
 
 afterEach(() => {
-  jest.restoreAllMocks();
+  global.fetch = originalFetch;
 });
 
 describe('useWeatherSummary (Phase 177 — DASH-06)', () => {
@@ -69,18 +72,18 @@ describe('useWeatherSummary (Phase 177 — DASH-06)', () => {
       return mockUnsubscribe;
     });
 
-    const fetchSpy = jest
-      .spyOn(global, 'fetch')
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(okForecast),
-      } as Response);
+    // Use mockResolvedValue (not Once) — React StrictMode (jest.setup.ts) double-invokes
+    // useEffect in tests, so the hook may issue two fetches. Both should land on okForecast.
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(okForecast),
+    } as Response);
 
     const { result } = renderHook(() => useWeatherSummary());
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(fetchSpy).toHaveBeenCalledWith(
+    expect(global.fetch).toHaveBeenCalledWith(
       expect.stringContaining('/api/weather/forecast?lat=45.4642&lon=9.19'),
     );
     expect(result.current.city).toBe('Milano');
@@ -101,9 +104,9 @@ describe('useWeatherSummary (Phase 177 — DASH-06)', () => {
       return mockUnsubscribe;
     });
 
-    jest
-      .spyOn(global, 'fetch')
-      .mockRejectedValueOnce(new Error('network down'));
+    // Use mockRejectedValue (not Once) — React StrictMode double-mount triggers two fetch
+    // attempts; both should reject. Hook flips loading=false, fields stay null.
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('network down'));
 
     const { result } = renderHook(() => useWeatherSummary());
 
@@ -120,8 +123,12 @@ describe('useWeatherSummary (Phase 177 — DASH-06)', () => {
     mockedSubscribe.mockImplementation(() => mockUnsubscribe);
 
     const { unmount } = renderHook(() => useWeatherSummary());
+    const beforeUnmount = mockUnsubscribe.mock.calls.length;
     unmount();
-    expect(mockUnsubscribe).toHaveBeenCalledTimes(1);
+    // Final unmount must trigger at least one additional unsubscribe call.
+    // (Under React StrictMode the cleanup also fires once during the
+    // intentional double-mount, so the total may be 2.)
+    expect(mockUnsubscribe.mock.calls.length).toBeGreaterThan(beforeUnmount);
   });
 
   test('handles location with no coordinates (loading flips to false, no fetch)', async () => {
@@ -129,13 +136,12 @@ describe('useWeatherSummary (Phase 177 — DASH-06)', () => {
       cb(null);
       return mockUnsubscribe;
     });
-    const fetchSpy = jest.spyOn(global, 'fetch');
 
     const { result } = renderHook(() => useWeatherSummary());
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(global.fetch).not.toHaveBeenCalled();
     expect(result.current.temp).toBeNull();
   });
 });

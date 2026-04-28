@@ -1,0 +1,99 @@
+'use client';
+
+/**
+ * TuyaCard — Phase 177 (DASH-10).
+ *
+ * Bundle source: .planning/inbox/ember-glass-design/project/components/cards.jsx:385-432.
+ *
+ * Per DASH-10, the dashboard surface is REPORT-ONLY: NO inline toggles, NO switch role.
+ * Plug toggles live in the PlugsSheet (Phase 178). Tapping the card opens the placeholder
+ * sheet wired to `<SheetPlaceholderBody phase="178" device="plugs-tuya" />`.
+ *
+ * Hook field mapping — `TuyaPlug` (types/tuyaProxy.ts:33-46) exposes:
+ *   device_id   → row key + fallback name
+ *   switch_on   → on-state (boolean | null; null = UNREACHABLE → treated as off)
+ *   power_w     → wattage contribution (null tolerated → 0)
+ *   custom_name → display name (null → falls back to device_id)
+ *
+ * RC-clean — no manual memoization hooks (D-28 — React Compiler discipline).
+ */
+
+import { useState } from 'react';
+import { Plug } from 'lucide-react';
+import { GlassCard } from '../GlassCard';
+import { CardHead } from '../CardHead';
+import { StatusDot } from '../StatusDot';
+import { Sheet } from '../Sheet';
+import { SheetPlaceholderBody } from './SheetPlaceholderBody';
+import { useTuyaData } from '@/app/components/devices/tuya/hooks/useTuyaData';
+
+const TONE = '#ffb84a';
+
+function formatPower(w: number): string {
+  return w >= 1000 ? `${(w / 1000).toFixed(1)}kW` : `${w}W`;
+}
+
+export default function TuyaCard() {
+  const [open, setOpen] = useState(false);
+  const { plugs } = useTuyaData();
+  const list = plugs ?? [];
+  const visible = list.slice(0, 4);
+  const onCount = list.filter((p) => p.switch_on === true).length;
+  const totalPower = list.reduce((s, p) => s + (p.power_w ?? 0), 0);
+
+  const right = (
+    <div
+      style={{
+        fontSize: 11,
+        fontWeight: 600,
+        color: TONE,
+        letterSpacing: 0.3,
+        fontVariantNumeric: 'tabular-nums',
+      }}
+    >
+      {formatPower(totalPower)}
+    </div>
+  );
+
+  return (
+    <>
+      <GlassCard tone={TONE} onOpen={() => setOpen(true)} data-testid="tuya-card">
+        <CardHead Icon={Plug} label="Prese smart" tone={TONE} right={right} />
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 5,
+            flex: 1,
+            justifyContent: 'center',
+          }}
+        >
+          {visible.map((p) => (
+            <div
+              key={p.device_id}
+              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <StatusDot on={p.switch_on === true} color={TONE} />
+              <div
+                style={{
+                  flex: 1,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: '#fff',
+                }}
+              >
+                {p.custom_name ?? p.device_id}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-2)' }}>
+          {onCount} di {list.length} accese
+        </div>
+      </GlassCard>
+      <Sheet open={open} onClose={() => setOpen(false)} title="Prese smart">
+        <SheetPlaceholderBody phase="178" device="plugs-tuya" />
+      </Sheet>
+    </>
+  );
+}

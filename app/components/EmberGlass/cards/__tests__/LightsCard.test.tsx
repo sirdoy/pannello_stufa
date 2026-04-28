@@ -93,8 +93,10 @@ describe('LightsCard (Phase 177 — DASH-04)', () => {
     expect(handleAllLightsToggle).toHaveBeenCalledTimes(1);
     expect(handleAllLightsToggle).toHaveBeenCalledWith(false);
 
-    // Sheet placeholder body must NOT be present (stopPropagation prevented sheet open)
-    expect(screen.queryByText(/Controlli in arrivo/)).toBeNull();
+    // Sheet must remain closed (stopPropagation prevented parent click → onOpen).
+    // Sheet uses Radix forceMount, so we assert the dialog data-state = "closed".
+    const dialog = document.querySelector('[role="dialog"]');
+    expect(dialog?.getAttribute('data-state')).toBe('closed');
   });
 
   test('(d) clicking card body opens the sheet with the placeholder body', () => {
@@ -107,8 +109,15 @@ describe('LightsCard (Phase 177 — DASH-04)', () => {
 
     render(<LightsCard />);
 
-    expect(screen.queryByText(/Controlli in arrivo/)).toBeNull();
+    // Initial: dialog mounted but closed
+    const dialogBefore = document.querySelector('[role="dialog"]');
+    expect(dialogBefore?.getAttribute('data-state')).toBe('closed');
+
     fireEvent.click(screen.getByTestId('lights-card'));
+
+    // After click: dialog is open AND placeholder body is rendered
+    const dialogAfter = document.querySelector('[role="dialog"]');
+    expect(dialogAfter?.getAttribute('data-state')).toBe('open');
     expect(screen.getByText(/Controlli in arrivo nella Phase 178/)).toBeInTheDocument();
   });
 

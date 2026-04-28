@@ -22,7 +22,9 @@ describe('StatusDot (Phase 177 — DASH-01)', () => {
   test('custom color is honored when on={true}', () => {
     const { getByTestId } = render(<StatusDot on color="#5eafff" />);
     const el = getByTestId('status-dot');
-    expect(el.style.background).toContain('#5eafff');
+    // jsdom normalizes hex → rgb in style.background; assert via rgb form.
+    // boxShadow is preserved verbatim (jsdom keeps the literal hex inside box-shadow).
+    expect(el.style.background).toContain('rgb(94, 175, 255)');
     expect(el.style.boxShadow).toContain('#5eafff');
   });
 });

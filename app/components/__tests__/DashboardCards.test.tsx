@@ -29,53 +29,57 @@ jest.mock('@/lib/services/unifiedDeviceConfigService', () => ({
   getVisibleDashboardCards: jest.fn(),
 }));
 
-// Mock @/lib/utils/dashboardColumns
-jest.mock('@/lib/utils/dashboardColumns', () => ({
-  splitIntoColumns: jest.fn(),
-}));
-
-// Mock all 6 card components
-jest.mock('@/app/components/devices/stove/StoveCard', () => ({
+// Phase 177: Mock all 10 EmberGlass card components
+jest.mock('@/app/components/EmberGlass/cards/StoveCard', () => ({
   __esModule: true,
   default: () => <div data-testid="stove-card">StoveCard</div>,
 }));
-jest.mock('@/app/components/devices/thermostat/ThermostatCard', () => ({
+jest.mock('@/app/components/EmberGlass/cards/ClimateCard', () => ({
   __esModule: true,
-  default: () => <div data-testid="thermostat-card">ThermostatCard</div>,
+  default: () => <div data-testid="thermostat-card">ClimateCard</div>,
 }));
-jest.mock('@/app/components/devices/weather/WeatherCardWrapper', () => ({
-  __esModule: true,
-  default: () => <div data-testid="weather-card">WeatherCard</div>,
-}));
-jest.mock('@/app/components/devices/lights/LightsCard', () => ({
+jest.mock('@/app/components/EmberGlass/cards/LightsCard', () => ({
   __esModule: true,
   default: () => <div data-testid="lights-card">LightsCard</div>,
 }));
-jest.mock('@/app/components/devices/camera/CameraCard', () => ({
+jest.mock('@/app/components/EmberGlass/cards/SonosCard', () => ({
+  __esModule: true,
+  default: () => <div data-testid="sonos-card">SonosCard</div>,
+}));
+jest.mock('@/app/components/EmberGlass/cards/WeatherCard', () => ({
+  __esModule: true,
+  default: () => <div data-testid="weather-card">WeatherCard</div>,
+}));
+jest.mock('@/app/components/EmberGlass/cards/CameraCard', () => ({
   __esModule: true,
   default: () => <div data-testid="camera-card">CameraCard</div>,
 }));
-jest.mock('@/app/components/devices/network/NetworkCard', () => ({
+jest.mock('@/app/components/EmberGlass/cards/NetworkCard', () => ({
   __esModule: true,
   default: () => <div data-testid="network-card">NetworkCard</div>,
+}));
+jest.mock('@/app/components/EmberGlass/cards/RaspiCard', () => ({
+  __esModule: true,
+  default: () => <div data-testid="raspi-card">RaspiCard</div>,
+}));
+jest.mock('@/app/components/EmberGlass/cards/TuyaCard', () => ({
+  __esModule: true,
+  default: () => <div data-testid="tuya-card">TuyaCard</div>,
+}));
+jest.mock('@/app/components/EmberGlass/cards/DirigeraCard', () => ({
+  __esModule: true,
+  default: () => <div data-testid="dirigera-card">DirigeraCard</div>,
+}));
+
+// Mock GlassCardSkeleton (DS-24 shared fallback)
+jest.mock('@/app/components/EmberGlass/GlassCardSkeleton', () => ({
+  GlassCardSkeleton: () => <div data-testid="glass-card-skeleton" />,
 }));
 
 // Mock ErrorBoundary as passthrough
 jest.mock('@/app/components/ErrorBoundary', () => ({
   DeviceCardErrorBoundary: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-
-// Mock Skeleton sub-components
-jest.mock('@/app/components/ui/Skeleton', () => {
-  const MockSkeleton = () => <div data-testid="skeleton" />;
-  MockSkeleton.StovePanel = () => <div data-testid="skeleton-stove" />;
-  MockSkeleton.ThermostatCard = () => <div data-testid="skeleton-thermostat" />;
-  MockSkeleton.WeatherCard = () => <div data-testid="skeleton-weather" />;
-  MockSkeleton.LightsCard = () => <div data-testid="skeleton-lights" />;
-  MockSkeleton.CameraCard = () => <div data-testid="skeleton-camera" />;
-  MockSkeleton.NetworkCard = () => <div data-testid="skeleton-network" />;
-  return { __esModule: true, default: MockSkeleton };
-});
 
 // Mock EmptyState component
 jest.mock('@/app/components/ui', () => ({
@@ -90,24 +94,10 @@ import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
 } from '@/lib/services/unifiedDeviceConfigService';
-import { splitIntoColumns } from '@/lib/utils/dashboardColumns';
-import { redirect } from 'next/navigation';
 
 // Helper to create mock visible cards for specific IDs
 function makeMockCards(ids: string[]) {
   return ids.map((id, index) => ({ id, label: id, icon: '🔧', visible: true, order: index }));
-}
-
-// Helper to set up splitIntoColumns mock based on visible cards
-function setupColumnMock(ids: string[]) {
-  const cards = makeMockCards(ids);
-  const leftCards = cards.filter((_, i) => i % 2 === 0);
-  const rightCards = cards.filter((_, i) => i % 2 !== 0);
-  (splitIntoColumns as jest.Mock).mockReturnValue({
-    left: leftCards.map((card, i) => ({ card, flatIndex: i * 2 })),
-    right: rightCards.map((card, i) => ({ card, flatIndex: i * 2 + 1 })),
-  });
-  return cards;
 }
 
 // Helper to render DashboardCards (async Server Component)
@@ -126,19 +116,18 @@ describe('DashboardCards', () => {
     (getUnifiedDeviceConfigAdmin as jest.Mock).mockResolvedValue({ devices: [] });
     // Default: no visible cards
     (getVisibleDashboardCards as jest.Mock).mockReturnValue([]);
-    // Default: empty columns
-    (splitIntoColumns as jest.Mock).mockReturnValue({ left: [], right: [] });
   });
 
   it('renders visible cards from deviceConfig', async () => {
-    const cards = setupColumnMock(['stove', 'thermostat', 'lights']);
+    const cards = makeMockCards(['stove', 'thermostat', 'lights']);
     (getVisibleDashboardCards as jest.Mock).mockReturnValue(cards);
 
     await renderDashboardCards();
 
-    expect(screen.getAllByTestId('stove-card')).toHaveLength(2); // mobile + desktop
-    expect(screen.getAllByTestId('thermostat-card')).toHaveLength(2);
-    expect(screen.getAllByTestId('lights-card')).toHaveLength(2);
+    // Phase 177 (DASH-01): single grid renders each card exactly once
+    expect(screen.getAllByTestId('stove-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('thermostat-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('lights-card')).toHaveLength(1);
   });
 
   it('redirects to login when no session', async () => {
@@ -154,7 +143,6 @@ describe('DashboardCards', () => {
 
   it('renders EmptyState when no visible cards', async () => {
     (getVisibleDashboardCards as jest.Mock).mockReturnValue([]);
-    (splitIntoColumns as jest.Mock).mockReturnValue({ left: [], right: [] });
 
     await renderDashboardCards();
 
@@ -162,29 +150,43 @@ describe('DashboardCards', () => {
     expect(screen.getByText('Nessun dispositivo configurato')).toBeInTheDocument();
   });
 
-  it('renders all 6 cards when all devices are enabled', async () => {
-    const allIds = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network'];
-    const cards = setupColumnMock(allIds);
+  it('renders all 10 cards when all devices are enabled (DASH-01)', async () => {
+    const allIds = [
+      'stove',
+      'thermostat',
+      'weather',
+      'lights',
+      'camera',
+      'network',
+      'raspi',
+      'sonos',
+      'dirigera',
+      'tuya',
+    ];
+    const cards = makeMockCards(allIds);
     (getVisibleDashboardCards as jest.Mock).mockReturnValue(cards);
 
     await renderDashboardCards();
 
-    expect(screen.getAllByTestId('stove-card')).toHaveLength(2);
-    expect(screen.getAllByTestId('thermostat-card')).toHaveLength(2);
-    expect(screen.getAllByTestId('weather-card')).toHaveLength(2);
-    expect(screen.getAllByTestId('lights-card')).toHaveLength(2);
-    expect(screen.getAllByTestId('camera-card')).toHaveLength(2);
-    expect(screen.getAllByTestId('network-card')).toHaveLength(2);
+    expect(screen.getAllByTestId('stove-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('thermostat-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('weather-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('lights-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('camera-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('network-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('raspi-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('sonos-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('dirigera-card')).toHaveLength(1);
+    expect(screen.getAllByTestId('tuya-card')).toHaveLength(1);
   });
 
   it('stove card appears before other cards in DOM order', async () => {
     const allIds = ['stove', 'thermostat', 'weather', 'lights', 'camera', 'network'];
-    const cards = setupColumnMock(allIds);
+    const cards = makeMockCards(allIds);
     (getVisibleDashboardCards as jest.Mock).mockReturnValue(cards);
 
     const { container } = await renderDashboardCards();
 
-    // In the mobile layout (single column), verify stove card is before other cards
     const allCards = container.querySelectorAll('[data-testid$="-card"]');
     const stoveIndex = Array.from(allCards).findIndex(
       (el) => el.getAttribute('data-testid') === 'stove-card'
@@ -197,19 +199,42 @@ describe('DashboardCards', () => {
     expect(stoveIndex).toBe(0); // Stove is the very first card rendered
   });
 
-  it('wraps each card in a Suspense boundary with skeleton fallback', async () => {
-    const cards = setupColumnMock(['stove', 'thermostat']);
+  it('renders cards inside a single 2-col grid (DASH-01)', async () => {
+    const cards = makeMockCards(['stove', 'thermostat', 'lights', 'sonos']);
     (getVisibleDashboardCards as jest.Mock).mockReturnValue(cards);
 
-    const jsx = await DashboardCards();
+    const { container } = await renderDashboardCards();
 
-    // Check the JSX structure contains Suspense elements
-    const stoveCard = cards.find((c) => c.id === 'stove');
-    expect(stoveCard).toBeDefined();
+    // Phase 177 (DASH-01): single grid-cols-2 wrapper, no masonry split
+    const grid = container.querySelector('.grid.grid-cols-2');
+    expect(grid).not.toBeNull();
+    expect(grid?.children.length).toBe(cards.length);
+    // No legacy masonry markers
+    expect(container.querySelector('.flex-col.gap-6.sm\\:hidden')).toBeNull();
+  });
 
-    // Rendered output should contain cards (Suspense renders content when not suspended)
-    const { container } = render(jsx as React.ReactElement);
-    expect(container.querySelectorAll('[data-testid="stove-card"]')).toHaveLength(2);
-    expect(container.querySelectorAll('[data-testid="thermostat-card"]')).toHaveLength(2);
+  it('applies stagger animation to each card slot (DASH-12)', async () => {
+    const cards = makeMockCards(['stove', 'thermostat', 'lights']);
+    (getVisibleDashboardCards as jest.Mock).mockReturnValue(cards);
+
+    const { container } = await renderDashboardCards();
+
+    const slots = container.querySelectorAll('.animate-spring-in');
+    expect(slots.length).toBe(cards.length);
+    // First slot has 0ms delay, second 100ms, third 200ms (flatIndex * 100ms)
+    expect((slots[0] as HTMLElement).style.animationDelay).toBe('0ms');
+    expect((slots[1] as HTMLElement).style.animationDelay).toBe('100ms');
+    expect((slots[2] as HTMLElement).style.animationDelay).toBe('200ms');
+  });
+
+  it('wraps each card in a Suspense boundary with GlassCardSkeleton fallback (DS-24)', async () => {
+    const cards = makeMockCards(['stove', 'thermostat']);
+    (getVisibleDashboardCards as jest.Mock).mockReturnValue(cards);
+
+    const { container } = await renderDashboardCards();
+
+    // Suspense renders content when not suspended; cards render once each
+    expect(container.querySelectorAll('[data-testid="stove-card"]')).toHaveLength(1);
+    expect(container.querySelectorAll('[data-testid="thermostat-card"]')).toHaveLength(1);
   });
 });

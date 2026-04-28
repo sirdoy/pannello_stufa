@@ -23,10 +23,13 @@ describe('CardHead (Phase 177 — DASH-01)', () => {
 
   test('tile background uses color-mix with the tone color', () => {
     const { container } = render(<CardHead Icon={Flame} label="Lights" tone="#f5c84a" />);
-    // First inner div is the tile (parent has display:flex row); look for color-mix substring
-    const tile = container.querySelector('div > div') as HTMLElement;
-    expect(tile.style.background).toContain('color-mix');
-    expect(tile.style.background).toContain('#f5c84a');
+    // The tile is the first inner div of the row whose width style is set (32px).
+    const divs = Array.from(container.querySelectorAll('div')) as HTMLElement[];
+    const tile = divs.find((d) => d.style.width === '32px');
+    expect(tile).toBeDefined();
+    expect(tile!.style.background).toContain('color-mix');
+    // jsdom normalizes hex → rgb inside color-mix(); assert via rgb form.
+    expect(tile!.style.background).toContain('rgb(245, 200, 74)');
   });
 
   test('label has fontSize: 13 (px)', () => {

@@ -64,11 +64,12 @@ function isDisplayOnly(deviceId: DeviceId): boolean {
 
 /**
  * Check if device has a homepage card
- * All devices have homepage cards except those not in CARD_COMPONENTS (sonos for now)
+ * Phase 177 (A-03 / LANDMINE #1): Sonos enabled on dashboard.
+ * Every device with a registered card in DashboardCards.CARD_COMPONENTS
+ * is dashboard-eligible.
  */
-function hasHomepageCard(deviceId: DeviceId): boolean {
-  // Sonos doesn't have a homepage card yet
-  return deviceId !== 'sonos';
+function hasHomepageCard(_deviceId: DeviceId): boolean {
+  return true;
 }
 
 /**
@@ -366,7 +367,7 @@ function getDeviceDescription(deviceId: string): string {
     weather: 'Previsioni meteo locali (solo homepage)',
     lights: 'Luci Philips Hue',
     camera: 'Videocamera di sorveglianza',
-    sonos: 'Sistema audio Sonos (solo menu)',
+    sonos: 'Sistema audio Sonos',
     network: 'Rete Fritz!Box (solo homepage)',
     raspi: 'Raspberry Pi system monitor',
   };

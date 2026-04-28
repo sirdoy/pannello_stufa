@@ -1,30 +1,29 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { auth0 } from '@/lib/auth0';
-import { splitIntoColumns } from '@/lib/utils/dashboardColumns';
-import StoveCard from './devices/stove/StoveCard';
-import ThermostatCard from './devices/thermostat/ThermostatCard';
-import CameraCard from './devices/camera/CameraCard';
-import LightsCard from './devices/lights/LightsCard';
-import WeatherCardWrapper from './devices/weather/WeatherCardWrapper';
-import NetworkCard from './devices/network/NetworkCard';
-import RaspiCard from './devices/raspi/RaspiCard';
-import SonosCard from './devices/sonos/SonosCard';
-import DirigeraCard from './devices/dirigera/DirigeraCard';
-import TuyaCard from './devices/tuya/TuyaCard';
+import StoveCard from './EmberGlass/cards/StoveCard';
+import ClimateCard from './EmberGlass/cards/ClimateCard';
+import LightsCard from './EmberGlass/cards/LightsCard';
+import SonosCard from './EmberGlass/cards/SonosCard';
+import WeatherCard from './EmberGlass/cards/WeatherCard';
+import CameraCard from './EmberGlass/cards/CameraCard';
+import NetworkCard from './EmberGlass/cards/NetworkCard';
+import RaspiCard from './EmberGlass/cards/RaspiCard';
+import TuyaCard from './EmberGlass/cards/TuyaCard';
+import DirigeraCard from './EmberGlass/cards/DirigeraCard';
+import { GlassCardSkeleton } from './EmberGlass/GlassCardSkeleton';
 import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
 } from '@/lib/services/unifiedDeviceConfigService';
 import { EmptyState } from './ui';
 import { DeviceCardErrorBoundary } from './ErrorBoundary';
-import Skeleton from '@/app/components/ui/Skeleton';
 
 // Card component registry - maps card IDs to React components
 const CARD_COMPONENTS: Record<string, React.ComponentType> = {
   stove: StoveCard,
-  thermostat: ThermostatCard,
-  weather: WeatherCardWrapper,
+  thermostat: ClimateCard,
+  weather: WeatherCard,
   lights: LightsCard,
   camera: CameraCard,
   network: NetworkCard,
@@ -32,20 +31,6 @@ const CARD_COMPONENTS: Record<string, React.ComponentType> = {
   sonos: SonosCard,
   dirigera: DirigeraCard,
   tuya: TuyaCard,
-};
-
-// Skeleton registry - maps card IDs to their skeleton components
-const CARD_SKELETONS: Record<string, React.ComponentType> = {
-  stove: Skeleton.StovePanel,
-  thermostat: Skeleton.ThermostatCard,
-  weather: Skeleton.WeatherCard,
-  lights: Skeleton.LightsCard,
-  camera: Skeleton.CameraCard,
-  network: Skeleton.NetworkCard,
-  raspi: Skeleton.RaspiCard,
-  sonos: Skeleton.SonosCard,
-  dirigera: Skeleton.DirigeraCard,
-  tuya: Skeleton.TuyaCard,
 };
 
 // Device metadata for error boundaries
@@ -59,20 +44,21 @@ const DEVICE_META: Record<string, { name: string; icon: string }> = {
   raspi: { name: 'Raspberry Pi', icon: '🖥️' },
   sonos: { name: 'Sonos', icon: '🎵' },
   dirigera: { name: 'DIRIGERA', icon: '🔌' },
-  tuya: { name: 'Tuya', icon: '\u26A1' },
+  tuya: { name: 'Tuya', icon: '⚡' },
 };
 
 /**
  * DashboardCards — Async Server Component
  *
- * Fetches session + device config server-side and renders the masonry card grid.
- * Wrapped in a Suspense boundary by page.tsx; loading.tsx provides the fallback.
+ * Phase 177: Renders the equal-size 1:1 EmberGlass card grid (DASH-01).
+ * All 10 device cards render in a single 2-column grid (mobile + desktop) with
+ * v9.0 stagger animation preserved (animate-spring-in + animationDelay).
  *
  * Auth: redirects to /auth/login if no valid session is found.
- * Layout: matches loading.tsx masonry (even→left, odd→right).
  *
- * Each card is wrapped in a per-card Suspense boundary with its matching skeleton
- * fallback, inside a DeviceCardErrorBoundary for error isolation.
+ * Each card is wrapped in a per-card Suspense boundary with the shared
+ * GlassCardSkeleton fallback (DS-24), inside a DeviceCardErrorBoundary for
+ * error isolation.
  */
 export default async function DashboardCards() {
   const session = await auth0.getSession();
@@ -90,62 +76,42 @@ export default async function DashboardCards() {
   // Fetch unified device config server-side (with automatic migration)
   const deviceConfig = await getUnifiedDeviceConfigAdmin(userId);
 
-  // Get visible dashboard cards (enabled && dashboardVisible, sorted by order)
+  // Get visible dashboard cards (visible: true, hasHomepageCard: true, sorted by order)
   const visibleCards = getVisibleDashboardCards(deviceConfig);
 
-  // Precompute left/right columns by index parity (even→left, odd→right)
-  const { left: leftColumn, right: rightColumn } = splitIntoColumns(visibleCards);
-
-  // Shared card renderer — used by both mobile and desktop layouts
-  const renderCard = (card: typeof visibleCards[number], flatIndex: number) => {
-    const CardComponent = CARD_COMPONENTS[card.id];
-    const CardSkeleton = CARD_SKELETONS[card.id];
-    if (!CardComponent) return null;
+  // Empty State using EmptyState component
+  if (visibleCards.length === 0) {
     return (
-      <div
-        key={card.id}
-        className="animate-spring-in transition-all duration-300 ease-out"
-        style={{ animationDelay: `${flatIndex * 100}ms` }}
-      >
-        <DeviceCardErrorBoundary
-          deviceName={DEVICE_META[card.id]?.name ?? card.id}
-          deviceIcon={DEVICE_META[card.id]?.icon ?? '⚠️'}
-        >
-          <Suspense fallback={CardSkeleton ? <CardSkeleton /> : null}>
-            <CardComponent />
-          </Suspense>
-        </DeviceCardErrorBoundary>
-      </div>
+      <EmptyState
+        icon="🏠"
+        title="Nessun dispositivo configurato"
+        description="Aggiungi i tuoi dispositivi per iniziare"
+      />
     );
-  };
+  }
 
+  // Phase 177 (DASH-01): single 2-col grid replacing v8.1 masonry layout.
+  // Identical 1:1 card footprint on mobile + desktop.
   return (
-    <>
-      {/* Mobile: single column, flat order (LAYOUT-03) */}
-      <div className="flex flex-col gap-6 sm:hidden">
-        {visibleCards.map((card, index) => renderCard(card, index))}
-      </div>
-
-      {/* Desktop: two-column masonry (LAYOUT-01, LAYOUT-02, EDGE-01) */}
-      <div className="hidden sm:flex sm:flex-row gap-8 lg:gap-10">
-        <div className={`flex flex-col gap-8 lg:gap-10 min-w-0 ${rightColumn.length === 0 ? 'w-full' : 'flex-1'}`}>
-          {leftColumn.map(({ card, flatIndex }) => renderCard(card, flatIndex))}
-        </div>
-        {rightColumn.length > 0 && (
-          <div className="flex flex-col gap-8 lg:gap-10 flex-1 min-w-0">
-            {rightColumn.map(({ card, flatIndex }) => renderCard(card, flatIndex))}
+    <div className="grid grid-cols-2 gap-3 max-w-md sm:max-w-2xl mx-auto px-3">
+      {visibleCards.map((card, flatIndex) => {
+        const CardComponent = CARD_COMPONENTS[card.id];
+        if (!CardComponent) return null;
+        const meta = DEVICE_META[card.id] ?? { name: card.id, icon: '⚠️' };
+        return (
+          <div
+            key={card.id}
+            className="animate-spring-in transition-all duration-300 ease-out"
+            style={{ animationDelay: `${flatIndex * 100}ms` }}
+          >
+            <DeviceCardErrorBoundary deviceName={meta.name} deviceIcon={meta.icon}>
+              <Suspense fallback={<GlassCardSkeleton />}>
+                <CardComponent />
+              </Suspense>
+            </DeviceCardErrorBoundary>
           </div>
-        )}
-      </div>
-
-      {/* Empty State using new EmptyState component */}
-      {visibleCards.length === 0 && (
-        <EmptyState
-          icon="🏠"
-          title="Nessun dispositivo configurato"
-          description="Aggiungi i tuoi dispositivi per iniziare"
-        />
-      )}
-    </>
+        );
+      })}
+    </div>
   );
 }

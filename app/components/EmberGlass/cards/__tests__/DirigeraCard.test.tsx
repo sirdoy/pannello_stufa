@@ -41,12 +41,13 @@ describe('DirigeraCard (Phase 177 — DASH-10 / A-02)', () => {
   });
 
   test('clicking the card opens a sheet titled "IKEA"', () => {
-    const { getByTestId, queryByText, queryByRole } = render(<DirigeraCard />);
+    const { getByTestId, queryByRole } = render(<DirigeraCard />);
     fireEvent.click(getByTestId('dirigera-card'));
     const dialog = queryByRole('dialog');
     expect(dialog).not.toBeNull();
     expect(dialog!.getAttribute('style') ?? '').toContain('translateY(0)');
-    expect(queryByText('IKEA')).toBeInTheDocument();
+    // Sheet title lives inside the dialog (CardHead also renders "IKEA"; scope to dialog).
+    expect(dialog!.textContent ?? '').toContain('IKEA');
   });
 
   test('NO inline toggle in card body (DASH-10)', () => {

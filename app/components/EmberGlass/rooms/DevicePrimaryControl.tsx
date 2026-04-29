@@ -19,7 +19,7 @@
  * Per-body self-fetch pattern — CONTEXT D-39 / Phase 178 D-04. Each sub-component
  * imports its own data + commands hooks.
  *
- * No useMemo/useCallback — Phase 71/95/178 D-33 React Compiler discipline.
+ * RC-clean: no manual memo hooks — Phase 71/95/178 D-33 React Compiler discipline.
  * Inline-style + var(--token) — CONTEXT D-02.
  * Bundle source: rooms.jsx:319-352.
  */

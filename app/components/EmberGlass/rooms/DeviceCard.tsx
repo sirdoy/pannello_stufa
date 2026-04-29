@@ -9,7 +9,7 @@
  *
  * Visual contract: bundle rooms.jsx:276-317 (verbatim shape).
  * Inline-style + var(--token) — CONTEXT D-02. No Tailwind in this file.
- * No useMemo/useCallback — Phase 71/95/178 D-33 React Compiler discipline.
+ * RC-clean: no manual memo hooks — Phase 71/95/178 D-33 React Compiler discipline.
  *
  * DeviceBody ships in Plan 08 (Wave 3) — import resolves at integration time.
  * DeviceCard.test.tsx mocks ./DeviceBody so this component is independently green.

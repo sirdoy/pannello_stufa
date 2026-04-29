@@ -156,10 +156,10 @@
 - [x] 179-01-PLAN.md — Wave 0: types + lib (rooms-config + getDevicesForRoom) + aggregator unit tests (ROOMS-01) [Wave 0]
 - [x] 179-02-PLAN.md — Wave 1: 5 primitives (StatChip / DualTempReadout / SliderRow / ControlRow / MiniButton) + jest specs (ROOMS-04, ROOMS-05) [Wave 1]
 - [x] 179-03-PLAN.md — Wave 1: RoomCard + DeviceChip + jest specs (ROOMS-02) [Wave 1]
-- [ ] 179-04-PLAN.md — Wave 2: DeviceCard + DevicePrimaryControl + DeviceBody dispatcher (ROOMS-04) [Wave 2]
-- [ ] 179-05-PLAN.md — Wave 2: 6 bodies (Stove wired + Plug/Sensor read-only + Tv/Shade/Camera no-op) (ROOMS-05) [Wave 2]
-- [ ] 179-06-PLAN.md — Wave 2: ThermoBody (+ ValveBody) debounced 500ms + LightBody debounced 250ms (ROOMS-05) [Wave 2]
-- [ ] 179-07-PLAN.md — Wave 2: SonosBody debounced 250ms with handleSetZoneVolume (ROOMS-05) [Wave 2]
+- [x] 179-04-PLAN.md — Wave 2: DeviceCard + DevicePrimaryControl + DeviceBody dispatcher (ROOMS-04) [Wave 2]
+- [x] 179-05-PLAN.md — Wave 2: 6 bodies (Stove wired + Plug/Sensor read-only + Tv/Shade/Camera no-op) (ROOMS-05) [Wave 2]
+- [x] 179-06-PLAN.md — Wave 2: ThermoBody (+ ValveBody) debounced 500ms + LightBody debounced 250ms (ROOMS-05) [Wave 2]
+- [x] 179-07-PLAN.md — Wave 2: SonosBody debounced 250ms with handleSetZoneVolume (ROOMS-05) [Wave 2]
 - [ ] 179-08-PLAN.md — Wave 3: RoomSheet + RoomsTab orchestrator + barrel + EmberGlass index + /stanze route (ROOMS-01, ROOMS-03) [Wave 3]
 - [ ] 179-09-PLAN.md — Wave 3: Playwright smoke tests/smoke/rooms-tab.spec.ts (5 ROOMS-* scenarios) + human UAT (ROOMS-01..05) [Wave 3]
 **UI hint**: yes
@@ -209,7 +209,7 @@
 | 176. Post-Auth0 Splash Animation | 4/4 | Complete    | 2026-04-27 |
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
 | 178. Per-Device Modal Sheets | 10/10 | Complete   | 2026-04-29 |
-| 179. Rooms Tab Redesign | 3/9 | In Progress|  |
+| 179. Rooms Tab Redesign | 7/9 | In Progress|  |
 | 180. Automations Tab Full Editor | 0/0 | Not started | - |
 | 181. Glass Bottom Tab Bar | 0/0 | Not started | - |
 | 182. Design System Reference Page v2 | 0/0 | Not started | - |

@@ -139,7 +139,7 @@
 - [x] 178-07-sonos-sheet-PLAN.md — SonosSheet body (group list + debounced volume 250ms + master Promise.allSettled; Pitfall 7 flat coordinator_uid) + jest spec (SHEET-05) [Wave 2]
 - [x] 178-08-plugs-sheet-PLAN.md — PlugsSheet body (2-col summary + plug list with kW/W boundary; Pitfall 8 drop room segment) + jest spec (SHEET-06) [Wave 2]
 - [x] 178-09-card-swap-integration-PLAN.md — Single-line swap of <SheetPlaceholderBody> → <*Sheet> in 5 cards (Stove/Climate/Lights/Sonos/Tuya) + 5 jest spec updates (SHEET-02, SHEET-03, SHEET-04, SHEET-05, SHEET-06) [Wave 3]
-- [ ] 178-10-playwright-smoke-PLAN.md — Extend tests/smoke/dashboard-glass-cards.spec.ts with 5 SHEET-* describe blocks (mock + click + assert request hit + DASH-10/SHEET-06 cross-check) (SHEET-02, SHEET-03, SHEET-04, SHEET-05, SHEET-06) [Wave 4]
+- [x] 178-10-playwright-smoke-PLAN.md — Extend tests/smoke/dashboard-glass-cards.spec.ts with 5 SHEET-* describe blocks (mock + click + assert request hit + DASH-10/SHEET-06 cross-check) (SHEET-02, SHEET-03, SHEET-04, SHEET-05, SHEET-06) [Wave 4]
 **UI hint**: yes
 
 ### Phase 179: Rooms Tab Redesign
@@ -199,7 +199,7 @@
 | 175. Glass Primitives — Press Animation & Sheet | 3/3 | Complete   | 2026-04-27 |
 | 176. Post-Auth0 Splash Animation | 4/4 | Complete    | 2026-04-27 |
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
-| 178. Per-Device Modal Sheets | 9/10 | In Progress|  |
+| 178. Per-Device Modal Sheets | 10/10 | Complete   | 2026-04-29 |
 | 179. Rooms Tab Redesign | 0/0 | Not started | - |
 | 180. Automations Tab Full Editor | 0/0 | Not started | - |
 | 181. Glass Bottom Tab Bar | 0/0 | Not started | - |

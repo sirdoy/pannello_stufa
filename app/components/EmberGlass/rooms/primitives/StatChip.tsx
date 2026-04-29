@@ -15,7 +15,7 @@ export interface StatChipProps {
   tone?: string;
 }
 
-export function StatChip({ label, value }: StatChipProps): JSX.Element {
+export function StatChip({ label, value }: StatChipProps){
   return (
     <div
       data-testid="stat-chip"

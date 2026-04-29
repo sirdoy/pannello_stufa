@@ -182,7 +182,7 @@ describe('LightBody', () => {
     // Temperature track should have aria-disabled
     const tracks = screen.getAllByTestId('slider-row-track');
     // 2nd track is temperature (always disabled)
-    const tempTrack = tracks[1];
+    const tempTrack = tracks[1]!;
     fireEvent.click(tempTrack, { clientX: 50 });
 
     await act(async () => {
@@ -201,7 +201,7 @@ describe('LightBody', () => {
 
     // Click brightness track — should not fire
     const tracks = screen.getAllByTestId('slider-row-track');
-    fireEvent.click(tracks[0], { clientX: 50 });
+    fireEvent.click(tracks[0]!, { clientX: 50 });
 
     await act(async () => {
       jest.advanceTimersByTime(500);

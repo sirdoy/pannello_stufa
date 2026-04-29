@@ -32,7 +32,7 @@ export function MiniButton({
   onClick,
   disabled = false,
   ariaLabel,
-}: MiniButtonProps): JSX.Element {
+}: MiniButtonProps){
   const slug = label ? slugify(label) : 'icon';
 
   const style: CSSProperties = {

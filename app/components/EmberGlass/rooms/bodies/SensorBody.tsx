@@ -14,7 +14,7 @@
 import { StatChip } from '../primitives/StatChip';
 import type { RoomDevice } from '../types';
 
-export function SensorBody({ device }: { device: RoomDevice }): JSX.Element {
+export function SensorBody({ device }: { device: RoomDevice }){
   const humidity = (device.extra.humidity as number | undefined) ?? 0;
   const trend = (device.extra.trend as string | undefined) ?? 'stabile';
 

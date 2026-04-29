@@ -26,7 +26,7 @@ import { RoomCard } from './RoomCard';
 import { RoomSheet } from './RoomSheet';
 import type { AggregatorState } from './types';
 
-export function RoomsTab(): JSX.Element {
+export function RoomsTab(){
   const [selectedRoomName, setSelectedRoomName] = useState<string | null>(null);
 
   // Pitfall 9: useStoveData requires { checkVersion, userId }

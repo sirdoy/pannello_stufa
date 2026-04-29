@@ -25,7 +25,7 @@ export interface DeviceCardProps {
   device: RoomDevice;
 }
 
-export function DeviceCard({ device }: DeviceCardProps): JSX.Element {
+export function DeviceCard({ device }: DeviceCardProps){
   const Icon = ICON_FOR[device.kind];
   const tone = device.tone;
   const slug = `${device.kind}-${device.name.toLowerCase().replace(/\s+/g, '-')}`;

@@ -30,7 +30,7 @@ export interface RoomCardProps {
   onOpen: () => void;
 }
 
-export function RoomCard({ room, devices, onOpen }: RoomCardProps): JSX.Element {
+export function RoomCard({ room, devices, onOpen }: RoomCardProps){
   const Icon = ICON_FOR[room.icon];
   const activeCount = devices.filter((d) => d.on).length;
   const total = devices.length;

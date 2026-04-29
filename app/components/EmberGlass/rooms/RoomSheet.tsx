@@ -39,7 +39,7 @@ export function RoomSheet({
   onClose,
   room,
   devices,
-}: RoomSheetProps): JSX.Element {
+}: RoomSheetProps){
   if (!room) {
     return <Sheet open={false} onClose={onClose} />;
   }

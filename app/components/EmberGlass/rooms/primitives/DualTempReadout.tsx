@@ -15,7 +15,7 @@ export interface DualTempReadoutProps {
   tone: string;
 }
 
-export function DualTempReadout({ current, target, tone }: DualTempReadoutProps): JSX.Element {
+export function DualTempReadout({ current, target, tone }: DualTempReadoutProps){
   const numStyle: CSSProperties = {
     fontFamily: 'var(--font-display)',
     fontSize: 22,

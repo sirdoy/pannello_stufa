@@ -14,7 +14,7 @@ import { RoomsTab } from '@/app/components/EmberGlass/rooms';
 
 export const dynamic = 'force-dynamic';
 
-export default function StanzePage(): JSX.Element {
+export default function StanzePage() {
   return (
     <section className="py-8 sm:py-12 lg:py-16">
       <h1 className="sr-only">Stanze</h1>

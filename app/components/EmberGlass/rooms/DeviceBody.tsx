@@ -22,7 +22,7 @@ import { ShadeBody } from './bodies/ShadeBody';
 import { CameraBody } from './bodies/CameraBody';
 import { SensorBody } from './bodies/SensorBody';
 
-export function DeviceBody({ device }: { device: RoomDevice }): JSX.Element | null {
+export function DeviceBody({ device }: { device: RoomDevice }) {
   switch (device.kind) {
     case 'stove':  return <StoveBody device={device} />;
     case 'thermo': return <ThermoBody device={device} />;

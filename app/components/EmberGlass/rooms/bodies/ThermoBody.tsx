@@ -30,7 +30,7 @@ import type { RoomDevice } from '../types';
  * Threat T-179-06-01: all command calls gated on non-empty homeId AND roomId (Pitfall 8).
  * Threat T-179-06-02: useDebounce(pending, 500) coalesces rapid taps into one network call.
  */
-function ThermoOrValveBody({ device }: { device: RoomDevice }): JSX.Element {
+function ThermoOrValveBody({ device }: { device: RoomDevice }){
   const data = useThermostatData();
   const homeId = data.topology?.home_id ?? '';
   const refetch = data.refetch;
@@ -90,11 +90,11 @@ function ThermoOrValveBody({ device }: { device: RoomDevice }): JSX.Element {
 }
 
 /** Thermostat zone body (kind: 'thermo'). */
-export function ThermoBody({ device }: { device: RoomDevice }): JSX.Element {
+export function ThermoBody({ device }: { device: RoomDevice }){
   return <ThermoOrValveBody device={device} />;
 }
 
 /** Thermostatic valve body (kind: 'valve'). Same shape as ThermoBody. */
-export function ValveBody({ device }: { device: RoomDevice }): JSX.Element {
+export function ValveBody({ device }: { device: RoomDevice }){
   return <ThermoOrValveBody device={device} />;
 }

@@ -40,7 +40,7 @@ export function SliderRow({
   Icon,
   disabled = false,
   onChange,
-}: SliderRowProps): JSX.Element {
+}: SliderRowProps){
   // Clamp + compute fill percentage
   const range = max === min ? 1 : max - min;
   const pct = Math.max(0, Math.min(100, ((value - min) / range) * 100));

@@ -16,7 +16,7 @@ import { ControlRow } from '../primitives/ControlRow';
 import { MiniButton } from '../primitives/MiniButton';
 import type { RoomDevice } from '../types';
 
-export function TvBody({ device }: { device: RoomDevice }): JSX.Element {
+export function TvBody({ device }: { device: RoomDevice }){
   const source = (device.extra.source as string | undefined) ?? '—';
   const volume = (device.extra.volume as number | undefined) ?? 0;
   // No-op: no TV proxy (CONTEXT D-32 Out of Scope)

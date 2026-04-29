@@ -26,7 +26,7 @@ import { ControlRow } from '../primitives/ControlRow';
 import { MiniButton } from '../primitives/MiniButton';
 import type { RoomDevice } from '../types';
 
-export function StoveBody({ device }: { device: RoomDevice }): JSX.Element {
+export function StoveBody({ device }: { device: RoomDevice }){
   const router = useRouter();
   const { checkVersion } = useVersion();
   const { user } = useUser();

@@ -17,7 +17,7 @@ import { ControlRow } from '../primitives/ControlRow';
 import { MiniButton } from '../primitives/MiniButton';
 import type { RoomDevice } from '../types';
 
-export function ShadeBody({ device }: { device: RoomDevice }): JSX.Element {
+export function ShadeBody({ device }: { device: RoomDevice }){
   const position = (device.extra.position as number | undefined) ?? 0;
   // No-op: no shade proxy (CONTEXT D-33 Out of Scope)
   const noop = () => undefined;

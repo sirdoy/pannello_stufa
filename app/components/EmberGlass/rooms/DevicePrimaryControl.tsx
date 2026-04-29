@@ -36,7 +36,7 @@ import { useThermostatCommands } from '@/app/components/devices/thermostat/hooks
 import { useRouter } from 'next/navigation';
 import type { RoomDevice } from './types';
 
-export function DevicePrimaryControl({ device }: { device: RoomDevice }): JSX.Element {
+export function DevicePrimaryControl({ device }: { device: RoomDevice }){
   switch (device.kind) {
     case 'sonos':
       return <SonosControl device={device} />;

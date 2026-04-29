@@ -16,7 +16,7 @@
 import { Play } from 'lucide-react';
 import type { RoomDevice } from '../types';
 
-export function CameraBody({ device }: { device: RoomDevice }): JSX.Element {
+export function CameraBody({ device }: { device: RoomDevice }){
   const fps = (device.extra.fps as number | undefined) ?? 24;
   const motion = (device.extra.motion as string | undefined) ?? '—';
   // No-op: no camera-stream proxy (CONTEXT D-34 Out of Scope)

@@ -21,7 +21,7 @@ export interface DeviceChipProps {
   device: RoomDevice;
 }
 
-export function DeviceChip({ device }: DeviceChipProps): JSX.Element {
+export function DeviceChip({ device }: DeviceChipProps){
   const Icon = ICON_FOR[device.kind];
   const tone = device.tone;
   const on = device.on;

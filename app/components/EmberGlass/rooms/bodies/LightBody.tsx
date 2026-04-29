@@ -27,7 +27,7 @@ import { useDebounce } from '@/app/hooks/useDebounce';
 import { SliderRow } from '../primitives/SliderRow';
 import type { RoomDevice } from '../types';
 
-export function LightBody({ device }: { device: RoomDevice }): JSX.Element {
+export function LightBody({ device }: { device: RoomDevice }){
   const router = useRouter();
   const data = useLightsData();
   // Pass full lightsData shape required by useLightsCommands (LightsSheet pattern)

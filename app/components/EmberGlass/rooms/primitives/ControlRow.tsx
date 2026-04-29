@@ -7,7 +7,7 @@
  */
 import type { ReactNode } from 'react';
 
-export function ControlRow({ children }: { children: ReactNode }): JSX.Element {
+export function ControlRow({ children }: { children: ReactNode }){
   return (
     <div
       data-testid="control-row"

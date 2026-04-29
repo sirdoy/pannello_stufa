@@ -28,7 +28,7 @@ import { ControlRow } from '../primitives/ControlRow';
 import { MiniButton } from '../primitives/MiniButton';
 import type { RoomDevice } from '../types';
 
-export function SonosBody({ device }: { device: RoomDevice }): JSX.Element {
+export function SonosBody({ device }: { device: RoomDevice }){
   const data = useSonosFullData();
   // RESEARCH §Aggregator Reconciliation Sonos + Phase 178 SonosSheet precedent:
   // prefer handleSetZoneVolume(group_id, vol) — targets the whole group (Pitfall 7).

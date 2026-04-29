@@ -21,7 +21,7 @@ function formatPower(watts: number): string {
   return `${Math.round(watts)}W`;
 }
 
-export function PlugBody({ device }: { device: RoomDevice }): JSX.Element {
+export function PlugBody({ device }: { device: RoomDevice }){
   const power = (device.extra.power as number | undefined) ?? 0;
   const todayKwh = (device.extra.today_kwh as number | undefined) ?? 0;
 

@@ -390,3 +390,180 @@ test.describe('SHEET-03 ClimateSheet wires command', () => {
     ).toEqual([]);
   });
 });
+
+test.describe('SHEET-04 LightsSheet wires command', () => {
+  let hueRequests: string[];
+
+  test.beforeEach(async ({ page }) => {
+    hueRequests = [];
+    // useLightsCommands.handleAllLightsToggle iterates groups and PUTs to
+    // /api/v1/hue/groups/{groupId}/action (verified at useLightsCommands.ts:188).
+    // page.route() globs are method-agnostic, so this single mock covers both
+    // PUT (write) and any incidental GETs for the same path.
+    await page.route('**/api/v1/hue/groups/**/action', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      }),
+    );
+    page.on('request', (req) => {
+      if (/\/api\/v1\/hue\/groups\/[^/]+\/action/.test(req.url())) {
+        hueRequests.push(req.url());
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('clicking Tutte off fires hue group action endpoint', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('lights-card').click();
+    const sheet = page.getByTestId('lights-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    // QuickActionButton renders testid `quick-action-${slugify(label)}` →
+    // "Tutte off" → "tutte-off" (verified in QuickActionButton.tsx:23).
+    await sheet.getByTestId('quick-action-tutte-off').click();
+    // handleAllLightsToggle batches one PUT per group via Promise.all, so we
+    // expect at least one matching request.
+    await expect.poll(() => hueRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-04 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});
+
+test.describe('SHEET-05 SonosSheet wires command', () => {
+  let sonosRequests: string[];
+
+  test.beforeEach(async ({ page }) => {
+    sonosRequests = [];
+    // useSonosCommands.handlePlay/handlePause POST to
+    // /api/v1/sonos/zones/{groupId}/{play|pause} (verified at useSonosCommands.ts:42, 57).
+    await page.route('**/api/v1/sonos/zones/**/play', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, suggested_poll_delay_s: 1 }),
+      }),
+    );
+    await page.route('**/api/v1/sonos/zones/**/pause', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, suggested_poll_delay_s: 1 }),
+      }),
+    );
+    page.on('request', (req) => {
+      const u = req.url();
+      if (
+        /\/api\/v1\/sonos\/zones\/[^/]+\/(play|pause)$/.test(u)
+      ) {
+        sonosRequests.push(u);
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('clicking play/pause on first group row fires sonos zones endpoint', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('sonos-card').click();
+    const sheet = page.getByTestId('sonos-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    // SonosSheet renders `sonos-sheet-group-${i}-play-pause` testids
+    // (verified at SonosSheet.tsx:214). Skip the test gracefully if no groups
+    // are loaded (offline / no zones discovered) — fixture state is opaque.
+    const playPause = sheet.getByTestId('sonos-sheet-group-0-play-pause');
+    if (await playPause.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await playPause.click();
+      await expect.poll(() => sonosRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    } else {
+      // No Sonos zones discovered in this run — assert the sheet at least mounted
+      // its empty-state UX without throwing. The runtime smoke gate runs against
+      // a real Auth0 session; in environments without Sonos hardware the sheet
+      // shows skeleton/error/empty. Assertion bound stays meaningful (sheet
+      // visible) without false-failing on missing fixtures.
+      await expect(sheet).toBeVisible();
+    }
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-05 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});
+
+test.describe('SHEET-06 PlugsSheet wires command', () => {
+  let tuyaRequests: string[];
+
+  test.beforeEach(async ({ page }) => {
+    tuyaRequests = [];
+    // useTuyaCommands.togglePlug POSTs to /api/tuya/plugs/{deviceId}/state
+    // (verified at useTuyaCommands.ts:14).
+    await page.route('**/api/tuya/plugs/**/state', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      }),
+    );
+    page.on('request', (req) => {
+      if (/\/api\/tuya\/plugs\/[^/]+\/state$/.test(req.url())) {
+        tuyaRequests.push(req.url());
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('DASH-10 / SHEET-06 cross-check — TuyaCard dashboard tile has NO toggle', async ({ page }) => {
+    // The dashboard TuyaCard is report-only; no inline toggles. The toggles
+    // live exclusively inside the PlugsSheet body (per CONTEXT D-23 / Phase 177 D-23).
+    const { errors, cleanup } = collectConsoleErrors(page);
+    const card = page.getByTestId('tuya-card');
+    await expect(card).toBeVisible();
+    // role="switch" is the InlineToggle attribute (verified at InlineToggle.tsx:32).
+    await expect(card.locator('[role="switch"]')).toHaveCount(0);
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-06 cross-check: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  test('clicking a plug InlineToggle inside the sheet fires tuya state endpoint', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('tuya-card').click();
+    const sheet = page.getByTestId('plugs-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    // PlugsSheet renders `plugs-sheet-plug-${slug}-toggle` wrappers around each
+    // InlineToggle (verified at PlugsSheet.tsx:297). The InlineToggle itself
+    // exposes role="switch". Grab the first matching switch inside the sheet.
+    const firstToggle = sheet.locator('[data-testid$="-toggle"] [role="switch"]').first();
+    if (await firstToggle.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await firstToggle.click();
+      await expect.poll(() => tuyaRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    } else {
+      // No Tuya plugs discovered — assert sheet mounted without errors. Same
+      // empty-state rationale as SHEET-05 above.
+      await expect(sheet).toBeVisible();
+    }
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-06 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});

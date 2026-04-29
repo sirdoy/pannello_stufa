@@ -53,11 +53,11 @@
 ### Modal Sheets (per-device controls)
 
 - [ ] **SHEET-01**: Bottom sheet primitive — translucent (rgba bg + backdrop-blur), translates from off-screen with cubic-bezier `.22,1,.36,1` 400ms, includes grabber + title bar + close button + Escape key dismissal + backdrop tap dismissal + body scroll-lock while open
-- [ ] **SHEET-02**: StoveSheet — large temp readout, target/fan/power steppers + sliders, Orari/Manutenzione buttons, large Accendi/Spegni primary button
+- [ ] **SHEET-02**: StoveSheet — large flame-power readout (powerLevel/5) + FlameViz hero, fan/power steppers, Orari/Manutenzione buttons, large Accendi/Spegni primary button (room temperature readout deferred until Thermorossi setpoint endpoint or Netatmo stove-room sensor wiring is shipped — see Phase 178 deferred items)
 - [ ] **SHEET-03**: ClimateSheet — horizontal zone selector chips, Apple-Home-style radial dial for selected zone target, mode picker (Auto/Manuale/Eco/Off), per-zone toggle
 - [ ] **SHEET-04**: LightsSheet — accese count card + "Tutte on/Tutte off" buttons, 4 scene buttons (Rilassante/Concentrato/Cena/Notte), per-room grouped list with individual toggles
 - [ ] **SHEET-05**: SonosSheet — group list (each row = colored album-art tile + name + track + play/pause), volume slider for selected group, "Riproduci/Pausa ovunque" master button
-- [ ] **SHEET-06**: PlugsSheet — accese count + total consumption summary cards, per-plug list with name + room + live W/kW + individual toggle (toggles allowed only inside the sheet, not on the dashboard card)
+- [ ] **SHEET-06**: PlugsSheet — accese count + total consumption summary cards, per-plug list with name + live W/kW + individual toggle (room mapping deferred — see Phase 178 deferred items pending device-registry join hook); toggles allowed only inside the sheet, not on the dashboard card
 
 ### Rooms Tab (data-driven)
 

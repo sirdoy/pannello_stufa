@@ -111,7 +111,7 @@ Out of scope (future phases):
   - **Summary cards (2-col grid):**
     - Left card (orange tint): caps `"Accese"` + 28px display `{onCount}/{total}`.
     - Right card (white tint): caps `"Consumo"` + 28px display total power, auto-formatted to `kW` (≥1000W) or `W` (<1000W) with 2 decimals for kW.
-  - **Plug list:** rounded 18px container. Each row = 36×36 plug icon tile (orange tint if on, grey if off) + plug name (14px 500) + subtitle `"{room}{on && power > 0 ? ' · ' + (power >= 1000 ? `${(power/1000).toFixed(1)}kW` : `${power}W`) : ''}"` + right-aligned `<InlineToggle on={p.on} color="#ffb84a" onChange={() => useTuyaCommands().togglePlug(p.id, p.on)} />`.
+  - **Plug list:** rounded 18px container. Each row = 36×36 plug icon tile (orange tint if on, grey if off) + plug name (14px 500) + subtitle `"{on && power > 0 ? (power >= 1000 ? `${(power/1000).toFixed(1)}kW` : `${power}W`) : ''}"` (room segment dropped — Pitfall 8 / RESEARCH Open Q2 RESOLVED → deferred per `<deferred>` "PlugsSheet per-row room subtitle" entry below) + right-aligned `<InlineToggle on={p.on} color="#ffb84a" onChange={() => useTuyaCommands().togglePlug(p.id, p.on)} />`.
   - Data: `useTuyaData()` (existing) — exposes `plugs[]` with id/name/room/on/power. `useTuyaCommands().togglePlug(deviceId, currentState)` (existing).
   - **Dirigera plugs are NOT shown in PlugsSheet.** DirigeraCard keeps placeholder body. PlugsSheet is mounted from TuyaCard only.
 
@@ -334,6 +334,7 @@ None — `gsd-sdk query todo.match-phase 178` returned 0 matches at context-gath
 - **Drag/touch on `<RadialDial>` arc** — only ± buttons in this phase; bundle does not implement arc drag either.
 - **Hue scene creation UI** — out of scope. Sheet only activates existing scenes.
 - **Sonos volume per-speaker (not per-group)** — Phase 178 uses the group's coordinator speaker. A polish phase could expose per-speaker controls in an expanded SonosSheet detail row.
+- **PlugsSheet per-row room subtitle** — bundle showed `{room} · {power}` per row. Tuya proxy exposes no `room` field on `TuyaPlug`, and v15.0's `useRoomStatus` returns Netatmo thermostat rooms only (no `device_id → room_name` Tuya plug join). The room segment is intentionally dropped from Phase 178 PlugsSheet (Pitfall 8 / RESEARCH Open Q2 RESOLVED). A follow-up phase ships a `useDeviceRegistry()` hook that joins `/api/v1/registry/devices` with `/api/v1/rooms` to expose `device_id → room_name`; PlugsSheet then reintroduces the `{room} · {power}` subtitle.
 - **Cleanup phase to delete `<SheetPlaceholderBody>` + legacy big cards + per-device skeletons** — fires once Camera/Network/Dirigera sheets ship and legacy detail pages are confirmed orphaned.
 - **Design System Reference v2 entry for the new sheets** — Phase 182.
 - **Web Vitals telemetry on sheet open/close** — could leverage v9.0 perf milestone tooling. Out of v20.0 scope.

@@ -746,7 +746,7 @@ Five sheet bodies, one per requirement. Each is a body-only component with **no 
    ├─ Stack (flex 1, minWidth 0)
    │  ├─ Name (14px / 500 / #fff)
    │  └─ Subtitle (11px / var(--text-2) / marginTop 2)
-   │     `{p.room}{p.on && p.power > 0 ? ` · ${p.power >= 1000 ? `${(p.power/1000).toFixed(1)}kW` : `${p.power}W`}` : ''}`
+   │     `{p.on && p.power > 0 ? `${p.power >= 1000 ? `${(p.power/1000).toFixed(1)}kW` : `${p.power}W`}` : ''}` (room segment dropped — see Phase 178 deferred-items: 'PlugsSheet per-row room subtitle' / Pitfall 8)
    │
    └─ <InlineToggle on={p.on} color="#ffb84a"
                     onChange={() => togglePlug(p.id, p.on)} />
@@ -974,8 +974,8 @@ All copy is **Italian** (project locale per `<html lang="it">`). Italian copy st
 | Consumption card eyebrow | `Consumo` |
 | Consumption card value (≥1000W) | `{(power/1000).toFixed(2)}` + `kW` suffix |
 | Consumption card value (<1000W) | `{power}` + `W` suffix |
-| Plug subtitle (off or zero power) | `{room}` |
-| Plug subtitle (on, power > 0) | `{room} · {(power/1000).toFixed(1)}kW` (≥1000) or `{room} · {power}W` |
+| Plug subtitle (off or zero power) | (empty — room segment deferred) |
+| Plug subtitle (on, power > 0) | `{(power/1000).toFixed(1)}kW` (≥1000) or `{power}W` (room segment deferred — see Phase 178 deferred-items 'PlugsSheet per-row room subtitle') |
 
 ### Cross-sheet (CONTEXT D-26, D-27)
 

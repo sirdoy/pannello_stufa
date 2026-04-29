@@ -789,32 +789,32 @@ export function findSceneByName(catalog: readonly HueScene[], name: string): Hue
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Per-light Hue toggle endpoint availability**
    - What we know: `useLightsCommands` exposes only `handleRoomToggle(groupId, on)` and `handleAllLightsToggle(on)`. No per-light handler.
    - What's unclear: Whether `/api/v1/hue/lights/{light_id}/state` PUT exists and is wired. There IS a `/api/v1/hue/lights` GET (verified in `useLightsData.ts:217`) but the per-light state-mutation route was not verified in this research.
-   - Recommendation: Plan agent (a) greps `app/api/v1/hue/lights/` for a state-mutation route; (b) if absent, accept the room-level semantic (per Pitfall 9 option (a)); (c) defers the per-light command extension to a follow-up phase.
+   - **RESOLVED:** Plan agent (a) greps `app/api/v1/hue/lights/` for a state-mutation route; (b) if absent, accept the room-level semantic (per Pitfall 9 option (a)); (c) defers the per-light command extension to a follow-up phase.
 
 2. **Tuya plug → room mapping via device registry**
    - What we know: Tuya proxy exposes `custom_name` and `device_type`; no `room`. v15.0 shipped a Rooms / Device Registry system (`useRoomStatus`, `roomsProxy`, `registryProxy`).
    - What's unclear: Whether a hook exists that returns "this `device_id` is in this `room_name`" suitable for PlugsSheet's per-row subtitle. Likely candidates: `useDevicesByRoom`, `lib/hooks/useRoomStatus.ts`.
-   - Recommendation: Plan agent greps `lib/hooks/` and `app/components/rooms/` for an existing helper. If found, wire it; if not, drop the `· {room}` segment per Pitfall 8 option (a).
+   - **RESOLVED:** Plan agent greps `lib/hooks/` and `app/components/rooms/` for an existing helper. If found, wire it; if not, drop the `· {room}` segment per Pitfall 8 option (a).
 
 3. **`useThermostatData()` `error` field surface**
    - What we know: `useThermostatData` returns `{ error: string | null }` (not an `Error` instance).
    - What's unclear: CONTEXT D-27 says "render `{error.message}` only when `error instanceof Error`". With a `string | null`, the error path is `error ? <error /> : null` and there's no `.message` access.
-   - Recommendation: Plan agent normalizes — if hook returns string, render the string verbatim as the secondary line; if it returns Error (Stove path uses `errorCode/errorDescription`), apply the type guard. Documented in 178-PLAN per-sheet error blocks.
+   - **RESOLVED:** Plan agent normalizes — if hook returns string, render the string verbatim as the secondary line; if it returns Error (Stove path uses `errorCode/errorDescription`), apply the type guard. Documented in 178-PLAN per-sheet error blocks.
 
 4. **`useStoveData` skeleton trigger field**
    - What we know: `useStoveData` exposes `initialLoading: boolean` (initial mount) and `loading: boolean` (transient command-in-flight).
    - What's unclear: D-26 says "loading === true && data === null". The hook does NOT have a single boolean matching this — it has `initialLoading` (true until first WS or HTTP message) which is the closest analog. Other hooks: `useThermostatData` has `loading`; `useLightsData` has `loading`; `useSonosFullData` has `loading + data === null`; `useTuyaData` has `loading + plugs === null`.
-   - Recommendation: Plan agent uses `initialLoading` for StoveSheet, `loading && (status === null \|\| topology === null)` for ClimateSheet, `loading && lights.length === 0 && groups.length === 0` for LightsSheet, `loading && data === null` for SonosSheet, `loading && plugs === null` for PlugsSheet. Document in each sheet's plan.
+   - **RESOLVED:** Plan agent uses `initialLoading` for StoveSheet, `loading && (status === null \|\| topology === null)` for ClimateSheet, `loading && lights.length === 0 && groups.length === 0` for LightsSheet, `loading && data === null` for SonosSheet, `loading && plugs === null` for PlugsSheet. Document in each sheet's plan.
 
 5. **Per-room mode revert (Tipo toggle off)**
    - What we know: ClimateSheet Tipo `<InlineToggle>` toggles per-room. `setRoomMode` accepts `'manual' | 'home'`.
    - What's unclear: Bundle says "off → setRoomMode('off')" but `'off'` is not a valid mode value.
-   - Recommendation: Off → `setRoomMode(roomId, 'home')` (revert to schedule). On → `setRoomMode(roomId, 'manual')`. Plan agent confirms by reading existing test routes.
+   - **RESOLVED:** Off → `setRoomMode(roomId, 'home')` (revert to schedule). On → `setRoomMode(roomId, 'manual')`. Plan agent confirms by reading existing test routes.
 
 ---
 

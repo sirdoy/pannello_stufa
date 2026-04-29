@@ -39,7 +39,7 @@
 - [ ] Phase 175: Glass Primitives — Press Animation & Sheet (0/0 plans) — not started
 - [ ] Phase 176: Post-Auth0 Splash Animation (0/0 plans) — not started
 - [ ] Phase 177: Equal-Size Dashboard Glass Cards (0/8 plans) — not started
-- [ ] Phase 178: Per-Device Modal Sheets (0/0 plans) — not started
+- [ ] Phase 178: Per-Device Modal Sheets (0/10 plans) — not started
 - [ ] Phase 179: Rooms Tab Redesign (0/0 plans) — not started
 - [ ] Phase 180: Automations Tab Full Editor (0/0 plans) — not started
 - [ ] Phase 181: Glass Bottom Tab Bar (0/0 plans) — not started
@@ -129,7 +129,17 @@
   3. LightsSheet shows the accese count card, "Tutte on/Tutte off" buttons, 4 scene buttons (Rilassante/Concentrato/Cena/Notte), and a per-room grouped list with individual toggles.
   4. SonosSheet shows a group list with colored album-art tile + name + track + play/pause per row, a volume slider for the selected group, and a "Riproduci/Pausa ovunque" master button.
   5. PlugsSheet shows accese count + total consumption summary cards and a per-plug list (name + room + live W/kW + individual toggle); toggling a plug from the dashboard card is impossible (no toggle controls rendered there) but works inside the sheet.
-**Plans**: TBD
+**Plans**: 10 plans
+- [ ] 178-01-sheet-primitives-PLAN.md — Six bundle-verbatim sub-primitives (SheetRow, Stepper, Slider, RadialDial, SheetBtn, QuickActionButton) + 6 jest specs + globals.css 3-LOC focus rule (SHEET-02, SHEET-03, SHEET-04, SHEET-05, SHEET-06) [Wave 1]
+- [ ] 178-02-helper-and-barrel-PLAN.md — findSceneByName helper + sheets/index.ts barrel + 5 sheet body stubs + EmberGlass top-level barrel re-export (SHEET-04) [Wave 1]
+- [ ] 178-03-thermostat-commands-hook-PLAN.md — New useThermostatCommands hook wrapping setroomthermpoint + setthermmode via useRetryableCommand + jest spec (SHEET-03) [Wave 1]
+- [ ] 178-04-stove-sheet-PLAN.md — StoveSheet body (hero + 2 SheetRows + SheetBtn grid + primary action; Pitfall 11 footnote drop) + jest spec (SHEET-02) [Wave 2]
+- [ ] 178-05-climate-sheet-PLAN.md — ClimateSheet body (zone chips + RadialDial debounced 500ms + Tipo SheetRow + 4-pill grid; Pitfall 5 Manuale UI-only) + jest spec (SHEET-03) [Wave 2]
+- [ ] 178-06-lights-sheet-PLAN.md — LightsSheet body (summary + 4 scene buttons + per-room sections; Pitfall 9 byRoom from groups) + jest spec (SHEET-04) [Wave 2]
+- [ ] 178-07-sonos-sheet-PLAN.md — SonosSheet body (group list + debounced volume 250ms + master Promise.allSettled; Pitfall 7 flat coordinator_uid) + jest spec (SHEET-05) [Wave 2]
+- [ ] 178-08-plugs-sheet-PLAN.md — PlugsSheet body (2-col summary + plug list with kW/W boundary; Pitfall 8 drop room segment) + jest spec (SHEET-06) [Wave 2]
+- [ ] 178-09-card-swap-integration-PLAN.md — Single-line swap of <SheetPlaceholderBody> → <*Sheet> in 5 cards (Stove/Climate/Lights/Sonos/Tuya) + 5 jest spec updates (SHEET-02, SHEET-03, SHEET-04, SHEET-05, SHEET-06) [Wave 3]
+- [ ] 178-10-playwright-smoke-PLAN.md — Extend tests/smoke/dashboard-glass-cards.spec.ts with 5 SHEET-* describe blocks (mock + click + assert request hit + DASH-10/SHEET-06 cross-check) (SHEET-02, SHEET-03, SHEET-04, SHEET-05, SHEET-06) [Wave 4]
 **UI hint**: yes
 
 ### Phase 179: Rooms Tab Redesign
@@ -189,7 +199,7 @@
 | 175. Glass Primitives — Press Animation & Sheet | 3/3 | Complete   | 2026-04-27 |
 | 176. Post-Auth0 Splash Animation | 4/4 | Complete    | 2026-04-27 |
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
-| 178. Per-Device Modal Sheets | 0/0 | Not started | - |
+| 178. Per-Device Modal Sheets | 0/10 | Not started | - |
 | 179. Rooms Tab Redesign | 0/0 | Not started | - |
 | 180. Automations Tab Full Editor | 0/0 | Not started | - |
 | 181. Glass Bottom Tab Bar | 0/0 | Not started | - |

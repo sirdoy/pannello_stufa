@@ -159,7 +159,9 @@ jest.mock('@/app/components/devices/thermostat/hooks/useThermostatCommands', () 
 }));
 
 // --- InlineToggle mock (to detect toggle calls) ---
-jest.mock('../InlineToggle', () => ({
+// DevicePrimaryControl imports from '../InlineToggle' (relative to rooms/)
+// which resolves to app/components/EmberGlass/InlineToggle.tsx
+jest.mock('../../InlineToggle', () => ({
   InlineToggle: ({ on, onChange }: { on: boolean; onChange: (e: React.MouseEvent<HTMLButtonElement>) => void }) => (
     <button
       data-testid="mock-inline-toggle"

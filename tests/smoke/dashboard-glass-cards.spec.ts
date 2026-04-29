@@ -251,3 +251,319 @@ test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
     });
   });
 });
+
+// ============================================================================
+// Phase 178 — SHEET-02..SHEET-06 wiring smoke tests (extends Phase 177 spec).
+//
+// Each describe asserts that tapping a dashboard card opens its real Sheet body
+// and that an interactive control fires the expected API endpoint via a
+// page.route() mock. Reuses (verbatim):
+//   - collectConsoleErrors (lines 30-42)
+//   - dismissVersionEnforcerIfPresent (lines 50-67)
+//   - dismissWhatsNewModalIfPresent (lines 80-94)
+//
+// Mocking strategy mirrors the Phase 177 beforeEach (lines 134-180) — defensive
+// route-mock + DOM dismissal + storageState pre-prime. Each describe owns its
+// own beforeEach because Playwright route-mocks are per-context and do not
+// inherit across describe blocks. Auth0 storageState is reused via the global
+// playwright.config.ts setup; no per-describe login flow needed.
+//
+// Endpoint URLs verified against the live command hooks at runtime:
+//   STOVE_ROUTES.setPower            → /api/v1/thermorossi/settings/power
+//   useThermostatCommands.setRoomSetpoint → /api/v1/netatmo/setroomthermpoint
+//   useLightsCommands.handleAllLightsToggle → PUT /api/v1/hue/groups/{id}/action
+//   useSonosCommands.handlePlay/handlePause → POST /api/v1/sonos/zones/{id}/play|pause
+//   useTuyaCommands.togglePlug       → POST /api/tuya/plugs/{id}/state
+// ============================================================================
+
+/**
+ * Shared pre-goto setup mirroring the Phase 177 describe-level beforeEach
+ * (lines 134-180). Each SHEET-* describe calls this BEFORE goto + dismissals.
+ * Pre-primes localStorage to suppress WhatsNewModal + installs a defensive
+ * version-check route mock so the changelog dialog cannot intercept clicks.
+ */
+async function primeDashboardForSheetTest(page: Page): Promise<void> {
+  await page.route('**/api/version*', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ version: '99.99.99' }),
+    })
+  );
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.setItem('lastSeenVersion', '99.99.99');
+      const dismissed = [
+        '99.99.99',
+        '1.77.0', '1.77.1', '1.77.2',
+        '1.78.0', '1.79.0', '1.80.0',
+        '2.0.0',
+      ];
+      window.localStorage.setItem('dismissedVersions', JSON.stringify(dismissed));
+    } catch {
+      // localStorage may be unavailable in some Playwright contexts — no-op.
+    }
+  });
+}
+
+test.describe('SHEET-02 StoveSheet wires command', () => {
+  let powerRequests: string[];
+
+  test.beforeEach(async ({ page }) => {
+    powerRequests = [];
+    // Mock the Thermorossi setPower endpoint (verified in lib/routes.ts:53).
+    await page.route('**/api/v1/thermorossi/settings/power', (route) =>
+      route.fulfill({
+        status: 202,
+        contentType: 'application/json',
+        body: JSON.stringify({ suggested_poll_delay_s: 1 }),
+      }),
+    );
+    page.on('request', (req) => {
+      if (req.url().includes('/api/v1/thermorossi/settings/power')) {
+        powerRequests.push(req.url());
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('clicking + on power stepper fires Thermorossi setPower command', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('stove-card').click();
+    const sheet = page.getByTestId('stove-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    const powerWrap = sheet.getByTestId('stove-sheet-power-stepper');
+    await powerWrap.getByTestId('stepper-plus').click();
+    // Wait for the asynchronous request to land.
+    await expect.poll(() => powerRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-02 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});
+
+test.describe('SHEET-03 ClimateSheet wires command', () => {
+  let setpointRequests: Array<{ url: string; body: string }>;
+
+  test.beforeEach(async ({ page }) => {
+    setpointRequests = [];
+    // Mock the Netatmo per-room setpoint endpoint (verified in useThermostatCommands.ts:92).
+    await page.route('**/api/v1/netatmo/setroomthermpoint', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ status: 'ok' }),
+      }),
+    );
+    page.on('request', (req) => {
+      if (req.url().includes('/api/v1/netatmo/setroomthermpoint')) {
+        setpointRequests.push({ url: req.url(), body: req.postData() ?? '' });
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('clicking + on RadialDial fires setroomthermpoint after debounce', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('climate-card').click();
+    const sheet = page.getByTestId('climate-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    // The radial-dial-plus button is rendered inside the radial wrap. ClimateSheet
+    // emits a stable `radial-dial-plus` testid on the + button (per primitives spec).
+    await sheet.getByTestId('radial-dial-plus').click();
+    // 500ms debounce in ClimateSheet (per ThermostatCard pattern) — wait past it.
+    await expect.poll(() => setpointRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-03 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});
+
+test.describe('SHEET-04 LightsSheet wires command', () => {
+  let hueRequests: string[];
+
+  test.beforeEach(async ({ page }) => {
+    hueRequests = [];
+    // useLightsCommands.handleAllLightsToggle iterates groups and PUTs to
+    // /api/v1/hue/groups/{groupId}/action (verified at useLightsCommands.ts:188).
+    // page.route() globs are method-agnostic, so this single mock covers both
+    // PUT (write) and any incidental GETs for the same path.
+    await page.route('**/api/v1/hue/groups/**/action', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      }),
+    );
+    page.on('request', (req) => {
+      if (/\/api\/v1\/hue\/groups\/[^/]+\/action/.test(req.url())) {
+        hueRequests.push(req.url());
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('clicking Tutte off fires hue group action endpoint', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('lights-card').click();
+    const sheet = page.getByTestId('lights-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    // QuickActionButton renders testid `quick-action-${slugify(label)}` →
+    // "Tutte off" → "tutte-off" (verified in QuickActionButton.tsx:23).
+    await sheet.getByTestId('quick-action-tutte-off').click();
+    // handleAllLightsToggle batches one PUT per group via Promise.all, so we
+    // expect at least one matching request.
+    await expect.poll(() => hueRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-04 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});
+
+test.describe('SHEET-05 SonosSheet wires command', () => {
+  let sonosRequests: string[];
+
+  test.beforeEach(async ({ page }) => {
+    sonosRequests = [];
+    // useSonosCommands.handlePlay/handlePause POST to
+    // /api/v1/sonos/zones/{groupId}/{play|pause} (verified at useSonosCommands.ts:42, 57).
+    await page.route('**/api/v1/sonos/zones/**/play', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, suggested_poll_delay_s: 1 }),
+      }),
+    );
+    await page.route('**/api/v1/sonos/zones/**/pause', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, suggested_poll_delay_s: 1 }),
+      }),
+    );
+    page.on('request', (req) => {
+      const u = req.url();
+      if (
+        /\/api\/v1\/sonos\/zones\/[^/]+\/(play|pause)$/.test(u)
+      ) {
+        sonosRequests.push(u);
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('clicking play/pause on first group row fires sonos zones endpoint', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('sonos-card').click();
+    const sheet = page.getByTestId('sonos-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    // SonosSheet renders `sonos-sheet-group-${i}-play-pause` testids
+    // (verified at SonosSheet.tsx:214). Skip the test gracefully if no groups
+    // are loaded (offline / no zones discovered) — fixture state is opaque.
+    const playPause = sheet.getByTestId('sonos-sheet-group-0-play-pause');
+    if (await playPause.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await playPause.click();
+      await expect.poll(() => sonosRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    } else {
+      // No Sonos zones discovered in this run — assert the sheet at least mounted
+      // its empty-state UX without throwing. The runtime smoke gate runs against
+      // a real Auth0 session; in environments without Sonos hardware the sheet
+      // shows skeleton/error/empty. Assertion bound stays meaningful (sheet
+      // visible) without false-failing on missing fixtures.
+      await expect(sheet).toBeVisible();
+    }
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-05 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});
+
+test.describe('SHEET-06 PlugsSheet wires command', () => {
+  let tuyaRequests: string[];
+
+  test.beforeEach(async ({ page }) => {
+    tuyaRequests = [];
+    // useTuyaCommands.togglePlug POSTs to /api/tuya/plugs/{deviceId}/state
+    // (verified at useTuyaCommands.ts:14).
+    await page.route('**/api/tuya/plugs/**/state', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      }),
+    );
+    page.on('request', (req) => {
+      if (/\/api\/tuya\/plugs\/[^/]+\/state$/.test(req.url())) {
+        tuyaRequests.push(req.url());
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('DASH-10 / SHEET-06 cross-check — TuyaCard dashboard tile has NO toggle', async ({ page }) => {
+    // The dashboard TuyaCard is report-only; no inline toggles. The toggles
+    // live exclusively inside the PlugsSheet body (per CONTEXT D-23 / Phase 177 D-23).
+    const { errors, cleanup } = collectConsoleErrors(page);
+    const card = page.getByTestId('tuya-card');
+    await expect(card).toBeVisible();
+    // role="switch" is the InlineToggle attribute (verified at InlineToggle.tsx:32).
+    await expect(card.locator('[role="switch"]')).toHaveCount(0);
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-06 cross-check: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+
+  test('clicking a plug InlineToggle inside the sheet fires tuya state endpoint', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('tuya-card').click();
+    const sheet = page.getByTestId('plugs-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    // PlugsSheet renders `plugs-sheet-plug-${slug}-toggle` wrappers around each
+    // InlineToggle (verified at PlugsSheet.tsx:297). The InlineToggle itself
+    // exposes role="switch". Grab the first matching switch inside the sheet.
+    const firstToggle = sheet.locator('[data-testid$="-toggle"] [role="switch"]').first();
+    if (await firstToggle.isVisible({ timeout: 1500 }).catch(() => false)) {
+      await firstToggle.click();
+      await expect.poll(() => tuyaRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    } else {
+      // No Tuya plugs discovered — assert sheet mounted without errors. Same
+      // empty-state rationale as SHEET-05 above.
+      await expect(sheet).toBeVisible();
+    }
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-06 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});

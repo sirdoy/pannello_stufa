@@ -17,6 +17,11 @@ import SonosCard from '../SonosCard';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 
 jest.mock('@/app/components/devices/sonos/hooks/useSonosFullData');
+// Mock the real SonosSheet body (Phase 178-09 swap) so the card-level test
+// does not run SonosSheet's hooks (Promise.allSettled batch, debounce, etc.).
+jest.mock('../../sheets/SonosSheet', () => ({
+  SonosSheet: () => <div data-testid="sonos-sheet" />,
+}));
 
 const mockUseSonosFullData = jest.mocked(useSonosFullData);
 
@@ -137,6 +142,7 @@ describe('SonosCard (Phase 177 — DASH-05)', () => {
 
     const dialogAfter = document.querySelector('[role="dialog"]');
     expect(dialogAfter?.getAttribute('data-state')).toBe('open');
-    expect(screen.getByText(/Controlli in arrivo nella Phase 178/)).toBeInTheDocument();
+    // Real SonosSheet body is mounted (mocked here) on open (Phase 178-09).
+    expect(screen.getByTestId('sonos-sheet')).toBeInTheDocument();
   });
 });

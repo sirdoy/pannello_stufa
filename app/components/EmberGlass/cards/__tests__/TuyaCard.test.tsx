@@ -18,6 +18,11 @@ const useTuyaDataMock = jest.fn();
 jest.mock('@/app/components/devices/tuya/hooks/useTuyaData', () => ({
   useTuyaData: () => useTuyaDataMock(),
 }));
+// Mock the real PlugsSheet body (Phase 178-09 swap) so the card-level test
+// does not run PlugsSheet's hooks (useTuyaCommands, optimistic toggles).
+jest.mock('../../sheets/PlugsSheet', () => ({
+  PlugsSheet: () => <div data-testid="plugs-sheet" />,
+}));
 
 function makePlug(overrides: Partial<{
   device_id: string;
@@ -113,12 +118,12 @@ describe('TuyaCard (Phase 177 — DASH-10)', () => {
     expect(card.querySelectorAll('[role="switch"]').length).toBe(0);
   });
 
-  test('clicking the card opens the placeholder sheet', () => {
+  test('clicking the card opens the real PlugsSheet body (Phase 178-09)', () => {
     useTuyaDataMock.mockReturnValue({
       plugs: [],
       loading: false, error: null, stale: false, lastUpdatedAt: 1,
     });
-    const { getByTestId, queryByText, queryByRole } = render(<TuyaCard />);
+    const { getByTestId, queryByRole } = render(<TuyaCard />);
     // Sheet uses forceMount → body is in DOM but dialog content has translateY(110%)
     // when closed. We assert the dialog visibility transition via the inline transform.
     const dialogBefore = document.querySelector('[role="dialog"]') as HTMLElement | null;
@@ -132,8 +137,8 @@ describe('TuyaCard (Phase 177 — DASH-10)', () => {
     const dialogAfter = queryByRole('dialog');
     expect(dialogAfter).not.toBeNull();
     expect(dialogAfter!.getAttribute('style') ?? '').toContain('translateY(0)');
-    // Placeholder body content matches expected copy.
-    expect(queryByText(/Controlli in arrivo/i)).toBeInTheDocument();
+    // Real PlugsSheet body is mounted (mocked here) on open.
+    expect(getByTestId('plugs-sheet')).toBeInTheDocument();
   });
 
   test('empty plug list renders 0W + "0 di 0 accese"', () => {

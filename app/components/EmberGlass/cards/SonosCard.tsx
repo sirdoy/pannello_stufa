@@ -11,7 +11,7 @@
  *  - <CardHead Icon={Music} label="Sonos" right={<count text>}>
  *  - Body: ≤4 group rows, PlayingBars on rows where transport_state === 'PLAYING',
  *    dim 6×6 dot otherwise. Track title on second line for playing rows.
- *  - Adjacent <Sheet> with placeholder body (Phase 178 swap).
+ *  - Adjacent <Sheet> wraps <SonosSheet /> (Phase 178-09 swap).
  *
  * Real proxy shapes (per types/sonosProxy.ts):
  *  - SonosZoneResponse → `coordinator_name` (NOT nested coordinator.name)
@@ -28,7 +28,7 @@ import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
 import { PlayingBars } from '../PlayingBars';
 import { Sheet } from '../Sheet';
-import { SheetPlaceholderBody } from './SheetPlaceholderBody';
+import { SonosSheet } from '../sheets/SonosSheet';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 
 const TONE = '#b080ff';
@@ -122,7 +122,7 @@ export default function SonosCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Sonos">
-        <SheetPlaceholderBody phase="178" device="sonos" />
+        <SonosSheet />
       </Sheet>
     </>
   );

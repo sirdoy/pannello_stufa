@@ -11,7 +11,7 @@
  * Off-state: rgba(255,255,255,0.04) background + 0.5px dim border.
  *
  * Non-clickable — taps bubble to parent RoomCard (CONTEXT D-20 + D-62).
- * No useMemo/useCallback (CONTEXT D-66, React Compiler discipline).
+ * RC-clean — no manual memoization hooks (CONTEXT D-66, React Compiler discipline).
  */
 
 import { ICON_FOR } from './lib/rooms-config';

@@ -23,10 +23,11 @@ jest.mock('../DevicePrimaryControl', () => ({
   DevicePrimaryControl: () => <div data-testid="mock-primary-control" />,
 }));
 
-// Mock DeviceBody — ships in Plan 08 (Wave 3)
+// Mock DeviceBody — ships in Plan 08 (Wave 3). Virtual mock since the file does
+// not exist yet at Wave 2 (DeviceCard's import resolves at integration time).
 jest.mock('../DeviceBody', () => ({
   DeviceBody: () => <div data-testid="mock-body" />,
-}));
+}), { virtual: true });
 
 const baseDevice: RoomDevice = {
   kind: 'light',
@@ -85,7 +86,8 @@ describe('DeviceCard (ROOMS-04 / CONTEXT D-23/D-24/D-61)', () => {
     render(<DeviceCard device={offDevice} />);
     const testId = 'stanze-device-light-luce-soggiorno';
     const container = screen.getByTestId(testId);
-    expect(container.style.background).toBe('rgba(255,255,255,0.03)');
+    // jsdom normalizes rgba by adding spaces: 'rgba(255,255,255,0.03)' → 'rgba(255, 255, 255, 0.03)'
+    expect(container.style.background).toMatch(/rgba\(255,?\s*255,?\s*255,?\s*0\.03\)/);
   });
 
   it('Test 7: outer container has correct data-testid and no onClick', () => {

@@ -44,10 +44,14 @@ describe('DeviceChip', () => {
     const chip = container.firstElementChild as HTMLElement;
     const bg = chip.style.background;
     const border = chip.style.border;
+    // JSDOM converts #f5c84a to rgb(245, 200, 74) in computed style
     expect(bg).toContain('color-mix');
-    expect(bg).toContain('#f5c84a');
     expect(border).toContain('color-mix');
-    expect(border).toContain('#f5c84a');
+    // Verify tinting (color-mix uses either hex or rgb form)
+    const bgContainsTone = bg.includes('#f5c84a') || bg.includes('245, 200, 74') || bg.includes('rgb(245');
+    const borderContainsTone = border.includes('#f5c84a') || border.includes('245, 200, 74') || border.includes('rgb(245');
+    expect(bgContainsTone).toBe(true);
+    expect(borderContainsTone).toBe(true);
   });
 
   test('Test 3: when device.on === false, background is rgba(255,255,255,0.04) and border is rgba(255,255,255,0.06)', () => {
@@ -61,7 +65,8 @@ describe('DeviceChip', () => {
 
   test('Test 4: when device.on === true, a 5x5 dot is rendered with position:absolute top:3 right:3 and boxShadow', () => {
     const { container } = render(<DeviceChip device={onLight} />);
-    const dot = container.querySelector('[aria-hidden="true"]') as HTMLElement | null;
+    // Use span[aria-hidden] to distinguish the dot from the lucide SVG (which also has aria-hidden="true")
+    const dot = container.querySelector('span[aria-hidden="true"]') as HTMLElement | null;
     expect(dot).toBeTruthy();
     expect(dot?.style.position).toBe('absolute');
     expect(dot?.style.top).toBe('3px');
@@ -73,7 +78,8 @@ describe('DeviceChip', () => {
 
   test('Test 5: when device.on === false, NO dot is rendered', () => {
     const { container } = render(<DeviceChip device={offShade} />);
-    const dot = container.querySelector('[aria-hidden="true"]');
+    // Use span[aria-hidden] to distinguish the dot from the lucide SVG
+    const dot = container.querySelector('span[aria-hidden="true"]');
     expect(dot).toBeNull();
   });
 

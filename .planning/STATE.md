@@ -4,8 +4,8 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: executing
 stopped_at: Phase 178 UI-SPEC approved
-last_updated: "2026-04-29T10:37:09.095Z"
-last_activity: 2026-04-29 -- Phase 178 planning complete
+last_updated: "2026-04-29T10:38:27.677Z"
+last_activity: 2026-04-29 -- Phase 178 execution started
 progress:
   total_phases: 9
   completed_phases: 4
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 177 — equal-size-dashboard-glass-cards
+**Current focus:** Phase 178 — Per-Device Modal Sheets
 
 ## Current Position
 
-Phase: 177 (equal-size-dashboard-glass-cards) — EXECUTING
-Plan: 1 of 8
-Status: Ready to execute
-Last activity: 2026-04-29 -- Phase 178 planning complete
+Phase: 178 (Per-Device Modal Sheets) — EXECUTING
+Plan: 1 of 10
+Status: Executing Phase 178
+Last activity: 2026-04-29 -- Phase 178 execution started
 
 Progress: [██████████] 100%
 

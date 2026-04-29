@@ -1,10 +1,11 @@
 ---
 phase: 178
 slug: per-device-modal-sheets
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-29
+reviewed_at: 2026-04-29
 ---
 
 # Phase 178 — UI Design Contract

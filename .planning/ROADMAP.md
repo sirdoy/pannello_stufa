@@ -39,7 +39,7 @@
 - [ ] Phase 175: Glass Primitives — Press Animation & Sheet (0/0 plans) — not started
 - [ ] Phase 176: Post-Auth0 Splash Animation (0/0 plans) — not started
 - [ ] Phase 177: Equal-Size Dashboard Glass Cards (0/8 plans) — not started
-- [ ] Phase 178: Per-Device Modal Sheets (0/10 plans) — not started
+- [x] Phase 178: Per-Device Modal Sheets (10/10 plans) — complete 2026-04-29 (verification: human_needed — see 178-HUMAN-UAT.md)
 - [ ] Phase 179: Rooms Tab Redesign (0/0 plans) — not started
 - [ ] Phase 180: Automations Tab Full Editor (0/0 plans) — not started
 - [ ] Phase 181: Glass Bottom Tab Bar (0/0 plans) — not started

@@ -130,9 +130,9 @@
   4. SonosSheet shows a group list with colored album-art tile + name + track + play/pause per row, a volume slider for the selected group, and a "Riproduci/Pausa ovunque" master button.
   5. PlugsSheet shows accese count + total consumption summary cards and a per-plug list (name + room + live W/kW + individual toggle); toggling a plug from the dashboard card is impossible (no toggle controls rendered there) but works inside the sheet.
 **Plans**: 10 plans
-- [ ] 178-01-sheet-primitives-PLAN.md — Six bundle-verbatim sub-primitives (SheetRow, Stepper, Slider, RadialDial, SheetBtn, QuickActionButton) + 6 jest specs + globals.css 3-LOC focus rule (SHEET-02, SHEET-03, SHEET-04, SHEET-05, SHEET-06) [Wave 1]
-- [ ] 178-02-helper-and-barrel-PLAN.md — findSceneByName helper + sheets/index.ts barrel + 5 sheet body stubs + EmberGlass top-level barrel re-export (SHEET-04) [Wave 1]
-- [ ] 178-03-thermostat-commands-hook-PLAN.md — New useThermostatCommands hook wrapping setroomthermpoint + setthermmode via useRetryableCommand + jest spec (SHEET-03) [Wave 1]
+- [x] 178-01-sheet-primitives-PLAN.md — Six bundle-verbatim sub-primitives (SheetRow, Stepper, Slider, RadialDial, SheetBtn, QuickActionButton) + 6 jest specs + globals.css 3-LOC focus rule (SHEET-02, SHEET-03, SHEET-04, SHEET-05, SHEET-06) [Wave 1]
+- [x] 178-02-helper-and-barrel-PLAN.md — findSceneByName helper + sheets/index.ts barrel + 5 sheet body stubs + EmberGlass top-level barrel re-export (SHEET-04) [Wave 1]
+- [x] 178-03-thermostat-commands-hook-PLAN.md — New useThermostatCommands hook wrapping setroomthermpoint + setthermmode via useRetryableCommand + jest spec (SHEET-03) [Wave 1]
 - [ ] 178-04-stove-sheet-PLAN.md — StoveSheet body (hero + 2 SheetRows + SheetBtn grid + primary action; Pitfall 11 footnote drop) + jest spec (SHEET-02) [Wave 2]
 - [ ] 178-05-climate-sheet-PLAN.md — ClimateSheet body (zone chips + RadialDial debounced 500ms + Tipo SheetRow + 4-pill grid; Pitfall 5 Manuale UI-only) + jest spec (SHEET-03) [Wave 2]
 - [ ] 178-06-lights-sheet-PLAN.md — LightsSheet body (summary + 4 scene buttons + per-room sections; Pitfall 9 byRoom from groups) + jest spec (SHEET-04) [Wave 2]
@@ -199,7 +199,7 @@
 | 175. Glass Primitives — Press Animation & Sheet | 3/3 | Complete   | 2026-04-27 |
 | 176. Post-Auth0 Splash Animation | 4/4 | Complete    | 2026-04-27 |
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
-| 178. Per-Device Modal Sheets | 0/10 | Not started | - |
+| 178. Per-Device Modal Sheets | 3/10 | In Progress|  |
 | 179. Rooms Tab Redesign | 0/0 | Not started | - |
 | 180. Automations Tab Full Editor | 0/0 | Not started | - |
 | 181. Glass Bottom Tab Bar | 0/0 | Not started | - |

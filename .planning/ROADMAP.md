@@ -109,14 +109,14 @@
   4. Card mount stagger (initialDelay pattern from v9.0) is preserved and visible on a fresh dashboard load.
   5. React Compiler auto-memoization remains active — `npx react-compiler-healthcheck` (or equivalent) reports zero new opt-outs introduced by the redesign and the existing `useMemo`/`useCallback` discipline is unchanged.
 **Plans**: 8 plans
-- [ ] 177-01-glass-primitives-PLAN.md — 5 stateless EmberGlass micro-primitives (GlassCard, CardHead, StatusDot, MiniStat, InlineToggle) + jest tests (DASH-01, DASH-04, DASH-09, DASH-12) [Wave 1]
-- [ ] 177-02-foundation-skeleton-keyframes-PLAN.md — PlayingBars + GlassCardSkeleton + SheetPlaceholderBody + sonosBar keyframes + useWeatherSummary hook (DASH-05, DASH-06, DASH-11, DASH-12) [Wave 1]
-- [ ] 177-03-stove-climate-cards-PLAN.md — StoveCard (FlameViz + power_level readout) + ClimateCard (≤4 zones + N/M attive) (DASH-02, DASH-03, DASH-11, DASH-12) [Wave 2]
-- [ ] 177-04-lights-sonos-cards-PLAN.md — LightsCard (header InlineToggle + ≤4 + overflow + Spente empty state) + SonosCard (PlayingBars + count copy) (DASH-04, DASH-05, DASH-11, DASH-12) [Wave 2]
-- [ ] 177-05-weather-camera-network-cards-PLAN.md — WeatherCard (read-only, no Sheet) + CameraCard (LIVE pill + img snapshot) + NetworkCard (down Mbps + device count) (DASH-06, DASH-07, DASH-08, DASH-11, DASH-12) [Wave 2]
-- [ ] 177-06-raspi-tuya-dirigera-cards-PLAN.md — RaspiCard (read-only, 2-stat MiniStat) + TuyaCard (no inline toggles) + DirigeraCard (empty list per A-02) (DASH-09, DASH-10, DASH-11, DASH-12) [Wave 2]
-- [ ] 177-07-dashboard-integration-PLAN.md — DashboardCards.tsx 2-col grid rewrite + barrel exports + Sonos visibility flip (A-03) + jest update (DASH-01, DASH-05, DASH-11, DASH-12) [Wave 3]
-- [ ] 177-08-playwright-smoke-PLAN.md — tests/smoke/dashboard-glass-cards.spec.ts (DASH-01..DASH-12 end-to-end) + final React Compiler grep gate + phase-closing SUMMARY (DASH-01..DASH-12) [Wave 4]
+- [x] 177-01-glass-primitives-PLAN.md — 5 stateless EmberGlass micro-primitives (GlassCard, CardHead, StatusDot, MiniStat, InlineToggle) + jest tests (DASH-01, DASH-04, DASH-09, DASH-12) [Wave 1]
+- [x] 177-02-foundation-skeleton-keyframes-PLAN.md — PlayingBars + GlassCardSkeleton + SheetPlaceholderBody + sonosBar keyframes + useWeatherSummary hook (DASH-05, DASH-06, DASH-11, DASH-12) [Wave 1]
+- [x] 177-03-stove-climate-cards-PLAN.md — StoveCard (FlameViz + power_level readout) + ClimateCard (≤4 zones + N/M attive) (DASH-02, DASH-03, DASH-11, DASH-12) [Wave 2]
+- [x] 177-04-lights-sonos-cards-PLAN.md — LightsCard (header InlineToggle + ≤4 + overflow + Spente empty state) + SonosCard (PlayingBars + count copy) (DASH-04, DASH-05, DASH-11, DASH-12) [Wave 2]
+- [x] 177-05-weather-camera-network-cards-PLAN.md — WeatherCard (read-only, no Sheet) + CameraCard (LIVE pill + img snapshot) + NetworkCard (down Mbps + device count) (DASH-06, DASH-07, DASH-08, DASH-11, DASH-12) [Wave 2]
+- [x] 177-06-raspi-tuya-dirigera-cards-PLAN.md — RaspiCard (read-only, 2-stat MiniStat) + TuyaCard (no inline toggles) + DirigeraCard (empty list per A-02) (DASH-09, DASH-10, DASH-11, DASH-12) [Wave 2]
+- [x] 177-07-dashboard-integration-PLAN.md — DashboardCards.tsx 2-col grid rewrite + barrel exports + Sonos visibility flip (A-03) + jest update (DASH-01, DASH-05, DASH-11, DASH-12) [Wave 3]
+- [x] 177-08-playwright-smoke-PLAN.md — tests/smoke/dashboard-glass-cards.spec.ts (DASH-01..DASH-12 end-to-end) + final React Compiler grep gate + phase-closing SUMMARY (DASH-01..DASH-12) [Wave 4]
 **UI hint**: yes
 
 ### Phase 178: Per-Device Modal Sheets
@@ -188,7 +188,7 @@
 | 174. Ember Glass Tokens & Foundations | 0/0 | Not started | - |
 | 175. Glass Primitives — Press Animation & Sheet | 3/3 | Complete   | 2026-04-27 |
 | 176. Post-Auth0 Splash Animation | 4/4 | Complete    | 2026-04-27 |
-| 177. Equal-Size Dashboard Glass Cards | 0/0 | Not started | - |
+| 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
 | 178. Per-Device Modal Sheets | 0/0 | Not started | - |
 | 179. Rooms Tab Redesign | 0/0 | Not started | - |
 | 180. Automations Tab Full Editor | 0/0 | Not started | - |

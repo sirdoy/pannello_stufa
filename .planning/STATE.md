@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v20.0
 milestone_name: Ember Glass Redesign
-status: planning
-stopped_at: Phase 177 context gathered
-last_updated: "2026-04-28T09:42:35.369Z"
-last_activity: 2026-04-27
+status: executing
+stopped_at: Phase 177 UI-SPEC approved
+last_updated: "2026-04-28T12:51:26.080Z"
+last_activity: 2026-04-28 -- Phase 177 execution started
 progress:
   total_phases: 9
   completed_phases: 3
-  total_plans: 10
+  total_plans: 18
   completed_plans: 10
-  percent: 100
+  percent: 56
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 176 — Post-Auth0 Splash Animation
+**Current focus:** Phase 177 — equal-size-dashboard-glass-cards
 
 ## Current Position
 
-Phase: 177
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-04-27
+Phase: 177 (equal-size-dashboard-glass-cards) — EXECUTING
+Plan: 1 of 8
+Status: Executing Phase 177
+Last activity: 2026-04-28 -- Phase 177 execution started
 
 Progress: [██████████] 100%
 
@@ -109,8 +109,8 @@ None.
 ## Session Continuity
 
 Last activity: 2026-04-27 — Wrote ROADMAP.md for v20.0 Ember Glass Redesign (9 phases, 174-182, 50/50 reqs mapped)
-Stopped at: Phase 177 context gathered
-Resume file: .planning/phases/177-equal-size-dashboard-glass-cards/177-CONTEXT.md
+Stopped at: Phase 177 UI-SPEC approved
+Resume file: .planning/phases/177-equal-size-dashboard-glass-cards/177-UI-SPEC.md
 
 **Next Action:** `/gsd-plan-phase 174` (Ember Glass Tokens & Foundations)
 

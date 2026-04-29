@@ -61,11 +61,11 @@
 
 ### Rooms Tab (data-driven)
 
-- [ ] **ROOMS-01**: Rooms tab is fully data-driven — derives device list per room from existing `state.thermostat.zones`, `state.lights`, `state.plugs`, `state.sonos.groups`, `state.stove`, plus static device entries (TV, blinds, humidity sensor, entrance camera) for the mock layer
-- [ ] **ROOMS-02**: Each RoomCard shows header (room icon + name + "N/M attivi" counter) + 3×2 grid of device chips colored per category (accent for stove, yellow for lights, blue for thermo, violet for audio, etc.), with "+N" overflow chip when devices > 6
-- [ ] **ROOMS-03**: Tapping a RoomCard opens a RoomSheet with summary header (name + icon + active counts + category count) + per-category sections
-- [ ] **ROOMS-04**: RoomSheet device cards are **expanded** (one card per device, not a flat single-row list): each card has a header (icon + name + status text + primary toggle/play/LIVE badge) and a body with type-specific controls
-- [ ] **ROOMS-05**: Type-specific bodies — Stove (3 stat chips + −/power/+ row), Thermostat/Valve (current→target dual readout + ±0.5°/Eco/Auto buttons), Light (brightness slider + color-temp slider), Plug (Ora W/kW chip + Oggi kWh chip), Sonos (track + volume slider + skip/play/skip), TV (source + volume + HDMI selector), Blind (position slider + Up/Stop/Down), Camera (16:9 preview with LIVE + fps + last-motion + play button), Humidity sensor (value chip + trend chip)
+- [x] **ROOMS-01**: Rooms tab is fully data-driven — derives device list per room from existing `state.thermostat.zones`, `state.lights`, `state.plugs`, `state.sonos.groups`, `state.stove`, plus static device entries (TV, blinds, humidity sensor, entrance camera) for the mock layer
+- [x] **ROOMS-02**: Each RoomCard shows header (room icon + name + "N/M attivi" counter) + 3×2 grid of device chips colored per category (accent for stove, yellow for lights, blue for thermo, violet for audio, etc.), with "+N" overflow chip when devices > 6
+- [x] **ROOMS-03**: Tapping a RoomCard opens a RoomSheet with summary header (name + icon + active counts + category count) + per-category sections
+- [x] **ROOMS-04**: RoomSheet device cards are **expanded** (one card per device, not a flat single-row list): each card has a header (icon + name + status text + primary toggle/play/LIVE badge) and a body with type-specific controls
+- [x] **ROOMS-05**: Type-specific bodies — Stove (3 stat chips + −/power/+ row), Thermostat/Valve (current→target dual readout + ±0.5°/Eco/Auto buttons), Light (brightness slider + color-temp slider), Plug (Ora W/kW chip + Oggi kWh chip), Sonos (track + volume slider + skip/play/skip), TV (source + volume + HDMI selector), Blind (position slider + Up/Stop/Down), Camera (16:9 preview with LIVE + fps + last-motion + play button), Humidity sensor (value chip + trend chip)
 
 ### Automations Tab (full editor)
 
@@ -162,11 +162,11 @@ All v20.0 requirements map to phases starting at Phase 174 (continuing numbering
 | SHEET-04 | Phase 178 | Pending |
 | SHEET-05 | Phase 178 | Pending |
 | SHEET-06 | Phase 178 | Pending |
-| ROOMS-01 | Phase 179 | Pending |
-| ROOMS-02 | Phase 179 | Pending |
-| ROOMS-03 | Phase 179 | Pending |
-| ROOMS-04 | Phase 179 | Pending |
-| ROOMS-05 | Phase 179 | Pending |
+| ROOMS-01 | Phase 179 | Complete |
+| ROOMS-02 | Phase 179 | Complete |
+| ROOMS-03 | Phase 179 | Complete |
+| ROOMS-04 | Phase 179 | Complete |
+| ROOMS-05 | Phase 179 | Complete |
 | AUTO-01 | Phase 180 | Pending |
 | AUTO-02 | Phase 180 | Pending |
 | AUTO-03 | Phase 180 | Pending |

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v20.0
 milestone_name: Ember Glass Redesign
-status: executing
+status: ready_to_plan
 stopped_at: Phase 179 UI-SPEC approved
 last_updated: "2026-04-29T13:47:21.674Z"
 last_activity: 2026-04-29 -- Phase 179 execution started
 progress:
   total_phases: 9
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 37
   completed_plans: 28
-  percent: 76
+  percent: 67
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 
 ## Current Position
 
-Phase: 179 (rooms-tab-redesign) — EXECUTING
-Plan: 1 of 9
-Status: Executing Phase 179
-Last activity: 2026-04-29 -- Phase 179 execution started
+Phase: 180
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-04-29
 
 Progress: [██████████] 100%
 

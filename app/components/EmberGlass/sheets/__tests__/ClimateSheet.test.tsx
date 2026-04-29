@@ -59,7 +59,9 @@ const baseData = {
   refetch: jest.fn().mockResolvedValue(undefined),
 };
 
-let dataOverride: Partial<typeof baseData> = {};
+// `dataOverride` deliberately widened to `Record<string, unknown>` so individual tests
+// can override `topology`/`status` with `null` (loading/error states).
+let dataOverride: Record<string, unknown> = {};
 
 jest.mock('@/app/components/devices/thermostat/hooks/useThermostatData', () => ({
   useThermostatData: () => ({ ...baseData, ...dataOverride }),
@@ -233,7 +235,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
       topology: null,
       status: null,
       loading: true,
-    } as Partial<typeof baseData>;
+    };
     render(<ClimateSheet />);
     expect(screen.getByTestId('climate-sheet-skeleton')).toBeInTheDocument();
   });
@@ -243,7 +245,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
       topology: null,
       status: null,
       error: 'Connection refused',
-    } as Partial<typeof baseData>;
+    };
     render(<ClimateSheet />);
     expect(screen.getByTestId('climate-sheet-error')).toBeInTheDocument();
     expect(

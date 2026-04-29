@@ -40,7 +40,7 @@
 - [ ] Phase 176: Post-Auth0 Splash Animation (0/0 plans) — not started
 - [ ] Phase 177: Equal-Size Dashboard Glass Cards (0/8 plans) — not started
 - [x] Phase 178: Per-Device Modal Sheets (10/10 plans) — complete 2026-04-29 (verification: human_needed — see 178-HUMAN-UAT.md)
-- [ ] Phase 179: Rooms Tab Redesign (0/0 plans) — not started
+- [ ] Phase 179: Rooms Tab Redesign (0/9 plans) — not started
 - [ ] Phase 180: Automations Tab Full Editor (0/0 plans) — not started
 - [ ] Phase 181: Glass Bottom Tab Bar (0/0 plans) — not started
 - [ ] Phase 182: Design System Reference Page v2 (0/0 plans) — not started
@@ -152,7 +152,16 @@
   3. Tapping a RoomCard opens a RoomSheet with a summary header (name + icon + active counts + category count) and per-category sections.
   4. Inside RoomSheet, each device renders as an expanded card (one card per device, not a flat row): header has icon + name + status text + primary toggle/play/LIVE badge, and the body has type-specific controls.
   5. Type-specific bodies match the spec — Stove (3 stat chips + −/power/+ row), Thermostat/Valve (current→target dual readout + ±0.5°/Eco/Auto), Light (brightness slider + color-temp slider), Plug (Ora W/kW + Oggi kWh chip), Sonos (track + volume + skip/play/skip), TV (source + volume + HDMI selector), Blind (position slider + Up/Stop/Down), Camera (16:9 preview + LIVE + fps + last-motion + play), Humidity (value + trend chip).
-**Plans**: TBD
+**Plans**: 9 plans
+- [ ] 179-01-PLAN.md — Wave 0: types + lib (rooms-config + getDevicesForRoom) + aggregator unit tests (ROOMS-01) [Wave 0]
+- [ ] 179-02-PLAN.md — Wave 1: 5 primitives (StatChip / DualTempReadout / SliderRow / ControlRow / MiniButton) + jest specs (ROOMS-04, ROOMS-05) [Wave 1]
+- [ ] 179-03-PLAN.md — Wave 1: RoomCard + DeviceChip + jest specs (ROOMS-02) [Wave 1]
+- [ ] 179-04-PLAN.md — Wave 2: DeviceCard + DevicePrimaryControl + DeviceBody dispatcher (ROOMS-04) [Wave 2]
+- [ ] 179-05-PLAN.md — Wave 2: 6 bodies (Stove wired + Plug/Sensor read-only + Tv/Shade/Camera no-op) (ROOMS-05) [Wave 2]
+- [ ] 179-06-PLAN.md — Wave 2: ThermoBody (+ ValveBody) debounced 500ms + LightBody debounced 250ms (ROOMS-05) [Wave 2]
+- [ ] 179-07-PLAN.md — Wave 2: SonosBody debounced 250ms with handleSetZoneVolume (ROOMS-05) [Wave 2]
+- [ ] 179-08-PLAN.md — Wave 3: RoomSheet + RoomsTab orchestrator + barrel + EmberGlass index + /stanze route (ROOMS-01, ROOMS-03) [Wave 3]
+- [ ] 179-09-PLAN.md — Wave 3: Playwright smoke tests/smoke/rooms-tab.spec.ts (5 ROOMS-* scenarios) + human UAT (ROOMS-01..05) [Wave 3]
 **UI hint**: yes
 
 ### Phase 180: Automations Tab Full Editor
@@ -200,7 +209,7 @@
 | 176. Post-Auth0 Splash Animation | 4/4 | Complete    | 2026-04-27 |
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
 | 178. Per-Device Modal Sheets | 10/10 | Complete   | 2026-04-29 |
-| 179. Rooms Tab Redesign | 0/0 | Not started | - |
+| 179. Rooms Tab Redesign | 0/9 | Not started | - |
 | 180. Automations Tab Full Editor | 0/0 | Not started | - |
 | 181. Glass Bottom Tab Bar | 0/0 | Not started | - |
 | 182. Design System Reference Page v2 | 0/0 | Not started | - |

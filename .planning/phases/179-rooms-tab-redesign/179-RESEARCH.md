@@ -798,21 +798,24 @@ test.describe('ROOMS-01..05 Rooms tab', () => {
 
 **If this table is empty:** No user confirmation needed. Three rows above are minor and pre-acknowledged by CONTEXT/UI-SPEC.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the aggregator's stove `value` string drop temperature (since useStoveData has no `temp` field)?**
    - What we know: bundle reads `${state.stove.temp}°C` for the chip value. Real hook has `powerLevel` (1–5) and `status` (StoveState union).
    - What's unclear: should the chip show `${powerLevel}/5` or `${status}` or "Spenta" / "Accesa" only.
    - Recommendation: aggregator outputs `value: stove.isAccesa ? 'Accesa' : 'Spenta'` (status-only, matches what Phase 178 StoveSheet already shows on the dashboard). Plan agent confirms.
+   - **RESOLVED:** `${powerLevel}/5` — Plan 01's `getDevicesForRoom` aggregator emits the power-level fraction so Soggiorno's stove chip surfaces the actual flame level (e.g. `3/5`), preserving the bundle's information density. `isAccesa` already drives the on/off boolean separately, so the value string carries the richer reading.
 
 2. **Should ThermoBody / ValveBody `useThermostatData` self-fetch, or accept the data via prop drilling from RoomsTab?**
    - What we know: Phase 178 sheets self-fetch (D-04). Phase 179 CONTEXT D-39 endorses self-fetch.
    - What's unclear: 6 rooms × N zones = potentially many ThermoBody instances each calling `useThermostatData` (which polls + WS-subs). React's hook dedup makes this reasonable, but it does spawn N React subscriptions to the same data.
    - Recommendation: each body self-fetches; rely on React's hook subscription dedup. The hook's WebSocket subscription is conditional on `isWsConnected` and shares the singleton context, so multiple consumers don't multiply network traffic. Plan agent verifies no warnings in dev.
+   - **RESOLVED:** Self-fetch — Plans 06 (ThermoBody/ValveBody) and 07 (other bodies) call `useThermostatData()` / equivalent hooks inside each body, matching CONTEXT D-39 and the Phase 178 sheet precedent. WebSocket subscription dedup via the singleton context keeps network traffic flat.
 
 3. **Should `getDevicesForRoom` be exported as default or named?**
    - What we know: CONTEXT D-68 says `export function getDevicesForRoom`.
    - Recommendation: named export. Plan agent uses verbatim.
+   - **RESOLVED:** Named export — Plan 01 ships `export function getDevicesForRoom(...)` in `app/components/EmberGlass/rooms/lib/getDevicesForRoom.ts`, consumed via `import { getDevicesForRoom } from './lib/getDevicesForRoom'` (Plan 08 RoomsTab + barrel). Matches CONTEXT D-68 verbatim.
 
 ## Environment Availability
 

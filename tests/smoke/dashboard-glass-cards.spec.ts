@@ -251,3 +251,142 @@ test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
     });
   });
 });
+
+// ============================================================================
+// Phase 178 — SHEET-02..SHEET-06 wiring smoke tests (extends Phase 177 spec).
+//
+// Each describe asserts that tapping a dashboard card opens its real Sheet body
+// and that an interactive control fires the expected API endpoint via a
+// page.route() mock. Reuses (verbatim):
+//   - collectConsoleErrors (lines 30-42)
+//   - dismissVersionEnforcerIfPresent (lines 50-67)
+//   - dismissWhatsNewModalIfPresent (lines 80-94)
+//
+// Mocking strategy mirrors the Phase 177 beforeEach (lines 134-180) — defensive
+// route-mock + DOM dismissal + storageState pre-prime. Each describe owns its
+// own beforeEach because Playwright route-mocks are per-context and do not
+// inherit across describe blocks. Auth0 storageState is reused via the global
+// playwright.config.ts setup; no per-describe login flow needed.
+//
+// Endpoint URLs verified against the live command hooks at runtime:
+//   STOVE_ROUTES.setPower            → /api/v1/thermorossi/settings/power
+//   useThermostatCommands.setRoomSetpoint → /api/v1/netatmo/setroomthermpoint
+//   useLightsCommands.handleAllLightsToggle → PUT /api/v1/hue/groups/{id}/action
+//   useSonosCommands.handlePlay/handlePause → POST /api/v1/sonos/zones/{id}/play|pause
+//   useTuyaCommands.togglePlug       → POST /api/tuya/plugs/{id}/state
+// ============================================================================
+
+/**
+ * Shared pre-goto setup mirroring the Phase 177 describe-level beforeEach
+ * (lines 134-180). Each SHEET-* describe calls this BEFORE goto + dismissals.
+ * Pre-primes localStorage to suppress WhatsNewModal + installs a defensive
+ * version-check route mock so the changelog dialog cannot intercept clicks.
+ */
+async function primeDashboardForSheetTest(page: Page): Promise<void> {
+  await page.route('**/api/version*', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ version: '99.99.99' }),
+    })
+  );
+  await page.addInitScript(() => {
+    try {
+      window.localStorage.setItem('lastSeenVersion', '99.99.99');
+      const dismissed = [
+        '99.99.99',
+        '1.77.0', '1.77.1', '1.77.2',
+        '1.78.0', '1.79.0', '1.80.0',
+        '2.0.0',
+      ];
+      window.localStorage.setItem('dismissedVersions', JSON.stringify(dismissed));
+    } catch {
+      // localStorage may be unavailable in some Playwright contexts — no-op.
+    }
+  });
+}
+
+test.describe('SHEET-02 StoveSheet wires command', () => {
+  let powerRequests: string[];
+
+  test.beforeEach(async ({ page }) => {
+    powerRequests = [];
+    // Mock the Thermorossi setPower endpoint (verified in lib/routes.ts:53).
+    await page.route('**/api/v1/thermorossi/settings/power', (route) =>
+      route.fulfill({
+        status: 202,
+        contentType: 'application/json',
+        body: JSON.stringify({ suggested_poll_delay_s: 1 }),
+      }),
+    );
+    page.on('request', (req) => {
+      if (req.url().includes('/api/v1/thermorossi/settings/power')) {
+        powerRequests.push(req.url());
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('clicking + on power stepper fires Thermorossi setPower command', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('stove-card').click();
+    const sheet = page.getByTestId('stove-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    const powerWrap = sheet.getByTestId('stove-sheet-power-stepper');
+    await powerWrap.getByTestId('stepper-plus').click();
+    // Wait for the asynchronous request to land.
+    await expect.poll(() => powerRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-02 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});
+
+test.describe('SHEET-03 ClimateSheet wires command', () => {
+  let setpointRequests: Array<{ url: string; body: string }>;
+
+  test.beforeEach(async ({ page }) => {
+    setpointRequests = [];
+    // Mock the Netatmo per-room setpoint endpoint (verified in useThermostatCommands.ts:92).
+    await page.route('**/api/v1/netatmo/setroomthermpoint', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ status: 'ok' }),
+      }),
+    );
+    page.on('request', (req) => {
+      if (req.url().includes('/api/v1/netatmo/setroomthermpoint')) {
+        setpointRequests.push({ url: req.url(), body: req.postData() ?? '' });
+      }
+    });
+    await primeDashboardForSheetTest(page);
+    await page.goto('/');
+    await page.waitForLoadState('domcontentloaded');
+    await dismissVersionEnforcerIfPresent(page);
+    await dismissWhatsNewModalIfPresent(page);
+  });
+
+  test('clicking + on RadialDial fires setroomthermpoint after debounce', async ({ page }) => {
+    const { errors, cleanup } = collectConsoleErrors(page);
+    await page.getByTestId('climate-card').click();
+    const sheet = page.getByTestId('climate-sheet');
+    await expect(sheet).toBeVisible({ timeout: 2000 });
+    // The radial-dial-plus button is rendered inside the radial wrap. ClimateSheet
+    // emits a stable `radial-dial-plus` testid on the + button (per primitives spec).
+    await sheet.getByTestId('radial-dial-plus').click();
+    // 500ms debounce in ClimateSheet (per ThermostatCard pattern) — wait past it.
+    await expect.poll(() => setpointRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
+    cleanup();
+    expect(
+      errors,
+      `Console errors during SHEET-03 scenario: ${errors.join(', ')}`,
+    ).toEqual([]);
+  });
+});

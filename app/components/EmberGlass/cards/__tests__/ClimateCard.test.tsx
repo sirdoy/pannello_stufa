@@ -18,6 +18,11 @@ import { fireEvent, render } from '@testing-library/react';
 jest.mock('@/app/components/devices/thermostat/hooks/useThermostatData', () => ({
   useThermostatData: jest.fn(),
 }));
+// Mock the real ClimateSheet body (Phase 178-09 swap) so the card-level test
+// does not run ClimateSheet's hooks (debounce, useThermostatCommands, etc.).
+jest.mock('../../sheets/ClimateSheet', () => ({
+  ClimateSheet: () => <div data-testid="climate-sheet" />,
+}));
 
 import ClimateCard from '../ClimateCard';
 import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
@@ -143,7 +148,8 @@ describe('ClimateCard (Phase 177 — DASH-03)', () => {
     fireEvent.click(getByTestId('climate-card'));
     const dialogOpen = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialogOpen?.getAttribute('style') ?? '').toContain('translateY(0)');
-    expect(getByTestId('sheet-placeholder-body')).toBeInTheDocument();
+    // Real ClimateSheet body is mounted (mocked here) on open (Phase 178-09).
+    expect(getByTestId('climate-sheet')).toBeInTheDocument();
   });
 
   test('Handles status=null gracefully (no crash, footer 0 di 0 attive)', () => {

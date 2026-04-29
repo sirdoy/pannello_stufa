@@ -23,6 +23,11 @@ const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
+// Mock the real LightsSheet body (Phase 178-09 swap) so the card-level test
+// does not run LightsSheet's hooks (room grouping, scene catalog lookup, etc.).
+jest.mock('../../sheets/LightsSheet', () => ({
+  LightsSheet: () => <div data-testid="lights-sheet" />,
+}));
 
 const mockUseLightsData = jest.mocked(useLightsData);
 const mockUseLightsCommands = jest.mocked(useLightsCommands);
@@ -115,10 +120,11 @@ describe('LightsCard (Phase 177 — DASH-04)', () => {
 
     fireEvent.click(screen.getByTestId('lights-card'));
 
-    // After click: dialog is open AND placeholder body is rendered
+    // After click: dialog is open AND the real LightsSheet body is mounted
+    // (mocked here) — Phase 178-09 swapped the placeholder for the real body.
     const dialogAfter = document.querySelector('[role="dialog"]');
     expect(dialogAfter?.getAttribute('data-state')).toBe('open');
-    expect(screen.getByText(/Controlli in arrivo nella Phase 178/)).toBeInTheDocument();
+    expect(screen.getByTestId('lights-sheet')).toBeInTheDocument();
   });
 
   test('(e) overflow row "+ altre N" shows when more than 4 lights are on', () => {

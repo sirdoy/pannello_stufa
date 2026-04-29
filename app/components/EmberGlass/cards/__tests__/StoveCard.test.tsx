@@ -25,6 +25,12 @@ jest.mock('@auth0/nextjs-auth0/client', () => ({
 jest.mock('@/app/context/VersionContext', () => ({
   useVersion: () => ({ checkVersion: jest.fn() }),
 }));
+// Mock the real StoveSheet body (Phase 178-09 swap) so the card-level test
+// does not run StoveSheet's hooks. The card asserts only that the sheet body
+// renders inside the Sheet primitive on tap.
+jest.mock('../../sheets/StoveSheet', () => ({
+  StoveSheet: () => <div data-testid="stove-sheet" />,
+}));
 
 import StoveCard from '../StoveCard';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
@@ -82,12 +88,13 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     // Sheet uses forceMount so the dialog stays in the DOM with translateY(110%) when closed.
     const dialogClosed = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialogClosed?.getAttribute('style') ?? '').toContain('translateY(110%)');
-    // The placeholder body is mounted, so we assert via the data-testid sheet element transform.
+    // The real StoveSheet body is mounted (mocked here as a stub div with
+    // data-testid="stove-sheet"); assert via the data-testid sheet element.
     fireEvent.click(getByTestId('stove-card'));
     const dialogOpen = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialogOpen?.getAttribute('style') ?? '').toContain('translateY(0)');
-    // Sheet placeholder body is the visible (non-translated) content.
-    expect(getByTestId('sheet-placeholder-body')).toBeInTheDocument();
+    // Real StoveSheet body is the visible (non-translated) content (Phase 178-09).
+    expect(getByTestId('stove-sheet')).toBeInTheDocument();
   });
 
   test('(d) renders dash placeholder when powerLevel is null', () => {

@@ -5,8 +5,8 @@
  *
  * Dashboard summary tile for the Thermorossi stove. Composes Wave 1 EmberGlass
  * primitives (GlassCard + CardHead + StatusDot) with FlameViz (Phase 176) and
- * the Phase 175 Sheet primitive (placeholder body — Phase 178 swaps in the
- * real StoveSheet).
+ * the Phase 175 Sheet primitive wrapping the real `<StoveSheet>` body
+ * (Phase 178-09 swap; placeholder retired for this card).
  *
  * A-01 deviation (no °C superscript on the value):
  *   The bundle (`cards.jsx:81-107`) renders a `°C` superscript on the 36px
@@ -31,7 +31,7 @@ import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { FlameViz } from '../FlameViz';
 import { Sheet } from '../Sheet';
-import { SheetPlaceholderBody } from './SheetPlaceholderBody';
+import { StoveSheet } from '../sheets/StoveSheet';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useVersion } from '@/app/context/VersionContext';
 
@@ -97,7 +97,7 @@ export default function StoveCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Stufa">
-        <SheetPlaceholderBody phase="178" device="stove" />
+        <StoveSheet />
       </Sheet>
     </>
   );

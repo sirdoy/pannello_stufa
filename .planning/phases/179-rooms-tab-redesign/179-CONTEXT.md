@@ -58,7 +58,7 @@ Out of scope (future phases):
 ## Implementation Decisions
 
 ### File layout & namespace
-- **D-01:** All new Rooms-tab files live under `app/components/EmberGlass/rooms/` — sibling to `app/components/EmberGlass/cards/` (Phase 177 D-01) and `app/components/EmberGlass/sheets/` (Phase 178 D-01). Concrete layout:
+- **D-01:** [informational] All new Rooms-tab files live under `app/components/EmberGlass/rooms/` — sibling to `app/components/EmberGlass/cards/` (Phase 177 D-01) and `app/components/EmberGlass/sheets/` (Phase 178 D-01). Concrete layout:
   - `rooms/RoomsTab.tsx` (orchestrator)
   - `rooms/RoomCard.tsx`
   - `rooms/RoomSheet.tsx`
@@ -72,8 +72,8 @@ Out of scope (future phases):
   - `rooms/types.ts`
   - `rooms/index.ts` — barrel re-exporting everything for downstream consumers.
   - Re-exported from `app/components/EmberGlass/index.ts` so Phase 181 can import via `@/app/components/EmberGlass`.
-- **D-02:** Inline-style + `var(--token)` convention from Phase 174 D-12 / Phase 175 D-08 / Phase 176 D-23 / Phase 177 D-02 / Phase 178 D-02 is mandatory. **No Tailwind classes for visual values inside any `rooms/` file** — bundle is the source of truth and bundle is inline-style. Layout flex/grid + spacing tokens stay inline too. This is the consistent rule for the whole `EmberGlass/` namespace.
-- **D-03:** RoomsTab itself uses `'use client'` (state-bearing — owns `selectedRoomName`). All sub-components are client components when they bind events; pure presentational atoms (`<DeviceChip>`, `<StatChip>`, `<DualTempReadout>`, `<SliderRow>`, `<ControlRow>`, `<MiniButton>`) are client components by inheritance. No server-component refactor in this phase.
+- **D-02:** [informational] Inline-style + `var(--token)` convention from Phase 174 D-12 / Phase 175 D-08 / Phase 176 D-23 / Phase 177 D-02 / Phase 178 D-02 is mandatory. **No Tailwind classes for visual values inside any `rooms/` file** — bundle is the source of truth and bundle is inline-style. Layout flex/grid + spacing tokens stay inline too. This is the consistent rule for the whole `EmberGlass/` namespace.
+- **D-03:** [informational] RoomsTab itself uses `'use client'` (state-bearing — owns `selectedRoomName`). All sub-components are client components when they bind events; pure presentational atoms (`<DeviceChip>`, `<StatChip>`, `<DualTempReadout>`, `<SliderRow>`, `<ControlRow>`, `<MiniButton>`) are client components by inheritance. No server-component refactor in this phase.
 - **D-04:** Route mount: new `app/stanze/page.tsx` renders `<RoomsTab />` only. The page is `'use client'` and reuses the existing auth wrapping pattern from `app/page.tsx` (Auth0 guard via `useUser` if applicable; plan agent confirms by reading `app/page.tsx`). The existing `/rooms` settings-CRUD page is **untouched**. The route name is `/stanze` (Italian, matches the NAV-02 nav label from Phase 181, and explicitly avoids the `/rooms` collision).
 
 ### Static room config (bundle parity)
@@ -215,17 +215,17 @@ Out of scope (future phases):
   - **`<SliderRow label value unit min max tone icon disabled onChange?>`** — bundle `rooms.jsx:559-585`. Read-only gradient bar (no thumb, no native `<input>`). When `onChange` is provided, the row becomes a tap-to-seek strip (compute click x → percentage → onChange(percent)). Default min=0, max=100. `disabled` dims to opacity 0.45 and disables `onChange`.
   - **`<ControlRow>{children}`** — bundle `rooms.jsx:587-589`. Flex row, 6px gap.
   - **`<MiniButton Icon label filled tone onClick disabled>`** — bundle `rooms.jsx:591-604`. 34px tall, 10px radius, optional icon + label (one or both required), `filled` variant uses tone-tinted bg + tone color + glow shadow.
-- **D-37:** Primitives are **pure presentational**. No `useMemo` / `useCallback` (Phase 71 / 95 / 178 D-33 React Compiler discipline). Inline event handlers permitted (Phase 178 D-34).
+- **D-37:** [informational] Primitives are **pure presentational**. No `useMemo` / `useCallback` (Phase 71 / 95 / 178 D-33 React Compiler discipline). Inline event handlers permitted (Phase 178 D-34).
 
 ### Commands hook usage
-- **D-38:** All wiring uses **existing** commands hooks. **No new commands hooks** in Phase 179:
+- **D-38:** [informational] All wiring uses **existing** commands hooks. **No new commands hooks** in Phase 179:
   - `useStoveCommands` — `handleIgnite`, `handleShutdown`, `handlePowerChange`, `handleConfirmCleaning` (gate).
   - `useThermostatCommands` — `setRoomSetpoint`, `setHomeMode`, `setRoomMode` (Phase 178 added).
   - `useLightsCommands` — `handleRoomToggle`, `handleBrightnessChange`.
   - `useSonosCommands` — `handlePlay`, `handlePause`, `handleNext`, `handlePrevious`, `handleSetVolume`.
   - `useTuyaCommands` — `togglePlug`.
-- **D-39:** Hooks are called inside the relevant body component (RoomCard / DevicePrimaryControl / each `<*Body>`) — NOT at the RoomsTab orchestrator level. Reasons: (a) decouples sub-components from the orchestrator's hook list; (b) each body owns the handlers it needs; (c) parallels the Phase 178 self-fetch pattern. RoomsTab only owns the `selectedRoomName` state and the data hooks for the **chip-grid** active counts (so cards can color the count badge correctly).
-- **D-40:** **Optimistic UI** — same pattern as Phase 178 D-28. InlineToggle and slider commits flip locally and roll back on next data tick if the underlying command fails. Reuses the existing `useRetryableCommand` infrastructure already wrapped inside each commands hook.
+- **D-39:** [informational] Hooks are called inside the relevant body component (RoomCard / DevicePrimaryControl / each `<*Body>`) — NOT at the RoomsTab orchestrator level. Reasons: (a) decouples sub-components from the orchestrator's hook list; (b) each body owns the handlers it needs; (c) parallels the Phase 178 self-fetch pattern. RoomsTab only owns the `selectedRoomName` state and the data hooks for the **chip-grid** active counts (so cards can color the count badge correctly).
+- **D-40:** [informational] **Optimistic UI** — same pattern as Phase 178 D-28. InlineToggle and slider commits flip locally and roll back on next data tick if the underlying command fails. Reuses the existing `useRetryableCommand` infrastructure already wrapped inside each commands hook.
 
 ### RoomsTab (orchestrator)
 - **D-41:** Reads all 5 device hooks at the top of the function: `useStoveData`, `useThermostatData`, `useLightsData`, `useTuyaData`, `useSonosFullData`. Builds an `AggregatorState` literal from their outputs (mapping field names per D-10). Pure projection — no `useMemo`.
@@ -257,7 +257,7 @@ Out of scope (future phases):
 - **D-61:** **Glass surfaces** in this phase are: **`<RoomCard>`** (the GlassCard) and **`<DeviceCard>`** (a glass-tinted container). Per Phase 175 SC-#1, every NEW glass surface in Phases 177-181 reuses `<Pressable>`. Therefore:
   - `<RoomCard>` wraps in `<Pressable as={GlassCard} onClick={onOpen}>`. **Required.**
   - `<DeviceCard>` is **not interactive at the card level** — controls inside dispatch their own actions. **Skip Pressable wrap** because there is no card-level click. Plan agent verifies SC-#1 wording — if "every glass surface" is interpreted strictly as "every visually-glass surface regardless of interactivity", the rule still applies and DeviceCard wraps in `<Pressable>` with no `onClick`. Recommend the strict interpretation to avoid argument: wrap with `<Pressable as="div">` and no handler.
-- **D-62:** Sub-primitives (`<MiniButton>`, `<SliderRow>` thumb, `<DeviceChip>`) are bare clickable elements. Browser `:active` state is sufficient feedback. They are NOT glass surfaces (they have tone-tinted small chips, not blurred glass).
+- **D-62:** [informational] Sub-primitives (`<MiniButton>`, `<SliderRow>` thumb, `<DeviceChip>`) are bare clickable elements. Browser `:active` state is sufficient feedback. They are NOT glass surfaces (they have tone-tinted small chips, not blurred glass).
 
 ### Tests
 - **D-63:** **Jest unit tests** under `app/components/EmberGlass/rooms/__tests__/` — one spec per non-trivial component:
@@ -276,11 +276,11 @@ Out of scope (future phases):
   - "ROOMS-04 expanded device cards" — assert sheet contains at least one `<DeviceCard>` with header + body (e.g. Stove with stat chips).
   - "ROOMS-05 type-specific bodies" — open Soggiorno (likely contains stove + sonos + tv), assert each body's distinguishing element renders (Power button + Play/Pause + HDMI buttons).
   - Zero console errors per scenario.
-- **D-65:** Reuse the **Phase 177 dashboard-glass-cards.spec.ts auth/setup helpers** by extracting them to `tests/playwright/_helpers/auth.ts` if not already extracted. If they're inline, leave inline and duplicate for now (cleanup phase). Plan agent decides based on current state.
+- **D-65:** [informational] Reuse the **Phase 177 dashboard-glass-cards.spec.ts auth/setup helpers** by extracting them to `tests/playwright/_helpers/auth.ts` if not already extracted. If they're inline, leave inline and duplicate for now (cleanup phase). Plan agent decides based on current state.
 
 ### React Compiler discipline (Phase 71 / 95 / 178 D-33)
-- **D-66:** **No `useMemo` / `useCallback`** anywhere in `rooms/`. Pure-function components only. The plan must include a `npx react-compiler-healthcheck` step in `<verify><automated>` (mirror Phase 177 D-28 / Phase 178 D-33).
-- **D-67:** Inline event handler functions (`onClick={() => handlePause(g.id)}`) explicitly allowed. Do NOT extract to `useCallback`.
+- **D-66:** [informational] **RESEARCH-OVERRIDE:** grep gate per Pitfall 11 (npx react-compiler-healthcheck command does not exist; Plan 08 substitutes the grep gate). **No `useMemo` / `useCallback`** anywhere in `rooms/`. Pure-function components only. The plan must include a `npx react-compiler-healthcheck` step in `<verify><automated>` (mirror Phase 177 D-28 / Phase 178 D-33).
+- **D-67:** [informational] Inline event handler functions (`onClick={() => handlePause(g.id)}`) explicitly allowed. Do NOT extract to `useCallback`.
 
 ### Index / barrel exports
 - **D-68:** `app/components/EmberGlass/rooms/index.ts` exports:

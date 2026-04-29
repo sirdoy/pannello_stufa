@@ -4,8 +4,8 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: executing
 stopped_at: Phase 179 UI-SPEC approved
-last_updated: "2026-04-29T13:46:17.263Z"
-last_activity: 2026-04-29 -- Phase 179 planning complete
+last_updated: "2026-04-29T13:47:21.674Z"
+last_activity: 2026-04-29 -- Phase 179 execution started
 progress:
   total_phases: 9
   completed_phases: 5
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 178 — Per-Device Modal Sheets
+**Current focus:** Phase 179 — rooms-tab-redesign
 
 ## Current Position
 
-Phase: 178 (Per-Device Modal Sheets) — COMPLETE (verification: human_needed — 178-HUMAN-UAT.md)
-Plan: 10 of 10
-Status: Ready to execute
-Last activity: 2026-04-29 -- Phase 179 planning complete
+Phase: 179 (rooms-tab-redesign) — EXECUTING
+Plan: 1 of 9
+Status: Executing Phase 179
+Last activity: 2026-04-29 -- Phase 179 execution started
 
 Progress: [██████████] 100%
 

@@ -36,3 +36,6 @@ export type { SheetPlaceholderBodyProps, SheetPlaceholderDevice } from './cards/
 
 // Phase 178 — sheets (bodies + sub-primitives + helper)
 export * from './sheets';
+
+// Phase 179 — rooms tab
+export * from './rooms';

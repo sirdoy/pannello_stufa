@@ -143,7 +143,8 @@ describe('useThermostatCommands (CONTEXT D-16)', () => {
       await result.current.setRoomMode('room-A', 'home');
     });
 
-    const lastCallBody = mockTempCmd.execute.mock.calls.at(-1)?.[1]?.body;
+    const calls = mockTempCmd.execute.mock.calls;
+    const lastCallBody = calls[calls.length - 1]?.[1]?.body;
     expect(lastCallBody).toBe(
       JSON.stringify({ home_id: 'home-1', room_id: 'room-A', mode: 'home' }),
     );

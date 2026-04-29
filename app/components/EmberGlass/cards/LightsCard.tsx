@@ -12,7 +12,7 @@
  *  - Body: ≤4 on-light name rows (with StatusDot) + overflow `+ altre N`
  *    + footer `{N} di {total} accese`. Empty state: 28px display "Spente"
  *    + subtitle `{total} disponibili`.
- *  - Adjacent <Sheet> with placeholder body (Phase 178 swap).
+ *  - Adjacent <Sheet> wraps <LightsSheet /> (Phase 178-09 swap).
  *
  * Stop-propagation rule (D-17): the master InlineToggle MUST call
  * e.stopPropagation() so its click does NOT also fire the parent Pressable
@@ -35,7 +35,7 @@ import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { InlineToggle } from '../InlineToggle';
 import { Sheet } from '../Sheet';
-import { SheetPlaceholderBody } from './SheetPlaceholderBody';
+import { LightsSheet } from '../sheets/LightsSheet';
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
 import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
 
@@ -143,7 +143,7 @@ export default function LightsCard() {
         )}
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Luci">
-        <SheetPlaceholderBody phase="178" device="lights" />
+        <LightsSheet />
       </Sheet>
     </>
   );

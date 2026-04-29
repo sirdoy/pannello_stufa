@@ -31,7 +31,7 @@ import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
-import { SheetPlaceholderBody } from './SheetPlaceholderBody';
+import { ClimateSheet } from '../sheets/ClimateSheet';
 import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 import type { RoomStatus, NetatmoTopology } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 
@@ -114,7 +114,7 @@ export default function ClimateCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Clima">
-        <SheetPlaceholderBody phase="178" device="thermostat" />
+        <ClimateSheet />
       </Sheet>
     </>
   );

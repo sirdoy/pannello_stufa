@@ -6,8 +6,8 @@
  * Bundle source: .planning/inbox/ember-glass-design/project/components/cards.jsx:385-432.
  *
  * Per DASH-10, the dashboard surface is REPORT-ONLY: NO inline toggles, NO switch role.
- * Plug toggles live in the PlugsSheet (Phase 178). Tapping the card opens the placeholder
- * sheet wired to `<SheetPlaceholderBody phase="178" device="plugs-tuya" />`.
+ * Plug toggles live in the PlugsSheet (Phase 178). Tapping the card opens the sheet
+ * wired to `<PlugsSheet />` (Phase 178-09 swap).
  *
  * Hook field mapping — `TuyaPlug` (types/tuyaProxy.ts:33-46) exposes:
  *   device_id   → row key + fallback name
@@ -24,7 +24,7 @@ import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
-import { SheetPlaceholderBody } from './SheetPlaceholderBody';
+import { PlugsSheet } from '../sheets/PlugsSheet';
 import { useTuyaData } from '@/app/components/devices/tuya/hooks/useTuyaData';
 
 const TONE = '#ffb84a';
@@ -92,7 +92,7 @@ export default function TuyaCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Prese smart">
-        <SheetPlaceholderBody phase="178" device="plugs-tuya" />
+        <PlugsSheet />
       </Sheet>
     </>
   );

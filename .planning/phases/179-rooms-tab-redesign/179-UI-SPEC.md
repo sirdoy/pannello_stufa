@@ -1,10 +1,11 @@
 ---
 phase: 179
 slug: rooms-tab-redesign
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-29
+reviewed_at: 2026-04-29
 ---
 
 # Phase 179 — UI Design Contract

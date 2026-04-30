@@ -176,8 +176,8 @@
   5. Actions list supports the 9 action types (`netatmo_set_room_temp`, `netatmo_set_home_mode`, `netatmo_switch_schedule`, `stove_command`, `lights_command`, `plug_command`, `sonos_command`, `http_webhook`, `log_event`), each row has type-specific form + reorder ↑/↓ + remove; the Avanzate tab exposes `min_interval_seconds` and `max_triggers_per_hour`; Save is disabled until name is non-empty AND ≥1 action exists; an unsaved-changes guard prompts on close; existing automations open in the same editor and surface a Delete (with confirm) button in edit mode.
 **Plans**: 9 plans
 - [x] 180-01-PLAN.md — Foundation: rewrite types/automations.ts (D-05) + patch 3 legacy consumers + add assertNever helper [Wave 1]
-- [ ] 180-02-PLAN.md — Lib + UI types: catalogs (TRIGGER_TYPES/CONDITION_TYPES/ACTION_TYPES per D-08+D-09) + factories + apiToDraft/draftToApi/computePatchDelta mappers + countConditions + describeTrigger (AUTO-03, AUTO-04, AUTO-05) [Wave 2]
-- [ ] 180-03-PLAN.md — 10 inline-style primitives (FieldLabel, TextInput, NumInput, SegmentedControl, TwoCol, TypeTile, AddChip, Pill, CronHint, IconBtn) per UI-SPEC visual contract (AUTO-02, AUTO-04, AUTO-05) [Wave 2]
+- [x] 180-02-PLAN.md — Lib + UI types: catalogs (TRIGGER_TYPES/CONDITION_TYPES/ACTION_TYPES per D-08+D-09) + factories + apiToDraft/draftToApi/computePatchDelta mappers + countConditions + describeTrigger (AUTO-03, AUTO-04, AUTO-05) [Wave 2]
+- [x] 180-03-PLAN.md — 10 inline-style primitives (FieldLabel, TextInput, NumInput, SegmentedControl, TwoCol, TypeTile, AddChip, Pill, CronHint, IconBtn) per UI-SPEC visual contract (AUTO-02, AUTO-04, AUTO-05) [Wave 2]
 - [ ] 180-04-PLAN.md — TriggerSection (2 tiles per D-08) + 2 trigger forms (ScheduleCronForm + ManualApiCallForm) + edit-mode read-only (D-12) (AUTO-03) [Wave 3]
 - [ ] 180-05-PLAN.md — ConditionsSection + recursive ConditionGroup (depth-2 cap per D-11, AND/OR toggle) + ConditionItem + 4 leaf forms with API field names (AUTO-04) [Wave 3]
 - [ ] 180-06-PLAN.md — ActionsSection (11-tile picker per D-09) + ActionRow (reorder + remove) + 11 action forms with discriminator narrowing + http_webhook JSON validation (AUTO-05) [Wave 3]
@@ -222,7 +222,7 @@
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
 | 178. Per-Device Modal Sheets | 10/10 | Complete   | 2026-04-29 |
 | 179. Rooms Tab Redesign | 9/9 | Complete    | 2026-04-29 |
-| 180. Automations Tab Full Editor | 1/9 | In Progress|  |
+| 180. Automations Tab Full Editor | 3/9 | In Progress|  |
 | 181. Glass Bottom Tab Bar | 0/0 | Not started | - |
 | 182. Design System Reference Page v2 | 0/0 | Not started | - |
 

@@ -41,7 +41,7 @@
 - [ ] Phase 177: Equal-Size Dashboard Glass Cards (0/8 plans) — not started
 - [x] Phase 178: Per-Device Modal Sheets (10/10 plans) — complete 2026-04-29 (verification: human_needed — see 178-HUMAN-UAT.md)
 - [ ] Phase 179: Rooms Tab Redesign (0/9 plans) — not started
-- [ ] Phase 180: Automations Tab Full Editor (0/0 plans) — not started
+- [ ] Phase 180: Automations Tab Full Editor (0/9 plans) — not started
 - [ ] Phase 181: Glass Bottom Tab Bar (0/0 plans) — not started
 - [ ] Phase 182: Design System Reference Page v2 (0/0 plans) — not started
 
@@ -174,7 +174,19 @@
   3. Trigger picker supports all 5 documented types from `docs/automations.md` (`schedule_cron`, `sensor_state_change`, `sensor_threshold`, `netatmo_temperature_threshold`, `manual`) with type-specific forms, including a visual hint for cron strings.
   4. Conditions support nested AND/OR groups up to 2 levels deep with a per-group operator toggle and colored side-bars for visual nesting; the 4 condition types `time_window`, `device_state`, `temperature_range`, `always_true` each have their dedicated form.
   5. Actions list supports the 9 action types (`netatmo_set_room_temp`, `netatmo_set_home_mode`, `netatmo_switch_schedule`, `stove_command`, `lights_command`, `plug_command`, `sonos_command`, `http_webhook`, `log_event`), each row has type-specific form + reorder ↑/↓ + remove; the Avanzate tab exposes `min_interval_seconds` and `max_triggers_per_hour`; Save is disabled until name is non-empty AND ≥1 action exists; an unsaved-changes guard prompts on close; existing automations open in the same editor and surface a Delete (with confirm) button in edit mode.
-**Plans**: TBD
+**Plans**: 9 plans
+- [ ] 180-01-PLAN.md — Foundation: rewrite types/automations.ts (D-05) + patch 3 legacy consumers + add assertNever helper [Wave 1]
+- [ ] 180-02-PLAN.md — Lib + UI types: catalogs (TRIGGER_TYPES/CONDITION_TYPES/ACTION_TYPES per D-08+D-09) + factories + apiToDraft/draftToApi/computePatchDelta mappers + countConditions + describeTrigger (AUTO-03, AUTO-04, AUTO-05) [Wave 2]
+- [ ] 180-03-PLAN.md — 10 inline-style primitives (FieldLabel, TextInput, NumInput, SegmentedControl, TwoCol, TypeTile, AddChip, Pill, CronHint, IconBtn) per UI-SPEC visual contract (AUTO-02, AUTO-04, AUTO-05) [Wave 2]
+- [ ] 180-04-PLAN.md — TriggerSection (2 tiles per D-08) + 2 trigger forms (ScheduleCronForm + ManualApiCallForm) + edit-mode read-only (D-12) (AUTO-03) [Wave 3]
+- [ ] 180-05-PLAN.md — ConditionsSection + recursive ConditionGroup (depth-2 cap per D-11, AND/OR toggle) + ConditionItem + 4 leaf forms with API field names (AUTO-04) [Wave 3]
+- [ ] 180-06-PLAN.md — ActionsSection (11-tile picker per D-09) + ActionRow (reorder + remove) + 11 action forms with discriminator narrowing + http_webhook JSON validation (AUTO-05) [Wave 3]
+- [ ] 180-07-PLAN.md — AdvancedSection (cooldown fields per AUTO-06) + AutomationEditor (4-tab nav + tab badges + dirty tracking + save guard + ConfirmationDialog wiring per D-12/13/14/15/16) (AUTO-02, AUTO-06, AUTO-07, AUTO-08) [Wave 4]
+- [ ] 180-08-PLAN.md — useAutomationsList hook (CRUD + optimistic toggle per D-13/D-23) + AutomationRow (4 status pills per AUTO-01) + AutomationsTab orchestrator + /automazioni route + barrels (AUTO-01, AUTO-02, AUTO-08) [Wave 5]
+- [ ] 180-09-PLAN.md — Playwright smoke spec (tests/smoke/automations-tab.spec.ts) + console-error gate (D-27) + human UAT for visual parity + Italian copy (AUTO-01..08) [Wave 6]
+
+> Note: SC-#3 and SC-#5 are honored per CONTEXT D-08 and D-09 with API-truth corrections — Trigger picker ships 2 actual API trigger types (`schedule_cron`, `manual_api_call`); the 3 sensor concepts surface as condition leaves under Condizioni. Action picker ships 11 API action types (`netatmo_set_room_temp`, `netatmo_set_home_mode`, `netatmo_switch_schedule`, `thermorossi`, `hue_light`, `hue_group`, `hue_scene`, `tuya`, `sonos`, `http_webhook`, `log_event`) — the 9 generic bundle labels translate to 11 explicit API types. User confirmed both adjustments in 180-CONTEXT.md.
+
 **UI hint**: yes
 
 ### Phase 181: Glass Bottom Tab Bar

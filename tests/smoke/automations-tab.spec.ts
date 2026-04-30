@@ -184,10 +184,14 @@ async function mockAutomationsApi(
         body: JSON.stringify({ ...MOCK_RULE_BASE, ...body, id: 99 }),
       });
     } else if (method === 'PATCH') {
+      // Merge the request body so update-flow assertions see the patched
+      // fields (symmetry with the POST branch above). Echoing the unmodified
+      // base would silently mask orchestrator bugs that send the wrong patch.
+      const body = JSON.parse(route.request().postData() ?? '{}') as Record<string, unknown>;
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify({ ...MOCK_RULE_BASE }),
+        body: JSON.stringify({ ...MOCK_RULE_BASE, ...body }),
       });
     } else if (method === 'DELETE') {
       await route.fulfill({ status: 204, body: '' });

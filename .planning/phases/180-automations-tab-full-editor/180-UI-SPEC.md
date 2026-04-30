@@ -96,7 +96,7 @@ All sizes are literal px values used in inline-style declarations (bundle-verbat
 | Body / description | 13px | 400 (regular) | 1.5 | `var(--font-body)` | Row description (line 194 — 11px), actions intro copy (line 577 — 12px), input text (line 827), type-picker label (line 603 — 11px) |
 | Caption / pills / labels | 10–11px | 600 | 1.3 | `var(--font-body)` | Pill text 10px weight 600 (line 217), FieldLabel 11px weight 600 uppercase (line 819), sub-counter 13px (line 135) |
 
-**Declared sizes (rounded to the 4 distinct roles used):**
+**Declared sizes (orientation summary — see CONTEXT D-02 Override below for canonical locked scale):**
 
 | Role | Size | Weight |
 |------|------|--------|
@@ -105,13 +105,43 @@ All sizes are literal px values used in inline-style declarations (bundle-verbat
 | Label / pill | 11px | 600 semibold |
 | Caption / hint | 10px | 600 semibold |
 
-Two weights: **400 regular** (body text, descriptions, sub-copy) and **600 semibold** (all
-labels, CTAs, headlines, badges, pills). No 500 or 700 weights are introduced.
-
 **Letter spacing:**
 - Headline: `-0.8` (bundle line 136 — applies to `--font-display` only).
 - FieldLabel uppercase: `0.8` letter-spacing (bundle line 819).
 - Pill text: `0.2` letter-spacing (bundle line 217).
+
+### CONTEXT D-02 Override
+
+Per locked CONTEXT D-02, the bundle (`automations.jsx`) is the source of truth for all typography values. The expanded scale supersedes the standard 4-size/2-weight checker heuristic. Executors must transcribe values verbatim — do NOT consolidate.
+
+The standard checker heuristic (max 4 sizes, max 2 weights) is overridden by this authority. The full exhaustive type scale for this phase is:
+
+**Canonical size table (all 8 sizes):**
+
+| Size | Weight | Line Height | Font | Role | Bundle citation |
+|------|--------|-------------|------|------|----------------|
+| 30px | 600 | 1.2 | `var(--font-display)` | Page headline "Automazioni" | line 136 |
+| 15px | 600 | 1.2 | `var(--font-body)` | AutomationRow rule name | line 193 |
+| 14px | 600 | 1.2 | `var(--font-body)` | Footer button labels ("Annulla", "Salva modifiche", "Crea automazione") | line 308 |
+| 13px | 400 | 1.5 | `var(--font-body)` | Input text, actions-empty CTA label, intro copy body | line 827, line 407 |
+| 12px | 600 | 1.2 | `var(--font-body)` | TypeTile label, SegmentedControl segment label, trigger-read-only note | line 237, line 284 |
+| 11px | 600 | 1.3 | `var(--font-body)` | FieldLabel uppercase, tab segment label, AddChip label | line 819, line 207, line 328 |
+| 10px | 600 | 1.3 | `var(--font-body)` | Pill text | line 217 |
+| 9px | 700 | 1.0 | `var(--font-body)` | Tab badge (Condizioni/Azioni count) + CronHint segment label (uppercase) | line 364, line 339 |
+
+**Canonical weight table (all 3 weights):**
+
+| Weight | Name | Usage | Bundle citation |
+|--------|------|-------|----------------|
+| 400 | regular | Body text, input text, descriptions, sub-copy, intro paragraphs | line 194, line 827 |
+| 600 | semibold | All labels, CTAs, headlines, pills, tab segments, FieldLabels, TypeTile labels | line 136, line 193, line 217, line 819 |
+| 700 | bold | ActionRow number badge, tab badge (Condizioni/Azioni count) | line 310 (`10px weight 700 tabular-nums`), line 364 (`9px weight 700`) |
+
+Per locked CONTEXT D-02, the bundle (`automations.jsx`) is the source of truth for all typography values. The expanded scale supersedes the standard 4-size/2-weight checker heuristic. Executors must transcribe values verbatim — do NOT consolidate.
+
+### Visual Hierarchy
+
+Primary focal point: "Automazioni" headline (30px, `var(--font-display)`) anchors the list screen; "Nuova" CTA (accent fill) is the secondary focal element. "Nuova" is a single-word Italian-convention override — intentional, bundle-verbatim (line 139), and locked per CONTEXT D-02.
 
 ---
 
@@ -744,7 +774,7 @@ Row icon derivation: `TRIGGER_TYPES.find(t => t.id === rule.trigger?.type)?.Icon
 | Lucide icons | CONTEXT D-19 (locked) |
 | Italian copywriting | CONTEXT D-21/D-22 + bundle verbatim |
 | Spacing values | `automations.jsx` bundle (verbatim) |
-| Typography sizes | `automations.jsx` bundle (verbatim) |
+| Typography sizes | `automations.jsx` bundle (verbatim) — CONTEXT D-02 Override (8 sizes, 3 weights) |
 | Color tones (per-type) | CONTEXT D-09/D-18 + bundle |
 | Save guard logic | CONTEXT D-14 (locked) |
 | Unsaved-changes copy | CONTEXT D-15 (locked) |

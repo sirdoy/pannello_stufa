@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v20.0
 milestone_name: Ember Glass Redesign
-status: executing
+status: ready_to_plan
 stopped_at: Phase 180 context gathered
 last_updated: "2026-04-30T14:56:48.181Z"
 last_activity: 2026-04-30 -- Phase 180 execution started
 progress:
   total_phases: 9
-  completed_phases: 6
+  completed_phases: 7
   total_plans: 46
   completed_plans: 45
-  percent: 98
+  percent: 78
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 
 ## Current Position
 
-Phase: 180 (automations-tab-full-editor) — EXECUTING
-Plan: 1 of 9
-Status: Executing Phase 180
-Last activity: 2026-04-30 -- Phase 180 execution started
+Phase: 181
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-04-30
 
 Progress: [██████████] 100%
 

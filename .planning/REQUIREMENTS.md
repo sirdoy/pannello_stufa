@@ -69,14 +69,14 @@
 
 ### Automations Tab (full editor)
 
-- [ ] **AUTO-01**: Automations list shows each automation with icon + name + description + toggle + status pill (trigger type + condition count + action count + "ultima esecuzione: …")
-- [ ] **AUTO-02**: "Nuova automazione" button opens an editor sheet with Name + Description fields and 4 inner tabs (Trigger / Condizioni / Azioni / Avanzate) showing badge counts on each tab
-- [ ] **AUTO-03**: Trigger picker supports the 5 types from `docs/automations.md`: `schedule_cron`, `sensor_state_change`, `sensor_threshold`, `netatmo_temperature_threshold`, `manual` — each with a type-specific form, including a visual hint for cron strings
-- [ ] **AUTO-04**: Conditions support nested AND/OR groups up to 2 levels deep, with a per-group operator toggle and colored side-bars for visual nesting; 4 condition types: `time_window`, `device_state`, `temperature_range`, `always_true`
-- [ ] **AUTO-05**: Actions list supports 9 action types: `netatmo_set_room_temp`, `netatmo_set_home_mode`, `netatmo_switch_schedule`, `stove_command`, `lights_command`, `plug_command`, `sonos_command`, `http_webhook`, `log_event` — each row has type-specific form, reorder ↑/↓ buttons, and a remove button
-- [ ] **AUTO-06**: Advanced tab exposes cooldown controls — `min_interval_seconds` and `max_triggers_per_hour`
-- [ ] **AUTO-07**: Save button is disabled until automation has a non-empty name AND at least one action; an unsaved-changes guard prompts on close
-- [ ] **AUTO-08**: Existing automations can be opened in the same editor for edit; Delete button (with confirm) is available in edit mode
+- [x] **AUTO-01**: Automations list shows each automation with icon + name + description + toggle + status pill (trigger type + condition count + action count + "ultima esecuzione: …")
+- [x] **AUTO-02**: "Nuova automazione" button opens an editor sheet with Name + Description fields and 4 inner tabs (Trigger / Condizioni / Azioni / Avanzate) showing badge counts on each tab
+- [x] **AUTO-03**: Trigger picker supports the 5 types from `docs/automations.md`: `schedule_cron`, `sensor_state_change`, `sensor_threshold`, `netatmo_temperature_threshold`, `manual` — each with a type-specific form, including a visual hint for cron strings
+- [x] **AUTO-04**: Conditions support nested AND/OR groups up to 2 levels deep, with a per-group operator toggle and colored side-bars for visual nesting; 4 condition types: `time_window`, `device_state`, `temperature_range`, `always_true`
+- [x] **AUTO-05**: Actions list supports 9 action types: `netatmo_set_room_temp`, `netatmo_set_home_mode`, `netatmo_switch_schedule`, `stove_command`, `lights_command`, `plug_command`, `sonos_command`, `http_webhook`, `log_event` — each row has type-specific form, reorder ↑/↓ buttons, and a remove button
+- [x] **AUTO-06**: Advanced tab exposes cooldown controls — `min_interval_seconds` and `max_triggers_per_hour`
+- [x] **AUTO-07**: Save button is disabled until automation has a non-empty name AND at least one action; an unsaved-changes guard prompts on close
+- [x] **AUTO-08**: Existing automations can be opened in the same editor for edit; Delete button (with confirm) is available in edit mode
 
 ### Navigation (glass tab bar)
 
@@ -167,14 +167,14 @@ All v20.0 requirements map to phases starting at Phase 174 (continuing numbering
 | ROOMS-03 | Phase 179 | Complete |
 | ROOMS-04 | Phase 179 | Complete |
 | ROOMS-05 | Phase 179 | Complete |
-| AUTO-01 | Phase 180 | Pending |
-| AUTO-02 | Phase 180 | Pending |
-| AUTO-03 | Phase 180 | Pending |
-| AUTO-04 | Phase 180 | Pending |
-| AUTO-05 | Phase 180 | Pending |
-| AUTO-06 | Phase 180 | Pending |
-| AUTO-07 | Phase 180 | Pending |
-| AUTO-08 | Phase 180 | Pending |
+| AUTO-01 | Phase 180 | Complete |
+| AUTO-02 | Phase 180 | Complete |
+| AUTO-03 | Phase 180 | Complete |
+| AUTO-04 | Phase 180 | Complete |
+| AUTO-05 | Phase 180 | Complete |
+| AUTO-06 | Phase 180 | Complete |
+| AUTO-07 | Phase 180 | Complete |
+| AUTO-08 | Phase 180 | Complete |
 | NAV-01 | Phase 181 | Pending |
 | NAV-02 | Phase 181 | Pending |
 | NAV-03 | Phase 181 | Pending |

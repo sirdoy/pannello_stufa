@@ -222,7 +222,7 @@
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
 | 178. Per-Device Modal Sheets | 10/10 | Complete   | 2026-04-29 |
 | 179. Rooms Tab Redesign | 9/9 | Complete    | 2026-04-29 |
-| 180. Automations Tab Full Editor | 9/9 | Complete   | 2026-04-30 |
+| 180. Automations Tab Full Editor | 9/9 | Complete    | 2026-04-30 |
 | 181. Glass Bottom Tab Bar | 0/0 | Not started | - |
 | 182. Design System Reference Page v2 | 0/0 | Not started | - |
 

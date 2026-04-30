@@ -554,8 +554,10 @@ test('full create flow generates no console errors (D-27)', async ({ page }) => 
 
   await page.getByRole('button', { name: 'Crea automazione' }).click();
 
-  // Allow refetch + sheet close animation.
-  await page.waitForTimeout(800);
+  // Wait for the editor Sheet to unmount (deterministic completion signal,
+  // replaces the previous hard-coded 800ms sleep that masked real timing
+  // bugs and could miss late-emitted console errors on slow CI runners).
+  await expect(page.getByRole('dialog')).toHaveCount(0, { timeout: 5000 });
 
   cleanup();
   expect(errors).toEqual([]);

@@ -18,11 +18,11 @@ const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 const mockContext = { params: Promise.resolve({ rule_id: 'rule-123' }) };
 
 const mockExecution = {
-  id: 'exec-001',
-  rule_id: 'rule-123',
+  id: 1,
+  rule_id: 1,
   status: 'success' as const,
-  started_at: '2026-01-01T10:00:00Z',
-  duration_ms: 150,
+  triggered_at: 1735689600,
+  trigger_source: 'auto' as const,
   error_message: null,
 };
 

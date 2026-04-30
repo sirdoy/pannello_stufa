@@ -20,12 +20,18 @@ const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 const mockContext = { params: Promise.resolve({ rule_id: 'rule-123' }) };
 
 const mockRule = {
-  id: 'rule-123',
+  id: 1,
   name: 'Test Rule',
   enabled: true,
   description: null,
-  last_execution_at: null,
-  created_at: '2026-01-01T00:00:00Z',
+  trigger: null,
+  condition: { type: 'always_true' as const },
+  actions: [{ type: 'log_event' as const, message: 'test' }],
+  min_interval_seconds: 0,
+  max_triggers_per_hour: 0,
+  last_triggered_at: null,
+  created_at: 1735689600,
+  updated_at: 1735689600,
 };
 
 describe('GET /api/v1/automations/[rule_id]', () => {

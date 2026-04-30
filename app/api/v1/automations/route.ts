@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { withAuthAndErrorHandler, success, created, badRequest, parseQuery, parseJson } from '@/lib/core';
 import { automationsProxy } from '@/lib/automations';
+import type { AutomationRuleCreate } from '@/types/automations';
 
 const automationCreateSchema = z.object({
   name: z.string().min(1),
@@ -32,6 +33,9 @@ export const POST = withAuthAndErrorHandler(async (request) => {
   if (!result.success) {
     return badRequest(result.error.issues.map(i => i.message).join(', '));
   }
-  const data = await automationsProxy.createAutomation(result.data);
+  // Legacy API route — schema only validates name/description/enabled;
+  // server defaults condition/actions when missing.
+  // Full typed body is used by /automazioni Phase 180 editor.
+  const data = await automationsProxy.createAutomation(result.data as unknown as AutomationRuleCreate);
   return created(data as unknown as Record<string, unknown>);
 }, 'Automations/Create');

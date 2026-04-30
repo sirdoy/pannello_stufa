@@ -80,14 +80,17 @@ export default function AutomationsPage() {
   const handleCreate = async (data: AutomationFormData) => {
     setSubmitting(true);
     try {
+      // Legacy admin form — server has defaults for condition/actions.
+      // Full editor at /automazioni (Phase 180) provides the typed body.
+      const body = {
+        name: data.name,
+        description: data.description?.trim() ?? null,
+        enabled: data.enabled,
+      };
       const res = await fetch('/api/v1/automations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: data.name,
-          description: data.description?.trim() ?? null,
-          enabled: data.enabled,
-        }),
+        body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error('Operazione non riuscita. Riprova.');
       toastSuccess('Regola creata con successo');
@@ -176,11 +179,12 @@ export default function AutomationsPage() {
       enableSorting: false,
     },
     {
-      accessorKey: 'last_execution_at',
+      accessorKey: 'last_triggered_at',
       header: 'Ultima esecuzione',
       cell: ({ row }) => {
-        const val = row.original.last_execution_at;
-        return val ? new Date(val).toLocaleString('it-IT') : '\u2014';
+        const val = row.original.last_triggered_at;
+        // last_triggered_at is Unix seconds (number) \u2014 convert to ms
+        return val ? new Date(val * 1000).toLocaleString('it-IT') : '\u2014';
       },
       enableSorting: false,
     },

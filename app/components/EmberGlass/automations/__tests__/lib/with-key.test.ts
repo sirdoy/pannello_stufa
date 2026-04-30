@@ -10,7 +10,7 @@ describe('withKey', () => {
     const keyed = withKey(sampleAction);
     expect(keyed.__key).toMatch(/^act_\d+_\d+$/);
     expect(keyed.type).toBe('log_event');
-    expect(keyed.message).toBe('hello');
+    expect(keyed).toMatchObject({ message: 'hello' });
   });
 
   test('two consecutive calls produce DIFFERENT __keys (counter increments)', () => {

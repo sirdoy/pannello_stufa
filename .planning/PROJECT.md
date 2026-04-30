@@ -880,4 +880,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-27 — milestone v20.0 Ember Glass Redesign started*
+*Last updated: 2026-04-30 — Phase 180 (Automations Tab Full Editor) complete: AUTO-01..08 validated at static-structure level; runtime smoke deferred pending data-layer rewire (haGet → relative /api/v1/automations fetch).*

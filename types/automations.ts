@@ -1,30 +1,34 @@
-export interface AutomationRule {
-  id: string;
-  name: string;
-  description?: string | null;
-  enabled: boolean;
-  last_execution_at?: string | null;
-  created_at?: string;
-  [key: string]: unknown;
-}
+/**
+ * types/automations.ts — Phase 180 (CONTEXT D-05).
+ *
+ * Re-exports the authoritative discriminated unions from
+ * docs/api/automations.types.ts (which mirrors api/automations/models.py).
+ *
+ * Breaking shape change vs prior stub:
+ *   - AutomationRule.id flips string -> number
+ *   - last_execution_at -> last_triggered_at (number Unix seconds)
+ *   - AutomationExecution: started_at/duration_ms -> triggered_at + trigger_source
+ *   - AutomationRulePatch has NO `trigger` field (by API design)
+ *
+ * Three legacy consumers patched in same wave: app/automations/page.tsx,
+ * app/automations/[rule_id]/page.tsx, __tests__/lib/automationsProxy.test.ts.
+ *
+ * Frontend imports MUST come from this file (NOT from @/docs/api/...).
+ */
 
-export interface AutomationCreate {
-  name: string;
-  description?: string | null;
-  enabled?: boolean;
-}
+export * from '@/docs/api/automations.types';
 
-export interface AutomationUpdate {
-  name?: string;
-  description?: string | null;
-  enabled?: boolean;
-}
+import type {
+  AutomationRule,
+  AutomationRuleCreate,
+  AutomationRulePatch,
+  AutomationExecution,
+} from '@/docs/api/automations.types';
 
-export interface AutomationExecution {
-  id: string;
-  rule_id: string;
-  status: 'success' | 'failure' | 'running';
-  started_at: string;
-  duration_ms?: number | null;
-  error_message?: string | null;
-}
+export type { AutomationRule, AutomationRuleCreate, AutomationRulePatch, AutomationExecution };
+
+/** @deprecated alias kept for legacy imports — use AutomationRuleCreate */
+export type AutomationCreate = AutomationRuleCreate;
+
+/** @deprecated alias kept for legacy imports — use AutomationRulePatch */
+export type AutomationUpdate = AutomationRulePatch;

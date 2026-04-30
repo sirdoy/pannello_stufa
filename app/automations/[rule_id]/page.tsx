@@ -85,8 +85,12 @@ function getExecutionBadge(status: string) {
       return <Badge variant="sage">Completata</Badge>;
     case 'failure':
       return <Badge variant="danger">Fallita</Badge>;
-    case 'running':
-      return <Badge variant="warning">In esecuzione</Badge>;
+    case 'partial_failure':
+      return <Badge variant="warning">Parzialmente fallita</Badge>;
+    case 'skipped':
+      return <Badge variant="neutral">Saltata</Badge>;
+    case 'condition_not_met':
+      return <Badge variant="neutral">Condizione non soddisfatta</Badge>;
     default:
       return <Badge variant="neutral">{status}</Badge>;
   }
@@ -110,24 +114,16 @@ export default function AutomationDetailPage() {
 
   const executionColumns: ColumnDef<AutomationExecution>[] = [
     {
-      accessorKey: 'started_at',
+      accessorKey: 'triggered_at',
       header: 'Data',
-      cell: ({ row }) => new Date(row.original.started_at).toLocaleString('it-IT'),
+      // triggered_at is Unix seconds \u2014 convert to ms
+      cell: ({ row }) => new Date(row.original.triggered_at * 1000).toLocaleString('it-IT'),
       enableSorting: false,
     },
     {
       accessorKey: 'status',
       header: 'Stato',
       cell: ({ row }) => getExecutionBadge(row.original.status),
-      enableSorting: false,
-    },
-    {
-      accessorKey: 'duration_ms',
-      header: 'Durata',
-      cell: ({ row }) => {
-        const val = row.original.duration_ms;
-        return val != null ? `${val}ms` : '\u2014';
-      },
       enableSorting: false,
     },
     {
@@ -189,11 +185,8 @@ export default function AutomationDetailPage() {
               </div>
               <div>
                 <Text variant="secondary" size="sm">Creata il</Text>
-                <Text>
-                  {rule.created_at
-                    ? new Date(rule.created_at).toLocaleDateString('it-IT')
-                    : '\u2014'}
-                </Text>
+                {/* created_at is Unix seconds \u2014 convert to ms */}
+                <Text>{new Date(rule.created_at * 1000).toLocaleDateString('it-IT')}</Text>
               </div>
               <div>
                 <Text variant="secondary" size="sm">ID</Text>

@@ -4,8 +4,8 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: executing
 stopped_at: Phase 180 context gathered
-last_updated: "2026-04-30T11:40:29.110Z"
-last_activity: 2026-04-30 -- Phase 180 planning complete
+last_updated: "2026-04-30T11:42:10.950Z"
+last_activity: 2026-04-30 -- Phase 180 execution started
 progress:
   total_phases: 9
   completed_phases: 6
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 179 — rooms-tab-redesign
+**Current focus:** Phase 180 — automations-tab-full-editor
 
 ## Current Position
 
-Phase: 180
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-30 -- Phase 180 planning complete
+Phase: 180 (automations-tab-full-editor) — EXECUTING
+Plan: 1 of 9
+Status: Executing Phase 180
+Last activity: 2026-04-30 -- Phase 180 execution started
 
 Progress: [██████████] 100%
 

@@ -11,6 +11,7 @@
 
 import { automationsProxy } from '@/lib/automations';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
+import type { AutomationRule, AutomationExecution } from '@/types/automations';
 
 // Mock global fetch
 const mockFetch = jest.fn();
@@ -19,13 +20,19 @@ global.fetch = mockFetch;
 const TEST_PROXY_URL = 'https://proxy.example.com';
 const TEST_API_KEY = 'test-api-key-12345';
 
-const mockAutomationRule = {
-  id: 'rule-abc',
-  name: 'Test Rule',
-  enabled: true,
+const mockAutomationRule: AutomationRule = {
+  id: 1,
+  name: 'Test rule',
   description: null,
-  last_execution_at: null,
-  created_at: '2026-01-01T00:00:00Z',
+  enabled: true,
+  trigger: null,
+  condition: { type: 'always_true' },
+  actions: [{ type: 'log_event', message: 'test' }],
+  min_interval_seconds: 0,
+  max_triggers_per_hour: 0,
+  last_triggered_at: null,
+  created_at: 1735689600,
+  updated_at: 1735689600,
 };
 
 const mockPaginatedRules = {
@@ -35,12 +42,12 @@ const mockPaginatedRules = {
   offset: 0,
 };
 
-const mockExecution = {
-  id: 'exec-001',
-  rule_id: 'rule-abc',
-  status: 'success' as const,
-  started_at: '2026-01-01T10:00:00Z',
-  duration_ms: 150,
+const mockExecution: AutomationExecution = {
+  id: 1,
+  rule_id: 1,
+  status: 'success',
+  triggered_at: 1735689600,
+  trigger_source: 'auto',
   error_message: null,
 };
 
@@ -99,12 +106,17 @@ describe('automationsProxy', () => {
         json: async () => mockAutomationRule,
       });
 
-      await automationsProxy.createAutomation({ name: 'Test' });
+      const createBody = {
+        name: 'Test',
+        condition: { type: 'always_true' as const },
+        actions: [{ type: 'log_event' as const, message: 'test' }],
+      };
+      await automationsProxy.createAutomation(createBody);
 
       const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
       expect(url).toBe(`${TEST_PROXY_URL}/api/v1/automations`);
       expect(options.method).toBe('POST');
-      expect(JSON.parse(options.body as string)).toEqual({ name: 'Test' });
+      expect(JSON.parse(options.body as string)).toEqual(createBody);
       expect((options.headers as Record<string, string>)['X-API-Key']).toBe(TEST_API_KEY);
       expect((options.headers as Record<string, string>)['Content-Type']).toBe('application/json');
     });

@@ -39,3 +39,6 @@ export * from './sheets';
 
 // Phase 179 — rooms tab
 export * from './rooms';
+
+// Phase 180 — automations tab
+export * from './automations';

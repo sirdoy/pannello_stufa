@@ -237,7 +237,9 @@ test.describe('AUTO-01: List rendering', () => {
     await dismissVersionEnforcerIfPresent(page);
     await dismissWhatsNewModalIfPresent(page);
 
-    await expect(page.getByText(/Nessuna automazione/)).toBeVisible({ timeout: 10000 });
+    // Anchor on the full empty-state sentence to avoid false matches on
+    // hypothetical strings like "Nessuna automazione attiva" elsewhere.
+    await expect(page.getByText(/Nessuna automazione\. Tocca/)).toBeVisible({ timeout: 10000 });
 
     cleanup();
     expect(errors).toEqual([]);

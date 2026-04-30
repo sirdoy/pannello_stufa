@@ -182,7 +182,7 @@
 - [x] 180-05-PLAN.md — ConditionsSection + recursive ConditionGroup (depth-2 cap per D-11, AND/OR toggle) + ConditionItem + 4 leaf forms with API field names (AUTO-04) [Wave 3]
 - [x] 180-06-PLAN.md — ActionsSection (11-tile picker per D-09) + ActionRow (reorder + remove) + 11 action forms with discriminator narrowing + http_webhook JSON validation (AUTO-05) [Wave 3]
 - [x] 180-07-PLAN.md — AdvancedSection (cooldown fields per AUTO-06) + AutomationEditor (4-tab nav + tab badges + dirty tracking + save guard + ConfirmationDialog wiring per D-12/13/14/15/16) (AUTO-02, AUTO-06, AUTO-07, AUTO-08) [Wave 4]
-- [ ] 180-08-PLAN.md — useAutomationsList hook (CRUD + optimistic toggle per D-13/D-23) + AutomationRow (4 status pills per AUTO-01) + AutomationsTab orchestrator + /automazioni route + barrels (AUTO-01, AUTO-02, AUTO-08) [Wave 5]
+- [x] 180-08-PLAN.md — useAutomationsList hook (CRUD + optimistic toggle per D-13/D-23) + AutomationRow (4 status pills per AUTO-01) + AutomationsTab orchestrator + /automazioni route + barrels (AUTO-01, AUTO-02, AUTO-08) [Wave 5]
 - [ ] 180-09-PLAN.md — Playwright smoke spec (tests/smoke/automations-tab.spec.ts) + console-error gate (D-27) + human UAT for visual parity + Italian copy (AUTO-01..08) [Wave 6]
 
 > Note: SC-#3 and SC-#5 are honored per CONTEXT D-08 and D-09 with API-truth corrections — Trigger picker ships 2 actual API trigger types (`schedule_cron`, `manual_api_call`); the 3 sensor concepts surface as condition leaves under Condizioni. Action picker ships 11 API action types (`netatmo_set_room_temp`, `netatmo_set_home_mode`, `netatmo_switch_schedule`, `thermorossi`, `hue_light`, `hue_group`, `hue_scene`, `tuya`, `sonos`, `http_webhook`, `log_event`) — the 9 generic bundle labels translate to 11 explicit API types. User confirmed both adjustments in 180-CONTEXT.md.
@@ -222,7 +222,7 @@
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |
 | 178. Per-Device Modal Sheets | 10/10 | Complete   | 2026-04-29 |
 | 179. Rooms Tab Redesign | 9/9 | Complete    | 2026-04-29 |
-| 180. Automations Tab Full Editor | 7/9 | In Progress|  |
+| 180. Automations Tab Full Editor | 8/9 | In Progress|  |
 | 181. Glass Bottom Tab Bar | 0/0 | Not started | - |
 | 182. Design System Reference Page v2 | 0/0 | Not started | - |
 

@@ -2,12 +2,12 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { outfit, inter } from './fonts';
 import { WebVitals } from './_components/WebVitals';
-import Navbar from './components/Navbar';
-import { Footer } from './components/ui';
 import ClientProviders from './components/ClientProviders';
 import VersionEnforcer from './components/VersionEnforcer';
 import AppleSplashScreens from './components/AppleSplashScreens';
 import AmbientBg from './components/EmberGlass/AmbientBg';
+import { BottomTabBar } from './components/EmberGlass';
+import { NavbarConnectionStatusChip } from './components/layout/NavbarConnectionStatusChip';
 
 export const metadata: Metadata = {
   title: 'Pannello Stufa',
@@ -69,13 +69,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClientProviders>
       <WebVitals />
       <VersionEnforcer />
-      <Navbar />
-      <main id="main-content" className="flex-1 pt-2 pb-12 px-4 sm:px-6 lg:px-8">
+      <NavbarConnectionStatusChip />
+      <main
+        id="main-content"
+        className="flex-1 pt-[calc(env(safe-area-inset-top)+12px)] pb-[calc(env(safe-area-inset-bottom)+88px)] px-4 sm:px-6 lg:px-8"
+      >
         <div className="max-w-7xl mx-auto">
           {children}
         </div>
       </main>
-      <Footer />
+      <BottomTabBar />
     </ClientProviders>
     </body>
     </html>

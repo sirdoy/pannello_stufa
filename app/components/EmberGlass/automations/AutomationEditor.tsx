@@ -47,11 +47,18 @@ const TABS = ['Trigger', 'Condizioni', 'Azioni', 'Avanzate'] as const;
 /**
  * Count leaf conditions in the UI draft's UIConditionGroup shape.
  * Avoids double-conversion via the API countConditions function.
- * kind:'cond' = 1 leaf; kind:'group' = sum of children; empty = 0.
+ * kind:'cond' = 1 leaf (except always_true => 0); kind:'group' = sum of
+ * children; empty = 0.
+ *
+ * WR-01 (REVIEW iteration 2): mirror countConditions' always_true => 0
+ * rule so the editor's tab badge agrees with the AutomationRow pill after
+ * save/refetch. Previously a user adding "Sempre vero" saw "Condizioni 1"
+ * in the tab while the row showed no condition pill at all.
  */
 function countDraftConditions(group: UIConditionGroup): number {
   return group.items.reduce((sum, item) => {
     if (item.kind === 'group') return sum + countDraftConditions(item);
+    if ((item as { type?: string }).type === 'always_true') return sum;
     return sum + 1;
   }, 0);
 }

@@ -211,4 +211,41 @@ describe('Sheet (EmberGlass primitive)', () => {
       expect(closeBtn).toHaveAttribute('data-sheet-close', 'true');
     });
   });
+
+  describe('Body data-attribute (Phase 181 D-10)', () => {
+    afterEach(() => {
+      delete document.body.dataset.sheetOpen;
+    });
+
+    test('mounting open=true sets body.dataset.sheetOpen', () => {
+      render(<Sheet open={true} onClose={onCloseMock}><div>x</div></Sheet>);
+      expect(document.body.dataset.sheetOpen).toBe('true');
+    });
+
+    test('flipping open true → false clears the attribute', () => {
+      const { rerender } = render(<Sheet open={true} onClose={onCloseMock}><div>x</div></Sheet>);
+      expect(document.body.dataset.sheetOpen).toBe('true');
+      rerender(<Sheet open={false} onClose={onCloseMock}><div>x</div></Sheet>);
+      expect(document.body.dataset.sheetOpen).toBeUndefined();
+    });
+
+    test('two stacked open sheets keep attribute until both close', () => {
+      const { rerender, unmount } = render(
+        <>
+          <Sheet open={true} onClose={onCloseMock}><div>a</div></Sheet>
+          <Sheet open={true} onClose={onCloseMock}><div>b</div></Sheet>
+        </>
+      );
+      expect(document.body.dataset.sheetOpen).toBe('true');
+      rerender(
+        <>
+          <Sheet open={false} onClose={onCloseMock}><div>a</div></Sheet>
+          <Sheet open={true} onClose={onCloseMock}><div>b</div></Sheet>
+        </>
+      );
+      expect(document.body.dataset.sheetOpen).toBe('true'); // counter still 1
+      unmount();
+      expect(document.body.dataset.sheetOpen).toBeUndefined();
+    });
+  });
 });

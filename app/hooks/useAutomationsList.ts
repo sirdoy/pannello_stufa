@@ -6,11 +6,17 @@
  * Paginated CRUD hook for AutomationRule resources.
  *
  * Responsibilities:
- *  - Paginated GET via automationsProxy.getAutomations
- *  - create/update/remove: proxy call → refetch → Italian success toast (throws on error)
+ *  - Paginated GET via /api/v1/automations
+ *  - create/update/remove: HTTP call → refetch → Italian success toast (throws on error)
  *  - toggle: optimistic setRules flip; PATCH; rollback on error + error toast (no success toast)
  *
  * No polling (D-25): data is fetched once on mount + on explicit page change.
+ *
+ * BL-01 (REVIEW iteration 2): All HTTP calls go through Next.js API routes
+ * (`/api/v1/automations*`). The previous implementation imported `automationsProxy`
+ * directly and crashed in the browser because `haClient` reads `process.env.HA_API_URL`
+ * which is `undefined` in the client bundle. Every other client hook in the
+ * codebase uses `fetch('/api/v1/...')`; this hook now matches that pattern.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -19,7 +25,7 @@ import type {
   AutomationRuleCreate,
   AutomationRulePatch,
 } from '@/types/automations';
-import { automationsProxy } from '@/lib/automations/automationsProxy';
+import type { PaginatedResponse } from '@/types/common';
 import { useToast } from '@/app/hooks/useToast';
 
 export interface UseAutomationsListOptions {
@@ -42,6 +48,15 @@ export interface UseAutomationsListResult {
 
 const DEFAULT_PAGE_SIZE = 20;
 
+async function readErrorMessage(res: Response, fallback: string): Promise<string> {
+  try {
+    const data = (await res.json()) as { message?: string; error?: string };
+    return data.message ?? data.error ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export function useAutomationsList(
   options: UseAutomationsListOptions = {}
 ): UseAutomationsListResult {
@@ -58,10 +73,13 @@ export function useAutomationsList(
     setLoading(true);
     setError(null);
     try {
-      const data = await automationsProxy.getAutomations({
-        limit: pageSize,
-        offset: page * pageSize,
-      });
+      const res = await fetch(
+        `/api/v1/automations?limit=${pageSize}&offset=${page * pageSize}`
+      );
+      if (!res.ok) {
+        throw new Error(await readErrorMessage(res, 'Errore nel caricamento'));
+      }
+      const data = (await res.json()) as PaginatedResponse<AutomationRule>;
       setRules(data.items);
       setTotalCount(data.total_count);
     } catch (err) {
@@ -78,7 +96,14 @@ export function useAutomationsList(
   const create = useCallback(
     async (body: AutomationRuleCreate) => {
       try {
-        await automationsProxy.createAutomation(body);
+        const res = await fetch('/api/v1/automations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          throw new Error(await readErrorMessage(res, 'Errore durante il salvataggio'));
+        }
         toastSuccess('Automazione creata');
         await refetch();
       } catch (err) {
@@ -94,7 +119,14 @@ export function useAutomationsList(
   const update = useCallback(
     async (id: number, patch: AutomationRulePatch) => {
       try {
-        await automationsProxy.updateAutomation(String(id), patch);
+        const res = await fetch(`/api/v1/automations/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(patch),
+        });
+        if (!res.ok) {
+          throw new Error(await readErrorMessage(res, 'Errore durante il salvataggio'));
+        }
         toastSuccess('Automazione aggiornata');
         await refetch();
       } catch (err) {
@@ -110,7 +142,12 @@ export function useAutomationsList(
   const remove = useCallback(
     async (id: number) => {
       try {
-        await automationsProxy.deleteAutomation(String(id));
+        const res = await fetch(`/api/v1/automations/${id}`, {
+          method: 'DELETE',
+        });
+        if (!res.ok) {
+          throw new Error(await readErrorMessage(res, "Errore durante l'eliminazione"));
+        }
         toastSuccess('Automazione eliminata');
         await refetch();
       } catch (err) {
@@ -130,9 +167,14 @@ export function useAutomationsList(
         prev.map((r) => (r.id === id ? { ...r, enabled: !currentEnabled } : r))
       );
       try {
-        await automationsProxy.updateAutomation(String(id), {
-          enabled: !currentEnabled,
+        const res = await fetch(`/api/v1/automations/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled: !currentEnabled }),
         });
+        if (!res.ok) {
+          throw new Error(await readErrorMessage(res, 'Errore durante il salvataggio'));
+        }
         // No success toast — InlineToggle is its own visual feedback
       } catch (err) {
         // Rollback

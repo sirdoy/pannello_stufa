@@ -14,6 +14,7 @@ import type {
   ConditionNode,
 } from '@/types/automations';
 import type { UIDraft, UIConditionGroup, UIConditionNode } from '../types';
+import { withConditionKeys } from './condition-keys';
 
 // ─── API → UI ────────────────────────────────────────────────────────────────
 
@@ -22,12 +23,16 @@ import type { UIDraft, UIConditionGroup, UIConditionNode } from '../types';
  * D-10: bare leaf → wrapped AND root group; always_true → empty AND group.
  */
 export function apiToDraft(rule: AutomationRule): UIDraft {
+  // WR-03 (REVIEW iteration 2): seed every UIConditionNode with a stable
+  // __key so ConditionGroup can render with key={item.__key}. Stripped
+  // in uiGroupToConditionNode before serialization.
+  const conditions = withConditionKeys(conditionNodeToUIGroup(rule.condition));
   return {
     name: rule.name,
     description: rule.description ?? null,
     enabled: rule.enabled,
     trigger: rule.trigger ?? null,
-    conditions: conditionNodeToUIGroup(rule.condition),
+    conditions,
     actions: [...rule.actions],
     min_interval_seconds: rule.min_interval_seconds,
     max_triggers_per_hour: rule.max_triggers_per_hour,
@@ -113,8 +118,7 @@ function uiGroupToConditionNode(group: UIConditionGroup): ConditionNode {
   }
   if (group.items.length === 1 && group.items[0]!.kind === 'cond') {
     // Unwrap single-leaf AND group — emit bare leaf
-    const { kind: _kind, ...leaf } = group.items[0]! as { kind: string } & Record<string, unknown>;
-    return leaf as unknown as ConditionNode;
+    return stripUIFields(group.items[0]!);
   }
   return {
     type: group.op.toLowerCase() as 'and' | 'or',
@@ -129,8 +133,17 @@ function asApiNode(node: UIConditionNode): ConditionNode {
   if (node.kind === 'group') {
     return uiGroupToConditionNode(node);
   }
-  // leaf — strip the `kind` field
-  const { kind: _kind, ...leaf } = node as { kind: string } & Record<string, unknown>;
+  return stripUIFields(node);
+}
+
+/**
+ * Strip UI-only fields (`kind`, `__key` per WR-03) from a leaf before
+ * serialization. The remaining keys are leaf-type-specific API fields.
+ */
+function stripUIFields(node: { kind: string; __key?: string } & Record<string, unknown>): ConditionNode {
+  const { kind: _kind, __key: _key, ...leaf } = node;
+  void _kind;
+  void _key;
   return leaf as unknown as ConditionNode;
 }
 
@@ -140,6 +153,10 @@ function asApiNode(node: UIConditionNode): ConditionNode {
  * Recursively sort object keys for stable JSON.stringify comparison.
  * Pitfall 3 fix: different key insertion orders should NOT produce spurious diffs.
  * Arrays are preserved in order (not sorted).
+ *
+ * WR-03 (REVIEW iteration 2): skip `__key` (UI-only stable identity for
+ * condition rows) so adding+removing a row doesn't permanently mark dirty.
+ * Same skip-pattern as the inner canonicalize in AutomationEditor.tsx.
  */
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) {
@@ -149,6 +166,7 @@ function canonicalize(value: unknown): unknown {
     const obj = value as Record<string, unknown>;
     return Object.fromEntries(
       Object.keys(obj)
+        .filter((k) => k !== '__key')
         .sort()
         .map(k => [k, canonicalize(obj[k])])
     );

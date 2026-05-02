@@ -18,9 +18,17 @@ export type {
 
 import type { TriggerType, ActionItem } from '@/types/automations';
 
-/** UI-internal: a leaf condition (any type from ConditionNode minus and/or). */
+/** UI-internal: a leaf condition (any type from ConditionNode minus and/or).
+ *
+ * WR-03 (REVIEW iteration 2): __key is an optional UI-only stable identity
+ * minted on add/insert (mintConditionKey) so React reconciles by leaf
+ * identity rather than position. Stripped before serialization in
+ * uiGroupToConditionNode. Latent bug today (no leaf form holds local state)
+ * but the same class of bug as the action-row __key fix.
+ */
 export interface UIConditionLeaf {
   kind: 'cond';
+  __key?: string;
   type: string; // discriminator from API ConditionNode (sensor_state_change, time_window, ..., always_true)
   // The remaining keys are leaf-type-specific. We type loosely here and the
   // form components narrow via the discriminator before reading fields.
@@ -30,6 +38,7 @@ export interface UIConditionLeaf {
 /** UI-internal: an AND/OR group (recursive). */
 export interface UIConditionGroup {
   kind: 'group';
+  __key?: string;
   op: 'AND' | 'OR';
   items: UIConditionNode[];
 }

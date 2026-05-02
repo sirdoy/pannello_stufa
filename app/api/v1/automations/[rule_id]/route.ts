@@ -51,7 +51,12 @@ export const PATCH = withAuthAndErrorHandler(async (request, context) => {
   if (!result.success) {
     return badRequest(result.error.issues.map((i) => i.message).join(', '));
   }
-  const data = await automationsProxy.updateAutomation(rule_id, result.data);
+  // Cast through unknown: the schema declares condition/actions as `unknown`
+  // (the HA backend owns authoritative discriminated-union validation).
+  const data = await automationsProxy.updateAutomation(
+    rule_id,
+    result.data as unknown as Parameters<typeof automationsProxy.updateAutomation>[1]
+  );
   return success(data as unknown as Record<string, unknown>);
 }, 'Automations/Update');
 

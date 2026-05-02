@@ -140,7 +140,10 @@ describe('apiToDraft correctness', () => {
 
   test('always_true condition maps to empty AND group', () => {
     const draft = apiToDraft(mockRule({ condition: { type: 'always_true' } }));
-    expect(draft.conditions).toEqual({ kind: 'group', op: 'AND', items: [] });
+    // toMatchObject (not toEqual) — apiToDraft now seeds a stable __key on
+    // every condition node (WR-03) which is intentionally opaque to tests.
+    expect(draft.conditions).toMatchObject({ kind: 'group', op: 'AND', items: [] });
+    expect(draft.conditions.__key).toEqual(expect.any(String));
   });
 
   test('bare leaf maps to AND group with single cond item', () => {

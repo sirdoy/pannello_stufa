@@ -82,6 +82,29 @@ describe('ConditionGroup — addCondition', () => {
     expect(call.items[0]).toMatchObject({ kind: 'cond', type: 'time_window' });
   });
 
+  // WR-03 (REVIEW iteration 2): each newly-added leaf carries a stable
+  // __key so React reconciles by identity (not array index). Without
+  // this, removing item[0] would paint leftover state from item[0]
+  // onto the new item[0] in any leaf form that holds local state.
+  it('appended condition carries a stable __key (WR-03)', () => {
+    const onChange = jest.fn();
+    const group: UIConditionGroup = { kind: 'group', op: 'AND', items: [] };
+    render(<ConditionGroup group={group} depth={0} onChange={onChange} />);
+    fireEvent.click(screen.getByText('+ Condizione'));
+    const newItem = (onChange.mock.calls[0]?.[0] as UIConditionGroup).items[0] as { __key?: string };
+    expect(newItem.__key).toEqual(expect.any(String));
+    expect(newItem.__key!.length).toBeGreaterThan(0);
+  });
+
+  it('appended group carries a stable __key (WR-03)', () => {
+    const onChange = jest.fn();
+    const group: UIConditionGroup = { kind: 'group', op: 'AND', items: [] };
+    render(<ConditionGroup group={group} depth={0} onChange={onChange} />);
+    fireEvent.click(screen.getByText('+ Gruppo O'));
+    const newItem = (onChange.mock.calls[0]?.[0] as UIConditionGroup).items[0] as { __key?: string };
+    expect(newItem.__key).toEqual(expect.any(String));
+  });
+
   it('appended condition has API field names start_time and end_time', () => {
     const onChange = jest.fn();
     const group: UIConditionGroup = { kind: 'group', op: 'AND', items: [] };

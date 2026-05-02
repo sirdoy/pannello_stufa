@@ -9,12 +9,19 @@
  * - "+ Condizione" always visible; "+ Gruppo X" ABSENT (not just disabled) at depth >= 2 (D-11)
  * - Children dispatch: kind='cond' → ConditionItem, kind='group' → ConditionGroup (depth+1)
  * D-02: inline-style + var(--token) only.
+ *
+ * WR-03 (REVIEW iteration 2): each child item is rendered with a stable
+ * __key (minted on add) instead of the array index, so removing item[0]
+ * cannot paint leftover state from item[0] onto the new item[0]. Latent
+ * today (no leaf form holds local state) but the same class of bug fixed
+ * for action rows in Plan 07.
  */
 import type { UIConditionGroup, UIConditionLeaf, UIConditionNode } from './types';
 import type { ConditionNode } from '@/types/automations';
 import { defaultCondition } from './lib/automations-config';
 import { ConditionItem } from './ConditionItem';
 import { AddChip } from './primitives/AddChip';
+import { mintConditionKey } from './lib/condition-keys';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -46,7 +53,11 @@ export function ConditionGroup({ group, depth, onChange }: ConditionGroupProps) 
       ...group,
       items: [
         ...group.items,
-        { kind: 'cond', ...defaultCondition('time_window') } as UIConditionLeaf,
+        {
+          kind: 'cond',
+          __key: mintConditionKey('cond'),
+          ...defaultCondition('time_window'),
+        } as UIConditionLeaf,
       ],
     });
 
@@ -55,12 +66,24 @@ export function ConditionGroup({ group, depth, onChange }: ConditionGroupProps) 
       ...group,
       items: [
         ...group.items,
-        { kind: 'group', op: oppositeOp(group.op), items: [] } satisfies UIConditionGroup,
+        {
+          kind: 'group',
+          __key: mintConditionKey('group'),
+          op: oppositeOp(group.op),
+          items: [],
+        } satisfies UIConditionGroup,
       ],
     });
 
   const updateItem = (idx: number, next: UIConditionNode) => {
-    const items = group.items.map((x, i) => (i === idx ? next : x));
+    // Preserve the existing __key on update so React keeps the same fiber.
+    const items = group.items.map((x, i) => {
+      if (i !== idx) return x;
+      const prevKey = (x as { __key?: string }).__key;
+      return prevKey !== undefined && (next as { __key?: string }).__key === undefined
+        ? ({ ...next, __key: prevKey } as UIConditionNode)
+        : next;
+    });
     onChange({ ...group, items });
   };
 
@@ -114,9 +137,16 @@ export function ConditionGroup({ group, depth, onChange }: ConditionGroupProps) 
           <span style={{ fontSize: 11, color: 'var(--text-2)' }}>{counter}</span>
         </div>
 
-        {/* Items with separators between them */}
+        {/* Items with separators between them.
+            WR-03: key is the item's stable __key (minted on add); fall back
+            to a position+type tag for items pre-dating the keying scheme. */}
         {group.items.map((item, i) => (
-          <div key={i}>
+          <div
+            key={
+              (item as { __key?: string }).__key ??
+              `legacy_${i}_${item.kind}`
+            }
+          >
             {/* Separator BETWEEN items (not before first, not after last) */}
             {i > 0 && (
               <div

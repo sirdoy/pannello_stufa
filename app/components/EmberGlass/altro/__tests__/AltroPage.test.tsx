@@ -56,9 +56,11 @@ describe('AltroPage', () => {
     expect(screen.getByText('Account')).toBeInTheDocument();
   });
 
-  test('2: Esci row links to /auth/logout with #ff8a4a label color', () => {
+  test('2: Esci row links to /auth/logout with #ff8a4a label color', async () => {
     render(<AltroPage />);
-    const esci = screen.getByRole('link', { name: /esci/i });
+    // Wait for the async fetch + setState in useEffect to settle so the
+    // act() warning does not fire when an assertion runs before mount completes.
+    const esci = await screen.findByRole('link', { name: /esci/i });
     expect(esci).toHaveAttribute('href', '/auth/logout');
     // The labelColor='#ff8a4a' is set as inline style on the Pressable container.
     // Some browsers normalize to rgb(255, 138, 74); test either form.
@@ -66,10 +68,13 @@ describe('AltroPage', () => {
     expect(colorRaw === '#ff8a4a' || colorRaw === 'rgb(255, 138, 74)').toBe(true);
   });
 
-  test('3: always-present Sistema + Account links render (Log, Registro, Changelog, Esci)', () => {
+  test('3: always-present Sistema + Account links render (Log, Registro, Changelog, Esci)', async () => {
     render(<AltroPage />);
     // Use exact-match regex so /log/i does not also match "Changelog".
-    expect(screen.getByRole('link', { name: /^log$/i })).toHaveAttribute('href', '/log');
+    expect(await screen.findByRole('link', { name: /^log$/i })).toHaveAttribute(
+      'href',
+      '/log'
+    );
     expect(screen.getByRole('link', { name: /^registro$/i })).toHaveAttribute(
       'href',
       '/registry'
@@ -84,8 +89,10 @@ describe('AltroPage', () => {
     );
   });
 
-  test('4: deferred settings routes are NOT rendered (UI-SPEC OQ-2)', () => {
+  test('4: deferred settings routes are NOT rendered (UI-SPEC OQ-2)', async () => {
     render(<AltroPage />);
+    // Settle the async fetch first so subsequent assertions don't fire mid-update.
+    await screen.findByRole('link', { name: /^esci$/i });
     const allLinks = screen.getAllByRole('link').map((a) => a.getAttribute('href'));
     expect(allLinks).not.toContain('/settings/account');
     expect(allLinks).not.toContain('/settings/gdpr');

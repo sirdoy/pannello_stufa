@@ -152,4 +152,33 @@ describe('POST /api/v1/automations', () => {
 
     expect(response.status).toBe(400);
   });
+
+  // BL-02 (REVIEW iteration 2): the schema previously stripped trigger,
+  // condition, actions, scheduling fields. Phase 180 editor relies on the
+  // full body reaching automationsProxy.createAutomation.
+  it('forwards full Phase 180 editor body (trigger/condition/actions/scheduling) to proxy', async () => {
+    const fullBody = {
+      name: 'Wake Up',
+      description: 'Lights at 7am',
+      enabled: true,
+      trigger: { type: 'schedule_cron', cron_expression: '0 7 * * *' },
+      condition: { type: 'always_true' },
+      actions: [{ type: 'log_event', message: 'wake' }],
+      min_interval_seconds: 60,
+      max_triggers_per_hour: 10,
+      active_hours_start: '06:00',
+      active_hours_end: '09:00',
+    };
+    mockParseJson.mockResolvedValue(fullBody as any);
+    mockAutomationsProxy.createAutomation.mockResolvedValue(mockRule);
+    const request = new Request('http://localhost:3000/api/v1/automations', {
+      method: 'POST',
+      body: JSON.stringify(fullBody),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    await POST(request as any, {} as any);
+
+    expect(mockAutomationsProxy.createAutomation).toHaveBeenCalledWith(fullBody);
+  });
 });

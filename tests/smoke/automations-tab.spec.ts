@@ -57,25 +57,32 @@ function collectConsoleErrors(page: Page): { errors: string[]; cleanup: () => vo
 
 /**
  * Best-effort dismissal of the VersionEnforcer / ForceUpdateModal overlay
- * (Phase 175 known blocker per CONTEXT.md D-28). Verbatim copy of the helper
- * established in tests/smoke/splash.spec.ts:60-80.
+ * (Phase 175 known blocker per CONTEXT.md D-28).
+ *
+ * WR-06 (REVIEW iteration 2): widened to a 4-attempt poll mirroring
+ * dismissWhatsNewModalIfPresent. The previous single-shot 500ms poll
+ * raced against VersionEnforcer's Firebase-backed checkVersion(): on
+ * slower CI runners the overlay can mount AFTER 500ms and intercept
+ * the click on `Nuova automazione`. Polling for ~3s closes the race.
  */
 async function dismissVersionEnforcerIfPresent(page: Page): Promise<void> {
-  const overlay = page
-    .locator(
-      'text=/Aggiornamento Disponibile/i, [data-version-enforcer], [data-testid="version-enforcer"]'
-    )
-    .first();
-
-  if (await overlay.isVisible({ timeout: 500 }).catch(() => false)) {
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const overlay = page
+      .locator(
+        'text=/Aggiornamento Disponibile/i, [data-version-enforcer], [data-testid="version-enforcer"]'
+      )
+      .first();
+    const visible = await overlay.isVisible({ timeout: 750 }).catch(() => false);
+    if (!visible) return;
     const dismiss = page
       .getByRole('button', { name: /aggiorna|ricarica|reload|chiudi|ignora|dismiss/i })
       .first();
     if (await dismiss.isVisible({ timeout: 200 }).catch(() => false)) {
-      await dismiss.click({ trial: false }).catch(() => undefined);
+      await dismiss.click({ force: true, trial: false }).catch(() => undefined);
     } else {
       await page.keyboard.press('Escape').catch(() => undefined);
     }
+    await overlay.waitFor({ state: 'hidden', timeout: 1500 }).catch(() => undefined);
   }
 }
 

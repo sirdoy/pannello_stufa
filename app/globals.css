@@ -357,6 +357,49 @@
   50%      { transform: translate(20px, -20px) scale(1.2); opacity: 0.6; }
 }
 
+/* Phase 181 — bottom tab bar + WS chip cross-cutting rules.
+   D-08 desktop centering + D-09 hide-on-sheet-open + Pitfall 2 combined-translate
+   + Pitfall 7 / OQ-3 chip hide. Six rules total (transition + mobile hide +
+   desktop center + desktop combined-translate hide + chip transition + chip hide). */
+[data-bottom-tab="true"] {
+  transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .2s;
+}
+
+@media (min-width: 640px) {
+  [data-bottom-tab="true"] {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 480px;
+    max-width: calc(100vw - 24px);
+  }
+}
+
+body[data-sheet-open="true"] [data-bottom-tab="true"] {
+  transform: translateY(140%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Pitfall 2: combine centering + hide transforms on desktop.
+   Without this, desktop bar slides off horizontally instead of straight down. */
+@media (min-width: 640px) {
+  body[data-sheet-open="true"] [data-bottom-tab="true"] {
+    transform: translate(-50%, 140%);
+  }
+}
+
+/* RESEARCH OQ-3 / Pitfall 7 — hide WS chip under open sheet (slide UP). */
+[data-ws-chip="true"] {
+  transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .2s;
+}
+
+body[data-sheet-open="true"] [data-ws-chip="true"] {
+  transform: translateY(-140%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Reduced-motion guard (UI-SPEC §"Reduced-motion contract") */
 @media (prefers-reduced-motion: reduce) {
   .ember-ambient-blob { animation: none !important; }

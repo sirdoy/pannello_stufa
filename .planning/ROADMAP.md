@@ -42,7 +42,7 @@
 - [x] Phase 178: Per-Device Modal Sheets (10/10 plans) — complete 2026-04-29 (verification: human_needed — see 178-HUMAN-UAT.md)
 - [ ] Phase 179: Rooms Tab Redesign (0/9 plans) — not started
 - [ ] Phase 180: Automations Tab Full Editor (0/9 plans) — not started
-- [ ] Phase 181: Glass Bottom Tab Bar (0/6 plans) — planning complete
+- [x] Phase 181: Glass Bottom Tab Bar (6/6 plans) — completed 2026-05-02
 - [ ] Phase 182: Design System Reference Page v2 (0/0 plans) — not started
 
 </details>

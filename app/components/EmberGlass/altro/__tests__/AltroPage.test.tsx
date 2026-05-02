@@ -45,7 +45,12 @@ afterAll(() => {
 describe('AltroPage', () => {
   test('1: renders 4 group titles (Dispositivi, Sistema, Impostazioni, Account)', async () => {
     render(<AltroPage />);
-    expect(await screen.findByText('Dispositivi')).toBeInTheDocument();
+    // Group titles render inside CardHead (the styled label div with
+    // letter-spacing: 0.2px). "Dispositivi" appears twice (group title +
+    // Impostazioni "Dispositivi" row label) — assert at least one match for
+    // the title text.
+    const titles = await screen.findAllByText('Dispositivi');
+    expect(titles.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Sistema')).toBeInTheDocument();
     expect(screen.getByText('Impostazioni')).toBeInTheDocument();
     expect(screen.getByText('Account')).toBeInTheDocument();
@@ -63,13 +68,17 @@ describe('AltroPage', () => {
 
   test('3: always-present Sistema + Account links render (Log, Registro, Changelog, Esci)', () => {
     render(<AltroPage />);
-    expect(screen.getByRole('link', { name: /log/i })).toHaveAttribute('href', '/log');
-    expect(screen.getByRole('link', { name: /registro/i })).toHaveAttribute('href', '/registry');
-    expect(screen.getByRole('link', { name: /changelog/i })).toHaveAttribute(
+    // Use exact-match regex so /log/i does not also match "Changelog".
+    expect(screen.getByRole('link', { name: /^log$/i })).toHaveAttribute('href', '/log');
+    expect(screen.getByRole('link', { name: /^registro$/i })).toHaveAttribute(
+      'href',
+      '/registry'
+    );
+    expect(screen.getByRole('link', { name: /^changelog$/i })).toHaveAttribute(
       'href',
       '/changelog'
     );
-    expect(screen.getByRole('link', { name: /esci/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^esci$/i })).toHaveAttribute(
       'href',
       '/auth/logout'
     );

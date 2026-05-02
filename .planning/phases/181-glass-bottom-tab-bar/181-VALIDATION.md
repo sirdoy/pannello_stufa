@@ -38,16 +38,16 @@ created: 2026-05-02
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 181-01-01 | 01 | 1 | NAV-03 | — | Body data-attribute set on Sheet open, cleared on last close | unit | `npm test -- app/components/EmberGlass/__tests__/SheetCounter.test.ts` | ❌ W0 (new) | ⬜ pending |
-| 181-01-02 | 01 | 1 | NAV-03 | — | Sheet.tsx augmentation increments/decrements counter | unit | `npm test -- app/components/EmberGlass/__tests__/Sheet.test.tsx` | ✅ extends existing | ⬜ pending |
+| 181-01-01 | 01 | 1 | NAV-03 | — | Body data-attribute set on Sheet open, cleared on last close | unit | `npm run test:components -- app/components/EmberGlass/__tests__/SheetCounter.test.ts` | ❌ W0 (new) | ⬜ pending |
+| 181-01-02 | 01 | 1 | NAV-03 | — | Sheet.tsx augmentation increments/decrements counter | unit | `npm run test:components -- app/components/EmberGlass/__tests__/Sheet.test.tsx` | ✅ extends existing | ⬜ pending |
 | 181-01-03 | 01 | 1 | NAV-03 | — | `body[data-sheet-open] [data-bottom-tab]` hide rule in globals.css | grep | `grep -q "body\[data-sheet-open" app/globals.css` | ❌ W0 (new rule) | ⬜ pending |
-| 181-02-01 | 02 | 1 | NAV-01, NAV-02 | — | BottomTabBar renders 4 tabs + glass surface inline-style | unit | `npm test -- app/components/EmberGlass/__tests__/BottomTabBar.test.tsx` | ❌ W0 (new) | ⬜ pending |
+| 181-02-01 | 02 | 1 | NAV-01, NAV-02 | — | BottomTabBar renders 4 tabs + glass surface inline-style | unit | `npm run test:components -- app/components/EmberGlass/__tests__/BottomTabBar.test.tsx` | ❌ W0 (new) | ⬜ pending |
 | 181-02-02 | 02 | 1 | NAV-02 | — | Active state mapping per pathname (`/`, `/stanze`, `/automazioni`, `/altro`) | unit | same as 181-02-01 | ❌ W0 (new) | ⬜ pending |
 | 181-02-03 | 02 | 1 | NAV-04 | — | Container `bottom: calc(8px + env(safe-area-inset-bottom))` | grep | `grep -q "env(safe-area-inset-bottom)" app/components/EmberGlass/BottomTabBar.tsx` | ❌ W0 (new) | ⬜ pending |
-| 181-03-01 | 03 | 2 | NAV-02 (Altro reachable) | — | `/altro` route renders 4 group sections + Logout link | unit | `npm test -- app/altro/__tests__/page.test.tsx` | ❌ W0 (new) | ⬜ pending |
-| 181-04-01 | 04 | 2 | — | — | NavbarConnectionStatusChip floating wrapper | unit | `npm test -- app/components/layout/__tests__/NavbarConnectionStatusChip.test.tsx` | ❌ W0 (new) | ⬜ pending |
-| 181-05-01 | 05 | 3 | NAV-01..04 | — | layout.tsx unmounts legacy Navbar/Footer; mounts BottomTabBar + chip | unit (snapshot) | `npm test -- app/__tests__/layout.test.tsx` (or grep-based assertion) | ✅ test infra exists | ⬜ pending |
-| 181-05-02 | 05 | 3 | — | — | Legacy Navbar.test.tsx still passes (unchanged file) | unit | `npm test -- app/components/__tests__/Navbar.test.tsx` | ✅ existing | ⬜ pending |
+| 181-03-01 | 03 | 2 | NAV-02 (Altro reachable) | — | `/altro` route renders 4 group sections + Logout link | unit | `npm run test:pages -- app/altro/__tests__/page.test.tsx` | ❌ W0 (new) | ⬜ pending |
+| 181-04-01 | 04 | 2 | — | — | NavbarConnectionStatusChip floating wrapper | unit | `npm run test:components -- app/components/layout/__tests__/NavbarConnectionStatusChip.test.tsx` | ❌ W0 (new) | ⬜ pending |
+| 181-05-01 | 05 | 3 | NAV-01..04 | — | layout.tsx unmounts legacy Navbar/Footer; mounts BottomTabBar + chip | grep | `grep -q "BottomTabBar" app/layout.tsx && ! grep -q "import Navbar" app/layout.tsx` | ✅ existing file | ⬜ pending |
+| 181-05-02 | 05 | 3 | — | — | Legacy Navbar.test.tsx still passes (unchanged file) | unit | `npm run test:components -- app/components/__tests__/Navbar.test.tsx` | ✅ existing | ⬜ pending |
 | 181-06-01 | 06 | 4 | NAV-04 | — | Safe-area inset honored at 375×812 | smoke (Playwright) | `npx playwright test tests/smoke/bottom-tab-bar.spec.ts -g "safe-area"` | ❌ W0 (new spec) | ⬜ pending |
 | 181-06-02 | 06 | 4 | NAV-02 | — | Active tab tinting on each route | smoke | `npx playwright test tests/smoke/bottom-tab-bar.spec.ts -g "active"` | ❌ W0 (new spec) | ⬜ pending |
 | 181-06-03 | 06 | 4 | NAV-03 | — | Bar hides under open Sheet, returns on close | smoke | `npx playwright test tests/smoke/bottom-tab-bar.spec.ts -g "hides under sheet"` | ❌ W0 (new spec) | ⬜ pending |

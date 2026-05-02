@@ -612,22 +612,24 @@ None — all required test infrastructure already exists:
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> All three open questions were resolved before planning and propagated into 181-CONTEXT.md, 181-UI-SPEC.md, and the 181-XX-PLAN.md files. RESOLVED markers added per Dimension 11 / #1602 contract for downstream plan-checker detection.
 
 1. **`/altro` Dispositivi data source — fetch in-page or hook extraction?**
    - What we know: Legacy `Navbar.tsx:142-167` fetches `/api/devices/config` + `/api/user`, builds a `preferences` object, and passes it to `getNavigationStructureWithPreferences`.
    - What's unclear: Whether `<AltroPage>` should inline that fetch (simpler, one-shot) or extract a `useEnabledDevices` hook (testable, reusable for Phase 182).
-   - Recommendation: Inline the fetch for Phase 181 (mirrors the existing one-call pattern). If Phase 182 DSREF needs the same data, extract then.
+   - **RESOLVED:** Inline the fetch in `<AltroPage>` for Phase 181 (mirrors the existing one-call pattern in legacy `Navbar.tsx:142-167`). If Phase 182 DSREF needs the same data, extract a `useEnabledDevices` hook then. Implemented in Plan 03 Task 181-03-02.
 
 2. **Settings routes named in D-12 that don't exist — defer or surface error?**
    - What we know: `/settings/api-keys`, `/settings/notifications`, `/settings/dashboard`, `/settings/devices`, `/settings/location`, `/settings/thermostat` exist. `/settings/account`, `/settings/gdpr`, `/settings/privacy` do NOT.
    - What's unclear: Whether the user expected those 3 routes to already exist or wants them deferred.
-   - Recommendation: Render only the existing 6 + the index `/settings`. Add the 3 missing to PLAN.md `<deferred>`. Planner can confirm with the user via `--auto` defaults.
+   - **RESOLVED:** Render only the 6 existing + the `/settings` index in the AltroPage Impostazioni group. Add the 3 missing routes (`/settings/account`, `/settings/gdpr`, `/settings/privacy`) to 181-CONTEXT.md `<deferred>` and to Plan 03's plan-level `<deferred>` block. Implemented in Plan 03 Task 181-03-02 + UI-SPEC §4 Copywriting.
 
 3. **WS chip during open sheet — hide it too? (Pitfall 7)**
    - What we know: D-13 mounts the chip at z-150 (same as bar). Sheet at z-200/201 covers it correctly. But the chip is at `top: env(safe-area-inset-top) + 12`, the sheet's close button is also at top-right of the sheet content — visual conflict.
    - What's unclear: Whether D-13 intended the chip to also hide under sheets.
-   - Recommendation: Add `body[data-sheet-open="true"] [data-ws-chip="true"]` rule to globals.css (mirror of bar). Planner adds this to Plan 04 + Plan 01 globals.css edit.
+   - **RESOLVED:** Add `body[data-sheet-open="true"] [data-ws-chip="true"] { transform: translateY(-140%); opacity: 0; pointer-events: none; }` rule to `app/globals.css` (mirror of the bar's hide rule, sliding UP instead of DOWN). Chip carries `data-ws-chip="true"` data-attribute hook. Implemented in Plan 01 Task 181-01-03 (globals.css) + Plan 04 Task 181-04-01 (chip wrapper sets the data-attribute).
 
 ---
 

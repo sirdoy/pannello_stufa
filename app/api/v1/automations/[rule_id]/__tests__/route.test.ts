@@ -8,13 +8,19 @@ jest.mock('@/lib/automations');
 jest.mock('@/lib/auth0', () => ({
   auth0: { getSession: jest.fn() },
 }));
+jest.mock('@/lib/core/requestParser', () => ({
+  ...jest.requireActual('@/lib/core/requestParser'),
+  parseJson: jest.fn(),
+}));
 
 import { GET, PATCH, DELETE } from '../route';
 import { automationsProxy } from '@/lib/automations';
 import { auth0 } from '@/lib/auth0';
+import { parseJson } from '@/lib/core/requestParser';
 
 const mockGetSession = jest.mocked(auth0.getSession);
 const mockAutomationsProxy = jest.mocked(automationsProxy);
+const mockParseJson = jest.mocked(parseJson);
 
 const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 const mockContext = { params: Promise.resolve({ rule_id: 'rule-123' }) };
@@ -80,6 +86,9 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
     mockGetSession.mockResolvedValue(mockSession as any);
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
+    // Default: parseJson returns { name: 'Updated' } — matches the existing
+    // PATCH test fixtures so legacy tests stay green.
+    mockParseJson.mockResolvedValue({ name: 'Updated' } as any);
   });
 
   it('returns 401 when not authenticated', async () => {
@@ -124,6 +133,67 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
     await PATCH(request as any, mockContext as any);
 
     expect(mockAutomationsProxy.updateAutomation).toHaveBeenCalledWith('rule-123', expect.any(Object));
+  });
+
+  // BL-03 (REVIEW iteration 2): the route now Zod-validates the PATCH body
+  // and uses .strict() so AutomationRulePatch's no-trigger invariant (D-12)
+  // is enforced at the API boundary — clients cannot smuggle arbitrary keys
+  // through to the HA backend.
+  it('returns 400 when body contains a trigger field (strict mode rejects)', async () => {
+    mockParseJson.mockResolvedValue({
+      name: 'Updated',
+      trigger: { type: 'schedule_cron', cron_expression: '0 0 * * *' },
+    } as any);
+    const request = new Request('http://localhost:3000/api/v1/automations/rule-123', {
+      method: 'PATCH',
+      body: JSON.stringify({}),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const response = await PATCH(request as any, mockContext as any);
+
+    expect(response.status).toBe(400);
+    expect(mockAutomationsProxy.updateAutomation).not.toHaveBeenCalled();
+  });
+
+  it('returns 400 when body contains an unknown key (strict mode rejects)', async () => {
+    mockParseJson.mockResolvedValue({ name: 'Updated', smuggled_field: 'evil' } as any);
+    const request = new Request('http://localhost:3000/api/v1/automations/rule-123', {
+      method: 'PATCH',
+      body: JSON.stringify({}),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const response = await PATCH(request as any, mockContext as any);
+
+    expect(response.status).toBe(400);
+    expect(mockAutomationsProxy.updateAutomation).not.toHaveBeenCalled();
+  });
+
+  it('accepts the full AutomationRulePatch shape (no trigger)', async () => {
+    const validPatch = {
+      name: 'Updated',
+      description: 'New desc',
+      enabled: false,
+      condition: { type: 'always_true' },
+      actions: [{ type: 'log_event', message: 'updated' }],
+      min_interval_seconds: 30,
+      max_triggers_per_hour: 5,
+      active_hours_start: '08:00',
+      active_hours_end: '20:00',
+    };
+    mockParseJson.mockResolvedValue(validPatch as any);
+    mockAutomationsProxy.updateAutomation.mockResolvedValue({ ...mockRule, name: 'Updated' });
+    const request = new Request('http://localhost:3000/api/v1/automations/rule-123', {
+      method: 'PATCH',
+      body: JSON.stringify(validPatch),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const response = await PATCH(request as any, mockContext as any);
+
+    expect(response.status).toBe(200);
+    expect(mockAutomationsProxy.updateAutomation).toHaveBeenCalledWith('rule-123', validPatch);
   });
 });
 

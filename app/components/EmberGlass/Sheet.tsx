@@ -32,6 +32,8 @@ import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { X } from 'lucide-react';
 
+import { incrementSheetCount, decrementSheetCount } from './SheetCounter';
+
 export interface SheetProps {
   open: boolean;
   onClose: () => void;
@@ -51,12 +53,14 @@ export function Sheet({ open, onClose, title, children }: SheetProps): ReactElem
     document.body.style.top = `-${lockedScrollY.current}px`;
     document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
+    incrementSheetCount();        // ← NEW (Phase 181 D-10)
     return () => {
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
       document.body.style.overflow = '';
       window.scrollTo(0, lockedScrollY.current);
+      decrementSheetCount();      // ← NEW (Phase 181 D-10)
     };
   }, [open]);
 

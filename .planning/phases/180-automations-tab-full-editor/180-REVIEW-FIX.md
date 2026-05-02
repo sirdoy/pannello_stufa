@@ -1,95 +1,149 @@
 ---
 phase: 180-automations-tab-full-editor
-fixed_at: 2026-04-30T00:00:00Z
+fixed_at: 2026-05-02T00:00:00Z
 review_path: .planning/phases/180-automations-tab-full-editor/180-REVIEW.md
-iteration: 1
-findings_in_scope: 4
-fixed: 3
-skipped: 1
-status: partial
+iteration: 2
+findings_in_scope: 11
+fixed: 11
+skipped: 0
+status: all_fixed
 ---
 
-# Phase 180: Code Review Fix Report
+# Phase 180 Re-Review: Code Review Fix Report
 
-**Fixed at:** 2026-04-30
+**Fixed at:** 2026-05-02
 **Source review:** .planning/phases/180-automations-tab-full-editor/180-REVIEW.md
-**Iteration:** 1
+**Iteration:** 2
 
 **Summary:**
-- Findings in scope: 4 (Critical + Warning)
-- Fixed: 3
-- Skipped: 1
+- Findings in scope: 11 (4 blockers + 7 warnings)
+- Fixed: 11
+- Skipped: 0
 
-REVIEW.md reports 0 critical and 4 warning findings. Info-level findings (5)
-are out of scope for this iteration per workflow configuration
-(`fix_scope: critical_warning`).
+All blockers and warnings from the iteration-2 re-review were fixed. WR-04
+(documentation invariant) was bundled into the BL-04 commit because the
+two findings address the same root cause (mount-once initializers without
+parent keying).
 
 ## Fixed Issues
 
-### WR-01: Hard-coded 800ms `waitForTimeout` in console-error gate is flake-prone
+### BL-01: Client hook calls server-only HA proxy — runtime crash in browser
+
+**Files modified:** `app/hooks/useAutomationsList.ts`, `app/hooks/__tests__/useAutomationsList.test.ts`
+**Commit:** 595eb299
+**Applied fix:** Rewrote every CRUD method to go through `/api/v1/automations*` via
+`fetch`, matching the legacy hook and every other client hook in the codebase.
+Test suite migrated from `jest.mock(automationsProxy)` to a per-method `fetch`
+handler router that records every call into a `fetchCalls` array. Failure-path
+tests refactored to capture rejections inside `act()` rather than chaining
+`.rejects.toThrow` on the act promise (the matcher resolves before the hook's
+catch-block side effects are observable to the assertion). All 17 tests pass.
+
+### BL-02: POST `/api/v1/automations` Zod schema silently strips trigger/condition/actions
+
+**Files modified:** `app/api/v1/automations/route.ts`, `app/api/v1/automations/__tests__/route.test.ts`
+**Commit:** 7742f654
+**Applied fix:** Widened `automationCreateSchema` to validate the full Phase 180
+editor body (trigger, condition, actions, min_interval_seconds, max_triggers_per_hour,
+active_hours_start, active_hours_end). Used `.passthrough()` so future API additions
+flow without a schema bump. Authoritative discriminated-union validation lives on
+the HA backend; the route only enforces shape (object/array/int bounds) plus a
+non-empty trimmed name. Test added: full editor body reaches the proxy unchanged.
+
+### BL-03: PATCH `/api/v1/automations/[rule_id]` accepts unvalidated body
+
+**Files modified:** `app/api/v1/automations/[rule_id]/route.ts`, `app/api/v1/automations/[rule_id]/__tests__/route.test.ts`
+**Commit:** 8d557445
+**Applied fix:** Added `automationPatchSchema` mirroring `AutomationRulePatch` shape
+with `.strict()` so the no-trigger invariant (D-12 — triggers are immutable
+post-creation) is enforced at the API boundary. A hand-crafted request including
+`trigger` or any unknown key now 400s before reaching the proxy. Three tests added:
+trigger field rejected, unknown key rejected, full valid patch accepted and
+forwarded unchanged.
+
+### BL-04 + WR-04: AutomationEditor `useMemo` with empty deps captures only the FIRST rule prop
+
+**Files modified:** `app/components/EmberGlass/automations/AutomationsTab.tsx`, `app/components/EmberGlass/automations/AutomationEditor.tsx`
+**Commit:** e878ded3
+**Applied fix:** Parent now sets `key={editingRule === 'new' ? 'new' : editingRule.id}`
+on `<AutomationEditor>` so React unmounts and remounts the editor for every new
+rule. The mount-once `useMemo` and two `useState` initializers now correctly
+re-evaluate on each rule. Documented the invariant in a JSDoc comment block
+above the initializers so a future refactor that drops the parent `key=` cannot
+silently re-introduce the latch (this addresses WR-04's documentation request
+in the same change).
+
+### WR-01: `countDraftConditions` counts `always_true` as 1 — disagrees with API-side `countConditions`
+
+**Files modified:** `app/components/EmberGlass/automations/AutomationEditor.tsx`
+**Commit:** 444e10d8
+**Applied fix:** Mirrored `countConditions`' `always_true => 0` rule in
+`countDraftConditions`. Tab badge and AutomationRow pill now agree on the same
+condition tree.
+
+### WR-02: `computePatchDelta` produces spurious `description` patch when API returns `undefined`
+
+**Files modified:** `app/components/EmberGlass/automations/lib/automations-mappers.ts`, `app/components/EmberGlass/automations/__tests__/lib/automations-mappers.test.ts`
+**Commit:** 53d6b431
+**Applied fix:** Coerce `undefined` to `null` on both sides before canonicalize-then-stringify
+so `JSON.stringify(undefined) !== JSON.stringify(null)` (`undefined !== "null"`)
+no longer fires for nullable+optional fields the API serializer omits. Three
+tests added covering description, active_hours_start, active_hours_end.
+
+### WR-03: `ConditionGroup` uses array index as React key
+
+**Files modified:** `app/components/EmberGlass/automations/types.ts`, `app/components/EmberGlass/automations/lib/condition-keys.ts` (new), `app/components/EmberGlass/automations/lib/automations-mappers.ts`, `app/components/EmberGlass/automations/ConditionGroup.tsx`, `app/components/EmberGlass/automations/__tests__/lib/automations-mappers.test.ts`, `app/components/EmberGlass/automations/__tests__/ConditionGroup.test.tsx`, `app/api/v1/automations/[rule_id]/route.ts`
+**Commit:** c43b8030
+**Applied fix:** Mirrored the action-row `__key` pattern for conditions:
+- `lib/condition-keys.ts` (new): `mintConditionKey()` + `withConditionKeys()` recursive seeder
+- `types.ts`: `__key?: string` added to `UIConditionLeaf` and `UIConditionGroup`
+- `apiToDraft`: seeds keys via `withConditionKeys()`
+- `ConditionGroup` `addCondition`/`addGroup`: mints fresh `__key` on insert
+- `ConditionGroup` `updateItem`: preserves existing `__key` on update
+- `uiGroupToConditionNode`/`asApiNode`: new `stripUIFields` helper drops `kind` + `__key` before serialization
+- mapper `canonicalize`: skips `__key` so dirty comparison ignores it
+- PATCH route cast widened so the new schema's `unknown`-typed `condition` flows through TS
+
+Round-trip tests (29 mapper + 19 ConditionGroup, all passing) verify the strip-on-serialize path. Two new tests cover the mint paths.
+
+### WR-04: `apiToDraft` `useMemo` in editor — bundled into BL-04 fix
+
+**Files modified:** see BL-04
+**Commit:** e878ded3
+**Applied fix:** Documented the parent-must-key invariant in a JSDoc above
+the `useMemo` + `useState` initializers in AutomationEditor. The keying
+itself was applied in AutomationsTab as part of BL-04, so this finding's
+documentation request landed in the same commit.
+
+### WR-05: `mockAutomationsApi.opts.rules` typed as `object[]`
 
 **Files modified:** `tests/smoke/automations-tab.spec.ts`
-**Commit:** 6039f3eb
-**Applied fix:** Replaced `await page.waitForTimeout(800)` (line 558) with a
-deterministic wait keyed to the editor Sheet unmounting:
-`await expect(page.getByRole('dialog')).toHaveCount(0, { timeout: 5000 });`.
-This uses Option A from the reviewer's suggestion — asserting the actual
-completion signal (Sheet outro finished) instead of guessing how long the
-animation + refetch take. Removes the CI-flake hazard and ensures any
-console errors emitted during the close animation are caught by the
-subsequent `expect(errors).toEqual([])` assertion.
+**Commit:** e950f9fd
+**Applied fix:** Imported `AutomationRule` type and changed `opts.rules?: object[]`
+to `opts.rules?: Partial<AutomationRule>[]`. Future fixture overrides that drop
+required fields will now be a TypeScript error at edit time.
 
-### WR-02: PATCH mock ignores request body — silently masks update bugs
+### WR-06: Smoke spec helper `dismissVersionEnforcerIfPresent` race window
 
 **Files modified:** `tests/smoke/automations-tab.spec.ts`
-**Commit:** cded250b
-**Applied fix:** Changed the PATCH branch in `mockAutomationsApi` (lines
-186-195) to parse the request body and merge it into the response, mirroring
-the POST branch's `{ ...MOCK_RULE_BASE, ...body, id: 99 }` pattern. PATCH now
-returns `{ ...MOCK_RULE_BASE, ...body }` so any future update-flow test will
-observe the patched fields rather than the unmodified base, eliminating the
-asymmetry between POST and PATCH that the reviewer flagged as a latent bug.
+**Commit:** d3c2be01
+**Applied fix:** Widened the helper from a single-shot 500ms `isVisible()` check
+to a 4-attempt poll mirroring the `dismissWhatsNewModalIfPresent` structure
+(750ms × 4 = ~3s window). Each iteration: detect overlay, click dismiss or press
+Escape, wait for hidden, retry if still visible. Closes the race where
+VersionEnforcer's Firebase-backed checkVersion mounts the overlay AFTER the
+single-shot check on slow CI runners.
 
-### WR-03: Empty-state text is split across DOM nodes — regex match may misbehave on strict roles
+### WR-07: `AutomationsPage` (legacy) `handleDelete` does not toggle `submitting` state
 
-**Files modified:** `tests/smoke/automations-tab.spec.ts`
-**Commit:** f20e6f56
-**Applied fix:** Tightened the empty-state regex (line 236) from
-`/Nessuna automazione/` to `/Nessuna automazione\. Tocca/`. The new pattern
-includes the period and the word that follows the inline `<strong>Nuova</strong>`,
-which is unique to the empty-state copy in
-`app/components/EmberGlass/automations/AutomationsTab.tsx:139` and would not
-match a hypothetical heading like "Nessuna automazione attiva". Added an
-explanatory comment for future maintainers. Verified Playwright concatenates
-the rendered text across the parent `<div>` and inner `<strong>`, so the
-escaped period still matches the actual DOM output.
-
-## Skipped Issues
-
-### WR-04: `dismissVersionEnforcerIfPresent` race with WhatsNewModal — 200ms polls may miss late-mount overlays
-
-**File:** `tests/smoke/automations-tab.spec.ts:62-79`
-**Reason:** Helper is a verbatim cross-file duplicate (the reviewer
-explicitly notes this in the finding: "verbatim from rooms-tab; not
-introduced here but reviewed in scope" and "Since this helper is shared with
-rooms-tab, fix at the source if pursued"). The same code lives at
-`tests/smoke/rooms-tab.spec.ts:53-67` and in at least three other smoke specs
-per IN-01 (page-loads, splash, dashboard-glass-cards). Patching only the
-automations copy would create immediate drift between the duplicates,
-worsening the IN-01 helper-duplication tech debt that the reviewer separately
-flagged for a future cleanup pass. The recommended fix path is the structural
-one called out in IN-01 — extract `tests/smoke/_helpers.ts` and re-import
-across all smoke specs, then apply the WR-04 hardening once at the source.
-That refactor is out of scope for a code-review-fix iteration. Leaving WR-04
-unfixed preserves cross-spec consistency until the helper extraction lands.
-**Original issue:** VersionEnforcer overlay may mount after the 500ms
-detection window on slow Auth0 callback hydration (600-1200ms), making the
-dismissal a no-op and causing intermittent overlay-intercept click failures
-in CI. Mirroring the WhatsNewModal 4-attempt poll structure or pre-priming
-`localStorage.lastSeenVersion` to a sentinel would close the race.
+**Files modified:** `app/automations/page.tsx`
+**Commit:** ad3ee99c
+**Applied fix:** Added `setSubmitting(true)` on entry and `setSubmitting(false)`
+in a `finally` block, matching the create/update pattern. Prevents parallel
+DELETEs racing the refetch when ConfirmationDialog auto-closes too quickly.
 
 ---
 
-_Fixed: 2026-04-30_
+_Fixed: 2026-05-02_
 _Fixer: Claude (gsd-code-fixer)_
-_Iteration: 1_
+_Iteration: 2_

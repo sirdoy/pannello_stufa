@@ -42,3 +42,6 @@ export * from './rooms';
 
 // Phase 180 — automations tab
 export * from './automations';
+
+// Phase 181 — bottom tab bar
+export { BottomTabBar } from './BottomTabBar';

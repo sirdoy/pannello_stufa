@@ -42,7 +42,7 @@
 - [x] Phase 178: Per-Device Modal Sheets (10/10 plans) — complete 2026-04-29 (verification: human_needed — see 178-HUMAN-UAT.md)
 - [ ] Phase 179: Rooms Tab Redesign (0/9 plans) — not started
 - [ ] Phase 180: Automations Tab Full Editor (0/9 plans) — not started
-- [ ] Phase 181: Glass Bottom Tab Bar (0/0 plans) — not started
+- [ ] Phase 181: Glass Bottom Tab Bar (0/6 plans) — planning complete
 - [ ] Phase 182: Design System Reference Page v2 (0/0 plans) — not started
 
 </details>
@@ -198,7 +198,13 @@
   2. Four sections are visible (Home / Stanze / Automazioni / Altro), each with icon + label; the active tab is highlighted via accent color + glow that responds to the user's chosen oklch hue from Phase 174.
   3. When any device or room sheet from Phases 178-179 is open, the bottom tab bar is hidden (no visual stacking conflict with the sheet's own border).
   4. On iOS PWA, the bar respects `env(safe-area-inset-bottom)` (verified at 375px viewport with simulated iPhone home-indicator inset).
-**Plans**: TBD
+**Plans**: 6 plans
+- [ ] 181-01-PLAN.md — SheetCounter + Sheet.tsx augmentation + globals.css cross-cutting rules (NAV-03) [Wave 1]
+- [ ] 181-02-PLAN.md — BottomTabBar component + barrel export + Jest spec (NAV-01, NAV-02, NAV-04) [Wave 1]
+- [ ] 181-03-PLAN.md — /altro route + AltroPage + AltroRow + 2 Jest specs (NAV-02) [Wave 2]
+- [ ] 181-04-PLAN.md — NavbarConnectionStatusChip wrapper + Jest spec (NAV-01) [Wave 2]
+- [ ] 181-05-PLAN.md — app/layout.tsx atomic chrome swap (NAV-01..04) [Wave 3]
+- [ ] 181-06-PLAN.md — tests/smoke/bottom-tab-bar.spec.ts + final scoped pass (NAV-01..04) [Wave 4]
 **UI hint**: yes
 
 ### Phase 182: Design System Reference Page v2

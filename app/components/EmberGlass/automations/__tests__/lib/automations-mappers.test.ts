@@ -247,6 +247,40 @@ describe('computePatchDelta', () => {
     expect(computePatchDelta(original, changed)).toEqual({});
   });
 
+  // WR-02 (REVIEW iteration 2): JSON.stringify(undefined) is undefined,
+  // not the string "null". When the API serializer omits a nullable field
+  // (origVal === undefined) and apiToDraft normalizes it to null
+  // (draftVal === null), the comparison was reporting a spurious diff.
+  // computePatchDelta now coerces undefined to null on both sides.
+  test('null draft vs undefined original (description) does NOT produce spurious diff', () => {
+    // Simulate the API-omits-null-fields case: original.description is undefined;
+    // draft (post apiToDraft) normalizes to null.
+    const original = { ...mockRule({ description: null }) };
+    delete (original as { description?: string | null }).description;
+    const changed = mockRule({ description: null });
+
+    const patch = computePatchDelta(original as AutomationRule, changed);
+    expect(patch).not.toHaveProperty('description');
+  });
+
+  test('null draft vs undefined original (active_hours_start) does NOT produce spurious diff', () => {
+    const original = { ...mockRule({ active_hours_start: null }) };
+    delete (original as { active_hours_start?: string | null }).active_hours_start;
+    const changed = mockRule({ active_hours_start: null });
+
+    const patch = computePatchDelta(original as AutomationRule, changed);
+    expect(patch).not.toHaveProperty('active_hours_start');
+  });
+
+  test('null draft vs undefined original (active_hours_end) does NOT produce spurious diff', () => {
+    const original = { ...mockRule({ active_hours_end: null }) };
+    delete (original as { active_hours_end?: string | null }).active_hours_end;
+    const changed = mockRule({ active_hours_end: null });
+
+    const patch = computePatchDelta(original as AutomationRule, changed);
+    expect(patch).not.toHaveProperty('active_hours_end');
+  });
+
   test('patch.trigger is structurally absent from AutomationRulePatch type', () => {
     const original = mockRule();
     const changed = mockRule();

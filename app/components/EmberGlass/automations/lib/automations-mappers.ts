@@ -192,7 +192,18 @@ export function computePatchDelta(
     const origVal = original[field as keyof AutomationRule];
     const draftVal = draft[field as keyof AutomationRule];
 
-    if (JSON.stringify(canonicalize(origVal)) !== JSON.stringify(canonicalize(draftVal))) {
+    // WR-02 (REVIEW iteration 2): JSON.stringify(undefined) === undefined
+    // (the literal, not a string) while JSON.stringify(null) === '"null"'.
+    // The API serializer omits null fields (origVal becomes undefined) but
+    // apiToDraft normalizes them to null on the draft side. Without
+    // normalization, every PATCH would carry a spurious description: null
+    // (and active_hours_start/end: null) even when the user did not touch
+    // those fields. Coerce undefined to null on both sides before
+    // canonicalization so the comparison is symmetric.
+    const origNorm = origVal === undefined ? null : origVal;
+    const draftNorm = draftVal === undefined ? null : draftVal;
+
+    if (JSON.stringify(canonicalize(origNorm)) !== JSON.stringify(canonicalize(draftNorm))) {
       (patch as Record<PatchField, unknown>)[field] = draftVal;
     }
   }

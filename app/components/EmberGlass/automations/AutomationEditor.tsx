@@ -105,10 +105,18 @@ export function AutomationEditor({
 }: AutomationEditorProps) {
   // Build initial draft from API rule (edit) or empty (create).
   // Augment actions with stable __keys immediately on mount.
+  //
+  // INVARIANT (BL-04 + WR-04, REVIEW iteration 2): The parent MUST set
+  // `key={rule.id}` (or 'new') on this component so it remounts whenever
+  // the selected rule changes. The empty-deps `useMemo` and the two
+  // `useState` initializers below are mount-once: without remount, swapping
+  // the `rule` prop would be silently ignored and the editor would stick
+  // on whatever rule it first saw. AutomationsTab (the only current caller)
+  // satisfies this invariant — do NOT drop that key in future refactors.
   const initial: UIDraft = useMemo(
     () => (rule ? apiToDraft(rule) : emptyDraft()),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [] // intentional: stable snapshot on mount only
+    [] // intentional: stable snapshot on mount only — see invariant above
   );
   const initialKeyed: UIDraft = useMemo(
     () => ({ ...initial, actions: initial.actions.map(withKey) }),
@@ -116,6 +124,7 @@ export function AutomationEditor({
   );
 
   // original is the immutable snapshot for dirty tracking.
+  // Mount-once initializer — relies on parent `key={rule.id}` invariant above.
   const [original] = useState<UIDraft>(initialKeyed);
   const [draft, setDraft] = useState<UIDraft>(initialKeyed);
   const [activeTab, setActiveTab] = useState<number>(0);

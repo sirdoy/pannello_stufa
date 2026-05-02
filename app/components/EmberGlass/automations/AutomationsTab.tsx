@@ -159,6 +159,12 @@ export function AutomationsTab() {
       >
         {editingRule !== null && (
           <AutomationEditor
+            // BL-04 (REVIEW iteration 2): key on rule.id so React unmounts the
+            // editor between rule selections. The editor's `useState`/`useMemo`
+            // initializers are mount-once; without this key, swapping `rule`
+            // without unmounting (future "Next rule" button, deep-link refresh,
+            // batched close→open) would silently latch the first rule's data.
+            key={editingRule === 'new' ? 'new' : editingRule.id}
             rule={isNew ? null : (editingRule as AutomationRule)}
             isNew={isNew}
             onSaveCreate={handleSaveCreate}

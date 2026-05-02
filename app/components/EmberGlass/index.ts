@@ -45,3 +45,7 @@ export * from './automations';
 
 // Phase 181 — bottom tab bar
 export { BottomTabBar } from './BottomTabBar';
+
+// Phase 181 — altro page row primitive
+export { AltroRow } from './altro/AltroRow';
+export type { AltroRowProps } from './altro/AltroRow';

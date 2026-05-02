@@ -4,8 +4,8 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: executing
 stopped_at: Phase 181 UI-SPEC approved
-last_updated: "2026-05-02T20:58:13.037Z"
-last_activity: 2026-05-02 -- Phase 181 planning complete
+last_updated: "2026-05-02T20:59:04.498Z"
+last_activity: 2026-05-02 -- Phase 181 execution started
 progress:
   total_phases: 9
   completed_phases: 7
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 180 — automations-tab-full-editor
+**Current focus:** Phase 181 — glass-bottom-tab-bar
 
 ## Current Position
 
-Phase: 181
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-02 -- Phase 181 planning complete
+Phase: 181 (glass-bottom-tab-bar) — EXECUTING
+Plan: 1 of 6
+Status: Executing Phase 181
+Last activity: 2026-05-02 -- Phase 181 execution started
 
 Progress: [██████████] 100%
 

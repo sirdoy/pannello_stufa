@@ -199,12 +199,12 @@
   3. When any device or room sheet from Phases 178-179 is open, the bottom tab bar is hidden (no visual stacking conflict with the sheet's own border).
   4. On iOS PWA, the bar respects `env(safe-area-inset-bottom)` (verified at 375px viewport with simulated iPhone home-indicator inset).
 **Plans**: 6 plans
-- [ ] 181-01-PLAN.md — SheetCounter + Sheet.tsx augmentation + globals.css cross-cutting rules (NAV-03) [Wave 1]
-- [ ] 181-02-PLAN.md — BottomTabBar component + barrel export + Jest spec (NAV-01, NAV-02, NAV-04) [Wave 1]
-- [ ] 181-03-PLAN.md — /altro route + AltroPage + AltroRow + 2 Jest specs (NAV-02) [Wave 2]
-- [ ] 181-04-PLAN.md — NavbarConnectionStatusChip wrapper + Jest spec (NAV-01) [Wave 2]
-- [ ] 181-05-PLAN.md — app/layout.tsx atomic chrome swap (NAV-01..04) [Wave 3]
-- [ ] 181-06-PLAN.md — tests/smoke/bottom-tab-bar.spec.ts + final scoped pass (NAV-01..04) [Wave 4]
+- [x] 181-01-PLAN.md — SheetCounter + Sheet.tsx augmentation + globals.css cross-cutting rules (NAV-03) [Wave 1]
+- [x] 181-02-PLAN.md — BottomTabBar component + barrel export + Jest spec (NAV-01, NAV-02, NAV-04) [Wave 1]
+- [x] 181-03-PLAN.md — /altro route + AltroPage + AltroRow + 2 Jest specs (NAV-02) [Wave 2]
+- [x] 181-04-PLAN.md — NavbarConnectionStatusChip wrapper + Jest spec (NAV-01) [Wave 2]
+- [x] 181-05-PLAN.md — app/layout.tsx atomic chrome swap (NAV-01..04) [Wave 3]
+- [x] 181-06-PLAN.md — tests/smoke/bottom-tab-bar.spec.ts + final scoped pass (NAV-01..04) [Wave 4]
 **UI hint**: yes
 
 ### Phase 182: Design System Reference Page v2
@@ -229,7 +229,7 @@
 | 178. Per-Device Modal Sheets | 10/10 | Complete   | 2026-04-29 |
 | 179. Rooms Tab Redesign | 9/9 | Complete    | 2026-04-29 |
 | 180. Automations Tab Full Editor | 9/9 | Complete    | 2026-04-30 |
-| 181. Glass Bottom Tab Bar | 0/0 | Not started | - |
+| 181. Glass Bottom Tab Bar | 6/6 | Complete   | 2026-05-02 |
 | 182. Design System Reference Page v2 | 0/0 | Not started | - |
 
 <details>

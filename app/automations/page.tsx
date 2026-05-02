@@ -131,6 +131,10 @@ export default function AutomationsPage() {
 
   const handleDelete = async () => {
     if (!ruleToDelete) return;
+    // WR-07 (REVIEW iteration 2): symmetric submitting state with
+    // handleCreate/handleUpdate. Prevents parallel DELETEs racing the
+    // refetch when ConfirmationDialog auto-closes too quickly.
+    setSubmitting(true);
     try {
       const res = await fetch(`/api/v1/automations/${ruleToDelete.id}`, {
         method: 'DELETE',
@@ -142,6 +146,8 @@ export default function AutomationsPage() {
     } catch (err) {
       toastError(err instanceof Error ? err.message : 'Operazione non riuscita. Riprova.');
       setRuleToDelete(null);
+    } finally {
+      setSubmitting(false);
     }
   };
 

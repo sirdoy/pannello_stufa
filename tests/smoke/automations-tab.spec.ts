@@ -1,4 +1,5 @@
 import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import type { AutomationRule } from '@/types/automations';
 
 /**
  * Phase 180 Plan 09 — AUTO-01..08 Playwright smoke spec.
@@ -153,10 +154,15 @@ const MOCK_RULE_BASE = {
 /**
  * Mocks /api/v1/automations** with synthesized GET/POST/PATCH/DELETE responses.
  * Default fixture: 1 rule (Sveglia mattutina). Override with opts.rules = [].
+ *
+ * WR-05 (REVIEW iteration 2): rules typed as Partial<AutomationRule>[]
+ * (was: object[]). Catches fixture overrides that drop required fields
+ * (e.g. forgetting `actions: []`) at compile time instead of crashing
+ * AutomationRow.tsx at `rule.actions.length` during the smoke run.
  */
 async function mockAutomationsApi(
   page: Page,
-  opts: { rules?: object[] } = {}
+  opts: { rules?: Partial<AutomationRule>[] } = {}
 ): Promise<void> {
   const rules = opts.rules ?? [MOCK_RULE_BASE];
   await page.route('**/api/v1/automations**', async (route) => {

@@ -23,7 +23,7 @@ describe('useFritzServiceDiscovery', () => {
     });
 
     expect(result.current.services).toHaveLength(1);
-    expect(result.current.services[0].name).toBe('WANIPConnection');
+    expect(result.current.services[0]!.name).toBe('WANIPConnection');
     expect(result.current.error).toBeNull();
   });
 
@@ -74,7 +74,7 @@ describe('useFritzServiceDiscovery', () => {
     });
 
     expect(result.current.services).toHaveLength(2);
-    expect(result.current.services[0].name).toBe('B');
+    expect(result.current.services[0]!.name).toBe('B');
   });
 
   it('network error (rejected fetch) sets error without throwing', async () => {

@@ -107,7 +107,7 @@ describe('FritzboxServiceDiscoveryTab', () => {
   it('clicking the copy URL button calls navigator.clipboard.writeText with the URL', () => {
     render(<FritzboxServiceDiscoveryTab />);
     const copyButtons = screen.getAllByRole('button', { name: /Copia URL/i });
-    fireEvent.click(copyButtons[0]);
+    fireEvent.click(copyButtons[0]!);
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith('/upnp/control/wanipconn1');
   });
 });

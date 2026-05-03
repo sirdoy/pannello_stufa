@@ -101,12 +101,23 @@ export function Section09SheetPrimitives(): React.ReactElement {
         name="Slider"
         description="Slider compatto 140px, default color var(--accent)."
         sample={
-          <Slider
-            value={sliderVal}
-            min={0}
-            max={100}
-            onChange={setSliderVal}
-          />
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: 12,
+                color: 'var(--text-2)',
+              }}
+            >
+              Volume
+            </span>
+            <Slider
+              value={sliderVal}
+              min={0}
+              max={100}
+              onChange={setSliderVal}
+            />
+          </label>
         }
         code={
           '<Slider value={vol} min={0} max={100} onChange={setVol} color="var(--accent)" />'
@@ -118,9 +129,12 @@ export function Section09SheetPrimitives(): React.ReactElement {
         name="BigSlider"
         description="Slider 72px con gradient color-mix var(--accent), label percentuale 28/600."
         sample={
-          <div style={{ width: '100%', maxWidth: 360 }}>
+          <label style={{ display: 'block', width: '100%', maxWidth: 360 }}>
+            <span style={{ position: 'absolute', width: 1, height: 1, padding: 0, margin: -1, overflow: 'hidden', clip: 'rect(0,0,0,0)', whiteSpace: 'nowrap', border: 0 }}>
+              Luminosità
+            </span>
             <BigSlider value={bigSliderVal} onChange={setBigSliderVal} />
-          </div>
+          </label>
         }
         code={
           '<BigSlider value={brightness} onChange={setBrightness} color="var(--accent)" />'

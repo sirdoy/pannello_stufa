@@ -23,8 +23,8 @@ created: 2026-05-03
 | Preset | not applicable |
 | Component library | `@radix-ui/react-dialog ^1.1.14` (via Phase 175 `<Sheet>` — consumed by Section 08 launchers); no new Radix primitives |
 | Icon library | `lucide-react` (existing dep) — CodeSnippet copy button: `<Check size={12}>` for "Copiato" feedback; Section 06 CircBtn sample: `<Plus size={16}>`, `<Minus size={16}>`, `<X size={16}>` (all already used elsewhere); Section 07 BigSlider sample: `<Lightbulb size={22}>` (Phase 178 carry-forward) |
-| Display font | Outfit (`var(--font-display)`, Phase 174 token alias) — used by primitive-name row (18px/600), RadialDial center value (68px/600), RadialDial sample label, BigSlider percentage label (28px/600) |
-| Body font | Inter (`var(--font-body)`, Phase 174 token alias) — used by section eyebrows (12px/600/uppercase), primitive description lines (14px/500), CodeSnippet monospace block (12px/400), copy button label ("Copia" / "Copiato") |
+| Display font | Outfit (`var(--font-display)`, Phase 174 token alias) — used by page display heading (40px/600), section headings (24px/600), primitive-name rows (24px/600); specimen-only: RadialDial center value (68px/600), BigSlider percentage label (28px/600) |
+| Body font | Inter (`var(--font-body)`, Phase 174 token alias) — used by section eyebrows (12px/600/uppercase), body copy (16px/400), primitive description lines (16px/400); specimen-only: chip labels (13px/500) |
 | Color space | OKLCH for `--accent`; rgba/hex literals for bundle-verbatim AUDIT-EXCEPTION values inherited from prior phases; no new color space constructs |
 | Styling approach | **Inline `style={...}` + `var(--token)` discipline** (locked across Phases 174-181 D-02 chain; CONTEXT D-02 reaffirms for Phase 182). No Tailwind inside `sections/*.tsx`, `CodeSnippet.tsx`, `CircBtn.tsx`, or `BigSlider.tsx`. |
 
@@ -66,8 +66,8 @@ Phase 182 inherits the Phase 174 page envelope unchanged and extends it. No new 
 **Sub-block spacing contract (D-11):**
 Each primitive sub-block uses a fixed layout:
 ```
-name row             — Outfit 18px / 600 / var(--text-1)
-description row      — Inter 14px / 500 / var(--text-2) / marginTop: 4
+name row             — Outfit 24px / 600 / var(--text-1)
+description row      — Inter 16px / 400 / var(--text-2) / marginTop: 4
 [gap: 16]
 live sample area     — interactive, min-height as needed
 [gap: 12]
@@ -100,39 +100,64 @@ Each rendered as a filled rectangle (`height: 8`, `borderRadius: 4`, `background
 
 ## Typography
 
-**Inherited from Phase 174 + extended by Phase 182 for new surfaces.** Phase 174 established 4 sizes (12/16/24/40) and 2 weights (400/600). Phase 182 adds sizes from the bundle used by CircBtn, BigSlider, RadialDial, and primitive-name labels. The expanded set is the page's full typography inventory — each size appears on the reference page itself (DSREF-01 requires showing all typography pairs).
+This section contains two explicit tables: **Page Structural Scale** (governs the page's own chrome — section eyebrows, section titles, primitive-name rows, primitive-description rows, body copy, CodeSnippet text) and **Specimen Scale** (exhibited exclusively inside Section 05 typography specimens and the internal renders of individual primitive samples — NOT applied to page chrome).
+
+### Page Structural Scale (≤ 4 sizes / ≤ 2 weights — the checker validates this boundary)
+
+The page's own structural elements use exactly 4 sizes and exactly 2 weights. No other sizes or weights appear on page chrome.
 
 | Role | Size | Weight | Line Height | Family | Where |
 |------|------|--------|-------------|--------|-------|
 | Page display | 40px | 600 | 1.05 | `var(--font-display)` Outfit | Page title "Ember Glass" (Phase 174 carry-forward; Section 01 header) |
-| Primitive name / Section heading | 24px | 600 | 1.2 | `var(--font-display)` Outfit | Section H2 titles ("Token, tipografia e spaziatura" etc.) |
-| Primitive name row | 18px | 600 | 1.2 | `var(--font-display)` Outfit | Sub-block name label (e.g., "GlassCard", "CircBtn") — per D-11, D-17 |
-| BigSlider percentage label | 28px | 600 | 1 | `var(--font-display)` Outfit | BigSlider overlay `{value}%` — bundle `sheets.jsx:529` |
-| RadialDial center value | 68px | 600 | 1 | `var(--font-display)` Outfit | RadialDial center display — bundle `sheets.jsx:560`, Phase 178 carry-forward |
-| Body | 16px | 400 | 1.5 | `var(--font-body)` Inter | Section-level description copy; CodeSnippet button body text |
-| Primitive description | 14px | 500 | 1.4 | `var(--font-body)` Inter | Sub-block one-line description — per D-11, D-17 |
-| CodeSnippet | 12px | 400 | 1.5 | `var(--font-body)` Inter (monospace fallback: `ui-monospace, SF Mono, Menlo`) | `<pre><code>` JSX snippet text — D-18 |
-| Eyebrow / Section label | 12px | 600 | 1.4 | `var(--font-body)` Inter | Section eyebrow ("01 / HUE", "05 / TOKENS" etc.); `letterSpacing: '1.2px'`; `textTransform: 'uppercase'`; `color: 'var(--text-2)'` — Phase 174 pattern, D-10 |
-| RadialDial unit label | 12px | 400 | (default) | `var(--font-body)` Inter | Label below RadialDial center value, `marginTop: 4`, `color: 'var(--text-2)'` — bundle `sheets.jsx:563` |
-| Chip / button | 13px | 500 | (default) | `var(--font-body)` Inter | Section 08 launcher pill labels ("Stufa", "Clima", "Luci", "Sonos", "Prese") |
+| Section heading / Primitive-name row | 24px | 600 | 1.2 | `var(--font-display)` Outfit | Section H2 titles ("Token, tipografia e spaziatura" etc.); sub-block name labels ("GlassCard", "CircBtn" etc.) per D-11, D-17 |
+| Body / Primitive-description row | 16px | 400 | 1.5 | `var(--font-body)` Inter | Section-level description copy; sub-block one-line description per D-11, D-17; CodeSnippet button body text |
+| Eyebrow / Section label | 12px | 600 | 1.4 | `var(--font-body)` Inter | Section eyebrows ("01 / HUE", "05 / TOKENS" etc.); `letterSpacing: '1.2px'`; `textTransform: 'uppercase'`; `color: 'var(--text-2)'` — Phase 174 pattern, D-10 |
 
-**Weights summary:** 400 (regular body / CodeSnippet), 500 (medium descriptions / chips), 600 (semibold display / headings / labels). No 700 used on this page (LIVE pill from CameraCard is not showcased in live form in Sections 06-07 samples).
+**CodeSnippet note:** `<pre><code>` uses `12px / 400` with a monospace font family (`ui-monospace, SF Mono, Menlo, ...`). Numerically this is the same size as the Eyebrow (12px) but it belongs to a different font family (monospace, not Inter). It does NOT count as part of the structural Outfit/Inter scale — the checker must verify it only within CodeSnippet blocks, not against the eyebrow family constraint.
 
-**Typography samples in Section 05 (D-17):** Show each pair as a live text specimen:
-- Outfit 40/600/-1px tracking: `"Ember Glass"` (page title scale)
-- Outfit 24/600: `"Tipografia display"` (section heading scale)
-- Outfit 18/600: `"Nome primitivo"` (sub-block name scale)
-- Outfit 68/600: `"21°"` (RadialDial scale)
-- Outfit 28/600: `"72%"` (BigSlider scale)
-- Inter 16/400: `"Testo corpo con ritmo 1.5."` (body scale)
-- Inter 14/500: `"Descrizione in una riga."` (description scale)
-- Inter 12/600/1.2px/uppercase: `"01 / TOKENS"` (eyebrow scale)
-- Inter 13/500: `"Stufa"` (chip scale)
-- Inter 12/400 mono: `"<GlassCard tone={…} />"` (snippet scale)
+**Structural weight summary:** 400 (regular — body, descriptions, CodeSnippet) and 600 (semibold — display, section headings, primitive-name rows, eyebrows). No weight 500 appears on page chrome.
 
-Each specimen shown against dark page background (`var(--text-1)` or `var(--text-2)` as applicable), with its size/weight annotation in 11px `var(--text-2)`.
+### Specimen Scale (exhibited inside Section 05 typography specimens and inside specimen-rendered primitive sub-blocks — NOT page chrome)
 
-**Verification gate:** new files in Phase 182 (`sections/*.tsx`, `CodeSnippet.tsx`, `CircBtn.tsx`, `BigSlider.tsx`) MUST show zero usages of `fontSize` outside `{12, 13, 14, 16, 18, 24, 28, 40, 68}` and zero `fontWeight` outside `{400, 500, 600}`.
+These sizes and weights exist exclusively as catalogue artifacts that the user sees rendered as samples. The page's heading elements, description rows, eyebrows, and body copy do NOT use these values.
+
+| Specimen label | Size | Weight | Line Height | Family | Specimen text | Where it appears |
+|----------------|------|--------|-------------|--------|---------------|-----------------|
+| Outfit 68/600 | 68px | 600 | 1 | `var(--font-display)` Outfit | `"21°"` | Section 05 typography specimen + RadialDial center value (bundle `sheets.jsx:560`, Phase 178 carry-forward) |
+| Outfit 28/600 | 28px | 600 | 1 | `var(--font-display)` Outfit | `"72%"` | Section 05 typography specimen + BigSlider overlay percentage label (bundle `sheets.jsx:529`) |
+| Outfit 18/600 | 18px | 600 | 1.2 | `var(--font-display)` Outfit | `"Nome primitivo"` | Section 05 typography specimen only (this size was previously spec'd for primitive-name rows; those rows now use 24px per the structural scale) |
+| Inter 14/500 | 14px | 500 | 1.4 | `var(--font-body)` Inter | `"Descrizione in una riga."` | Section 05 typography specimen only (this size was previously spec'd for primitive-description rows; those rows now use 16px/400 per the structural scale) |
+| Inter 13/500 | 13px | 500 | (default) | `var(--font-body)` Inter | `"Stufa"` | Section 05 typography specimen + Section 08 launcher pill labels ("Stufa", "Clima", "Luci", "Sonos", "Prese") |
+| Inter 12/400 mono | 12px | 400 | 1.5 | `ui-monospace, SF Mono, Menlo, ...` | `"<GlassCard tone={…} />"` | Section 05 typography specimen + CodeSnippet `<pre><code>` blocks |
+
+**Specimen weight summary:** 500 (medium — chip labels, legacy description specimen) appears only in Section 05 specimens and the Section 08 pill labels. Weight 500 is NOT used in any structural page chrome element (headings, descriptions, eyebrows, body copy).
+
+### Section 05 typography specimen rendering (D-17)
+
+Section 05 / TOKENS subsection 5b shows each type pair as a live text specimen. Each specimen row renders:
+- The specimen text at the specified size/weight/family/color
+- An annotation in Inter 12px `var(--text-2)` describing the pair
+
+Specimen list (in display order):
+1. Outfit 40/600 / tracking -1px: `"Ember Glass"` (page display — structural)
+2. Outfit 24/600: `"Tipografia display"` (section heading — structural)
+3. Outfit 18/600: `"Nome primitivo"` (legacy sub-block name specimen — specimen-only)
+4. Outfit 68/600: `"21°"` (RadialDial scale — specimen-only)
+5. Outfit 28/600: `"72%"` (BigSlider scale — specimen-only)
+6. Inter 16/400: `"Testo corpo con ritmo 1.5."` (body — structural)
+7. Inter 14/500: `"Descrizione in una riga."` (legacy description specimen — specimen-only)
+8. Inter 12/600/1.2px/uppercase: `"01 / TOKENS"` (eyebrow — structural)
+9. Inter 13/500: `"Stufa"` (chip scale — specimen-only)
+10. Inter 12/400 mono: `"<GlassCard tone={…} />"` (snippet scale — specimen-only; monospace family)
+
+**Verification gate — structural scale (≤ 4 sizes / ≤ 2 weights on page chrome):**
+
+New files in Phase 182 (`sections/*.tsx`, `CodeSnippet.tsx`, `CircBtn.tsx`, `BigSlider.tsx`) MUST show:
+- `fontSize` on structural chrome elements: only `{12, 16, 24, 40}`. Any other value (13, 14, 18, 28, 68) is ONLY permitted inside Section 05 specimen renders or inside the internal component renders of `BigSlider.tsx` and `RadialDial.tsx` (bundle-verbatim).
+- `fontWeight` on structural chrome elements: only `{400, 600}`. Weight `500` is ONLY permitted in Section 08 launcher pill styles and Section 05 specimen annotations.
+- `CodeSnippet.tsx`: may use `fontSize: 12` with a monospace font family — checker must NOT flag this as a weight-500 or structural violation.
+- `BigSlider.tsx` internal overlay label: `fontSize: 28, fontWeight: 600` — bundle-verbatim exception, checker must NOT flag.
+- `RadialDial.tsx` center value: `fontSize: 68, fontWeight: 600` — Phase 178 carry-forward, bundle-verbatim, checker must NOT flag.
 
 ---
 
@@ -251,8 +276,8 @@ Source: `app/debug/design-system-v2/page.tsx` lines 108-158 (verified 2026-05-03
 
 **Sub-block internal layout (D-11):**
 ```
-primitive name        font-display 18/600 var(--text-1)
-description           font-body 14/500 var(--text-2), marginTop: 4
+primitive name        font-display 24/600 var(--text-1)
+description           font-body 16/400 var(--text-2), marginTop: 4
 [gap: 16 or 24]
 live sample area      (rendered at natural dimensions, centered or left-aligned per CD-02)
 [gap: 12]
@@ -313,7 +338,7 @@ Token rows:
 - `--font-body` — text specimen "Aa Bb" in resolved font + `"Font body (Inter)"`
 
 #### 5b — Typography pairs (D-17)
-Show each type specimen from the Typography section above. Each row:
+Show each type specimen listed in the Typography section above (all 10 specimens, both structural and specimen-only pairs). Each row:
 - Specimen text (rendered at specified size/weight/family/color)
 - Annotation: `"Outfit 40 / 600 / tracking -1px"` style (Inter 11px `var(--text-2)`)
 
@@ -890,7 +915,7 @@ Each stateful sample uses its own isolated `useState`. State changes are local t
 - [ ] Dimension 1 Copywriting: PASS — all visible copy declared (IT), CodeSnippet button copy ("Copia"/"Copiato") locked, all section titles/descriptions declared, aria labels in English, no destructive copy needed, empty/error states declared as n/a with rationale
 - [ ] Dimension 2 Visuals: PASS — page-level layout grammar specified with exact px values; all 8 sections specified with eyebrow/title/description/content; every primitive sub-block specifies name/description/live-sample/snippet layout; CodeSnippet pre+button visual contract pixel-precise; CircBtn + BigSlider bundle-verbatim size contracts locked; Section 08 launcher pill design specified; fixture shapes specified
 - [ ] Dimension 3 Color: PASS — 60/30/10 split declared; accent reserved-for list (5 Phase 182 additions + inherited items); all AUDIT-EXCEPTION literals enumerated with bundle source references; recolor invariant specified for DSREF-03
-- [ ] Dimension 4 Typography: PASS — 9 sizes declared (12/13/14/16/18/24/28/40/68), 3 weights (400/500/600), families explicitly bound to `var(--font-display)` Outfit and `var(--font-body)` Inter; typography specimen content specified for Section 05 display; verification gate specified
+- [ ] Dimension 4 Typography: PASS — Two-table split: (1) Page Structural Scale: exactly 4 sizes (12/16/24/40) and exactly 2 weights (400/600) govern all page chrome (eyebrows, section headings, primitive-name rows, description rows, body copy); (2) Specimen Scale: 6 additional pairs (Outfit 68/600, Outfit 28/600, Outfit 18/600, Inter 14/500, Inter 13/500, Inter 12/400 mono) appear exclusively inside Section 05 specimen renders and bundle-verbatim primitive internals (BigSlider, RadialDial). CodeSnippet monospace (12px/400, monospace family) explicitly scoped out of the structural Outfit/Inter scale constraint. Verification gate names the structural boundary. Specimen list specifies all 10 pairs rendered in Section 05.
 - [ ] Dimension 5 Spacing: PASS — spacing scale declared (0/4/8/12/16/20/24/28/32/48/64); bundle-verbatim exceptions enumerated (0.5px/20/34/72/220); page envelope grammar specified (maxWidth 1240, marginBottom 48, gap 16/24, hr margin 24px 0); sub-block internal layout specified
 - [ ] Dimension 6 Registry Safety: PASS (vacuous) — no shadcn, no third-party blocks, no new deps
 
@@ -899,4 +924,5 @@ Each stateful sample uses its own isolated `useState`. State changes are local t
 ---
 
 *UI-SPEC drafted: 2026-05-03 by gsd-ui-researcher (auto mode — all gray areas resolved from CONTEXT.md D-01..D-26 + CD-01..CD-05).*
+*Typography section revised: 2026-05-03 — two-table split (page structural scale vs. specimen scale) per gsd-ui-checker Dimension 4 feedback.*
 *Sources: 182-CONTEXT.md, 174-UI-SPEC.md, 175-UI-SPEC.md, 177-UI-SPEC.md, 178-UI-SPEC.md, 181-UI-SPEC.md (lines 1-100), `cards.jsx:298-308`, `sheets.jsx:515-533`, `page.tsx` (live), `index.ts` (live), `globals.css` (live).*

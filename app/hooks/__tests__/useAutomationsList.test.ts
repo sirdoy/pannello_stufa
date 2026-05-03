@@ -109,9 +109,15 @@ function setHandler(method: 'GET' | 'POST' | 'PATCH' | 'DELETE', handler: Handle
   methodHandlers[method] = handler;
 }
 
+// Phase 183 Plan 04: absorb console.error noise from the hook's catch blocks
+// so error-path tests don't flood Jest output. Declared at module scope so the
+// shared beforeEach/afterEach below can install/restore it.
+let consoleErrorSpy: jest.SpyInstance;
+
 beforeEach(() => {
   jest.clearAllMocks();
   fetchCalls.length = 0;
+  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   // Reset per-method handlers; tests opt-in via setHandler().
   for (const k of Object.keys(methodHandlers)) {
     methodHandlers[k] = null;
@@ -146,6 +152,7 @@ beforeEach(() => {
 afterEach(() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   delete (globalThis as any).fetch;
+  consoleErrorSpy.mockRestore();
 });
 
 function getCalls(method: string): FetchCall[] {

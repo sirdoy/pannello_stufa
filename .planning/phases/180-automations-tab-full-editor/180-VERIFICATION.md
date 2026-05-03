@@ -180,3 +180,13 @@ No phase-180-introduced blocker anti-patterns detected. No TODO/FIXME/PLACEHOLDE
 
 _Verified: 2026-04-30_
 _Verifier: Claude (gsd-verifier)_
+
+---
+
+## Post-Verification Update (2026-05-03)
+
+**BL-01 RESOLVED** — The runtime blocker documented in §"Human Verification Required" (item 1) and §"Gaps Summary" was fixed in commit `595eb299`. `useAutomationsList` no longer calls `automationsProxy.getAutomations()` directly; it now uses `fetch('/api/v1/automations*')` against the existing Next.js API routes, matching the pattern of every other client hook in the codebase.
+
+The Playwright spec at `tests/smoke/automations-tab.spec.ts` becomes runnable without modification once Auth0 storageState is populated. The deferred-runtime precedent from Phase 175-03 no longer applies to this phase.
+
+_Updated: 2026-05-03 (Phase 183 hygiene)_

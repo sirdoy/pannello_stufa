@@ -21,3 +21,7 @@ export type { QuickActionButtonProps } from './primitives/QuickActionButton';
 
 // Helper
 export { findSceneByName } from './lib/findSceneByName';
+
+// Phase 182 — BigSlider primitive (D-06)
+export { BigSlider } from './primitives/BigSlider';
+export type { BigSliderProps } from './primitives/BigSlider';

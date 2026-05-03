@@ -53,3 +53,5 @@ export type { AltroRowProps } from './altro/AltroRow';
 // Phase 182 — new primitives (CircBtn + BigSlider added by Plan 02 + Plan 03)
 export { CircBtn } from './cards/CircBtn';
 export type { CircBtnProps } from './cards/CircBtn';
+export { BigSlider } from './sheets/primitives/BigSlider';
+export type { BigSliderProps } from './sheets/primitives/BigSlider';

@@ -190,4 +190,4 @@ All v20.0 requirements map to phases starting at Phase 174 (continuing numbering
 
 ---
 *Requirements defined: 2026-04-27*
-*Last updated: 2026-04-27 — roadmap traceability filled*
+*Last updated: 2026-05-03 — Phase 183 hygiene: 26 Pending rows flipped to Complete; DSREF-01/02 checkboxes flipped to [x]*

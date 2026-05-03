@@ -4,14 +4,14 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: executing
 stopped_at: "Phase 182 plans verified — decision-coverage gate: 2/26 D-IDs cited in plan must_haves (substantive coverage in plan bodies confirmed by plan-checker)"
-last_updated: "2026-05-03T16:14:11.064Z"
-last_activity: 2026-05-03 -- Phase 183 planning complete
+last_updated: "2026-05-03T16:22:31.170Z"
+last_activity: 2026-05-03
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 182 — design-system-reference-page-v2
+**Current focus:** Phase 183 — v20.0 Hygiene & Cleanup
 
 ## Current Position
 
-Phase: 182 (design-system-reference-page-v2) — EXECUTING
-Plan: 1 of 9
+Phase: 183 (v20.0 Hygiene & Cleanup) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-05-03 -- Phase 183 planning complete
+Last activity: 2026-05-03
 
-Progress: [██████████] 100%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Progress: [██████████] 100%
 | v20.0 Ember Glass Redesign | 174-182 | TBD | in progress |
 | Phase 174 P01 | 3min | 2 tasks | 2 files |
 | Phase 174 P03 | 25min | 3 tasks | 7 files |
+| Phase 183 P01 | 4min | 3 tasks | 7 files |
 
 ## v20.0 Phase Map
 
@@ -86,6 +87,8 @@ Recent decisions affecting v20.0 scope (carried over from v19.0 close):
 - Splash branding (logo/wordmark glyphs) reuses existing flame mark; only the animation is new
 - Mobile gesture library (swipe-to-dismiss sheets) deferred; tap/Escape/backdrop sufficient for v20.0
 - Phase 174-03: Hand-rolled <button role='switch'> + 6-swatch picker dispatch CustomEvent ember-glass-ambient-change to AmbientBg
+- Phase 183-01: Deferred ui/Sheet.tsx + ui/BottomSheet.tsx deletion to follow-up legacy-design-system-retirement phase per RESEARCH grep evidence (live importers in /debug/design-system + scheduler IntervalBottomSheet)
+- Phase 183-01: Source+test paired deletion pattern (Pitfall 5) — orphaned tests must be deleted alongside their sources to keep test:changed green
 
 ### Pending Todos
 
@@ -110,7 +113,7 @@ None.
 
 Last activity: 2026-04-27 — Wrote ROADMAP.md for v20.0 Ember Glass Redesign (9 phases, 174-182, 50/50 reqs mapped)
 Stopped at: Phase 182 plans verified — decision-coverage gate: 2/26 D-IDs cited in plan must_haves (substantive coverage in plan bodies confirmed by plan-checker)
-Resume file: .planning/phases/182-design-system-reference-page-v2/
+Resume file: None
 
 **Next Action:** `/gsd-plan-phase 174` (Ember Glass Tokens & Foundations)
 

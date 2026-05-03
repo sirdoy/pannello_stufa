@@ -12,6 +12,46 @@ declare global {
   var runAxeWithRealTimers: (container: Element) => Promise<any>;
 }
 
+// Mock aria-hidden (used by Radix Dialog) to prevent hideOthers from aria-hiding
+// page content during tests. Without this mock, forceMount on DialogPrimitive.Portal
+// causes Radix to set aria-hidden="true" on all DOM nodes outside the dialog,
+// making buttons/headings inaccessible to screen.getByRole queries.
+// This is a test-environment-only no-op: production behaviour is unchanged.
+jest.mock('aria-hidden', () => ({
+  hideOthers: () => () => undefined,
+}));
+
+// Prevent Radix DismissableLayer from setting `body.style.pointerEvents = 'none'`
+// when a modal dialog is forceMounted (open=false). Without this guard, the Sheet
+// component's forceMount causes `userEvent.click()` to fail with pointer-events:none
+// on ALL page elements — breaking interaction tests for components that co-exist with
+// a mounted-but-closed Sheet on the page.
+// Strategy: override the `pointerEvents` CSS property setter on document.body in
+// JSDOM to silently refuse writes that would set it to 'none'. This preserves all
+// other body style mutations (position, top, overflow — used by scroll-lock tests)
+// while stopping the "disableOutsidePointerEvents" side-effect from bleeding into
+// sibling component tests.
+// This is a test-environment-only guard: production behaviour is unchanged.
+if (typeof document !== 'undefined') {
+  const originalBodyStyle = document.body.style;
+  let _bodyPointerEvents = '';
+  try {
+    Object.defineProperty(originalBodyStyle, 'pointerEvents', {
+      get: () => _bodyPointerEvents,
+      set: (value: string) => {
+        // Only accept empty string resets (restoring from 'none').
+        // Silently drop 'none' writes from Radix disableOutsidePointerEvents.
+        if (value !== 'none') {
+          _bodyPointerEvents = value;
+        }
+      },
+      configurable: true,
+    });
+  } catch {
+    // JSDOM may already have a non-configurable descriptor — silently skip.
+  }
+}
+
 // Mock react-dom FIRST (before testing-library loads it)
 // This ensures createPortal renders inline in tests
 jest.mock('react-dom', () => {

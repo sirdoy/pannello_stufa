@@ -49,3 +49,7 @@ export { BottomTabBar } from './BottomTabBar';
 // Phase 181 — altro page row primitive
 export { AltroRow } from './altro/AltroRow';
 export type { AltroRowProps } from './altro/AltroRow';
+
+// Phase 182 — new primitives (CircBtn + BigSlider added by Plan 02 + Plan 03)
+export { CircBtn } from './cards/CircBtn';
+export type { CircBtnProps } from './cards/CircBtn';

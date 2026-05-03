@@ -28,22 +28,23 @@
 - ✅ **v17.1 WebSocket Alignment & Tuya Integration** — Phases 145-148 (shipped 2026-03-30)
 - ✅ **v18.0 Dark-Only & Mobile-First** — Phases 149-155 (shipped 2026-04-02)
 - ✅ **v19.0 API Alignment & Full Coverage** — Phases 156-173 (shipped 2026-04-27) — [archive](milestones/v19.0-ROADMAP.md)
-- 🚧 **v20.0 Ember Glass Redesign** — Phases 174-182 (started 2026-04-27)
+- 🚧 **v20.0 Ember Glass Redesign** — Phases 174-183 (started 2026-04-27)
 
 ## Phases
 
 <details open>
-<summary>🚧 v20.0 Ember Glass Redesign (Phases 174-182) — IN PROGRESS</summary>
+<summary>🚧 v20.0 Ember Glass Redesign (Phases 174-183) — IN PROGRESS</summary>
 
 - [x] Phase 174: Ember Glass Tokens & Foundations (3/3 plans) — complete 2026-04-27
-- [ ] Phase 175: Glass Primitives — Press Animation & Sheet (0/0 plans) — not started
-- [ ] Phase 176: Post-Auth0 Splash Animation (0/0 plans) — not started
-- [ ] Phase 177: Equal-Size Dashboard Glass Cards (0/8 plans) — not started
+- [x] Phase 175: Glass Primitives — Press Animation & Sheet (3/3 plans) — completed 2026-04-27
+- [x] Phase 176: Post-Auth0 Splash Animation (4/4 plans) — completed 2026-04-27
+- [x] Phase 177: Equal-Size Dashboard Glass Cards (8/8 plans) — completed 2026-04-29
 - [x] Phase 178: Per-Device Modal Sheets (10/10 plans) — complete 2026-04-29 (verification: human_needed — see 178-HUMAN-UAT.md)
-- [ ] Phase 179: Rooms Tab Redesign (0/9 plans) — not started
-- [ ] Phase 180: Automations Tab Full Editor (0/9 plans) — not started
+- [x] Phase 179: Rooms Tab Redesign (9/9 plans) — completed 2026-04-29
+- [x] Phase 180: Automations Tab Full Editor (9/9 plans) — completed 2026-04-30
 - [x] Phase 181: Glass Bottom Tab Bar (6/6 plans) — completed 2026-05-02
 - [x] Phase 182: Design System Reference Page v2 (9/9 plans) — completed 2026-05-03
+- [ ] Phase 183: v20.0 Hygiene & Cleanup (0/0 plans) — not started
 
 </details>
 
@@ -227,6 +228,20 @@
 - [x] 182-09-PLAN.md — Playwright smoke spec for section presence + 13 primitives + violet recolor invariant (DSREF-01, DSREF-02, DSREF-03) [Wave 3]
 **UI hint**: yes
 
+### Phase 183: v20.0 Hygiene & Cleanup
+**Goal**: Close v20.0 documentation drift, delete orphaned legacy chrome, and normalize Nyquist VALIDATION status across all v20.0 phases so the milestone can ship clean. No new requirements; addresses tech_debt logged in `v20.0-MILESTONE-AUDIT.md`.
+**Depends on**: Phase 182
+**Requirements**: none (hygiene phase — closes audit tech_debt, not REQ-IDs)
+**Gap Closure**: Closes tech_debt items from `v20.0-MILESTONE-AUDIT.md` (orphan files, doc drift, Nyquist status flips, anti-pattern fix). Visual UAT debt + Playwright runtime blockers + deferred primitives + accepted deviations remain backlog (out of scope).
+**Success Criteria** (what must be TRUE):
+  1. Orphan files deleted from disk: `app/components/Navbar.tsx`, `app/components/ui/Footer.tsx`, `app/automations/page.tsx`, `app/components/ui/Sheet.tsx`, `app/components/ui/BottomSheet.tsx`, `app/hooks/useReducedMotion.ts` — all confirmed zero importers via grep before deletion; `npm run test:changed` + `tsc --noEmit` clean post-delete.
+  2. `.planning/REQUIREMENTS.md` traceability table reflects implementation truth: DSREF-01 + DSREF-02 checkboxes flipped `[ ]` → `[x]`; every REQ-ID with VERIFICATION.md evidence shows `Status: Complete` (not `Pending`); coverage block date stamp updated.
+  3. `.planning/phases/180-automations-tab-full-editor/180-VERIFICATION.md` carries an appended note documenting BL-01 post-verification fix in commit `595eb299`.
+  4. `useAutomationsList` adds `console.error` (or equivalent operator-visible logging) on fetch failure paths so silent error swallowing is fixed without changing UX.
+  5. Run `/gsd-validate-phase` against 174, 176, 178, 179, 180, 181, 182 — VALIDATION.md frontmatter `status` flipped `draft` → `final` (or equivalent terminal state) for each; `wave_0_complete: true` where applicable.
+**Plans**: TBD (planned via `/gsd-plan-phase 183`)
+**UI hint**: no
+
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
@@ -240,6 +255,7 @@
 | 180. Automations Tab Full Editor | 9/9 | Complete    | 2026-04-30 |
 | 181. Glass Bottom Tab Bar | 6/6 | Complete   | 2026-05-02 |
 | 182. Design System Reference Page v2 | 9/9 | Complete   | 2026-05-03 |
+| 183. v20.0 Hygiene & Cleanup | 0/0 | Not started | - |
 
 <details>
 <summary>✅ v19.0 API Alignment & Full Coverage (Phases 156-173) — SHIPPED 2026-04-27</summary>

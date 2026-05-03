@@ -4,14 +4,14 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: executing
 stopped_at: "Phase 182 plans verified — decision-coverage gate: 2/26 D-IDs cited in plan must_haves (substantive coverage in plan bodies confirmed by plan-checker)"
-last_updated: "2026-05-03T16:22:31.170Z"
+last_updated: "2026-05-03T16:27:08.666Z"
 last_activity: 2026-05-03
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 183 (v20.0 Hygiene & Cleanup) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-05-03
 
-Progress: [██░░░░░░░░] 20%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [██░░░░░░░░] 20%
 | Phase 174 P01 | 3min | 2 tasks | 2 files |
 | Phase 174 P03 | 25min | 3 tasks | 7 files |
 | Phase 183 P01 | 4min | 3 tasks | 7 files |
+| Phase 183 P02 | 2min | 3 tasks | 1 files |
 
 ## v20.0 Phase Map
 
@@ -89,6 +90,7 @@ Recent decisions affecting v20.0 scope (carried over from v19.0 close):
 - Phase 174-03: Hand-rolled <button role='switch'> + 6-swatch picker dispatch CustomEvent ember-glass-ambient-change to AmbientBg
 - Phase 183-01: Deferred ui/Sheet.tsx + ui/BottomSheet.tsx deletion to follow-up legacy-design-system-retirement phase per RESEARCH grep evidence (live importers in /debug/design-system + scheduler IntervalBottomSheet)
 - Phase 183-01: Source+test paired deletion pattern (Pitfall 5) — orphaned tests must be deleted alongside their sources to keep test:changed green
+- [Phase 183]: Phase 183-02: Per-row evidence-anchored Edit calls (not bulk replace) keep traceability flips auditable per row — REQUIREMENTS.md drift fix; 26 Pending->Complete + 2 [x] flips
 
 ### Pending Todos
 

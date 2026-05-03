@@ -242,7 +242,7 @@
 **Plans**: 5 plans
 - [x] 183-01-PLAN.md — Delete 4 orphan files + Navbar test + Footer barrel re-export [Wave 1]
 - [x] 183-02-PLAN.md — Flip 26 Pending REQ rows + 2 DSREF checkboxes + date stamp in REQUIREMENTS.md [Wave 1]
-- [ ] 183-03-PLAN.md — Append BL-01 note to 180-VERIFICATION.md + fix Phase 174 Progress row [Wave 1]
+- [x] 183-03-PLAN.md — Append BL-01 note to 180-VERIFICATION.md + fix Phase 174 Progress row [Wave 1]
 - [ ] 183-04-PLAN.md — Add console.error to 5 catch blocks in useAutomationsList + test spy [Wave 1]
 - [ ] 183-05-PLAN.md — Run /gsd-validate-phase across 7 partial-Nyquist phases [Wave 2]
 **UI hint**: no
@@ -260,7 +260,7 @@
 | 180. Automations Tab Full Editor | 9/9 | Complete    | 2026-04-30 |
 | 181. Glass Bottom Tab Bar | 6/6 | Complete   | 2026-05-02 |
 | 182. Design System Reference Page v2 | 9/9 | Complete   | 2026-05-03 |
-| 183. v20.0 Hygiene & Cleanup | 2/5 | In Progress|  |
+| 183. v20.0 Hygiene & Cleanup | 3/5 | In Progress|  |
 
 <details>
 <summary>✅ v19.0 API Alignment & Full Coverage (Phases 156-173) — SHIPPED 2026-04-27</summary>

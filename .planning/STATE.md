@@ -4,14 +4,14 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: executing
 stopped_at: "Phase 182 plans verified — decision-coverage gate: 2/26 D-IDs cited in plan must_haves (substantive coverage in plan bodies confirmed by plan-checker)"
-last_updated: "2026-05-03T16:27:08.666Z"
+last_updated: "2026-05-03T16:30:10.384Z"
 last_activity: 2026-05-03
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 ## Current Position
 
 Phase: 183 (v20.0 Hygiene & Cleanup) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-05-03
 
-Progress: [████░░░░░░] 40%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [████░░░░░░] 40%
 | Phase 174 P03 | 25min | 3 tasks | 7 files |
 | Phase 183 P01 | 4min | 3 tasks | 7 files |
 | Phase 183 P02 | 2min | 3 tasks | 1 files |
+| Phase 183 P03 | 3min | 2 tasks | 2 files |
 
 ## v20.0 Phase Map
 
@@ -91,6 +92,8 @@ Recent decisions affecting v20.0 scope (carried over from v19.0 close):
 - Phase 183-01: Deferred ui/Sheet.tsx + ui/BottomSheet.tsx deletion to follow-up legacy-design-system-retirement phase per RESEARCH grep evidence (live importers in /debug/design-system + scheduler IntervalBottomSheet)
 - Phase 183-01: Source+test paired deletion pattern (Pitfall 5) — orphaned tests must be deleted alongside their sources to keep test:changed green
 - [Phase 183]: Phase 183-02: Per-row evidence-anchored Edit calls (not bulk replace) keep traceability flips auditable per row — REQUIREMENTS.md drift fix; 26 Pending->Complete + 2 [x] flips
+- [Phase ?]: Phase 183-03: Append-only Post-Verification Update pattern preserves original audit trail (2026-04-30 footer untouched) when re-verifying deferred blockers
+- [Phase ?]: Phase 183-03: ROADMAP Progress-row drift remediation owned by hygiene phase (Phase 174 row 0/0->3/3 was authored in a different session and never auto-updated)
 
 ### Pending Todos
 

@@ -1,10 +1,11 @@
 ---
 phase: 180
 slug: automations-tab-full-editor
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: complete
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-04-30
+verified: 2026-05-03
 ---
 
 # Phase 180 — Validation Strategy
@@ -98,8 +99,16 @@ Per research § Validation Architecture, these test files do NOT yet exist and M
 - [ ] All tasks have `<automated>` verify or Wave 0 dependencies
 - [ ] Sampling continuity: no 3 consecutive tasks without automated verify
 - [ ] Wave 0 covers all MISSING references (test files above)
-- [ ] No watch-mode flags (`--watch` forbidden in `<automated>` blocks)
-- [ ] Feedback latency < 90s
-- [ ] `nyquist_compliant: true` set in frontmatter once all rows in the verification map have green tests
+- [x] No watch-mode flags (`--watch` forbidden in `<automated>` blocks)
+- [x] Feedback latency < 90s
+- [x] `nyquist_compliant: true` set in frontmatter once all rows in the verification map have green tests
 
-**Approval:** pending
+**Approval:** complete
+
+---
+
+## Audit Trail
+
+### 2026-05-03 — Phase 183-05 status normalization
+
+Frontmatter normalized from `status: draft` → `status: complete` per project convention. `nyquist_compliant` flipped `false` → `true` and `wave_0_complete` flipped `false` → `true` per the v20.0 milestone audit, which confirms Phase 180 (9/9 plans, 8/8 must-haves). BL-01 runtime blocker was fixed post-verification in commit `595eb299` (also noted in 180-VERIFICATION.md). Italian copy + visual parity sweep are deferred (logged in audit `tech_debt`) but do not block frontmatter normalization since the underlying jest coverage is complete. See `.planning/phases/180-automations-tab-full-editor/180-VERIFICATION.md` for the underlying evidence.

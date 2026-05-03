@@ -206,7 +206,7 @@ describe('Storico grezzo tab (Phase 171-02)', () => {
     // the storico one is the FIRST match because RawHistoryTab renders above the
     // DeviceHistoryTimeline block.
     const sevenDayButtons = screen.getAllByRole('button', { name: '7d' });
-    await user.click(sevenDayButtons[0]);
+    await user.click(sevenDayButtons[0]!);
 
     const bwCalls = bandwidthHookMock.mock.calls.map((c) => (c[0] as { hours?: string }).hours);
     const evCalls = eventsHookMock.mock.calls.map((c) => (c[0] as { hours?: string }).hours);

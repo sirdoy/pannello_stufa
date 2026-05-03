@@ -1,5 +1,57 @@
 # Project Milestones: Pannello Stufa
 
+## v20.0 Ember Glass Redesign (Shipped: 2026-05-03)
+
+**Delivered:** Complete UI overhaul from "Ember Noir" to "Ember Glass" (iOS 18 glass/blur aesthetic) on the existing v19.0 API surface — token-driven design system, post-Auth0 splash, equal-size 2-column dashboard with 10 glass cards, 5 per-device modal sheets, data-driven Rooms tab with expanded device cards, full Automations editor with nested AND/OR conditions and 11 action types, glass bottom tab bar, and a `/debug/design-system-v2` reference page covering 13 live primitives. Zero backend changes — pure presentational rewrite over the v19.0 API contract.
+
+**Phases completed:** 174-183 (10 phases, 66 plans)
+
+**Key accomplishments:**
+
+- **Ember Glass design system** (Phase 174): 11 CSS custom properties on `:root` (`--glass-bg/blur/border/shadow`, `--accent` oklch, `--text-1/2`, `--r-card`, `--pad-card`, `--font-display/body`), 6-hue accent picker (copper/rose/violet/blue/green/amber), Outfit + Inter via `next/font` (no Google CDN), AmbientBg client provider with pre-paint script, `.glass-surface` utility with `backdrop-filter` + `-webkit-` fallback + `@supports not` graceful degradation
+- **Shared glass primitives** (Phase 175): `<Pressable>` polymorphic component + `usePressed` hook + `.press-anim` CSS utility (DS-07: scale 0.97 / cubic-bezier .34,1.56,.64,1 / 220ms) — composed by every interactive surface in 177-181; `<Sheet>` primitive (Radix Dialog facade) with translucent backdrop, off-screen translate (cubic-bezier .22,1,.36,1 / 400ms), Escape/backdrop/close-button dismissal, body scroll-lock with scroll-position restore
+- **Post-Auth0 splash** (Phase 176): FlameViz primitive + 4-phase state machine (logo scale-in → wordmark + subtitle → "Autenticato · Auth0" badge → fade-out) within ~2s, SplashGate orchestrator wiring `useUser` + sessionStorage + `useReducedMotion` (200ms opacity-only fallback), non-blocking initial fetches, never re-runs in-session
+- **Equal-size dashboard** (Phase 177): 2-column 1:1 glass card grid with 10 cards (Stove + animated FlameViz, Climate ≤4 zones, Lights ≤4 names + header toggle, Sonos with PlayingBars, Weather, Camera with LIVE pill, Network down/up Mbps, Raspi 2-stat, Tuya/Plugs report-only, all sharing identical footprint); 5 micro-primitives (GlassCard, CardHead, StatusDot, MiniStat, InlineToggle), v9.0 stagger preserved, React Compiler clean
+- **Per-device modal sheets** (Phase 178): StoveSheet (FlameViz hero + steppers + Accendi/Spegni), ClimateSheet (zone chips + Apple-Home radial dial debounced 500ms + mode picker), LightsSheet (4 scene buttons + per-room sections), SonosSheet (group list + volume slider debounced 250ms + master Promise.allSettled), PlugsSheet (per-plug toggles inside sheet only); new `useThermostatCommands` hook over `setroomthermpoint`/`setthermmode`; 6 bundle-verbatim sub-primitives (SheetRow, Stepper, Slider, RadialDial, SheetBtn, QuickActionButton)
+- **Data-driven Rooms tab** (Phase 179): RoomCard 3×2 category-colored chip grid + "+N" overflow, RoomSheet with expanded device cards and type-specific bodies (Stove 3 stat chips + −/power/+, Thermo dual readout + ±0.5°/Eco/Auto, Light brightness+CT sliders, Plug Ora W/kW + Oggi kWh, Sonos track + volume + skip, TV source/volume/HDMI, Blind position + Up/Stop/Down, Camera 16:9 + LIVE + fps, Humidity value + trend); zero hardcoded room/device lists in JSX
+- **Full Automations editor** (Phase 180): Discriminated-union rewrite of `types/automations.ts` (string→number id, full TriggerType/ConditionNode/ActionItem unions, `assertNever` helper), 4-tab editor (Trigger/Condizioni/Azioni/Avanzate) with badge counts, 2 API trigger types (`schedule_cron` + `manual_api_call` per locked CONTEXT D-08), AND/OR depth-2 condition nesting, 11 API action types (`netatmo_set_room_temp/home_mode/switch_schedule`, `thermorossi`, `hue_light/group/scene`, `tuya`, `sonos`, `http_webhook`, `log_event` per locked D-09), reorder + remove + cooldown controls, save-guard + unsaved-changes prompt, edit/delete flows
+- **Glass bottom tab bar** (Phase 181): 4 sections (Home/Stanze/Automazioni/Altro) with icon + label + accent-glow active state, SheetCounter pure module + Sheet.tsx augmentation broadcasting `body[data-sheet-open]` so the bar hides under any open sheet, iOS safe-area respect via `env(safe-area-inset-bottom)`, atomic chrome swap in `app/layout.tsx`
+- **Design System Reference v2** (Phase 182): `/debug/design-system-v2` single source of truth — 10 sections (colors + typography + spacing + radius + shadow/blur + 5 primitive galleries), 13 live samples (GlassCard, CardHead, StatusDot, InlineToggle, CircBtn, Stepper, Slider, BigSlider, RadialDial, Sheet preview, MiniStat, FlameViz, PlayingBars), shared CodeSnippet primitive, dev accent picker inline at top
+- **Hygiene cleanup** (Phase 183): 6 orphan files deleted (Navbar.tsx, ui/Footer.tsx, app/automations/page.tsx, app/hooks/useReducedMotion.ts + 2 tests), 26 REQUIREMENTS.md traceability rows + 2 DSREF checkboxes flipped to Complete, BL-01 post-verify note appended to 180-VERIFICATION.md, 5 `console.error` calls added to `useAutomationsList` catch blocks (silent error swallowing fix), 7 v20.0 VALIDATION.md frontmatters normalized to `status: complete` + `nyquist_compliant: true`
+
+**Stats:**
+
+- 66 plans executed across 10 phases
+- 50/50 v20.0 requirements satisfied (100%) per re-audit 2026-05-03
+- 480 files changed (+109,610 insertions, -2,177 deletions, net +107,433 LOC)
+- 416 git commits with atomic changes
+- 7 days (2026-04-27 → 2026-05-03)
+
+**Git range:** `docs(174)` (a7e7866c) → `docs(183)` (18e36347)
+
+**Archives:**
+
+- [Roadmap](milestones/v20.0-ROADMAP.md)
+- [Requirements](milestones/v20.0-REQUIREMENTS.md)
+- [Audit](milestones/v20.0-MILESTONE-AUDIT.md)
+
+**Tech debt (accepted):**
+
+- Visual UAT debt (~50+ items across phases 174, 177, 178, 179, 180, 181, 182): real-device visual fidelity, motion curves, Italian copy parity, iOS safe-area edge cases, ambient gradient motion, blur fallback in non-supporting browsers — explicitly out of autonomous scope, parked for backlog
+- Playwright runtime gates (phases 174, 175, 176, 178, 180, 181, 182): spec files authored and statically reviewed; runtime blocked by stale Auth0 storageState + missing Firebase Database URL in worktree env + VersionEnforcer overlay — infrastructure backlog, not plan defect
+- Legacy `app/components/ui/Sheet.tsx` + `ui/BottomSheet.tsx` retained (have live importers in `/debug/design-system` + scheduler `IntervalBottomSheet`); deletion deferred to a future migration phase that swaps consumers to EmberGlass/Sheet
+- CircBtn + BigSlider extracted in Phase 182 but not yet imported in production sheets (CONTEXT D-07 explicitly deferred — design-system primitives only)
+- DASH-10 deviation: DirigeraCard renders empty list — proxy exposes only sensors today; hook retained for forward-compat
+- Locked deviations: AUTO-03 ships 2 API trigger types (not bundle's 5 — sensor concepts moved to condition leaves per D-08); AUTO-05 ships 11 API action types (not bundle's 9 generic — `light_set` explodes into hue_light/group/scene per D-09)
+- Stale comment in `types/automations.ts:13` references deleted `app/automations/page.tsx` (informational drift, no runtime impact)
+- 7 orphan `.resolved` debug-session state files (cosmetic — slugs not renamed)
+- 39 missing quick-task scaffolds in `.planning/quick/` (idea backlog, never executed)
+- Known deferred items at close: 58 (see STATE.md Deferred Items)
+
+**What's next:** v20.0 ships Ember Glass UI on the v19.0 API surface. Visual fidelity polish, Playwright runtime infrastructure, and legacy `ui/Sheet.tsx` + `BottomSheet.tsx` retirement are next-milestone candidates. Scheduler API endpoints remain explicitly deferred from v19.0/v20.0.
+
+---
+
 ## v19.0 API Alignment & Full Coverage (Shipped: 2026-04-27)
 
 **Delivered:** All 8 device providers fully unified on canonical `/api/v1/{provider}/*` namespace, every documented HA proxy endpoint exposed (auth, automations, Hue, Sonos, Netatmo, Fritz!Box, DIRIGERA gap closures), and every new endpoint wired through to a production UI consumer — closing the 52-requirement contract at 100% with audit-passed verification.

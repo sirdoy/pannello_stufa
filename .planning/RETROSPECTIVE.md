@@ -457,6 +457,63 @@
 
 ---
 
+## Milestone: v20.0 — Ember Glass Redesign
+
+**Shipped:** 2026-05-03
+**Phases:** 10 | **Plans:** 66
+
+### What Was Built
+- Token-driven Ember Glass design system on `:root` (11 CSS custom properties, oklch accent + 6 hues, Outfit + Inter via next/font, ambient glow with pre-paint script, backdrop-filter + WebKit fallback + @supports graceful degradation)
+- Two shared interaction primitives composed by every later phase: `<Pressable>` + `usePressed` + `.press-anim` (DS-07) and `<Sheet>` Radix Dialog facade with scroll-lock + 4 dismissal modes (SHEET-01)
+- Post-Auth0 splash with 4-phase state machine, sessionStorage gate, reduced-motion fallback, non-blocking initial fetches
+- Equal-size 2-column 1:1 dashboard with 10 device cards; 5 micro-primitives (GlassCard, CardHead, StatusDot, MiniStat, InlineToggle); v9.0 stagger preserved; React Compiler clean
+- 5 per-device modal sheets (Stove, Climate w/ Apple-Home radial dial, Lights w/ scenes, Sonos w/ master, Plugs report-only); 6 bundle-verbatim sub-primitives; new `useThermostatCommands` hook
+- Data-driven Rooms tab: RoomCard 3×2 chip grid + RoomSheet expanded device cards with type-specific bodies for 9 device classes
+- Full Automations editor: discriminated-union types rewrite, 4-tab editor, AND/OR depth-2 condition nesting, 11 API action types, save guard + edit/delete
+- Glass bottom tab bar: 4 sections, accent-glow active state, sheet-aware visibility via SheetCounter, iOS safe-area
+- `/debug/design-system-v2` single source of truth: 13 live primitive samples + accent picker inline
+- Hygiene cleanup phase (183): 6 orphan files deleted, 26 traceability rows + 2 checkboxes flipped, BL-01 note appended, 5 console.error calls added, 7 VALIDATION.md frontmatters normalized
+
+### What Worked
+- **Bundle-verbatim porting** — copying primitives byte-for-byte from `.planning/inbox/ember-glass-design/` minimized invention; visuals matched the design source on first compile
+- **Foundation-first sequencing** — Phase 174 tokens + Phase 175 primitives shipped before any consuming phase, so dashboard/sheets/rooms/automations/nav all composed against stable APIs
+- **CONTEXT-locked deviations** — AUTO-03 (2 trigger types vs bundle's 5) and AUTO-05 (11 action types vs bundle's 9) were locked in 180-CONTEXT.md before code, preventing rework
+- **Re-audit closed prior gaps** — Phase 183 hygiene phase was scoped from the first audit's `tech_debt` block and then a re-audit confirmed `passed`, closing the loop
+- **Polymorphic Pressable** as the single grep-target for SC-#1 made the DS-07 invariant verifiable
+
+### What Was Inefficient
+- **Visual UAT debt accumulated across 7 phases** (~50+ items) — autonomous code-verification is not a substitute for real-device visual fidelity, motion curves, or copy parity
+- **Playwright runtime gates blocked end-to-end on infra** — Auth0 storageState + Firebase Database URL + VersionEnforcer overlay turned authored specs into static review only
+- **REQUIREMENTS.md doc-drift caught only by audit** — 26 Pending traceability rows + 2 unchecked DSREF boxes survived implementation; needed dedicated Phase 183-02 to flip
+- **VALIDATION.md frontmatter convention drift** — 7 phases shipped with `status: draft` + `nyquist_compliant: false` until Phase 183-05 normalized; suggests planner template needs alignment
+- **Legacy `ui/Sheet.tsx` + `ui/BottomSheet.tsx` deletion deferred mid-phase** — RESEARCH grep correctly caught live importers (`/debug/design-system` + scheduler `IntervalBottomSheet`) but only after Phase 183-01 was already in motion; a pre-phase grep would have scoped 183 cleanly upfront
+
+### Patterns Established
+- **EmberGlass namespace + barrel** — `app/components/EmberGlass/` + `index.ts` re-exports as the single import surface for every glass primitive
+- **`usePressed()` + `.press-anim` triad** — the polymorphic `<Pressable as>` + hook + CSS class is the only sanctioned way to opt into DS-07 (3 grep targets enforce the invariant)
+- **Sheet primitive contract** — Radix Dialog facade with `forceMount` on Portal/Overlay/Content (for outro animation), `onPointerDownOutside.preventDefault()` + own backdrop onClick (avoids double-fire), `useRef`-captured scrollY for scroll-lock + restore, VisuallyHidden Title fallback
+- **z-index 200/201 reserved** for sheets; nav (181) stays below
+- **SheetCounter pure module** — broadcasts `body[data-sheet-open]` so any later chrome (nav bar, FAB) can react via CSS without coupling to Sheet implementation
+- **Discriminated-union API types + `assertNever`** — TriggerType / ConditionNode / ActionItem unions in 180 made the editor's 11 action forms exhaustively type-checked
+- **Apple-Home radial dial debounced 500ms** + **Sonos volume slider debounced 250ms** — established two debounce constants for analog controls
+- **AmbientBg pre-paint script** — inline script in `app/layout.tsx` reads localStorage before React hydrates, eliminating accent/ambient hue flash on first paint
+- **Append-only Post-Verification Update pattern** (183-03) — preserves original audit trail when re-verifying deferred blockers, instead of mutating the prior verification footer
+
+### Key Lessons
+- **Foundation phases pay off across the milestone** — Phases 174 + 175 (6 plans total) unlocked 60 plans of consumer code. ROI is invisible in the foundation-phase metric but compounds downstream
+- **Audit-driven hygiene phases are now standard** — Phase 183 (5 plans) closed all actionable items from the first audit; without a re-audit gate, the milestone would have shipped with REQUIREMENTS doc-drift, orphan files, and 7 stale VALIDATION frontmatters
+- **Visual UAT is the new ceiling** — pure-UI milestones expose the same testing-ceiling problem v16.0 hit with hardware-required Sonos UAT: code-verification ≠ visual-fidelity verification. Future milestones should budget for real-device sweeps explicitly, not assume autonomous closure
+- **Playwright runtime infrastructure needs its own milestone** — three different blockers (Auth0 storageState, Firebase env, VersionEnforcer overlay) each one-off, but together they neutralize 7 phases of authored specs. Treating Playwright runtime as infra (not per-phase work) would unblock everything at once
+- **Per-row Edit beats bulk replace_all for traceability flips** — Phase 183-02 used 26 evidence-anchored Edit calls so each Pending→Complete row remained auditable; replace_all would have erased the per-REQ-ID provenance
+- **Locked deviations save rework** — AUTO-03/AUTO-05 (5→2 triggers, 9→11 actions) were API-truth corrections lockable in CONTEXT before code; doing it after would have been a rewrite
+
+### Cost Observations
+- Model mix: balanced profile (~40% opus, ~60% sonnet)
+- Sessions: ~12-15 (discuss + plan + execute + verify per phase + 2 audits + close)
+- Notable: largest milestone by plan count (66) and LOC delta (+107,433) — pure-UI rewrite generated more code than any backend milestone in project history; React Compiler stayed clean throughout (zero new opt-outs)
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -475,6 +532,9 @@
 | v16.0 | 13 | 26 | Sonos + DIRIGERA + Fritz!Box advanced — largest milestone, 7 providers |
 | v17.0 | 6 | 11 | WebSocket real-time transport — WS-primary for all 6 providers |
 | v17.1 | 4 | 10 | WS type alignment + Tuya integration — 8th provider, all on WS |
+| v18.0 | 7 | 15 | Dark-only + mobile-first — light theme deleted, 375px Playwright sweep |
+| v19.0 | 18 | 39 | API alignment + full coverage — `/api/v1/{provider}` namespace, ~80 endpoints exposed, all wired to UI |
+| v20.0 | 10 | 66 | Ember Glass UI rewrite — token-driven design system, 10 dashboard cards, 5 device sheets, full automations editor, glass nav |
 
 ### Cumulative Quality
 
@@ -492,6 +552,9 @@
 | v16.0 | 4,000+ | 62/62 requirements | +20,351 |
 | v17.0 | 4,000+ | 23/23 requirements | +3,245 |
 | v17.1 | 4,000+ | 35/35 requirements | +10,013 |
+| v18.0 | 4,000+ | 31/31 requirements | +8,304 |
+| v19.0 | 4,000+ | 52/52 requirements | +71,274 |
+| v20.0 | 4,000+ | 50/50 requirements | +107,433 |
 
 ### Top Lessons (Verified Across Milestones)
 
@@ -509,3 +572,9 @@
 12. **Pattern maturity keeps pace constant** — v16.0 (26 plans) shipped in 4 days, same daily throughput as v15.0 (13 plans in 2 days). Established patterns eliminate research overhead.
 13. **Human verification is the testing ceiling** — 26 items in v16.0 require physical hardware. No amount of automation can replace plugging in a Sonos speaker.
 14. **Pattern replication is the fastest execution mode** — v17.0 established one migration template (Phase 140) then replicated it 5 times with minimal variation, shipping 6 phases in 3 days (verified v17.0)
+15. **Foundation phases compound across the milestone** — v20.0 Phases 174 + 175 (6 plans) unlocked 60 plans of consumer code; ROI invisible in foundation metrics but compounds downstream (verified v20.0)
+16. **Visual UAT is the new ceiling for UI milestones** — v20.0 accumulated ~50+ deferred visual items; code-verification ≠ visual-fidelity verification, budget for real-device sweeps explicitly (verified v20.0; mirrors v16.0 hardware-UAT ceiling)
+17. **Audit-driven hygiene phases close the loop** — v20.0 Phase 183 (5 plans) closed every actionable item from the first audit, then re-audit confirmed `passed`; dedicate a final hygiene phase per milestone to convert `tech_debt` → `passed` (verified v20.0)
+18. **CONTEXT-locked deviations save rework** — v20.0 AUTO-03/AUTO-05 (5→2 triggers, 9→11 actions) were API-truth corrections locked before code; deviations caught after implementation become rewrites (verified v20.0)
+19. **Per-row Edit beats bulk replace_all for traceability** — v20.0 Phase 183-02 used 26 evidence-anchored Edits so each Pending→Complete flip remained auditable per REQ-ID (verified v20.0)
+20. **Polymorphic primitives + grep-targets enforce design invariants** — v20.0 `<Pressable>` + `usePressed` + `.press-anim` triad gave SC-#1 three grep targets; primitives that can be enforced by grep stay enforceable across phases (verified v20.0)

@@ -4,7 +4,7 @@ milestone: v20.0
 milestone_name: Ember Glass Redesign
 status: verifying
 stopped_at: Completed 183-04-PLAN.md
-last_updated: "2026-05-03T16:39:33.884Z"
+last_updated: "2026-05-03T17:48:10.819Z"
 last_activity: 2026-05-03
 progress:
   total_phases: 1
@@ -18,19 +18,18 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-27)
+See: .planning/PROJECT.md (updated 2026-05-03 after v20.0 close)
 
 **Core value:** I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e le notifiche arrivano sempre (100% delivery rate per dispositivi registrati).
-**Current focus:** Phase 183 — v20.0 Hygiene & Cleanup
+**Current focus:** Between milestones — v20.0 Ember Glass Redesign shipped 2026-05-03; awaiting `/gsd-new-milestone` for next cycle
 
 ## Current Position
 
-Phase: 183 (v20.0 Hygiene & Cleanup) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
+Milestone: v20.0 — SHIPPED 2026-05-03
+Status: Closed (10 phases, 66 plans, 50/50 reqs)
 Last activity: 2026-05-03
 
-Progress: [██████████] 100%
+Progress: [██████████] 100% (v20.0 closed)
 
 ## Performance Metrics
 
@@ -48,7 +47,7 @@ Progress: [██████████] 100%
 | v17.1 WebSocket Alignment & Tuya Integration | 145-148 | 10 | 3 days |
 | v18.0 Dark-Only & Mobile-First | 149-155 | 15 | 2 days |
 | v19.0 API Alignment & Full Coverage | 156-173 | 39 | 25 days |
-| v20.0 Ember Glass Redesign | 174-182 | TBD | in progress |
+| v20.0 Ember Glass Redesign | 174-183 | 66 | 7 days |
 | Phase 174 P01 | 3min | 2 tasks | 2 files |
 | Phase 174 P03 | 25min | 3 tasks | 7 files |
 | Phase 183 P01 | 4min | 3 tasks | 7 files |
@@ -120,17 +119,17 @@ None.
 
 ## Session Continuity
 
-Last activity: 2026-04-27 — Wrote ROADMAP.md for v20.0 Ember Glass Redesign (9 phases, 174-182, 50/50 reqs mapped)
-Stopped at: Completed 183-04-PLAN.md
+Last activity: 2026-05-03 — Closed v20.0 Ember Glass Redesign milestone (10 phases / 66 plans / 50 reqs); archived ROADMAP + REQUIREMENTS + AUDIT to milestones/v20.0-*.md
+Stopped at: v20.0 milestone closed
 Resume file: None
 
-**Next Action:** `/gsd-plan-phase 174` (Ember Glass Tokens & Foundations)
+**Next Action:** `/gsd-new-milestone` to define the next milestone cycle (questioning → research → requirements → roadmap)
 
 ## Deferred Items
 
-Items acknowledged and deferred at v19.0 milestone close on 2026-04-27. Carried into v20.0 unchanged.
+Items acknowledged and deferred at v20.0 milestone close on 2026-05-03. Audit-documented backlog from `milestones/v20.0-MILESTONE-AUDIT.md` — re-audit `passed`, residual items parked.
 
-### Debug Sessions (7 — orphan `.resolved` state files)
+### Debug Sessions (7 — orphan `.resolved` state files, carried over from v19.0)
 
 | Slug | Status |
 |------|--------|
@@ -142,26 +141,24 @@ Items acknowledged and deferred at v19.0 milestone close on 2026-04-27. Carried 
 | netatmo-invalid-token.resolved | verifying |
 | permission-denied-panel-commands.resolved | checkpoint |
 
-### UAT Gaps (3 partial — v19.0 audit accepted)
+### UAT Gaps (3 partial — v20.0 visual UAT, audit-acknowledged)
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| 166 | partial | 1 pending: Firebase adminDbPush log write (live env) |
-| 169 | partial | 1 pending: /dirigera panels render (Playwright BYPASS_AUTH) |
-| 170 | partial | 4 pending: cookie httpOnly, plaintext API key auth, revoke 401, clipboard |
+| 178 | partial | 6 pending: visual sheet polish, motion curves, real-device fidelity |
+| 179 | partial | 16 pending: Rooms tab visual UAT, type-specific body parity |
+| 180 | partial | 2 pending: Automations editor visual UAT, Italian copy parity |
 
-### Verification Gaps (8)
+### Verification Gaps (6)
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| 05 | gaps_found | Pre-v19.0 historical |
 | 39 | gaps_found | Pre-v19.0 historical |
 | 42 | gaps_found | Pre-v19.0 historical |
-| 50 | human_needed | Pre-v19.0 historical |
-| 158 | human_needed | v19.0 — code-verified, 3 browser smoke pending |
-| 166 | human_needed | v19.0 — code-verified, live env pending |
-| 169 | human_needed | v19.0 — code-verified, Playwright BYPASS_AUTH blocked |
-| 170 | human_needed | v19.0 — code-verified, browser/live UAT pending |
+| 174 | human_needed | v20.0 — 5/5 must-haves code-verified, visual UAT deferred |
+| 177 | human_needed | v20.0 — 12/12 must-haves code-verified, dashboard visual UAT deferred |
+| 178 | human_needed | v20.0 — 12/12 must-haves code-verified, sheet visual UAT deferred |
+| 179 | human_needed | v20.0 — 5/5 SC + 16 UAT items code-verified, visual UAT deferred |
 
 ### Quick Tasks (39 missing — backlog of unexecuted ideas in `.planning/quick/`)
 
@@ -169,4 +166,12 @@ Items acknowledged and deferred at v19.0 milestone close on 2026-04-27. Carried 
 
 These are idea slugs scaffolded but never executed. Promote individually post-close if needed.
 
-**Planned Phase:** 175 (Glass Primitives — Press Animation & Sheet) — 3 plans — 2026-04-27T13:08:57.254Z
+### v20.0 Audit Tech Debt (parked for next milestone)
+
+- Visual UAT debt (~50+ items across phases 174, 177, 178, 179, 180, 181, 182): real-device fidelity, motion curves, Italian copy parity, iOS safe-area, ambient gradient motion, blur fallback
+- Playwright runtime gates (174, 175, 176, 178, 180, 181, 182): specs authored + statically reviewed, runtime blocked by Auth0 storageState + Firebase Database URL + VersionEnforcer overlay
+- Legacy `app/components/ui/Sheet.tsx` + `ui/BottomSheet.tsx` retention (live importers — deletion deferred to follow-up migration phase)
+- CircBtn + BigSlider extracted in Phase 182 but not yet imported in production sheets (CONTEXT D-07)
+- DASH-10: DirigeraCard renders empty list (proxy exposes only sensors today)
+- Locked deviations: AUTO-03 (2 trigger types vs bundle's 5, D-08), AUTO-05 (11 action types vs bundle's 9 generic, D-09)
+- Stale comment in `types/automations.ts:13` (informational drift)

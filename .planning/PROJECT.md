@@ -10,24 +10,22 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 
 ## Current State
 
-**Version:** v19.0 (shipped 2026-04-27)
-**Status:** Active — v20.0 Ember Glass Redesign (defining requirements)
+**Version:** v20.0 (shipped 2026-05-03)
+**Status:** Active — between milestones, v20.0 Ember Glass Redesign just shipped, awaiting next milestone definition
 
-## Current Milestone: v20.0 Ember Glass Redesign
+## Next Milestone Goals
 
-**Goal:** Migrare l'intera UI da "Ember Noir" a "Ember Glass" (estetica iOS 18 glass/blur), redisegnare dashboard a card quadrate equi-dimensionate list-based, redisegnare tab Stanze e Automazioni, aggiungere splash animation post-Auth0, e rilasciare pagina Design System di riferimento.
+v20.0 closed Ember Glass UI rewrite over the v19.0 API surface. Candidate next-milestone themes (to be defined via `/gsd-new-milestone`):
 
-**Target features:**
-- Design system "Ember Glass": token glass (bg/blur/border/shadow), accent oklch + 6 preset, font pairing Outfit (display) + Inter (body), ambient glow opzionale
-- Splash animation post-Auth0: logo fiamma → wordmark → fade in dashboard (~2s)
-- Dashboard a card quadrate equi-dimensionate (10 card list-based: Stove, Climate, Lights, Sonos, Weather, Camera, Network, Raspi, Tuya, Plugs)
-- Sheet modali ridisegnati per ogni dispositivo (Stove, Climate w/ zone+dial, Lights w/ scene+room, Sonos w/ player, Plugs report-only)
-- Tab Stanze data-driven: chip-grid 3×2 + sheet per-stanza con card dispositivo espanse
-- Editor Automazioni completo: trigger picker + condizioni AND/OR annidabili (≤2 livelli) + azioni multiple riordinabili + cooldown
-- Bottom tab bar glass (4 sezioni)
-- Pagina riferimento Design System (`/debug/design-system-v2`)
+- **Visual fidelity & UAT closure** — work through ~50+ deferred visual UAT items across phases 174/177/178/179/180/181/182 (real-device fidelity, motion curves, Italian copy parity, iOS safe-area, ambient gradient motion, blur fallback in non-supporting browsers)
+- **Playwright runtime infrastructure** — unblock authored specs in 174/175/176/178/180/181/182: refresh Auth0 storageState, wire Firebase Database URL into worktree env, neutralize VersionEnforcer overlay in test mode
+- **Legacy design-system retirement** — migrate live importers off `app/components/ui/Sheet.tsx` + `ui/BottomSheet.tsx` and delete (deferred from Phase 183 per RESEARCH grep evidence)
+- **Production sheet adoption of Phase 182 primitives** — wire CircBtn + BigSlider into production sheets (CONTEXT D-07 deferral)
+- **Scheduler API endpoints** — still explicitly deferred from v19.0 and v20.0
+- **Personalization** — user-selectable accent hue per-account (post-v20.0 PERS-01), light-mode variant of Ember Glass (PERS-02), custom card ordering (PERS-03)
+- **Automations advanced** — visual cron builder (AUTO-FUT-01), per-action retry/timeout config (AUTO-FUT-02), action templates/library (AUTO-FUT-03)
 
-**Source design bundle:** `.planning/inbox/ember-glass-design/` (README + chats/chat1.md + 7 .jsx component prototipi, ~4800 LOC)
+**Source design bundle (v20.0, archived for reference):** `.planning/inbox/ember-glass-design/` (README + chats/chat1.md + 7 .jsx component prototipi, ~4800 LOC)
 
 **Tech Stack:**
 - Next.js 15.5 PWA with App Router
@@ -642,6 +640,47 @@ I dispositivi vengono riconosciuti automaticamente dopo il riavvio del browser e
 - ✓ **FRITZ-13** through **FRITZ-16**: Frontend system info, WiFi clients, network services, history charts — v16.0 (Phase 134)
 - ✓ **FRITZ-17** through **FRITZ-20**: Extended frontend (WiFi networks, device count chart, budget stats, auto-granularity) — v16.0 (Phase 137)
 
+**v18.0 Dark-Only & Mobile-First (Shipped 2026-04-02):**
+- ✓ ThemeContext / ThemeProvider / theme API route / theme settings page deleted; `class="dark"` hardcoded on `<html>` — v18.0 (Phase 149)
+- ✓ ~170 files cleaned of `dark:` Tailwind variants and `html:not(.dark)` selectors — v18.0 (Phase 150)
+- ✓ Design system mobile-first: ButtonGroup flex-wrap, all 12 layout components verified at 375px — v18.0 (Phase 151)
+- ✓ All 30+ pages/sub-pages verified at 375px viewport via Playwright scrollWidth checks — v18.0 (Phases 152-154)
+
+**v19.0 API Alignment & Full Coverage (Shipped 2026-04-27):**
+- ✓ All 8 device providers unified on canonical `/api/v1/{provider}/*` namespace — v19.0 (Phases 156, 172)
+- ✓ ~80 missing HA proxy endpoints exposed across Hue, Sonos, Netatmo, Fritz!Box, DIRIGERA, auth, automations — v19.0 (Phases 157-163)
+- ✓ Every gap-closure endpoint wired to production UI (Hue, Sonos, Netatmo, DIRIGERA, Auth UI, Fritz!Box) — v19.0 (Phases 166-171)
+- ✓ Cross-provider device aggregator `/api/v1/devices` via Promise.allSettled fan-out — v19.0 (Phase 173)
+- ✓ 52/52 v19.0 requirements satisfied (audit-passed 2026-04-27)
+
+**v20.0 Ember Glass Redesign (Shipped 2026-05-03):**
+
+**Design System (Ember Glass tokens):**
+- ✓ **DS-01** through **DS-06**: Tokens on `:root`, no hardcoded glass/blur/accent in components, oklch accent + 6 hues, Outfit/Inter via next/font, ambient glow togglable + persisted, backdrop-filter + WebKit fallback + @supports graceful degradation — v20.0 (Phase 174)
+- ✓ **DS-07**: Card press animation (`scale(0.97)` cubic-bezier .34,1.56,.64,1 / 220ms) shared via `<Pressable>` + `usePressed` + `.press-anim` — v20.0 (Phase 175)
+
+**Splash (post-Auth0):**
+- ✓ **SPLASH-01** through **SPLASH-05**: Splash renders post-auth, ~2s sequence, reduced-motion fallback (200ms opacity), never re-runs in-session, non-blocking initial fetches — v20.0 (Phase 176)
+
+**Dashboard (equal-size glass cards):**
+- ✓ **DASH-01** through **DASH-12**: 2-col 1:1 glass card grid, 10 device cards (Stove/Climate/Lights/Sonos/Weather/Camera/Network/Raspi/Tuya/Plugs), per-card content shape verified, modal-sheet on tap (Weather + Raspi read-only), v9.0 stagger preserved, React Compiler clean — v20.0 (Phase 177)
+
+**Modal Sheets (per-device):**
+- ✓ **SHEET-01**: Bottom sheet primitive (Radix Dialog facade) — translucent + backdrop-blur, off-screen translate cubic-bezier .22,1,.36,1 / 400ms, Escape/backdrop/close dismissal, body scroll-lock — v20.0 (Phase 175)
+- ✓ **SHEET-02** through **SHEET-06**: StoveSheet (FlameViz hero + steppers), ClimateSheet (zone chips + radial dial), LightsSheet (4 scenes + per-room), SonosSheet (group list + master), PlugsSheet (per-plug toggles inside sheet only) — v20.0 (Phase 178)
+
+**Rooms Tab (data-driven):**
+- ✓ **ROOMS-01** through **ROOMS-05**: Data-driven from existing state, 3×2 chip grid + "+N" overflow, RoomSheet expanded device cards with type-specific bodies (Stove/Thermo/Light/Plug/Sonos/TV/Blind/Camera/Humidity) — v20.0 (Phase 179)
+
+**Automations Tab (full editor):**
+- ✓ **AUTO-01** through **AUTO-08**: List with status pills, 4-tab editor, 2 API trigger types (D-08), AND/OR depth-2 condition nesting, 11 API action types (D-09), reorder + cooldown + save guard + edit/delete — v20.0 (Phase 180)
+
+**Navigation (glass tab bar):**
+- ✓ **NAV-01** through **NAV-04**: Glass bottom tab bar (Home/Stanze/Automazioni/Altro), accent-glow active, hidden under open sheets via SheetCounter, iOS safe-area respect — v20.0 (Phase 181)
+
+**Design System Reference:**
+- ✓ **DSREF-01** through **DSREF-03**: `/debug/design-system-v2` single source of truth, 13 live primitive samples, dev accent picker inline — v20.0 (Phase 182)
+
 ### Out of Scope
 
 - Notifiche email — Solo push notifications, no email
@@ -880,4 +919,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-30 — Phase 180 (Automations Tab Full Editor) complete: AUTO-01..08 validated at static-structure level; runtime smoke deferred pending data-layer rewire (haGet → relative /api/v1/automations fetch).*
+*Last updated: 2026-05-03 after v20.0 Ember Glass Redesign milestone close — 50/50 v20.0 requirements moved to Validated; ROADMAP.md collapsed; REQUIREMENTS.md archived to milestones/v20.0-REQUIREMENTS.md; awaiting `/gsd-new-milestone` for next cycle.*

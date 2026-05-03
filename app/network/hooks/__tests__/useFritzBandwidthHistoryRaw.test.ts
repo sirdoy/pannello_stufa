@@ -105,7 +105,7 @@ describe('useFritzBandwidthHistoryRaw', () => {
 
     const { rerender, result } = renderHook(
       ({ hours }: { hours: '1h' | '24h' | '7d' }) => useFritzBandwidthHistoryRaw({ hours }),
-      { initialProps: { hours: '24h' as const } }
+      { initialProps: { hours: '24h' as '1h' | '24h' | '7d' } }
     );
 
     await waitFor(() => {
@@ -114,13 +114,14 @@ describe('useFritzBandwidthHistoryRaw', () => {
 
     (global.fetch as jest.Mock).mockClear();
 
-    rerender({ hours: '7d' as const });
+    rerender({ hours: '7d' });
 
     await waitFor(() => {
       expect((global.fetch as jest.Mock).mock.calls.length).toBeGreaterThan(0);
     });
 
-    const lastUrl = (global.fetch as jest.Mock).mock.calls.at(-1)[0] as string;
+    const calls = (global.fetch as jest.Mock).mock.calls;
+    const lastUrl = calls[calls.length - 1]![0] as string;
     expect(lastUrl).toContain('hours=168');
     expect(lastUrl).toContain('offset=0');
   });

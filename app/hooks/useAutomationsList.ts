@@ -83,6 +83,7 @@ export function useAutomationsList(
       setRules(data.items);
       setTotalCount(data.total_count);
     } catch (err) {
+      console.error('[useAutomationsList] refetch failed:', err);
       setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     } finally {
       setLoading(false);
@@ -107,6 +108,7 @@ export function useAutomationsList(
         toastSuccess('Automazione creata');
         await refetch();
       } catch (err) {
+        console.error('[useAutomationsList] create failed:', err);
         toastError(
           err instanceof Error ? err.message : 'Errore durante il salvataggio'
         );
@@ -130,6 +132,7 @@ export function useAutomationsList(
         toastSuccess('Automazione aggiornata');
         await refetch();
       } catch (err) {
+        console.error('[useAutomationsList] update failed:', err);
         toastError(
           err instanceof Error ? err.message : 'Errore durante il salvataggio'
         );
@@ -151,6 +154,7 @@ export function useAutomationsList(
         toastSuccess('Automazione eliminata');
         await refetch();
       } catch (err) {
+        console.error('[useAutomationsList] remove failed:', err);
         toastError(
           err instanceof Error ? err.message : "Errore durante l'eliminazione"
         );
@@ -177,6 +181,7 @@ export function useAutomationsList(
         }
         // No success toast — InlineToggle is its own visual feedback
       } catch (err) {
+        console.error('[useAutomationsList] toggle failed:', err);
         // Rollback
         setRules((prev) =>
           prev.map((r) => (r.id === id ? { ...r, enabled: currentEnabled } : r))

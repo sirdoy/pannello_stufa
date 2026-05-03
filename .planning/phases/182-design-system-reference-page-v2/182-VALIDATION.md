@@ -2,7 +2,7 @@
 phase: 182
 slug: design-system-reference-page-v2
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-05-03
 ---
@@ -49,7 +49,7 @@ created: 2026-05-03
 | 182-XX-05 | 05 (Section 06 card primitives reference) | 2 | DSREF-01, DSREF-02 | — | N/A | page | `npm run test:pages -- app/debug/design-system-v2/__tests__/page` | ✅ | ⬜ pending |
 | 182-XX-06 | 06 (Section 07 sheet primitives reference) | 2 | DSREF-01, DSREF-02 | — | N/A | page | `npm run test:pages -- app/debug/design-system-v2/__tests__/page` | ✅ | ⬜ pending |
 | 182-XX-07 | 07 (Section 08 sheet gallery + fixtures + hook mocks) | 2 | DSREF-01, DSREF-02 | — | N/A — fixture/mock data only | page | `npm run test:pages -- app/debug/design-system-v2/__tests__/page` | ✅ | ⬜ pending |
-| 182-XX-08 | 08 (Playwright smoke: section-mount + recolor invariant) | 3 | DSREF-01, DSREF-02, DSREF-03 | — | N/A | e2e | `npx playwright test tests/smoke/design-system-v2-primitives.spec.ts` | ❌ W0 | ⬜ pending |
+| 182-XX-08 | 08 (Playwright smoke: section-mount + recolor invariant) | 3 | DSREF-01, DSREF-02, DSREF-03 | — | N/A | e2e | `npx playwright test tests/smoke/design-system-v2-primitives.spec.ts` | Created Wave 3 (Plan 09) — see note | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -59,8 +59,9 @@ created: 2026-05-03
 
 - [ ] `app/components/EmberGlass/cards/__tests__/CircBtn.test.tsx` — Jest spec stub for CircBtn (DSREF-01)
 - [ ] `app/components/EmberGlass/sheets/primitives/__tests__/BigSlider.test.tsx` — Jest spec stub for BigSlider (DSREF-01)
-- [ ] `tests/smoke/design-system-v2-primitives.spec.ts` — new Playwright spec for Phase 182 sample assertions (DSREF-01..03)
 - [ ] No new framework install — Jest + Playwright already established (Phases 174-181)
+
+> Note: `tests/smoke/design-system-v2-primitives.spec.ts` is created in Plan 09 (Wave 3) rather than Wave 0 because no content to assert against exists until Wave 2 section files render. A Wave 0 stub would give false confidence; deferring is intentional.
 
 ---
 
@@ -77,7 +78,7 @@ created: 2026-05-03
 
 - [ ] All tasks have `<automated>` verify or Wave 0 dependencies
 - [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (CircBtn spec stub, BigSlider spec stub, Playwright spec stub)
+- [ ] Wave 0 covers all MISSING references (CircBtn spec stub, BigSlider spec stub) — Playwright spec deferred to Wave 3 per note above
 - [ ] No watch-mode flags
 - [ ] Feedback latency < 60s
 - [ ] `nyquist_compliant: true` set in frontmatter (set by planner once tasks reference these test commands)

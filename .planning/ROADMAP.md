@@ -43,7 +43,7 @@
 - [ ] Phase 179: Rooms Tab Redesign (0/9 plans) — not started
 - [ ] Phase 180: Automations Tab Full Editor (0/9 plans) — not started
 - [x] Phase 181: Glass Bottom Tab Bar (6/6 plans) — completed 2026-05-02
-- [ ] Phase 182: Design System Reference Page v2 (0/0 plans) — not started
+- [ ] Phase 182: Design System Reference Page v2 (0/9 plans) — not started
 
 </details>
 
@@ -215,7 +215,16 @@
   1. Visiting `/debug/design-system-v2` renders a single page with sections for colors (accent + neutrals + tones), typography pairs, spacing/radius scale, shadow/blur values, and live samples of GlassCard, CardHead, StatusDot, InlineToggle, CircBtn, Stepper, Slider, BigSlider, RadialDial, Sheet preview, MiniStat, FlameViz, and PlayingBars.
   2. Every visual primitive used by the dashboard, sheets, rooms tab, automations editor, and nav bar appears on this page with a copy-paste-ready code snippet (or token reference) — verifiable by cross-referencing the component import list in Phases 177-181 against the page's sample list.
   3. The developer accent picker from Phase 174 (DS-03) is rendered inline near the top of the page so changing the hue updates every primitive on the page in place without a reload.
-**Plans**: TBD
+**Plans**: 9 plans
+- [ ] 182-01-PLAN.md — Decompose page.tsx into Section01..Section07 verbatim extracts (DSREF-03) [Wave 1]
+- [ ] 182-02-PLAN.md — Port CircBtn primitive + Jest spec + barrel exports (DSREF-01) [Wave 1]
+- [ ] 182-03-PLAN.md — Port BigSlider primitive + Jest spec + barrel exports (DSREF-01) [Wave 1]
+- [ ] 182-04-PLAN.md — Build shared CodeSnippet primitive + Jest spec (DSREF-02) [Wave 1]
+- [ ] 182-05-PLAN.md — Extend Section03Tokens with live token table + typography + spacing + shadow tiles (DSREF-01, DSREF-02) [Wave 2]
+- [ ] 182-06-PLAN.md — Section08CardPrimitives: 8 card-primitive samples with CodeSnippets (DSREF-01, DSREF-02) [Wave 2]
+- [ ] 182-07-PLAN.md — Section09SheetPrimitives: 7 sheet-primitive samples with CodeSnippets (DSREF-01, DSREF-02) [Wave 2]
+- [ ] 182-08-PLAN.md — Section10SheetGallery: 5 device-sheet launchers + sheetFixtures + page.test mocks (DSREF-01, DSREF-02) [Wave 2]
+- [ ] 182-09-PLAN.md — Playwright smoke spec for section presence + 13 primitives + violet recolor invariant (DSREF-01, DSREF-02, DSREF-03) [Wave 3]
 **UI hint**: yes
 
 ## Progress
@@ -230,7 +239,7 @@
 | 179. Rooms Tab Redesign | 9/9 | Complete    | 2026-04-29 |
 | 180. Automations Tab Full Editor | 9/9 | Complete    | 2026-04-30 |
 | 181. Glass Bottom Tab Bar | 6/6 | Complete   | 2026-05-02 |
-| 182. Design System Reference Page v2 | 0/0 | Not started | - |
+| 182. Design System Reference Page v2 | 0/9 | Not started | - |
 
 <details>
 <summary>✅ v19.0 API Alignment & Full Coverage (Phases 156-173) — SHIPPED 2026-04-27</summary>

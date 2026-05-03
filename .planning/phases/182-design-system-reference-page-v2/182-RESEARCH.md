@@ -817,17 +817,11 @@ Phase 182 is a code/config-only change with no external service dependencies bey
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Section 08 hook mocking scope in page.test.tsx**
-   - What we know: StoveSheet etc. call multiple hooks (useStoveData, useStoveCommands, useRouter, useUser, useVersion). The existing StoveSheet.test.tsx mocks 5+ dependencies.
-   - What's unclear: Whether the page-level Jest test needs all these mocks, or whether just wrapping Section08 in a mock is sufficient.
-   - Recommendation: The planner should instruct the executor to add a `jest.mock(...)` call per sheet's hook dependencies in `page.test.tsx`, or alternatively render the page without Section08 being fully active (all sheets start with `open=false`, so their render should be minimal).
+1. **Section 10 (formerly Section 08) hook mocking scope in page.test.tsx** — **RESOLVED** by Plan 08 Task 4 (`182-08-PLAN.md`): the executor adds 13+ `jest.mock(...)` calls in `app/debug/design-system-v2/__tests__/page.test.tsx` covering every hook imported by the 5 `<*Sheet>` components (useStoveData, useStoveCommands, useThermostatData, useThermostatCommands, useLightsData, useLightsCommands, useSonosData, useSonosCommands, useTuyaData, useTuyaCommands, useRouter, useUser, useVersion). Acceptance criterion: `grep -c "^jest.mock" app/debug/design-system-v2/__tests__/page.test.tsx returns >= 13`. Sheets start with `open=false`, so internal render is minimal — but mocks are required because hook calls happen at module-evaluation time.
 
-2. **Section04Sheet: add 5 device launchers or remain verbatim?**
-   - What we know: CONTEXT D-01 says Section04Sheet is "extracted verbatim" from old 06/SHEET, but Phase Boundary item 4 says the old 04/SHEET section gets the 5 device-launcher buttons. The UI-SPEC §Section 04 also says "extracted verbatim."
-   - What's unclear: Does Section04Sheet stay as-is (just the demo sheet) or grow with 5 launchers? Section08SheetGallery is a separate section with the 5 real-device launchers.
-   - Recommendation: Section04Sheet = verbatim extraction of the existing 06/SHEET demo (no launchers). Section08SheetGallery = new section with the 5 real-device launchers. The "5 device-sheet-launcher buttons" in the Phase Boundary description refers to Section08, not Section04.
+2. **Section06Sheet (existing 06/SHEET) — add launchers or remain verbatim?** — **RESOLVED** by Plan 01 reconciliation block + Plan 08 (`182-08-PLAN.md`): existing `Section06Sheet.tsx` stays **verbatim** (single demo sheet from Phase 175, no device launchers). The 5 real-device launchers ship as `Section10SheetGallery.tsx` — a new section in Plan 08. CONTEXT.md D-13/D-14 (single-open-at-a-time, fixture data) apply to Section 10, not Section 06. The "5 device-sheet-launcher buttons" in the Phase Boundary always referred to the new section.
 
 ---
 

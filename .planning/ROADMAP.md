@@ -251,7 +251,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 174. Ember Glass Tokens & Foundations | 0/0 | Not started | - |
+| 174. Ember Glass Tokens & Foundations | 3/3 | Complete   | 2026-04-27 |
 | 175. Glass Primitives — Press Animation & Sheet | 3/3 | Complete   | 2026-04-27 |
 | 176. Post-Auth0 Splash Animation | 4/4 | Complete    | 2026-04-27 |
 | 177. Equal-Size Dashboard Glass Cards | 8/8 | Complete   | 2026-04-29 |

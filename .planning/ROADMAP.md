@@ -223,7 +223,7 @@
 - [x] 182-05-PLAN.md — Extend Section03Tokens with live token table + typography + spacing + shadow tiles (DSREF-01, DSREF-02) [Wave 2]
 - [x] 182-06-PLAN.md — Section08CardPrimitives: 8 card-primitive samples with CodeSnippets (DSREF-01, DSREF-02) [Wave 2]
 - [x] 182-07-PLAN.md — Section09SheetPrimitives: 7 sheet-primitive samples with CodeSnippets (DSREF-01, DSREF-02) [Wave 2]
-- [ ] 182-08-PLAN.md — Section10SheetGallery: 5 device-sheet launchers + sheetFixtures + page.test mocks (DSREF-01, DSREF-02) [Wave 2]
+- [x] 182-08-PLAN.md — Section10SheetGallery: 5 device-sheet launchers + sheetFixtures + page.test mocks (DSREF-01, DSREF-02) [Wave 2]
 - [ ] 182-09-PLAN.md — Playwright smoke spec for section presence + 13 primitives + violet recolor invariant (DSREF-01, DSREF-02, DSREF-03) [Wave 3]
 **UI hint**: yes
 
@@ -239,7 +239,7 @@
 | 179. Rooms Tab Redesign | 9/9 | Complete    | 2026-04-29 |
 | 180. Automations Tab Full Editor | 9/9 | Complete    | 2026-04-30 |
 | 181. Glass Bottom Tab Bar | 6/6 | Complete   | 2026-05-02 |
-| 182. Design System Reference Page v2 | 7/9 | In Progress|  |
+| 182. Design System Reference Page v2 | 8/9 | In Progress|  |
 
 <details>
 <summary>✅ v19.0 API Alignment & Full Coverage (Phases 156-173) — SHIPPED 2026-04-27</summary>

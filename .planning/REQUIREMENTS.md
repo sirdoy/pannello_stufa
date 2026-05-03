@@ -87,8 +87,8 @@
 
 ### Design System Reference Page
 
-- [ ] **DSREF-01**: New route `/debug/design-system-v2` renders a single-page reference for Ember Glass — colors (accent + neutrals + tones), typography pairs, spacing/radius scale, shadow/blur values, and live component samples (GlassCard, CardHead, StatusDot, InlineToggle, CircBtn, Stepper, Slider, BigSlider, RadialDial, Sheet preview, MiniStat, FlameViz, PlayingBars)
-- [ ] **DSREF-02**: Page is the **single source of truth** — every visual primitive used by dashboard/sheets/rooms/automations appears here with copy-paste-ready code snippet (or token reference) per sample
+- [x] **DSREF-01**: New route `/debug/design-system-v2` renders a single-page reference for Ember Glass — colors (accent + neutrals + tones), typography pairs, spacing/radius scale, shadow/blur values, and live component samples (GlassCard, CardHead, StatusDot, InlineToggle, CircBtn, Stepper, Slider, BigSlider, RadialDial, Sheet preview, MiniStat, FlameViz, PlayingBars)
+- [x] **DSREF-02**: Page is the **single source of truth** — every visual primitive used by dashboard/sheets/rooms/automations appears here with copy-paste-ready code snippet (or token reference) per sample
 - [x] **DSREF-03**: Page exposes the developer accent picker (DS-03
 ) inline so designers can preview hue shifts against all primitives at once
 

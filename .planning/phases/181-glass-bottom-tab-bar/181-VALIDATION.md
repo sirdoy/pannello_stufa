@@ -1,10 +1,11 @@
 ---
 phase: 181
 slug: glass-bottom-tab-bar
-status: draft
-nyquist_compliant: false
+status: complete
+nyquist_compliant: true
 wave_0_complete: true
 created: 2026-05-02
+verified: 2026-05-03
 ---
 
 # Phase 181 — Validation Strategy
@@ -88,6 +89,14 @@ created: 2026-05-02
 - [x] Wave 0 covers all MISSING references — none missing.
 - [x] No watch-mode flags (per repo convention).
 - [x] Feedback latency < 30s (test:changed default scope).
-- [ ] `nyquist_compliant: true` — flip when planner finalizes task IDs and gsd-planner echoes the validation map into PLAN.md frontmatter.
+- [x] `nyquist_compliant: true` — flipped 2026-05-03 once all 6 plans landed and 8/8 must-haves were code-verified.
 
-**Approval:** pending — awaiting plan finalization.
+**Approval:** complete
+
+---
+
+## Audit Trail
+
+### 2026-05-03 — Phase 183-05 status normalization
+
+Frontmatter normalized from `status: draft` → `status: complete` per project convention. `nyquist_compliant` flipped `false` → `true` per the v20.0 milestone audit, which confirms Phase 181 (6/6 plans, 8/8 must-haves code-verified). `wave_0_complete` was already `true`. 5 human UAT items (real-device safe-area, live accent-glow, sheet hide-on-open, orientation, Playwright runtime) are deferred (logged in audit `tech_debt`) but do not block frontmatter normalization since the underlying jest coverage is complete. See `.planning/phases/181-glass-bottom-tab-bar/181-VERIFICATION.md` for the underlying evidence.

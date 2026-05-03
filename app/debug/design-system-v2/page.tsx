@@ -23,6 +23,7 @@ import { Section04GlassSurface } from './sections/Section04GlassSurface';
 import { Section05Press } from './sections/Section05Press';
 import { Section06Sheet } from './sections/Section06Sheet';
 import { Section07Splash } from './sections/Section07Splash';
+import { Section08CardPrimitives } from './sections/Section08CardPrimitives';
 
 export default function DesignSystemV2Page(): React.ReactElement {
   return (
@@ -84,6 +85,7 @@ export default function DesignSystemV2Page(): React.ReactElement {
       <Section05Press />
       <Section06Sheet />
       <Section07Splash />
+      <Section08CardPrimitives />
     </main>
   );
 }

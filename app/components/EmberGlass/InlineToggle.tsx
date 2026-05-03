@@ -17,15 +17,15 @@
  * RC-clean — no manual memoization hooks (D-28 — React Compiler discipline).
  */
 
-import type { MouseEvent } from 'react';
+import type { ButtonHTMLAttributes, MouseEvent } from 'react';
 
-export interface InlineToggleProps {
+export interface InlineToggleProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onChange' | 'color' | 'type' | 'role' | 'onClick'> {
   on: boolean;
   color?: string;
   onChange: (e: MouseEvent<HTMLButtonElement>) => void;
 }
 
-export function InlineToggle({ on, color = 'var(--accent)', onChange }: InlineToggleProps) {
+export function InlineToggle({ on, color = 'var(--accent)', onChange, ...rest }: InlineToggleProps) {
   return (
     <button
       type="button"
@@ -33,6 +33,7 @@ export function InlineToggle({ on, color = 'var(--accent)', onChange }: InlineTo
       aria-checked={on}
       data-testid="inline-toggle"
       onClick={onChange}
+      {...rest}
       style={{
         width: 44,
         height: 26,

@@ -137,6 +137,7 @@ export function Section08CardPrimitives(): React.ReactElement {
           <InlineToggle
             on={toggleOn}
             color="var(--accent)"
+            aria-label={toggleOn ? 'Stufa accesa' : 'Stufa spenta'}
             onChange={(e) => {
               e.stopPropagation();
               setToggleOn((prev) => !prev);
@@ -159,11 +160,13 @@ export function Section08CardPrimitives(): React.ReactElement {
               onClick={() => setCircBtnClicks((n) => n + 1)}
               primary
               tone="var(--accent)"
+              aria-label="Aumenta"
             />
             <CircBtn
               Icon={Minus}
               onClick={() => setCircBtnClicks((n) => n + 1)}
               tone="var(--accent)"
+              aria-label="Diminuisci"
             />
             <span
               style={{

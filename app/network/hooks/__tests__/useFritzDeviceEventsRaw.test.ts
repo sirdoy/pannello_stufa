@@ -45,7 +45,7 @@ describe('useFritzDeviceEventsRaw', () => {
     });
 
     expect(result.current.items).toHaveLength(1);
-    expect(result.current.items[0].event_type).toBe('connected');
+    expect(result.current.items[0]!.event_type).toBe('connected');
     expect(result.current.stale).toBe(false);
   });
 

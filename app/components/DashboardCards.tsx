@@ -93,7 +93,7 @@ export default async function DashboardCards() {
   // Phase 177 (DASH-01): single 2-col grid replacing v8.1 masonry layout.
   // Identical 1:1 card footprint on mobile + desktop.
   return (
-    <div className="grid grid-cols-2 gap-3 max-w-md sm:max-w-2xl mx-auto px-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-md sm:max-w-2xl lg:max-w-7xl mx-auto px-3">
       {visibleCards.map((card, flatIndex) => {
         const CardComponent = CARD_COMPONENTS[card.id];
         if (!CardComponent) return null;

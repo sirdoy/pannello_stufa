@@ -116,10 +116,11 @@ None.
 | 260331-dwi | Fix CameraCard not rendering with WS active | 2026-03-31 | 221f4efb | [260331-dwi-con-ws-attivo-non-si-vede-la-card-di-net](./quick/260331-dwi-con-ws-attivo-non-si-vede-la-card-di-net/) |
 | 260331-eyf | Fix broken /monitoring navbar link and notification URLs | 2026-03-31 | ad2b9507 | [260331-eyf-fix-menu-links-and-add-missing-pages-to-](./quick/260331-eyf-fix-menu-links-and-add-missing-pages-to-/) |
 | 260423-n6i | Fix jest config performance (worktree ignores, maxWorkers cap, scoped scripts, CLAUDE.md rule 8) | 2026-04-23 | 79b758a6 | [260423-n6i-fix-jest-config-performance-and-resource](./quick/260423-n6i-fix-jest-config-performance-and-resource/) |
+| 260504-jyc | Dashboard 4 colonne su desktop + tablet landscape (mobile resta 2) | 2026-05-04 | PENDING | [260504-jyc-dashboard-4-cols-desktop-tablet](./quick/260504-jyc-dashboard-4-cols-desktop-tablet/) |
 
 ## Session Continuity
 
-Last activity: 2026-05-03 — Closed v20.0 Ember Glass Redesign milestone (10 phases / 66 plans / 50 reqs); archived ROADMAP + REQUIREMENTS + AUDIT to milestones/v20.0-*.md
+Last activity: 2026-05-04 — Completed quick task 260504-jyc: Dashboard 4 colonne su desktop + tablet landscape
 Stopped at: v20.0 milestone closed
 Resume file: None
 

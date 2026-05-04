@@ -71,7 +71,12 @@ export function Sheet({ open, onClose, title, children }: SheetProps): ReactElem
         if (!next) onClose();
       }}
     >
-      <DialogPrimitive.Portal forceMount>
+      {/* forceMount on Portal removed too: it propagates to Content via portalContext
+          so leaving it on would re-mount Content even with forceMount={undefined} on
+          Content itself. With Portal unmounted when closed, the outro fade on the
+          custom backdrop is also lost; acceptable for now. Recoverable via CSS
+          animation on [data-state='closed']. */}
+      <DialogPrimitive.Portal>
         {/* Custom backdrop — owns the click-to-dismiss vector (D-10).
             Tagged data-sheet-backdrop="true" so unit + Playwright tests can target it. */}
         <div
@@ -90,9 +95,12 @@ export function Sheet({ open, onClose, title, children }: SheetProps): ReactElem
           }}
         />
         <DialogPrimitive.Content
-          forceMount
-          // Suppress Radix auto-dismiss on outside pointer-down so our own backdrop
-          // click is the single dismissal path (Pitfall 4 in 175-RESEARCH.md).
+          // forceMount removed: Radix DialogContentModal calls hideOthers() on mount
+          // which sets aria-hidden + pointer-events:none on the rest of the page —
+          // even when open=false. With forceMount, this fires on initial render and
+          // never unwinds, leaving the page inert. Outro animation degrades (sheet
+          // closes instantly); recoverable later via CSS animation on
+          // [data-state='closed'] which Radix Presence honors.
           onPointerDownOutside={(e) => e.preventDefault()}
           // Suppress Radix's missing-description console warning (UI-SPEC line 524).
           aria-describedby={undefined}

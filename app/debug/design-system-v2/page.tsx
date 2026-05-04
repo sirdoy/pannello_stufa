@@ -29,7 +29,10 @@ import { Section10SheetGallery } from './sections/Section10SheetGallery';
 
 export default function DesignSystemV2Page(): React.ReactElement {
   return (
-    <main
+    // Wrapper is a plain div: app/layout.tsx already renders the page-level
+    // <main> landmark, and nesting two main landmarks fails the axe-core
+    // landmark-no-duplicate-main rule that Next 16 surfaces in dev.
+    <div
       style={{
         maxWidth: 1240,
         margin: '0 auto',
@@ -90,6 +93,6 @@ export default function DesignSystemV2Page(): React.ReactElement {
       <Section08CardPrimitives />
       <Section09SheetPrimitives />
       <Section10SheetGallery />
-    </main>
+    </div>
   );
 }

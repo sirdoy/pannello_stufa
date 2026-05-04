@@ -111,3 +111,4 @@ WORKFLOW_PROGRESS_REPORT.md
 # Claude settings (user-specific)
 .claude/settings.local.json
 .claude/worktrees/
+.playwright-mcp/

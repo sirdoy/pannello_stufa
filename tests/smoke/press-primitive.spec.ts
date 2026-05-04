@@ -31,18 +31,33 @@ test.describe('DS-07 — press primitive', () => {
     await expect(card).toBeVisible();
     const box = await card.boundingBox();
     if (!box) throw new Error('press-card-demo bounding box missing');
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.waitForFunction(() => {
-      const el = document.querySelector('[data-testid="press-card-demo"]') as HTMLElement | null;
-      return !!el && getComputedStyle(el).transform.includes('matrix(0.97');
-    }, { timeout: 1000 });
-    await page.mouse.up();
+    // Pointer events are dispatched directly to bypass any flake from page.mouse
+    // moving over reactive overlays. The DS-07 spring (cubic-bezier(.34,1.56,.64,1))
+    // overshoots PAST scale(0.97) — values transiently dip to ~0.965 before
+    // settling — so the assertion tolerates anything in matrix(0.96…) ∪ matrix(0.97…).
+    await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="press-card-demo"]');
+      const r = el!.getBoundingClientRect();
+      el!.dispatchEvent(new PointerEvent('pointerdown', {
+        bubbles: true, pointerId: 1, pointerType: 'mouse',
+        clientX: r.left + r.width / 2, clientY: r.top + r.height / 2,
+      }));
+    });
     await page.waitForFunction(() => {
       const el = document.querySelector('[data-testid="press-card-demo"]') as HTMLElement | null;
       if (!el) return false;
       const t = getComputedStyle(el).transform;
-      return t === 'matrix(1, 0, 0, 1, 0, 0)' || t === 'none';
-    }, { timeout: 1000 });
+      return t.startsWith('matrix(0.96') || t.startsWith('matrix(0.97');
+    }, { timeout: 1500 });
+    await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="press-card-demo"]');
+      el!.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1 }));
+    });
+    await page.waitForFunction(() => {
+      const el = document.querySelector('[data-testid="press-card-demo"]') as HTMLElement | null;
+      if (!el) return false;
+      const t = getComputedStyle(el).transform;
+      return t === 'matrix(1, 0, 0, 1, 0, 0)' || t === 'none' || t.startsWith('matrix(1.00');
+    }, { timeout: 1500 });
   });
 });

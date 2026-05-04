@@ -69,16 +69,15 @@ function useFetchedOptions<T>({ url, enabled, extract, deps = [], onRaw }: Fetch
 
 // ─── Hue ─────────────────────────────────────────────────────────────────────
 
-// API envelopes here are double-wrapped: route handlers call success({ lights: data })
-// where data itself is the raw HA proxy payload `{ lights, count, is_stale, fetched_at }`.
-// Same for groups. Hook extractors peel both layers.
+// Hue routes flatten the HA proxy payload directly into the success envelope:
+// `{ success, lights, count, … }` for lights; same shape for groups.
 
 export function useHueLightOptions(enabled = true): DeviceOptionsResult {
-  return useFetchedOptions<{ lights: { lights: HueLight[] } }>({
+  return useFetchedOptions<{ lights: HueLight[] }>({
     url: '/api/v1/hue/lights',
     enabled,
     extract: (j) => {
-      const lights = (j as { lights?: { lights?: HueLight[] } }).lights?.lights ?? [];
+      const lights = (j as { lights?: HueLight[] }).lights ?? [];
       return lights.map((l) => ({
         value: l.light_id,
         label: l.custom_name ?? l.name,
@@ -88,11 +87,11 @@ export function useHueLightOptions(enabled = true): DeviceOptionsResult {
 }
 
 export function useHueGroupOptions(enabled = true): DeviceOptionsResult {
-  return useFetchedOptions<{ groups: { groups: HueGroup[] } }>({
+  return useFetchedOptions<{ groups: HueGroup[] }>({
     url: '/api/v1/hue/groups',
     enabled,
     extract: (j) => {
-      const groups = (j as { groups?: { groups?: HueGroup[] } }).groups?.groups ?? [];
+      const groups = (j as { groups?: HueGroup[] }).groups ?? [];
       return groups.map((g) => ({ value: g.group_id, label: g.name }));
     },
   });
@@ -148,15 +147,14 @@ export function netatmoSchedulesForHome(homes: NetatmoProxyHome[], homeId: strin
 // ─── Sonos ───────────────────────────────────────────────────────────────────
 
 export function useSonosSpeakerOptions(enabled = true): DeviceOptionsResult {
-  return useFetchedOptions<{ devices: { speakers: SonosDeviceResponse[] } }>({
+  return useFetchedOptions<{ devices: SonosDeviceResponse[] }>({
     url: '/api/v1/sonos/devices',
     enabled,
     extract: (j) => {
-      // Same double-wrap pattern as Hue: route returns success({ devices: data })
-      // where data is the HA payload `{ speakers, count, is_stale, fetched_at }`.
-      const speakers =
-        (j as { devices?: { speakers?: SonosDeviceResponse[] } }).devices?.speakers ?? [];
-      return speakers.map((d) => ({ value: d.uid, label: d.name }));
+      // Sonos route renames upstream `speakers` → `devices` for client clarity
+      // (see app/api/v1/sonos/devices/route.ts).
+      const devices = (j as { devices?: SonosDeviceResponse[] }).devices ?? [];
+      return devices.map((d) => ({ value: d.uid, label: d.name }));
     },
   });
 }

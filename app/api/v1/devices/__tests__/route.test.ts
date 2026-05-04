@@ -57,9 +57,14 @@ function seedAllProviders(): void {
   mockGetLights.mockResolvedValue([
     { light_id: '1', name: 'Lampada', reachable: true, room_name: 'Sala' },
   ] as any);
-  mockGetSonosDevices.mockResolvedValue([
-    { uid: 'RINCON_X', name: 'Cucina', ip: '192.168.1.20', is_visible: true, is_coordinator: true },
-  ] as any);
+  mockGetSonosDevices.mockResolvedValue({
+    speakers: [
+      { uid: 'RINCON_X', name: 'Cucina', ip: '192.168.1.20', is_visible: true, is_coordinator: true },
+    ],
+    count: 1,
+    is_stale: false,
+    fetched_at: 0,
+  } as any);
   mockGetProxyHomesdata.mockResolvedValue({
     body: {
       homes: [{

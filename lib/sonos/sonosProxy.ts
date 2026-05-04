@@ -51,12 +51,21 @@ export async function getHealth(): Promise<SonosHealthResponse> {
   return haGet<SonosHealthResponse>('/api/v1/sonos/health');
 }
 
+export interface SonosDevicesPayload {
+  speakers: SonosDeviceResponse[];
+  count: number;
+  is_stale: boolean;
+  fetched_at: number;
+}
+
 /**
- * Get the list of all discovered Sonos devices.
+ * Get the list of all discovered Sonos devices. The HA proxy returns a wrapper
+ * `{ speakers, count, is_stale, fetched_at }`, NOT a bare array — the previous
+ * `Promise<SonosDeviceResponse[]>` signature was a type lie.
  * Calls GET /api/v1/sonos/devices on the HA proxy.
  */
-export async function getDevices(): Promise<SonosDeviceResponse[]> {
-  return haGet<SonosDeviceResponse[]>('/api/v1/sonos/devices');
+export async function getDevices(): Promise<SonosDevicesPayload> {
+  return haGet<SonosDevicesPayload>('/api/v1/sonos/devices');
 }
 
 /**

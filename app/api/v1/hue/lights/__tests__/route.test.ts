@@ -52,7 +52,14 @@ describe('GET /api/v1/hue/lights', () => {
   });
 
   it('should return 200 with lights array', async () => {
-    mockGetLights.mockResolvedValue(mockLightsData as any);
+    // HA proxy wraps the array as `{ lights, count, is_stale, fetched_at }`;
+    // route spreads the wrapper so the response is `{ success, lights, count, … }`.
+    mockGetLights.mockResolvedValue({
+      lights: mockLightsData,
+      count: mockLightsData.length,
+      is_stale: false,
+      fetched_at: 0,
+    } as any);
     const req = new Request('http://localhost:3000/api/v1/hue/lights');
 
     const response = await GET(req as any, {} as any);
@@ -62,6 +69,7 @@ describe('GET /api/v1/hue/lights', () => {
     expect(data.success).toBe(true);
     expect(data.lights).toBeInstanceOf(Array);
     expect(data.lights).toHaveLength(2);
+    expect(data.count).toBe(2);
     expect(mockGetLights).toHaveBeenCalled();
   });
 });

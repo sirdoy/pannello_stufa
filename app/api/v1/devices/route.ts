@@ -76,9 +76,12 @@ function mapHue(lights: Awaited<ReturnType<typeof getLights>>): Device[] {
   });
 }
 
-function mapSonos(devices: Awaited<ReturnType<typeof getSonosDevices>>): Device[] {
+function mapSonos(payload: Awaited<ReturnType<typeof getSonosDevices>>): Device[] {
   // Pitfall 2: SonosDeviceResponse has no `room` field — omit room for Sonos.
-  return devices.map((d): Device => {
+  // Phase 180.x: getDevices() now returns the wrapper `{ speakers, count, … }`
+  // (was a type-lying bare array); peel `.speakers` here so each call site
+  // converging on this mapper does not have to repeat the unwrap.
+  return payload.speakers.map((d): Device => {
     const item: Device = {
       id: `sonos:${d.uid}`,
       name: d.custom_name ?? d.name,

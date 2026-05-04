@@ -60,7 +60,14 @@ describe('GET /api/v1/hue/groups', () => {
   });
 
   it('should return 200 with groups array', async () => {
-    mockGetGroups.mockResolvedValue(mockGroupsData as any);
+    // HA proxy wraps the array as `{ groups, count, is_stale, fetched_at }`;
+    // route spreads the wrapper so the response is `{ success, groups, count, … }`.
+    mockGetGroups.mockResolvedValue({
+      groups: mockGroupsData,
+      count: mockGroupsData.length,
+      is_stale: false,
+      fetched_at: 0,
+    } as any);
     const req = new Request('http://localhost:3000/api/v1/hue/groups');
 
     const response = await GET(req as any, {} as any);
@@ -70,6 +77,7 @@ describe('GET /api/v1/hue/groups', () => {
     expect(data.success).toBe(true);
     expect(data.groups).toBeInstanceOf(Array);
     expect(data.groups).toHaveLength(2);
+    expect(data.count).toBe(2);
     expect(mockGetGroups).toHaveBeenCalled();
   });
 });

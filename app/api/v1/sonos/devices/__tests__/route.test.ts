@@ -30,15 +30,24 @@ describe('GET /api/v1/sonos/devices', () => {
   });
 
   it('should return 200 with { devices: [...] } envelope', async () => {
-    const mockDevices = [
+    // HA proxy returns `{ speakers, count, is_stale, fetched_at }`; route
+    // renames `speakers` → `devices` for the client envelope and forwards
+    // the rest of the wrapper fields.
+    const mockSpeakers = [
       { uid: 'RINCON_A', name: 'Living Room' },
       { uid: 'RINCON_B', name: 'Kitchen' },
     ];
-    mockGetDevices.mockResolvedValue(mockDevices as any);
+    mockGetDevices.mockResolvedValue({
+      speakers: mockSpeakers,
+      count: mockSpeakers.length,
+      is_stale: false,
+      fetched_at: 0,
+    } as any);
     const response = await GET({} as any, {} as any);
     const data = await response.json();
     expect(response.status).toBe(200);
-    expect(data.devices).toEqual(mockDevices);
+    expect(data.devices).toEqual(mockSpeakers);
+    expect(data.count).toBe(2);
     expect(mockGetDevices).toHaveBeenCalledWith();
   });
 });

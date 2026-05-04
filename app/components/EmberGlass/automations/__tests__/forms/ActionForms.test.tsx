@@ -1,10 +1,25 @@
 /**
- * ActionForms tests — Phase 180 Plan 06 Task 1
+ * ActionForms tests — Phase 180 Plan 06 Task 1 + Phase 180.1 dropdown migration
  * Covers: 11 form renders, conditional field logic, JSON validation,
  * dispatcher, and D-09b unsupported type fallback.
+ *
+ * Phase 180.1: ID inputs migrated to DeviceIdField, which calls fetch on mount
+ * via per-category proxy hooks. jsdom doesn't ship a global fetch, so tests
+ * stub it with an empty 200 response. The hook then resolves with zero options
+ * and DeviceIdField falls back to TextInput — keeping aria-label assertions
+ * stable regardless of select-vs-input render path.
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+
+beforeEach(() => {
+  global.fetch = jest.fn(async () =>
+    new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  ) as unknown as typeof fetch;
+});
 import {
   NetatmoSetRoomTempForm,
   NetatmoSetHomeModeForm,
@@ -39,8 +54,8 @@ describe('NetatmoSetRoomTempForm', () => {
   it('renders home_id, room_id, mode, temp fields', () => {
     const action = defaultAction('netatmo_set_room_temp');
     render(<NetatmoSetRoomTempForm action={action as Parameters<typeof NetatmoSetRoomTempForm>[0]['action']} onChange={jest.fn()} />);
-    expect(screen.getByLabelText('Home ID')).toBeInTheDocument();
-    expect(screen.getByLabelText('Room ID')).toBeInTheDocument();
+    expect(screen.getByLabelText('Casa')).toBeInTheDocument();
+    expect(screen.getByLabelText('Stanza')).toBeInTheDocument();
     expect(screen.getByRole('radiogroup', { name: /Modalità/i })).toBeInTheDocument();
     expect(screen.getByLabelText('Temperatura')).toBeInTheDocument();
   });
@@ -58,7 +73,7 @@ describe('NetatmoSetHomeModeForm', () => {
   it('renders home_id and mode fields', () => {
     const action = defaultAction('netatmo_set_home_mode');
     render(<NetatmoSetHomeModeForm action={action as Parameters<typeof NetatmoSetHomeModeForm>[0]['action']} onChange={jest.fn()} />);
-    expect(screen.getByLabelText('Home ID')).toBeInTheDocument();
+    expect(screen.getByLabelText('Casa')).toBeInTheDocument();
     expect(screen.getByRole('radiogroup', { name: /Modalità/i })).toBeInTheDocument();
   });
 });
@@ -75,8 +90,8 @@ describe('NetatmoSwitchScheduleForm', () => {
   it('renders home_id and schedule_id fields', () => {
     const action = defaultAction('netatmo_switch_schedule');
     render(<NetatmoSwitchScheduleForm action={action as Parameters<typeof NetatmoSwitchScheduleForm>[0]['action']} onChange={jest.fn()} />);
-    expect(screen.getByLabelText('Home ID')).toBeInTheDocument();
-    expect(screen.getByLabelText('Schedule ID')).toBeInTheDocument();
+    expect(screen.getByLabelText('Casa')).toBeInTheDocument();
+    expect(screen.getByLabelText('Programma')).toBeInTheDocument();
   });
 });
 
@@ -145,7 +160,7 @@ describe('HueLightForm', () => {
   it('renders all 6 fields (light_id, on, brightness, color_temp, hue, sat)', () => {
     const action = defaultAction('hue_light');
     render(<HueLightForm action={action as Parameters<typeof HueLightForm>[0]['action']} onChange={jest.fn()} />);
-    expect(screen.getByLabelText('Light ID')).toBeInTheDocument();
+    expect(screen.getByLabelText('Luce')).toBeInTheDocument();
     expect(screen.getByRole('radiogroup', { name: /Stato/i })).toBeInTheDocument();
     expect(screen.getByLabelText('Luminosità')).toBeInTheDocument();
     expect(screen.getByLabelText('Temp. colore')).toBeInTheDocument();
@@ -166,7 +181,7 @@ describe('HueGroupForm', () => {
   it('renders group_id, on, brightness, color_temp — but NOT hue or sat', () => {
     const action = defaultAction('hue_group');
     render(<HueGroupForm action={action as Parameters<typeof HueGroupForm>[0]['action']} onChange={jest.fn()} />);
-    expect(screen.getByLabelText('Group ID')).toBeInTheDocument();
+    expect(screen.getByLabelText('Gruppo')).toBeInTheDocument();
     expect(screen.getByRole('radiogroup', { name: /Stato/i })).toBeInTheDocument();
     expect(screen.getByLabelText('Luminosità')).toBeInTheDocument();
     expect(screen.getByLabelText('Temp. colore')).toBeInTheDocument();
@@ -188,8 +203,8 @@ describe('HueSceneForm', () => {
   it('renders group_id and scene_id', () => {
     const action = defaultAction('hue_scene');
     render(<HueSceneForm action={action as Parameters<typeof HueSceneForm>[0]['action']} onChange={jest.fn()} />);
-    expect(screen.getByLabelText('Group ID')).toBeInTheDocument();
-    expect(screen.getByLabelText('Scene ID')).toBeInTheDocument();
+    expect(screen.getByLabelText('Gruppo')).toBeInTheDocument();
+    expect(screen.getByLabelText('Scena')).toBeInTheDocument();
   });
 });
 

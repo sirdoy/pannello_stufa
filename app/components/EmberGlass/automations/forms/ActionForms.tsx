@@ -33,6 +33,17 @@ import { NumInput } from '../primitives/NumInput';
 import { SegmentedControl } from '../primitives/SegmentedControl';
 import { FieldLabel } from '../primitives/FieldLabel';
 import { TwoCol } from '../primitives/TwoCol';
+import { DeviceIdField } from '../primitives/DeviceIdField';
+import {
+  useHueLightOptions,
+  useHueGroupOptions,
+  useHueSceneOptions,
+  useNetatmoHomeOptions,
+  useSonosSpeakerOptions,
+  useTuyaPlugOptions,
+  netatmoRoomsForHome,
+  netatmoSchedulesForHome,
+} from '../hooks/useAutomationDeviceOptions';
 
 // ─── Shared FormProps ────────────────────────────────────────────────────────
 
@@ -50,25 +61,33 @@ const ON_OFF_OPTIONS = [
 
 // ─── 1. NetatmoSetRoomTempForm ───────────────────────────────────────────────
 export function NetatmoSetRoomTempForm({ action, onChange }: FormProps<NetatmoSetRoomTempAction>) {
+  const homes = useNetatmoHomeOptions();
+  const roomOptions = netatmoRoomsForHome(homes._cache.homes, action.home_id);
   return (
     <>
       <TwoCol>
         <div>
-          <FieldLabel htmlFor="action-home-id">Home ID</FieldLabel>
-          <TextInput
+          <FieldLabel htmlFor="action-home-id">Casa</FieldLabel>
+          <DeviceIdField
             id="action-home-id"
             value={action.home_id}
-            onChange={(v) => onChange({ ...action, home_id: v })}
-            aria-label="Home ID"
+            onChange={(v) => onChange({ ...action, home_id: v, room_id: '' })}
+            options={homes.options}
+            loading={homes.loading}
+            error={homes.error}
+            aria-label="Casa"
           />
         </div>
         <div>
-          <FieldLabel htmlFor="action-room-id">Room ID</FieldLabel>
-          <TextInput
+          <FieldLabel htmlFor="action-room-id">Stanza</FieldLabel>
+          <DeviceIdField
             id="action-room-id"
             value={action.room_id}
             onChange={(v) => onChange({ ...action, room_id: v })}
-            aria-label="Room ID"
+            options={roomOptions}
+            loading={homes.loading}
+            error={homes.error}
+            aria-label="Stanza"
           />
         </div>
       </TwoCol>
@@ -100,14 +119,18 @@ export function NetatmoSetRoomTempForm({ action, onChange }: FormProps<NetatmoSe
 
 // ─── 2. NetatmoSetHomeModeForm ───────────────────────────────────────────────
 export function NetatmoSetHomeModeForm({ action, onChange }: FormProps<NetatmoSetHomeModeAction>) {
+  const homes = useNetatmoHomeOptions();
   return (
     <>
-      <FieldLabel htmlFor="action-home-id">Home ID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-home-id">Casa</FieldLabel>
+      <DeviceIdField
         id="action-home-id"
         value={action.home_id}
         onChange={(v) => onChange({ ...action, home_id: v })}
-        aria-label="Home ID"
+        options={homes.options}
+        loading={homes.loading}
+        error={homes.error}
+        aria-label="Casa"
       />
       <div style={{ height: 8 }} />
       <FieldLabel>Modalità</FieldLabel>
@@ -127,22 +150,30 @@ export function NetatmoSetHomeModeForm({ action, onChange }: FormProps<NetatmoSe
 
 // ─── 3. NetatmoSwitchScheduleForm ────────────────────────────────────────────
 export function NetatmoSwitchScheduleForm({ action, onChange }: FormProps<NetatmoSwitchScheduleAction>) {
+  const homes = useNetatmoHomeOptions();
+  const scheduleOptions = netatmoSchedulesForHome(homes._cache.homes, action.home_id);
   return (
     <>
-      <FieldLabel htmlFor="action-home-id">Home ID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-home-id">Casa</FieldLabel>
+      <DeviceIdField
         id="action-home-id"
         value={action.home_id}
-        onChange={(v) => onChange({ ...action, home_id: v })}
-        aria-label="Home ID"
+        onChange={(v) => onChange({ ...action, home_id: v, schedule_id: '' })}
+        options={homes.options}
+        loading={homes.loading}
+        error={homes.error}
+        aria-label="Casa"
       />
       <div style={{ height: 8 }} />
-      <FieldLabel htmlFor="action-schedule-id">Schedule ID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-schedule-id">Programma</FieldLabel>
+      <DeviceIdField
         id="action-schedule-id"
         value={action.schedule_id}
         onChange={(v) => onChange({ ...action, schedule_id: v })}
-        aria-label="Schedule ID"
+        options={scheduleOptions}
+        loading={homes.loading}
+        error={homes.error}
+        aria-label="Programma"
       />
     </>
   );
@@ -249,15 +280,19 @@ export function LogEventForm({ action, onChange }: FormProps<LogEventAction>) {
 
 // ─── 6. HueLightForm ─────────────────────────────────────────────────────────
 export function HueLightForm({ action, onChange }: FormProps<HueLightAction>) {
+  const lights = useHueLightOptions();
   const onValue = action.on === null || action.on === undefined ? 'true' : String(action.on);
   return (
     <>
-      <FieldLabel htmlFor="action-light-id">Light ID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-light-id">Luce</FieldLabel>
+      <DeviceIdField
         id="action-light-id"
         value={action.light_id}
         onChange={(v) => onChange({ ...action, light_id: v })}
-        aria-label="Light ID"
+        options={lights.options}
+        loading={lights.loading}
+        error={lights.error}
+        aria-label="Luce"
       />
       <div style={{ height: 8 }} />
       <FieldLabel>Stato</FieldLabel>
@@ -317,15 +352,19 @@ export function HueLightForm({ action, onChange }: FormProps<HueLightAction>) {
 
 // ─── 7. HueGroupForm ─────────────────────────────────────────────────────────
 export function HueGroupForm({ action, onChange }: FormProps<HueGroupAction>) {
+  const groups = useHueGroupOptions();
   const onValue = action.on === null || action.on === undefined ? 'true' : String(action.on);
   return (
     <>
-      <FieldLabel htmlFor="action-group-id">Group ID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-group-id">Gruppo</FieldLabel>
+      <DeviceIdField
         id="action-group-id"
         value={action.group_id}
         onChange={(v) => onChange({ ...action, group_id: v })}
-        aria-label="Group ID"
+        options={groups.options}
+        loading={groups.loading}
+        error={groups.error}
+        aria-label="Gruppo"
       />
       <div style={{ height: 8 }} />
       <FieldLabel>Stato</FieldLabel>
@@ -363,22 +402,30 @@ export function HueGroupForm({ action, onChange }: FormProps<HueGroupAction>) {
 
 // ─── 8. HueSceneForm ─────────────────────────────────────────────────────────
 export function HueSceneForm({ action, onChange }: FormProps<HueSceneAction>) {
+  const groups = useHueGroupOptions();
+  const scenes = useHueSceneOptions(action.group_id);
   return (
     <>
-      <FieldLabel htmlFor="action-group-id">Group ID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-group-id">Gruppo</FieldLabel>
+      <DeviceIdField
         id="action-group-id"
         value={action.group_id}
-        onChange={(v) => onChange({ ...action, group_id: v })}
-        aria-label="Group ID"
+        onChange={(v) => onChange({ ...action, group_id: v, scene_id: '' })}
+        options={groups.options}
+        loading={groups.loading}
+        error={groups.error}
+        aria-label="Gruppo"
       />
       <div style={{ height: 8 }} />
-      <FieldLabel htmlFor="action-scene-id">Scene ID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-scene-id">Scena</FieldLabel>
+      <DeviceIdField
         id="action-scene-id"
         value={action.scene_id}
         onChange={(v) => onChange({ ...action, scene_id: v })}
-        aria-label="Scene ID"
+        options={scenes.options}
+        loading={scenes.loading}
+        error={scenes.error}
+        aria-label="Scena"
       />
     </>
   );
@@ -463,15 +510,19 @@ export function SonosForm({ action, onChange }: FormProps<SonosAction>) {
     onChange({ ...action, command: cmd, volume: null, source: null });
 
   const sourceValue = action.source ?? 'tv';
+  const speakers = useSonosSpeakerOptions();
 
   return (
     <>
-      <FieldLabel htmlFor="action-speaker-uid">Speaker UID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-speaker-uid">Speaker</FieldLabel>
+      <DeviceIdField
         id="action-speaker-uid"
         value={action.speaker_uid}
         onChange={(v) => onChange({ ...action, speaker_uid: v })}
-        aria-label="Speaker UID"
+        options={speakers.options}
+        loading={speakers.loading}
+        error={speakers.error}
+        aria-label="Speaker"
       />
       <div style={{ height: 8 }} />
       <FieldLabel>Comando</FieldLabel>
@@ -527,15 +578,19 @@ export function TuyaForm({ action, onChange }: FormProps<TuyaAction>) {
     onChange({ ...action, command: cmd, on: null, timer_seconds: null });
 
   const onValue = action.on === null || action.on === undefined ? 'true' : String(action.on);
+  const plugs = useTuyaPlugOptions();
 
   return (
     <>
-      <FieldLabel htmlFor="action-device-id">Device ID</FieldLabel>
-      <TextInput
+      <FieldLabel htmlFor="action-device-id">Dispositivo</FieldLabel>
+      <DeviceIdField
         id="action-device-id"
         value={action.device_id}
         onChange={(v) => onChange({ ...action, device_id: v })}
-        aria-label="Device ID"
+        options={plugs.options}
+        loading={plugs.loading}
+        error={plugs.error}
+        aria-label="Dispositivo"
       />
       <div style={{ height: 8 }} />
       <FieldLabel>Comando</FieldLabel>

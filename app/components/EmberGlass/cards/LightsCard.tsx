@@ -67,6 +67,7 @@ export default function LightsCard() {
     <InlineToggle
       on={anyOn}
       color={TONE}
+      aria-label={anyOn ? 'Spegni tutte le luci' : 'Accendi tutte le luci'}
       onChange={(e) => {
         e.stopPropagation(); // D-17 — prevent parent Pressable click → sheet open
         void cmds.handleAllLightsToggle(!anyOn);

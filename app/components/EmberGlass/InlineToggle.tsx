@@ -26,6 +26,11 @@ export interface InlineToggleProps extends Omit<ButtonHTMLAttributes<HTMLButtonE
 }
 
 export function InlineToggle({ on, color = 'var(--accent)', onChange, ...rest }: InlineToggleProps) {
+  // Default fallback so axe-core's "Interactive element must have a name" rule
+  // does not fire when a consumer forgets aria-label / aria-labelledby. Real
+  // copy ("Accendi luci salotto", etc.) should still be passed where context
+  // is known; this is a safety net, not an excuse.
+  const ariaLabel = rest['aria-label'] ?? (rest['aria-labelledby'] ? undefined : 'Interruttore');
   return (
     <button
       type="button"
@@ -34,6 +39,7 @@ export function InlineToggle({ on, color = 'var(--accent)', onChange, ...rest }:
       data-testid="inline-toggle"
       onClick={onChange}
       {...rest}
+      aria-label={ariaLabel}
       style={{
         width: 44,
         height: 26,

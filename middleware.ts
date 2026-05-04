@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { auth0 } from '@/lib/auth0';
 
-export async function proxy(req) {
+export async function middleware(req: NextRequest) {
   // Block /debug pages in production
   if (process.env.NODE_ENV === 'production' && req.nextUrl.pathname.startsWith('/debug')) {
     return NextResponse.rewrite(new URL('/not-found', req.url));

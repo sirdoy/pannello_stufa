@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
-import 'dotenv/config';
+import { config as loadEnv } from 'dotenv';
+
+loadEnv({ path: '.env.local' });
+loadEnv();
 
 /**
  * Playwright E2E Test Configuration

@@ -2,7 +2,6 @@
 
 import { forwardRef, useRef, useEffect, type ReactNode, type ComponentPropsWithoutRef } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { AlertTriangle } from 'lucide-react';
@@ -57,8 +56,10 @@ export interface ConfirmationDialogProps extends ComponentPropsWithoutRef<typeof
  */
 
 // CVA variants for overlay
+// z-[300]: must sit above EmberGlass Sheet backdrop (z-200) and container (z-201)
+// so confirmation dialogs spawned from inside an open Sheet are interactive.
 const overlayVariants = cva([
-  'fixed inset-0 z-50',
+  'fixed inset-0 z-[300]',
   'bg-slate-950/70 ',
   'backdrop-blur-md',
   'data-[state=open]:animate-fade-in',
@@ -67,7 +68,7 @@ const overlayVariants = cva([
 
 // CVA variants for content
 const contentVariants = cva([
-  'fixed z-50 p-6',
+  'fixed z-[301] p-6',
   'bg-slate-900/95 ',
   'backdrop-blur-3xl',
   'border border-slate-700/50 ',
@@ -206,12 +207,11 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
           onInteractOutside={(e) => loading && e.preventDefault()}
           {...props}
         >
-          {/* Visually hidden title for accessibility when using custom title display */}
-          <VisuallyHidden.Root asChild>
-            <DialogPrimitive.Title>{title}</DialogPrimitive.Title>
-          </VisuallyHidden.Root>
-
-          {/* Header with icon and title */}
+          {/* Header with icon and title.
+              DialogPrimitive.Title renders as <h2> by default and provides Radix's
+              required a11y label — we used to ALSO render a separate <h2> next to a
+              VisuallyHidden Title, which produced duplicate headings and broke
+              role-based locators in strict mode. Single Title now serves both. */}
           <div className="flex items-start gap-4 mb-4">
             {displayIcon && (
               <div className="flex-shrink-0 mt-0.5">
@@ -219,15 +219,14 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
               </div>
             )}
             <div className="flex-1 min-w-0">
-              {/* Visible title */}
-              <h2
+              <DialogPrimitive.Title
                 className={cn(
                   'text-lg font-display font-semibold',
                   'text-slate-100 '
                 )}
               >
                 {title}
-              </h2>
+              </DialogPrimitive.Title>
               {/* Description */}
               <DialogPrimitive.Description
                 className={cn(

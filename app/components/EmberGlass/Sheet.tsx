@@ -102,6 +102,12 @@ export function Sheet({ open, onClose, title, children }: SheetProps): ReactElem
           // closes instantly); recoverable later via CSS animation on
           // [data-state='closed'] which Radix Presence honors.
           onPointerDownOutside={(e) => e.preventDefault()}
+          // Block Radix's onCloseAutoFocus: it returns focus to the trigger
+          // button via element.focus() which scrolls the trigger into view,
+          // overriding the scroll-lock restore in our [open] useEffect cleanup
+          // and dropping the user wherever the trigger lives in the page.
+          // Browser default-focuses body on Content unmount, which is enough.
+          onCloseAutoFocus={(e) => e.preventDefault()}
           // Suppress Radix's missing-description console warning (UI-SPEC line 524).
           aria-describedby={undefined}
           style={{

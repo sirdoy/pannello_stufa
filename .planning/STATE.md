@@ -117,10 +117,11 @@ None.
 | 260331-eyf | Fix broken /monitoring navbar link and notification URLs | 2026-03-31 | ad2b9507 | [260331-eyf-fix-menu-links-and-add-missing-pages-to-](./quick/260331-eyf-fix-menu-links-and-add-missing-pages-to-/) |
 | 260423-n6i | Fix jest config performance (worktree ignores, maxWorkers cap, scoped scripts, CLAUDE.md rule 8) | 2026-04-23 | 79b758a6 | [260423-n6i-fix-jest-config-performance-and-resource](./quick/260423-n6i-fix-jest-config-performance-and-resource/) |
 | 260504-jyc | Dashboard 4 colonne su desktop + tablet landscape (mobile resta 2) | 2026-05-04 | 3ce72294 | [260504-jyc-dashboard-4-cols-desktop-tablet](./quick/260504-jyc-dashboard-4-cols-desktop-tablet/) |
+| 260504-kn6 | BottomTabBar sticky always visible (move out of SplashGate transform wrapper) | 2026-05-04 | faeb136b | [260504-kn6-menu-sticky-bottom-centered-desktop](./quick/260504-kn6-menu-sticky-bottom-centered-desktop/) |
 
 ## Session Continuity
 
-Last activity: 2026-05-04 — Completed quick task 260504-jyc: Dashboard 4 colonne su desktop + tablet landscape
+Last activity: 2026-05-04 — Completed quick task 260504-kn6: BottomTabBar sticky always visible
 Stopped at: v20.0 milestone closed
 Resume file: None
 

@@ -78,8 +78,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
         </div>
       </main>
-      <BottomTabBar />
     </ClientProviders>
+    {/* Rendered outside ClientProviders so SplashGate's transform wrapper
+        doesn't become its containing block (which would re-anchor
+        position:fixed to the wrapper height instead of the viewport). */}
+    <BottomTabBar />
     </body>
     </html>
   );

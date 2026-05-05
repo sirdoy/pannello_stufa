@@ -1,53 +1,42 @@
-import Skeleton from '@/app/components/ui/Skeleton';
+import { GlassCardSkeleton } from '@/app/components/EmberGlass/GlassCardSkeleton';
 
 /**
  * Dashboard Loading Skeleton
  *
- * Next.js auto-detects this file and wraps the page in a Suspense boundary,
- * showing this skeleton immediately on navigation before any server data resolves.
+ * Route-level fallback for `/`. Next.js auto-detects this file and wraps the
+ * page in a Suspense boundary, showing this skeleton immediately on navigation
+ * before any server data resolves. The same default export is also reused as
+ * the explicit `<Suspense fallback={...}>` for `<DashboardCards />` inside
+ * `app/page.tsx`, so this layout MUST mirror the hydrated grid 1:1 to avoid
+ * any visible layout shift on first paint.
  *
- * Layout matches the masonry layout in DashboardCards:
- * - Mobile (sm:hidden): single column, flat order
- * - Desktop (hidden sm:flex): two-column masonry, even->left, odd->right
+ * Mirrors Phase 177 (DASH-01) layout from `app/components/DashboardCards.tsx`:
+ *   - Single grid wrapper at all breakpoints (`grid-cols-2` mobile, `lg:grid-cols-4` desktop).
+ *   - Identical max-width / gap / padding tokens.
+ *   - 1:1 aspect-ratio Ember Glass squares (rendered by the imported skeleton component).
  *
- * flatIndex assignment (6 cards):
- *   0: StovePanel    → left
- *   1: ThermostatCard → right
- *   2: WeatherCard   → left
- *   3: LightsCard    → right
- *   4: NetworkCard   → left
- *   5: CameraCard    → right
+ * The placeholder count (10) covers the maximum size of the `CARD_COMPONENTS`
+ * registry in `DashboardCards.tsx` (stove, thermostat, weather, lights, camera,
+ * network, raspi, sonos, dirigera, tuya). `deviceConfig` is unavailable at the
+ * route-level skeleton so the count is intentionally hardcoded.
+ *
+ * v9.0 stagger animation (`animate-spring-in` + `animationDelay: i * 100ms`)
+ * is preserved per the existing dashboard hydration animation.
  */
 export default function DashboardSkeleton() {
   return (
     <section className="py-8 sm:py-12 lg:py-16">
       <h1 className="sr-only">Dashboard</h1>
-
-      {/* Mobile: single column, flat order (sm:hidden) */}
-      <div className="flex flex-col gap-6 sm:hidden">
-        <Skeleton.StovePanel />
-        <Skeleton.ThermostatCard />
-        <Skeleton.WeatherCard />
-        <Skeleton.LightsCard />
-        <Skeleton.CameraCard />
-        <Skeleton.NetworkCard />
-      </div>
-
-      {/* Desktop: two-column masonry (hidden sm:flex), even→left, odd→right */}
-      <div className="hidden sm:flex sm:flex-row gap-8 lg:gap-10">
-        {/* Left column: flatIndex 0 (StovePanel), 2 (WeatherCard), 4 (NetworkCard) */}
-        <div className="flex flex-col gap-8 lg:gap-10 flex-1 min-w-0">
-          <Skeleton.StovePanel />
-          <Skeleton.WeatherCard />
-          <Skeleton.NetworkCard />
-        </div>
-
-        {/* Right column: flatIndex 1 (ThermostatCard), 3 (LightsCard), 5 (CameraCard) */}
-        <div className="flex flex-col gap-8 lg:gap-10 flex-1 min-w-0">
-          <Skeleton.ThermostatCard />
-          <Skeleton.LightsCard />
-          <Skeleton.CameraCard />
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-md sm:max-w-2xl lg:max-w-7xl mx-auto px-3">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div
+            key={i}
+            className="animate-spring-in transition-all duration-300 ease-out"
+            style={{ animationDelay: `${i * 100}ms` }}
+          >
+            <GlassCardSkeleton />
+          </div>
+        ))}
       </div>
     </section>
   );

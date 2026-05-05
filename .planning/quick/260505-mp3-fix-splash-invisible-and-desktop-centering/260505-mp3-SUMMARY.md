@@ -3,7 +3,7 @@ quick_id: 260505-mp3
 description: Fix splash leaves page invisible on reload + desktop bottom-tab not centered
 date: 2026-05-05
 status: complete
-commit: pending
+commit: 96248299
 ---
 
 # Quick 260505-mp3 — Summary

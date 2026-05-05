@@ -1,9 +1,20 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
-import type { SonosDeviceResponse, SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse, SonosEqResponse, SonosHomeTheaterResponse } from '@/types/sonosProxy';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
+import type {
+  SonosDeviceResponse,
+  SonosZoneResponse,
+  SonosPlaybackResponse,
+  SonosVolumeResponse,
+  SonosPlayModeResponse,
+  SonosSleepTimerResponse,
+  SonosEqResponse,
+  SonosHomeTheaterResponse,
+} from '@/types/sonosProxy';
 
 export interface SonosFullData {
   devices: SonosDeviceResponse[];
@@ -24,15 +35,86 @@ export interface UseSonosFullDataReturn {
   fetchData: () => Promise<void>;
 }
 
+// WS sonos_transport payload (push-only, per docs/api/websocket.md)
+interface SonosTransportWsPayload {
+  group_id: string;
+  transport_state: string | null;
+  title: string | null;
+  artist: string | null;
+  album: string | null;
+  album_art_url: string | null;
+  position: number | null;       // seconds (REST shape uses HH:MM:SS string)
+  duration: number | null;       // seconds
+  source_type: string | null;
+}
+
+// WS sonos_volume payload (push-only, two shapes)
+interface SonosVolumeWsSinglePayload {
+  uid: string;
+  volume: number;
+  mute: boolean;
+}
+interface SonosVolumeWsZonePayload {
+  group_id: string;
+  volumes: Array<{ uid: string; volume: number; mute: boolean }>;
+}
+
+// WS sonos snapshot/event payload (subset we use)
+interface SonosWsPayload {
+  speakers?: SonosDeviceResponse[] | null;
+  groups?: SonosZoneResponse[] | null;
+}
+
+function secondsToHms(s: number | null): string | null {
+  if (s == null || !Number.isFinite(s) || s < 0) return null;
+  const total = Math.floor(s);
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const sec = total % 60;
+  return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+}
+
+function isTransportState(v: string | null): SonosPlaybackResponse['transport_state'] {
+  if (v === 'PLAYING' || v === 'PAUSED_PLAYBACK' || v === 'STOPPED' || v === 'TRANSITIONING') {
+    return v;
+  }
+  return null;
+}
+
+function isSourceType(v: string | null): SonosPlaybackResponse['source_type'] {
+  if (v === 'tv' || v === 'streaming' || v === 'radio' || v === 'line_in' || v === 'airplay' || v === 'unknown') {
+    return v;
+  }
+  return null;
+}
+
+function adaptTransport(raw: SonosTransportWsPayload): SonosPlaybackResponse {
+  return {
+    group_id: raw.group_id,
+    transport_state: isTransportState(raw.transport_state),
+    title: raw.title,
+    artist: raw.artist,
+    album: raw.album,
+    album_art_url: raw.album_art_url,
+    position: secondsToHms(raw.position),
+    duration: secondsToHms(raw.duration),
+    source_type: isSourceType(raw.source_type),
+  };
+}
+
 export function useSonosFullData(): UseSonosFullDataReturn {
   const [data, setData] = useState<SonosFullData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stale, setStale] = useState(false);
   const dataRef = useRef<SonosFullData | null>(null);
+  const initialFetchDoneRef = useRef(false);
 
   const isVisible = useVisibility();
   const interval = isVisible ? 60000 : 300000;
+
+  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const isWsConnected = readyState === ReadyState.OPEN;
 
   const fetchData = async () => {
     try {
@@ -151,11 +233,101 @@ export function useSonosFullData(): UseSonosFullDataReturn {
     }
   };
 
+  // One-shot initial REST fetch — runs on mount regardless of WS state so the
+  // hook always exposes a populated snapshot before the first WS event arrives
+  // (sonos_transport / sonos_volume are push-only — no snapshot on subscribe).
+  const fetchDataRef = useRef(fetchData);
+  fetchDataRef.current = fetchData;
+  useEffect(() => {
+    if (initialFetchDoneRef.current) return;
+    initialFetchDoneRef.current = true;
+    void fetchDataRef.current();
+  }, []);
+
+  // WS subscriptions — primary live channel. Subscribes to:
+  //  - 'sonos'           → speakers + groups (snapshot on subscribe)
+  //  - 'sonos_transport' → playback per group_id (push-only)
+  //  - 'sonos_volume'    → volume per speaker or zone (push-only)
+  // EQ / home-theater / play-mode / sleep-timer are not on WS — they keep the
+  // values from the initial REST fetch (they rarely change; explicit fetchData
+  // exposed in the return value triggers a fresh load on demand).
+  useEffect(() => {
+    if (!isWsConnected) return;
+
+    const handleSonos = (raw: unknown) => {
+      const ws = raw as SonosWsPayload;
+      const devices = ws.speakers ?? [];
+      const zones = ws.groups ?? [];
+      setData(prev => {
+        const base: SonosFullData = prev ?? {
+          devices: [], zones: [],
+          playback: {}, volumes: {},
+          playModes: {}, sleepTimers: {},
+          eqData: {}, homeTheaterData: {},
+        };
+        const next: SonosFullData = { ...base, devices, zones };
+        dataRef.current = next;
+        return next;
+      });
+      setStale(false);
+      setLoading(false);
+      setError(null);
+    };
+
+    const handleTransport = (raw: unknown) => {
+      const ws = raw as SonosTransportWsPayload;
+      if (!ws || typeof ws.group_id !== 'string') return;
+      const adapted = adaptTransport(ws);
+      setData(prev => {
+        if (!prev) return prev;
+        const next: SonosFullData = {
+          ...prev,
+          playback: { ...prev.playback, [ws.group_id]: adapted },
+        };
+        dataRef.current = next;
+        return next;
+      });
+    };
+
+    const handleVolume = (raw: unknown) => {
+      const ws = raw as SonosVolumeWsSinglePayload | SonosVolumeWsZonePayload;
+      if (!ws) return;
+      setData(prev => {
+        if (!prev) return prev;
+        const volumes = { ...prev.volumes };
+        if ('uid' in ws && typeof ws.uid === 'string') {
+          volumes[ws.uid] = { uid: ws.uid, volume: ws.volume, mute: ws.mute };
+        } else if ('volumes' in ws && Array.isArray(ws.volumes)) {
+          for (const v of ws.volumes) {
+            volumes[v.uid] = { uid: v.uid, volume: v.volume, mute: v.mute };
+          }
+        } else {
+          return prev;
+        }
+        const next: SonosFullData = { ...prev, volumes };
+        dataRef.current = next;
+        return next;
+      });
+    };
+
+    subscribe('sonos', handleSonos);
+    subscribe('sonos_transport', handleTransport);
+    subscribe('sonos_volume', handleVolume);
+    return () => {
+      unsubscribe('sonos', handleSonos);
+      unsubscribe('sonos_transport', handleTransport);
+      unsubscribe('sonos_volume', handleVolume);
+    };
+  }, [isWsConnected, subscribe, unsubscribe]);
+
+  // Polling fallback: only runs when WS is CLOSED. The explicit one-shot
+  // initial fetch above handles the first paint; polling resumes if the WS
+  // connection drops.
   useAdaptivePolling({
     callback: fetchData,
-    interval,
+    interval: isWsConnected ? null : interval,
     alwaysActive: false,
-    immediate: true,
+    immediate: false,
     initialDelay: 200,
   });
 

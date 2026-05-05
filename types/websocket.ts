@@ -28,7 +28,8 @@ export type { TuyaPlug } from '@/types/tuyaProxy';
 /** All available WebSocket subscription topics */
 export type Topic =
   | 'fritzbox' | 'dirigera' | 'netatmo' | 'thermorossi'
-  | 'hue' | 'sonos' | 'raspi' | 'tuya';
+  | 'hue' | 'sonos' | 'raspi' | 'tuya'
+  | 'sonos_transport' | 'sonos_volume';
 
 /**
  * Envelope for all server-to-client messages.

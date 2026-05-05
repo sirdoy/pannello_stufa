@@ -5,19 +5,36 @@
  * Promise.allSettled resilience, error handling, stale state, and fetchData exposure.
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import type { SonosDeviceResponse, SonosZoneResponse, SonosPlaybackResponse, SonosVolumeResponse, SonosPlayModeResponse, SonosSleepTimerResponse } from '@/types/sonosProxy';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useAdaptivePolling');
 jest.mock('@/lib/hooks/useVisibility');
+jest.mock('@/app/context/WebSocketContext');
+jest.mock('@/lib/hooks/useWebSocketManager', () => ({
+  ReadyState: { OPEN: 1, CLOSED: 3, CONNECTING: 0, CLOSING: 2, UNINSTANTIATED: -1 },
+}));
 
 // Import mocked modules
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
 
 const mockUseVisibility = useVisibility as jest.MockedFunction<typeof useVisibility>;
 const mockUseAdaptivePolling = useAdaptivePolling as jest.MockedFunction<typeof useAdaptivePolling>;
+const mockUseWebSocketContext = useWebSocketContext as jest.MockedFunction<typeof useWebSocketContext>;
+
+const mockSubscribe = jest.fn();
+const mockUnsubscribe = jest.fn();
+
+function setWsConnected(connected: boolean) {
+  mockUseWebSocketContext.mockReturnValue({
+    subscribe: mockSubscribe,
+    unsubscribe: mockUnsubscribe,
+    readyState: connected ? 1 : 3,
+  } as ReturnType<typeof useWebSocketContext>);
+}
 
 // Device fixtures
 const mockDevice1: SonosDeviceResponse = {
@@ -183,6 +200,7 @@ describe('useSonosFullData', () => {
     global.fetch = jest.fn();
 
     mockUseVisibility.mockReturnValue(true);
+    setWsConnected(false);  // default: WS CLOSED, polling fallback path
 
     mockUseAdaptivePolling.mockImplementation(({ callback, immediate }) => {
       if (immediate) {
@@ -368,5 +386,179 @@ describe('useSonosFullData', () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
     expect(result.current.error).toBe('Sonos non raggiungibile');
     expect(result.current.stale).toBe(true);
+  });
+
+  // ---------------------------------------------------------------------------
+  // WebSocket primary channel
+  // ---------------------------------------------------------------------------
+
+  it('subscribes to sonos, sonos_transport, sonos_volume when WS is OPEN', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    renderHook(() => useSonosFullData());
+
+    await waitFor(() => expect(mockSubscribe).toHaveBeenCalled());
+
+    const subscribedTopics = mockSubscribe.mock.calls.map((c) => c[0] as string);
+    expect(subscribedTopics).toContain('sonos');
+    expect(subscribedTopics).toContain('sonos_transport');
+    expect(subscribedTopics).toContain('sonos_volume');
+  });
+
+  it('does not subscribe when WS is CLOSED', () => {
+    setWsConnected(false);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    renderHook(() => useSonosFullData());
+
+    expect(mockSubscribe).not.toHaveBeenCalled();
+  });
+
+  it('suppresses polling when WS is OPEN (interval=null)', () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    renderHook(() => useSonosFullData());
+
+    const pollingArgs = mockUseAdaptivePolling.mock.calls[0]?.[0];
+    expect(pollingArgs?.interval).toBeNull();
+  });
+
+  it('polls at 60000ms when WS is CLOSED (fallback)', () => {
+    setWsConnected(false);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    renderHook(() => useSonosFullData());
+
+    const pollingArgs = mockUseAdaptivePolling.mock.calls[0]?.[0];
+    expect(pollingArgs?.interval).toBe(60000);
+  });
+
+  it('runs an initial REST fetch on mount even when WS is OPEN (populates supplementary fields)', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+
+    // The one-shot initial fetch fires regardless of WS state so that EQ /
+    // home-theater / play-mode / sleep-timer (not on WS) are populated.
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.data).not.toBeNull();
+    expect(result.current.data!.eqData).toBeDefined();
+  });
+
+  it('updates zones + devices from sonos WS snapshot', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+
+    const sonosCall = mockSubscribe.mock.calls.find((c) => c[0] === 'sonos');
+    const handler = sonosCall?.[1] as (raw: unknown) => void;
+    expect(handler).toBeDefined();
+
+    const wsSnapshot = {
+      speakers: [{ ...mockDevice1, name: 'Beam (renamed)' }],
+      groups: [{ ...mockZone1, label: 'New Living' }],
+      data_freshness: 'LIVE' as const,
+    };
+
+    await act(async () => { handler(wsSnapshot); });
+
+    expect(result.current.data!.devices[0]!.name).toBe('Beam (renamed)');
+    expect(result.current.data!.zones[0]!.label).toBe('New Living');
+  });
+
+  it('updates playback per group_id from sonos_transport WS event', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+
+    const transportCall = mockSubscribe.mock.calls.find((c) => c[0] === 'sonos_transport');
+    const handler = transportCall?.[1] as (raw: unknown) => void;
+    expect(handler).toBeDefined();
+
+    await act(async () => {
+      handler({
+        group_id: 'RINCON_C',
+        transport_state: 'PLAYING',
+        title: 'New Track',
+        artist: 'Artist',
+        album: 'Album',
+        album_art_url: null,
+        position: 47,
+        duration: 354,
+        source_type: 'streaming',
+      });
+    });
+
+    expect(result.current.data!.playback['RINCON_C']!.transport_state).toBe('PLAYING');
+    expect(result.current.data!.playback['RINCON_C']!.title).toBe('New Track');
+    // seconds → HH:MM:SS conversion
+    expect(result.current.data!.playback['RINCON_C']!.position).toBe('0:00:47');
+    expect(result.current.data!.playback['RINCON_C']!.duration).toBe('0:05:54');
+  });
+
+  it('updates single-speaker volume from sonos_volume WS event', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+
+    const volumeCall = mockSubscribe.mock.calls.find((c) => c[0] === 'sonos_volume');
+    const handler = volumeCall?.[1] as (raw: unknown) => void;
+
+    await act(async () => {
+      handler({ uid: 'RINCON_A', volume: 88, mute: false });
+    });
+
+    expect(result.current.data!.volumes['RINCON_A']!.volume).toBe(88);
+  });
+
+  it('updates zone-wide volumes from sonos_volume WS event', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+
+    const volumeCall = mockSubscribe.mock.calls.find((c) => c[0] === 'sonos_volume');
+    const handler = volumeCall?.[1] as (raw: unknown) => void;
+
+    await act(async () => {
+      handler({
+        group_id: 'RINCON_A',
+        volumes: [
+          { uid: 'RINCON_A', volume: 30, mute: false },
+          { uid: 'RINCON_B', volume: 30, mute: false },
+        ],
+      });
+    });
+
+    expect(result.current.data!.volumes['RINCON_A']!.volume).toBe(30);
+    expect(result.current.data!.volumes['RINCON_B']!.volume).toBe(30);
+  });
+
+  it('unsubscribes from all 3 sonos topics on unmount', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { unmount } = renderHook(() => useSonosFullData());
+    await waitFor(() => {
+      const topics = mockSubscribe.mock.calls.map((c) => c[0] as string);
+      expect(topics).toEqual(expect.arrayContaining(['sonos', 'sonos_transport', 'sonos_volume']));
+    });
+
+    unmount();
+
+    const unsubscribedTopics = mockUnsubscribe.mock.calls.map((c) => c[0] as string);
+    expect(unsubscribedTopics).toContain('sonos');
+    expect(unsubscribedTopics).toContain('sonos_transport');
+    expect(unsubscribedTopics).toContain('sonos_volume');
   });
 });

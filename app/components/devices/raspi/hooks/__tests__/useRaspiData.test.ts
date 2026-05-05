@@ -258,8 +258,18 @@ describe('useRaspiData', () => {
     expect(mockUnsubscribe).toHaveBeenCalledWith('raspi', expect.any(Function));
   });
 
-  it('keeps polling active even when WS is connected (raspi not in WS topics)', () => {
+  it('suppresses polling when WS is OPEN (interval=null)', () => {
     setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    renderHook(() => useRaspiData());
+
+    const pollingArgs = mockUseAdaptivePolling.mock.calls[0]?.[0];
+    expect(pollingArgs?.interval).toBeNull();
+  });
+
+  it('polls at 60000ms when WS is CLOSED (fallback)', () => {
+    setWsConnected(false);
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
 
     renderHook(() => useRaspiData());

@@ -83,5 +83,35 @@ npx tsc --noEmit
 
 ## Commits
 
-- `feat(260505-o8n): suppress Raspi REST polling while WS is OPEN`
-- `docs(quick-260505-o8n): home WS audit + Raspi polling-suppression fix`
+- `feat(260505-o8n): suppress Raspi REST polling while WS is OPEN` (b8196c34)
+- `docs(quick-260505-o8n): home WS audit + Raspi polling-suppression fix` (4b04283a)
+- `feat(260505-o8n): WS-primary fetch for Sonos home card` (34299f63)
+
+## Follow-up — Sonos card was still polling REST after the Raspi fix
+
+After the Raspi commit, the user reported still seeing `GET /api/v1/sonos/devices`
+every minute on the home dashboard. Root cause: the home `SonosCard`
+(`app/components/EmberGlass/cards/SonosCard.tsx`) consumes `useSonosFullData`,
+**not** the already-WS-aware `useSonosData`. `useSonosFullData` was polling all
+~5+ Sonos endpoints per zone every 60 s regardless of WS state.
+
+Fix in the same task: made `useSonosFullData` WS-aware.
+
+- Subscribes to three Sonos topics on the HA proxy:
+  - `sonos` → `speakers` + `groups` (snapshot on subscribe)
+  - `sonos_transport` → playback per `group_id` (push-only)
+  - `sonos_volume` → volume per speaker or zone (push-only)
+- `useAdaptivePolling` interval becomes `null` when WS is OPEN — full polling
+  fallback resumes on disconnect.
+- One-shot REST fetch on mount still runs to populate EQ / home-theater /
+  play-mode / sleep-timer (these fields are not on any WS topic) and to seed
+  initial playback / volumes before the first push arrives.
+- Added `sonos_transport` and `sonos_volume` to the `Topic` union in
+  `types/websocket.ts` so `subscribe()` typechecks.
+- `secondsToHms()` adapter converts WS `position`/`duration` (numbers) to the
+  `HH:MM:SS` strings the rest of the app already expects.
+
+Tests: 22/22 in `useSonosFullData.test.ts` (12 existing + 10 new for WS
+subscriptions, polling suppression, snapshot/transport/volume handlers,
+unmount cleanup). 65/65 across the full Sonos hook test suite. `tsc --noEmit`
+clean.

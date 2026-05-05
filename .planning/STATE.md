@@ -119,10 +119,11 @@ None.
 | 260504-jyc | Dashboard 4 colonne su desktop + tablet landscape (mobile resta 2) | 2026-05-04 | 3ce72294 | [260504-jyc-dashboard-4-cols-desktop-tablet](./quick/260504-jyc-dashboard-4-cols-desktop-tablet/) |
 | 260504-kn6 | BottomTabBar sticky always visible (move out of SplashGate transform wrapper) | 2026-05-04 | faeb136b | [260504-kn6-menu-sticky-bottom-centered-desktop](./quick/260504-kn6-menu-sticky-bottom-centered-desktop/) |
 | 260505-nf1 | Aggiorna gli skeleton nella home che rispecchino il nuovo design | 2026-05-05 | cbbd2af1 | [260505-nf1-aggiorna-gli-skeleton-nella-home-che-ris](./quick/260505-nf1-aggiorna-gli-skeleton-nella-home-che-ris/) |
+| 260505-o8n | Home WS-primary coverage — suppress Raspi REST polling while WS OPEN (camera/weather need server-side topics) | 2026-05-05 | b8196c34 | [260505-o8n-home-ws-raspi-fix](./quick/260505-o8n-home-ws-raspi-fix/) |
 
 ## Session Continuity
 
-Last activity: 2026-05-05 — Completed quick task 260505-nf1: Aggiorna gli skeleton nella home che rispecchino il nuovo design
+Last activity: 2026-05-05 — Completed quick task 260505-o8n: Home WS-primary coverage / Raspi polling-suppression fix
 Stopped at: v20.0 milestone closed
 Resume file: None
 

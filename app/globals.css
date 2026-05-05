@@ -362,6 +362,8 @@
    + Pitfall 7 / OQ-3 chip hide. Six rules total (transition + mobile hide +
    desktop center + desktop combined-translate hide + chip transition + chip hide). */
 [data-bottom-tab="true"] {
+  left: 12px;
+  right: 12px;
   transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .2s;
 }
 

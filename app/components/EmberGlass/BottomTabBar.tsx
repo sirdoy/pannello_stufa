@@ -56,8 +56,6 @@ export function BottomTabBar(): React.ReactElement {
         style={{
           position: 'fixed',
           bottom: 'calc(8px + env(safe-area-inset-bottom))',
-          left: 12,
-          right: 12,
           zIndex: 150,
           borderRadius: 28,
           background: 'rgba(18, 15, 14, 0.75)',

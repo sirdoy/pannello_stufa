@@ -46,11 +46,21 @@ export function SplashGate({ children, forceShow = false }: SplashGateProps) {
   useEffect(() => {
     setHydrated(true);
     try {
-      setShownThisSession(sessionStorage.getItem(SPLASH_FLAG_KEY) === 'true');
+      const shown = sessionStorage.getItem(SPLASH_FLAG_KEY) === 'true';
+      setShownThisSession(shown);
+      if (shown) setReady(true);
     } catch {
       // Incognito or sessionStorage disabled — graceful no-op (splash plays).
     }
   }, []);
+
+  // When auth resolves with no user (logged-out / public route), splash never plays —
+  // surface content instead of leaving the wrapper at opacity:0 forever.
+  useEffect(() => {
+    if (hydrated && !isLoading && !user && !ready && !forceShow) {
+      setReady(true);
+    }
+  }, [hydrated, isLoading, user, ready, forceShow]);
 
   // SPLASH-01 trigger predicate (CONTEXT.md D-08): all four conditions hold OR forceShow.
   const shouldShowSplash =

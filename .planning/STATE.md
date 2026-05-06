@@ -120,10 +120,11 @@ None.
 | 260504-kn6 | BottomTabBar sticky always visible (move out of SplashGate transform wrapper) | 2026-05-04 | faeb136b | [260504-kn6-menu-sticky-bottom-centered-desktop](./quick/260504-kn6-menu-sticky-bottom-centered-desktop/) |
 | 260505-nf1 | Aggiorna gli skeleton nella home che rispecchino il nuovo design | 2026-05-05 | cbbd2af1 | [260505-nf1-aggiorna-gli-skeleton-nella-home-che-ris](./quick/260505-nf1-aggiorna-gli-skeleton-nella-home-che-ris/) |
 | 260505-o8n | Home WS-primary coverage — suppress Raspi REST polling + migrate Sonos home card to WS (sonos / sonos_transport / sonos_volume); camera/weather still need server-side topics | 2026-05-05 | 34299f63 | [260505-o8n-home-ws-raspi-fix](./quick/260505-o8n-home-ws-raspi-fix/) |
+| 260505-otx | Fix Sheet open perf slowdown — drop animated backdrop-filter on Sheet, pause AmbientBg keyframes while sheet open | 2026-05-05 | 919eb98b | [260505-otx-fix-sheet-open-perf-slowdown](./quick/260505-otx-fix-sheet-open-perf-slowdown/) |
 
 ## Session Continuity
 
-Last activity: 2026-05-05 — Completed quick task 260505-o8n: Home WS-primary coverage (Raspi polling suppression + Sonos WS migration)
+Last activity: 2026-05-05 — Completed quick task 260505-otx: Fix Sheet open perf slowdown
 Stopped at: v20.0 milestone closed
 Resume file: None
 

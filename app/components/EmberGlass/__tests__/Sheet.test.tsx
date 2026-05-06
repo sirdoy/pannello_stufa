@@ -6,7 +6,8 @@
  *     open=true (dialog role visible), title row, VisuallyHidden Title fallback.
  *   - Dismissal vectors (3): ESC keypress, backdrop click, close button click.
  *   - Backdrop NO-double-fire (onPointerDownOutside e.preventDefault on Content).
- *   - Body scroll-lock applied on open + restored on close.
+ *   - Body scroll-lock applied on open + restored on close (rAF-deferred per
+ *     260506-d45 Fix D — flush via flushRaf() before asserting body styles).
  *   - ARIA / a11y: dialog role + aria-modal=true; close button data attribute.
  *
  * Pitfall guards:
@@ -14,11 +15,28 @@
  *     where pointer events matter (Pitfall 1 from RESEARCH.md).
  *   - Body styles leak across tests → afterEach removes body style attribute (Pitfall 5).
  *   - jsdom window.scrollTo is a noop that throws → mock it (test 10 only needs the call).
+ *   - Sheet body-style writes are scheduled via requestAnimationFrame (260506-d45).
+ *     jsdom polyfills rAF via setTimeout(16); awaiting one rAF tick flushes the writes.
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { Sheet } from '../Sheet';
+
+/**
+ * Flush exactly one requestAnimationFrame callback. jsdom's polyfill drains rAF
+ * via setTimeout(16); awaiting `new Promise(r => requestAnimationFrame(r))`
+ * inside `act()` releases the queued style writes synchronously w.r.t. test
+ * code that follows. Use BEFORE asserting body-style mutations applied by the
+ * Sheet open/cleanup useEffect.
+ */
+async function flushRaf(): Promise<void> {
+  await act(async () => {
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
 
 describe('Sheet (EmberGlass primitive)', () => {
   const onCloseMock = jest.fn();
@@ -139,7 +157,7 @@ describe('Sheet (EmberGlass primitive)', () => {
   });
 
   describe('Body scroll-lock', () => {
-    test('applies fixed/overflow/width body styles on open', () => {
+    test('applies fixed/overflow/width body styles on open (after rAF flush)', async () => {
       const { rerender } = render(
         <Sheet open={false} onClose={onCloseMock} title="Demo">
           <div>body</div>
@@ -152,36 +170,69 @@ describe('Sheet (EmberGlass primitive)', () => {
           <div>body</div>
         </Sheet>
       );
+      // Pre-rAF: body styles still pristine — Fix D defers writes one frame.
+      expect(document.body.style.position).toBe('');
+      await flushRaf();
       expect(document.body.style.position).toBe('fixed');
       expect(document.body.style.overflow).toBe('hidden');
       expect(document.body.style.width).toBe('100%');
     });
 
-    test('restores body styles + calls window.scrollTo with locked scrollY on close', () => {
+    test('restores body styles + calls window.scrollTo with locked scrollY on close (after rAF flush)', async () => {
       const { rerender } = render(
         <Sheet open={false} onClose={onCloseMock} title="Demo">
           <div>body</div>
         </Sheet>
       );
-      // Open — captures scrollY (jsdom default 0).
+      // Open — captures scrollY synchronously (jsdom default 0); style writes deferred.
       rerender(
         <Sheet open={true} onClose={onCloseMock} title="Demo">
           <div>body</div>
         </Sheet>
       );
+      await flushRaf();
       expect(document.body.style.position).toBe('fixed');
-      // Close — runs cleanup.
+      // Close — schedules restore writes one rAF frame later.
       rerender(
         <Sheet open={false} onClose={onCloseMock} title="Demo">
           <div>body</div>
         </Sheet>
       );
+      await flushRaf();
       expect(document.body.style.position).toBe('');
       expect(document.body.style.overflow).toBe('');
       expect(document.body.style.width).toBe('');
       expect(document.body.style.top).toBe('');
       // scrollTo called with the captured scrollY (0 in jsdom).
       expect(window.scrollTo).toHaveBeenCalledWith(0, 0);
+    });
+
+    test('regression guard: requestAnimationFrame is invoked on both open and close (260506-d45 Fix D)', async () => {
+      const rafSpy = jest.spyOn(window, 'requestAnimationFrame');
+      const { rerender } = render(
+        <Sheet open={false} onClose={onCloseMock} title="Demo">
+          <div>body</div>
+        </Sheet>
+      );
+      const baselineCalls = rafSpy.mock.calls.length;
+      // Open — schedules ONE rAF for the body-style writes.
+      rerender(
+        <Sheet open={true} onClose={onCloseMock} title="Demo">
+          <div>body</div>
+        </Sheet>
+      );
+      await flushRaf();
+      expect(rafSpy.mock.calls.length).toBeGreaterThan(baselineCalls);
+      const afterOpenCalls = rafSpy.mock.calls.length;
+      // Close — schedules ANOTHER rAF for the cleanup restore writes.
+      rerender(
+        <Sheet open={false} onClose={onCloseMock} title="Demo">
+          <div>body</div>
+        </Sheet>
+      );
+      await flushRaf();
+      expect(rafSpy.mock.calls.length).toBeGreaterThan(afterOpenCalls);
+      rafSpy.mockRestore();
     });
   });
 

@@ -11,7 +11,11 @@
  */
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import { StoveSheet } from '../StoveSheet';
+// 260506-d45: render the SelfFetch zero-prop variant so the existing hook-mock
+// blocks below keep intercepting the inner useStoveData/useStoveCommands
+// calls. The presentational `StoveSheet` (now prop-based) is exercised in a
+// dedicated test at the bottom of the file with explicit fixture props.
+import { StoveSheet, StoveSheetSelfFetch } from '../StoveSheet';
 
 // --- Router / Auth0 / Version mocks -------------------------------------
 const mockPush = jest.fn();
@@ -88,7 +92,7 @@ beforeEach(() => {
 describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
   test('renders OFF state hero + power/fan rows + Orari/Manutenzione + Accendi primary', () => {
     stoveDataOverride = { isAccesa: false, powerLevel: 3, fanLevel: 2 };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     expect(screen.getByTestId('stove-sheet')).toBeInTheDocument();
     expect(screen.getByTestId('stove-sheet-state')).toHaveTextContent('Spenta');
     expect(screen.getByTestId('stove-sheet-temp')).toHaveTextContent('3');
@@ -104,7 +108,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
 
   test('renders ON state hero + Spegni primary', () => {
     stoveDataOverride = { isAccesa: true, powerLevel: 4, fanLevel: 3 };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     expect(screen.getByTestId('stove-sheet-state')).toHaveTextContent('In funzione');
     expect(screen.getByTestId('stove-sheet-primary-action')).toHaveTextContent(
       'Spegni stufa',
@@ -113,7 +117,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
 
   test('disables primary action with Manutenzione richiesta when needsMaintenance', () => {
     stoveDataOverride = { isAccesa: false, needsMaintenance: true };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     const btn = screen.getByTestId('stove-sheet-primary-action');
     expect(btn).toHaveTextContent('Manutenzione richiesta');
     expect(btn).toBeDisabled();
@@ -121,7 +125,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
 
   test('clicking power stepper plus invokes handlePowerChange with String(value+1)', () => {
     stoveDataOverride = { powerLevel: 3 };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     const powerWrap = screen.getByTestId('stove-sheet-power-stepper');
     const plus = powerWrap.querySelector(
       '[data-testid="stepper-plus"]',
@@ -134,7 +138,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
 
   test('clicking fan stepper minus invokes handleFanChange with String(value-1)', () => {
     stoveDataOverride = { fanLevel: 2 };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     const fanWrap = screen.getByTestId('stove-sheet-fan-stepper');
     const minus = fanWrap.querySelector(
       '[data-testid="stepper-minus"]',
@@ -147,7 +151,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
 
   test('clicking primary action when off invokes handleIgnite', () => {
     stoveDataOverride = { isAccesa: false };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('stove-sheet-primary-action'));
     expect(mockHandleIgnite).toHaveBeenCalledTimes(1);
     expect(mockHandleShutdown).not.toHaveBeenCalled();
@@ -155,7 +159,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
 
   test('clicking primary action when on invokes handleShutdown', () => {
     stoveDataOverride = { isAccesa: true };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('stove-sheet-primary-action'));
     expect(mockHandleShutdown).toHaveBeenCalledTimes(1);
     expect(mockHandleIgnite).not.toHaveBeenCalled();
@@ -163,20 +167,20 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
 
   test('disabled primary action does not fire ignite or shutdown', () => {
     stoveDataOverride = { needsMaintenance: true };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('stove-sheet-primary-action'));
     expect(mockHandleIgnite).not.toHaveBeenCalled();
     expect(mockHandleShutdown).not.toHaveBeenCalled();
   });
 
   test('Orari button navigates to /stove/scheduler', () => {
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('sheet-btn-orari'));
     expect(mockPush).toHaveBeenCalledWith('/stove/scheduler');
   });
 
   test('Manutenzione button navigates to /stove/maintenance', () => {
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('sheet-btn-manutenzione'));
     expect(mockPush).toHaveBeenCalledWith('/stove/maintenance');
   });
@@ -187,7 +191,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
       powerLevel: null,
       fanLevel: null,
     };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     expect(screen.getByTestId('stove-sheet-skeleton')).toBeInTheDocument();
     expect(screen.queryByTestId('stove-sheet')).not.toBeInTheDocument();
   });
@@ -198,11 +202,41 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
       powerLevel: null,
       fanLevel: null,
     };
-    render(<StoveSheet />);
+    render(<StoveSheetSelfFetch />);
     expect(screen.getByTestId('stove-sheet-error')).toBeInTheDocument();
     expect(
       screen.getByText('Non raggiungibile. Riprova più tardi.'),
     ).toBeInTheDocument();
     expect(screen.getByText('boom')).toBeInTheDocument();
+  });
+
+  // 260506-d45 — locks in the prop-based contract: the presentational
+  // StoveSheet must render with explicit data + cmds props and no internal
+  // hook calls. If a future regression re-introduces use*Data/use*Commands
+  // into the body, this test stays green only because the mocks would still
+  // intercept — but the body grep regression in done-criteria would fail.
+  test('260506-d45: presentational StoveSheet renders with explicit prop fixtures', () => {
+    const propStoveData = { ...baseStoveData, isAccesa: true, powerLevel: 4, fanLevel: 3 } as unknown as Parameters<typeof StoveSheet>[0]['stoveData'];
+    const propCmds = {
+      handleIgnite: mockHandleIgnite,
+      handleShutdown: mockHandleShutdown,
+      handlePowerChange: mockHandlePowerChange,
+      handleFanChange: mockHandleFanChange,
+    } as unknown as Parameters<typeof StoveSheet>[0]['cmds'];
+    const onNavigate = jest.fn();
+    render(
+      <StoveSheet
+        stoveData={propStoveData}
+        cmds={propCmds}
+        onNavigate={onNavigate}
+      />,
+    );
+    expect(screen.getByTestId('stove-sheet')).toBeInTheDocument();
+    expect(screen.getByTestId('stove-sheet-state')).toHaveTextContent('In funzione');
+    expect(screen.getByTestId('stove-sheet-temp')).toHaveTextContent('4');
+    // onNavigate is invoked instead of router.push — proves the card-owned
+    // navigation callback is honored by the presentational sheet.
+    fireEvent.click(screen.getByTestId('sheet-btn-orari'));
+    expect(onNavigate).toHaveBeenCalledWith('/stove/scheduler');
   });
 });

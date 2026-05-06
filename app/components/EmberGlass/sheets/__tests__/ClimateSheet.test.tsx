@@ -8,7 +8,9 @@
  */
 
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { ClimateSheet } from '../ClimateSheet';
+// 260506-d45: render the SelfFetch zero-prop variant; existing hook mocks
+// continue to intercept the inner useThermostatData/useThermostatCommands.
+import { ClimateSheet, ClimateSheetSelfFetch } from '../ClimateSheet';
 
 // ---------------------------------------------------------------------------
 // Hook mocks
@@ -79,7 +81,7 @@ afterEach(() => {
 
 describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
   test('Test 1: renders 2 zone chips + RadialDial + Tipo + Modalità label + 4 mode pills', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     expect(screen.getByTestId('climate-sheet')).toBeInTheDocument();
     expect(screen.getByTestId('climate-sheet-zone-chip-0')).toHaveTextContent('Salotto');
     expect(screen.getByTestId('climate-sheet-zone-chip-1')).toHaveTextContent('Camera');
@@ -93,18 +95,18 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
   });
 
   test('Test 2: selecting zone 1 updates RadialDial label to Camera', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('climate-sheet-zone-chip-1'));
     expect(screen.getByTestId('radial-dial-label')).toHaveTextContent(/Camera.*attuale 19\.0°/);
   });
 
   test('Test 3a: Tipo row label reflects NATherm1 (termostato) for r1', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     expect(screen.getByText('Termostato di stanza')).toBeInTheDocument();
   });
 
   test('Test 3b: Tipo row label reflects NRV (termovalvola) for r2', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('climate-sheet-zone-chip-1'));
     expect(screen.getByText('Termovalvola radiatore')).toBeInTheDocument();
   });
@@ -119,7 +121,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
         ],
       } as unknown as Record<string, unknown>,
     };
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     const toggleWrap = screen.getByTestId('climate-sheet-tipo-toggle');
     expect(toggleWrap).toBeInTheDocument();
     const switchEl = toggleWrap.querySelector('[role="switch"]');
@@ -128,7 +130,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
   });
 
   test('Test 5: debounces setpoint write 500ms after RadialDial plus click', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('radial-dial-plus'));
     expect(mockSetRoomSetpoint).not.toHaveBeenCalled();
     act(() => {
@@ -138,7 +140,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
   });
 
   test('Test 6: debouncing collapses 5 rapid plus clicks into one setpoint write', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     for (let i = 0; i < 5; i++) {
       fireEvent.click(screen.getByTestId('radial-dial-plus'));
     }
@@ -151,7 +153,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
   });
 
   test('Test 7: changing zone resets pending; no spurious cross-zone write', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('radial-dial-plus'));
     fireEvent.click(screen.getByTestId('climate-sheet-zone-chip-1'));
     act(() => {
@@ -162,31 +164,31 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
   });
 
   test('Test 8a: Auto pill click calls setHomeMode(schedule)', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('climate-sheet-mode-auto'));
     expect(mockSetHomeMode).toHaveBeenCalledWith('schedule');
   });
 
   test('Test 8b: Eco pill click calls setHomeMode(away)', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('climate-sheet-mode-eco'));
     expect(mockSetHomeMode).toHaveBeenCalledWith('away');
   });
 
   test('Test 8c: Off pill click calls setHomeMode(hg)', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('climate-sheet-mode-off'));
     expect(mockSetHomeMode).toHaveBeenCalledWith('hg');
   });
 
   test('Test 9a: Manuale pill click does NOT call setHomeMode (Pitfall 5)', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('climate-sheet-mode-manuale'));
     expect(mockSetHomeMode).not.toHaveBeenCalled();
   });
 
   test('Test 9b: Manuale pill is selected (aria-checked=true) when any room mode === manual', () => {
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     expect(screen.getByTestId('climate-sheet-mode-manuale')).toHaveAttribute(
       'aria-checked',
       'true',
@@ -195,7 +197,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
 
   test('Test 10a: Tipo InlineToggle click on zone with mode!==hg calls setRoomMode(zoneId, "home")', () => {
     // r1 starts on (mode=schedule). Clicking the toggle flips off → 'home'.
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     const toggleWrap = screen.getByTestId('climate-sheet-tipo-toggle');
     const switchEl = toggleWrap.querySelector('[role="switch"]') as HTMLElement;
     fireEvent.click(switchEl);
@@ -212,7 +214,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
         ],
       } as unknown as Record<string, unknown>,
     };
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     const toggleWrap = screen.getByTestId('climate-sheet-tipo-toggle');
     const switchEl = toggleWrap.querySelector('[role="switch"]') as HTMLElement;
     fireEvent.click(switchEl);
@@ -224,7 +226,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
       topology: { home_id: 'home-1', home_name: 'Casa', rooms: [], modules: [] } as unknown as Record<string, unknown>,
       status: { mode: 'schedule', rooms: [] } as unknown as Record<string, unknown>,
     };
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     expect(screen.getByTestId('climate-sheet-empty')).toHaveTextContent(
       'Nessuna zona configurata',
     );
@@ -236,7 +238,7 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
       status: null,
       loading: true,
     };
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     expect(screen.getByTestId('climate-sheet-skeleton')).toBeInTheDocument();
   });
 
@@ -246,11 +248,29 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
       status: null,
       error: 'Connection refused',
     };
-    render(<ClimateSheet />);
+    render(<ClimateSheetSelfFetch />);
     expect(screen.getByTestId('climate-sheet-error')).toBeInTheDocument();
     expect(
       screen.getByText('Non raggiungibile. Riprova più tardi.'),
     ).toBeInTheDocument();
     expect(screen.getByText('Connection refused')).toBeInTheDocument();
+  });
+
+  // 260506-d45 — presentational ClimateSheet rendered with explicit prop
+  // fixtures. Locks in the prop-based contract; if a future regression
+  // re-introduces use*Data calls into the body the existing scoped grep
+  // (in 260506-d45-PLAN done-criteria) catches it.
+  test('260506-d45: presentational ClimateSheet renders with explicit prop fixtures', () => {
+    const propData = baseData as unknown as Parameters<typeof ClimateSheet>[0]['data'];
+    const propCmds = {
+      setRoomSetpoint: mockSetRoomSetpoint,
+      setHomeMode: mockSetHomeMode,
+      setRoomMode: mockSetRoomMode,
+      netatmoTempCmd: { execute: jest.fn(), isRetrying: false, lastError: null },
+      netatmoModeCmd: { execute: jest.fn(), isRetrying: false, lastError: null },
+    } as unknown as Parameters<typeof ClimateSheet>[0]['cmds'];
+    render(<ClimateSheet data={propData} cmds={propCmds} />);
+    expect(screen.getByTestId('climate-sheet')).toBeInTheDocument();
+    expect(screen.getByTestId('climate-sheet-zone-chip-0')).toHaveTextContent('Salotto');
   });
 });

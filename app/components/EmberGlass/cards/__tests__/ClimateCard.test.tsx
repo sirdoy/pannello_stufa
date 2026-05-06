@@ -156,8 +156,14 @@ describe('ClimateCard (Phase 177 — DASH-03)', () => {
       topology: { rooms: [] },
     });
     const { getByTestId, container } = render(<ClimateCard />);
+    // Sheet no longer uses forceMount — when closed the dialog may be either
+    // unmounted (current behavior) or present with translateY(110%) (legacy).
     const dialogClosed = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
-    expect(dialogClosed?.getAttribute('style') ?? '').toContain('translateY(110%)');
+    if (dialogClosed) {
+      expect(dialogClosed.getAttribute('style') ?? '').toContain('translateY(110%)');
+    } else {
+      expect(dialogClosed).toBeNull();
+    }
     fireEvent.click(getByTestId('climate-card'));
     const dialogOpen = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialogOpen?.getAttribute('style') ?? '').toContain('translateY(0)');

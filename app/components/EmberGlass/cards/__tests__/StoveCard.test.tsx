@@ -92,23 +92,21 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     expect(getByText('Spenta')).toBeInTheDocument();
   });
 
-  test('(c) clicking card opens sheet (transform changes from translateY(110%) to translateY(0))', () => {
+  test('(c) clicking card opens sheet (translateY(0) and stove-sheet body mounted)', () => {
     useStoveDataMock.mockReturnValue({
       isAccesa: true,
       powerLevel: 1,
       fanLevel: 1,
       staleness: null,
     });
-    const { getByTestId, container } = render(<StoveCard />);
-    // Sheet uses forceMount so the dialog stays in the DOM with translateY(110%) when closed.
-    const dialogClosed = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
-    expect(dialogClosed?.getAttribute('style') ?? '').toContain('translateY(110%)');
-    // The real StoveSheet body is mounted (mocked here as a stub div with
-    // data-testid="stove-sheet"); assert via the data-testid sheet element.
+    const { getByTestId, container, queryByTestId } = render(<StoveCard />);
+    // Sheet no longer uses forceMount (260506-d45 follow-up — see Sheet.tsx:108-112,
+    // 131-137); when closed the dialog and StoveSheet body are unmounted entirely.
+    expect(container.ownerDocument.querySelector('[role="dialog"]')).toBeNull();
+    expect(queryByTestId('stove-sheet')).toBeNull();
     fireEvent.click(getByTestId('stove-card'));
     const dialogOpen = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialogOpen?.getAttribute('style') ?? '').toContain('translateY(0)');
-    // Real StoveSheet body is the visible (non-translated) content (Phase 178-09).
     expect(getByTestId('stove-sheet')).toBeInTheDocument();
   });
 

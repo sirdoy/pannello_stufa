@@ -99,9 +99,14 @@ describe('LightsCard (Phase 177 — DASH-04)', () => {
     expect(handleAllLightsToggle).toHaveBeenCalledWith(false);
 
     // Sheet must remain closed (stopPropagation prevented parent click → onOpen).
-    // Sheet uses Radix forceMount, so we assert the dialog data-state = "closed".
+    // Sheet no longer uses Radix forceMount → when closed the dialog may be
+    // unmounted entirely; either unmounted or data-state="closed" is valid.
     const dialog = document.querySelector('[role="dialog"]');
-    expect(dialog?.getAttribute('data-state')).toBe('closed');
+    if (dialog) {
+      expect(dialog.getAttribute('data-state')).toBe('closed');
+    } else {
+      expect(dialog).toBeNull();
+    }
   });
 
   test('(d) clicking card body opens the sheet with the placeholder body', () => {
@@ -114,9 +119,13 @@ describe('LightsCard (Phase 177 — DASH-04)', () => {
 
     render(<LightsCard />);
 
-    // Initial: dialog mounted but closed
+    // Initial: dialog unmounted (Sheet removed forceMount) OR data-state="closed"
     const dialogBefore = document.querySelector('[role="dialog"]');
-    expect(dialogBefore?.getAttribute('data-state')).toBe('closed');
+    if (dialogBefore) {
+      expect(dialogBefore.getAttribute('data-state')).toBe('closed');
+    } else {
+      expect(dialogBefore).toBeNull();
+    }
 
     fireEvent.click(screen.getByTestId('lights-card'));
 

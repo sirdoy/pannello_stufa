@@ -72,6 +72,19 @@ jest.mock('@/app/components/devices/thermostat/BatteryWarning', () => ({
   ModuleBatteryList: () => <div>Battery List</div>,
 }));
 
+// Mock WebSocketContext — useThermostatData now consumes the shared WS manager.
+// CLOSED keeps the hook on its polling/fetch path (matches the test's fetch mocks).
+jest.mock('@/app/context/WebSocketContext', () => ({
+  useWebSocketContext: () => ({
+    subscribe: jest.fn(),
+    unsubscribe: jest.fn(),
+    readyState: 3,
+  }),
+}));
+jest.mock('@/lib/hooks/useWebSocketManager', () => ({
+  ReadyState: { OPEN: 1, CLOSED: 3, CONNECTING: 0, CLOSING: 2, UNINSTANTIATED: -1 },
+}));
+
 describe('NetatmoPage - setState-in-render fix', () => {
   let mockRouter: { replace: jest.Mock; push: jest.Mock };
   let mockSearchParams: { get: jest.Mock };

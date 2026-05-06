@@ -23,11 +23,12 @@ jest.mock('../DevicePrimaryControl', () => ({
   DevicePrimaryControl: () => <div data-testid="mock-primary-control" />,
 }));
 
-// Mock DeviceBody — ships in Plan 08 (Wave 3). Virtual mock since the file does
-// not exist yet at Wave 2 (DeviceCard's import resolves at integration time).
+// Mock DeviceBody — Phase 179 Plan 08 shipped the real file, so this is a
+// regular (non-virtual) mock that isolates DeviceCard from the body
+// dispatcher's per-kind hooks (e.g. LightBody → useLightsData → WS context).
 jest.mock('../DeviceBody', () => ({
   DeviceBody: () => <div data-testid="mock-body" />,
-}), { virtual: true });
+}));
 
 const baseDevice: RoomDevice = {
   kind: 'light',

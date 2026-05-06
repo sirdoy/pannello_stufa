@@ -147,8 +147,13 @@ describe('SonosCard (Phase 177 — DASH-05)', () => {
 
     render(<SonosCard />);
 
+    // Sheet no longer uses forceMount → dialog unmounted when closed.
     const dialogBefore = document.querySelector('[role="dialog"]');
-    expect(dialogBefore?.getAttribute('data-state')).toBe('closed');
+    if (dialogBefore) {
+      expect(dialogBefore.getAttribute('data-state')).toBe('closed');
+    } else {
+      expect(dialogBefore).toBeNull();
+    }
 
     fireEvent.click(screen.getByTestId('sonos-card'));
 

@@ -55,7 +55,8 @@ describe('useDeviceStaleness', () => {
     renderHook(() => useDeviceStaleness('stove'));
 
     await waitFor(() => {
-      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledWith('stove');
+      // Hook now passes optional thresholdMs as 2nd arg (defaults to undefined when omitted).
+      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledWith('stove', undefined);
     });
   });
 
@@ -74,7 +75,7 @@ describe('useDeviceStaleness', () => {
     });
   });
 
-  it('polls every 5 seconds', async () => {
+  it('polls every 60 seconds', async () => {
     const mockStaleness = {
       isStale: false,
       cachedAt: new Date(),
@@ -90,15 +91,15 @@ describe('useDeviceStaleness', () => {
     });
     const initialCalls = jest.mocked(stalenessDetector.getDeviceStaleness).mock.calls.length;
 
-    // Advance 5 seconds
-    jest.advanceTimersByTime(5000);
+    // Advance 60 seconds
+    jest.advanceTimersByTime(60000);
 
     await waitFor(() => {
       expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledTimes(initialCalls + 1);
     });
 
-    // Advance another 5 seconds
-    jest.advanceTimersByTime(5000);
+    // Advance another 60 seconds
+    jest.advanceTimersByTime(60000);
 
     await waitFor(() => {
       expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledTimes(initialCalls + 2);
@@ -120,9 +121,9 @@ describe('useDeviceStaleness', () => {
       expect(result.current?.ageSeconds).toBe(5);
     });
 
-    // Update age and advance timer
+    // Update age and advance timer one poll cycle
     ageSeconds = 10;
-    jest.advanceTimersByTime(5000);
+    jest.advanceTimersByTime(60000);
 
     await waitFor(() => {
       expect(result.current?.ageSeconds).toBe(10);
@@ -130,7 +131,7 @@ describe('useDeviceStaleness', () => {
 
     // Update to stale
     ageSeconds = 60;
-    jest.advanceTimersByTime(5000);
+    jest.advanceTimersByTime(60000);
 
     await waitFor(() => {
       expect(result.current?.ageSeconds).toBe(60);
@@ -177,14 +178,14 @@ describe('useDeviceStaleness', () => {
     );
 
     await waitFor(() => {
-      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledWith('stove');
+      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledWith('stove', undefined);
     });
 
     // Change device ID
     rerender({ deviceId: 'thermostat' });
 
     await waitFor(() => {
-      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledWith('thermostat');
+      expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledWith('thermostat', undefined);
     });
   });
 
@@ -248,8 +249,8 @@ describe('useDeviceStaleness', () => {
 
     const firstCallCount = jest.mocked(stalenessDetector.getDeviceStaleness).mock.calls.length;
 
-    // Should resume interval polling
-    jest.advanceTimersByTime(5000);
+    // Should resume interval polling (60s cadence)
+    jest.advanceTimersByTime(60000);
     await waitFor(() => {
       expect(stalenessDetector.getDeviceStaleness).toHaveBeenCalledTimes(firstCallCount + 1);
     });

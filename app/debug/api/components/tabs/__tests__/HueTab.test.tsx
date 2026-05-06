@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HueTab from '../HueTab';
 
-jest.mock('../ApiTab', () => ({
+jest.mock('../../ApiTab', () => ({
   EndpointCard: () => <div data-testid="endpoint-card" />,
   PostEndpointCard: ({ name, url, params, onExecute }: any) => {
     const defaults = (params ?? []).reduce(

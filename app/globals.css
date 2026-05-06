@@ -402,6 +402,15 @@ body[data-sheet-open="true"] [data-ws-chip="true"] {
   pointer-events: none;
 }
 
+/* Perf-fix (260505-otx) — pause ambient blob keyframes while any Sheet is open.
+   Piggy-backs on body[data-sheet-open="true"] which SheetCounter toggles via
+   incrementSheetCount/decrementSheetCount. Removes per-frame triple-blur re-raster
+   through the Sheet's backdrop layer. See
+   .planning/quick/260505-otx-fix-sheet-open-perf-slowdown/260505-otx-RESEARCH.md §Fix-C. */
+body[data-sheet-open="true"] .ember-ambient-blob {
+  animation-play-state: paused;
+}
+
 /* Reduced-motion guard (UI-SPEC §"Reduced-motion contract") */
 @media (prefers-reduced-motion: reduce) {
   .ember-ambient-blob { animation: none !important; }

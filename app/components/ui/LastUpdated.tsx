@@ -22,7 +22,7 @@ export function LastUpdated({ tsMs, className }: LastUpdatedProps) {
   const relative = useRelativeTime(tsMs);
   if (!relative) return null;
   return (
-    <p className={cn('text-slate-400', className)}>
+    <p className={cn('text-xs text-slate-400', className)}>
       Aggiornato {relative}
     </p>
   );

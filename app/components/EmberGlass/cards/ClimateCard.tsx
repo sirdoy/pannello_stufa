@@ -33,6 +33,7 @@ import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
 import { ClimateSheet } from '../sheets/ClimateSheet';
 import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
+import { useThermostatCommands } from '@/app/components/devices/thermostat/hooks/useThermostatCommands';
 import type { RoomStatus, NetatmoTopology } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 
 const TONE = '#5eafff';
@@ -53,7 +54,15 @@ function resolveRoomName(z: RoomStatus, topology: NetatmoTopology | null): strin
 
 export default function ClimateCard() {
   const [open, setOpen] = useState(false);
-  const { status, topology } = useThermostatData();
+  // Hooks lifted from ClimateSheet body to this card (260506-d45 Fix B): the
+  // sheet was previously calling useThermostatData/useThermostatCommands too,
+  // doubling the WS subscription + adaptive-polling cost on every open.
+  const data = useThermostatData();
+  const cmds = useThermostatCommands({
+    homeId: data.topology?.home_id ?? '',
+    refetch: data.refetch,
+  });
+  const { status, topology } = data;
 
   const allRooms: RoomStatus[] = status?.rooms ?? [];
   const zones = allRooms.slice(0, 4);
@@ -114,7 +123,7 @@ export default function ClimateCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Clima">
-        <ClimateSheet />
+        <ClimateSheet data={data} cmds={cmds} />
       </Sheet>
     </>
   );

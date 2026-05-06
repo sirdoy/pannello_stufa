@@ -17,8 +17,20 @@ import SonosCard from '../SonosCard';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 
 jest.mock('@/app/components/devices/sonos/hooks/useSonosFullData');
-// Mock the real SonosSheet body (Phase 178-09 swap) so the card-level test
-// does not run SonosSheet's hooks (Promise.allSettled batch, debounce, etc.).
+// 260506-d45: useSonosCommands is now called from SonosCard (hook lifted from
+// SonosSheet body); stub it to avoid pulling in ToastProvider / retryable
+// command machinery.
+jest.mock('@/app/components/devices/sonos/hooks/useSonosCommands', () => ({
+  useSonosCommands: () => ({
+    handlePlay: jest.fn(),
+    handlePause: jest.fn(),
+    handleSetVolume: jest.fn(),
+    handleSetZoneVolume: jest.fn(),
+  }),
+}));
+// Mock the real SonosSheet body (Phase 178-09 swap; 260506-d45 props lifted)
+// so the card-level test does not run SonosSheet's hooks. The stub ignores
+// all props.
 jest.mock('../../sheets/SonosSheet', () => ({
   SonosSheet: () => <div data-testid="sonos-sheet" />,
 }));

@@ -2,8 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import { Lightbulb, TriangleAlert } from 'lucide-react';
-import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
-import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
+import {
+  useLightsData,
+  type UseLightsDataReturn,
+} from '@/app/components/devices/lights/hooks/useLightsData';
+import {
+  useLightsCommands,
+  type UseLightsCommandsReturn,
+} from '@/app/components/devices/lights/hooks/useLightsCommands';
 import { InlineToggle } from '../InlineToggle';
 import { QuickActionButton } from './primitives/QuickActionButton';
 import { findSceneByName } from './lib/findSceneByName';
@@ -29,9 +35,14 @@ function slugify(s: string): string {
 }
 
 /**
- * LightsSheet (SHEET-04 / CONTEXT D-07) — body-only component (D-04). Mounted
- * by Phase 177 `<LightsCard>` inside `<Sheet open onClose title="Luci">`. No
- * props; self-fetches via `useLightsData` + `useLightsCommands`.
+ * LightsSheet (SHEET-04 / CONTEXT D-07) — body component mounted by Phase 177
+ * `<LightsCard>` inside `<Sheet open onClose title="Luci">`.
+ *
+ * Presentational — receives lightsData/cmds from parent (per quick task
+ * 260506-d45 perf fix; reverses Phase 178 D-04). LightsCard already mounts
+ * BOTH hooks today; this sheet's second copy was pure waste. The SelfFetch
+ * wrapper below preserves the zero-prop contract for the design-system
+ * gallery (Section10SheetGallery).
  *
  * Visual contract verbatim from bundle
  * `.planning/inbox/ember-glass-design/project/components/sheets.jsx:199-297`.
@@ -70,22 +81,12 @@ function slugify(s: string): string {
  * RC-clean (D-33): no manual memoization hooks. React Compiler 1.0
  * auto-memoizes; inline arrow handlers are explicitly allowed (D-34).
  */
-export function LightsSheet() {
-  const router = useRouter();
-  const lightsData = useLightsData();
-  const cmds = useLightsCommands({
-    lightsData: {
-      setRefreshing: lightsData.setRefreshing,
-      setLoadingMessage: lightsData.setLoadingMessage,
-      setError: lightsData.setError,
-      fetchData: lightsData.fetchData,
-      groups: lightsData.groups,
-      checkConnection: lightsData.checkConnection,
-      connected: lightsData.connected,
-    },
-    router,
-  });
+export interface LightsSheetProps {
+  lightsData: UseLightsDataReturn;
+  cmds: UseLightsCommandsReturn;
+}
 
+export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
   const lights: HueLight[] = lightsData.lights ?? [];
   const groups: HueGroup[] = lightsData.groups ?? [];
   const scenes = lightsData.scenes ?? [];
@@ -393,4 +394,28 @@ export function LightsSheet() {
       })}
     </div>
   );
+}
+
+/**
+ * LightsSheetSelfFetch — zero-prop wrapper preserving the Phase 178 D-04
+ * contract for callers without a card-level mount of useLightsData/useLightsCommands
+ * (notably Section10SheetGallery on /debug/design-system-v2). Production
+ * LightsCard uses the prop-based LightsSheet directly.
+ */
+export function LightsSheetSelfFetch() {
+  const router = useRouter();
+  const lightsData = useLightsData();
+  const cmds = useLightsCommands({
+    lightsData: {
+      setRefreshing: lightsData.setRefreshing,
+      setLoadingMessage: lightsData.setLoadingMessage,
+      setError: lightsData.setError,
+      fetchData: lightsData.fetchData,
+      groups: lightsData.groups,
+      checkConnection: lightsData.checkConnection,
+      connected: lightsData.connected,
+    },
+    router,
+  });
+  return <LightsSheet lightsData={lightsData} cmds={cmds} />;
 }

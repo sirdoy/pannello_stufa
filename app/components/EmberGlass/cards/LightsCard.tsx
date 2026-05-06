@@ -144,7 +144,9 @@ export default function LightsCard() {
         )}
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Luci">
-        <LightsSheet />
+        {/* 260506-d45 Fix B: card already mounts useLightsData + useLightsCommands;
+            pass them down so the sheet body doesn't double-mount. */}
+        <LightsSheet lightsData={lightsData} cmds={cmds} />
       </Sheet>
     </>
   );

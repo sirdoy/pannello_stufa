@@ -18,8 +18,18 @@ const useTuyaDataMock = jest.fn();
 jest.mock('@/app/components/devices/tuya/hooks/useTuyaData', () => ({
   useTuyaData: () => useTuyaDataMock(),
 }));
-// Mock the real PlugsSheet body (Phase 178-09 swap) so the card-level test
-// does not run PlugsSheet's hooks (useTuyaCommands, optimistic toggles).
+// 260506-d45: useTuyaCommands is now called from TuyaCard (hook lifted from
+// PlugsSheet body); stub it to avoid pulling in retryable command machinery.
+jest.mock('@/app/components/devices/tuya/hooks/useTuyaCommands', () => ({
+  useTuyaCommands: () => ({
+    togglePlug: jest.fn(),
+    setTimer: jest.fn(),
+    cancelTimer: jest.fn(),
+  }),
+}));
+// Mock the real PlugsSheet body (Phase 178-09 swap; 260506-d45 props lifted)
+// so the card-level test does not run PlugsSheet's hooks (useTuyaCommands,
+// optimistic toggles). The stub ignores all props.
 jest.mock('../../sheets/PlugsSheet', () => ({
   PlugsSheet: () => <div data-testid="plugs-sheet" />,
 }));

@@ -1,9 +1,19 @@
 // Sheet bodies (Plans 178-04..178-08 implement; this barrel forwards as named exports)
-export { StoveSheet } from './StoveSheet';
-export { ClimateSheet } from './ClimateSheet';
-export { LightsSheet } from './LightsSheet';
-export { SonosSheet } from './SonosSheet';
-export { PlugsSheet } from './PlugsSheet';
+//
+// 260506-d45: each sheet exports BOTH a presentational `*Sheet` (REQUIRED
+// data + cmds props — used by production cards to dedup hook mounts) AND a
+// zero-prop `*SheetSelfFetch` wrapper (used by Section10SheetGallery on
+// /debug/design-system-v2 to preserve the Phase 178 D-04 zero-prop contract).
+export { StoveSheet, StoveSheetSelfFetch } from './StoveSheet';
+export type { StoveSheetProps } from './StoveSheet';
+export { ClimateSheet, ClimateSheetSelfFetch } from './ClimateSheet';
+export type { ClimateSheetProps } from './ClimateSheet';
+export { LightsSheet, LightsSheetSelfFetch } from './LightsSheet';
+export type { LightsSheetProps } from './LightsSheet';
+export { SonosSheet, SonosSheetSelfFetch } from './SonosSheet';
+export type { SonosSheetProps } from './SonosSheet';
+export { PlugsSheet, PlugsSheetSelfFetch } from './PlugsSheet';
+export type { PlugsSheetProps } from './PlugsSheet';
 
 // Sub-primitives (Plan 178-01)
 export { SheetRow } from './primitives/SheetRow';

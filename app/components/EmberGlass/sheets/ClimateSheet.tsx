@@ -1,8 +1,13 @@
 'use client';
 
 /**
- * ClimateSheet (SHEET-03 / CONTEXT D-06 / D-20) — body-only component (D-04). No props;
- * self-fetches via useThermostatData + useThermostatCommands.
+ * ClimateSheet (SHEET-03 / CONTEXT D-06 / D-20) — body component.
+ *
+ * Presentational — receives data/cmds from parent (per quick task 260506-d45
+ * perf fix; reverses Phase 178 D-04). The dashboard ClimateCard already mounts
+ * useThermostatData; this sheet body re-mounting it doubled the WS subscription
+ * + polling cost on every open. The SelfFetch wrapper below preserves the
+ * zero-prop contract for the design-system gallery (Section10SheetGallery).
  *
  * Visual contract verbatim from bundle `sheets.jsx:131-197`. Italian copy frozen (D-20).
  *
@@ -18,8 +23,14 @@
 
 import { useEffect, useState } from 'react';
 import { TriangleAlert } from 'lucide-react';
-import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
-import { useThermostatCommands } from '@/app/components/devices/thermostat/hooks/useThermostatCommands';
+import {
+  useThermostatData,
+  type UseThermostatDataReturn,
+} from '@/app/components/devices/thermostat/hooks/useThermostatData';
+import {
+  useThermostatCommands,
+  type UseThermostatCommandsReturn,
+} from '@/app/components/devices/thermostat/hooks/useThermostatCommands';
 import { useDebounce } from '@/app/hooks/useDebounce';
 import { InlineToggle } from '../InlineToggle';
 import { SheetRow } from './primitives/SheetRow';
@@ -46,16 +57,12 @@ const MODE_PILLS: ReadonlyArray<{
   { label: 'Off', backend: 'hg' },
 ];
 
-export function ClimateSheet() {
-  const data = useThermostatData();
-  const homeId = data.topology?.home_id ?? '';
-  // useThermostatData exposes `refetch` (verified — line ~327). `fetchData` does NOT exist;
-  // `setError` is internal-only and NOT on the return surface. Per checker WARNING 3.
-  const cmds = useThermostatCommands({
-    homeId,
-    refetch: data.refetch,
-  });
+export interface ClimateSheetProps {
+  data: UseThermostatDataReturn;
+  cmds: UseThermostatCommandsReturn;
+}
 
+export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
   // Destructure for stable identity in useEffect deps (checker WARNING 4 — depend on the
   // stable `setRoomSetpoint` reference, NOT the whole `cmds` object). useRetryableCommand
   // returns referentially-stable function handles, so destructuring here is safe.
@@ -321,4 +328,20 @@ export function ClimateSheet() {
       </div>
     </div>
   );
+}
+
+/**
+ * ClimateSheetSelfFetch — zero-prop wrapper preserving the Phase 178 D-04
+ * contract for callers that don't already mount useThermostatData at card
+ * level (notably Section10SheetGallery on /debug/design-system-v2). Production
+ * ClimateCard uses the prop-based ClimateSheet directly to avoid double-mount.
+ */
+export function ClimateSheetSelfFetch() {
+  const data = useThermostatData();
+  const homeId = data.topology?.home_id ?? '';
+  const cmds = useThermostatCommands({
+    homeId,
+    refetch: data.refetch,
+  });
+  return <ClimateSheet data={data} cmds={cmds} />;
 }

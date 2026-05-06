@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { Music, Pause, Play, Power, Volume2, TriangleAlert } from 'lucide-react';
-import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
-import { useSonosCommands } from '@/app/components/devices/sonos/hooks/useSonosCommands';
+import {
+  useSonosFullData,
+  type UseSonosFullDataReturn,
+} from '@/app/components/devices/sonos/hooks/useSonosFullData';
+import {
+  useSonosCommands,
+  type UseSonosCommandsReturn,
+} from '@/app/components/devices/sonos/hooks/useSonosCommands';
 import { useDebounce } from '@/app/hooks/useDebounce';
 import { PlayingBars } from '../PlayingBars';
 
@@ -20,8 +26,12 @@ interface SonosGroup {
 /**
  * SonosSheet (SHEET-05 / CONTEXT D-08 — Plan 178-07).
  *
- * Body-only sheet content (D-04). No props; self-fetches via `useSonosFullData`
- * and dispatches via `useSonosCommands`.
+ * Presentational — receives sonosData/cmds from parent (per quick task
+ * 260506-d45 perf fix; reverses Phase 178 D-04). The dashboard SonosCard already
+ * mounts useSonosFullData; the sheet body re-mounting it on every open
+ * triggered the worst-offender ~20 fan-out fetches (per-zone playback +
+ * per-speaker volumes). The SelfFetch wrapper below preserves the zero-prop
+ * contract for the design-system gallery (Section10SheetGallery).
  *
  * Visual contract verbatim from bundle `sheets.jsx:308-398`. Italian copy frozen
  * (CONTEXT D-22): `Volume · {name}`, `Non in riproduzione`, `Pausa ovunque`,
@@ -45,17 +55,12 @@ interface SonosGroup {
  * (rather than depending on the whole `cmds` object) so referential stability
  * is preserved across renders (checker WARNING 4).
  */
-export function SonosSheet() {
-  const sonosData = useSonosFullData();
+export interface SonosSheetProps {
+  sonosData: UseSonosFullDataReturn;
+  cmds: UseSonosCommandsReturn;
+}
 
-  // Local error sink — useSonosFullData does not expose a `setError` setter, so
-  // we provide one here for command-side failures (matches `app/sonos/page.tsx` pattern).
-  const [, setCommandError] = useState<string | null>(null);
-
-  const cmds = useSonosCommands({
-    fetchData: sonosData.fetchData,
-    setError: setCommandError,
-  });
+export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
   const { handleSetZoneVolume, handlePlay, handlePause } = cmds;
 
   // Field adapter (Pitfall 7): zone.coordinator_uid is FLAT, not nested.
@@ -319,4 +324,22 @@ export function SonosSheet() {
       </button>
     </div>
   );
+}
+
+/**
+ * SonosSheetSelfFetch — zero-prop wrapper preserving the Phase 178 D-04
+ * contract for callers without a card-level mount (notably Section10SheetGallery
+ * on /debug/design-system-v2). Production SonosCard uses the prop-based
+ * SonosSheet directly. The local `setCommandError` sink lives here (not in
+ * the presentational sheet) because `useSonosFullData` exposes no `setError`
+ * setter, so command-side failures need a local useState somewhere.
+ */
+export function SonosSheetSelfFetch() {
+  const sonosData = useSonosFullData();
+  const [, setCommandError] = useState<string | null>(null);
+  const cmds = useSonosCommands({
+    fetchData: sonosData.fetchData,
+    setError: setCommandError,
+  });
+  return <SonosSheet sonosData={sonosData} cmds={cmds} />;
 }

@@ -107,17 +107,20 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
     }
   };
 
-  // Initial fetch
+  // Initial fetch — fetchAllGetEndpoints is stable across renders by intent
+  // (uses only setState setters); listing it as a dep would loop forever.
   useEffect(() => {
     fetchAllGetEndpoints();
-  }, [fetchAllGetEndpoints]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Handle refresh trigger
   useEffect(() => {
     if (refreshTrigger) {
       fetchAllGetEndpoints();
     }
-  }, [refreshTrigger, fetchAllGetEndpoints]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]);
 
   // Auto-refresh
   useEffect(() => {
@@ -125,7 +128,8 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
       const interval = setInterval(fetchAllGetEndpoints, 5000);
       return () => clearInterval(interval);
     }
-  }, [autoRefresh, fetchAllGetEndpoints]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRefresh]);
 
   return (
     <div className="space-y-6">

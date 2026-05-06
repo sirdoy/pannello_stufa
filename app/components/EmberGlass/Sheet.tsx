@@ -90,7 +90,7 @@ export function Sheet({ open, onClose, title, children }: SheetProps): ReactElem
             background: open ? 'rgba(0,0,0,0.5)' : 'transparent', // AUDIT-EXCEPTION (DS-02): bundle sheets.jsx:20
             backdropFilter: open ? 'blur(8px)' : 'none', // AUDIT-EXCEPTION (DS-02): bundle sheets.jsx:21
             WebkitBackdropFilter: open ? 'blur(8px)' : 'none',
-            transition: 'background .3s, backdrop-filter .3s',
+            transition: 'background .3s', // perf-fix (260505-otx): drop backdrop-filter from transition; blur snaps instantly to avoid per-frame re-raster of the layer beneath
             pointerEvents: open ? 'auto' : 'none',
           }}
         />
@@ -117,9 +117,10 @@ export function Sheet({ open, onClose, title, children }: SheetProps): ReactElem
             bottom: 8,
             zIndex: 201,
             borderRadius: 32,
-            background: 'rgba(28, 25, 23, 0.85)', // AUDIT-EXCEPTION (DS-02): bundle sheets.jsx:31
-            backdropFilter: 'blur(40px) saturate(200%)', // AUDIT-EXCEPTION (DS-02): bundle sheets.jsx:32
-            WebkitBackdropFilter: 'blur(40px) saturate(200%)',
+            // perf-fix (260505-otx): container drops backdrop-filter; opaque background mirrors
+            // the @supports fallback (globals.css:340-345). Bundle parity intentionally diverges
+            // — see .planning/quick/260505-otx-fix-sheet-open-perf-slowdown/260505-otx-RESEARCH.md §Fix-A.
+            background: 'rgba(28, 25, 23, 0.92)',
             border: '0.5px solid rgba(255,255,255,0.12)', // AUDIT-EXCEPTION (DS-02): bundle sheets.jsx:34
             boxShadow:
               '0 -20px 60px rgba(0,0,0,0.5), inset 1px 1px 0 rgba(255,255,255,0.08)', // AUDIT-EXCEPTION (DS-02): bundle sheets.jsx:35

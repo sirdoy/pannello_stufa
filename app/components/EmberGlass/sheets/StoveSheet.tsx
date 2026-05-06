@@ -1,11 +1,16 @@
 'use client';
 
 /**
- * StoveSheet (SHEET-02 / CONTEXT D-05) — body-only component (D-04). Mounted
- * by Phase 177 `<StoveCard>` inside `<Sheet open onClose title="Stufa">`.
+ * StoveSheet (SHEET-02 / CONTEXT D-05) — body component mounted by Phase 177
+ * `<StoveCard>` inside `<Sheet open onClose title="Stufa">`.
  *
- * Self-fetches via `useStoveData` + `useStoveCommands` (D-04 — sheet bodies
- * take no props). Visual contract verbatim from bundle
+ * Presentational — receives stoveData/cmds from parent (per quick task
+ * 260506-d45 perf fix; reverses Phase 178 D-04). The dashboard card already
+ * mounts useStoveData; the sheet body re-mounting it doubled the WS subscription
+ * + polling cost on every open. The SelfFetch wrapper below preserves the
+ * zero-prop contract for the design-system gallery (Section10SheetGallery).
+ *
+ * Visual contract verbatim from bundle
  * `.planning/inbox/ember-glass-design/project/components/sheets.jsx:67-130`,
  * MINUS the dropped temperature / target / pellet hero footnote (RESEARCH
  * Pitfall 11 — the live Thermorossi proxy hook exposes only stove_state /
@@ -14,7 +19,9 @@
  *
  * Italian copy is frozen at CONTEXT D-19. Routing uses literal strings
  * `/stove/scheduler` + `/stove/maintenance` per Pitfall 2 (no STOVE_ROUTES
- * key for the scheduler/maintenance UI routes).
+ * key for the scheduler/maintenance UI routes). The card owns useRouter and
+ * threads navigation via the `onNavigate` callback — keeps the prop surface
+ * narrow (no router instance crosses the boundary).
  *
  * Sheet sub-primitives are NOT wrapped in `<Pressable>` (D-24) — they are
  * bare buttons with `data-sheet-focusable="true"` so the global focus-ring
@@ -29,20 +36,32 @@
 import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { AlertTriangle, Calendar, Power, TriangleAlert } from 'lucide-react';
-import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
-import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
+import {
+  useStoveData,
+  type UseStoveDataReturn,
+} from '@/app/components/devices/stove/hooks/useStoveData';
+import {
+  useStoveCommands,
+  type UseStoveCommandsReturn,
+} from '@/app/components/devices/stove/hooks/useStoveCommands';
 import { useVersion } from '@/app/context/VersionContext';
 import { FlameViz } from '../FlameViz';
 import { SheetRow } from './primitives/SheetRow';
 import { Stepper } from './primitives/Stepper';
 import { SheetBtn } from './primitives/SheetBtn';
 
-export function StoveSheet() {
-  const router = useRouter();
-  const { checkVersion } = useVersion();
-  const { user } = useUser();
-  const stoveData = useStoveData({ checkVersion, userId: user?.sub });
+export interface StoveSheetProps {
+  stoveData: UseStoveDataReturn;
+  cmds: UseStoveCommandsReturn;
+  /**
+   * Card-owned navigation callback. The card mounts useRouter() and passes a
+   * narrow `(path) => router.push(path)` shim so the router instance doesn't
+   * cross the prop boundary.
+   */
+  onNavigate: (path: string) => void;
+}
 
+export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
   // Field adapter (RESEARCH §"Field Gaps" — bundle assumed s.temp/s.target/
   // s.pelletPercent; none exist on the live hook). Fallbacks mirror Phase 177
   // StoveCard.tsx:76 — null-coalesce powerLevel/fanLevel to 1.
@@ -50,23 +69,6 @@ export function StoveSheet() {
   const powerLevel = stoveData.powerLevel ?? 1;
   const fanLevel = stoveData.fanLevel ?? 1;
   const needsCleaning = stoveData.needsMaintenance;
-
-  const cmds = useStoveCommands({
-    stoveData: {
-      setLoading: stoveData.setLoading,
-      setLoadingMessage: stoveData.setLoadingMessage,
-      fetchStatusAndUpdate: stoveData.fetchStatusAndUpdate,
-      setSchedulerEnabled: stoveData.setSchedulerEnabled,
-      setSemiManualMode: stoveData.setSemiManualMode,
-      setReturnToAutoAt: stoveData.setReturnToAutoAt,
-      setNextScheduledAction: stoveData.setNextScheduledAction,
-      setCleaningInProgress: stoveData.setCleaningInProgress,
-      fetchMaintenanceStatus: stoveData.fetchMaintenanceStatus,
-      semiManualMode: stoveData.semiManualMode,
-    },
-    router,
-    user,
-  });
 
   // Loading skeleton (D-26) — first-load only, before any cached data lands.
   if (stoveData.initialLoading && stoveData.powerLevel === null) {
@@ -206,12 +208,12 @@ export function StoveSheet() {
         <SheetBtn
           Icon={Calendar}
           label="Orari"
-          onClick={() => router.push('/stove/scheduler')}
+          onClick={() => onNavigate('/stove/scheduler')}
         />
         <SheetBtn
           Icon={AlertTriangle}
           label="Manutenzione"
-          onClick={() => router.push('/stove/maintenance')}
+          onClick={() => onNavigate('/stove/maintenance')}
         />
       </div>
 
@@ -259,5 +261,41 @@ export function StoveSheet() {
             : 'Accendi stufa'}
       </button>
     </div>
+  );
+}
+
+/**
+ * StoveSheetSelfFetch — zero-prop wrapper preserving the Phase 178 D-04 contract
+ * for callers that don't already have a card-level useStoveData mount (notably
+ * Section10SheetGallery on /debug/design-system-v2). Production cards (StoveCard)
+ * use the prop-based StoveSheet directly to avoid double-mounting the hook.
+ */
+export function StoveSheetSelfFetch() {
+  const router = useRouter();
+  const { checkVersion } = useVersion();
+  const { user } = useUser();
+  const stoveData = useStoveData({ checkVersion, userId: user?.sub });
+  const cmds = useStoveCommands({
+    stoveData: {
+      setLoading: stoveData.setLoading,
+      setLoadingMessage: stoveData.setLoadingMessage,
+      fetchStatusAndUpdate: stoveData.fetchStatusAndUpdate,
+      setSchedulerEnabled: stoveData.setSchedulerEnabled,
+      setSemiManualMode: stoveData.setSemiManualMode,
+      setReturnToAutoAt: stoveData.setReturnToAutoAt,
+      setNextScheduledAction: stoveData.setNextScheduledAction,
+      setCleaningInProgress: stoveData.setCleaningInProgress,
+      fetchMaintenanceStatus: stoveData.fetchMaintenanceStatus,
+      semiManualMode: stoveData.semiManualMode,
+    },
+    router,
+    user,
+  });
+  return (
+    <StoveSheet
+      stoveData={stoveData}
+      cmds={cmds}
+      onNavigate={(p) => router.push(p)}
+    />
   );
 }

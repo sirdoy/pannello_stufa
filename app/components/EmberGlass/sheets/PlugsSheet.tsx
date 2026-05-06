@@ -3,9 +3,12 @@
 /**
  * PlugsSheet — Plan 178-08 (SHEET-06 / CONTEXT D-09 / D-23).
  *
- * Body-only component (D-04). No props; self-fetches via `useTuyaData` and
- * delegates writes to `useTuyaCommands().togglePlug`. Mounted from `TuyaCard`
- * inside the Phase 175 `<Sheet>` primitive.
+ * Presentational — receives tuyaData/cmds from parent (per quick task
+ * 260506-d45 perf fix; reverses Phase 178 D-04). The dashboard TuyaCard already
+ * mounts useTuyaData; this sheet body re-mounting it doubled the polling cost
+ * on every open. The SelfFetch wrapper below preserves the zero-prop contract
+ * for the design-system gallery (Section10SheetGallery). Mounted from
+ * `TuyaCard` inside the Phase 175 `<Sheet>` primitive.
  *
  * Visual contract is verbatim from `.planning/inbox/ember-glass-design/project/components/sheets.jsx:400-466`:
  *   - 2-col summary grid (Accese / Consumo, gap 10, marginBottom 18)
@@ -38,8 +41,14 @@
  */
 
 import { Plug, TriangleAlert } from 'lucide-react';
-import { useTuyaData } from '@/app/components/devices/tuya/hooks/useTuyaData';
-import { useTuyaCommands } from '@/app/components/devices/tuya/hooks/useTuyaCommands';
+import {
+  useTuyaData,
+  type UseTuyaDataReturn,
+} from '@/app/components/devices/tuya/hooks/useTuyaData';
+import {
+  useTuyaCommands,
+  type UseTuyaCommandsReturn,
+} from '@/app/components/devices/tuya/hooks/useTuyaCommands';
 import { InlineToggle } from '../InlineToggle';
 
 interface SimplePlug {
@@ -79,10 +88,12 @@ function formatPowerRow(power: number): string {
   return `${power}W`;
 }
 
-export function PlugsSheet() {
-  const tuyaData = useTuyaData();
-  const cmds = useTuyaCommands();
+export interface PlugsSheetProps {
+  tuyaData: UseTuyaDataReturn;
+  cmds: UseTuyaCommandsReturn;
+}
 
+export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
   // Loading skeleton (D-26) — sized to roughly match the final layout.
   if (tuyaData.loading && tuyaData.plugs === null) {
     return (
@@ -309,4 +320,16 @@ export function PlugsSheet() {
       </div>
     </div>
   );
+}
+
+/**
+ * PlugsSheetSelfFetch — zero-prop wrapper preserving the Phase 178 D-04
+ * contract for callers without a card-level mount (notably Section10SheetGallery
+ * on /debug/design-system-v2). Production TuyaCard uses the prop-based
+ * PlugsSheet directly.
+ */
+export function PlugsSheetSelfFetch() {
+  const tuyaData = useTuyaData();
+  const cmds = useTuyaCommands();
+  return <PlugsSheet tuyaData={tuyaData} cmds={cmds} />;
 }

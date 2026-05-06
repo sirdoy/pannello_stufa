@@ -45,22 +45,56 @@ export function Sheet({ open, onClose, title, children }: SheetProps): ReactElem
   // Body scroll-lock + restore — recipe duplicated from app/components/ui/BottomSheet.tsx:50-67.
   // Captured scrollY persists in a ref so the cleanup uses the same value even under
   // React 18 Strict Mode double-mount (Pitfall 5 in 175-RESEARCH.md).
+  //
+  // perf-fix (260506-d45 / 260505-otx-RESEARCH §Fix-D): the body-style writes (and
+  // their cleanup restore) are deferred to the next animation frame so they do NOT
+  // block the slide-in transform's first paint. `position: fixed` + the resulting
+  // reflow used to land synchronously on the open edge, competing with the 400ms
+  // transform for the same composite frame and amplifying the pre-260505-otx
+  // backdrop-filter cost. By scheduling them inside requestAnimationFrame the
+  // transform paints first and the layout cost lands on frame +1.
+  //
+  //   SYNCHRONOUS (must run before the browser repaints — otherwise the body
+  //   becomes `position: fixed` on a later frame and would already see scrollY=0
+  //   because the document jumped to top during the rAF gap):
+  //     - lockedScrollY.current = window.scrollY
+  //     - incrementSheetCount() / decrementSheetCount() — Phase 181 D-10. The
+  //       global sheet-open counter drives the AmbientBg animation-pause CSS
+  //       rule shipped in 260505-otx; deferring it would let AmbientBg keep
+  //       painting one extra frame while the sheet is sliding in.
+  //
+  //   DEFERRED via requestAnimationFrame (style writes only):
+  //     - document.body.style.{position,top,width,overflow}
+  //     - cleanup restore + window.scrollTo(0, lockedScrollY.current)
   const lockedScrollY = useRef<number>(0);
   useEffect(() => {
     if (!open) return;
     lockedScrollY.current = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${lockedScrollY.current}px`;
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
-    incrementSheetCount();        // ← NEW (Phase 181 D-10)
+    incrementSheetCount();        // ← Phase 181 D-10 — synchronous (drives AmbientBg pause)
+    const setRaf = requestAnimationFrame(() => {
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${lockedScrollY.current}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+    });
     return () => {
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      document.body.style.overflow = '';
-      window.scrollTo(0, lockedScrollY.current);
-      decrementSheetCount();      // ← NEW (Phase 181 D-10)
+      cancelAnimationFrame(setRaf);
+      // Restore writes also rAF-deferred so the close transition's slide-out
+      // paints first. window.scrollTo MUST run AFTER the position:'' write,
+      // otherwise the scroll restore happens on a fixed-positioned body and is
+      // a no-op. We don't track the cancel id for restoreRaf because the
+      // cleanup runs once per [open=true → open=false] cycle; a re-open
+      // re-runs the effect and re-captures scrollY, and the restoreRaf write
+      // to '' is idempotent if a new open arrives mid-flight (the next setRaf
+      // will overwrite the cleared values).
+      requestAnimationFrame(() => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        window.scrollTo(0, lockedScrollY.current);
+      });
+      decrementSheetCount();      // ← Phase 181 D-10 — synchronous (symmetric with increment)
     };
   }, [open]);
 

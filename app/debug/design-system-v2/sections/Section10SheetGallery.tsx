@@ -3,8 +3,15 @@
  * Section10SheetGallery — Phase 182 (DSREF-01, DSREF-02; D-13, D-14)
  *
  * 5 launcher pills (one per device) that open the corresponding real *Sheet
- * body component wrapped in the Phase 175 <Sheet>. The *Sheet bodies
- * self-fetch via internal hooks; this gallery does NOT pass any data props.
+ * body component wrapped in the Phase 175 <Sheet>.
+ *
+ * 260506-d45: production cards (StoveCard / ClimateCard / LightsCard /
+ * SonosCard / TuyaCard) now render the prop-based `<*Sheet>` directly to
+ * avoid double-mounting use*Data / use*Commands hooks. This debug gallery
+ * has no card-level mount, so it imports the `*SheetSelfFetch` zero-prop
+ * wrappers — they call the hooks internally and render the prop-based body.
+ * Hook plumbing identical to the pre-260506-d45 path; only the import name
+ * changes.
  *
  * Only one sheet open at a time (D-14): single shared useState<DeviceKey | null>.
  *
@@ -14,11 +21,11 @@ import React, { useState } from 'react';
 import {
   Pressable,
   Sheet,
-  StoveSheet,
-  ClimateSheet,
-  LightsSheet,
-  SonosSheet,
-  PlugsSheet,
+  StoveSheetSelfFetch,
+  ClimateSheetSelfFetch,
+  LightsSheetSelfFetch,
+  SonosSheetSelfFetch,
+  PlugsSheetSelfFetch,
 } from '@/app/components/EmberGlass';
 import { DEVICE_KEYS, DEVICE_LABELS, type DeviceKey } from './sheetFixtures';
 
@@ -69,21 +76,24 @@ export function Section10SheetGallery(): React.ReactElement {
         })}
       </div>
 
-      {/* 5 sheets — each conditionally rendered. *Sheet bodies are zero-prop self-fetching. */}
+      {/* 5 sheets — each conditionally rendered. *SheetSelfFetch wrappers
+          preserve the zero-prop self-fetching contract for the design-system
+          gallery (per quick task 260506-d45 — production cards now use the
+          prop-based *Sheet for hook dedup). */}
       <Sheet open={openSheet === 'stove'} onClose={close} title="Stufa">
-        <StoveSheet />
+        <StoveSheetSelfFetch />
       </Sheet>
       <Sheet open={openSheet === 'climate'} onClose={close} title="Clima">
-        <ClimateSheet />
+        <ClimateSheetSelfFetch />
       </Sheet>
       <Sheet open={openSheet === 'lights'} onClose={close} title="Luci">
-        <LightsSheet />
+        <LightsSheetSelfFetch />
       </Sheet>
       <Sheet open={openSheet === 'sonos'} onClose={close} title="Sonos">
-        <SonosSheet />
+        <SonosSheetSelfFetch />
       </Sheet>
       <Sheet open={openSheet === 'plugs'} onClose={close} title="Prese">
-        <PlugsSheet />
+        <PlugsSheetSelfFetch />
       </Sheet>
     </section>
   );

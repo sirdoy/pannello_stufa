@@ -18,8 +18,21 @@ import { fireEvent, render } from '@testing-library/react';
 jest.mock('@/app/components/devices/thermostat/hooks/useThermostatData', () => ({
   useThermostatData: jest.fn(),
 }));
-// Mock the real ClimateSheet body (Phase 178-09 swap) so the card-level test
-// does not run ClimateSheet's hooks (debounce, useThermostatCommands, etc.).
+// 260506-d45: useThermostatCommands is now called from ClimateCard (hook
+// lifted from ClimateSheet body); stub it to avoid pulling in ToastProvider /
+// retryable command machinery.
+jest.mock('@/app/components/devices/thermostat/hooks/useThermostatCommands', () => ({
+  useThermostatCommands: () => ({
+    setRoomSetpoint: jest.fn(),
+    setHomeMode: jest.fn(),
+    setRoomMode: jest.fn(),
+    netatmoTempCmd: { execute: jest.fn(), isRetrying: false, lastError: null },
+    netatmoModeCmd: { execute: jest.fn(), isRetrying: false, lastError: null },
+  }),
+}));
+// Mock the real ClimateSheet body (Phase 178-09 swap; 260506-d45 props lifted)
+// so the card-level test does not run ClimateSheet's hooks (debounce,
+// useThermostatCommands, etc.). The stub ignores all props.
 jest.mock('../../sheets/ClimateSheet', () => ({
   ClimateSheet: () => <div data-testid="climate-sheet" />,
 }));

@@ -20,7 +20,9 @@
  */
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import { LightsSheet } from '../LightsSheet';
+// 260506-d45: render the SelfFetch zero-prop variant; existing hook mocks
+// continue to intercept the inner useLightsData/useLightsCommands.
+import { LightsSheet, LightsSheetSelfFetch } from '../LightsSheet';
 import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
 
 // --- Router mock --------------------------------------------------------
@@ -127,7 +129,7 @@ beforeEach(() => {
 
 describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
   test('renders summary header + Tutte on/off + 4 scene buttons + 2 room sections + 6 toggles', () => {
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     expect(screen.getByTestId('lights-sheet')).toBeInTheDocument();
     const count = screen.getByTestId('lights-sheet-count');
     expect(count).toHaveTextContent('3');
@@ -150,25 +152,25 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
   });
 
   test('Tutte on click invokes handleAllLightsToggle(true)', () => {
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('quick-action-tutte-on'));
     expect(mockHandleAllLightsToggle).toHaveBeenCalledWith(true);
   });
 
   test('Tutte off click invokes handleAllLightsToggle(false)', () => {
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('quick-action-tutte-off'));
     expect(mockHandleAllLightsToggle).toHaveBeenCalledWith(false);
   });
 
   test('Rilassante scene click invokes handleSceneActivate("s-rilassante", "g1")', () => {
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('lights-sheet-scene-rilassante'));
     expect(mockHandleSceneActivate).toHaveBeenCalledWith('s-rilassante', 'g1');
   });
 
   test('Concentrato scene is disabled when not in catalog (Pitfall: findSceneByName returns null)', () => {
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     const btn = screen.getByTestId('lights-sheet-scene-concentrato');
     expect(btn).toHaveAttribute('data-disabled', 'true');
     expect(btn).toHaveAttribute('title', "Crea scena 'Concentrato' su Hue");
@@ -179,7 +181,7 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
 
   test('all scenes disabled when no Room-type group exists', () => {
     dataOverride = { groups: [] };
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     expect(screen.getByTestId('lights-sheet-scene-rilassante')).toHaveAttribute(
       'data-disabled',
       'true',
@@ -199,7 +201,7 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
   });
 
   test('per-light toggle in "Salotto" invokes handleRoomToggle("g1", false) when group is on', () => {
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     const wrap = screen.getByTestId('lights-sheet-light-plafoniera-toggle');
     const toggle = wrap.querySelector('[role="switch"]') as HTMLElement;
     fireEvent.click(toggle);
@@ -208,7 +210,7 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
   });
 
   test('per-light toggle in "Camera" invokes handleRoomToggle("g2", true) when group is off', () => {
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     const wrap = screen.getByTestId('lights-sheet-light-comodino-toggle');
     const toggle = wrap.querySelector('[role="switch"]') as HTMLElement;
     fireEvent.click(toggle);
@@ -217,7 +219,7 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
   });
 
   test('count card uses yellow tint when onCount > 0', () => {
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     const countCard = screen.getByTestId('lights-sheet-count').parentElement;
     const styleAttr = (countCard?.getAttribute('style') ?? '').replace(/,\s+/g, ',');
     expect(styleAttr).toContain('rgba(245,200,74,0.1)');
@@ -228,7 +230,7 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
       lights: baseData.lights.map((l) => ({ ...l, on: false })),
       groups: baseData.groups.map((g) => ({ ...g, any_on: false, all_on: false })),
     };
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     const countCard = screen.getByTestId('lights-sheet-count').parentElement;
     const styleAttr = (countCard?.getAttribute('style') ?? '').replace(/,\s+/g, ',');
     expect(styleAttr).toContain('rgba(255,255,255,0.04)');
@@ -238,7 +240,7 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
     dataOverride = {
       lights: baseData.lights.map((l) => ({ ...l, on: true })),
     };
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     const tutteOn = screen.getByTestId('quick-action-tutte-on');
     const styleAttr = (tutteOn.getAttribute('style') ?? '').replace(/,\s+/g, ',');
     // QuickActionButton active=true → background rgba(245,200,74,0.18) + color #f5c84a
@@ -249,7 +251,7 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
 
   test('renders skeleton when loading and zero lights/groups', () => {
     dataOverride = { lights: [], groups: [], loading: true };
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     expect(screen.getByTestId('lights-sheet-skeleton')).toBeInTheDocument();
     // root sheet container should NOT render — skeleton-only path
     expect(screen.queryByTestId('lights-sheet')).not.toBeInTheDocument();
@@ -257,9 +259,22 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
 
   test('renders error state when error string set and zero data', () => {
     dataOverride = { lights: [], groups: [], error: 'bridge offline' };
-    render(<LightsSheet />);
+    render(<LightsSheetSelfFetch />);
     expect(screen.getByTestId('lights-sheet-error')).toBeInTheDocument();
     expect(screen.getByText('Non raggiungibile. Riprova più tardi.')).toBeInTheDocument();
     expect(screen.getByText('bridge offline')).toBeInTheDocument();
+  });
+
+  // 260506-d45 — presentational LightsSheet rendered with explicit prop fixtures.
+  test('260506-d45: presentational LightsSheet renders with explicit prop fixtures', () => {
+    const propData = baseData as unknown as Parameters<typeof LightsSheet>[0]['lightsData'];
+    const propCmds = {
+      handleAllLightsToggle: mockHandleAllLightsToggle,
+      handleSceneActivate: mockHandleSceneActivate,
+      handleRoomToggle: mockHandleRoomToggle,
+    } as unknown as Parameters<typeof LightsSheet>[0]['cmds'];
+    render(<LightsSheet lightsData={propData} cmds={propCmds} />);
+    expect(screen.getByTestId('lights-sheet')).toBeInTheDocument();
+    expect(screen.getByTestId('lights-sheet-count')).toHaveTextContent('3');
   });
 });

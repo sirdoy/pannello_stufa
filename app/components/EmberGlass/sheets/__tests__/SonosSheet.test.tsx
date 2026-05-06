@@ -11,7 +11,9 @@
  *  - Empty state hides volume strip when zones is empty.
  */
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { SonosSheet } from '../SonosSheet';
+// 260506-d45: render the SelfFetch zero-prop variant; existing hook mocks
+// continue to intercept the inner useSonosFullData/useSonosCommands.
+import { SonosSheet, SonosSheetSelfFetch } from '../SonosSheet';
 
 const mockHandlePlay = jest.fn().mockResolvedValue(undefined);
 const mockHandlePause = jest.fn().mockResolvedValue(undefined);
@@ -70,7 +72,7 @@ afterEach(() => {
 
 describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
   it('renders root + 2 group rows + volume strip + master action', () => {
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     expect(screen.getByTestId('sonos-sheet')).toBeInTheDocument();
     expect(screen.getByTestId('sonos-sheet-group-0')).toHaveTextContent('Salotto');
     expect(screen.getByTestId('sonos-sheet-group-0')).toHaveTextContent('Track · Artist');
@@ -82,19 +84,19 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
   });
 
   it('renders Volume eyebrow with selected zone name', () => {
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     expect(screen.getByText(/Volume · Salotto/)).toBeInTheDocument();
   });
 
   it('selecting group 1 updates volume eyebrow + readout', () => {
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     fireEvent.click(screen.getByTestId('sonos-sheet-group-1'));
     expect(screen.getByText(/Volume · Camera/)).toBeInTheDocument();
     expect(screen.getByTestId('sonos-sheet-volume-readout')).toHaveTextContent('60');
   });
 
   it('clicking play/pause on group 0 (playing) invokes handlePause and stops propagation', () => {
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     const btn = screen.getByTestId('sonos-sheet-group-0-play-pause');
     fireEvent.click(btn);
     expect(mockHandlePause).toHaveBeenCalledWith('z1');
@@ -102,7 +104,7 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
   });
 
   it('clicking play/pause on group 1 (idle) invokes handlePlay', () => {
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     const btn = screen.getByTestId('sonos-sheet-group-1-play-pause');
     fireEvent.click(btn);
     expect(mockHandlePlay).toHaveBeenCalledWith('z2');
@@ -110,7 +112,7 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
   });
 
   it('volume slider write debounced 250ms before handleSetZoneVolume', () => {
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     const slider = screen.getByTestId('sonos-sheet-volume-slider');
     fireEvent.change(slider, { target: { value: '50' } });
     expect(mockHandleSetZoneVolume).not.toHaveBeenCalled();
@@ -125,7 +127,7 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
   });
 
   it('debounce coalesces multiple rapid volume changes into one write', () => {
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     const slider = screen.getByTestId('sonos-sheet-volume-slider');
     fireEvent.change(slider, { target: { value: '40' } });
     fireEvent.change(slider, { target: { value: '50' } });
@@ -138,7 +140,7 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
   });
 
   it('master action when any playing → Pausa ovunque + iterates handlePause for both groups', async () => {
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     expect(screen.getByTestId('sonos-sheet-master-action')).toHaveTextContent('Pausa ovunque');
     await act(async () => {
       fireEvent.click(screen.getByTestId('sonos-sheet-master-action'));
@@ -160,7 +162,7 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
         },
       } as unknown as Record<string, unknown>,
     };
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     expect(screen.getByTestId('sonos-sheet-master-action')).toHaveTextContent('Riproduci ovunque');
     await act(async () => {
       fireEvent.click(screen.getByTestId('sonos-sheet-master-action'));
@@ -173,7 +175,7 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
 
   it('master action allSettled tolerates partial failure (one rejection does not abort the rest)', async () => {
     mockHandlePause.mockRejectedValueOnce(new Error('network'));
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     await act(async () => {
       fireEvent.click(screen.getByTestId('sonos-sheet-master-action'));
       await Promise.resolve();
@@ -184,7 +186,7 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
 
   it('renders skeleton when loading and no data', () => {
     dataOverride = { data: null as unknown as Record<string, unknown>, loading: true };
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     expect(screen.getByTestId('sonos-sheet-skeleton')).toBeInTheDocument();
   });
 
@@ -192,8 +194,22 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
     dataOverride = {
       data: { zones: [], playback: {}, volumes: {} } as unknown as Record<string, unknown>,
     };
-    render(<SonosSheet />);
+    render(<SonosSheetSelfFetch />);
     expect(screen.queryByTestId('sonos-sheet-volume-slider')).not.toBeInTheDocument();
     expect(screen.getByTestId('sonos-sheet-master-action')).toHaveTextContent('Riproduci ovunque');
+  });
+
+  // 260506-d45 — presentational SonosSheet rendered with explicit prop fixtures.
+  it('260506-d45: presentational SonosSheet renders with explicit prop fixtures', () => {
+    const propData = baseData as unknown as Parameters<typeof SonosSheet>[0]['sonosData'];
+    const propCmds = {
+      handlePlay: mockHandlePlay,
+      handlePause: mockHandlePause,
+      handleSetZoneVolume: mockHandleSetZoneVolume,
+      handleSetVolume: mockHandleSetVolume,
+    } as unknown as Parameters<typeof SonosSheet>[0]['cmds'];
+    render(<SonosSheet sonosData={propData} cmds={propCmds} />);
+    expect(screen.getByTestId('sonos-sheet')).toBeInTheDocument();
+    expect(screen.getByTestId('sonos-sheet-group-0')).toHaveTextContent('Salotto');
   });
 });

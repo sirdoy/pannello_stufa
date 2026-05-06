@@ -30,12 +30,25 @@ import { PlayingBars } from '../PlayingBars';
 import { Sheet } from '../Sheet';
 import { SonosSheet } from '../sheets/SonosSheet';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
+import { useSonosCommands } from '@/app/components/devices/sonos/hooks/useSonosCommands';
 
 const TONE = '#b080ff';
 
 export default function SonosCard() {
   const [open, setOpen] = useState(false);
-  const { data } = useSonosFullData();
+  // Hooks lifted from SonosSheet body to this card (260506-d45 Fix B): the
+  // sheet was the worst offender for double-mount — the per-open re-fetch of
+  // zones + per-zone playback + per-speaker volumes amounted to ~20 redundant
+  // requests on every open.
+  const sonosData = useSonosFullData();
+  const data = sonosData.data;
+  // useSonosFullData exposes no `setError`; provide a local sink for
+  // command-side failures (matches the sheet's previous local-state pattern).
+  const [, setCommandError] = useState<string | null>(null);
+  const cmds = useSonosCommands({
+    fetchData: sonosData.fetchData,
+    setError: setCommandError,
+  });
 
   const allZones = data?.zones ?? [];
   const groups = allZones.map((z) => {
@@ -122,7 +135,7 @@ export default function SonosCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Sonos">
-        <SonosSheet />
+        <SonosSheet sonosData={sonosData} cmds={cmds} />
       </Sheet>
     </>
   );

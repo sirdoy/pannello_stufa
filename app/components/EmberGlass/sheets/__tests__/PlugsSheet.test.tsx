@@ -12,7 +12,9 @@
  */
 
 import { fireEvent, render, screen } from '@testing-library/react';
-import { PlugsSheet } from '../PlugsSheet';
+// 260506-d45: render the SelfFetch zero-prop variant; existing hook mocks
+// continue to intercept the inner useTuyaData/useTuyaCommands.
+import { PlugsSheet, PlugsSheetSelfFetch } from '../PlugsSheet';
 
 // --- Tuya command mock -------------------------------------------------------
 const mockTogglePlug = jest.fn().mockResolvedValue(null);
@@ -63,7 +65,7 @@ beforeEach(() => {
 
 describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
   it('renders summary cards + 4 plug rows', () => {
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     expect(screen.getByTestId('plugs-sheet')).toBeInTheDocument();
     expect(screen.getByTestId('plugs-sheet-count')).toHaveTextContent('2');
     expect(screen.getByTestId('plugs-sheet-count')).toHaveTextContent('/ 4');
@@ -74,7 +76,7 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
   });
 
   it('total power below 1000 renders W suffix without conversion', () => {
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const consumption = screen.getByTestId('plugs-sheet-consumption');
     expect(consumption).toHaveTextContent('750');
     expect(consumption).toHaveTextContent('W');
@@ -87,7 +89,7 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
         { device_id: 'd1', custom_name: 'X', switch_on: true, power_w: 1000 },
       ],
     };
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const consumption = screen.getByTestId('plugs-sheet-consumption');
     expect(consumption).toHaveTextContent('1.00');
     expect(consumption).toHaveTextContent('kW');
@@ -99,14 +101,14 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
         { device_id: 'd1', custom_name: 'X', switch_on: true, power_w: 1500 },
       ],
     };
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const consumption = screen.getByTestId('plugs-sheet-consumption');
     expect(consumption).toHaveTextContent('1.50');
     expect(consumption).toHaveTextContent('kW');
   });
 
   it('per-plug subtitle when on with power = 750 reads 750W (no room prefix)', () => {
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const frigoRow = screen.getByTestId('plugs-sheet-plug-frigo');
     expect(frigoRow).toHaveTextContent('Frigo');
     expect(frigoRow).toHaveTextContent('750W');
@@ -118,13 +120,13 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
         { device_id: 'd1', custom_name: 'Forno', switch_on: true, power_w: 1500 },
       ],
     };
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const row = screen.getByTestId('plugs-sheet-plug-forno');
     expect(row).toHaveTextContent('1.5kW');
   });
 
   it('per-plug subtitle empty when off (no W/kW text)', () => {
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const lavaRow = screen.getByTestId('plugs-sheet-plug-lavatrice');
     expect(lavaRow).toHaveTextContent('Lavatrice');
     expect(lavaRow).not.toHaveTextContent('W');
@@ -132,7 +134,7 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
   });
 
   it('per-plug subtitle empty when on but power is 0', () => {
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const tvRow = screen.getByTestId('plugs-sheet-plug-tv');
     expect(tvRow).toHaveTextContent('TV');
     expect(tvRow).not.toHaveTextContent('W');
@@ -140,7 +142,7 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
   });
 
   it('clicking InlineToggle on Frigo (currently on) invokes togglePlug("d-frigo", true)', () => {
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const toggleWrap = screen.getByTestId('plugs-sheet-plug-frigo-toggle');
     const toggle = toggleWrap.querySelector('[role="switch"]') as HTMLElement;
     expect(toggle).toBeTruthy();
@@ -150,7 +152,7 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
   });
 
   it('clicking InlineToggle on Lavatrice (currently off) invokes togglePlug("d-lava", false)', () => {
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const toggleWrap = screen.getByTestId('plugs-sheet-plug-lavatrice-toggle');
     const toggle = toggleWrap.querySelector('[role="switch"]') as HTMLElement;
     fireEvent.click(toggle);
@@ -163,20 +165,20 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
         { device_id: 'd-anon', custom_name: null, switch_on: false, power_w: 0 },
       ],
     };
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     expect(screen.getByTestId('plugs-sheet-plug-d-anon')).toHaveTextContent('d-anon');
   });
 
   it('renders skeleton when loading and plugs is null', () => {
     dataOverride = { plugs: null, loading: true };
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     expect(screen.getByTestId('plugs-sheet-skeleton')).toBeInTheDocument();
     expect(screen.queryByTestId('plugs-sheet')).not.toBeInTheDocument();
   });
 
   it('renders empty state with 0/0 counts when plugs array is empty', () => {
     dataOverride = { plugs: [] };
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     expect(screen.getByTestId('plugs-sheet-count')).toHaveTextContent('0');
     expect(screen.getByTestId('plugs-sheet-count')).toHaveTextContent('/ 0');
     expect(screen.getByTestId('plugs-sheet-consumption')).toHaveTextContent('0W');
@@ -184,7 +186,7 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
 
   it('renders error state when error string set and plugs is null', () => {
     dataOverride = { plugs: null, error: 'auth expired' };
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     expect(screen.getByTestId('plugs-sheet-error')).toBeInTheDocument();
     expect(
       screen.getByText('Non raggiungibile. Riprova più tardi.'),
@@ -198,7 +200,7 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
         { device_id: 'd-unreach', custom_name: 'Unreach', switch_on: true, power_w: null },
       ],
     };
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     const row = screen.getByTestId('plugs-sheet-plug-unreach');
     expect(row).toHaveTextContent('Unreach');
     // Treated as 0 → on but power=0 → empty subtitle (no "W"/"kW")
@@ -207,8 +209,21 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
   });
 
   it('displays Italian copy "Accese" and "Consumo" eyebrows', () => {
-    render(<PlugsSheet />);
+    render(<PlugsSheetSelfFetch />);
     expect(screen.getByText('Accese')).toBeInTheDocument();
     expect(screen.getByText('Consumo')).toBeInTheDocument();
+  });
+
+  // 260506-d45 — presentational PlugsSheet rendered with explicit prop fixtures.
+  it('260506-d45: presentational PlugsSheet renders with explicit prop fixtures', () => {
+    const propData = baseData as unknown as Parameters<typeof PlugsSheet>[0]['tuyaData'];
+    const propCmds = {
+      togglePlug: mockTogglePlug,
+      setTimer: jest.fn(),
+      cancelTimer: jest.fn(),
+    } as unknown as Parameters<typeof PlugsSheet>[0]['cmds'];
+    render(<PlugsSheet tuyaData={propData} cmds={propCmds} />);
+    expect(screen.getByTestId('plugs-sheet')).toBeInTheDocument();
+    expect(screen.getByTestId('plugs-sheet-count')).toHaveTextContent('2');
   });
 });

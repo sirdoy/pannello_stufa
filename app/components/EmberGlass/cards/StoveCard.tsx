@@ -25,6 +25,7 @@
 
 import { useState } from 'react';
 import { Flame } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useUser } from '@auth0/nextjs-auth0/client';
 import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
@@ -33,13 +34,35 @@ import { FlameViz } from '../FlameViz';
 import { Sheet } from '../Sheet';
 import { StoveSheet } from '../sheets/StoveSheet';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
+import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
 import { useVersion } from '@/app/context/VersionContext';
 
 export default function StoveCard() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const { checkVersion } = useVersion();
   const { user } = useUser();
+  // Hook lifted from StoveSheet body to this card (260506-d45 Fix B): the
+  // sheet was previously calling useStoveData/useStoveCommands too, doubling
+  // the WS subscription + adaptive-polling cost on every open. Now the card
+  // owns the single mount and threads the live data into the sheet via props.
   const stove = useStoveData({ checkVersion, userId: user?.sub });
+  const cmds = useStoveCommands({
+    stoveData: {
+      setLoading: stove.setLoading,
+      setLoadingMessage: stove.setLoadingMessage,
+      fetchStatusAndUpdate: stove.fetchStatusAndUpdate,
+      setSchedulerEnabled: stove.setSchedulerEnabled,
+      setSemiManualMode: stove.setSemiManualMode,
+      setReturnToAutoAt: stove.setReturnToAutoAt,
+      setNextScheduledAction: stove.setNextScheduledAction,
+      setCleaningInProgress: stove.setCleaningInProgress,
+      fetchMaintenanceStatus: stove.fetchMaintenanceStatus,
+      semiManualMode: stove.semiManualMode,
+    },
+    router,
+    user,
+  });
 
   // D-25: stale → amber StatusDot. `staleness` is StalenessInfo | null.
   const isStale = stove.staleness?.isStale ?? false;
@@ -97,7 +120,11 @@ export default function StoveCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Stufa">
-        <StoveSheet />
+        <StoveSheet
+          stoveData={stove}
+          cmds={cmds}
+          onNavigate={(p) => router.push(p)}
+        />
       </Sheet>
     </>
   );

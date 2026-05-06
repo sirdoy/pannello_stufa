@@ -26,6 +26,7 @@ import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
 import { PlugsSheet } from '../sheets/PlugsSheet';
 import { useTuyaData } from '@/app/components/devices/tuya/hooks/useTuyaData';
+import { useTuyaCommands } from '@/app/components/devices/tuya/hooks/useTuyaCommands';
 
 const TONE = '#ffb84a';
 
@@ -35,8 +36,12 @@ function formatPower(w: number): string {
 
 export default function TuyaCard() {
   const [open, setOpen] = useState(false);
-  const { plugs } = useTuyaData();
-  const list = plugs ?? [];
+  // Hooks lifted from PlugsSheet body to this card (260506-d45 Fix B): the
+  // sheet was previously calling useTuyaData/useTuyaCommands too, doubling
+  // the polling cost on every open.
+  const tuyaData = useTuyaData();
+  const cmds = useTuyaCommands();
+  const list = tuyaData.plugs ?? [];
   const visible = list.slice(0, 4);
   const onCount = list.filter((p) => p.switch_on === true).length;
   const totalPower = list.reduce((s, p) => s + (p.power_w ?? 0), 0);
@@ -92,7 +97,7 @@ export default function TuyaCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Prese smart">
-        <PlugsSheet />
+        <PlugsSheet tuyaData={tuyaData} cmds={cmds} />
       </Sheet>
     </>
   );

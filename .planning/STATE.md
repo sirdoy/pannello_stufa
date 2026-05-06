@@ -121,10 +121,11 @@ None.
 | 260505-nf1 | Aggiorna gli skeleton nella home che rispecchino il nuovo design | 2026-05-05 | cbbd2af1 | [260505-nf1-aggiorna-gli-skeleton-nella-home-che-ris](./quick/260505-nf1-aggiorna-gli-skeleton-nella-home-che-ris/) |
 | 260505-o8n | Home WS-primary coverage — suppress Raspi REST polling + migrate Sonos home card to WS (sonos / sonos_transport / sonos_volume); camera/weather still need server-side topics | 2026-05-05 | 34299f63 | [260505-o8n-home-ws-raspi-fix](./quick/260505-o8n-home-ws-raspi-fix/) |
 | 260505-otx | Fix Sheet open perf slowdown — drop animated backdrop-filter on Sheet, pause AmbientBg keyframes while sheet open | 2026-05-05 | 919eb98b | [260505-otx-fix-sheet-open-perf-slowdown](./quick/260505-otx-fix-sheet-open-perf-slowdown/) |
+| 260506-d45 | Sheet perf follow-up — Fix B (lift use*Data + use*Commands hooks from 5 sheet bodies to parent cards via SelfFetch wrapper pattern) + Fix D (rAF-defer scroll-lock body-style writes) | 2026-05-06 | b567b4fd | [260506-d45-fix-sheet-hook-double-mount-and-raf-body](./quick/260506-d45-fix-sheet-hook-double-mount-and-raf-body/) |
 
 ## Session Continuity
 
-Last activity: 2026-05-05 — Completed quick task 260505-otx: Fix Sheet open perf slowdown
+Last activity: 2026-05-06 — Completed quick task 260506-d45: Sheet perf Fix B + Fix D
 Stopped at: v20.0 milestone closed
 Resume file: None
 

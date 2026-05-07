@@ -16,23 +16,40 @@
 
 import { useState } from 'react';
 import { Wifi } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
-import { SheetPlaceholderBody } from './SheetPlaceholderBody';
+import { NetworkSheet } from '../sheets/NetworkSheet';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 
 const TONE = '#5eafff';
 
+// Format Mbps for display: <10 → 1 decimal, ≥10 → integer
+function fmtMbps(v: number): string {
+  if (!Number.isFinite(v)) return '—';
+  return v < 10 ? v.toFixed(1) : Math.round(v).toString();
+}
+
 export default function NetworkCard() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   const network = useNetworkData();
-  const down = network.bandwidth?.download ?? 0;
-  const up = network.bandwidth?.upload ?? 0;
+  const hasBandwidth = network.bandwidth !== null;
+  const hasWan = network.wan !== null;
+  const hasDevices = network.devices && network.devices.length > 0;
+  // Unreachable when nothing has loaded — proxy 503 / WAN-down / no cache yet
+  const isUnreachable = !hasBandwidth && !hasWan && !hasDevices;
+  const down = network.bandwidth?.download;
+  const up = network.bandwidth?.upload;
   const deviceCount = network.devices?.length ?? 0;
-  const wanOk = network.wan?.connected !== false;
-  const dotColor = wanOk ? '#6aa86a' : '#ffb84a';
+  const wanConnected = network.wan?.connected === true;
+  const dotColor = isUnreachable
+    ? '#ff4d5c' // red — proxy unreachable
+    : !wanConnected
+      ? '#ffb84a' // amber — WAN down / stale
+      : '#6aa86a'; // green — healthy
 
   return (
     <>
@@ -62,17 +79,22 @@ export default function NetworkCard() {
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {down}
+              {down !== undefined ? fmtMbps(down) : '—'}
             </div>
             <div style={{ fontSize: 11, color: 'var(--text-2)' }}>Mbps ↓</div>
           </div>
           <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-2)' }}>
-            {up} Mbps ↑ · {deviceCount} dispositivi
+            {isUnreachable
+              ? 'Non raggiungibile'
+              : `${up !== undefined ? fmtMbps(up) : '—'} Mbps ↑ · ${deviceCount} dispositivi`}
           </div>
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Rete">
-        <SheetPlaceholderBody phase="178" device="network" />
+        <NetworkSheet
+          networkData={network}
+          onNavigate={(p) => router.push(p)}
+        />
       </Sheet>
     </>
   );

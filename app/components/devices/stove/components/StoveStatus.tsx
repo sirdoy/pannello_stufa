@@ -81,7 +81,8 @@ export default function StoveStatus({
               </span>
             </div>
 
-            {/* Two Info Boxes */}
+            {/* Two Info Boxes — hidden when stove is off */}
+            {status !== 'off' && (
             <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
               {/* Fan Level Box */}
               <div className={`relative overflow-hidden rounded-2xl ${statusInfo.boxBgColor} border border-white/10`}>
@@ -119,6 +120,7 @@ export default function StoveStatus({
                 </div>
               </div>
             </div>
+            )}
           </div>
         </div>
 

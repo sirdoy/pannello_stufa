@@ -38,6 +38,10 @@ export function Stepper({ value, min, max, onChange }: StepperProps) {
           background: 'rgba(255,255,255,0.1)', // AUDIT-EXCEPTION (sheets.jsx:488)
           color: '#fff', // AUDIT-EXCEPTION
           cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 0,
         }}
       >
         <Minus size={14} strokeWidth={2.5} />
@@ -69,6 +73,10 @@ export function Stepper({ value, min, max, onChange }: StepperProps) {
           background: 'rgba(255,255,255,0.1)', // AUDIT-EXCEPTION (sheets.jsx:495)
           color: '#fff',
           cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 0,
         }}
       >
         <Plus size={14} strokeWidth={2.5} />

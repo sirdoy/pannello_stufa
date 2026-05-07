@@ -112,7 +112,7 @@ export default function StoveCard() {
               zIndex: 1,
             }}
           >
-            {stove.powerLevel ?? '—'}
+            {stove.isAccesa ? (stove.powerLevel ?? '—') : '—'}
           </div>
           <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-2)' }}>
             {stove.isAccesa ? `Fiamma ${stove.powerLevel} · Ventola ${stove.fanLevel}` : 'Spenta'}

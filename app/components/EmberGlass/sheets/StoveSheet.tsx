@@ -165,34 +165,38 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
         </div>
       </div>
 
-      {/* Livello fiamma row — Stepper wraps onChange to fit handlePowerChange's
-          synthetic-event signature. */}
-      <div data-testid="stove-sheet-power-stepper">
-        <SheetRow label="Livello fiamma" value={`${powerLevel}/5`}>
-          <Stepper
-            value={powerLevel}
-            min={1}
-            max={5}
-            onChange={(v) =>
-              void cmds.handlePowerChange({ target: { value: String(v) } })
-            }
-          />
-        </SheetRow>
-      </div>
+      {/* Livello fiamma + Ventola — stacked on mobile, 2-col on desktop (sm+).
+          Hidden when stove is off (no point showing levels for an off stove). */}
+      {isAccesa && (
+      <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-5">
+        {/* Stepper wraps onChange to fit handlePowerChange's synthetic-event signature. */}
+        <div data-testid="stove-sheet-power-stepper">
+          <SheetRow label="Livello fiamma" value={`${powerLevel}/5`}>
+            <Stepper
+              value={powerLevel}
+              min={1}
+              max={5}
+              onChange={(v) =>
+                void cmds.handlePowerChange({ target: { value: String(v) } })
+              }
+            />
+          </SheetRow>
+        </div>
 
-      {/* Ventola row */}
-      <div data-testid="stove-sheet-fan-stepper">
-        <SheetRow label="Ventola" value={`${fanLevel}/5`}>
-          <Stepper
-            value={fanLevel}
-            min={1}
-            max={5}
-            onChange={(v) =>
-              void cmds.handleFanChange({ target: { value: String(v) } })
-            }
-          />
-        </SheetRow>
+        <div data-testid="stove-sheet-fan-stepper">
+          <SheetRow label="Ventola" value={`${fanLevel}/5`}>
+            <Stepper
+              value={fanLevel}
+              min={1}
+              max={5}
+              onChange={(v) =>
+                void cmds.handleFanChange({ target: { value: String(v) } })
+              }
+            />
+          </SheetRow>
+        </div>
       </div>
+      )}
 
       {/* 2-col SheetBtn grid — Pitfall 2: literal route strings, not
           STOVE_ROUTES.* (the constants object exposes API-route keys, not the

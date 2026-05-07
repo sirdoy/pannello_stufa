@@ -14,6 +14,8 @@ export { SonosSheet, SonosSheetSelfFetch } from './SonosSheet';
 export type { SonosSheetProps } from './SonosSheet';
 export { PlugsSheet, PlugsSheetSelfFetch } from './PlugsSheet';
 export type { PlugsSheetProps } from './PlugsSheet';
+export { NetworkSheet, NetworkSheetSelfFetch } from './NetworkSheet';
+export type { NetworkSheetProps } from './NetworkSheet';
 
 // Sub-primitives (Plan 178-01)
 export { SheetRow } from './primitives/SheetRow';

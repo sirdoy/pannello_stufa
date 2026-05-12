@@ -35,62 +35,73 @@ export function RadialDial({ value, min, max, onChange, color, label }: RadialDi
         position: 'relative',
       }}
     >
-      <svg width={size} height={size} style={{ transform: 'rotate(135deg)' }}>
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke="rgba(255,255,255,0.08)" /* AUDIT-EXCEPTION (sheets.jsx:549) */
-          strokeWidth={10}
-          strokeLinecap="round"
-          strokeDasharray={`${arcLen} ${circ}`}
-        />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke={color}
-          strokeWidth={10}
-          strokeLinecap="round"
-          strokeDasharray={`${arcLen * pct} ${circ}`}
-          style={{ filter: `drop-shadow(0 0 12px ${color})`, transition: 'stroke-dasharray .3s' }}
-        />
-      </svg>
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      {/* Dial wrapper: size × size, positioning context for the overlay so the
+          value sits at the SVG's geometric centre regardless of the outer
+          column's width. */}
+      <div style={{ position: 'relative', width: size, height: size }}>
+        <svg width={size} height={size} style={{ transform: 'rotate(135deg)' }}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke="rgba(255,255,255,0.08)" /* AUDIT-EXCEPTION (sheets.jsx:549) */
+            strokeWidth={10}
+            strokeLinecap="round"
+            strokeDasharray={`${arcLen} ${circ}`}
+          />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth={10}
+            strokeLinecap="round"
+            strokeDasharray={`${arcLen * pct} ${circ}`}
+            style={{ filter: `drop-shadow(0 0 12px ${color})`, transition: 'stroke-dasharray .3s' }}
+          />
+        </svg>
         <div
-          data-testid="radial-dial-value"
           style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 68,
-            fontWeight: 600,
-            color: '#fff', // AUDIT-EXCEPTION (sheets.jsx:560)
-            lineHeight: 1,
-            letterSpacing: -3,
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          {value}
-          <span style={{ fontSize: 28, opacity: 0.5 }}>°</span>
+          <div
+            data-testid="radial-dial-value"
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 68,
+              fontWeight: 600,
+              color: '#fff', // AUDIT-EXCEPTION (sheets.jsx:560)
+              lineHeight: 1,
+              letterSpacing: -3,
+            }}
+          >
+            {value}
+            <span style={{ fontSize: 28, opacity: 0.5 }}>°</span>
+          </div>
         </div>
-        <div
-          data-testid="radial-dial-label"
-          style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 4 }}
-        >
-          {label}
-        </div>
+      </div>
+      {/* Label moved OUT of the SVG-overlay so it can't collide with the dial
+          arc / digit. Sits between the arc and the +/- button row. */}
+      <div
+        data-testid="radial-dial-label"
+        style={{
+          fontSize: 12,
+          color: 'var(--text-2)',
+          marginTop: 10,
+          textAlign: 'center',
+          padding: '0 8px',
+          lineHeight: 1.3,
+        }}
+      >
+        {label}
       </div>
       <div style={{ display: 'flex', gap: 12, marginTop: 14 }}>
         <button
@@ -107,6 +118,10 @@ export function RadialDial({ value, min, max, onChange, color, label }: RadialDi
             background: 'rgba(255,255,255,0.08)', // AUDIT-EXCEPTION (sheets.jsx:567)
             color: '#fff',
             cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0,
           }}
         >
           <Minus size={18} strokeWidth={2.2} />
@@ -125,6 +140,10 @@ export function RadialDial({ value, min, max, onChange, color, label }: RadialDi
             background: 'rgba(255,255,255,0.08)', // AUDIT-EXCEPTION (sheets.jsx:572)
             color: '#fff',
             cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 0,
           }}
         >
           <Plus size={18} strokeWidth={2.2} />

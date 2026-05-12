@@ -52,6 +52,24 @@ function resolveRoomName(z: RoomStatus, topology: NetatmoTopology | null): strin
   return z.room_id;
 }
 
+/**
+ * "Active" signal: room currently controls/calls the boiler.
+ *   - heating_power_request > 0  → actively firing (strongest signal)
+ *   - room hosts central thermostat hardware (NATherm1 or NAPlug relay)
+ *     → "primary controller" room. NRV-only rooms are zone valves and stay
+ *     inactive unless they're actively heating.
+ *
+ * Note: HTTP /homestatus strips therm_setpoint_mode, so we cannot use mode
+ * here. WS-only data would expose mode but the rule above is more robust.
+ */
+function isRoomActive(r: RoomStatus, topology: NetatmoTopology | null): boolean {
+  if (r.heating) return true;
+  const mods = (topology?.modules ?? []) as Array<{ room_id?: string; type?: string }>;
+  return mods.some(
+    (m) => m.room_id === r.room_id && (m.type === 'NATherm1' || m.type === 'NAPlug'),
+  );
+}
+
 export default function ClimateCard() {
   const [open, setOpen] = useState(false);
   // Hooks lifted from ClimateSheet body to this card (260506-d45 Fix B): the
@@ -65,10 +83,18 @@ export default function ClimateCard() {
   const { status, topology } = data;
 
   const allRooms: RoomStatus[] = status?.rooms ?? [];
-  const zones = allRooms.slice(0, 4);
-  const activeCount = allRooms.filter((r) => r.heating).length;
+  // Pin "Ovunque" (central thermostat) first; preserve order for the rest.
+  const sortedRooms = [...allRooms].sort((a, b) => {
+    const aOvunque = resolveRoomName(a, topology) === 'Ovunque' ? 0 : 1;
+    const bOvunque = resolveRoomName(b, topology) === 'Ovunque' ? 0 : 1;
+    return aOvunque - bOvunque;
+  });
+  const zones = sortedRooms.slice(0, 4);
+  const activeCount = allRooms.filter((r) => isRoomActive(r, topology)).length;
   const totalCount = allRooms.length;
   const mode = (status?.mode ?? '').toUpperCase();
+  // Heat tone for active dots — ember/red instead of card TONE blue
+  const HEAT_TONE = '#ff6676';
 
   const right = (
     <div
@@ -87,7 +113,7 @@ export default function ClimateCard() {
   return (
     <>
       <GlassCard tone={TONE} onOpen={() => setOpen(true)} data-testid="climate-card">
-        <CardHead Icon={Thermometer} label="Clima" tone={TONE} right={right} />
+        <CardHead Icon={Thermometer} label="Temperature" tone={TONE} right={right} />
         <div
           style={{
             display: 'flex',
@@ -102,7 +128,7 @@ export default function ClimateCard() {
               key={z.room_id}
               style={{ display: 'flex', alignItems: 'center', gap: 6 }}
             >
-              <StatusDot on={Boolean(z.heating)} color={TONE} />
+              <StatusDot on={isRoomActive(z, topology)} color={HEAT_TONE} />
               <div style={{ flex: 1, fontSize: 11, fontWeight: 500, color: '#fff' }}>
                 {resolveRoomName(z, topology)}
               </div>
@@ -122,7 +148,7 @@ export default function ClimateCard() {
           {activeCount} di {totalCount} attive
         </div>
       </GlassCard>
-      <Sheet open={open} onClose={() => setOpen(false)} title="Clima">
+      <Sheet open={open} onClose={() => setOpen(false)} title="Temperature">
         <ClimateSheet data={data} cmds={cmds} />
       </Sheet>
     </>

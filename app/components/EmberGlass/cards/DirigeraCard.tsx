@@ -1,74 +1,65 @@
 'use client';
 
 /**
- * DirigeraCard — Phase 177 (DASH-10 sibling).
+ * DirigeraCard — IKEA DIRIGERA sensors summary.
  *
- * Bundle source: .planning/inbox/ember-glass-design/project/components/cards.jsx:385-432
- * (same shape as TuyaCard, label "IKEA").
+ * Surfaces the contact + occupancy sensors from the DIRIGERA proxy. The earlier
+ * placeholder was hardcoded to an empty plug list (A-02 LANDMINE #2) — replaced
+ * here with real data from useDirigeraFullData('all') since plug data still
+ * isn't exposed by the proxy but sensors ARE.
  *
- * A-02 / RESEARCH LANDMINE #2:
- *   useDirigeraData() exposes sensors (contact + motion) only, NOT plugs.
- *   Per A-02 default (c), this card renders an empty list with `0W` total power
- *   and `0 di 0 accese` footer until a future phase adds plug data to the
- *   DIRIGERA proxy. The hook is still consumed here for forward-compatibility —
- *   when plug data lands, the empty array below can be replaced without re-wiring.
- *
- * Per DASH-10, dashboard surface is REPORT-ONLY (no toggles); plug controls
- * land in PlugsSheet (Phase 178).
- *
- * RC-clean — no manual memoization hooks (D-28 — React Compiler discipline).
+ * RC-clean — no manual memoization hooks.
  */
 
 import { useState } from 'react';
-import { Plug } from 'lucide-react';
+import { Boxes } from 'lucide-react';
 import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
+import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
-import { SheetPlaceholderBody } from './SheetPlaceholderBody';
-import { useDirigeraData } from '@/app/components/devices/dirigera/hooks/useDirigeraData';
+import { DirigeraSheet } from '../sheets/DirigeraSheet';
+import { useDirigeraFullData } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
+import type { DirigeraSensor } from '@/types/dirigeraProxy';
 
 const TONE = '#ffb84a';
 
-interface DirigeraPlug {
-  id: string;
-  name: string;
-  on: boolean;
-  power: number;
-}
-
-function formatPower(w: number): string {
-  return w >= 1000 ? `${(w / 1000).toFixed(1)}kW` : `${w}W`;
+/**
+ * Active = open contact sensor OR detected motion. The proxy types `is_open`
+ * for contact + we read `is_detected` defensively (motion sensors include it
+ * in payload but it's not on the DirigeraSensor interface).
+ */
+function isSensorActive(s: DirigeraSensor): boolean {
+  if (s.type === 'openCloseSensor') return s.is_open === true;
+  const detected = (s as { is_detected?: boolean }).is_detected;
+  return detected === true;
 }
 
 export default function DirigeraCard() {
   const [open, setOpen] = useState(false);
-
-  // A-02 LANDMINE #2: useDirigeraData() returns sensors only.
-  // Hook consumed for forward-compatibility — when plug data lands,
-  // replace the empty array below with the real list.
-  useDirigeraData();
-  const list: DirigeraPlug[] = [];
-  const onCount = 0;
-  const totalPower = 0;
+  const { data } = useDirigeraFullData('all');
+  const sensors = data?.sensors ?? [];
+  const visibleSensors = sensors.slice(0, 4);
+  const activeCount = sensors.filter(isSensorActive).length;
+  const totalCount = sensors.length;
 
   const right = (
     <div
       style={{
         fontSize: 11,
         fontWeight: 600,
-        color: TONE,
+        color: activeCount > 0 ? TONE : 'var(--text-2)',
         letterSpacing: 0.3,
         fontVariantNumeric: 'tabular-nums',
       }}
     >
-      {formatPower(totalPower)}
+      {activeCount > 0 ? `${activeCount} aperti` : 'OK'}
     </div>
   );
 
   return (
     <>
       <GlassCard tone={TONE} onOpen={() => setOpen(true)} data-testid="dirigera-card">
-        <CardHead Icon={Plug} label="IKEA" tone={TONE} right={right} />
+        <CardHead Icon={Boxes} label="IKEA" tone={TONE} right={right} />
         <div
           style={{
             display: 'flex',
@@ -78,14 +69,56 @@ export default function DirigeraCard() {
             justifyContent: 'center',
           }}
         >
-          {/* Empty by design per A-02. */}
+          {visibleSensors.length === 0 && (
+            <div style={{ fontSize: 11, color: 'var(--text-2)' }}>
+              {data === null ? 'Caricamento…' : 'Nessun sensore'}
+            </div>
+          )}
+          {visibleSensors.map((s) => (
+            <div
+              key={s.id}
+              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              <StatusDot on={isSensorActive(s)} color={TONE} />
+              <div
+                style={{
+                  flex: 1,
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: '#fff',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {s.custom_name}
+              </div>
+              <div
+                style={{
+                  fontSize: 10,
+                  color: 'var(--text-2)',
+                  flexShrink: 0,
+                }}
+              >
+                {s.type === 'openCloseSensor'
+                  ? s.is_open
+                    ? 'Aperto'
+                    : 'Chiuso'
+                  : isSensorActive(s)
+                    ? 'Movimento'
+                    : 'Fermo'}
+              </div>
+            </div>
+          ))}
         </div>
         <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-2)' }}>
-          {onCount} di {list.length} accese
+          {totalCount === 0
+            ? '—'
+            : `${activeCount} attivi di ${totalCount} sensori`}
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="IKEA">
-        <SheetPlaceholderBody phase="178" device="plugs-dirigera" />
+        <DirigeraSheet sensors={sensors} loading={data === null} />
       </Sheet>
     </>
   );

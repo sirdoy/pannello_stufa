@@ -26,7 +26,18 @@ export default function WeatherCard() {
   const hasData = !loading && temp !== null;
 
   const right = (
-    <div style={{ fontSize: 11, color: 'var(--text-2)' }}>{city ?? ''}</div>
+    <div
+      style={{
+        fontSize: 11,
+        color: 'var(--text-2)',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        maxWidth: 110,
+      }}
+    >
+      {city ?? ''}
+    </div>
   );
 
   return (

@@ -24,11 +24,14 @@ export interface CardHeadProps {
 
 export function CardHead({ Icon, label, tone, right }: CardHeadProps) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, minHeight: 32 }}>
       <div
         style={{
           width: 32,
           height: 32,
+          minWidth: 32,
+          minHeight: 32,
+          flexShrink: 0,
           borderRadius: 10,
           background: `color-mix(in oklab, ${tone} 22%, transparent)`,
           color: tone,
@@ -47,6 +50,10 @@ export function CardHead({ Icon, label, tone, right }: CardHeadProps) {
           color: 'var(--text-2)',
           letterSpacing: 0.2,
           flex: 1,
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
         }}
       >
         {label}

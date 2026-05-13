@@ -242,8 +242,14 @@ export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
       >
         {plugs.map((p, i) => {
           const isLast = i === plugs.length - 1;
-          // Pitfall 8 — drop room segment. Subtitle is power-only when on, empty when off.
-          const subtitle = p.on && p.power > 0 ? formatPowerRow(p.power) : '';
+          // Subtitle: explicit on/off state + power when drawing current.
+          // (Previous version dropped the label entirely when power=0, leaving
+          //  no visible "Accesa" cue on standby plugs.)
+          const subtitle = p.on
+            ? p.power > 0
+              ? `Accesa · ${formatPowerRow(p.power)}`
+              : 'Accesa'
+            : 'Spenta';
           const slug = slugify(p.name);
           return (
             <div
@@ -296,7 +302,8 @@ export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
                   data-testid={`plugs-sheet-plug-${slug}-subtitle`}
                   style={{
                     fontSize: 11,
-                    color: 'var(--text-2)',
+                    color: p.on ? '#ffb84a' : 'var(--text-2)',
+                    fontWeight: p.on ? 600 : 400,
                     marginTop: 2,
                   }}
                 >
@@ -304,13 +311,25 @@ export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
                 </div>
               </div>
 
-              {/* Toggle — Tuya orange (#ffb84a). Pitfall 10: no retry wrapper. */}
+              {/* Toggle — Tuya orange (#ffb84a). Optimistic update + refetch
+                  so the UI reflects the new state immediately and converges to
+                  the proxy's confirmed value on the next HTTP tick. */}
               <div data-testid={`plugs-sheet-plug-${slug}-toggle`}>
                 <InlineToggle
                   on={p.on}
                   color="#ffb84a"
                   onChange={() => {
-                    void cmds.togglePlug(p.id, p.on);
+                    const next = !p.on;
+                    tuyaData.setPlugOptimistic(p.id, next);
+                    void (async () => {
+                      const result = await cmds.togglePlug(p.id, p.on);
+                      if (!result) {
+                        // Command failed — revert the optimistic flip
+                        tuyaData.setPlugOptimistic(p.id, p.on);
+                      }
+                      // Reconcile with proxy state either way
+                      void tuyaData.refetch();
+                    })();
                   }}
                 />
               </div>

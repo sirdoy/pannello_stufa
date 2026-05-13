@@ -14,6 +14,10 @@ export interface UseTuyaDataReturn {
   error: string | null;
   stale: boolean;
   lastUpdatedAt: number | null;
+  /** Force an immediate HTTP refresh — used by command handlers after a mutation. */
+  refetch: () => Promise<void>;
+  /** Optimistic local override of a single plug's switch_on state. */
+  setPlugOptimistic: (deviceId: string, on: boolean) => void;
 }
 
 export function useTuyaData(): UseTuyaDataReturn {
@@ -96,5 +100,33 @@ export function useTuyaData(): UseTuyaDataReturn {
     initialDelay: 600,
   });
 
-  return { plugs, loading, error, stale, lastUpdatedAt };
+  // Bootstrap HTTP fetch on mount regardless of WS state. Without this, when
+  // WS is already OPEN at mount the useAdaptivePolling `immediate` step is
+  // skipped (interval=null) and the card stays empty until the WS proxy
+  // emits a 'tuya' message — which it may never do if the topic is idle.
+  useEffect(() => {
+    void fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const setPlugOptimistic = (deviceId: string, on: boolean) => {
+    setPlugs((prev) => {
+      if (!prev) return prev;
+      const next = prev.map((p) =>
+        p.device_id === deviceId ? { ...p, switch_on: on } : p,
+      );
+      plugsRef.current = next;
+      return next;
+    });
+  };
+
+  return {
+    plugs,
+    loading,
+    error,
+    stale,
+    lastUpdatedAt,
+    refetch: fetchData,
+    setPlugOptimistic,
+  };
 }

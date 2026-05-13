@@ -73,24 +73,40 @@ export default function TuyaCard() {
             justifyContent: 'center',
           }}
         >
-          {visible.map((p) => (
-            <div
-              key={p.device_id}
-              style={{ display: 'flex', alignItems: 'center', gap: 6 }}
-            >
-              <StatusDot on={p.switch_on === true} color={TONE} />
+          {visible.map((p) => {
+            const on = p.switch_on === true;
+            return (
               <div
-                style={{
-                  flex: 1,
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: '#fff',
-                }}
+                key={p.device_id}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
               >
-                {p.custom_name ?? p.device_id}
+                <StatusDot on={on} color={TONE} />
+                <div
+                  style={{
+                    flex: 1,
+                    fontSize: 11,
+                    fontWeight: 500,
+                    color: on ? '#fff' : 'var(--text-2)',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {p.custom_name ?? p.device_id}
+                </div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: on ? TONE : 'var(--text-2)',
+                    flexShrink: 0,
+                  }}
+                >
+                  {on ? 'ON' : 'OFF'}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-2)' }}>
           {onCount} di {list.length} accese

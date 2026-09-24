@@ -15,8 +15,13 @@ test.describe('DS-03 — accent picker (live --accent + localStorage)', () => {
     await page.goto('/debug/design-system-v2');
     await expect(page.getByRole('heading', { level: 1, name: /Ember Glass/i })).toBeVisible({ timeout: 10000 });
 
-    // Click Rose
-    await page.getByRole('button', { name: /Set accent to Rose/i }).click();
+    // Click Rose. The SSR heading is visible before hydration, so a click can land
+    // before React attaches handlers (next dev): retry until the swatch is pressed.
+    const rose = page.getByRole('button', { name: /Set accent to Rose/i });
+    await expect(async () => {
+      await rose.click();
+      await expect(rose).toHaveAttribute('aria-pressed', 'true', { timeout: 1000 });
+    }).toPass({ timeout: 15000 });
 
     // Assert --accent on documentElement
     const accent = await page.evaluate(() =>

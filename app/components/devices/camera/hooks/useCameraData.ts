@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import type { CameraStatus, DataFreshness } from '@/types/netatmoProxy';
+import type { NetatmoData } from '@/types/websocket';
 
 export interface UseCameraDataReturn {
   cameras: CameraStatus[];
@@ -33,6 +36,12 @@ export function useCameraData(): UseCameraDataReturn {
 
   const isVisible = useVisibility();
   const interval = isVisible ? 60000 : 300000;
+
+  // WS primary channel — Netatmo topic now carries a `cameras` array per
+  // docs/api/websocket.md (since 260513-dlo). HTTP /camera/status is the
+  // fallback when WS isn't connected.
+  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const isWsConnected = readyState === ReadyState.OPEN;
 
   const fetchCameras = useCallback(async (): Promise<void> => {
     try {
@@ -83,13 +92,62 @@ export function useCameraData(): UseCameraDataReturn {
     }
   }, []);
 
+  // WS subscription — extracts the cameras array from the netatmo topic payload.
+  // The WS NetatmoCamera shape is a superset of CameraStatus (adds vpn_url,
+  // proxy_streams, etc.) — we read the CameraStatus-compatible subset here so
+  // the card/sheet keep their existing field contract.
+  useEffect(() => {
+    if (!isWsConnected) return;
+    const handleMessage = (raw: unknown) => {
+      const data = raw as NetatmoData;
+      const wsCameras = data['cameras'];
+      if (!Array.isArray(wsCameras)) return;
+      const mapped: CameraStatus[] = wsCameras.map((c) => {
+        const cam = c as Record<string, unknown>;
+        return {
+          camera_id: String(cam['camera_id'] ?? ''),
+          name: (cam['name'] as string | null) ?? null,
+          device_type: (cam['device_type'] as string | null) ?? null,
+          status: (cam['status'] as string | null) ?? null,
+          sd_status: (cam['sd_status'] as string | null) ?? null,
+          alim_status: (cam['alim_status'] as string | null) ?? null,
+          firmware: (cam['firmware'] as string | null) ?? null,
+          is_local: (cam['is_local'] as boolean | null) ?? null,
+        };
+      });
+      dataRef.current = mapped;
+      setCameras(mapped);
+      setDataFreshness(data.data_freshness ?? null);
+      setConnected(true);
+      setStale(data.data_freshness !== 'LIVE');
+      setLoading(false);
+      setError(null);
+      setLastUpdatedAt(Date.now());
+    };
+    subscribe('netatmo', handleMessage);
+    return () => {
+      unsubscribe('netatmo', handleMessage);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isWsConnected, subscribe, unsubscribe]);
+
   useAdaptivePolling({
     callback: fetchCameras,
-    interval,
+    // Suppress HTTP polling when WS is live (same pattern as other device hooks).
+    interval: isWsConnected ? null : interval,
     alwaysActive: false,
     immediate: true,
     initialDelay: 400,
   });
+
+  // Bootstrap HTTP fetch on mount regardless of WS state — useAdaptivePolling
+  // skips its `immediate` step when interval=null, so without this the card
+  // could stay empty until the first WS netatmo push (which may not include
+  // cameras if the proxy hasn't refreshed homedata yet).
+  useEffect(() => {
+    void fetchCameras();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return { cameras, loading, error, connected, stale, dataFreshness, lastUpdatedAt, refresh: fetchCameras };
 }

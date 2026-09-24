@@ -49,7 +49,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     window.scrollTo = originalScrollTo;
   });
 
-  test('(a) renders <img> with /api/camera/snapshot/{id}?t={lastUpdatedAt}', () => {
+  test('(a) renders <img> with /api/v1/netatmo/camera/{id}/snapshot?t={lastUpdatedAt}', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -62,7 +62,23 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     const img = container.querySelector('img');
 
     expect(img).not.toBeNull();
-    expect(img?.getAttribute('src')).toBe('/api/camera/snapshot/cam1?t=1700000000');
+    expect(img?.getAttribute('src')).toBe('/api/v1/netatmo/camera/cam1/snapshot?t=1700000000');
+  });
+
+  test('(a2) falls back to the placeholder when the snapshot fails to load', () => {
+    mockedUseCameraData.mockReturnValue(
+      buildReturn({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera' } as any],
+        lastUpdatedAt: 1700000000,
+      })
+    );
+
+    const { container, getByTestId } = render(<CameraCard />);
+    fireEvent.error(container.querySelector('img')!);
+
+    expect(container.querySelector('img')).toBeNull();
+    expect(getByTestId('camera-snapshot-fallback')).toBeInTheDocument();
   });
 
   test('(b) renders mono label "{name} · {resolution}"', () => {

@@ -659,27 +659,6 @@ export default function NotificationsSettingsPage() {
         </div>
       </Card>
 
-      {/* Debug Logs Link */}
-      <Card variant="glass" className="p-4 sm:p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="text-xl flex-shrink-0">🔍</div>
-            <div className="min-w-0">
-              <Text>Debug Logs</Text>
-              <Text variant="tertiary" size="sm">
-                Visualizza log diagnostici per troubleshooting
-              </Text>
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => (window.location.href = '/debug/logs')}
-          >
-            Apri
-          </Button>
-        </div>
-      </Card>
     </SettingsLayout>
   );
 }

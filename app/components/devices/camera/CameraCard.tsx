@@ -11,6 +11,7 @@ import { getCameraTypeName } from '@/lib/netatmo/netatmoCameraApi';
 import HlsPlayer from './HlsPlayer';
 import { useCameraData } from './hooks/useCameraData';
 import { useCameraMonitoringToggle } from './hooks/useCameraMonitoringToggle';
+import { pickStreamUrl } from '@/lib/netatmo/cameraStreamUrl';
 
 /**
  * Build a snapshot URL for a camera, optionally appending a cache-busting
@@ -83,11 +84,10 @@ export default function CameraCard() {
         setStreamError(true);
         return;
       }
-      const data = await response.json() as { vpn_streams?: { high: string }; is_local?: boolean; local_streams?: { high: string } };
-      if (data.is_local && data.local_streams?.high) {
-        setStreamUrl(data.local_streams.high);
-      } else if (data.vpn_streams?.high) {
-        setStreamUrl(data.vpn_streams.high);
+      const data = await response.json() as Parameters<typeof pickStreamUrl>[0];
+      const url = pickStreamUrl(data, window.location.protocol === 'https:');
+      if (url) {
+        setStreamUrl(url);
       } else {
         // Proxy responded OK but no stream URL available
         setStreamError(true);

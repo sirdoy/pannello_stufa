@@ -10,7 +10,6 @@
  * - Weather: Weather forecast API
  * - Firebase: Database health and config endpoints
  * - Scheduler: Cron and automation endpoints
- * - Log: Firebase debug logs
  * - Notifiche: Notifications dashboard
  * - Network: Fritz!Box Network Monitor API
  *
@@ -27,7 +26,7 @@ import Text from '@/app/components/ui/Text';
 import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import PageLayout from '@/app/components/ui/PageLayout';
-import { Flame, Thermometer, Lightbulb, Cloud, Database, Clock, FileText, Bell, Palette, RefreshCw, Wifi, Network } from 'lucide-react';
+import { Flame, Thermometer, Lightbulb, Cloud, Database, Clock, Bell, Palette, RefreshCw, Wifi, Network } from 'lucide-react';
 
 // API Tab Components
 import StoveTab from '@/app/debug/components/tabs/StoveTab';
@@ -38,136 +37,6 @@ import FirebaseTab from '@/app/debug/components/tabs/FirebaseTab';
 import SchedulerTab from '@/app/debug/components/tabs/SchedulerTab';
 import NetworkTab from '@/app/debug/components/tabs/NetworkTab';
 import FritzboxServiceDiscoveryTab from '@/app/debug/components/tabs/FritzboxServiceDiscoveryTab';
-
-// ============================================================================
-// LOG CONTENT - Debug Logs
-// ============================================================================
-interface LogEntry {
-  id?: string;
-  message: string;
-  timestamp: number;
-  data?: Record<string, any>;
-}
-
-type LogCategory = 'notifications' | 'fcm' | 'general';
-
-function LogContent() {
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
-  const [category, setCategory] = useState<LogCategory>('notifications');
-  const [total, setTotal] = useState<number>(0);
-
-  const fetchLogs = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/debug/log?category=${category}&limit=100`);
-      const data = await res.json();
-      if (data.success) {
-        setLogs(data.logs);
-        setTotal(data.total);
-      }
-    } catch (err) {
-      console.error('Error fetching logs:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchLogs();
-  }, [category]);
-
-  useEffect(() => {
-    if (autoRefresh) {
-      const interval = setInterval(fetchLogs, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [autoRefresh, category]);
-
-  const formatTime = (timestamp: number): string => {
-    const date = new Date(timestamp);
-    return date.toLocaleString('it-IT', {
-      day: '2-digit',
-      month: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  };
-
-  return (
-    <div className="space-y-6 mt-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex gap-2">
-          {(['notifications', 'fcm', 'general'] as const).map((cat) => (
-            <Button
-              key={cat}
-              variant={category === cat ? 'ember' : 'outline'}
-              size="sm"
-              onClick={() => setCategory(cat)}
-            >
-              {cat}
-            </Button>
-          ))}
-        </div>
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={fetchLogs} disabled={loading}>
-            {loading ? '...' : '🔄'} Refresh
-          </Button>
-          <Button
-            variant={autoRefresh ? 'success' : 'outline'}
-            onClick={() => setAutoRefresh(!autoRefresh)}
-          >
-            {autoRefresh ? '⏸️ Stop' : '▶️ Auto'} (5s)
-          </Button>
-        </div>
-      </div>
-
-      <Text variant="tertiary" size="sm">
-        {total} log totali per categoria &quot;{category}&quot;
-      </Text>
-
-      <div className="space-y-3 max-h-[500px] overflow-y-auto">
-        {logs.length === 0 ? (
-          <Card className="p-6 bg-slate-800/50 text-center">
-            <Text variant="tertiary">Nessun log trovato</Text>
-          </Card>
-        ) : (
-          logs.map((log, index) => (
-            <Card
-              key={log.id || index}
-              className={`p-4 ${
-                log.message.includes('Errore')
-                  ? 'border-l-4 border-l-ember-500 bg-ember-500/10'
-                  : log.message.includes('successo')
-                  ? 'border-l-4 border-l-sage-500 bg-sage-500/10'
-                  : 'bg-slate-800/50'
-              }`}
-            >
-              <div className="flex justify-between items-start mb-2">
-                <Text size="sm">{log.message}</Text>
-                <Text variant="tertiary" size="xs" className="whitespace-nowrap ml-4">
-                  {formatTime(log.timestamp)}
-                </Text>
-              </div>
-              {log.data && Object.keys(log.data).length > 0 && (
-                <details className="mt-2">
-                  <summary className="cursor-pointer text-xs text-ocean-400 hover:text-ocean-300">
-                    Mostra dati ({Object.keys(log.data).length} campi)
-                  </summary>
-                  <pre className="mt-2 p-3 bg-slate-900 rounded text-xs text-sage-400 font-mono overflow-auto max-h-64">
-                    {JSON.stringify(log.data, null, 2)}
-                  </pre>
-                </details>
-              )}
-            </Card>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ============================================================================
 // NOTIFICHE CONTENT - Notifications Dashboard
@@ -307,7 +176,7 @@ function DebugPageContent() {
     const handleKeyDown = (e: KeyboardEvent): void => {
       // Tab shortcuts (1-9)
       if (e.key >= '1' && e.key <= '9' && !e.metaKey && !e.ctrlKey) {
-        const tabs = ['stufa', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler', 'log', 'notifiche', 'network'];
+        const tabs = ['stufa', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler', 'notifiche', 'network'];
         const index = parseInt(e.key) - 1;
         if (tabs[index]) {
           e.preventDefault();
@@ -393,7 +262,6 @@ function DebugPageContent() {
               <Tabs.Trigger value="weather" icon={<Cloud size={18} />}>Weather</Tabs.Trigger>
               <Tabs.Trigger value="firebase" icon={<Database size={18} />}>Firebase</Tabs.Trigger>
               <Tabs.Trigger value="scheduler" icon={<Clock size={18} />}>Scheduler</Tabs.Trigger>
-              <Tabs.Trigger value="log" icon={<FileText size={18} />}>Log</Tabs.Trigger>
               <Tabs.Trigger value="notifiche" icon={<Bell size={18} />}>Notifiche</Tabs.Trigger>
               <Tabs.Trigger value="network" icon={<Wifi size={18} />}>Network</Tabs.Trigger>
               <Tabs.Trigger value="service-discovery" icon={<Network size={18} />}>Service Discovery</Tabs.Trigger>
@@ -429,7 +297,6 @@ function DebugPageContent() {
                 <SchedulerTab autoRefresh={autoRefresh} refreshTrigger={refreshTrigger} />
               </div>
             </Tabs.Content>
-            <Tabs.Content value="log"><LogContent /></Tabs.Content>
             <Tabs.Content value="notifiche"><NotificheContent /></Tabs.Content>
             <Tabs.Content value="network">
               <div className="mt-6">

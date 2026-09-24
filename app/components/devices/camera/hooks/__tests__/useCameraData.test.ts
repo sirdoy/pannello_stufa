@@ -5,16 +5,31 @@
  * stale state, and useAdaptivePolling configuration.
  */
 
-import { renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import type { CameraStatus, DataFreshness } from '@/types/netatmoProxy';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useAdaptivePolling');
 jest.mock('@/lib/hooks/useVisibility');
+jest.mock('@/app/context/WebSocketContext');
+jest.mock('@/lib/hooks/useWebSocketManager', () => ({
+  ReadyState: { OPEN: 1, CLOSED: 3, CONNECTING: 0, CLOSING: 2, UNINSTANTIATED: -1 },
+}));
 
 // Import mocked modules
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+
+const mockSubscribe = jest.fn();
+const mockUnsubscribe = jest.fn();
+function setWsReadyState(readyState: number) {
+  (useWebSocketContext as jest.Mock).mockReturnValue({
+    subscribe: mockSubscribe,
+    unsubscribe: mockUnsubscribe,
+    readyState,
+  });
+}
 
 const mockUseVisibility = useVisibility as jest.MockedFunction<typeof useVisibility>;
 const mockUseAdaptivePolling = useAdaptivePolling as jest.MockedFunction<typeof useAdaptivePolling>;
@@ -56,6 +71,7 @@ describe('useCameraData', () => {
     global.fetch = jest.fn();
 
     mockUseVisibility.mockReturnValue(true);
+    setWsReadyState(3); // WS closed by default → HTTP polling path
 
     let pollingStarted = false;
     mockUseAdaptivePolling.mockImplementation(({ callback, immediate }) => {
@@ -154,5 +170,35 @@ describe('useCameraData', () => {
         initialDelay: 400,
       }),
     );
+  });
+
+  it('Test 6: WS netatmo payload updates cameras (current backend shape: {rooms, cameras, data_freshness})', async () => {
+    setWsReadyState(1);
+    (global.fetch as jest.Mock).mockImplementation(() => makeSuccessResponse());
+
+    const { result } = renderHook(() => useCameraData());
+    const handler = mockSubscribe.mock.calls.find((c) => c[0] === 'netatmo')?.[1] as (raw: unknown) => void;
+    expect(handler).toBeDefined();
+
+    act(() => {
+      handler({
+        rooms: [],
+        cameras: [{ camera_id: 'cam-9', name: 'Giardino', status: 'on', is_local: false, proxy_streams: {} }],
+        data_freshness: 'LIVE',
+      });
+    });
+
+    await waitFor(() => expect(result.current.cameras[0]?.camera_id).toBe('cam-9'));
+    expect(result.current.cameras[0]?.name).toBe('Giardino');
+    expect(result.current.stale).toBe(false);
+  });
+
+  it('Test 7: suppresses HTTP polling while WS is open', () => {
+    setWsReadyState(1);
+    (global.fetch as jest.Mock).mockImplementation(() => makeSuccessResponse());
+
+    renderHook(() => useCameraData());
+
+    expect(mockUseAdaptivePolling).toHaveBeenCalledWith(expect.objectContaining({ interval: null }));
   });
 });

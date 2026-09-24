@@ -268,6 +268,25 @@ export async function getProxyHomeData(): Promise<NetatmoHomedataResponse> {
  * @throws ApiError when env vars are missing or on network/timeout errors
  */
 export async function getProxyCameraEventSnapshot(eventId: string): Promise<Response> {
+  return haFetchRaw(`/api/v1/netatmo/camera/events/${encodeURIComponent(eventId)}/snapshot`);
+}
+
+/**
+ * Fetch a live camera resource through the HA proxy, as a raw Response for streaming:
+ * - `snapshot.jpg`                → JPEG bytes (browser-safe live snapshot)
+ * - `{quality}/index.m3u8`        → HLS playlist (segment URIs already rewritten by the
+ *                                   backend to /api/v1/netatmo/camera/{id}/live/{q}/seg/...)
+ * - `{quality}/seg/{rest}`        → HLS segment or sub-playlist
+ * Calls GET /api/v1/netatmo/camera/{cameraId}/live/{subpath}.
+ *
+ * @throws ApiError when env vars are missing or on network/timeout errors
+ */
+export async function getProxyCameraLive(cameraId: string, subpath: string): Promise<Response> {
+  return haFetchRaw(`/api/v1/netatmo/camera/${encodeURIComponent(cameraId)}/live/${subpath}`);
+}
+
+/** Raw GET against the HA proxy (X-API-Key, 15 s timeout) — for binary/streamed bodies. */
+async function haFetchRaw(path: string): Promise<Response> {
   const baseUrl = process.env.HA_API_URL;
   const apiKey = process.env.HA_API_KEY;
 
@@ -284,7 +303,7 @@ export async function getProxyCameraEventSnapshot(eventId: string): Promise<Resp
   const timeoutId = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
 
   try {
-    const response = await fetch(`${baseUrl}/api/v1/netatmo/camera/events/${eventId}/snapshot`, {
+    const response = await fetch(`${baseUrl}${path}`, {
       headers: { 'X-API-Key': apiKey },
       signal: controller.signal,
     });

@@ -22,6 +22,7 @@ import { getCameraTypeName, getEventTypeName, getEventIcon } from '@/lib/netatmo
 import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 import type { CameraStatus, CameraEvent, DataFreshness } from '@/types/netatmoProxy';
+import { pickStreamUrl } from '@/lib/netatmo/cameraStreamUrl';
 
 export default function CameraDashboard() {
   const router = useRouter();
@@ -119,11 +120,10 @@ export default function CameraDashboard() {
         setStreamError(true);
         return;
       }
-      const data = await response.json() as { vpn_streams?: { high: string }; is_local?: boolean; local_streams?: { high: string } };
-      if (data.is_local && data.local_streams?.high) {
-        setStreamUrl(data.local_streams.high);
-      } else if (data.vpn_streams?.high) {
-        setStreamUrl(data.vpn_streams.high);
+      const data = await response.json() as Parameters<typeof pickStreamUrl>[0];
+      const url = pickStreamUrl(data, window.location.protocol === 'https:');
+      if (url) {
+        setStreamUrl(url);
       } else {
         // Proxy responded OK but no stream URL available
         setStreamError(true);

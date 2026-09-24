@@ -12,7 +12,7 @@
 
 /**
  * Source provider discriminator on aggregated Device items.
- * Mirrors the WebSocket Topic union in types/websocket.ts (same 8-provider set).
+ * Mirrors the 8 provider topics of the WebSocket Topic union in types/websocket.ts.
  */
 export type ProviderType =
   | 'fritzbox'

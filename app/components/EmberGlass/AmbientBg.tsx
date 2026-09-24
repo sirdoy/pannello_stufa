@@ -32,6 +32,17 @@ export default function AmbientBg(): React.ReactElement | null {
       setOn(Boolean(detail));
     };
     window.addEventListener('ember-glass-ambient-change', handler);
+    // React 19 resets <html> attributes it doesn't own when hydrating the root
+    // singleton, wiping the data-ambient set by the pre-paint script: restore it
+    // and notify through the same event the picker uses.
+    try {
+      if (localStorage.getItem('ember-glass-ambient') === 'true') {
+        document.documentElement.dataset.ambient = 'on';
+        window.dispatchEvent(new CustomEvent<boolean>('ember-glass-ambient-change', { detail: true }));
+      }
+    } catch {
+      /* localStorage unavailable — keep the default (off). */
+    }
     return () => {
       window.removeEventListener('ember-glass-ambient-change', handler);
     };

@@ -5,7 +5,7 @@
  * haGet is mocked — no network calls, no JWT, no env var setup required.
  */
 
-import { fritzboxClient } from '../fritzboxClient';
+import { fritzboxClient, SERVICE_DISCOVERY_TIMEOUT_MS } from '../fritzboxClient';
 import { haGet } from '@/lib/haClient';
 
 jest.mock('@/lib/haClient', () => ({
@@ -270,6 +270,31 @@ describe('fritzboxClient', () => {
     afterEach(() => {
       global.fetch = originalFetch;
       process.env = { ...originalEnv };
+    });
+
+    it('waits past the 15s haClient default before aborting (cold TR-064 walk)', async () => {
+      jest.useFakeTimers();
+      try {
+        let signal: AbortSignal | undefined;
+        global.fetch = jest.fn((_url: string, init?: RequestInit) => {
+          signal = init?.signal ?? undefined;
+          return new Promise((_resolve, reject) => {
+            signal?.addEventListener('abort', () => reject(new Error('aborted')));
+          });
+        }) as unknown as typeof fetch;
+
+        const pending = fritzboxClient.getServiceDiscovery();
+        const settled = pending.catch((e: Error) => e);
+
+        jest.advanceTimersByTime(20_000);
+        expect(signal?.aborted).toBe(false);
+
+        jest.advanceTimersByTime(SERVICE_DISCOVERY_TIMEOUT_MS);
+        expect(signal?.aborted).toBe(true);
+        await expect(settled).resolves.toBeInstanceOf(Error);
+      } finally {
+        jest.useRealTimers();
+      }
     });
 
     it('normalizes the backend services dict into [{ name, type, url }]', async () => {

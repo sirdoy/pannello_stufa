@@ -77,7 +77,7 @@ describe('AltroPage', () => {
     );
     expect(screen.getByRole('link', { name: /^registro$/i })).toHaveAttribute(
       'href',
-      '/registry'
+      '/registry/types'
     );
     expect(screen.getByRole('link', { name: /^changelog$/i })).toHaveAttribute(
       'href',
@@ -87,6 +87,26 @@ describe('AltroPage', () => {
       'href',
       '/auth/logout'
     );
+  });
+
+  test('3b: every internal link points to an existing app page (no 404 rows)', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fs = require('fs') as typeof import('fs');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const path = require('path') as typeof import('path');
+    render(<AltroPage />);
+    await screen.findByRole('link', { name: /^esci$/i });
+    const hrefs = screen
+      .getAllByRole('link')
+      .map((a) => a.getAttribute('href') ?? '')
+      .filter((h) => h.startsWith('/') && !h.startsWith('/auth/'));
+    expect(hrefs.length).toBeGreaterThan(0);
+    const appDir = path.join(process.cwd(), 'app');
+    const missing = hrefs.filter((h) => {
+      const candidates = [path.join(appDir, h, 'page.tsx'), path.join(appDir, '(pages)', h, 'page.tsx')];
+      return !candidates.some((c) => fs.existsSync(c));
+    });
+    expect(missing).toEqual([]);
   });
 
   test('4: deferred settings routes are NOT rendered (UI-SPEC OQ-2)', async () => {

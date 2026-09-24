@@ -142,7 +142,7 @@ export function AltroPage(): React.ReactElement {
             style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}
           >
             <AltroRow icon={ScrollText} label="Log" href="/log" />
-            <AltroRow icon={Boxes} label="Registro" href="/registry" />
+            <AltroRow icon={Boxes} label="Registro" href="/registry/types" />
             <AltroRow icon={History} label="Changelog" href="/changelog" />
           </div>
         </GlassCard>

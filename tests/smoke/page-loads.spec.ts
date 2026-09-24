@@ -155,36 +155,25 @@ test.describe('Page Loads', () => {
       ).toHaveLength(0);
     });
 
-    // Active-nav assertion: /registry/types lights Registro, NOT API Keys.
-    // Opens the hamburger menu so nav items are in the DOM/visible.
-    test('active nav: /registry/types lights Registro but not API Keys', async ({
-      page,
-    }) => {
-      await page.goto('/registry/types');
-      await page.waitForLoadState('domcontentloaded');
-      // Open hamburger menu to expose global nav links.
-      await page.getByRole('button', { name: /apri menu/i }).click();
-      await expect(
-        page.locator('a[href="/registry/types"][aria-current="page"]')
-      ).toBeVisible();
-      await expect(
-        page.locator('a[href="/settings/api-keys"][aria-current="page"]')
-      ).toHaveCount(0);
-    });
-
-    test('active nav: /settings/api-keys lights API Keys but not Registro', async ({
-      page,
-    }) => {
-      await page.goto('/settings/api-keys');
-      await page.waitForLoadState('domcontentloaded');
-      await page.getByRole('button', { name: /apri menu/i }).click();
-      await expect(
-        page.locator('a[href="/settings/api-keys"][aria-current="page"]')
-      ).toBeVisible();
-      await expect(
-        page.locator('a[href="/registry/types"][aria-current="page"]')
-      ).toHaveCount(0);
-    });
+    // Navigation to secondary pages goes through /altro (Phase 181 bottom tab bar
+    // replaced the hamburger menu). Sub-pages leave every bottom tab inactive (D-06).
+    for (const { label, href } of [
+      { label: /^registro$/i, href: '/registry/types' },
+      { label: /^api keys$/i, href: '/settings/api-keys' },
+    ]) {
+      test(`nav: /altro "${label.source}" row opens ${href} with no active bottom tab`, async ({
+        page,
+      }) => {
+        await page.goto('/altro');
+        await page.waitForLoadState('domcontentloaded');
+        await page.getByRole('link', { name: label }).click();
+        await expect(page).toHaveURL(new RegExp(`${href}$`));
+        await expect(page.locator('main')).toBeAttached({ timeout: 15000 });
+        await expect(
+          page.locator('[data-bottom-tab="true"] a[aria-current="page"]')
+        ).toHaveCount(0);
+      });
+    }
   });
 
   // Phase 171: Fritz!Box Consumer UI smoke matrix (telephony + raw history + service discovery).
@@ -204,7 +193,8 @@ test.describe('Page Loads', () => {
     test('/network Storico grezzo tab renders sub-sections', async ({ page }) => {
       const { errors, cleanup } = collectConsoleErrors(page);
       await page.goto('/network');
-      await page.waitForLoadState('networkidle');
+      // Not 'networkidle': the page polls continuously, so it may never go idle.
+      await page.waitForLoadState('domcontentloaded');
       // Click the Storico grezzo tab trigger (native <button>, text-based selector).
       await page.getByRole('button', { name: /Storico grezzo/i }).click();
       // Assert the bandwidth sub-section heading becomes visible once the tab is active.
@@ -221,7 +211,8 @@ test.describe('Page Loads', () => {
     test('/debug Service Discovery tab renders heading', async ({ page }) => {
       const { errors, cleanup } = collectConsoleErrors(page);
       await page.goto('/debug?tab=service-discovery');
-      await page.waitForLoadState('networkidle');
+      // Not 'networkidle': the page polls continuously, so it may never go idle.
+      await page.waitForLoadState('domcontentloaded');
       await expect(
         page.getByRole('heading', { name: /Service Discovery/i, level: 2 })
       ).toBeVisible({ timeout: 15000 });

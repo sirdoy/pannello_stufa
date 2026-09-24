@@ -1243,7 +1243,7 @@ interface CameraStatus {
   camera_id: string | null;
   name: string | null;
   device_type: string | null;   // e.g. "NOC" (Presence), "NACamera" (Welcome)
-  status: string | null;        // "on" | "off"
+  status: string | null;        // "on" | "off" | "disconnected" (camera offline) — snapshot/stream answer 503 unless "on"
   sd_status: string | null;     // "on" | "off"
   alim_status: string | null;   // "on" | "off"
   firmware: string | null;

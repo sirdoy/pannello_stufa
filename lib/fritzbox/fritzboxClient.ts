@@ -678,6 +678,9 @@ function normalizeServices(services: unknown): ServiceEntry[] {
   }));
 }
 
+/** Service discovery is heavyweight: allow a cold TR-064 catalog walk (haClient default is 15s). */
+export const SERVICE_DISCOVERY_TIMEOUT_MS = 60_000;
+
 /**
  * Get TR-064 service discovery -- FRITZ-07 (v19.0).
  * Per D-06: Parse TR-064 XML to JSON in the client function.
@@ -695,7 +698,9 @@ async function getServiceDiscovery(): Promise<ServiceDiscoveryResponse> {
   }
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15_000);
+  // The first (cold) call walks the whole TR-064 catalog on the Pi and takes >15s;
+  // later calls hit fritzconnection's cache and answer in <1s.
+  const timeoutId = setTimeout(() => controller.abort(), SERVICE_DISCOVERY_TIMEOUT_MS);
 
   try {
     const response = await fetch(`${baseUrl}/api/v1/fritzbox/service-discovery`, {

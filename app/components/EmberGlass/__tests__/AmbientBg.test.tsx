@@ -4,6 +4,14 @@ import AmbientBg from '../AmbientBg';
 describe('AmbientBg (Phase 174 — DS-05)', () => {
   beforeEach(() => {
     delete document.documentElement.dataset.ambient;
+    localStorage.removeItem('ember-glass-ambient');
+  });
+
+  it('restores data-ambient from localStorage after hydration wiped it (React 19 <html> reset)', () => {
+    localStorage.setItem('ember-glass-ambient', 'true');
+    const { container } = render(<AmbientBg />);
+    expect(document.documentElement.dataset.ambient).toBe('on');
+    expect(container.querySelectorAll('.ember-ambient-blob').length).toBe(3);
   });
 
   it('renders nothing when data-ambient is unset (D-14 default OFF)', () => {

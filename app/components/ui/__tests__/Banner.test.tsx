@@ -301,6 +301,17 @@ describe('Banner', () => {
       expect(screen.getByText('italic')).toBeInTheDocument();
     });
 
+    it('wraps a block JSX description in a <div>, a string description in a <p>', () => {
+      const { container, rerender } = render(
+        <Banner title="Block" description={<div data-testid="block-desc">block</div>} />
+      );
+      expect(container.querySelector('p [data-testid="block-desc"]')).toBeNull();
+      expect(screen.getByTestId('block-desc').parentElement?.tagName).toBe('DIV');
+
+      rerender(<Banner title="Plain" description="plain text" />);
+      expect(screen.getByText('plain text').tagName).toBe('P');
+    });
+
     it('renders both description and children', () => {
       render(
         <Banner

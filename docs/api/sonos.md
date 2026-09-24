@@ -416,7 +416,7 @@ interface SonosZonesListResponse {
 
 interface SonosZoneResponse {
   group_id: string;           // === coordinator_uid (plain RINCON_... UID, no ":N" suffix)
-  label: string;              // human-readable zone label from SoCo
+  label: string;              // human-readable zone label from SoCo, repeated names collapsed ("Salotto, Bagno")
   coordinator_uid: string;    // UID of the zone coordinator
   coordinator_name: string;   // player name of the coordinator
   member_count: number;

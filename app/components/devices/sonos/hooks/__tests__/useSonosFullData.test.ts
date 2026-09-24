@@ -435,6 +435,19 @@ describe('useSonosFullData', () => {
     expect(pollingArgs?.interval).toBe(60000);
   });
 
+  it('fetches home-theater only for soundbar members (backend 404s every other role)', async () => {
+    setWsConnected(false);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    const htUrls = (global.fetch as jest.Mock).mock.calls
+      .map((c) => c[0] as string)
+      .filter((u) => u.endsWith('/home-theater'));
+    expect(htUrls).toEqual(['/api/v1/sonos/speakers/RINCON_A/home-theater']);
+  });
+
   it('runs an initial REST fetch on mount even when WS is OPEN (populates supplementary fields)', async () => {
     setWsConnected(true);
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());

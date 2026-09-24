@@ -253,6 +253,9 @@ test.describe('Phase 181 — Bottom Tab Bar (NAV-01..04)', () => {
   });
 
   test('NAV-01..04 console-error gate over /altro navigation', async ({ page }) => {
+    // Unload the dashboard from beforeEach first: the hard navigation aborts its
+    // in-flight polling fetches ("Failed to fetch"), which is not an /altro error.
+    await page.goto('about:blank');
     const { errors, cleanup } = collectConsoleErrors(page);
     await page.goto('/altro');
     await page.waitForLoadState('domcontentloaded');

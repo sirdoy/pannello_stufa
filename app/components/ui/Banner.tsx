@@ -230,6 +230,8 @@ export default function Banner({
           {/* Description */}
           {description && (
             <Text
+              // JSX descriptions may contain block elements (<div>, <Text>): a <p> wrapper would be invalid HTML
+              as={typeof description === 'string' ? 'p' : 'div'}
               size={compact ? 'xs' : 'sm'}
               className={cn(
                 styles.description,

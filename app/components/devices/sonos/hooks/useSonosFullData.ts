@@ -171,7 +171,11 @@ export function useSonosFullData(): UseSonosFullDataReturn {
         if (r.status === 'fulfilled') volumes[allUids[i]!] = r.value;
       });
 
-      // 4b. Fetch EQ and home-theater for ALL speakers in parallel
+      // 4b. Fetch EQ for ALL speakers and home-theater for soundbars only
+      // (backend answers 404 "Not a soundbar speaker" for every other role)
+      const soundbarUids = [...new Set(
+        zones.flatMap(z => z.members.filter(m => m.role === 'soundbar').map(m => m.uid))
+      )];
       const [eqResults, htResults] = await Promise.all([
         Promise.allSettled(
           allUids.map(uid =>
@@ -182,7 +186,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
           )
         ),
         Promise.allSettled(
-          allUids.map(uid =>
+          soundbarUids.map(uid =>
             fetch(`/api/v1/sonos/speakers/${uid}/home-theater`).then(r => {
               if (!r.ok) throw new Error('home-theater failed');
               return r.json() as Promise<SonosHomeTheaterResponse>;
@@ -196,7 +200,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
       });
       const homeTheaterData: Record<string, SonosHomeTheaterResponse> = {};
       htResults.forEach((r, i) => {
-        if (r.status === 'fulfilled') homeTheaterData[allUids[i]!] = r.value;
+        if (r.status === 'fulfilled') homeTheaterData[soundbarUids[i]!] = r.value;
       });
 
       // 5. Fetch play-mode and sleep-timer for ALL zones in parallel

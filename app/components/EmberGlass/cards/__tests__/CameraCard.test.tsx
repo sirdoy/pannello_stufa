@@ -53,7 +53,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera' } as any],
+        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera', status: 'on' } as any],
         lastUpdatedAt: 1700000000,
       })
     );
@@ -69,7 +69,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera' } as any],
+        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera', status: 'on' } as any],
         lastUpdatedAt: 1700000000,
       })
     );
@@ -85,7 +85,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera' } as any],
+        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera', status: 'on' } as any],
         lastUpdatedAt: 1700000000,
       })
     );
@@ -99,7 +99,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera' } as any],
+        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera', status: 'on' } as any],
         lastUpdatedAt: 1700000000,
       })
     );
@@ -114,7 +114,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera' } as any],
+        cameras: [{ camera_id: 'cam1', name: 'INGRESSO', device_type: 'NACamera', status: 'on' } as any],
         lastUpdatedAt: 1700000000,
       })
     );
@@ -142,5 +142,21 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
 
     expect(container.querySelector('img')).toBeNull();
     expect(getByText(/—/)).toBeInTheDocument();
+  });
+
+  test('(f) offline camera ("disconnected"): no snapshot request, no LIVE pill, "Camera offline"', () => {
+    mockedUseCameraData.mockReturnValue(
+      buildReturn({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cameras: [{ camera_id: 'cam1', name: 'Garage1', device_type: 'NACamera', status: 'disconnected' } as any],
+        lastUpdatedAt: 1700000000,
+      })
+    );
+
+    const { container, getByText, queryByTestId } = render(<CameraCard />);
+
+    expect(container.querySelector('img')).toBeNull();
+    expect(queryByTestId('live-dot')).toBeNull();
+    expect(getByText('Camera offline')).toBeInTheDocument();
   });
 });

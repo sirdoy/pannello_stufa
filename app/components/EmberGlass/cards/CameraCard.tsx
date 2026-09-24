@@ -41,7 +41,10 @@ export default function CameraCard() {
   // Hits the browser-safe snapshot proxy (server-streams JPEG bytes from the
   // HA proxy's /live/snapshot.jpg endpoint). The ?t= query busts the cache on
   // every poll cycle so the preview refreshes.
-  const src = cam
+  // The backend answers 503 for any status other than "on" (e.g. "disconnected"),
+  // so an offline camera gets the fallback without hitting the proxy.
+  const online = cam?.status === 'on';
+  const src = cam && online
     ? `/api/v1/netatmo/camera/${cam.camera_id}/snapshot?t=${lastUpdatedAt ?? 0}`
     : null;
   // CameraStatus does not expose a resolution field; use device_type as the
@@ -76,7 +79,7 @@ export default function CameraCard() {
   return (
     <>
       <GlassCard tone={TONE} onOpen={() => setOpen(true)} data-testid="camera-card">
-        <CardHead Icon={Video} label="Camera" tone={TONE} right={livePill} />
+        <CardHead Icon={Video} label="Camera" tone={TONE} right={online ? livePill : null} />
         <div
           style={{
             flex: 1,
@@ -115,7 +118,7 @@ export default function CameraCard() {
             >
               <VideoOff size={28} strokeWidth={1.6} />
               <div style={{ fontSize: 11 }}>
-                {!cam ? 'Nessuna camera' : 'Snapshot non disponibile'}
+                {!cam ? 'Nessuna camera' : !online ? 'Camera offline' : 'Snapshot non disponibile'}
               </div>
             </div>
           )}

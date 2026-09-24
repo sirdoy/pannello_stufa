@@ -8,7 +8,7 @@
  * Endpoints:
  *   /api/v1/automations                      - GET list, POST create
  *   /api/v1/automations/{rule_id}            - GET single, PATCH update, DELETE
- *   /api/v1/automations/{rule_id}/executions - GET execution history
+ *   /api/v1/automations/{rule_id}/history - GET execution history
  */
 
 import { haGet, haPost, haPatch, haDelete } from '@/lib/haClient';
@@ -53,7 +53,7 @@ async function getExecutions(ruleId: string, params?: { limit?: number; offset?:
   if (params?.offset !== undefined) qs.set('offset', String(params.offset));
   const query = qs.toString();
   return haGet<PaginatedResponse<AutomationExecution>>(
-    `/api/v1/automations/${ruleId}/executions${query ? `?${query}` : ''}`
+    `/api/v1/automations/${ruleId}/history${query ? `?${query}` : ''}`
   );
 }
 

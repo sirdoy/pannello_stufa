@@ -6,16 +6,21 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/fritzbox/telephony/calls
  * Returns paginated call history from Fritz!Box.
- * Forwards optional limit and offset query params to the HA proxy.
+ * Forwards optional call_type, limit and offset query params to the HA proxy.
  * Protected: Requires Auth0 authentication
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *
  * Query params:
- *   limit  - Max items per page (default: proxy default)
- *   offset - Pagination offset (default: 0)
+ *   call_type - Filter: received | missed | outgoing | rejected | active_received | active_outgoing
+ *   limit     - Max items per page (default: backend default 100, max 1000)
+ *   offset    - Pagination offset (default: 0)
  *
- * Success: { calls: { items, total_count, limit, offset } }
+ * The cache key includes the forwarded params, otherwise every page/filter
+ * would be served the first cached page for 60s.
+ *
+ * Success: { calls: { items: CallRecord[], total_count, limit, offset } }
+ *   (backend PaginatedResponse[CallRecordModel], see docs/api/fritzbox.md)
  * Errors:
  *   - 429 RATE_LIMITED: Too many requests
  *   - Plus all health endpoint errors (403, 504, 500)
@@ -32,11 +37,15 @@ export const GET = withAuthAndErrorHandler(async (request, _context, session) =>
   }
   const { searchParams } = new URL(request.url);
   const params = new URLSearchParams();
+  // Only forward well-formed values (they also end up in the Firebase cache key).
+  const callType = searchParams.get('call_type');
   const limit = searchParams.get('limit');
   const offset = searchParams.get('offset');
-  if (limit) params.set('limit', limit);
-  if (offset) params.set('offset', offset);
+  if (callType && /^[a-z_]+$/.test(callType)) params.set('call_type', callType);
+  if (limit && /^\d+$/.test(limit)) params.set('limit', limit);
+  if (offset && /^\d+$/.test(offset)) params.set('offset', offset);
 
-  const calls = await getCachedData('telephony-calls', () => fritzboxClient.getCallHistory(params));
+  const cacheKey = `telephony-calls-${params.get('call_type') ?? 'all'}-${params.get('limit') ?? 'default'}-${params.get('offset') ?? '0'}`;
+  const calls = await getCachedData(cacheKey, () => fritzboxClient.getCallHistory(params));
   return success({ calls });
 }, 'FritzBox/TelephonyCalls');

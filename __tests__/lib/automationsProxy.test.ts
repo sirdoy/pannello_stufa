@@ -173,7 +173,7 @@ describe('automationsProxy', () => {
   });
 
   describe('getExecutions()', () => {
-    it('calls GET /api/v1/automations/{ruleId}/executions with limit and offset', async () => {
+    it('calls GET /api/v1/automations/{ruleId}/history with limit and offset', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockPaginatedExecutions,
@@ -182,12 +182,12 @@ describe('automationsProxy', () => {
       await automationsProxy.getExecutions('abc', { limit: 20, offset: 0 });
 
       const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/automations/abc/executions?limit=20&offset=0`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/automations/abc/history?limit=20&offset=0`);
       expect(options.method).toBeUndefined();
       expect((options.headers as Record<string, string>)['X-API-Key']).toBe(TEST_API_KEY);
     });
 
-    it('calls GET /api/v1/automations/{ruleId}/executions without query if no params', async () => {
+    it('calls GET /api/v1/automations/{ruleId}/history without query if no params', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockPaginatedExecutions,
@@ -196,7 +196,7 @@ describe('automationsProxy', () => {
       await automationsProxy.getExecutions('abc');
 
       const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/automations/abc/executions`);
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/automations/abc/history`);
     });
   });
 

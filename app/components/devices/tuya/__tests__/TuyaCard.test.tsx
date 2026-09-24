@@ -73,6 +73,8 @@ const baseReturn: UseTuyaDataReturn = {
   error: null,
   stale: false,
   lastUpdatedAt: 1711800000000,
+  refetch: jest.fn(),
+  setPlugOptimistic: jest.fn(),
 };
 
 describe('TuyaCard', () => {

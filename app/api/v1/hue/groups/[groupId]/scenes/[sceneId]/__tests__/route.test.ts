@@ -47,7 +47,7 @@ describe('POST /api/v1/hue/groups/[groupId]/scenes/[sceneId]', () => {
   });
 
   it('should return 202 with proxy response body', async () => {
-    mockActivateScene.mockResolvedValue(mockProxyResponse);
+    mockActivateScene.mockResolvedValue(mockProxyResponse as never);
     const req = new Request('http://localhost:3000/api/v1/hue/groups/1/scenes/Ab1Cd2Ef3G', {
       method: 'POST',
     });

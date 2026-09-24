@@ -108,17 +108,18 @@ export function useRaspiData(): UseRaspiDataReturn {
     if (!isWsConnected) return; // guard against CLOSED state
 
     const handleMessage = (raw: unknown) => {
-      const wsData = raw as WsRaspiData;
-      const memPercent = (wsData?.memory as { percent?: unknown } | undefined)?.percent;
-      const diskPercent = (wsData?.disk as { percent?: unknown } | undefined)?.percent;
-      const temperature = (wsData?.system as { temperature?: unknown } | undefined)?.temperature;
+      const wsData = raw as Partial<WsRaspiData> | null;
+      const cpuPercent = wsData?.cpu?.cpu_percent;
+      const memPercent = wsData?.memory?.percent;
+      const diskPercent = wsData?.disk?.percent;
+      const temperature = wsData?.system?.cpu_temperature;
 
-      if (!isValidNumber(wsData?.cpu_percent) || !isValidNumber(memPercent) || !isValidNumber(diskPercent)) {
+      if (!isValidNumber(cpuPercent) || !isValidNumber(memPercent) || !isValidNumber(diskPercent)) {
         return; // drop malformed payload, keep last known good data
       }
 
       const newData: RaspiData = {
-        cpuPercent: wsData.cpu_percent,
+        cpuPercent,
         memoryPercent: memPercent,
         diskPercent: diskPercent,
         cpuTemperature: isValidNumber(temperature) ? temperature : null,
@@ -145,6 +146,14 @@ export function useRaspiData(): UseRaspiDataReturn {
     immediate: true,
     initialDelay: 600,
   });
+
+  // Bootstrap HTTP fetch on mount regardless of WS state: when WS is already OPEN at
+  // mount, useAdaptivePolling skips `immediate` (interval=null) and the card would
+  // wait for a WS message that may never come (empty raspi cache → no snapshot).
+  useEffect(() => {
+    void fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const health: RaspiHealth = data ? computeRaspiHealth(data) : 'ok';
 

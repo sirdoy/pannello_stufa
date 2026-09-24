@@ -10,6 +10,8 @@ interface DirigeraHistoryPanelProps {
   error: string | null;
   stale: boolean;
   loadMore: () => void;
+  /** sensor_id → display name (events carry only sensor_id). */
+  sensorNames?: Record<string, string>;
 }
 
 /**
@@ -26,6 +28,7 @@ export default function DirigeraHistoryPanel({
   error,
   stale,
   loadMore,
+  sensorNames = {},
 }: DirigeraHistoryPanelProps) {
   const staleBadge = stale && loading
     ? <span className="text-xs text-ember-400 ml-2">Aggiornamento…</span>
@@ -78,13 +81,13 @@ export default function DirigeraHistoryPanel({
               <tbody>
                 {items.map(event => (
                   <tr key={event.id} className="border-t border-slate-700/50">
-                    <td className="py-2">{event.sensor_name ?? event.sensor_id}</td>
+                    <td className="py-2">{sensorNames[event.sensor_id] ?? event.sensor_id}</td>
                     <td className="py-2">{event.event_type}</td>
                     <td className="py-2 text-slate-400">
                       {new Intl.DateTimeFormat('it-IT', {
                         dateStyle: 'short',
                         timeStyle: 'medium',
-                      }).format(new Date(event.recorded_at * 1000))}
+                      }).format(new Date(event.timestamp * 1000))}
                     </td>
                   </tr>
                 ))}

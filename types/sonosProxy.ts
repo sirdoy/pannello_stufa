@@ -217,7 +217,9 @@ export interface JoinRequest { target_uid: string; }
 
 // Generic command acknowledgment (used for play/pause/stop/next/previous/unjoin)
 export interface SonosCommandOkResponse {
-  status: 'ok';
-  group_id?: string;
-  uid?: string;
+  /** true when the backend re-poll after the command succeeded. */
+  data_confirmed: boolean;
+  /** Re-polled resource: playback | volume | volumes | eq_settings | play_mode |
+   *  speakers + groups | sleep_timer | home_theater (see docs/api/sonos.md). */
+  [resource: string]: unknown;
 }

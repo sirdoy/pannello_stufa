@@ -6,15 +6,11 @@ import { useVisibility } from '@/lib/hooks/useVisibility';
 
 export const PAGE_SIZE = 50;
 
-export interface CallRecord {
-  id: string;
-  call_type: string; // 'incoming' | 'outgoing' | 'missed' | 'voicemail' | unknown
-  number: string;
-  name: string | null;
-  duration_seconds: number;
-  timestamp: number; // Unix SECONDS (Pitfall 6 — *1000 for Date)
-  port: string | null;
-}
+import type { CallRecord, CallType, CallHistoryResponse } from '@/lib/fritzbox/fritzboxClient';
+
+// Types mirror the backend contract (PaginatedResponse[CallRecordModel], docs/api/fritzbox.md).
+// CallRecord has no id; `date` is ISO 8601 local time without timezone.
+export type { CallRecord, CallType, CallHistoryResponse };
 
 interface UseFritzCallHistoryOptions {
   paused?: boolean;
@@ -60,12 +56,13 @@ export function useFritzCallHistory(options: UseFritzCallHistoryOptions = {}): {
         setTotalCount(0);
         return;
       }
-      const json = (await res.json()) as {
-        calls: { items: CallRecord[]; total_count: number; limit: number; offset: number };
-      };
-      setCalls(json.calls.items);
-      setTotalCount(json.calls.total_count);
-      setStale(false);
+      const json = (await res.json()) as { calls?: Partial<CallHistoryResponse> | null };
+      const payload = json.calls ?? null;
+      // Defensive: Firebase RTDB cache drops empty arrays.
+      const items = Array.isArray(payload?.items) ? payload.items : [];
+      setCalls(items);
+      setTotalCount(typeof payload?.total_count === 'number' ? payload.total_count : items.length);
+      setStale(payload === null);
     } catch {
       setStale(true);
     } finally {

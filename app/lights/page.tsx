@@ -28,8 +28,8 @@ export default function LightsPage() {
         body: JSON.stringify({ on }),
       });
       if (!res.ok) throw new Error(res.status === 409 ? 'Luce non raggiungibile' : `Comando fallito: ${res.status}`);
-      const data = await res.json() as { suggested_poll_delay_s?: number };
-      await new Promise<void>(r => setTimeout(r, (data.suggested_poll_delay_s ?? 2) * 1000));
+      const data = await res.json() as { data_confirmed?: boolean; suggested_poll_delay_s?: number };
+      if (!data.data_confirmed) await new Promise<void>(r => setTimeout(r, (data.suggested_poll_delay_s ?? 2) * 1000));
       await lightsData.fetchData();
     } catch (err) { lightsData.setError(err instanceof Error ? err.message : String(err)); }
     finally { lightsData.setRefreshing(false); }
@@ -44,8 +44,8 @@ export default function LightsPage() {
         body: JSON.stringify({ bri: Math.round(pct * 254 / 100) }),
       });
       if (!res.ok) throw new Error(res.status === 409 ? 'Luce non raggiungibile' : `Comando fallito: ${res.status}`);
-      const data = await res.json() as { suggested_poll_delay_s?: number };
-      await new Promise<void>(r => setTimeout(r, (data.suggested_poll_delay_s ?? 2) * 1000));
+      const data = await res.json() as { data_confirmed?: boolean; suggested_poll_delay_s?: number };
+      if (!data.data_confirmed) await new Promise<void>(r => setTimeout(r, (data.suggested_poll_delay_s ?? 2) * 1000));
       await lightsData.fetchData();
     } catch (err) { lightsData.setError(err instanceof Error ? err.message : String(err)); }
     finally { lightsData.setRefreshing(false); }
@@ -60,8 +60,8 @@ export default function LightsPage() {
         body: JSON.stringify({ xy: [preset.xy.x, preset.xy.y] }),
       });
       if (!res.ok) throw new Error(`Comando fallito: ${res.status}`);
-      const data = await res.json() as { suggested_poll_delay_s?: number };
-      await new Promise<void>(r => setTimeout(r, (data.suggested_poll_delay_s ?? 2) * 1000));
+      const data = await res.json() as { data_confirmed?: boolean; suggested_poll_delay_s?: number };
+      if (!data.data_confirmed) await new Promise<void>(r => setTimeout(r, (data.suggested_poll_delay_s ?? 2) * 1000));
       setSuccess(`Colore cambiato a ${preset.name}`);
       setTimeout(() => setSuccess(null), 2000);
       await lightsData.fetchData();

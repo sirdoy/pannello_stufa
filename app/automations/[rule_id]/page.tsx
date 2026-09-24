@@ -58,7 +58,7 @@ function useExecutions(ruleId: string) {
     setError(null);
     try {
       const res = await fetch(
-        `/api/v1/automations/${ruleId}/executions?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`
+        `/api/v1/automations/${ruleId}/history?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`
       );
       if (!res.ok) throw new Error('Errore nel caricamento dello storico esecuzioni');
       const data = (await res.json()) as PaginatedResponse<AutomationExecution>;

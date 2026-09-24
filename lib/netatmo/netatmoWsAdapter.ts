@@ -17,7 +17,14 @@ import type {
 } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 
 /**
- * Adapts a raw Netatmo WS payload (homestatus envelope) to NetatmoStatus.
+ * Adapts a Netatmo WS payload to NetatmoStatus.
+ *
+ * Current backend shape (backend/api/ws/manager.py `_enrich_payload`):
+ *   { rooms: [<raw homestatus room>], cameras: [...], data_freshness }
+ * Legacy shape (raw homestatus envelope) is still accepted:
+ *   { body: { home: { rooms, modules } } }
+ * The current payload carries no `modules`: battery fields are then omitted
+ * (undefined) so callers can keep the values they already have.
  *
  * Field mapping (D-05):
  *   therm_measured_temperature -> temperature
@@ -33,18 +40,23 @@ export function adaptNetatmoWsPayload(raw: Record<string, unknown>): NetatmoStat
   // D-06: null/falsy payload guard
   if (!raw || typeof raw !== 'object') return null;
 
-  const body = raw['body'] as Record<string, unknown> | undefined;
-  if (!body || typeof body !== 'object') return null;
+  let source: Record<string, unknown>;
+  if (Array.isArray(raw['rooms'])) {
+    source = raw;
+  } else {
+    const body = raw['body'] as Record<string, unknown> | undefined;
+    const home = body && typeof body === 'object'
+      ? (body['home'] as Record<string, unknown> | undefined)
+      : undefined;
+    if (!home || typeof home !== 'object') return null;
+    source = home;
+  }
 
-  const home = body['home'] as Record<string, unknown> | undefined;
-  if (!home || typeof home !== 'object') return null;
-
-  const wsRooms = Array.isArray(home['rooms'])
-    ? (home['rooms'] as Record<string, unknown>[])
+  const wsRooms = Array.isArray(source['rooms'])
+    ? (source['rooms'] as Record<string, unknown>[])
     : [];
-  const wsModules = Array.isArray(home['modules'])
-    ? (home['modules'] as Record<string, unknown>[])
-    : [];
+  const hasModules = Array.isArray(source['modules']);
+  const wsModules = hasModules ? (source['modules'] as Record<string, unknown>[]) : [];
 
   // D-05: field mapping for rooms
   const rooms: RoomStatus[] = wsRooms.map(r => ({
@@ -79,8 +91,13 @@ export function adaptNetatmoWsPayload(raw: Record<string, unknown>): NetatmoStat
       rf_strength: m.rf_strength,
     }));
 
+  const freshness = raw['data_freshness'];
+  const status: NetatmoStatus = { rooms };
+  if (typeof freshness === 'string') status.data_freshness = freshness;
+  if (!hasModules) return status;
+
   return {
-    rooms,
+    ...status,
     modules,
     hasLowBattery: lowBatteryModules.length > 0,
     hasCriticalBattery: modules.some(m => m.battery_state === 'very_low'),

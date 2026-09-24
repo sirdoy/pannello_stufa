@@ -60,7 +60,6 @@ const mockWsPayload: DirigeraData = {
       battery_percentage: null,
       is_reachable: false, // offline
       last_seen: null,
-      is_open: null, // motion sensors have is_open: null
     },
   ],
   data_freshness: 'LIVE',

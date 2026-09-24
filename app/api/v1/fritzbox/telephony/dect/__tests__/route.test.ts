@@ -23,20 +23,20 @@ const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 describe('GET /api/v1/fritzbox/telephony/dect', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  // Real backend shape (DectListResponse, backend/api/models.py) — not paginated.
   const mockData = {
-    items: [
+    handsets: [
       {
-        id: '1',
-        name: 'Handset 1',
-        model: 'FRITZ!Fon C6',
-        firmware_version: '4.57',
-        battery_charge_level: 80,
-        is_registered: true,
+        dect_id: 1,
+        name: 'Wohnzimmer',
+        phonebook_id: 0,
+        model: null,
+        registration_status: 'registered',
       },
     ],
-    total_count: 1,
-    limit: 100,
-    offset: 0,
+    handset_count: 1,
+    is_stale: false,
+    fetched_at: '2026-02-17T13:00:00Z',
   };
 
   beforeEach(() => {
@@ -74,6 +74,8 @@ describe('GET /api/v1/fritzbox/telephony/dect', () => {
 
     expect(response.status).toBe(200);
     expect(data).toEqual({ success: true, dect: mockData });
+    expect(data.dect.handsets[0].dect_id).toBe(1);
+    expect(data.dect.handset_count).toBe(1);
     expect(mockCheckRateLimit).toHaveBeenCalledWith('auth0|123', 'telephony-dect');
   });
 

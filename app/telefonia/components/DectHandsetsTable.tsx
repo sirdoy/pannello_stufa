@@ -13,6 +13,15 @@ import {
 } from '@/app/components/ui';
 import type { DectHandset } from '../hooks/useFritzDectHandsets';
 
+function getRegistrationMeta(status: string | null | undefined): {
+  variant: 'sage' | 'warning';
+  label: string;
+} {
+  // Backend always sends "registered" (presence in the TR-064 list implies it).
+  if (status === 'registered') return { variant: 'sage', label: 'Registrato' };
+  return { variant: 'warning', label: 'Non registrato' };
+}
+
 interface DectHandsetsTableProps {
   handsets: DectHandset[];
   loading: boolean;
@@ -48,62 +57,42 @@ export default function DectHandsetsTable({
       ),
     },
     {
+      accessorKey: 'dect_id',
+      header: 'ID',
+      enableSorting: true,
+      cell: ({ row }) => (
+        <span className="font-mono text-xs text-slate-400">{row.original.dect_id}</span>
+      ),
+    },
+    {
       accessorKey: 'model',
       header: 'Modello',
-      enableSorting: true,
+      enableSorting: false,
+      // TR-064 does not expose the model: backend always sends null.
       cell: ({ row }) => (
         <span className="text-slate-300">{row.original.model ?? '—'}</span>
       ),
     },
     {
-      accessorKey: 'firmware_version',
-      header: 'Firmware',
+      accessorKey: 'registration_status',
+      header: 'Stato',
       enableSorting: false,
-      cell: ({ row }) => (
-        <span className="font-mono text-xs text-slate-400">
-          {row.original.firmware_version ?? '—'}
-        </span>
-      ),
-    },
-    {
-      accessorKey: 'battery_charge_level',
-      header: 'Batteria',
-      enableSorting: true,
       cell: ({ row }) => {
-        const pct = row.original.battery_charge_level;
-        if (pct === null || pct === undefined) {
-          return <span className="text-slate-500">—</span>;
-        }
-        const variant: 'ember' | 'warning' | 'danger' =
-          pct >= 50 ? 'ember' : pct >= 20 ? 'warning' : 'danger';
-        const pulse = pct < 20;
+        const meta = getRegistrationMeta(row.original.registration_status);
         return (
-          <Badge variant={variant} size="sm" pulse={pulse}>
-            {pct}%
+          <Badge variant={meta.variant} size="sm">
+            {meta.label}
           </Badge>
         );
       },
     },
-    {
-      accessorKey: 'is_registered',
-      header: 'Stato',
-      enableSorting: true,
-      cell: ({ row }) => (
-        <Badge
-          variant={row.original.is_registered ? 'sage' : 'warning'}
-          size="sm"
-        >
-          {row.original.is_registered ? 'Registrato' : 'Non registrato'}
-        </Badge>
-      ),
-    },
   ];
 
-  // Sort: registered first, then by name (Italian locale)
+  // Sort by DECT id (stable, matches Fritz!Box order), then name (Italian locale)
   const sortedHandsets = [...handsets].sort(
     (a, b) =>
-      Number(b.is_registered) - Number(a.is_registered) ||
-      a.name.localeCompare(b.name, 'it')
+      (a.dect_id ?? 0) - (b.dect_id ?? 0) ||
+      (a.name ?? '').localeCompare(b.name ?? '', 'it')
   );
 
   return (
@@ -134,6 +123,7 @@ export default function DectHandsetsTable({
         <DataTable
           columns={columns}
           data={sortedHandsets}
+          getRowId={(h: DectHandset) => String(h.dect_id)}
           density="default"
           striped={true}
           enableFiltering={false}

@@ -34,6 +34,11 @@ async function createType(body: DeviceTypeCreate): Promise<DeviceType> {
   return haPost<DeviceType>('/api/v1/registry/types', body as unknown as Record<string, unknown>);
 }
 
+/** Update a device type's label (slug is immutable) — PUT /registry/types/{slug} */
+async function updateType(slug: string, label: string): Promise<DeviceType> {
+  return haPut<DeviceType>(`/api/v1/registry/types/${encodeURIComponent(slug)}`, { label });
+}
+
 /** Delete a custom device type by slug */
 async function deleteType(slug: string): Promise<void> {
   return haDelete(`/api/v1/registry/types/${slug}`);
@@ -82,6 +87,7 @@ async function getHealth(): Promise<RegistryHealthResponse> {
 export const registryProxy = {
   getTypes,
   createType,
+  updateType,
   deleteType,
   getDevices,
   registerDevice,

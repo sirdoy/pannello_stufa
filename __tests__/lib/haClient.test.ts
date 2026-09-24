@@ -215,6 +215,32 @@ describe('haGet', () => {
     expect(caught?.code).toBe(ERROR_CODES.EXTERNAL_API_ERROR);
   });
 
+  it.each([
+    [404, 'Not Found', ERROR_CODES.NOT_FOUND],
+    [403, 'Forbidden', ERROR_CODES.FORBIDDEN],
+    [422, 'Unprocessable Entity', ERROR_CODES.VALIDATION_ERROR],
+    [400, 'Bad Request', ERROR_CODES.VALIDATION_ERROR],
+  ])('keeps backend client error %s (%s) instead of mapping it to 502', async (status, title, code) => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status,
+      statusText: title,
+      json: async () => ({ type: 'about:blank', title, status, detail: 'Room 7 not found' }),
+    });
+
+    let caught: ApiError | undefined;
+    try {
+      await haGet('/api/test');
+    } catch (e) {
+      caught = e as ApiError;
+    }
+
+    expect(caught).toBeInstanceOf(ApiError);
+    expect(caught?.code).toBe(code);
+    expect(caught?.status).toBe(status);
+    expect(caught?.message).toBe('Room 7 not found');
+  });
+
   it('parses RFC 9457 detail field from error response body', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,

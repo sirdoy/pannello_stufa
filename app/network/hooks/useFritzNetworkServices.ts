@@ -110,15 +110,19 @@ export function useFritzNetworkServices(options: UseFritzNetworkServicesOptions 
       const [dhcpResult, portFwdResult, upnpResult, meshResult] = results;
 
       if (dhcpResult.status === 'fulfilled' && dhcpResult.value.ok) {
-        const json = await dhcpResult.value.json() as { reservations: { items: DhcpReservation[]; total: number } };
-        setDhcp(json.reservations);
+        // Backend PaginatedResponse uses total_count (not total)
+        const json = await dhcpResult.value.json() as { reservations: { items: DhcpReservation[]; total_count: number } };
+        setDhcp({ items: json.reservations.items, total: json.reservations.total_count ?? json.reservations.items.length });
       } else {
         hasError = true;
       }
 
       if (portFwdResult.status === 'fulfilled' && portFwdResult.value.ok) {
-        const json = await portFwdResult.value.json() as { portForwarding: { items: PortForwardingRule[]; total: number } };
-        setPortForwarding(json.portForwarding);
+        const json = await portFwdResult.value.json() as { portForwarding: { items: PortForwardingRule[]; total_count: number } };
+        setPortForwarding({
+          items: json.portForwarding.items,
+          total: json.portForwarding.total_count ?? json.portForwarding.items.length,
+        });
       } else {
         hasError = true;
       }

@@ -27,6 +27,35 @@ describe('useFritzServiceDiscovery', () => {
     expect(result.current.error).toBeNull();
   });
 
+  it('normalizes a raw backend services dict (keyed by service name) into an array', async () => {
+    // Backend routes.py get_service_discovery shape
+    const backendServices = {
+      'WANIPConnection:1': {
+        version: '1',
+        service_type: 'urn:schemas-upnp-org:service:WANIPConnection:1',
+        control_url: '/igdupnp/control/WANIPConn1',
+        actions: [],
+        action_count: 12,
+      },
+    };
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ discovery: { model: 'FRITZ!Box', service_count: 1, services: backendServices } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzServiceDiscovery());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.services).toEqual([
+      { name: 'WANIPConnection:1', type: 'urn:schemas-upnp-org:service:WANIPConnection:1', url: '/igdupnp/control/WANIPConn1' },
+    ]);
+  });
+
   it('sets error on non-OK response (500)', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,

@@ -13,6 +13,17 @@ import {
 } from '@/app/components/ui';
 import type { TamStatus } from '../hooks/useFritzTamStatus';
 
+/**
+ * Parse backend fetched_at defensively. Accepts "…Z", "…+00:00" and the
+ * legacy malformed "…+00:00Z". Returns null (never throws) on bad input.
+ */
+function parseFetchedAt(value: string | null | undefined): Date | null {
+  if (!value || typeof value !== 'string') return null;
+  const normalized = value.replace(/([+-]\d{2}:\d{2})Z$/, '$1');
+  const date = new Date(normalized);
+  return isNaN(date.getTime()) ? null : date;
+}
+
 interface TamStatusCardProps {
   status: TamStatus | null;
   loading: boolean;
@@ -61,7 +72,7 @@ export default function TamStatusCard({
   }
 
   // If we have no status (edge case — treat as error per UI-SPEC "TAM is never empty")
-  if (!status) {
+  if (!status || !status.tam) {
     return (
       <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
         <div className="flex items-center justify-between">
@@ -81,9 +92,14 @@ export default function TamStatusCard({
     );
   }
 
-  const iconColor = status.enabled ? 'text-ember-400' : 'text-slate-400';
-  const healthStatus = status.enabled ? 'ok' : 'warning';
-  const healthLabel = status.enabled ? 'Attiva' : 'Disattiva';
+  const tam = status.tam;
+  const enabled = tam.tam_enabled === true;
+  const iconColor = enabled ? 'text-ember-400' : 'text-slate-400';
+  const healthStatus = enabled ? 'ok' : 'warning';
+  const healthLabel = enabled ? 'Attiva' : 'Disattiva';
+  const newMessages = tam.new_messages ?? 0;
+  const totalMessages = tam.total_messages ?? 0;
+  const fetchedAt = parseFetchedAt(status.fetched_at);
 
   return (
     <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
@@ -91,7 +107,12 @@ export default function TamStatusCard({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Voicemail size={24} aria-hidden="true" className={iconColor} />
-          <Heading level={2} size="lg">Segreteria</Heading>
+          <div>
+            <Heading level={2} size="lg">Segreteria</Heading>
+            {tam.tam_name && (
+              <Text variant="tertiary" size="xs">{tam.tam_name}</Text>
+            )}
+          </div>
         </div>
         <HealthIndicator status={healthStatus} label={healthLabel} size="md" />
       </div>
@@ -108,22 +129,22 @@ export default function TamStatusCard({
           <Heading
             level={3}
             size="3xl"
-            variant={status.new_messages > 0 ? 'ember' : 'default'}
+            variant={newMessages > 0 ? 'ember' : 'default'}
           >
-            {status.new_messages}
+            {newMessages}
           </Heading>
         </div>
         <div>
           <Text variant="label" size="xs">Totale</Text>
-          <Heading level={3} size="lg">{status.total_messages}</Heading>
+          <Heading level={3} size="lg">{totalMessages}</Heading>
         </div>
       </div>
 
       {/* Row 4: relative fetched_at */}
-      {status.fetched_at && (
+      {fetchedAt && (
         <div className="flex justify-end">
           <Text variant="tertiary" size="xs">
-            Aggiornato: {formatDistanceToNow(new Date(status.fetched_at), {
+            Aggiornato: {formatDistanceToNow(fetchedAt, {
               addSuffix: true,
               locale: it,
             })}

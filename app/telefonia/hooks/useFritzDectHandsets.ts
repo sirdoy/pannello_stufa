@@ -4,14 +4,10 @@ import { useEffect, useState } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 
-export interface DectHandset {
-  id: string;
-  name: string;
-  model: string;
-  firmware_version: string;
-  battery_charge_level: number | null;
-  is_registered: boolean;
-}
+import type { DectHandset, DectListResponse } from '@/lib/fritzbox/fritzboxClient';
+
+// Types mirror the backend contract (DectListResponse, docs/api/fritzbox.md).
+export type { DectHandset, DectListResponse };
 
 interface UseFritzDectHandsetsOptions {
   paused?: boolean;
@@ -25,6 +21,8 @@ interface UseFritzDectHandsetsOptions {
  * - 60s visible cadence, 300s hidden cadence
  * - paused: true stops polling (interval = null)
  * - Never throws on non-OK: sets stale=true, empties state
+ * - Response is NOT paginated: { dect: { handsets, handset_count, is_stale, fetched_at } }
+ * - Defensive on missing arrays (Firebase RTDB cache drops empty arrays/nulls)
  * - Defensive paused->active re-fetch (Open Question #2 RESOLVED)
  */
 export function useFritzDectHandsets(options: UseFritzDectHandsetsOptions = {}): {
@@ -52,12 +50,12 @@ export function useFritzDectHandsets(options: UseFritzDectHandsetsOptions = {}):
         setTotal(0);
         return;
       }
-      const json = (await res.json()) as {
-        dect: { items: DectHandset[]; total_count: number; limit: number; offset: number };
-      };
-      setHandsets(json.dect.items);
-      setTotal(json.dect.total_count);
-      setStale(false);
+      const json = (await res.json()) as { dect?: Partial<DectListResponse> | null };
+      const dect = json.dect ?? null;
+      const list = Array.isArray(dect?.handsets) ? dect.handsets : [];
+      setHandsets(list);
+      setTotal(typeof dect?.handset_count === 'number' ? dect.handset_count : list.length);
+      setStale(dect === null || dect.is_stale === true);
     } catch {
       setStale(true);
     } finally {

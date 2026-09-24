@@ -503,6 +503,54 @@ describe('useSonosFullData', () => {
     expect(result.current.data!.playback['RINCON_C']!.duration).toBe('0:05:54');
   });
 
+  it('keeps backend "H:MM:SS" position/duration strings from sonos_transport', async () => {
+    // Real backend payload: raw SoCo strings (backend/api/providers/sonos/client.py)
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+
+    const handler = mockSubscribe.mock.calls.find((c) => c[0] === 'sonos_transport')?.[1] as (
+      raw: unknown,
+    ) => void;
+    await act(async () => {
+      handler({
+        group_id: 'RINCON_C',
+        transport_state: 'PLAYING',
+        title: 'Track',
+        artist: null,
+        album: null,
+        album_art_url: null,
+        position: '0:03:12',
+        duration: '0:04:05',
+        source_type: 'streaming',
+      });
+    });
+
+    expect(result.current.data!.playback['RINCON_C']!.position).toBe('0:03:12');
+    expect(result.current.data!.playback['RINCON_C']!.duration).toBe('0:04:05');
+  });
+
+  it('applies sonos_topology pushes (group/ungroup) like sonos events', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+
+    const handler = mockSubscribe.mock.calls.find((c) => c[0] === 'sonos_topology')?.[1] as (
+      raw: unknown,
+    ) => void;
+    expect(handler).toBeDefined();
+    const devices = result.current.data!.devices;
+    await act(async () => {
+      handler({ speakers: devices, groups: [] });
+    });
+
+    expect(result.current.data!.zones).toEqual([]);
+  });
+
   it('updates single-speaker volume from sonos_volume WS event', async () => {
     setWsConnected(true);
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());

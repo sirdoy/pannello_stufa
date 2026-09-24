@@ -170,27 +170,71 @@ describe('WS-03: Dispatch routes message to correct topic callback', () => {
       data: { devices: [] },
       ts: 123,
     };
-    __mockHelpers.setLastMessage({ data: JSON.stringify(message) });
-
-    // Re-render to trigger the useEffect that processes lastMessage
     act(() => {
-      rerender();
+      __mockHelpers.emitMessage(JSON.stringify(message));
     });
 
     expect(fritzboxCb).toHaveBeenCalledWith({ devices: [] });
     expect(hueCb).not.toHaveBeenCalled();
   });
 
-  it('ignores malformed (non-JSON) messages without throwing', () => {
-    const { rerender } = renderHook(() => useWebSocketManager(TEST_URL));
+  it('dispatches every frame of a burst (no render batching loss)', () => {
+    const { result } = renderHook(() => useWebSocketManager(TEST_URL));
+    const fritzboxCb = jest.fn();
+    const hueCb = jest.fn();
+    act(() => {
+      result.current.subscribe('fritzbox', fritzboxCb);
+      result.current.subscribe('hue', hueCb);
+    });
 
-    __mockHelpers.setLastMessage({ data: 'not-valid-json' });
+    // Two snapshots back to back, with no render in between
+    act(() => {
+      __mockHelpers.emitMessage(JSON.stringify({ type: 'snapshot', topic: 'fritzbox', data: { a: 1 }, ts: 1 }));
+      __mockHelpers.emitMessage(JSON.stringify({ type: 'snapshot', topic: 'hue', data: { b: 2 }, ts: 2 }));
+    });
+
+    expect(fritzboxCb).toHaveBeenCalledWith({ a: 1 });
+    expect(hueCb).toHaveBeenCalledWith({ b: 2 });
+  });
+
+  it('ignores malformed (non-JSON) messages without throwing', () => {
+    renderHook(() => useWebSocketManager(TEST_URL));
 
     expect(() => {
       act(() => {
-        rerender();
+        __mockHelpers.emitMessage('not-valid-json');
       });
     }).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// One server subscription per topic
+// ---------------------------------------------------------------------------
+
+describe('Idempotent topic subscription', () => {
+  it('second callback on an active topic sends no subscribe and gets the last payload replayed', async () => {
+    const { result } = renderHook(() => useWebSocketManager(TEST_URL));
+    const sendJsonMessage = __mockHelpers.getSendJsonMessage();
+    const first = jest.fn();
+    const second = jest.fn();
+
+    act(() => {
+      result.current.subscribe('netatmo', first);
+    });
+    act(() => {
+      __mockHelpers.emitMessage(JSON.stringify({ type: 'snapshot', topic: 'netatmo', data: { rooms: [] }, ts: 1 }));
+    });
+    sendJsonMessage.mockClear();
+
+    await act(async () => {
+      result.current.subscribe('netatmo', second);
+      await Promise.resolve();
+    });
+
+    expect(sendJsonMessage).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledWith({ rooms: [] });
+    expect(first).toHaveBeenCalledTimes(1); // no duplicate snapshot fan-out
   });
 });
 
@@ -229,6 +273,19 @@ describe('WS-04: Reconnection config with exponential backoff', () => {
     const options = (useWebSocket as jest.Mock).mock.calls[0]?.[1] as Record<string, unknown>;
     const reconnectInterval = options['reconnectInterval'] as (attempt: number) => number;
     expect(reconnectInterval(1)).toBe(2000);
+  });
+});
+
+describe('Reconnect policy', () => {
+  it('does not reconnect after an auth rejection (1008), reconnects otherwise', () => {
+    renderHook(() => useWebSocketManager(TEST_URL));
+    const options = (useWebSocket as jest.Mock).mock.calls[0]?.[1] as {
+      shouldReconnect: (event: { code: number }) => boolean;
+    };
+
+    expect(options.shouldReconnect({ code: 1008 })).toBe(false);
+    expect(options.shouldReconnect({ code: 1006 })).toBe(true);
+    expect(options.shouldReconnect({ code: 1011 })).toBe(true);
   });
 });
 

@@ -93,7 +93,8 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
           throw new Error(`Comando fallito: ${response.status}`);
         }
         const data = await response.json() as HueCommandResponse;
-        const delayMs = (data.suggested_poll_delay_s ?? 2) * 1000;
+        // Backend re-polled before answering: no wait when the new state is confirmed.
+        const delayMs = data.data_confirmed ? 0 : (data.suggested_poll_delay_s ?? 2) * 1000;
         await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await lightsData.fetchData();
       }
@@ -129,7 +130,8 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
           throw new Error(`Comando fallito: ${response.status}`);
         }
         const data = await response.json() as HueCommandResponse;
-        const delayMs = (data.suggested_poll_delay_s ?? 2) * 1000;
+        // Backend re-polled before answering: no wait when the new state is confirmed.
+        const delayMs = data.data_confirmed ? 0 : (data.suggested_poll_delay_s ?? 2) * 1000;
         await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await lightsData.fetchData();
       }
@@ -160,7 +162,8 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
           throw new Error(`Comando fallito: ${response.status}`);
         }
         const data = await response.json() as HueCommandResponse;
-        const delayMs = (data.suggested_poll_delay_s ?? 2) * 1000;
+        // Backend re-polled before answering: no wait when the new state is confirmed.
+        const delayMs = data.data_confirmed ? 0 : (data.suggested_poll_delay_s ?? 2) * 1000;
         await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await lightsData.fetchData();
       }

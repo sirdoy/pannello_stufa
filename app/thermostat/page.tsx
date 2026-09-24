@@ -288,7 +288,8 @@ function NetatmoContent() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {['schedule', 'away', 'hg', 'off'].map((targetMode) => {
+                  {/* Backend setthermmode accepts only schedule | away | hg (no 'off'). */}
+                  {['schedule', 'away', 'hg'].map((targetMode) => {
                     const config = modeConfig[targetMode as keyof typeof modeConfig];
                     const isActive = mode === targetMode;
                     return (

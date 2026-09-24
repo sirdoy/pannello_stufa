@@ -12,10 +12,21 @@ export const dynamic = 'force-dynamic';
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const eventId = await getPathParam(context, 'eventId');
   const response = await getProxyCameraEventSnapshot(eventId);
+  if (!response.ok) {
+    // Backend 404 (unknown event / blob not cached) or 503: forward status and
+    // problem body, never cache it as a JPEG.
+    return new NextResponse(response.body, {
+      status: response.status,
+      headers: {
+        'Content-Type': response.headers.get('Content-Type') ?? 'application/problem+json',
+        'Cache-Control': 'no-store',
+      },
+    });
+  }
   return new NextResponse(response.body, {
     status: 200,
     headers: {
-      'Content-Type': 'image/jpeg',
+      'Content-Type': response.headers.get('Content-Type') ?? 'image/jpeg',
       'Cache-Control': 'public, max-age=3600',
     },
   });

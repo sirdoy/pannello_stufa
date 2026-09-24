@@ -18,7 +18,7 @@ jest.mock('@/lib/hooks/useVisibility', () => ({
 
 describe('useFritzDevicePresenceHistory', () => {
   const sample = [
-    { timestamp: 1713700000, mac: 'AA:BB:CC:DD:EE:FF', name: 'laptop', ip: '192.168.1.100', is_online: true },
+    { timestamp: 1713700000, mac: 'AA:BB:CC:DD:EE:FF', name: 'laptop', ip: '192.168.1.100', is_online: 1 },
   ];
 
   beforeEach(() => {

@@ -124,6 +124,9 @@ export default function DirigeraPage() {
           error={history.error}
           stale={history.stale}
           loadMore={history.loadMore}
+          sensorNames={Object.fromEntries(
+            (data?.sensors ?? []).map((s) => [s.id, s.custom_name ?? s.id]),
+          )}
         />
 
         {/* Telemetry panel — sensor readings from /api/v1/dirigera/telemetry */}

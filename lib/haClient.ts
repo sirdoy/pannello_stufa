@@ -102,6 +102,24 @@ async function mapResponseError(response: Response): Promise<never> {
     );
   }
 
+  // Client errors keep their status so route/UI branches (e.g. 404 room not found,
+  // 422 invalid rule) can react; they are not upstream failures (502).
+  if (parsedStatus === HTTP_STATUS.NOT_FOUND) {
+    throw new ApiError(ERROR_CODES.NOT_FOUND, detail ?? 'Not found', HTTP_STATUS.NOT_FOUND);
+  }
+
+  if (parsedStatus === HTTP_STATUS.FORBIDDEN) {
+    throw new ApiError(ERROR_CODES.FORBIDDEN, detail ?? 'Forbidden', HTTP_STATUS.FORBIDDEN);
+  }
+
+  if (parsedStatus === HTTP_STATUS.BAD_REQUEST || parsedStatus === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
+    throw new ApiError(
+      ERROR_CODES.VALIDATION_ERROR,
+      detail ?? 'Invalid request',
+      parsedStatus
+    );
+  }
+
   throw new ApiError(
     ERROR_CODES.EXTERNAL_API_ERROR,
     detail ?? `HA proxy error: ${response.statusText}`,

@@ -29,8 +29,11 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 | `GET` | `/api/v1/netatmo/camera/events` | Paginated security camera event log | Required |
 | `GET` | `/api/v1/netatmo/camera/events/{event_id}/snapshot` | Snapshot image URL for a specific event | Required |
 | `GET` | `/api/v1/netatmo/camera/status` | Camera connection status and capabilities | Required |
-| `GET` | `/api/v1/netatmo/camera/{camera_id}/stream` | Live RTSP stream URL for a camera | Required |
-| `GET` | `/api/v1/netatmo/camera/{camera_id}/snapshot` | Latest snapshot URL for a camera | Required |
+| `GET` | `/api/v1/netatmo/camera/{camera_id}/stream` | Live HLS stream URLs (VPN + proxy) for a camera | Required |
+| `GET` | `/api/v1/netatmo/camera/{camera_id}/snapshot` | Latest snapshot URLs (VPN + proxy) for a camera | Required |
+| `GET` | `/api/v1/netatmo/camera/{camera_id}/live/snapshot.jpg` | Proxied JPEG snapshot bytes (browser-safe) | Required |
+| `GET` | `/api/v1/netatmo/camera/{camera_id}/live/{quality}/index.m3u8` | Proxied HLS playlist (browser-safe) | Required |
+| `GET` | `/api/v1/netatmo/camera/{camera_id}/live/{quality}/seg/{rest}` | Proxied HLS segment / sub-playlist | Required |
 | `POST` | `/api/v1/netatmo/camera/{camera_id}/monitoring` | Enable or disable camera monitoring | Required |
 | `POST` | `/api/v1/netatmo/renamehome` | Rename a home | Required |
 
@@ -60,6 +63,9 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
   - [GET /camera/status](#get-camerastatus)
   - [GET /camera/{camera_id}/stream](#get-cameracamera_idstream)
   - [GET /camera/{camera_id}/snapshot](#get-cameracamera_idsnapshot)
+  - [GET /camera/{camera_id}/live/snapshot.jpg](#get-cameracamera_idlivesnapshotjpg)
+  - [GET /camera/{camera_id}/live/{quality}/index.m3u8](#get-cameracamera_idlivequalityindexm3u8)
+  - [GET /camera/{camera_id}/live/{quality}/seg/{rest}](#get-cameracamera_idlivequalitysegrest)
   - [POST /camera/{camera_id}/monitoring](#post-cameracamera_idmonitoring)
   - [GET /camera/events](#get-cameraevents)
   - [GET /camera/events/{event_id}/snapshot](#get-cameraeventsevents_idsnapshot)
@@ -644,6 +650,58 @@ curl -s YOUR_BASE_URL/api/v1/netatmo/gethomedata \
 
 ## Control Endpoints
 
+### Mutation responses
+
+All control endpoints return **HTTP 200** with `data_confirmed` plus the re-polled upstream state (not the raw Netatmo `{"status": "ok", "time_exec": ...}` body). After the Netatmo call succeeds, the backend waits `REPOLL_DELAY_S` (2 s), re-polls, updates the cache and pushes the `netatmo` WS topic.
+
+| Endpoint(s) | Response model | Body |
+|-------------|----------------|------|
+| `POST /setroomthermpoint`, `/setthermmode`, `/switchhomeschedule`, `/synchomeschedule`, `/createnewhomeschedule` | `NetatmoEnergyMutationResponse` | `{data_confirmed, homestatus}` |
+| `POST /camera/{camera_id}/monitoring` | `NetatmoCameraMutationResponse` | `{data_confirmed, camera_id, monitoring, homedata}` |
+| `POST /renamehome` | `NetatmoTopologyMutationResponse` | `{data_confirmed, topology}` |
+| `POST /valves/calibrate`, `POST /valves/{module_id}/calibrate` | plain JSON, **HTTP 202** | see [Valve Calibration](#valve-calibration) |
+
+```typescript
+// Source: api/providers/netatmo/routes.py
+interface NetatmoEnergyMutationResponse {
+  data_confirmed: boolean;
+  homestatus: object;   // RAW Netatmo homestatus response ({status, time_server, body: {home: {id, rooms, modules}}}) -- NOT the {rooms, data_freshness} shape of GET /homestatus
+}
+interface NetatmoCameraMutationResponse {
+  data_confirmed: boolean;
+  camera_id: string;
+  monitoring: "on" | "off";  // echo of the requested value
+  homedata: object;          // raw Netatmo Security gethomedata response ({status, body: {homes: [{cameras, ...}]}})
+}
+interface NetatmoTopologyMutationResponse {
+  data_confirmed: boolean;
+  topology: object;          // cached homesdata topology after forced refresh ({} if unavailable)
+}
+```
+
+```json
+{
+  "data_confirmed": true,
+  "homestatus": {
+    "status": "ok",
+    "time_server": 1773330259,
+    "body": {
+      "home": {
+        "id": "5a1234567890abcdef012345",
+        "rooms": [
+          { "id": "3456789", "reachable": true, "therm_measured_temperature": 20.4, "therm_setpoint_temperature": 21.5, "therm_setpoint_mode": "manual", "therm_setpoint_end_time": 1773333857 }
+        ],
+        "modules": []
+      }
+    }
+  }
+}
+```
+
+`data_confirmed: false` means the Netatmo command succeeded but the re-poll failed: `homestatus` / `homedata` / `topology` then come from the previous cache (`{}` if nothing is cached). Errors from the Netatmo call itself are still 503 (`Netatmo API unavailable: ...`) or 502 (camera, upstream HTTP error).
+
+---
+
 ### POST /setroomthermpoint
 
 Set the thermostat setpoint for a specific room. Validates `temp` in [5.0, 30.0] and `mode` in `["manual", "home"]` before any Netatmo API call.
@@ -682,15 +740,7 @@ interface SetRoomThermpointRequest {
 }
 ```
 
-**Response JSON:**
-
-```json
-{
-  "status": "ok",
-  "time_exec": 0.074,
-  "time_server": 1773330257
-}
-```
+**Response JSON (HTTP 200):** `NetatmoEnergyMutationResponse` -- see [Mutation responses](#mutation-responses).
 
 **curl:**
 
@@ -719,7 +769,7 @@ curl -s -X POST YOUR_BASE_URL/api/v1/netatmo/setroomthermpoint \
 
 ### POST /setthermmode
 
-Set the global thermostat mode for a home. After setting the mode, performs a confirmation read-back via `homestatus` to verify the change was applied.
+Set the global thermostat mode for a home. After setting the mode, re-polls `homestatus` and returns it (the applied mode is in `homestatus.body.home` / per-room `therm_setpoint_mode`).
 
 **Authentication:** Required (JWT Bearer or API Key)
 
@@ -748,31 +798,7 @@ interface SetThermmodeRequest {
 }
 ```
 
-**Response JSON:**
-
-```json
-{
-  "status": "ok",
-  "confirmed_mode": "schedule",
-  "netatmo_response": {
-    "status": "ok",
-    "time_exec": 0.082,
-    "time_server": 1773330257
-  }
-}
-```
-
-> Note: `confirmed_mode` is `null` if the read-back confirmation call fails. This is non-fatal; the set operation still succeeded.
-
-**TypeScript type (response):**
-
-```typescript
-interface SetThermmodeResponse {
-  status: string;
-  confirmed_mode: string | null;  // null if read-back failed
-  netatmo_response: object;
-}
-```
+**Response JSON (HTTP 200):** `NetatmoEnergyMutationResponse` -- see [Mutation responses](#mutation-responses). There is no `confirmed_mode` / `netatmo_response` field.
 
 **curl:**
 
@@ -792,7 +818,7 @@ curl -s -X POST YOUR_BASE_URL/api/v1/netatmo/setthermmode \
 |--------|-----------|---------|
 | 401 | Missing or invalid authentication | `{"detail": "Not authenticated"}` |
 | 422 | Validation failed (invalid mode) | `{"detail": [{"msg": "..."}]}` |
-| 503 | Provider not initialized or DOWN | `{"detail": "Netatmo provider is currently unavailable"}` |
+| 503 | Provider not initialized, DOWN, or Netatmo API unreachable | `{"detail": "Netatmo API unavailable: ..."}` |
 
 ---
 
@@ -825,15 +851,7 @@ interface SwitchHomeScheduleRequest {
 }
 ```
 
-**Response JSON:**
-
-```json
-{
-  "status": "ok",
-  "time_exec": 0.067,
-  "time_server": 1773330257
-}
-```
+**Response JSON (HTTP 200):** `NetatmoEnergyMutationResponse` -- see [Mutation responses](#mutation-responses).
 
 **curl:**
 
@@ -882,15 +900,7 @@ Transparent proxy to sync a home schedule to the Netatmo API. Forwards all body 
 
 > `home_id` is required. All other fields are forwarded as-is to the Netatmo API.
 
-**Response JSON:**
-
-```json
-{
-  "status": "ok",
-  "time_exec": 0.089,
-  "time_server": 1773330257
-}
-```
+**Response JSON (HTTP 200):** `NetatmoEnergyMutationResponse` -- see [Mutation responses](#mutation-responses).
 
 **curl:**
 
@@ -941,16 +951,7 @@ Transparent proxy to create a new home schedule via the Netatmo API. Forwards al
 
 > `home_id` is required. All other fields are forwarded as-is to the Netatmo API.
 
-**Response JSON:**
-
-```json
-{
-  "status": "ok",
-  "schedule_id": "5c1234567890abcdef098765",
-  "time_exec": 0.091,
-  "time_server": 1773330257
-}
-```
+**Response JSON (HTTP 200):** `NetatmoEnergyMutationResponse` -- see [Mutation responses](#mutation-responses). The new `schedule_id` returned by Netatmo is **not** passed through; read it from `GET /homesdata` (schedules list) after creation.
 
 **curl:**
 
@@ -996,13 +997,12 @@ Rename a home via the Netatmo API. Both `home_id` and `name` are required.
 | `home_id` | string | Yes | Netatmo home ID |
 | `name` | string | Yes | New name for the home |
 
-**Response JSON:**
+**Response JSON (HTTP 200):** `NetatmoTopologyMutationResponse` -- see [Mutation responses](#mutation-responses).
 
 ```json
 {
-  "status": "ok",
-  "time_exec": 0.059,
-  "time_server": 1773330257
+  "data_confirmed": true,
+  "topology": { "body": { "homes": [ { "id": "5a1234567890abcdef012345", "name": "Casa al Mare", "rooms": [], "modules": [] } ] } }
 }
 ```
 
@@ -1030,7 +1030,7 @@ curl -s -X POST YOUR_BASE_URL/api/v1/netatmo/renamehome \
 
 ## Valve Calibration
 
-NRV valve status is served from the background poll cache. Calibration commands are forwarded to the Netatmo Energy API and return HTTP 202 because physical motor movement takes 30–120 seconds.
+NRV valve status is served from the background poll cache. Calibration commands are forwarded to the Netatmo Energy API and return HTTP 202 because physical motor movement takes 30–120 seconds. Before responding, both calibrate endpoints wait `REPOLL_DELAY_S` (2 s), re-poll `homestatus` (updating the cache and pushing the `netatmo` WS topic) and report the `calibrating` flag read back plus `data_confirmed`.
 
 ### GET /valves
 
@@ -1108,9 +1108,10 @@ Trigger motor calibration on all NRV valves. Sends calibration commands sequenti
 {
   "status": "accepted",
   "results": [
-    { "module_id": "09:00:00:aa:bb:cc", "status": "accepted" },
-    { "module_id": "09:00:00:dd:ee:ff", "status": "error", "error": "timeout" }
+    { "module_id": "09:00:00:aa:bb:cc", "status": "accepted", "calibrating": true },
+    { "module_id": "09:00:00:dd:ee:ff", "status": "error", "error": "timeout", "calibrating": false }
   ],
+  "data_confirmed": true,
   "poll_endpoint": "/netatmo/homestatus"
 }
 ```
@@ -1122,12 +1123,14 @@ interface CalibrateBatchResult {
   module_id: string;
   status: "accepted" | "error";
   error?: string;
+  calibrating: boolean | null;  // from re-polled homestatus; null when the re-poll failed
 }
 
 interface CalibrateBatchResponse {
   status: "accepted";
   results: CalibrateBatchResult[];
-  poll_endpoint: string;
+  data_confirmed: boolean;      // false => homestatus re-poll failed
+  poll_endpoint: "/netatmo/homestatus";
 }
 ```
 
@@ -1167,6 +1170,8 @@ Trigger motor calibration on a single NRV valve identified by `module_id`. Valid
 {
   "status": "accepted",
   "module_id": "09:00:00:aa:bb:cc",
+  "calibrating": true,
+  "data_confirmed": true,
   "poll_endpoint": "/netatmo/homestatus"
 }
 ```
@@ -1177,7 +1182,9 @@ Trigger motor calibration on a single NRV valve identified by `module_id`. Valid
 interface CalibrateValveResponse {
   status: "accepted";
   module_id: string;
-  poll_endpoint: string;
+  calibrating: boolean;         // true only if the re-polled homestatus shows this module calibrating (false also when re-poll failed)
+  data_confirmed: boolean;      // false => homestatus re-poll failed
+  poll_endpoint: "/netatmo/homestatus";
 }
 ```
 
@@ -1287,6 +1294,11 @@ Return HLS stream URLs for a specific camera. The response always includes VPN s
     "medium": "https://v.netatmo.com/restricted/.../.../live/files/medium/index.m3u8",
     "low": "https://v.netatmo.com/restricted/.../.../live/files/low/index.m3u8"
   },
+  "proxy_streams": {
+    "high": "/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/high/index.m3u8",
+    "medium": "/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/medium/index.m3u8",
+    "low": "/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/low/index.m3u8"
+  },
   "is_local": true,
   "local_streams": {
     "high": "http://192.168.178.x/.../live/files/high/index.m3u8",
@@ -1295,6 +1307,8 @@ Return HLS stream URLs for a specific camera. The response always includes VPN s
   }
 }
 ```
+
+> **Browser usage:** load `proxy_streams.*` URLs into `hls.js`, not `vpn_streams.*`. VPN URLs require Netatmo VPN session state the browser does not have; proxy URLs route through this API (authenticated via the same JWT / API key) and stream segments back. `vpn_streams` remains in the payload for server-to-server consumers and diagnostics. `local_streams` works only when the client is on the same LAN as the camera.
 
 **TypeScript type:**
 
@@ -1307,9 +1321,10 @@ interface StreamUrls {
 
 interface CameraStreamResponse {
   camera_id: string;
-  vpn_streams: StreamUrls;
+  vpn_streams: StreamUrls;          // raw Netatmo VPN URLs (server-side use)
+  proxy_streams: StreamUrls;        // authenticated proxy URLs (browser use)
   is_local: boolean;
-  local_streams?: StreamUrls;  // only present when is_local=true and local URL available
+  local_streams?: StreamUrls;       // only present when is_local=true and local URL available
 }
 ```
 
@@ -1349,16 +1364,20 @@ Return the current snapshot URL for a camera. Returns a URL string pointing to t
 ```json
 {
   "camera_id": "70:ee:50:aa:bb:cc",
-  "snapshot_url": "https://v.netatmo.com/restricted/.../.../live/snapshot_720.jpg"
+  "snapshot_url": "https://v.netatmo.com/restricted/.../.../live/snapshot_720.jpg",
+  "snapshot_proxy_url": "/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/snapshot.jpg"
 }
 ```
+
+> **Browser usage:** point `<img src>` at `snapshot_proxy_url` — it streams JPEG bytes through this API after the backend fetches them from the VPN. `snapshot_url` is kept for server-to-server consumers.
 
 **TypeScript type:**
 
 ```typescript
 interface CameraSnapshotUrlResponse {
   camera_id: string;
-  snapshot_url: string;
+  snapshot_url: string;        // raw Netatmo VPN URL (server-side use)
+  snapshot_proxy_url: string;  // authenticated proxy URL (browser use)
 }
 ```
 
@@ -1376,6 +1395,111 @@ curl -s YOUR_BASE_URL/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/snapshot \
 | 401 | Missing or invalid authentication | `{"detail": "Not authenticated"}` |
 | 404 | camera_id not found in homedata | `{"detail": "Camera '70:ee:50:aa:bb:cc' not found"}` |
 | 503 | Provider not initialized, DOWN, homedata not cached, or VPN URL missing | `{"detail": "Camera VPN URL not available"}` |
+
+---
+
+### GET /camera/{camera_id}/live/snapshot.jpg
+
+Authenticated proxy for the live snapshot. The backend fetches `{vpn_url}/live/snapshot_720.jpg` from Netatmo and streams the JPEG bytes back to the client. Use this instead of `snapshot_url` from `GET /camera/{camera_id}/snapshot` whenever the consumer is a browser — the VPN URL fails directly because the browser holds no Netatmo session and Netatmo serves no CORS headers.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Path Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `camera_id` | string | Camera MAC address (from `GET /netatmo/camera/status`) |
+
+**Response:** `image/jpeg` body, `Cache-Control: no-store`.
+
+**HTML usage:**
+
+```html
+<img src="/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/snapshot.jpg?token=..." />
+```
+
+**Error responses:**
+
+| Status | Condition |
+|--------|-----------|
+| 401 | Missing or invalid authentication |
+| 404 | camera_id not found in homedata |
+| 502 | Netatmo VPN unreachable or returned non-200 |
+| 503 | Provider not initialized, DOWN, camera offline, or homedata not cached |
+
+---
+
+### GET /camera/{camera_id}/live/{quality}/index.m3u8
+
+Authenticated proxy for the HLS master playlist. The backend fetches `{vpn_url}/live/files/{quality}/index.m3u8` from Netatmo, then rewrites every segment URI (and `#EXT-X-KEY`, `#EXT-X-MAP`, `#EXT-X-MEDIA` `URI=` attributes) to point at `GET /camera/{camera_id}/live/{quality}/seg/...` so each segment fetch stays on the authenticated proxy.
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Path Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `camera_id` | string | Camera MAC address |
+| `quality` | string | `high`, `medium`, or `low` |
+
+**Response:** `application/vnd.apple.mpegurl` body, `Cache-Control: no-store`.
+
+**Example (rewritten):**
+
+```text
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:6
+#EXT-X-KEY:METHOD=AES-128,URI="/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/high/seg/key.bin"
+#EXTINF:6.0,
+/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/high/seg/chunk_0001.ts
+```
+
+**Browser usage (hls.js):**
+
+```js
+const hls = new Hls();
+hls.loadSource(`/api/v1/netatmo/camera/${cameraId}/live/high/index.m3u8`);
+hls.attachMedia(videoEl);
+```
+
+**Error responses:**
+
+| Status | Condition |
+|--------|-----------|
+| 401 | Missing or invalid authentication |
+| 404 | camera_id not found in homedata |
+| 422 | `quality` not in `{high, medium, low}` |
+| 502 | Netatmo VPN unreachable or returned non-200 |
+| 503 | Provider not initialized, DOWN, camera offline, or homedata not cached |
+
+---
+
+### GET /camera/{camera_id}/live/{quality}/seg/{rest}
+
+Authenticated proxy for an HLS segment (typically `*.ts`) or a nested playlist referenced by the master `index.m3u8`. The backend fetches `{vpn_url}/live/files/{quality}/{rest}` from Netatmo and streams the body back. Nested `.m3u8` responses are rewritten with the same proxy rules as the master playlist; everything else is forwarded as-is with the upstream `Content-Type` (or `video/MP2T` for `*.ts` when upstream omits it).
+
+**Authentication:** Required (JWT Bearer or API Key)
+
+**Path Parameters:**
+
+| Name | Type | Description |
+|------|------|-------------|
+| `camera_id` | string | Camera MAC address |
+| `quality` | string | `high`, `medium`, or `low` |
+| `rest` | string | Segment filename or nested path. `..` components and absolute `/`-prefixed paths are rejected with 422. |
+
+**Response:** binary body with upstream-derived `Content-Type`, `Cache-Control: no-store`. Called automatically by `hls.js` after loading the proxied master playlist — clients normally do not request this endpoint directly.
+
+**Error responses:**
+
+| Status | Condition |
+|--------|-----------|
+| 401 | Missing or invalid authentication |
+| 404 | camera_id not found in homedata |
+| 422 | Invalid `quality` or unsafe `rest` (path traversal) |
+| 502 | Netatmo VPN unreachable or returned non-200 |
+| 503 | Provider not initialized, DOWN, camera offline, or homedata not cached |
 
 ---
 
@@ -1401,13 +1525,21 @@ Toggle monitoring on or off for a specific camera. Proxies the `setstate` comman
 |-------|------|----------|-------------|
 | `monitoring` | string | Yes | `"on"` to enable monitoring, `"off"` to disable |
 
-**Response JSON:**
+**Response JSON (HTTP 200):** `NetatmoCameraMutationResponse` -- see [Mutation responses](#mutation-responses). After `setstate`, the backend waits 2 s and re-polls `gethomedata` (updating the camera/VPN cache). The WS push that follows carries the cached `homestatus`, so the `netatmo` topic payload keeps its `rooms` (cameras are rebuilt from the fresh homedata).
 
 ```json
 {
+  "data_confirmed": true,
   "camera_id": "70:ee:50:aa:bb:cc",
   "monitoring": "on",
-  "status": "applied"
+  "homedata": {
+    "status": "ok",
+    "body": {
+      "homes": [
+        { "id": "5a1234567890abcdef012345", "cameras": [ { "id": "70:ee:50:aa:bb:cc", "type": "NACamera", "name": "Ingresso", "status": "on" } ] }
+      ]
+    }
+  }
 }
 ```
 
@@ -1418,10 +1550,12 @@ interface SetMonitoringRequest {
   monitoring: "on" | "off";
 }
 
+// NetatmoCameraMutationResponse
 interface SetMonitoringResponse {
+  data_confirmed: boolean;   // false => gethomedata re-poll failed, homedata is the previous cache
   camera_id: string;
-  monitoring: "on" | "off";
-  status: "applied";
+  monitoring: "on" | "off";  // echo of the requested value (not read back)
+  homedata: object;          // raw gethomedata response; check cameras[].status for the applied state
 }
 ```
 

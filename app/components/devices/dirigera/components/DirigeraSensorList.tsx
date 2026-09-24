@@ -26,7 +26,7 @@ export default function DirigeraSensorList({ sensors, filter }: DirigeraSensorLi
   const sorted = [...sensors].sort((a, b) => {
     const roomCmp = (a.room ?? '').localeCompare(b.room ?? '', 'it');
     if (roomCmp !== 0) return roomCmp;
-    return a.custom_name.localeCompare(b.custom_name, 'it');
+    return (a.custom_name ?? a.id).localeCompare(b.custom_name ?? b.id, 'it');
   });
 
   const showFreshness = filter !== 'all';

@@ -1,5 +1,5 @@
 /**
- * Tests for GET /api/v1/automations/[rule_id]/executions
+ * Tests for GET /api/v1/automations/[rule_id]/history
  */
 
 jest.mock('@/lib/automations');
@@ -33,7 +33,7 @@ const mockPaginatedExecutions = {
   offset: 0,
 };
 
-describe('GET /api/v1/automations/[rule_id]/executions', () => {
+describe('GET /api/v1/automations/[rule_id]/history', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetSession.mockResolvedValue(mockSession as any);
@@ -43,7 +43,7 @@ describe('GET /api/v1/automations/[rule_id]/executions', () => {
 
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const request = new Request('http://localhost:3000/api/v1/automations/rule-123/executions');
+    const request = new Request('http://localhost:3000/api/v1/automations/rule-123/history');
 
     const response = await GET(request as any, mockContext as any);
     const data = await response.json();
@@ -54,7 +54,7 @@ describe('GET /api/v1/automations/[rule_id]/executions', () => {
 
   it('returns 200 with paginated execution history', async () => {
     mockAutomationsProxy.getExecutions.mockResolvedValue(mockPaginatedExecutions);
-    const request = new Request('http://localhost:3000/api/v1/automations/rule-123/executions');
+    const request = new Request('http://localhost:3000/api/v1/automations/rule-123/history');
 
     const response = await GET(request as any, mockContext as any);
     const data = await response.json();
@@ -66,7 +66,7 @@ describe('GET /api/v1/automations/[rule_id]/executions', () => {
 
   it('passes rule_id and pagination params to proxy', async () => {
     mockAutomationsProxy.getExecutions.mockResolvedValue(mockPaginatedExecutions);
-    const request = new Request('http://localhost:3000/api/v1/automations/rule-123/executions?limit=20&offset=0');
+    const request = new Request('http://localhost:3000/api/v1/automations/rule-123/history?limit=20&offset=0');
 
     await GET(request as any, mockContext as any);
 

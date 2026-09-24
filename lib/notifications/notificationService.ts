@@ -34,26 +34,11 @@ function getVapidKey() {
 }
 
 /**
- * Debug logger - salva log su Firebase per troubleshooting remoto
+ * Debug logger (console only). The remote sink POST /api/debug/log was removed
+ * in v1.77.0 (unauthenticated Firebase write) — calling it only produced 404s.
  */
 async function debugLog(message: string, data: Record<string, unknown> = {}) {
-  try {
-    await fetch('/api/debug/log', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        category: 'notifications',
-        message,
-        data: {
-          ...data,
-          timestamp: new Date().toISOString(),
-          url: typeof window !== 'undefined' ? window.location.href : 'SSR',
-        },
-      }),
-    });
-  } catch (e) {
-    console.error('[debugLog] Failed to send:', e);
-  }
+  console.debug('[notifications]', message, data);
 }
 
 /**

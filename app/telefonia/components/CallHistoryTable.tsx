@@ -2,14 +2,15 @@
 
 import type { ReactNode } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {
   Phone,
   PhoneIncoming,
   PhoneOutgoing,
   PhoneMissed,
-  Voicemail,
+  PhoneOff,
+  PhoneCall,
   History,
   ChevronLeft,
   ChevronRight,
@@ -41,27 +42,58 @@ interface CallHistoryTableProps {
 
 type CallTypeVariant = 'sage' | 'ocean' | 'danger' | 'warning' | 'neutral';
 
-function getCallTypeMeta(type: string): {
+function getCallTypeMeta(type: string | null | undefined): {
   variant: CallTypeVariant;
   icon: ReactNode;
   label: string;
 } {
+  // Backend call_type values (call_type_code 1/2/3/9/10/11).
   switch (type) {
-    case 'incoming':
-      return { variant: 'sage', icon: <PhoneIncoming size={14} />, label: 'In entrata' };
-    case 'outgoing':
-      return { variant: 'ocean', icon: <PhoneOutgoing size={14} />, label: 'In uscita' };
+    case 'received':
+      return { variant: 'sage', icon: <PhoneIncoming size={14} />, label: 'Ricevuta' };
     case 'missed':
       return { variant: 'danger', icon: <PhoneMissed size={14} />, label: 'Persa' };
-    case 'voicemail':
-      return { variant: 'warning', icon: <Voicemail size={14} />, label: 'Segreteria' };
+    case 'outgoing':
+      return { variant: 'ocean', icon: <PhoneOutgoing size={14} />, label: 'In uscita' };
+    case 'rejected':
+      return { variant: 'warning', icon: <PhoneOff size={14} />, label: 'Rifiutata' };
+    case 'active_received':
+    case 'active_outgoing':
+      return { variant: 'ocean', icon: <PhoneCall size={14} />, label: 'In corso' };
     default:
       return { variant: 'neutral', icon: <Phone size={14} />, label: 'Sconosciuto' };
   }
 }
 
-function formatDuration(sec: number): ReactNode {
-  if (sec === 0) return <span className="text-slate-500">—</span>;
+const OUTGOING_TYPES = new Set(['outgoing', 'active_outgoing']);
+
+/**
+ * Number of the remote party: caller for incoming-ish calls
+ * (received/missed/rejected/active_received), called for outgoing ones.
+ * Falls back to the raw caller/called fields, then null.
+ */
+export function getCounterpartNumber(call: CallRecord): string | null {
+  if (OUTGOING_TYPES.has(call.call_type)) {
+    return call.called_number || call.called || null;
+  }
+  return call.caller_number || call.caller || null;
+}
+
+/**
+ * Format the backend `date` (ISO 8601 local time, no timezone, e.g.
+ * "2026-02-17T10:30:00"). Returns null on missing/invalid input — never throws.
+ */
+export function formatCallDate(value: string | null | undefined): string | null {
+  if (!value || typeof value !== 'string') return null;
+  const date = parseISO(value);
+  if (!isValid(date)) return null;
+  return format(date, 'dd MMM yyyy HH:mm', { locale: it });
+}
+
+function formatDuration(sec: number | null | undefined): ReactNode {
+  if (sec === null || sec === undefined || !Number.isFinite(sec) || sec <= 0) {
+    return <span className="text-slate-500">—</span>;
+  }
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
   const s = sec % 60;
@@ -71,14 +103,19 @@ function formatDuration(sec: number): ReactNode {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
+/** Stable row id — backend CallRecord has no id field. */
+function getCallRowId(call: CallRecord, index: number): string {
+  return `${call.date ?? 'nodate'}|${call.caller_number ?? call.caller ?? call.called_number ?? call.called ?? ''}|${index}`;
+}
+
 /**
  * CallHistoryTable — FRITZ-02 presentational card for call history.
  *
  * Server-paginated 50/page with Prev/Next controls. Uses Banner
  * variant="error" per Pitfall 4 (not the legacy alert primitive) and
  * never renders untrusted HTML — JSX default escaping covers threat
- * T-171-01. Pitfall 5 (unknown call_type fallback) and Pitfall 6
- * (timestamp seconds→ms) are both applied.
+ * T-171-01. Unknown call_type falls back to "Sconosciuto"; `date` is
+ * parsed defensively (invalid/null → "—").
  */
 export default function CallHistoryTable({
   calls,
@@ -107,19 +144,24 @@ export default function CallHistoryTable({
       },
     },
     {
-      accessorKey: 'number',
+      id: 'number',
       header: 'Numero',
       enableSorting: false,
-      cell: ({ row }) => (
-        <span className="font-mono text-slate-200">{row.original.number}</span>
-      ),
+      cell: ({ row }) => {
+        const number = getCounterpartNumber(row.original);
+        return number ? (
+          <span className="font-mono text-slate-200">{number}</span>
+        ) : (
+          <span className="text-slate-500">—</span>
+        );
+      },
     },
     {
       accessorKey: 'name',
       header: 'Nome',
       enableSorting: false,
       cell: ({ row }) => (
-        <span className="text-slate-300">{row.original.name ?? '—'}</span>
+        <span className="text-slate-300">{row.original.name || '—'}</span>
       ),
     },
     {
@@ -129,14 +171,11 @@ export default function CallHistoryTable({
       cell: ({ row }) => formatDuration(row.original.duration_seconds),
     },
     {
-      accessorKey: 'timestamp',
+      accessorKey: 'date',
       header: 'Data/ora',
       enableSorting: false,
-      // Pitfall 6: raw timestamp is Unix SECONDS — *1000 for Date.
       cell: ({ row }) =>
-        format(new Date(row.original.timestamp * 1000), 'dd MMM yyyy HH:mm', {
-          locale: it,
-        }),
+        formatCallDate(row.original.date) ?? <span className="text-slate-500">—</span>,
     },
   ];
 
@@ -172,6 +211,7 @@ export default function CallHistoryTable({
         <DataTable
           columns={columns}
           data={calls}
+          getRowId={getCallRowId}
           density="default"
           striped={true}
           enableFiltering={false}

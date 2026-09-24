@@ -753,7 +753,7 @@ describe('Scheduler Check Route', () => {
   describe('State Transitions - Ignition', () => {
     it('ignites stove when schedule is active and stove is OFF', async () => {
       // Mock sendIgnit to succeed
-      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
 
       // Mock stove as OFF
       mockGetStatus.mockResolvedValue({
@@ -894,7 +894,7 @@ describe('Scheduler Check Route', () => {
 
     it('tracks ignition interval for unexpected off detection', async () => {
       // Mock successful ignition
-      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
       mockGetStatus.mockResolvedValue({
         stove_state: 'off',
         power_level: 2,
@@ -933,7 +933,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('logs analytics event on successful ignition', async () => {
-      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
       mockGetStatus.mockResolvedValue({
         stove_state: 'off',
         power_level: 2,
@@ -974,7 +974,7 @@ describe('Scheduler Check Route', () => {
         error_code: null,
         error_description: null,
       });
-      mockSendShutdown.mockResolvedValue({ command: 'shutdown', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendShutdown.mockResolvedValue({ command: 'shutdown', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -1050,7 +1050,7 @@ describe('Scheduler Check Route', () => {
         error_code: null,
         error_description: null,
       });
-      mockSendShutdown.mockResolvedValue({ command: 'shutdown', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendShutdown.mockResolvedValue({ command: 'shutdown', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -1082,7 +1082,7 @@ describe('Scheduler Check Route', () => {
         error_code: null,
         error_description: null,
       });
-      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 });
+      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 } as never);
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -1115,7 +1115,7 @@ describe('Scheduler Check Route', () => {
         error_code: null,
         error_description: null,
       });
-      mockSetFan.mockResolvedValue({ command: 'set_fan', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 });
+      mockSetFan.mockResolvedValue({ command: 'set_fan', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 } as never);
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);
@@ -1534,8 +1534,8 @@ describe('Scheduler Check Route', () => {
   describe('Semi-Manual to Automatic Transition', () => {
     it('clears semi-manual mode when change is applied during semi-manual', async () => {
       // Mock successful ignition during semi-manual with past returnToAutoAt
-      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
-      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 });
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
+      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: 4 } as never);
       mockGetStatus.mockResolvedValue({
         stove_state: 'off',
         power_level: 2,
@@ -1702,7 +1702,7 @@ describe('Scheduler Check Route', () => {
       // Remove ADMIN_USER_ID
       delete process.env.ADMIN_USER_ID;
 
-      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
       mockGetStatus.mockResolvedValue({
         stove_state: 'off',
         power_level: 2,
@@ -2711,7 +2711,7 @@ describe('Scheduler Check Route', () => {
 
   describe('Fire-and-Forget Helper Branches - sendSchedulerNotification', () => {
     it('handles skipped scheduler notification', async () => {
-      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
       mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerSchedulerActionServer.mockResolvedValue({
         success: false,
@@ -2744,7 +2744,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('logs error when scheduler notification fails', async () => {
-      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
       mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerSchedulerActionServer.mockResolvedValue({
         success: false,
@@ -2777,7 +2777,7 @@ describe('Scheduler Check Route', () => {
     });
 
     it('handles scheduler notification exception', async () => {
-      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null });
+      mockSendIgnit.mockResolvedValue({ command: 'ignit', status: 'accepted', previous_state: 'off', suggested_poll_delay_s: 15, poll_endpoint: '/status', requested_value: null } as never);
       mockGetStatus.mockResolvedValue({ stove_state: 'off', power_level: 2, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
       mockTriggerSchedulerActionServer.mockRejectedValue(new Error('Network error'));
 
@@ -2823,7 +2823,7 @@ describe('Scheduler Check Route', () => {
     it('adjusts power level when PID output differs from current', async () => {
       // Mock stove in WORK state at power 4 (PID will output 3, causing an adjustment)
       mockGetStatus.mockResolvedValue({ stove_state: 'working', power_level: 4, fan_level: 3, data_freshness: 'LIVE', last_poll_at: null, error_code: null, error_description: null });
-      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: null });
+      mockSetPower.mockResolvedValue({ command: 'set_power', status: 'accepted', previous_state: 'working', suggested_poll_delay_s: 5, poll_endpoint: '/status', requested_value: null } as never);
 
       const mockUpdateStoveState = jest.mocked(updateStoveState);
       mockUpdateStoveState.mockResolvedValue(undefined as any);

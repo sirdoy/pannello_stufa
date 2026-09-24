@@ -17,18 +17,26 @@ const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockStatsData = {
   aggregation: {
-    last_run_at: 1773244800,
-    last_run_status: 'ok',
-    rows_aggregated_last_run: 248,
+
+    last_run: 1773244800,
+
+    last_sensors_processed: 248,
+
     total_runs: 7,
-    total_rows_aggregated: 1736,
+
   },
   retention: {
-    last_run_at: 1773244800,
-    last_run_status: 'ok',
-    rows_deleted_last_run: 0,
+
+    last_run: 1773244800,
+
+    last_raw_events_deleted: 42,
+
+    last_daily_rows_deleted: 0,
+
+    last_telemetry_deleted: 0,
+
     total_runs: 7,
-    total_rows_deleted: 42,
+
   },
 };
 
@@ -57,7 +65,7 @@ describe('GET /api/v1/dirigera/stats', () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.aggregation.total_runs).toBe(7);
-    expect(data.retention.total_rows_deleted).toBe(42);
+    expect(data.retention.last_raw_events_deleted).toBe(42);
     expect(mockGetStats).toHaveBeenCalledTimes(1);
     expect(mockGetStats).toHaveBeenCalledWith();
   });

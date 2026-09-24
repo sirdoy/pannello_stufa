@@ -231,3 +231,18 @@ describe('stoveStatusUtils', () => {
     });
   });
 });
+
+describe("StoveState 'unknown' (backend mutation fallback when nothing is cached)", () => {
+  it('getStatusInfo returns a neutral, non-animated SCONOSCIUTO state', () => {
+    const info = getStatusInfo('unknown');
+    expect(info.label).toBe('SCONOSCIUTO');
+    expect(info.animated).toBe(false);
+  });
+
+  it('getStatusDisplay returns a neutral warning display', () => {
+    const display = getStatusDisplay('unknown');
+    expect(display.label).toBe('SCONOSCIUTO');
+    expect(display.variant).toBe('neutral');
+    expect(display.health).toBe('warning');
+  });
+});

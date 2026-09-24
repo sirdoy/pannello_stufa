@@ -59,7 +59,7 @@ describe('useFritzBandwidthTiers', () => {
   it('clears tierData when tier is "realtime"', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ hourly: { items: mockHourlyItems, total: 2 } }),
+      json: () => Promise.resolve({ hourly: { items: mockHourlyItems, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -81,10 +81,10 @@ describe('useFritzBandwidthTiers', () => {
     expect(result.current.tierData).toEqual([]);
   });
 
-  it('fetches /hourly?days=7 for hourly tier', async () => {
+  it('fetches /hourly?days=7&limit=1000 for hourly tier (168 rows > backend default 100)', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ hourly: { items: mockHourlyItems, total: 2 } }),
+      json: () => Promise.resolve({ hourly: { items: mockHourlyItems, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -97,13 +97,13 @@ describe('useFritzBandwidthTiers', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/hourly?days=7');
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/hourly?days=7&limit=1000');
   });
 
   it('fetches /daily?days=30 for daily tier', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ daily: { items: mockDailyItems, total: 1 } }),
+      json: () => Promise.resolve({ daily: { items: mockDailyItems, total_count: 1, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -116,13 +116,13 @@ describe('useFritzBandwidthTiers', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/daily?days=30');
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/daily?days=30&limit=1000');
   });
 
   it('transforms bps to Mbps and seconds to ms for hourly data', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ hourly: { items: mockHourlyItems, total: 2 } }),
+      json: () => Promise.resolve({ hourly: { items: mockHourlyItems, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -147,7 +147,7 @@ describe('useFritzBandwidthTiers', () => {
   it('transforms bps to Mbps and seconds to ms for daily data', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ daily: { items: mockDailyItems, total: 1 } }),
+      json: () => Promise.resolve({ daily: { items: mockDailyItems, total_count: 1, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -187,7 +187,7 @@ describe('useFritzBandwidthTiers', () => {
     const reversedItems = [...mockHourlyItems].reverse();
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ hourly: { items: reversedItems, total: 2 } }),
+      json: () => Promise.resolve({ hourly: { items: reversedItems, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -210,10 +210,10 @@ describe('useFritzBandwidthTiers', () => {
     { timestamp: 1700003600, granularity: 'hourly', avg_downstream_rate: 15_000_000, avg_upstream_rate: 3_000_000 },
   ];
 
-  it('fetches /api/v1/fritzbox/history/bandwidth/auto?days=7 for auto tier', async () => {
+  it('fetches /api/v1/fritzbox/history/bandwidth/auto?days=7&limit=1000 for auto tier', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
+      json: () => Promise.resolve({ auto: { items: mockAutoItems, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -226,13 +226,13 @@ describe('useFritzBandwidthTiers', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/auto?days=7');
+    expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/auto?days=7&limit=1000');
   });
 
   it('maps timestamp (not hour_timestamp) to chart points for auto tier', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
+      json: () => Promise.resolve({ auto: { items: mockAutoItems, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -257,7 +257,7 @@ describe('useFritzBandwidthTiers', () => {
   it('sets autoGranularity from first item granularity field', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
+      json: () => Promise.resolve({ auto: { items: mockAutoItems, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());
@@ -276,7 +276,7 @@ describe('useFritzBandwidthTiers', () => {
   it('resets autoGranularity to null when switching from auto to realtime', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ auto: { items: mockAutoItems, total: 2 } }),
+      json: () => Promise.resolve({ auto: { items: mockAutoItems, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzBandwidthTiers());

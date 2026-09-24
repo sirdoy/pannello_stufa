@@ -16,7 +16,7 @@ export interface WiFiClient {
   ip: string;
   band: string;
   ssid: string;
-  signal_strength: number;    // dBm (negative integer)
+  signal_strength: number;    // quality 0-100 (Fritz!Box scale, not dBm)
   link_speed_mbps: number;
   is_active: boolean;
 }
@@ -34,13 +34,14 @@ interface WifiClientsTableProps {
 /**
  * SignalStrengthBars
  *
- * Visual 4-bar signal strength indicator based on dBm value.
- * > -50: 4 bars, > -60: 3 bars, > -70: 2 bars, else: 1 bar
+ * Visual 4-bar signal strength indicator for the backend 0-100 quality scale
+ * (WiFiClientModel.signal_strength is NOT dBm).
+ * >= 75: 4 bars, >= 50: 3 bars, >= 25: 2 bars, else: 1 bar
  */
-function SignalStrengthBars({ dbm }: { dbm: number }) {
-  const bars = dbm > -50 ? 4 : dbm > -60 ? 3 : dbm > -70 ? 2 : 1;
+function SignalStrengthBars({ quality }: { quality: number }) {
+  const bars = quality >= 75 ? 4 : quality >= 50 ? 3 : quality >= 25 ? 2 : 1;
   return (
-    <div className="flex items-end gap-0.5" title={`${dbm} dBm`}>
+    <div className="flex items-end gap-0.5" title={`Segnale ${quality}%`} data-bars={bars}>
       {[1, 2, 3, 4].map((b) => (
         <div
           key={b}
@@ -63,10 +64,10 @@ const BAND_FILTERS: { value: WifiBandFilter; label: string }[] = [
  *
  * DataTable of WiFi clients with:
  * - Band filter toggle (All / 2.4 GHz / 5 GHz)
- * - Signal strength bars (1-4 bars based on dBm)
+ * - Signal strength bars (1-4 bars, 0-100 quality scale)
  * - Band badges (ocean for 5GHz, ember for 2.4GHz)
  * - CopyableIp for IP column
- * - Default sort: strongest signal first (less negative = stronger)
+ * - Default sort: strongest signal first (higher quality = stronger)
  */
 export default function WifiClientsTable({
   clients,
@@ -101,7 +102,7 @@ export default function WifiClientsTable({
       enableSorting: true,
       sortingFn: (rowA, rowB) =>
         rowB.original.signal_strength - rowA.original.signal_strength,
-      cell: ({ row }) => <SignalStrengthBars dbm={row.original.signal_strength} />,
+      cell: ({ row }) => <SignalStrengthBars quality={row.original.signal_strength} />,
     },
     {
       accessorKey: 'band',

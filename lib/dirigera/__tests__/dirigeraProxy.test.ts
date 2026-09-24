@@ -86,7 +86,6 @@ const mockMotionSensorsResponse: MotionSensorsResponse = {
       firmware_version: '24056010',
       battery_percentage: 75,
       is_reachable: true,
-      is_open: null,
       last_seen: '2026-03-12T15:28:00.000Z',
       light_level: 42,
       data_freshness: 'LIVE',
@@ -109,9 +108,8 @@ const mockHistoryResponse: SensorHistoryResponse = {
     {
       id: 1,
       sensor_id: 'abc',
-      sensor_name: 'Door',
       event_type: 'open',
-      recorded_at: 1773000000,
+      timestamp: 1773000000,
     },
   ],
   total: 1,
@@ -121,18 +119,26 @@ const mockHistoryResponse: SensorHistoryResponse = {
 
 const mockStatsResponse: DirigeraStatsResponse = {
   aggregation: {
-    last_run_at: 1773244800,
-    last_run_status: 'ok',
-    rows_aggregated_last_run: 248,
+
+    last_run: 1773244800,
+
+    last_sensors_processed: 248,
+
     total_runs: 7,
-    total_rows_aggregated: 1736,
+
   },
   retention: {
-    last_run_at: 1773244800,
-    last_run_status: 'ok',
-    rows_deleted_last_run: 0,
+
+    last_run: 1773244800,
+
+    last_raw_events_deleted: 42,
+
+    last_daily_rows_deleted: 0,
+
+    last_telemetry_deleted: 0,
+
     total_runs: 7,
-    total_rows_deleted: 42,
+
   },
 };
 

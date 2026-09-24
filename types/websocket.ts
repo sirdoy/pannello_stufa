@@ -28,8 +28,9 @@ export type { TuyaPlug } from '@/types/tuyaProxy';
 /** All available WebSocket subscription topics */
 export type Topic =
   | 'fritzbox' | 'dirigera' | 'netatmo' | 'thermorossi'
-  | 'hue' | 'sonos' | 'raspi' | 'tuya'
-  | 'sonos_transport' | 'sonos_volume';
+  | 'hue' | 'sonos' | 'raspi' | 'tuya' | 'scheduler'
+  | 'sonos_transport' | 'sonos_volume' | 'sonos_topology'
+  | 'automations';
 
 /**
  * Envelope for all server-to-client messages.
@@ -97,18 +98,16 @@ export interface DirigeraData {
 // ---------------------------------------------------------------------------
 
 /**
- * Raw Netatmo cloud API homestatus response with enrichment metadata.
- * WS sends raw Netatmo homestatus envelope (body.home.rooms[]), NOT proxy format.
- * Adapter in lib/netatmo/netatmoWsAdapter.ts handles conversion.
- * The index signature [key: string]: unknown preserves backward compat for other
- * Netatmo API top-level fields.
+ * Netatmo topic payload (backend/api/ws/manager.py `_enrich_payload`):
+ * `rooms` are raw homestatus rooms (id, therm_measured_temperature, ...), `cameras`
+ * the camera view with proxy URLs. No `modules` (battery info is REST-only).
+ * Adapter in lib/netatmo/netatmoWsAdapter.ts maps rooms to NetatmoStatus.
  */
 export interface NetatmoData {
-  body: Record<string, unknown>;
-  status: string;
-  time_server: number;
+  rooms: Record<string, unknown>[];
+  cameras: Record<string, unknown>[];
   data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';
-  [key: string]: unknown;  // additional Netatmo API top-level fields
+  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------
@@ -122,13 +121,16 @@ export interface NetatmoData {
 export type ThermorossiData = ThermorossiStatusResponse;
 
 // ---------------------------------------------------------------------------
-// Hue — WS sends Bridge v1 dicts; adaptWsLights/adaptWsGroups convert to proxy arrays
+// Hue — dicts keyed by id with REST-shaped entries; adaptWsLights/adaptWsGroups → arrays
 // ---------------------------------------------------------------------------
 
 export interface HueData {
-  lights: Record<string, unknown> | null;   // Bridge v1 dict keyed by light_id
-  groups: Record<string, unknown> | null;   // Bridge v1 dict keyed by group_id
+  lights: Record<string, HueLight> | null;  // keyed by light_id, HueLight item shape
+  groups: Record<string, HueGroup> | null;  // keyed by group_id, HueGroup item shape
   data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';
+  is_stale?: boolean;
+  last_poll_at?: string | null;
+  fetched_at?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -145,11 +147,12 @@ export interface SonosData {
 // Raspi — always-live system stats (no cache freshness threshold)
 // ---------------------------------------------------------------------------
 
+// Same sections as the REST endpoints /raspi/{cpu,memory,disk,system}, nested per section.
 export interface RaspiData {
-  cpu_percent: number;
-  memory: Record<string, unknown>;
-  disk: Record<string, unknown>;
-  system: Record<string, unknown>;
+  cpu: { cpu_percent: number };
+  memory: { percent: number; [key: string]: unknown };
+  disk: { percent: number; mount_point?: string; [key: string]: unknown };
+  system: { cpu_temperature: number | null; [key: string]: unknown };
   data_freshness: 'LIVE';  // always 'LIVE' — raspi is an on-demand provider
 }
 
@@ -157,9 +160,9 @@ export interface RaspiData {
 // Tuya — smart plug state and energy data
 // ---------------------------------------------------------------------------
 
+/** Same item shape as GET /tuya/plugs; freshness is per plug (no top-level field). */
 export interface TuyaData {
   plugs: TuyaPlug[] | null;
-  data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';
 }
 
 // ---------------------------------------------------------------------------

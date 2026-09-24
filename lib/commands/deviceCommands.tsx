@@ -63,6 +63,48 @@ async function executeStoveAction(
 }
 
 /**
+ * Resolve the Netatmo home_id (required by setthermmode) from /homesdata,
+ * same source as useThermostatData: { body: { homes: [{ id, ... }] } }.
+ */
+async function fetchNetatmoHomeId(): Promise<string | null> {
+  const res = await fetch('/api/v1/netatmo/homesdata');
+  if (!res.ok) return null;
+  const data = (await res.json()) as { body?: { homes?: Array<{ id?: string }> } };
+  return data.body?.homes?.[0]?.id ?? null;
+}
+
+/**
+ * Set the thermostat mode for the home (backend requires { home_id, mode }).
+ */
+async function setThermostatMode(mode: 'schedule' | 'away' | 'hg'): Promise<unknown> {
+  try {
+    const homeId = await fetchNetatmoHomeId();
+    if (!homeId) {
+      console.error('[CommandPalette] Thermostat setthermmode: home_id not available');
+      return undefined;
+    }
+    return await executeThermostatAction('setthermmode', { home_id: homeId, mode });
+  } catch (err) {
+    console.error('[CommandPalette] Thermostat setthermmode failed:', err);
+    return undefined;
+  }
+}
+
+/**
+ * Turn every Hue group on/off. Groups come from GET /api/v1/hue/groups as
+ * { groups: HueGroup[] } (v1 flat: group_id, no CLIP v2 `services`).
+ */
+async function setAllLights(on: boolean): Promise<void> {
+  const res = await fetch('/api/v1/hue/groups');
+  if (!res.ok) return;
+  const data = (await res.json()) as { groups?: Array<{ group_id?: string }> };
+  const groupIds = (data.groups ?? [])
+    .map((g) => g.group_id)
+    .filter((id): id is string => typeof id === 'string' && id.length > 0);
+  await Promise.all(groupIds.map((id) => executeLightsAction(`groups/${id}/action`, 'PUT', { on })));
+}
+
+/**
  * Execute thermostat action with error handling
  */
 async function executeThermostatAction(endpoint: string, body: Record<string, unknown> = {}): Promise<unknown> {
@@ -225,19 +267,19 @@ function getThermostatCommands(): CommandGroup {
         id: 'thermo-mode-schedule',
         label: 'Modalita Automatica',
         icon: <Calendar className="w-4 h-4" />,
-        onSelect: async () => { await executeThermostatAction('setthermmode', { mode: 'schedule' }); },
+        onSelect: async () => { await setThermostatMode('schedule'); },
       },
       {
         id: 'thermo-mode-away',
         label: 'Modalita Away',
         icon: <Home className="w-4 h-4" />,
-        onSelect: async () => { await executeThermostatAction('setthermmode', { mode: 'away' }); },
+        onSelect: async () => { await setThermostatMode('away'); },
       },
       {
         id: 'thermo-mode-hg',
         label: 'Modalita Antigelo',
         icon: <Snowflake className="w-4 h-4" />,
-        onSelect: async () => { await executeThermostatAction('setthermmode', { mode: 'hg' }); },
+        onSelect: async () => { await setThermostatMode('hg'); },
       },
       {
         id: 'thermo-temp-up',
@@ -276,18 +318,7 @@ function getLightsCommands(): CommandGroup {
         shortcut: '⌘⇧L',
         onSelect: async () => {
           try {
-            // Get all groups and toggle each
-            const roomsRes = await fetch('/api/v1/hue/groups');
-            if (!roomsRes.ok) return;
-            const roomsData = await roomsRes.json();
-            const rooms = roomsData.groups || [];
-
-            for (const room of rooms) {
-              const groupedLightId = room.services?.find((s: { rtype?: string; rid?: string }) => s.rtype === 'grouped_light')?.rid;
-              if (groupedLightId) {
-                await executeLightsAction(`groups/${groupedLightId}/action`, 'PUT', { on: { on: true } });
-              }
-            }
+            await setAllLights(true);
           } catch (err) {
             console.error('[CommandPalette] lights-all-on failed:', err);
           }
@@ -299,17 +330,7 @@ function getLightsCommands(): CommandGroup {
         icon: <Moon className="w-4 h-4" />,
         onSelect: async () => {
           try {
-            const roomsRes = await fetch('/api/v1/hue/groups');
-            if (!roomsRes.ok) return;
-            const roomsData = await roomsRes.json();
-            const rooms = roomsData.groups || [];
-
-            for (const room of rooms) {
-              const groupedLightId = room.services?.find((s: { rtype?: string; rid?: string }) => s.rtype === 'grouped_light')?.rid;
-              if (groupedLightId) {
-                await executeLightsAction(`groups/${groupedLightId}/action`, 'PUT', { on: { on: false } });
-              }
-            }
+            await setAllLights(false);
           } catch (err) {
             console.error('[CommandPalette] lights-all-off failed:', err);
           }

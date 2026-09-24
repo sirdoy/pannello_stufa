@@ -55,35 +55,35 @@ Return all device types (the taxonomy used for classifying registered devices).
   {
     "slug": "light",
     "label": "Light",
-    "is_builtin": true,
+    "is_builtin": 1,
     "created_at": 1711000000,
     "is_deletable": false
   },
   {
     "slug": "sensor",
     "label": "Sensor",
-    "is_builtin": true,
+    "is_builtin": 1,
     "created_at": 1711000000,
     "is_deletable": false
   },
   {
     "slug": "thermostat",
     "label": "Thermostat",
-    "is_builtin": true,
+    "is_builtin": 1,
     "created_at": 1711000000,
     "is_deletable": false
   },
   {
     "slug": "irrigatore",
     "label": "Irrigatore giardino",
-    "is_builtin": false,
+    "is_builtin": 0,
     "created_at": 1711200000,
     "is_deletable": true
   }
 ]
 ```
 
-> **Note:** `is_deletable` is `true` only when `is_builtin` is `false` AND no devices are currently assigned to the type. Built-in types always have `is_deletable: false`.
+> **Note:** `is_builtin` is returned as the raw SQLite integer (`1` = built-in, `0` = custom), **not** a JSON boolean — test it as truthy/falsy (`!!t.is_builtin`), not with `=== true`. `is_deletable` IS a real boolean (converted in `get_all_types()`): `true` only when the type is custom AND no devices are currently assigned to it. Built-in types always have `is_deletable: false`. Only `GET /registry/types` includes `is_deletable`; `POST` / `PUT` responses are the raw `device_types` row (`slug`, `label`, `is_builtin`, `created_at`).
 
 **Error responses:**
 
@@ -118,7 +118,7 @@ Create a custom device type. Slug must be lowercase alphanumeric with underscore
 {
   "slug": "irrigatore",
   "label": "Irrigatore giardino",
-  "is_builtin": false,
+  "is_builtin": 0,
   "created_at": 1711200000
 }
 ```
@@ -160,7 +160,7 @@ Update the label of a device type. The slug is immutable — only the label can 
 {
   "slug": "irrigatore",
   "label": "Irrigatore giardino (aggiornato)",
-  "is_builtin": false,
+  "is_builtin": 0,
   "created_at": 1711200000
 }
 ```
@@ -187,7 +187,7 @@ curl -X PUT http://localhost:8000/api/v1/registry/types/irrigatore \
 
 ### DELETE /registry/types/{slug}
 
-Delete a custom device type. Built-in types (where `is_builtin=true`) cannot be deleted. A type that is currently assigned to one or more registered devices cannot be deleted.
+Delete a custom device type. Built-in types (where `is_builtin` is `1`) cannot be deleted. A type that is currently assigned to one or more registered devices cannot be deleted.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
@@ -198,7 +198,7 @@ Delete a custom device type. Built-in types (where `is_builtin=true`) cannot be 
 | Status | Condition |
 |--------|-----------|
 | 401 | Missing or invalid authentication |
-| 403 | Type is built-in (`is_builtin=true`) and cannot be deleted |
+| 403 | Type is built-in (`is_builtin` = `1`) and cannot be deleted |
 | 404 | Device type not found |
 | 409 | Device type is in use by registered devices |
 | 503 | Registry DB not initialized |
@@ -241,6 +241,7 @@ Returns `PaginatedResponse<RegistryDevice>`. For the `PaginatedResponse<T>` gene
       "device_id": "5",
       "custom_name": "Lampada IKEA Soggiorno",
       "device_type_slug": "light",
+      "last_seen_at": 1711099990,
       "created_at": 1711090000,
       "updated_at": 1711090000
     },
@@ -250,6 +251,7 @@ Returns `PaginatedResponse<RegistryDevice>`. For the `PaginatedResponse<T>` gene
       "device_id": "abc-001",
       "custom_name": "Sensore DIRIGERA Camera",
       "device_type_slug": "sensor",
+      "last_seen_at": null,
       "created_at": 1711091000,
       "updated_at": 1711091000
     }
@@ -307,6 +309,7 @@ Register a new device with a custom name and type assignment.
   "device_id": "12",
   "custom_name": "Lampada IKEA Soggiorno",
   "device_type_slug": "light",
+  "last_seen_at": null,
   "created_at": 1711200000,
   "updated_at": 1711200000
 }
@@ -354,6 +357,7 @@ Update the custom name and device type slug of a registered device.
   "device_id": "12",
   "custom_name": "Lampada Philips Soggiorno",
   "device_type_slug": "light",
+  "last_seen_at": 1711299000,
   "created_at": 1711200000,
   "updated_at": 1711300000
 }
@@ -460,8 +464,8 @@ curl http://localhost:8000/api/v1/registry/health
 interface DeviceType {
   slug: string;        // Pattern: ^[a-z0-9_]+$, max 64 chars
   label: string;       // Max 128 chars
-  is_builtin: boolean; // Built-in types cannot be deleted
-  is_deletable: boolean; // true when custom type has no devices assigned
+  is_builtin: 0 | 1;   // raw SQLite INTEGER (NOT a boolean); 1 = built-in, cannot be deleted
+  is_deletable?: boolean; // real boolean; only in GET /registry/types; true when custom type has no devices assigned
   created_at: number;  // Unix timestamp
 }
 
@@ -480,6 +484,7 @@ interface RegistryDevice {
   device_id: string;        // Provider-internal device identifier
   custom_name: string;
   device_type_slug: string;
+  last_seen_at: number | null; // Unix timestamp of the last provider poll that saw this device; null until first seen
   created_at: number;       // Unix timestamp
   updated_at: number;       // Unix timestamp
 }

@@ -10,7 +10,8 @@ export const dynamic = 'force-dynamic';
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *
- * Success: { tam: { enabled, new_messages, total_messages, is_stale, fetched_at } }
+ * Success: { tam: { tam: { total_messages, new_messages, tam_enabled, tam_name }, is_stale, fetched_at } }
+ *   (backend TamStatusResponse, see docs/api/fritzbox.md)
  * Errors:
  *   - 429 RATE_LIMITED: Too many requests
  *   - Plus all health endpoint errors (403, 504, 500)

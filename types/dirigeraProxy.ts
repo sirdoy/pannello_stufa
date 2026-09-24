@@ -33,23 +33,27 @@ export type DirigeraDataFreshness = 'LIVE' | 'STALE' | 'UNREACHABLE';
 
 // Source: docs/api/dirigera.md — DirigeraHealthResponse
 export interface DirigeraHealthResponse {
-  firmware_version: string;
-  connected_sensors: number;
+  firmware_version: string | null;  // null when the last poll failed (hub unreachable)
+  connected_sensors: number;        // 0 when the hub is unreachable
   is_reachable: boolean;
 }
 
 // Source: docs/api/dirigera.md — DirigeraSensor
 export interface DirigeraSensor {
   id: string;
-  type: 'openCloseSensor' | 'occupancySensor' | string;
-  custom_name: string;
+  relation_id?: string | null;  // links occupancySensor <-> lightSensor
+  type: 'openCloseSensor' | 'occupancySensor' | 'motionSensor' | string;
+  custom_name: string | null;   // registry custom_name, else hub customName (may be null)
   room: string | null;
   firmware_version: string | null;
   battery_percentage: number | null;
   is_reachable: boolean;
-  is_open: boolean | null;    // null for motion sensors
-  last_seen: string | null;   // ISO 8601 timestamp
-  device_type?: string | null;   // registry device type slug, null if not set
+  last_seen: string | null;     // ISO 8601 timestamp
+  // Type-specific keys — ABSENT (not null) on other sensor types:
+  is_open?: boolean;            // only on openCloseSensor
+  is_detected?: boolean;        // only on occupancySensor / motionSensor
+  light_level?: number | null;
+  device_type?: string | null;  // registry device type slug, null if not set
 }
 
 // Source: docs/api/dirigera.md — DirigeraSensorsResponse
@@ -57,6 +61,8 @@ export interface DirigeraSensorsResponse {
   sensors: DirigeraSensor[];
   count: number;
   is_stale: boolean;
+  fetched_at?: string | null;
+  data_freshness?: 'LIVE' | 'STALE';
 }
 
 // Source: docs/api/dirigera.md — ContactSensor
@@ -101,12 +107,12 @@ export interface SensorSummaryResponse {
 // --- DIRIG-F01: history ---
 
 // Source: docs/api/dirigera.md — SensorEvent
+// Raw sensor_events row — no sensor name (resolve it from the sensors list).
 export interface SensorEvent {
   id: number;
   sensor_id: string;
-  sensor_name: string | null;
   event_type: 'open' | 'close' | 'motion_detected' | 'motion_cleared' | string;
-  recorded_at: number;   // Unix timestamp (seconds)
+  timestamp: number;   // Unix timestamp (seconds)
 }
 
 // Source: Phase 163 D-07 — query params for GET /api/v1/dirigera/history
@@ -130,21 +136,20 @@ export interface SensorHistoryResponse {
 // --- DIRIG-F02: stats ---
 
 // Source: docs/api/dirigera.md — AggregationStats
+// In-memory job stats: null / 0 until the job first runs after a restart.
 export interface AggregationStats {
-  last_run_at: number | null;
-  last_run_status: string | null;
-  rows_aggregated_last_run: number;
+  last_run: number | null;               // Unix seconds of last successful run
+  last_sensors_processed: number | null;
   total_runs: number;
-  total_rows_aggregated: number;
 }
 
 // Source: docs/api/dirigera.md — RetentionStats
 export interface RetentionStats {
-  last_run_at: number | null;
-  last_run_status: string | null;
-  rows_deleted_last_run: number;
+  last_run: number | null;               // Unix seconds of last successful run
+  last_raw_events_deleted: number | null;
+  last_daily_rows_deleted: number | null;
+  last_telemetry_deleted: number | null;
   total_runs: number;
-  total_rows_deleted: number;
 }
 
 // Source: docs/api/dirigera.md — DirigeraStatsResponse

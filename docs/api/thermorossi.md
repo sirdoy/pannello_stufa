@@ -370,24 +370,57 @@ curl "YOUR_BASE_URL/api/v1/thermorossi/history?scale=daily&limit=30" \
 
 ## Control Endpoints
 
-### Polling After Commands
+### Command Responses
 
-Stove state transitions are slow -- ignition takes 5-15 minutes, shutdown takes several minutes. All control endpoints return **202 Accepted** immediately and include a `suggested_poll_delay_s` hint.
+All control endpoints return **HTTP 200** (not 202) with the full stove state (`ThermorossiMutationResponse`). After WiNet accepts the command, the backend waits `REPOLL_DELAY_S` (1.5 s), re-polls `GetStatus`, updates the cache and pushes a `thermorossi` WS event, then returns the fresh state. There is no `suggested_poll_delay_s` / `poll_endpoint`.
 
-**202 Accepted response shape (all control endpoints):**
+**Response (200) -- all control endpoints:**
 
 ```json
 {
-  "command": "ignite",
-  "status": "accepted",
-  "previous_state": "off",
-  "suggested_poll_delay_s": 15,
-  "poll_endpoint": "/api/v1/thermorossi/status",
-  "requested_value": null
+  "stove_state": "igniting",
+  "power_level": 3,
+  "fan_level": 2,
+  "data_freshness": "LIVE",
+  "last_poll_at": "2026-03-15T10:30:01.512345+00:00",
+  "error_code": null,
+  "error_description": null,
+  "custom_name": "Stufa",
+  "device_type": "stove",
+  "data_confirmed": true
 }
 ```
 
-After waiting `suggested_poll_delay_s` seconds, poll `GET /api/v1/thermorossi/status` to check the new `stove_state`.
+```typescript
+// Source: api/providers/thermorossi/routes.py — ThermorossiMutationResponse
+interface ThermorossiMutationResponse extends ThermorossiStatusResponse {
+  data_confirmed: boolean; // false => re-poll failed; fields come from the last cached status
+}
+```
+
+- `data_confirmed: true` → `data_freshness` is `"LIVE"`; `data_confirmed: false` → `data_freshness` is `"STALE"` and the values are the last cached ones (`stove_state` falls back to `"unknown"` if nothing is cached).
+- Stove transitions are slow (ignition 5-15 min): right after `ignit` the state is typically still `off` or `igniting`. Keep following `GET /status` or the `thermorossi` WS topic for the final state.
+
+**409 Conflict body** (state gate, see table below) -- `application/problem+json`, `detail` is the human message and the conflict data are top-level extension members:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Conflict",
+  "status": 409,
+  "detail": "Command 'ignite' not allowed in state 'working'. Allowed states: ['off', 'standby']",
+  "error": "state_conflict",
+  "command": "ignite",
+  "current_state": "working",
+  "allowed_states": [
+    "off",
+    "standby"
+  ]
+}
+```
+
+`command` is the internal key (`ignite`, `shutdown`, `set_power`, `set_fan`, `set_water_temp`); `allowed_states` is sorted alphabetically.
+
 
 ---
 
@@ -409,15 +442,13 @@ Commands are blocked unless the stove is in an allowed state. The server returns
 
 ### POST /commands/ignit
 
-Ignites the stove. Note: the URL path is `/commands/ignit` (no trailing `e`); the response body uses `"command": "ignite"`.
+Ignites the stove. Note: the URL path is `/commands/ignit` (no trailing `e`); the internal command key (used in the 409 body) is `ignite`.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
 **Request body:** None
 
 **Allowed states:** `off`, `standby`
-
-**`suggested_poll_delay_s`:** 15 (stove ignition takes several minutes)
 
 **curl:**
 
@@ -430,7 +461,7 @@ curl -X POST YOUR_BASE_URL/api/v1/thermorossi/commands/ignit \
 
 | Status | Condition |
 |--------|-----------|
-| `409 Conflict` | Stove is not in `off` or `standby` state |
+| `409 Conflict` (see body above) | Stove is not in `off` or `standby` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |
@@ -447,8 +478,6 @@ Shuts down the stove. Also allowed from `alarm` state for emergency remote shutd
 
 **Allowed states:** `working`, `alarm`, `igniting`, `modulating`
 
-**`suggested_poll_delay_s`:** 15
-
 **curl:**
 
 ```bash
@@ -460,7 +489,7 @@ curl -X POST YOUR_BASE_URL/api/v1/thermorossi/commands/shutdown \
 
 | Status | Condition |
 |--------|-----------|
-| `409 Conflict` | Stove is not in `working`, `alarm`, `igniting`, or `modulating` state |
+| `409 Conflict` (see body above) | Stove is not in `working`, `alarm`, `igniting`, or `modulating` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |
@@ -474,8 +503,6 @@ Sets the stove power level. Valid range: 1-5.
 **Authentication:** Required (JWT Bearer or API Key)
 
 **Allowed states:** `working`, `igniting`, `cleaning`, `modulating`
-
-**`suggested_poll_delay_s`:** 5
 
 **Request body:**
 
@@ -499,7 +526,7 @@ curl -X POST YOUR_BASE_URL/api/v1/thermorossi/settings/power \
 | Status | Condition |
 |--------|-----------|
 | `422 Unprocessable Entity` | `value` is outside 1-5 range |
-| `409 Conflict` | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
+| `409 Conflict` (see body above) | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |
@@ -513,8 +540,6 @@ Sets the stove fan speed level. Valid range: 1-6.
 **Authentication:** Required (JWT Bearer or API Key)
 
 **Allowed states:** `working`, `igniting`, `cleaning`, `modulating`
-
-**`suggested_poll_delay_s`:** 5
 
 **Request body:**
 
@@ -538,7 +563,7 @@ curl -X POST YOUR_BASE_URL/api/v1/thermorossi/settings/fan-level \
 | Status | Condition |
 |--------|-----------|
 | `422 Unprocessable Entity` | `value` is outside 1-6 range |
-| `409 Conflict` | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
+| `409 Conflict` (see body above) | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |
@@ -552,8 +577,6 @@ Sets the hydronic water temperature setpoint. Valid range: 40-80C.
 **Authentication:** Required (JWT Bearer or API Key)
 
 **Allowed states:** `working`, `igniting`, `cleaning`, `modulating`
-
-**`suggested_poll_delay_s`:** 5
 
 **Request body:**
 
@@ -577,7 +600,7 @@ curl -X POST YOUR_BASE_URL/api/v1/thermorossi/settings/temperature/water \
 | Status | Condition |
 |--------|-----------|
 | `422 Unprocessable Entity` | `value` is outside 40-80 range |
-| `409 Conflict` | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
+| `409 Conflict` (see body above) | Stove is not in `working`, `igniting`, `cleaning`, or `modulating` state |
 | `503 Service Unavailable` | Provider UNREACHABLE or cache not yet populated |
 | `502 Bad Gateway` | WiNet API returned an error |
 | `504 Gateway Timeout` | WiNet API timed out |

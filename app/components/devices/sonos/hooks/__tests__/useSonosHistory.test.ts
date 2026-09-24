@@ -50,6 +50,14 @@ describe('useSonosHistory', () => {
     expect(calledUrl).toMatch(/&start=/);
     expect(calledUrl).toMatch(/&end=/);
     expect(calledUrl).toMatch(/&limit=200/);
+    // Backend declares start/end as Unix epoch seconds (int) — ISO strings get 422
+    const params = new URL(calledUrl, 'http://localhost').searchParams;
+    const start = Number(params.get('start'));
+    const end = Number(params.get('end'));
+    expect(Number.isInteger(start)).toBe(true);
+    expect(Number.isInteger(end)).toBe(true);
+    expect(end - start).toBe(24 * 3600);
+    expect(Math.abs(end - Date.now() / 1000)).toBeLessThan(60);
     expect(calledUrl).not.toMatch(/speaker_uid/);
     expect(calledUrl).not.toMatch(/group_id/);
   });

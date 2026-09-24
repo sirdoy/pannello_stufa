@@ -125,7 +125,7 @@ describe('useLightsData', () => {
 
     // Mock fetch globally — proxy-wrapped responses
     (global as any).fetch = jest.fn((url: string) => {
-      if (url.includes('/api/hue/status')) {
+      if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({
@@ -135,19 +135,19 @@ describe('useLightsData', () => {
           }),
         }) as any;
       }
-      if (url.includes('/api/hue/rooms')) {
+      if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, groups: [mockGroup, mockGroupCasa] }),
         }) as any;
       }
-      if (url.includes('/api/hue/lights')) {
+      if (url.includes('/api/v1/hue/lights')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, lights: [mockLight, mockLightOff] }),
         }) as any;
       }
-      if (url.includes('/api/hue/scenes')) {
+      if (url.includes('/api/v1/hue/scenes')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, scenes: [mockScene] }),
@@ -187,11 +187,11 @@ describe('useLightsData', () => {
     expect((result.current as any).remoteConnected).toBeUndefined();
   });
 
-  it('calls checkConnection on mount (fetches /api/hue/status)', async () => {
+  it('calls checkConnection on mount (fetches /api/v1/hue/health)', async () => {
     renderHook(() => useLightsData());
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/hue/status');
+      expect(global.fetch).toHaveBeenCalledWith('/api/v1/hue/health');
     });
   });
 
@@ -207,7 +207,7 @@ describe('useLightsData', () => {
 
   it('sets stale=true when data_freshness is STALE', async () => {
     (global as any).fetch = jest.fn((url: string) => {
-      if (url.includes('/api/hue/status')) {
+      if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'STALE' }),
@@ -224,9 +224,47 @@ describe('useLightsData', () => {
     });
   });
 
+  it('WS message: stale follows the payload data_freshness (same rule as HTTP)', async () => {
+    jest.mocked(useWebSocketContext).mockReturnValue({
+      subscribe: mockSubscribe,
+      unsubscribe: mockUnsubscribe,
+      readyState: ReadyState.OPEN,
+    });
+
+    const { result } = renderHook(() => useLightsData());
+    const handler = mockSubscribe.mock.calls.find((c) => c[0] === 'hue')?.[1] as (raw: unknown) => void;
+    expect(handler).toBeDefined();
+
+    act(() => { handler({ lights: {}, groups: {}, data_freshness: 'STALE' }); });
+    await waitFor(() => expect(result.current.stale).toBe(true));
+
+    act(() => { handler({ lights: {}, groups: {}, data_freshness: 'LIVE' }); });
+    await waitFor(() => expect(result.current.stale).toBe(false));
+  });
+
+  it('stays connected on STALE cache even when backend reports connected=false', async () => {
+    // backend /hue/health: connected = (freshness == LIVE); STALE still serves lights/groups (200)
+    (global as any).fetch = jest.fn((url: string) => {
+      if (url.includes('/api/v1/hue/health')) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, connected: false, data_freshness: 'STALE' }),
+        }) as any;
+      }
+      return Promise.reject(new Error('Unknown URL')) as any;
+    });
+
+    const { result } = renderHook(() => useLightsData());
+
+    await waitFor(() => {
+      expect(result.current.connected).toBe(true);
+      expect(result.current.stale).toBe(true);
+    });
+  });
+
   it('sets connected=false on 503 (Bridge UNREACHABLE)', async () => {
     (global as any).fetch = jest.fn((url: string) => {
-      if (url.includes('/api/hue/status')) {
+      if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: false,
           status: 503,
@@ -412,25 +450,25 @@ describe('useLightsData', () => {
 
   it('handles fetchData error from groups response', async () => {
     (global as any).fetch = jest.fn((url: string) => {
-      if (url.includes('/api/hue/status')) {
+      if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
         }) as any;
       }
-      if (url.includes('/api/hue/rooms')) {
+      if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ error: 'Rooms fetch failed' }),
         }) as any;
       }
-      if (url.includes('/api/hue/lights')) {
+      if (url.includes('/api/v1/hue/lights')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, lights: [mockLight] }),
         }) as any;
       }
-      if (url.includes('/api/hue/scenes')) {
+      if (url.includes('/api/v1/hue/scenes')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, scenes: [mockScene] }),
@@ -448,13 +486,13 @@ describe('useLightsData', () => {
 
   it('handles reconnect flag in fetchData response', async () => {
     (global as any).fetch = jest.fn((url: string) => {
-      if (url.includes('/api/hue/status')) {
+      if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
         }) as any;
       }
-      if (url.includes('/api/hue/rooms')) {
+      if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ reconnect: true }),
@@ -483,7 +521,7 @@ describe('useLightsData', () => {
       await result.current.handleRefresh();
     });
 
-    expect(fetchSpy).toHaveBeenCalledWith('/api/hue/status');
+    expect(fetchSpy).toHaveBeenCalledWith('/api/v1/hue/health');
     expect(result.current.refreshing).toBe(false);
   });
 
@@ -525,25 +563,25 @@ describe('useLightsData', () => {
     };
 
     (global as any).fetch = jest.fn((url: string) => {
-      if (url.includes('/api/hue/status')) {
+      if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
         }) as any;
       }
-      if (url.includes('/api/hue/rooms')) {
+      if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, groups: [mockGroup] }),
         }) as any;
       }
-      if (url.includes('/api/hue/lights')) {
+      if (url.includes('/api/v1/hue/lights')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, lights: [brightLight] }),
         }) as any;
       }
-      if (url.includes('/api/hue/scenes')) {
+      if (url.includes('/api/v1/hue/scenes')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, scenes: [] }),
@@ -577,25 +615,25 @@ describe('useLightsData', () => {
     };
 
     (global as any).fetch = jest.fn((url: string) => {
-      if (url.includes('/api/hue/status')) {
+      if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
         }) as any;
       }
-      if (url.includes('/api/hue/rooms')) {
+      if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, groups: [groupAllOff] }),
         }) as any;
       }
-      if (url.includes('/api/hue/lights')) {
+      if (url.includes('/api/v1/hue/lights')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, lights: [mockLightOff] }),
         }) as any;
       }
-      if (url.includes('/api/hue/scenes')) {
+      if (url.includes('/api/v1/hue/scenes')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, scenes: [] }),
@@ -826,7 +864,7 @@ describe('useLightsData', () => {
       jest.clearAllMocks();
       // Re-setup fetch mock for scenes
       (global as any).fetch = jest.fn((url: string) => {
-        if (url.includes('/api/hue/scenes')) {
+        if (url.includes('/api/v1/hue/scenes')) {
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({ success: true, scenes: [] }),
@@ -840,7 +878,7 @@ describe('useLightsData', () => {
       });
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith('/api/hue/scenes');
+        expect(global.fetch).toHaveBeenCalledWith('/api/v1/hue/scenes');
       });
     });
 

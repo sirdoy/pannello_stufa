@@ -14,7 +14,8 @@
 /**
  * Represents the operational state of the Thermorossi stove.
  */
-export type StoveState = 'off' | 'igniting' | 'working' | 'standby' | 'cleaning' | 'alarm' | 'modulating';
+// 'unknown' only in mutation responses when nothing is cached yet (backend fallback).
+export type StoveState = 'off' | 'igniting' | 'working' | 'standby' | 'cleaning' | 'alarm' | 'modulating' | 'unknown';
 
 /**
  * Indicates how fresh the data returned by the proxy is.
@@ -88,18 +89,21 @@ export interface ThermorossiHealthResponse {
 // =============================================================================
 
 /**
- * Response from proxy POST /api/v1/thermorossi/command/* endpoints.
- * The proxy always returns 202 Accepted for commands.
- * Callers should poll poll_endpoint after suggested_poll_delay_s seconds.
+ * Response from backend POST /api/v1/thermorossi/{commands,settings}/* endpoints
+ * (ThermorossiMutationResponse): HTTP 200 with the full status after a re-poll.
+ * data_confirmed=false → re-poll failed, fields come from the last cached status.
  */
-export interface ThermorossiCommandResponse {
-  command: string;
-  status: 'accepted';
-  previous_state: StoveState;
-  suggested_poll_delay_s: number;
-  poll_endpoint: string;
-  requested_value: number | null;
+export interface ThermorossiMutationResponse extends ThermorossiStatusResponse {
+  data_confirmed: boolean;
 }
+
+/**
+ * Command response as consumed by the UI. `suggested_poll_delay_s` only exists on
+ * the legacy 202 contract (pre-mutation-response backends) and is optional.
+ */
+export type ThermorossiCommandResponse = ThermorossiMutationResponse & {
+  suggested_poll_delay_s?: number;
+};
 
 // =============================================================================
 // HISTORY TYPES

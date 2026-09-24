@@ -127,4 +127,48 @@ describe('hueWsAdapter', () => {
       expect(result[0]?.any_on).toBe(false);
     });
   });
+
+  // Current backend payload: backend/api/ws/manager.py _enrich_payload('hue') flattens
+  // each entry to the REST item shape (HueLightStateResponse / HueGroupResponse).
+  describe('backend flattened payload (REST item shape)', () => {
+    const flatLight = {
+      light_id: '7',
+      name: 'Lampada Divano',
+      on: true,
+      brightness: 180,
+      ct_mirek: 366,
+      ct_kelvin: 2732,
+      hue: 8402,
+      saturation: 140,
+      colormode: 'ct',
+      reachable: true,
+      capability_tier: 'color',
+      room_id: '1',
+      room_name: 'Soggiorno',
+      model_id: 'LCT015',
+      light_type: 'Extended color light',
+      custom_name: 'Divano',
+      device_type: 'lamp',
+    };
+    const flatGroup = {
+      group_id: '1',
+      name: 'Soggiorno',
+      type: 'Room',
+      group_class: 'Living room',
+      lights: ['7'],
+      any_on: true,
+      all_on: true,
+      brightness: 180,
+      color_temp: 366,
+      colormode: 'ct',
+    };
+
+    it('passes flattened lights through unchanged', () => {
+      expect(adaptWsLights({ '7': flatLight })).toEqual([flatLight]);
+    });
+
+    it('passes flattened groups through unchanged', () => {
+      expect(adaptWsGroups({ '1': flatGroup })).toEqual([flatGroup]);
+    });
+  });
 });

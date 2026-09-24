@@ -135,24 +135,18 @@ export default function DeviceTypesPage() {
     await refetch();
   };
 
-  // Handle edit: DELETE old + POST new (backend has no PUT for types)
+  // Handle edit: PUT /api/registry/types/{slug} (label only — slug is immutable).
+  // Works for types in use by devices and keeps created_at (DELETE+POST did not).
   const handleEdit = async (data: { label: string }) => {
     if (!typeToEdit) return;
     // If label hasn't changed, skip
     if (data.label === typeToEdit.label) return;
-    // Delete old type, then recreate with new label
-    const delRes = await fetch(`/api/registry/types/${typeToEdit.slug}`, {
-      method: 'DELETE',
-    });
-    if (!delRes.ok && delRes.status !== 404) {
-      throw new Error('Errore durante la modifica');
-    }
-    const createRes = await fetch('/api/registry/types', {
-      method: 'POST',
+    const res = await fetch(`/api/registry/types/${encodeURIComponent(typeToEdit.slug)}`, {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slug: typeToEdit.slug, label: data.label }),
+      body: JSON.stringify({ label: data.label }),
     });
-    if (!createRes.ok) throw new Error('Errore durante la modifica');
+    if (!res.ok) throw new Error('Errore durante la modifica');
     toastSuccess('Tipo aggiornato');
     await refetch();
   };

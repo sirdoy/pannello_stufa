@@ -49,7 +49,7 @@ describe('PUT /api/v1/hue/groups/[groupId]/action', () => {
   });
 
   it('should call setGroupAction and return 202', async () => {
-    mockSetGroupAction.mockResolvedValue(mockProxyResponse);
+    mockSetGroupAction.mockResolvedValue(mockProxyResponse as never);
     const req = new Request('http://localhost:3000/api/v1/hue/groups/1/action', {
       method: 'PUT',
       body: JSON.stringify({ on: true }),

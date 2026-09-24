@@ -54,6 +54,8 @@ describe('TuyaPage', () => {
       error: null,
       stale: false,
       lastUpdatedAt: null,
+      refetch: jest.fn(),
+      setPlugOptimistic: jest.fn(),
     });
 
     render(<TuyaPage />);
@@ -70,6 +72,8 @@ describe('TuyaPage', () => {
       error: null,
       stale: false,
       lastUpdatedAt: Date.now(),
+      refetch: jest.fn(),
+      setPlugOptimistic: jest.fn(),
     });
 
     render(<TuyaPage />);
@@ -85,6 +89,8 @@ describe('TuyaPage', () => {
       error: 'Tuya non raggiungibile',
       stale: false,
       lastUpdatedAt: null,
+      refetch: jest.fn(),
+      setPlugOptimistic: jest.fn(),
     });
 
     render(<TuyaPage />);
@@ -101,6 +107,8 @@ describe('TuyaPage', () => {
       error: null,
       stale: false,
       lastUpdatedAt: Date.now(),
+      refetch: jest.fn(),
+      setPlugOptimistic: jest.fn(),
     });
 
     const { container } = render(<TuyaPage />);

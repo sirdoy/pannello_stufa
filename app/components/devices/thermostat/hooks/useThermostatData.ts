@@ -291,7 +291,16 @@ export function useThermostatData(): UseThermostatDataReturn {
         });
       }
 
-      setStatus(adapted);
+      // Merge over the previous status: WS rooms carry only live measurements, so keep
+      // REST-only room fields and battery info when the WS payload has no modules.
+      setStatus(prev => {
+        const prevRooms = new Map((prev?.rooms ?? []).map(r => [r.room_id, r]));
+        return {
+          ...prev,
+          ...adapted,
+          rooms: (adapted.rooms ?? []).map(r => ({ ...prevRooms.get(r.room_id), ...r })),
+        };
+      });
       setLoading(false);
       setError(null);
       setLastUpdatedAt(Date.now());

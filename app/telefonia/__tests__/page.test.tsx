@@ -37,10 +37,14 @@ describe('TelefoniaPage', () => {
     pushMock.mockClear();
 
     tamMod.useFritzTamStatus.mockReturnValue({
+      // Real backend shape (TamStatusResponse)
       status: {
-        enabled: true,
-        new_messages: 0,
-        total_messages: 0,
+        tam: {
+          total_messages: 0,
+          new_messages: 0,
+          tam_enabled: true,
+          tam_name: 'Anrufbeantworter',
+        },
         is_stale: false,
         fetched_at: '2026-04-22T10:00:00Z',
       },
@@ -49,23 +53,10 @@ describe('TelefoniaPage', () => {
     });
 
     dectMod.useFritzDectHandsets.mockReturnValue({
+      // Real backend shape (DectHandsetModel)
       handsets: [
-        {
-          id: '1',
-          name: 'Cucina',
-          model: 'C6',
-          firmware_version: '113.01',
-          battery_charge_level: 75,
-          is_registered: true,
-        },
-        {
-          id: '2',
-          name: 'Camera',
-          model: 'C5',
-          firmware_version: '112.00',
-          battery_charge_level: 80,
-          is_registered: true,
-        },
+        { dect_id: 1, name: 'Cucina', phonebook_id: 0, model: null, registration_status: 'registered' },
+        { dect_id: 2, name: 'Camera', phonebook_id: 0, model: null, registration_status: 'registered' },
       ],
       loading: false,
       stale: false,
@@ -74,14 +65,19 @@ describe('TelefoniaPage', () => {
 
     callsMod.useFritzCallHistory.mockReturnValue({
       calls: [
+        // Real backend shape (CallRecordModel)
         {
-          id: 'c1',
-          call_type: 'incoming',
-          number: '+393331112233',
+          call_type: 'received',
+          call_type_code: 1,
           name: 'Mario',
+          caller: '+393331112233',
+          called: '0301234567',
+          caller_number: '+393331112233',
+          called_number: '0301234567',
+          date: '2026-02-17T10:30:00',
           duration_seconds: 125,
-          timestamp: 1713700000,
-          port: 'DECT-1',
+          device: 'Cucina',
+          port: 'FON1',
         },
       ],
       loading: false,
@@ -103,6 +99,16 @@ describe('TelefoniaPage', () => {
     expect(screen.getByText('Segreteria')).toBeInTheDocument();
     expect(screen.getByText('Cornette DECT')).toBeInTheDocument();
     expect(screen.getByText('Cronologia chiamate')).toBeInTheDocument();
+  });
+
+  it('renders real backend data in all three cards', () => {
+    render(<TelefoniaPage />);
+    expect(screen.getByText('Attiva')).toBeInTheDocument();
+    expect(screen.getByText('Cucina')).toBeInTheDocument();
+    expect(screen.getAllByText('Registrato')).toHaveLength(2);
+    expect(screen.getByText('Ricevuta')).toBeInTheDocument();
+    expect(screen.getByText('+393331112233')).toBeInTheDocument();
+    expect(screen.getByText('17 feb 2026 10:30')).toBeInTheDocument();
   });
 
   it('does not emit console errors during render', () => {

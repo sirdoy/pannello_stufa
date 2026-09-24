@@ -24,9 +24,10 @@ jest.mock('@/app/components/ui/DataTable', () => ({
 }));
 
 describe('DevicePresenceTable', () => {
+  // Backend DeviceHistoryRecord.is_online is an int (1/0), not a boolean
   const sample: DevicePresenceRecord[] = [
-    { timestamp: 1713700000, mac: 'AA:BB:CC:DD:EE:FF', name: 'laptop', ip: '192.168.1.100', is_online: true },
-    { timestamp: 1713700060, mac: 'FF:EE:DD:CC:BB:AA', name: 'phone', ip: '192.168.1.101', is_online: false },
+    { timestamp: 1713700000, mac: 'AA:BB:CC:DD:EE:FF', name: 'laptop', ip: '192.168.1.100', is_online: 1 },
+    { timestamp: 1713700060, mac: 'FF:EE:DD:CC:BB:AA', name: 'phone', ip: '192.168.1.101', is_online: 0 },
   ];
 
   const defaultProps = {

@@ -81,10 +81,9 @@ export default function DirigeraStatsPanel({ data, loading, error, stale }: Diri
           <section className="mb-6">
             <h3 className="text-xs uppercase tracking-wide text-slate-400 mb-3">Aggregazione</h3>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Tile label="Righe aggregate totali" value={data.aggregation.total_rows_aggregated} />
-              <Tile label="Ultimo run" value={formatTimestamp(data.aggregation.last_run_at)} />
-              <Tile label="Righe ultimo run" value={data.aggregation.rows_aggregated_last_run} />
-              <Tile label="Stato ultimo run" value={data.aggregation.last_run_status ?? 'n/d'} />
+              <Tile label="Esecuzioni" value={data.aggregation.total_runs} />
+              <Tile label="Ultimo run" value={formatTimestamp(data.aggregation.last_run)} />
+              <Tile label="Sensori ultimo run" value={data.aggregation.last_sensors_processed ?? 'n/d'} />
             </div>
           </section>
 
@@ -92,10 +91,11 @@ export default function DirigeraStatsPanel({ data, loading, error, stale }: Diri
           <section>
             <h3 className="text-xs uppercase tracking-wide text-slate-400 mb-3">Retention</h3>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Tile label="Righe eliminate totali" value={data.retention.total_rows_deleted} />
-              <Tile label="Ultimo run" value={formatTimestamp(data.retention.last_run_at)} />
-              <Tile label="Righe eliminate ultimo run" value={data.retention.rows_deleted_last_run} />
-              <Tile label="Stato ultimo run" value={data.retention.last_run_status ?? 'n/d'} />
+              <Tile label="Esecuzioni" value={data.retention.total_runs} />
+              <Tile label="Ultimo run" value={formatTimestamp(data.retention.last_run)} />
+              <Tile label="Eventi eliminati" value={data.retention.last_raw_events_deleted ?? 'n/d'} />
+              <Tile label="Giornalieri eliminati" value={data.retention.last_daily_rows_deleted ?? 'n/d'} />
+              <Tile label="Telemetria eliminata" value={data.retention.last_telemetry_deleted ?? 'n/d'} />
             </div>
           </section>
         </>

@@ -24,7 +24,10 @@ describe('useFritzNetworkServices', () => {
       items: [
         { ip: '192.168.1.10', name: 'server', mac: 'AA:BB:CC:DD:EE:01', interface_type: 'LAN', address_source: 'Static' },
       ],
-      total: 1,
+      // Backend PaginatedResponse shape (total_count, not total); > items to prove it is read
+      total_count: 3,
+      limit: 1000,
+      offset: 0,
     },
   };
 
@@ -33,7 +36,9 @@ describe('useFritzNetworkServices', () => {
       items: [
         { external_port: 80, internal_port: 8080, protocol: 'TCP', internal_client: '192.168.1.10', enabled: true, description: 'Web', lease_duration: 0 },
       ],
-      total: 1,
+      total_count: 4,
+      limit: 1000,
+      offset: 0,
     },
   };
 
@@ -94,8 +99,8 @@ describe('useFritzNetworkServices', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.dhcp).toEqual(mockDhcp.reservations);
-    expect(result.current.portForwarding).toEqual(mockPortForwarding.portForwarding);
+    expect(result.current.dhcp).toEqual({ items: mockDhcp.reservations.items, total: 3 });
+    expect(result.current.portForwarding).toEqual({ items: mockPortForwarding.portForwarding.items, total: 4 });
     expect(result.current.upnp).toEqual(mockUpnp.upnp);
     expect(result.current.mesh).toEqual(mockMesh.mesh);
   });
@@ -113,7 +118,7 @@ describe('useFritzNetworkServices', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(result.current.dhcp).toEqual(mockDhcp.reservations);
+    expect(result.current.dhcp).toEqual({ items: mockDhcp.reservations.items, total: 3 });
     expect(result.current.portForwarding).toBeNull(); // failed
     expect(result.current.upnp).toEqual(mockUpnp.upnp);
     expect(result.current.mesh).toBeNull(); // failed

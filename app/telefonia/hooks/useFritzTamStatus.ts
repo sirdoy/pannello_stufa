@@ -4,13 +4,12 @@ import { useEffect, useState } from 'react';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useVisibility } from '@/lib/hooks/useVisibility';
 
-export interface TamStatus {
-  enabled: boolean;
-  new_messages: number;
-  total_messages: number;
-  is_stale: boolean;
-  fetched_at: string | null;
-}
+import type { TamStatusModel, TamStatusResponse } from '@/lib/fritzbox/fritzboxClient';
+
+// Types mirror the backend contract (TamStatusResponse, docs/api/fritzbox.md):
+// { tam: { total_messages, new_messages, tam_enabled, tam_name }, is_stale, fetched_at }
+export type TamStatus = TamStatusResponse;
+export type { TamStatusModel };
 
 interface UseFritzTamStatusOptions {
   paused?: boolean;
@@ -20,7 +19,8 @@ interface UseFritzTamStatusOptions {
  * useFritzTamStatus
  *
  * Polls /api/v1/fritzbox/telephony/tam (FRITZ-03).
- * Single-object response (no pagination). Follows the canonical
+ * Single-object response (no pagination), nested as
+ * { tam: { tam: TamStatusModel, is_stale, fetched_at } }. Follows the canonical
  * Fritz!Box polling pattern with paused/visibility gating.
  * Defensive paused->active re-fetch (Open Question #2 RESOLVED).
  */
@@ -46,9 +46,16 @@ export function useFritzTamStatus(options: UseFritzTamStatusOptions = {}): {
         setStatus(null);
         return;
       }
-      const json = (await res.json()) as { tam: TamStatus };
-      setStatus(json.tam);
-      setStale(false);
+      const json = (await res.json()) as { tam?: TamStatus | null };
+      const payload = json.tam ?? null;
+      if (!payload || !payload.tam) {
+        // Malformed payload — never crash the card, surface as stale/unavailable.
+        setStale(true);
+        setStatus(null);
+        return;
+      }
+      setStatus(payload);
+      setStale(payload.is_stale === true);
     } catch {
       setStale(true);
     } finally {

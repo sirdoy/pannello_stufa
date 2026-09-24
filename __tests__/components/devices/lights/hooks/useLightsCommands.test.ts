@@ -53,13 +53,13 @@ describe('useLightsCommands', () => {
     },
   ];
 
-  const mockCommandResponse: HueCommandResponse = {
+  const mockCommandResponse = {
     command: 'set_group_action',
     status: 'accepted',
     group_id: '1',
     suggested_poll_delay_s: 2,
     poll_endpoint: '/api/hue/rooms/1',
-  };
+  } as unknown as HueCommandResponse; // legacy 202 contract
 
   const mockLightsData: Pick<
     UseLightsDataReturn,
@@ -167,7 +167,7 @@ describe('useLightsCommands', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/rooms/1',
+      '/api/v1/hue/groups/1/action',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ on: true }),  // v1 flat key, NOT { on: { on: true } }
@@ -218,7 +218,7 @@ describe('useLightsCommands', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/rooms/1',
+      '/api/v1/hue/groups/1/action',
       expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ bri: 191 }),  // Math.round(75 * 254 / 100) = 191; v1 flat, NOT { dimming: { brightness: 75 } }
@@ -228,14 +228,14 @@ describe('useLightsCommands', () => {
   });
 
   it('handleSceneActivate calls POST to /api/hue/groups/{groupId}/scenes/{sceneId}', async () => {
-    const sceneResponse: HueCommandResponse = {
+    const sceneResponse = {
       command: 'activate_scene',
       status: 'accepted',
       scene_id: 'scene1',
       group_id: '1',
       suggested_poll_delay_s: 2,
       poll_endpoint: '/api/hue/rooms/1',
-    };
+    } as unknown as HueCommandResponse; // legacy 202 contract
     mockExecute.mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue(sceneResponse),
@@ -253,7 +253,7 @@ describe('useLightsCommands', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/groups/1/scenes/scene1',  // POST /groups/{gid}/scenes/{sid}
+      '/api/v1/hue/groups/1/scenes/scene1',  // POST /groups/{gid}/scenes/{sid}
       expect.objectContaining({
         method: 'POST',  // not PUT
       })
@@ -281,13 +281,13 @@ describe('useLightsCommands', () => {
     // Should be called twice — once for each group (group_id '1' and '2')
     expect(mockExecute).toHaveBeenCalledTimes(2);
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/rooms/1',
+      '/api/v1/hue/groups/1/action',
       expect.objectContaining({
         body: JSON.stringify({ on: true }),
       })
     );
     expect(mockExecute).toHaveBeenCalledWith(
-      '/api/hue/rooms/2',
+      '/api/v1/hue/groups/2/action',
       expect.objectContaining({
         body: JSON.stringify({ on: true }),
       })

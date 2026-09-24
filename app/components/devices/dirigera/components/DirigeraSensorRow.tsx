@@ -71,7 +71,7 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
           {sensorIcon}
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-medium truncate">{sensor.custom_name}</p>
+          <p className="text-sm font-medium truncate">{sensor.custom_name ?? sensor.id}</p>
           <p className="text-xs text-slate-400 truncate">
             {sensor.room ?? 'Nessuna stanza'}
           </p>

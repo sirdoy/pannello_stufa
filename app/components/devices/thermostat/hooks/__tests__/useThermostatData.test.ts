@@ -146,6 +146,26 @@ describe('adaptNetatmoWsPayload', () => {
     expect(result?.modules?.[0]?.type).toBe('NATherm1');
   });
 
+  it('Test 10b: current backend shape {rooms, cameras, data_freshness} is adapted', () => {
+    // backend/api/ws/manager.py _enrich_payload('netatmo'): raw homestatus rooms, no modules
+    const payload: Record<string, unknown> = {
+      rooms: [
+        { id: 'room1', therm_measured_temperature: 19.8, therm_setpoint_temperature: 21, therm_setpoint_mode: 'schedule', heating_power_request: 40 },
+      ],
+      cameras: [],
+      data_freshness: 'LIVE',
+    };
+    const result = adaptNetatmoWsPayload(payload);
+    expect(result).not.toBeNull();
+    expect(result?.rooms).toEqual([
+      { room_id: 'room1', temperature: 19.8, setpoint: 21, mode: 'schedule', heating: true },
+    ]);
+    expect(result?.data_freshness).toBe('LIVE');
+    // No modules in payload → battery fields left undefined (caller keeps previous values)
+    expect(result?.modules).toBeUndefined();
+    expect(result?.hasLowBattery).toBeUndefined();
+  });
+
   it('Test 10: Empty rooms/modules arrays returns valid NetatmoStatus with rooms=[], modules=[]', () => {
     const payload: Record<string, unknown> = {
       body: { home: { id: 'home1', rooms: [], modules: [] } },
@@ -242,6 +262,32 @@ describe('useThermostatData — WebSocket subscription', () => {
 
     expect(result.current.status?.rooms).toHaveLength(2);
     expect(result.current.status?.rooms?.[0]?.temperature).toBe(21.4);
+  });
+
+  it('Test 13c: WS message in current backend shape updates room temperature', async () => {
+    mockUseWebSocketContext.mockReturnValue({
+      subscribe: mockSubscribe,
+      unsubscribe: mockUnsubscribe,
+      readyState: ReadyState.OPEN,
+    });
+
+    const { result } = renderHook(() => useThermostatData());
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    });
+
+    const handleMessage = mockSubscribe.mock.calls[0]?.[1];
+    await act(async () => {
+      handleMessage({
+        rooms: [{ id: 'room-live', therm_measured_temperature: 18.2, heating_power_request: 0 }],
+        cameras: [],
+        data_freshness: 'LIVE',
+      });
+    });
+
+    const room = result.current.status?.rooms?.find(r => r.room_id === 'room-live');
+    expect(room?.temperature).toBe(18.2);
+    expect(room?.heating).toBe(false);
   });
 
   it('Test 13b: WS low-battery modules enriched with name/type from topology', async () => {

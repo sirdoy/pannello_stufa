@@ -16,17 +16,15 @@ const mockUseVisibility = useVisibility as jest.MockedFunction<typeof useVisibil
 const mockEvent1 = {
   id: 1,
   sensor_id: 'sensor-abc',
-  sensor_name: 'Porta ingresso',
   event_type: 'open',
-  recorded_at: 1773244800,
+  timestamp: 1773244800,
 };
 
 const mockEvent2 = {
   id: 2,
   sensor_id: 'sensor-abc',
-  sensor_name: 'Porta ingresso',
   event_type: 'close',
-  recorded_at: 1773244900,
+  timestamp: 1773244900,
 };
 
 describe('useDirigeraHistory', () => {

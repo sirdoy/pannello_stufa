@@ -91,7 +91,7 @@ export default function DirigeraCard() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {s.custom_name}
+                {s.custom_name ?? s.id}
               </div>
               <div
                 style={{

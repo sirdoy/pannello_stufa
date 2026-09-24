@@ -62,11 +62,13 @@ Return DIRIGERA hub connection status including firmware version, connected sens
 
 ```typescript
 interface DirigeraHealthResponse {
-  firmware_version: string;
-  connected_sensors: number;
+  firmware_version: string | null;  // null when the last poll failed (hub unreachable)
+  connected_sensors: number;        // 0 when the hub is unreachable
   is_reachable: boolean;
 }
 ```
+
+When a poll fails, the cached hub info becomes `{"firmware_version": null, "connected_sensors": 0, "is_reachable": false}` (still HTTP 200).
 
 **curl:**
 
@@ -99,29 +101,36 @@ Return the full list of DIRIGERA sensors. Includes all sensor types (contact and
   "sensors": [
     {
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "relation_id": null,
       "type": "openCloseSensor",
       "custom_name": "MYGGBETT Ingresso",
       "room": "Ingresso",
       "firmware_version": "24056010",
       "battery_percentage": 90,
       "is_reachable": true,
+      "last_seen": "2026-03-12T15:30:00.000Z",
       "is_open": false,
-      "last_seen": "2026-03-12T15:30:00.000Z"
+      "device_type": "window_sensor"
     },
     {
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "relation_id": "c9d8e7f6-0000-1111-2222-333344445555",
       "type": "occupancySensor",
-      "custom_name": "MYGGBETT Soggiorno",
+      "custom_name": "MYGGSPRAY Soggiorno",
       "room": "Soggiorno",
       "firmware_version": "24056010",
       "battery_percentage": 75,
       "is_reachable": true,
-      "is_open": null,
-      "last_seen": "2026-03-12T15:28:00.000Z"
+      "last_seen": "2026-03-12T15:28:00.000Z",
+      "is_detected": false,
+      "light_level": 42,
+      "device_type": null
     }
   ],
   "count": 2,
-  "is_stale": false
+  "is_stale": false,
+  "fetched_at": "2026-03-12T15:30:05.123456Z",
+  "data_freshness": "LIVE"
 }
 ```
 
@@ -130,22 +139,34 @@ Return the full list of DIRIGERA sensors. Includes all sensor types (contact and
 ```typescript
 interface DirigeraSensor {
   id: string;
-  type: "openCloseSensor" | "occupancySensor" | string;
-  custom_name: string;
+  relation_id: string | null;    // DIRIGERA relationId (links occupancySensor <-> lightSensor)
+  type: "openCloseSensor" | "occupancySensor" | "motionSensor" | string;
+  custom_name: string | null;    // registry custom_name if set, else hub customName (may be null)
   room: string | null;
   firmware_version: string | null;
   battery_percentage: number | null;
   is_reachable: boolean;
-  is_open: boolean | null;       // null for motion sensors
-  last_seen: string | null;      // ISO 8601 timestamp
+  last_seen: string | null;      // ISO 8601 timestamp as reported by the hub
+  // Type-specific keys (the key is ABSENT on other sensor types, not null):
+  is_open?: boolean;             // only on openCloseSensor
+  is_detected?: boolean;         // only on occupancySensor / motionSensor
+  light_level?: number | null;   // motionSensor always; occupancySensor only when a
+                                 // companion lightSensor (same relation_id) exists
+  device_type?: string | null;   // registry device type slug — only on GET /sensors
 }
 
 interface DirigeraSensorsResponse {
   sensors: DirigeraSensor[];
   count: number;
   is_stale: boolean;
+  fetched_at: string | null;     // ISO 8601 UTC ending in "Z" (last successful poll)
+  data_freshness: "LIVE" | "STALE";
 }
 ```
+
+Notes:
+- `lightSensor` devices are never returned: their illuminance is merged into the companion `occupancySensor` (matched by `relation_id`) as `light_level`.
+- `device_type`, `fetched_at` and `data_freshness` (response-level) are only added by `GET /sensors`; the `/sensors/contact` and `/sensors/motion` responses contain only `sensors`, `count`, `is_stale`.
 
 **curl:**
 
@@ -184,26 +205,28 @@ Return only contact (open/close) sensors. Filters to `openCloseSensor` type. Eac
   "sensors": [
     {
       "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "relation_id": null,
       "type": "openCloseSensor",
       "custom_name": "MYGGBETT Ingresso",
       "room": "Ingresso",
       "firmware_version": "24056010",
       "battery_percentage": 90,
       "is_reachable": true,
-      "is_open": false,
       "last_seen": "2026-03-12T15:30:00.000Z",
+      "is_open": false,
       "data_freshness": "LIVE"
     },
     {
       "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "relation_id": null,
       "type": "openCloseSensor",
       "custom_name": "MYGGBETT Camera",
       "room": "Camera da letto",
       "firmware_version": "24056010",
       "battery_percentage": 83,
       "is_reachable": true,
-      "is_open": true,
       "last_seen": "2026-03-12T15:29:45.000Z",
+      "is_open": true,
       "data_freshness": "LIVE"
     }
   ],
@@ -215,9 +238,10 @@ Return only contact (open/close) sensors. Filters to `openCloseSensor` type. Eac
 **TypeScript type:**
 
 ```typescript
-interface ContactSensor extends DirigeraSensor {
+interface ContactSensor extends Omit<DirigeraSensor, "device_type"> {
+  type: "openCloseSensor";
+  is_open: boolean;              // always present on contact sensors
   data_freshness: "LIVE" | "STALE" | "UNREACHABLE";
-  is_open: boolean;
 }
 
 interface ContactSensorsResponse {
@@ -245,7 +269,7 @@ curl -s YOUR_BASE_URL/api/v1/dirigera/sensors/contact \
 
 ### GET /sensors/motion
 
-Return only motion/occupancy sensors. Filters to `occupancySensor` device type. Each sensor includes `data_freshness` and `light_level` fields. Companion `lightSensor` illuminance is automatically merged by room name.
+Return only motion/occupancy sensors. Filters to `occupancySensor` device type (legacy `motionSensor` devices are not included here, only in `GET /sensors`). Each sensor includes `data_freshness`; `light_level` is present only when a companion `lightSensor` with the same `relation_id` exists (matched by `relation_id`, not by room).
 
 **Authentication:** Required (JWT Bearer or API Key)
 
@@ -258,14 +282,15 @@ Return only motion/occupancy sensors. Filters to `occupancySensor` device type. 
   "sensors": [
     {
       "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "relation_id": "c9d8e7f6-0000-1111-2222-333344445555",
       "type": "occupancySensor",
-      "custom_name": "MYGGBETT Soggiorno",
+      "custom_name": "MYGGSPRAY Soggiorno",
       "room": "Soggiorno",
       "firmware_version": "24056010",
       "battery_percentage": 75,
       "is_reachable": true,
-      "is_open": null,
       "last_seen": "2026-03-12T15:28:00.000Z",
+      "is_detected": false,
       "light_level": 42,
       "data_freshness": "LIVE"
     }
@@ -278,8 +303,10 @@ Return only motion/occupancy sensors. Filters to `occupancySensor` device type. 
 **TypeScript type:**
 
 ```typescript
-interface MotionSensor extends DirigeraSensor {
-  light_level: number | null;
+interface MotionSensor extends Omit<DirigeraSensor, "device_type" | "is_open"> {
+  type: "occupancySensor";
+  is_detected: boolean;          // always present on motion sensors (no is_open key)
+  light_level?: number | null;   // absent when no companion lightSensor exists
   data_freshness: "LIVE" | "STALE" | "UNREACHABLE";
 }
 
@@ -356,7 +383,7 @@ curl -s YOUR_BASE_URL/api/v1/dirigera/sensors/summary \
 
 ### GET /history
 
-Return paginated sensor event history. Query events recorded by the change detection poller. Supports filtering by sensor, event type, and time range.
+Return paginated sensor event history. Events are the raw `sensor_events` rows written by the change-detection poller (`SELECT * FROM sensor_events ... ORDER BY timestamp DESC`). Rows are NOT enriched: there is no sensor name — join client-side with `GET /sensors` on `sensor_id`. Supports filtering by sensor, event type, and time range.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
@@ -379,23 +406,20 @@ Return paginated sensor event history. Query events recorded by the change detec
     {
       "id": 1042,
       "sensor_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "sensor_name": "MYGGBETT Ingresso",
       "event_type": "open",
-      "recorded_at": 1773330000
+      "timestamp": 1773330000
     },
     {
       "id": 1041,
       "sensor_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-      "sensor_name": "MYGGBETT Ingresso",
       "event_type": "close",
-      "recorded_at": 1773329700
+      "timestamp": 1773329700
     },
     {
       "id": 1040,
       "sensor_id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
-      "sensor_name": "MYGGBETT Soggiorno",
       "event_type": "motion_detected",
-      "recorded_at": 1773329500
+      "timestamp": 1773329500
     }
   ],
   "total": 1042,
@@ -410,9 +434,8 @@ Return paginated sensor event history. Query events recorded by the change detec
 interface SensorEvent {
   id: number;
   sensor_id: string;
-  sensor_name: string | null;
   event_type: "open" | "close" | "motion_detected" | "motion_cleared" | string;
-  recorded_at: number;   // Unix timestamp
+  timestamp: number;     // Unix timestamp (seconds)
 }
 
 interface SensorHistoryResponse {
@@ -451,7 +474,7 @@ curl -s "YOUR_BASE_URL/api/v1/dirigera/history?start=1773000000&end=1773330000" 
 
 ### GET /stats
 
-Return DIRIGERA aggregation and retention statistics. Exposes observability data about background job execution: daily rollup aggregation and event retention cleanup.
+Return DIRIGERA aggregation and retention statistics. Exposes observability data about background job execution: daily rollup aggregation (`aggregation.py`) and event/telemetry retention cleanup (`retention.py`). Stats are in-memory and reset on process restart (`last_*` fields are `null` and `total_runs` is `0` until the job runs once).
 
 **Authentication:** Required (JWT Bearer or API Key)
 
@@ -460,18 +483,16 @@ Return DIRIGERA aggregation and retention statistics. Exposes observability data
 ```json
 {
   "aggregation": {
-    "last_run_at": 1773244800,
-    "last_run_status": "ok",
-    "rows_aggregated_last_run": 248,
-    "total_runs": 7,
-    "total_rows_aggregated": 1736
+    "last_run": 1773244800,
+    "last_sensors_processed": 6,
+    "total_runs": 7
   },
   "retention": {
-    "last_run_at": 1773244800,
-    "last_run_status": "ok",
-    "rows_deleted_last_run": 0,
-    "total_runs": 7,
-    "total_rows_deleted": 42
+    "last_run": 1773244800,
+    "last_raw_events_deleted": 12,
+    "last_daily_rows_deleted": 0,
+    "last_telemetry_deleted": 288,
+    "total_runs": 7
   }
 }
 ```
@@ -480,19 +501,17 @@ Return DIRIGERA aggregation and retention statistics. Exposes observability data
 
 ```typescript
 interface AggregationStats {
-  last_run_at: number | null;
-  last_run_status: string | null;
-  rows_aggregated_last_run: number;
+  last_run: number | null;               // Unix seconds of last successful run
+  last_sensors_processed: number | null; // sensors rolled up in the last run
   total_runs: number;
-  total_rows_aggregated: number;
 }
 
 interface RetentionStats {
-  last_run_at: number | null;
-  last_run_status: string | null;
-  rows_deleted_last_run: number;
+  last_run: number | null;               // Unix seconds of last successful run
+  last_raw_events_deleted: number | null;  // sensor_events rows purged
+  last_daily_rows_deleted: number | null;  // sensor_daily rows purged
+  last_telemetry_deleted: number | null;   // sensor_telemetry rows purged
   total_runs: number;
-  total_rows_deleted: number;
 }
 
 interface DirigeraStatsResponse {

@@ -77,7 +77,9 @@ export function useTuyaData(): UseTuyaDataReturn {
         return;
       }
 
-      const isStale = wsData.data_freshness !== 'LIVE';
+      // Same rule as the HTTP path: per-plug freshness (the WS payload has the
+      // GET /tuya/plugs item shape and no top-level data_freshness).
+      const isStale = wsData.plugs.some(p => p.data_freshness !== 'LIVE');
 
       plugsRef.current = wsData.plugs;
       setPlugs(wsData.plugs);

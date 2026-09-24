@@ -39,12 +39,19 @@ function setWsConnected(connected: boolean) {
   } as ReturnType<typeof useWebSocketContext>);
 }
 
-// Mock WS payload (RaspiData shape from types/websocket.ts)
+// Mock WS payload — real backend shape (backend/api/providers/raspi/provider.py → payload)
 const mockWsPayload: WsRaspiData = {
-  cpu_percent: 25.3,
-  memory: { total: 8589934592, available: 4294967296, percent: 50.0, used: 4294967296 },
-  disk: { total: 32212254720, used: 12884901888, free: 19327352832, percent: 40.0 },
-  system: { temperature: 42.5, uptime: 86400, load_avg: [0.5, 0.3, 0.2], process_count: 145 },
+  cpu: { cpu_percent: 33.3 },
+  memory: { total: 8589934592, available: 4294967296, percent: 61.0, used: 4294967296 },
+  disk: { total: 32212254720, used: 12884901888, free: 19327352832, percent: 44.0, mount_point: '/' },
+  system: {
+    cpu_temperature: 47.5,
+    uptime_seconds: 86400,
+    load_avg_1: 0.5,
+    load_avg_5: 0.3,
+    load_avg_15: 0.2,
+    process_count: 145,
+  },
   data_freshness: 'LIVE',
 };
 
@@ -110,8 +117,9 @@ describe('useRaspiData', () => {
     mockUseVisibility.mockReturnValue(true);
     setWsConnected(false);  // default: polling mode
 
-    mockUseAdaptivePolling.mockImplementation(({ callback, immediate }) => {
-      if (immediate) {
+    // Mirror the real hook: `immediate` is skipped when interval is null (WS OPEN).
+    mockUseAdaptivePolling.mockImplementation(({ callback, immediate, interval }) => {
+      if (immediate && interval !== null) {
         setTimeout(() => void callback(), 0);
       }
     });
@@ -268,6 +276,18 @@ describe('useRaspiData', () => {
     expect(pollingArgs?.interval).toBeNull();
   });
 
+  it('bootstraps via HTTP on mount even when WS is already OPEN', async () => {
+    setWsConnected(true);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useRaspiData());
+
+    await waitFor(() => expect(result.current.data).not.toBeNull());
+    const calls = (global.fetch as jest.Mock).mock.calls.map((c) => c[0]);
+    expect(calls).toContain('/api/raspi/cpu');
+    expect(result.current.loading).toBe(false);
+  });
+
   it('polls at 60000ms when WS is CLOSED (fallback)', () => {
     setWsConnected(false);
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
@@ -293,10 +313,10 @@ describe('useRaspiData', () => {
 
     await waitFor(() => {
       expect(result.current.data).toEqual({
-        cpuPercent: 25.3,
-        memoryPercent: 50.0,
-        diskPercent: 40.0,
-        cpuTemperature: 42.5,
+        cpuPercent: 33.3,
+        memoryPercent: 61.0,
+        diskPercent: 44.0,
+        cpuTemperature: 47.5,
       });
     });
   });
@@ -310,7 +330,7 @@ describe('useRaspiData', () => {
     const goodData = result.current.data;
 
     const handler = mockSubscribe.mock.calls[0]?.[1] as (data: unknown) => void;
-    const malformed = { ...mockWsPayload, cpu_percent: undefined as unknown as number };
+    const malformed = { ...mockWsPayload, cpu: {} };
     act(() => { handler(malformed); });
 
     // Data untouched — last known good preserved

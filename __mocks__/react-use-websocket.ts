@@ -19,13 +19,15 @@ const mockSendJsonMessage = jest.fn();
 let mockReadyState = ReadyState.OPEN;
 let mockLastMessage: { data: string } | null = null;
 let mockOnOpen: (() => void) | null = null;
+let mockOnMessage: ((event: { data: string }) => void) | null = null;
 
 export const useWebSocket = jest.fn(
   (
     _url: string | null,
     options?: {
       onOpen?: () => void;
-      shouldReconnect?: () => boolean;
+      onMessage?: (event: { data: string }) => void;
+      shouldReconnect?: (event: { code: number }) => boolean;
       reconnectAttempts?: number;
       reconnectInterval?: (attempt: number) => number;
     },
@@ -33,6 +35,9 @@ export const useWebSocket = jest.fn(
   ) => {
     if (options?.onOpen) {
       mockOnOpen = options.onOpen;
+    }
+    if (options?.onMessage) {
+      mockOnMessage = options.onMessage;
     }
     return {
       sendJsonMessage: mockSendJsonMessage,
@@ -54,17 +59,27 @@ export const __mockHelpers = {
   triggerOnOpen: () => {
     mockOnOpen?.();
   },
+  /** Simulate a frame from the server (react-use-websocket calls onMessage per frame) */
+  emitMessage: (data: string) => {
+    mockOnMessage?.({ data });
+  },
   reset: () => {
     mockSendJsonMessage.mockClear();
     mockReadyState = ReadyState.OPEN;
     mockLastMessage = null;
     mockOnOpen = null;
+    mockOnMessage = null;
     (useWebSocket as jest.Mock).mockClear();
     (useWebSocket as jest.Mock).mockImplementation(
       (...args: unknown[]) => {
-        const options = args[1] as { onOpen?: () => void } | undefined;
+        const options = args[1] as
+          | { onOpen?: () => void; onMessage?: (event: { data: string }) => void }
+          | undefined;
         if (options?.onOpen) {
           mockOnOpen = options.onOpen;
+        }
+        if (options?.onMessage) {
+          mockOnMessage = options.onMessage;
         }
         return {
           sendJsonMessage: mockSendJsonMessage,

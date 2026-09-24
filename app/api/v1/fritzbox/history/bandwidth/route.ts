@@ -1,5 +1,6 @@
 import { withAuthAndErrorHandler, success, ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
 import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
+import { buildCacheKey, pickQueryParams, NUMERIC_PARAM } from '@/lib/fritzbox/fritzboxQuery';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,14 +33,9 @@ export const GET = withAuthAndErrorHandler(async (request, _context, session) =>
     );
   }
   const { searchParams } = new URL(request.url);
-  const params = new URLSearchParams();
-  const hours = searchParams.get('hours');
-  const limit = searchParams.get('limit');
-  const offset = searchParams.get('offset');
-  if (hours) params.set('hours', hours);
-  if (limit) params.set('limit', limit);
-  if (offset) params.set('offset', offset);
+  // Whitelisted + validated params; they are also part of the cache key.
+  const params = pickQueryParams(searchParams, { hours: NUMERIC_PARAM, limit: NUMERIC_PARAM, offset: NUMERIC_PARAM });
 
-  const bandwidth = await getCachedData('history-bandwidth-raw', () => fritzboxClient.getBandwidthHistoryRaw(params));
+  const bandwidth = await getCachedData(buildCacheKey('history-bandwidth-raw', params), () => fritzboxClient.getBandwidthHistoryRaw(params));
   return success({ bandwidth });
 }, 'FritzBox/HistoryBandwidthRaw');

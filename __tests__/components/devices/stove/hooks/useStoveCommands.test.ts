@@ -63,14 +63,14 @@ describe('useStoveCommands', () => {
   const mockClearError = jest.fn();
 
   // Standard 202 command response
-  const mockCommandResponse: ThermorossiCommandResponse = {
+  const mockCommandResponse = {
     command: 'ignite',
     status: 'accepted',
     previous_state: 'off',
     suggested_poll_delay_s: 15,
     poll_endpoint: '/api/v1/thermorossi/status',
     requested_value: null,
-  };
+  } as unknown as ThermorossiCommandResponse; // legacy 202 contract
 
   const mockResponse202 = {
     ok: true,
@@ -192,6 +192,26 @@ describe('useStoveCommands', () => {
     );
   });
 
+  it('handleIgnite refreshes immediately when the backend confirms the new status (data_confirmed)', async () => {
+    // Real backend: 200 + full ThermorossiMutationResponse after a synchronous re-poll
+    const confirmed = {
+      stove_state: 'igniting',
+      data_confirmed: true,
+      data_freshness: 'LIVE',
+    } as unknown as ThermorossiCommandResponse;
+    mockExecute.mockResolvedValue({ ok: true, status: 200, json: jest.fn().mockResolvedValue(confirmed) });
+
+    const { result } = renderHook(() =>
+      useStoveCommands({ stoveData: mockStoveData, router: mockRouter, user: mockUser })
+    );
+
+    await act(async () => {
+      await result.current.handleIgnite(); // no timer advance: must not wait 15 s
+    });
+
+    expect(mockStoveData.fetchStatusAndUpdate).toHaveBeenCalledTimes(1);
+  });
+
   it('handleIgnite delays fetchStatusAndUpdate by suggested_poll_delay_s', async () => {
     mockExecute.mockResolvedValue({
       ok: true,
@@ -218,10 +238,10 @@ describe('useStoveCommands', () => {
   });
 
   it('handleShutdown calls execute with correct endpoint', async () => {
-    const shutdownResponse: ThermorossiCommandResponse = {
+    const shutdownResponse = {
       ...mockCommandResponse,
       command: 'shutdown',
-    };
+    } as unknown as ThermorossiCommandResponse; // legacy 202 contract
     mockExecute.mockResolvedValue({
       ok: true,
       status: 202,
@@ -252,14 +272,14 @@ describe('useStoveCommands', () => {
   });
 
   it('handleFanChange calls execute with correct level', async () => {
-    const fanResponse: ThermorossiCommandResponse = {
+    const fanResponse = {
       command: 'setFan',
       status: 'accepted',
       previous_state: 'working',
       suggested_poll_delay_s: 5,
       poll_endpoint: '/api/v1/thermorossi/status',
       requested_value: 4,
-    };
+    } as unknown as ThermorossiCommandResponse; // legacy 202 contract
     mockExecute.mockResolvedValue({
       ok: true,
       status: 202,
@@ -290,14 +310,14 @@ describe('useStoveCommands', () => {
   });
 
   it('handleFanChange does not call setSemiManualMode directly', async () => {
-    const fanResponse: ThermorossiCommandResponse = {
+    const fanResponse = {
       command: 'setFan',
       status: 'accepted',
       previous_state: 'working',
       suggested_poll_delay_s: 5,
       poll_endpoint: '/api/v1/thermorossi/status',
       requested_value: 4,
-    };
+    } as unknown as ThermorossiCommandResponse; // legacy 202 contract
     mockExecute.mockResolvedValue({
       ok: true,
       status: 202,
@@ -323,14 +343,14 @@ describe('useStoveCommands', () => {
   });
 
   it('handlePowerChange calls execute with correct level', async () => {
-    const powerResponse: ThermorossiCommandResponse = {
+    const powerResponse = {
       command: 'setPower',
       status: 'accepted',
       previous_state: 'working',
       suggested_poll_delay_s: 5,
       poll_endpoint: '/api/v1/thermorossi/status',
       requested_value: 3,
-    };
+    } as unknown as ThermorossiCommandResponse; // legacy 202 contract
     mockExecute.mockResolvedValue({
       ok: true,
       status: 202,
@@ -361,14 +381,14 @@ describe('useStoveCommands', () => {
   });
 
   it('handlePowerChange does not call setSemiManualMode directly', async () => {
-    const powerResponse: ThermorossiCommandResponse = {
+    const powerResponse = {
       command: 'setPower',
       status: 'accepted',
       previous_state: 'working',
       suggested_poll_delay_s: 5,
       poll_endpoint: '/api/v1/thermorossi/status',
       requested_value: 3,
-    };
+    } as unknown as ThermorossiCommandResponse; // legacy 202 contract
     mockExecute.mockResolvedValue({
       ok: true,
       status: 202,

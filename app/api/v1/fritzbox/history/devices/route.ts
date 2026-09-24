@@ -1,5 +1,6 @@
 import { withAuthAndErrorHandler, success, ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
 import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
+import { buildCacheKey, pickQueryParams, NUMERIC_PARAM } from '@/lib/fritzbox/fritzboxQuery';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,7 @@ export const dynamic = 'force-dynamic';
  * Cached: 60-second TTL
  *
  * Query params:
+ *   hours  - Hours of history (1-168, default: backend 24)
  *   limit  - Max items per page (default: proxy default)
  *   offset - Pagination offset (default: 0)
  *
@@ -31,12 +33,9 @@ export const GET = withAuthAndErrorHandler(async (request, _context, session) =>
     );
   }
   const { searchParams } = new URL(request.url);
-  const params = new URLSearchParams();
-  const limit = searchParams.get('limit');
-  const offset = searchParams.get('offset');
-  if (limit) params.set('limit', limit);
-  if (offset) params.set('offset', offset);
+  // Whitelisted + validated params; they are also part of the cache key.
+  const params = pickQueryParams(searchParams, { hours: NUMERIC_PARAM, limit: NUMERIC_PARAM, offset: NUMERIC_PARAM });
 
-  const devices = await getCachedData('history-devices-raw', () => fritzboxClient.getDevicePresenceHistory(params));
+  const devices = await getCachedData(buildCacheKey('history-devices-raw', params), () => fritzboxClient.getDevicePresenceHistory(params));
   return success({ devices });
 }, 'FritzBox/HistoryDevicesRaw');

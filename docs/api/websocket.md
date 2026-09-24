@@ -12,7 +12,7 @@ Single endpoint for real-time push from all providers. The server sends data imm
 
 **Available topics:** `fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `tuya`, `hue`, `sonos`, `raspi`, `scheduler`, `sonos_transport`, `sonos_volume`, `sonos_topology`, `automations`
 
-> **Push-only topics (no snapshot on subscribe):** `sonos_transport`, `sonos_volume`, `sonos_topology`, `automations` — these are triggered by Sonos mutations/events or automation-engine executions, not polled. Subscribe to receive future pushes; no immediate snapshot is delivered.
+> **Push-only topics (no snapshot on subscribe):** `sonos_transport`, `sonos_volume`, `sonos_topology`, `automations` — `_get_snapshot()` has no branch for them. `sonos_transport` and `sonos_volume` are pushed both after Sonos mutations and by the 30 s Sonos poller whenever a zone's playback / a speaker's volume changes (including changes made from the Sonos app); `sonos_topology` only after join/unjoin/source mutations; `automations` on automation executions. Subscribe to receive future pushes; no immediate snapshot is delivered.
 
 ---
 
@@ -50,7 +50,7 @@ The `/ws/live` endpoint replaces REST polling for all providers. Key behaviours:
 
 - **Delta detection:** The server only pushes when provider data changes (MD5 fingerprint comparison). If the router returns the same device list twice in a row, no WebSocket message is sent.
 - **Snapshot on subscribe:** When you subscribe to a topic, the server immediately sends the current cached state (`type: "snapshot"`). You do not have to wait for the next poll cycle.
-- **Topic-based subscription:** A single connection can subscribe to any combination of the 12 topics. Each subscription is independent.
+- **Topic-based subscription:** A single connection can subscribe to any combination of the 13 topics. Each subscription is independent.
 - **Per-connection subscriptions:** Subscriptions are not persisted. If the connection drops and reconnects, you must re-subscribe. Always send subscribe messages inside the `onOpen` callback.
 
 ---
@@ -99,9 +99,9 @@ Credentials are validated before the connection is accepted. An invalid or missi
 6. Server sends a `snapshot` message immediately for each subscribed topic (if cache is populated).
 7. Server sends `event` messages whenever provider data changes.
 
-**Heartbeat:** The server sends a WebSocket `ping` frame every **30 seconds**. If no `pong` is received within **10 seconds**, the connection is considered dead and closed. Standard WebSocket clients (browser, react-use-websocket) handle pong automatically.
+**Heartbeat:** there is no application-level ping/pong message. Keep-alive is done with WebSocket protocol `ping` frames by **Uvicorn**, configured on the command line of the production systemd unit (`deploy/systemd/homeassistant.service`: `--ws-ping-interval 30 --ws-ping-timeout 10`, asserted by `tests/test_ws_manager.py::test_systemd_service_has_ping_flags`). In production the server pings every **30 s** and drops the connection if no `pong` arrives within **10 s**. When the app is started with `python main.py` (local dev), `uvicorn.run()` does not pass these options, so Uvicorn's defaults apply (20 s / 20 s). Browsers and react-use-websocket answer protocol pings automatically; clients must not send `{"action": "ping"}` (unknown actions are ignored, no reply). Nginx keeps idle `/ws/` upgrades open for up to `proxy_read_timeout 3600s`.
 
-**Send timeout:** Each message write has a **5-second** timeout. A connection that cannot receive within 5 seconds is detected as dead and closed.
+**Send timeout:** Each message write has a **5-second** timeout (`asyncio.wait_for(ws.send_json(...), 5.0)`). If a write fails or times out, the server closes the socket with code **`1011`** (so the client sees the drop and can reconnect) and unregisters the connection.
 
 > **Warning — Max 10 concurrent connections (code 1013):** The server accepts only 10 simultaneous WebSocket connections. In Next.js development mode, React StrictMode double-invokes effects and hot reload can create a stale connection that hasn't closed yet when the new connection attempts to open. If you get immediate disconnections in dev, check browser DevTools for close code `1013`. Use one browser tab at a time during development.
 
@@ -125,9 +125,11 @@ All messages are JSON objects. The client sends action messages; the server send
 {"action": "unsubscribe", "topic": "fritzbox"}
 ```
 
-**Valid topic values:** `fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `hue`, `sonos`, `raspi`, `scheduler`, `sonos_transport`, `sonos_volume`, `sonos_topology`
+**Valid topic values:** `fritzbox`, `dirigera`, `netatmo`, `thermorossi`, `tuya`, `hue`, `sonos`, `raspi`, `scheduler`, `sonos_transport`, `sonos_volume`, `sonos_topology`, `automations`
 
 On subscribe, the server immediately sends a `snapshot` message for the requested topic (if the cache is populated). Subsequent `event` messages arrive whenever the provider's data changes.
+
+**Invalid client frames are ignored, not fatal:** a frame that is not valid JSON, or valid JSON that is not an object (e.g. `[]`, `"x"`, `42`), is logged (`ws.message.invalid_json` / `ws.message.not_an_object`) and skipped — the connection stays open. Objects with an unknown `action` or a `topic` not in the valid list are silently ignored (no error reply).
 
 ### Server → Client
 
@@ -368,9 +370,9 @@ function processSensor(sensor: DirigeraSensor) {
 
 ### netatmo
 
-Netatmo energy system data: thermostat state, room temperatures, schedule, valve status.
+Netatmo energy system data (thermostat / rooms) plus security camera inventory with browser-safe media proxy URLs.
 
-> **Note:** As of Phase 120, the WS payload is no longer the raw Netatmo cloud API blob. It is now a structured object with a `rooms` array matching the REST endpoint response.
+> **Note:** As of Phase 120, the WS payload is no longer the raw Netatmo cloud API blob. It is now a structured object with a `rooms` array matching the REST endpoint response. As of quick task `260513-dlo` it also carries a `cameras` array sourced from the `gethomedata` cache and augmented with proxy URLs (browsers cannot use raw Netatmo VPN URLs directly).
 
 ```typescript
 interface NetatmoRoom {
@@ -381,13 +383,39 @@ interface NetatmoRoom {
   [key: string]: unknown;
 }
 
+interface NetatmoCameraStreamUrls {
+  high: string;
+  medium: string;
+  low: string;
+}
+
+interface NetatmoCamera {
+  camera_id: string;
+  name: string | null;
+  device_type: string | null;        // e.g. "NACamera"
+  status: string | null;              // "on" | "off" | "disconnected" | ...
+  sd_status: string | null;
+  alim_status: string | null;
+  firmware: number | null;
+  is_local: boolean;
+  vpn_url: string | null;             // raw Netatmo VPN URL (server-side use)
+  snapshot_url?: string;              // raw VPN snapshot (only when vpn_url present)
+  vpn_streams?: NetatmoCameraStreamUrls;  // raw VPN HLS (only when vpn_url present)
+  snapshot_proxy_url: string;         // browser-safe JPEG proxy (always present)
+  proxy_streams: NetatmoCameraStreamUrls; // browser-safe HLS proxy (always present)
+  local_streams?: NetatmoCameraStreamUrls; // only when is_local && local_url known
+}
+
 interface NetatmoPayload {
-  rooms: NetatmoRoom[];             // parsed from body.home.rooms in raw cache
+  rooms: NetatmoRoom[];                // parsed from body.home.rooms in raw cache
+  cameras: NetatmoCamera[];            // parsed from cached gethomedata response
   data_freshness: "LIVE" | "STALE";
 }
 ```
 
-For the full room field-by-field documentation, refer to `GET /api/v1/netatmo/energy/homestatus` in [Netatmo REST endpoints](./netatmo.md). The `rooms` array shape is identical to that endpoint's response.
+For the full room field-by-field documentation, refer to `GET /api/v1/netatmo/energy/homestatus` in [Netatmo REST endpoints](./netatmo.md). The `rooms` array shape is identical to that endpoint's response. The `cameras` array shape mirrors `GET /api/v1/netatmo/camera/status` plus the proxy URL fields documented under [GET /camera/{camera_id}/snapshot](./netatmo.md#get-cameracamera_idsnapshot) and [GET /camera/{camera_id}/stream](./netatmo.md#get-cameracamera_idstream).
+
+> **Browser usage:** load `cameras[].snapshot_proxy_url` into `<img src>` and `cameras[].proxy_streams.*` into `hls.js`. The raw `vpn_url` / `vpn_streams` / `snapshot_url` are not browser-usable (no session, no CORS, mixed-content under reverse proxies) — they are exposed only for server-to-server consumers.
 
 **JSON example:**
 
@@ -401,21 +429,48 @@ For the full room field-by-field documentation, refer to `GET /api/v1/netatmo/en
       "therm_measured_temperature": 21.5,
       "therm_setpoint_temperature": 20.0,
       "heating_power_request": 0
-    },
+    }
+  ],
+  "cameras": [
     {
-      "id": "1234567890",
-      "name": "Camera",
-      "reachable": true,
-      "therm_measured_temperature": 19.8,
-      "therm_setpoint_temperature": 18.0,
-      "heating_power_request": 35
+      "camera_id": "70:ee:50:aa:bb:cc",
+      "name": "Indoor",
+      "device_type": "NACamera",
+      "status": "on",
+      "sd_status": "on",
+      "alim_status": "on",
+      "firmware": 176,
+      "is_local": true,
+      "vpn_url": "https://v.netatmo.com/restricted/.../...",
+      "snapshot_url": "https://v.netatmo.com/restricted/.../live/snapshot_720.jpg",
+      "vpn_streams": {
+        "high": "https://v.netatmo.com/restricted/.../live/files/high/index.m3u8",
+        "medium": "https://v.netatmo.com/restricted/.../live/files/medium/index.m3u8",
+        "low": "https://v.netatmo.com/restricted/.../live/files/low/index.m3u8"
+      },
+      "snapshot_proxy_url": "/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/snapshot.jpg",
+      "proxy_streams": {
+        "high": "/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/high/index.m3u8",
+        "medium": "/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/medium/index.m3u8",
+        "low": "/api/v1/netatmo/camera/70:ee:50:aa:bb:cc/live/low/index.m3u8"
+      },
+      "local_streams": {
+        "high": "http://192.168.178.x/.../live/files/high/index.m3u8",
+        "medium": "http://192.168.178.x/.../live/files/medium/index.m3u8",
+        "low": "http://192.168.178.x/.../live/files/low/index.m3u8"
+      }
     }
   ],
   "data_freshness": "LIVE"
 }
 ```
 
-**Nullability:** The entire payload can be `null` if Netatmo cloud hasn't responded since server start. When cache is empty, `rooms` is `[]` and `data_freshness` reflects the cache state.
+**Nullability / when it is sent:**
+- The payload is built from the cached raw **homestatus** (`rooms` = `body.home.rooms`) plus the cached **homedata** (`cameras`). Both snapshot and event have exactly the keys `rooms`, `cameras`, `data_freshness`.
+- **Empty cache → no snapshot:** if no homestatus has been cached yet, subscribing sends **no** snapshot message at all (it does not send an empty payload). `cameras` is `[]` while homedata has not been polled yet.
+- **After a camera mutation** (`POST /camera/{id}/monitoring`) the backend re-polls `gethomedata` and pushes an event built from the **cached homestatus** (so `rooms` is populated, not `[]`) with `cameras` rebuilt from the fresh homedata. If no homestatus is cached, that push is skipped.
+- After energy / valve mutations the re-polled homestatus is pushed the same way.
+- A camera with no `vpn_url` (offline / unreachable) still appears in `cameras` with the proxy URL fields populated but without `vpn_url`, `snapshot_url`, `vpn_streams`, or `local_streams`.
 
 ---
 
@@ -427,7 +482,7 @@ Thermorossi pellet stove status: operating state, power level, fan level, error 
 interface ThermorossiData {
   stove_state: string;              // 'off' | 'igniting' | 'working' | 'cooling' | 'alarm' | ...
   power_level: number | null;       // 1–5 (fuel feed rate)
-  fan_level: number | null;         // 1–5 (combustion air)
+  fan_level: number | null;         // 1–6 (combustion air)
   error_code: number | null;
   error_description: string | null;
   data_freshness: "LIVE" | "STALE";
@@ -466,29 +521,29 @@ The payload is the enriched WiNet API status response. `stove_state_raw` is stri
 
 Tuya smart plugs: switch state, power monitoring (watts, voltage, current, energy), countdown timers. See [Tuya REST endpoints](./tuya.md) for REST endpoint details.
 
-> **Note:** The snapshot on subscribe delivers raw cache entries (dict keyed by device_id with `last_success_at`, `consecutive_failures`, `data` sub-object). Periodic push events deliver the enriched flat shape shown below. The TypeScript interface documents the push-event shape that consumers primarily work with.
+> **Snapshot and events have the same shape.** Publishers (poller and `POST /plugs/{id}/state|timer` re-poll) send the raw cache dict; `_enrich_payload()` converts it into `{plugs: [...]}` where every item is built with the same `_build_plug_response()` used by `GET /tuya/plugs` (`TuyaPlugResponse`), plus registry `custom_name` / `device_type`. No snapshot is sent while the Tuya cache is empty.
 
 ```typescript
 interface TuyaPlug {
   device_id: string;
-  switch_on: boolean | null;           // null when device UNREACHABLE or not yet polled
-  power_w: number | null;              // watts — null when UNREACHABLE
-  voltage_v: number | null;            // volts — null when UNREACHABLE
-  current_ma: number | null;           // milliamps — null when UNREACHABLE
-  energy_kwh: number | null;           // cumulative kWh — null when UNREACHABLE
+  switch_on: boolean | null;           // null when never polled successfully
+  power_w: number | null;              // watts
+  voltage_v: number | null;            // volts
+  current_ma: number | null;           // milliamps
+  energy_kwh: number | null;           // cumulative kWh
   countdown_s: number | null;          // active timer countdown in seconds, null if none
   data_freshness: "LIVE" | "STALE" | "UNREACHABLE";
-  last_polled_at: string | null;       // ISO 8601 UTC (e.g. "2026-04-03T08:30:00+00:00"), null if never polled
-  custom_name?: string | null;         // from device registry (only if registry entry exists)
-  device_type?: string | null;         // device_type_slug from registry (only if registry entry exists)
+  last_polled_at: number | null;       // Unix epoch seconds (float) of last successful poll, null if never polled
+  custom_name: string | null;          // from device registry (null if no entry) — key always present
+  device_type: string | null;          // device_type_slug from registry (null if no entry) — key always present
 }
 
 interface TuyaPayload {
-  plugs: TuyaPlug[];
+  plugs: TuyaPlug[];                   // exactly the GET /tuya/plugs item shape (TuyaPlugResponse)
 }
 ```
 
-The payload wraps all plugs in a `plugs` array. Each plug entry mirrors the REST `TuyaPlugResponse` fields with enrichment from the device registry and cache freshness tracking.
+The payload wraps all plugs in a `plugs` array (no top-level `data_freshness`; freshness is per plug). Item order follows the cache dict order.
 
 **JSON example:**
 
@@ -504,20 +559,20 @@ The payload wraps all plugs in a `plugs` array. Each plug entry mirrors the REST
       "energy_kwh": 1.23,
       "countdown_s": null,
       "data_freshness": "LIVE",
-      "last_polled_at": "2026-04-03T08:30:00+00:00",
+      "last_polled_at": 1775205000.123,
       "custom_name": "Presa Soggiorno",
       "device_type": "smart_plug"
     },
     {
       "device_id": "bfdef987654321",
-      "switch_on": null,
-      "power_w": null,
-      "voltage_v": null,
-      "current_ma": null,
-      "energy_kwh": null,
-      "countdown_s": null,
+      "switch_on": false,
+      "power_w": 0.0,
+      "voltage_v": 229.4,
+      "current_ma": 0.0,
+      "energy_kwh": 0.87,
+      "countdown_s": 0,
       "data_freshness": "UNREACHABLE",
-      "last_polled_at": "2026-04-03T06:00:00+00:00",
+      "last_polled_at": 1775196000.456,
       "custom_name": "Presa Cucina",
       "device_type": "smart_plug"
     }
@@ -525,7 +580,7 @@ The payload wraps all plugs in a `plugs` array. Each plug entry mirrors the REST
 }
 ```
 
-**Nullability:** All numeric fields (`switch_on`, `power_w`, `voltage_v`, `current_ma`, `energy_kwh`, `countdown_s`) are `null` when the device is unreachable or has never been polled. `last_polled_at` is `null` if no successful poll has occurred. `custom_name` and `device_type` are only present when the device has a registry entry.
+**Nullability:** The state fields (`switch_on`, `power_w`, `voltage_v`, `current_ma`, `energy_kwh`, `countdown_s`) are `null` when the device has never been polled successfully or the DP was not reported. An `UNREACHABLE` plug keeps its **last known** values (the cache retains `data` on poll failures) — check `data_freshness` before trusting them. `last_polled_at` is `null` if no successful poll has occurred. `custom_name` and `device_type` are always present and `null` when the device has no registry entry.
 
 ---
 
@@ -751,23 +806,30 @@ interface SonosData {
 
 ### sonos_transport
 
-Sonos playback state per group: transport state, current track metadata.
+Sonos playback state for **one zone per message** (the payload is a single playback snapshot, not a list).
 
-> **Push-only:** No snapshot is delivered on subscribe. You receive pushes when Sonos transport state changes (e.g., play/pause/track change). Subscribe to `sonos_transport` to receive future events.
+> **Push-only:** No snapshot is delivered on subscribe. Pushes come from two sources:
+> 1. **Poller (every 30 s):** for each zone coordinator, the fresh playback snapshot is pushed when it differs from the last one pushed for that zone (fingerprint key `sonos_transport:<group_id>`). This catches changes made outside the app (Sonos app, remotes, voice assistants), new tracks, and position changes while playing.
+> 2. **Transport mutations** (`POST /zones/{group_id}/play|pause|stop|next|previous`, `PUT /zones/{group_id}/seek`): after a 0.5 s re-poll, the new snapshot is pushed if it changed.
+>
+> Use `GET /api/v1/sonos/zones/{group_id}/playback` for the initial state.
 
 ```typescript
+// Same shape as REST SonosPlaybackResponse (GET /zones/{group_id}/playback)
 interface SonosTransportPayload {
-  group_id: string;
-  transport_state: string | null;    // e.g. "PLAYING", "PAUSED_PLAYBACK", "STOPPED"
+  group_id: string;                  // zone coordinator UID (RINCON_...), same as GET /zones group_id
+  transport_state: string | null;    // "PLAYING" | "PAUSED_PLAYBACK" | "STOPPED" | "TRANSITIONING"
   title: string | null;              // current track title
   artist: string | null;
   album: string | null;
-  album_art_url: string | null;
-  position: number | null;           // current position in seconds
-  duration: number | null;           // track duration in seconds
-  source_type: string | null;        // e.g. "music_service", "line_in", "tv"
+  album_art_url: string | null;      // absolute http://<speaker-ip>:1400/... URL
+  position: string | null;           // "H:MM:SS" string from SoCo (e.g. "0:00:47"); null when "0:00:00"/NOT_IMPLEMENTED
+  duration: string | null;           // "H:MM:SS" string; null for radio/TV/line-in or "0:00:00"
+  source_type: "tv" | "streaming" | "radio" | "line_in" | "airplay" | "unknown";
 }
 ```
+
+`source_type` comes from SoCo `music_source`: `TV`→`tv`, `LINE_IN`→`line_in`, `AIRPLAY`→`airplay`, `RADIO`→`radio`, `LIBRARY`/`WEB_FILE`→`streaming`, otherwise `unknown` (with a fallback on `is_playing_tv` / `is_playing_radio` / `is_playing_line_in`).
 
 No freshness enrichment — `_enrich_payload()` has no branch for `sonos_transport`.
 
@@ -780,10 +842,10 @@ No freshness enrichment — `_enrich_payload()` has no branch for `sonos_transpo
   "title": "Bohemian Rhapsody",
   "artist": "Queen",
   "album": "A Night at the Opera",
-  "album_art_url": "https://i.scdn.co/image/abc123",
-  "position": 47,
-  "duration": 354,
-  "source_type": "music_service"
+  "album_art_url": "http://192.168.178.101:1400/getaa?s=1&u=x-sonos-spotify%3a...",
+  "position": "0:00:47",
+  "duration": "0:05:54",
+  "source_type": "streaming"
 }
 ```
 
@@ -793,26 +855,30 @@ No freshness enrichment — `_enrich_payload()` has no branch for `sonos_transpo
 
 Sonos volume change per speaker or per zone.
 
-> **Push-only:** No snapshot is delivered on subscribe. Pushed when volume or mute state changes.
+> **Push-only:** No snapshot is delivered on subscribe. Use `GET /api/v1/sonos/speakers/{uid}/volume` for the initial state.
 
-Two payload shapes are possible depending on whether it's a single-speaker or zone-wide volume event:
+Two payload shapes are possible:
+
+| Source | Shape |
+|--------|-------|
+| Poller (every 30 s), one message per speaker whose volume/mute changed (fingerprint key `sonos_volume:<uid>`) — includes changes from the Sonos app | `SonosVolumePayload` `{uid, volume, mute}` |
+| `PUT /speakers/{uid}/volume`, `PUT /speakers/{uid}/mute` (per-speaker re-poll) | `SonosVolumePayload` `{uid, volume, mute}` |
+| `PUT /zones/{group_id}/volume` (zone re-poll of all members) | `SonosZoneVolumePayload` `{group_id, volumes: [...]}` |
+
+Discriminate with `"uid" in data` vs `"group_id" in data`.
 
 ```typescript
 // Single speaker volume change
 interface SonosVolumePayload {
   uid: string;
-  volume: number;                    // 0–100
-  mute: boolean;
+  volume: number | null;             // 0–100; null if the speaker read failed
+  mute: boolean | null;
 }
 
 // Zone-wide volume change (after group volume mutation)
 interface SonosZoneVolumePayload {
   group_id: string;
-  volumes: Array<{
-    uid: string;
-    volume: number;
-    mute: boolean;
-  }>;
+  volumes: SonosVolumePayload[];     // one entry per zone member
 }
 ```
 
@@ -846,9 +912,9 @@ No freshness enrichment.
 
 Sonos group topology change: speakers and groups after a topology repoll.
 
-> **Push-only:** No snapshot is delivered on subscribe. Pushed when the Sonos topology changes (e.g., speaker joins/leaves a group).
+> **Push-only:** No snapshot is delivered on subscribe. Pushed only after `POST /speakers/{uid}/join`, `/unjoin` or `/source` (full topology re-poll), when the result changed. Topology changes detected by the 30 s poller are delivered on the `sonos` topic instead.
 
-Shape mirrors the `sonos` topic payload but without freshness enrichment:
+Shape mirrors the `sonos` topic payload but without freshness or registry enrichment (speakers have no `custom_name` / `device_type`):
 
 ```typescript
 interface SonosTopologyPayload {
@@ -903,43 +969,48 @@ No freshness enrichment.
 
 Raspberry Pi system statistics: CPU, RAM, disk, temperature, uptime, load averages, network I/O, and process count. See [Raspberry Pi API](./raspberry-pi.md) for REST endpoint details.
 
+Collected by the `system_stats` job every **15 s** (`_poll_raspi()` in `api/providers/raspi/provider.py`) with psutil, stored in `raspi_cache` (used for the snapshot) and pushed only when the payload changed. Sub-object keys match the REST models (`CpuResponse`, `MemoryResponse`, `DiskResponse`, `SystemResponse`), without their per-object `data_freshness`.
+
 ```typescript
 interface RaspiCpu {
-  usage_percent: number;
+  cpu_percent: number;               // psutil.cpu_percent(interval=0.1)
 }
 
 interface RaspiMemory {
-  total_bytes: number;
-  available_bytes: number;
   used_bytes: number;
-  usage_percent: number;
+  total_bytes: number;
+  percent: number;
 }
 
 interface RaspiDisk {
-  total_bytes: number;
   used_bytes: number;
-  free_bytes: number;
-  usage_percent: number;
+  total_bytes: number;
+  percent: number;
   mount_point: "/";                  // always "/" (added by enrichment, D-03)
 }
 
+interface RaspiNetwork {
+  bytes_sent: number;
+  bytes_recv: number;
+  interface: string;                 // most active non-loopback NIC by bytes_sent ("unknown" if none)
+}
+
 interface RaspiSystem {
-  cpu_temp_celsius: number | null;
+  cpu_temperature: number | null;    // °C from psutil cpu_thermal; null if unavailable (e.g. macOS dev)
   uptime_seconds: number;
-  load_avg_1m: number;
-  load_avg_5m: number;
-  load_avg_15m: number;
+  load_avg_1: number;
+  load_avg_5: number;
+  load_avg_15: number;
   process_count: number;
-  net_bytes_sent: number;
-  net_bytes_recv: number;
+  network: RaspiNetwork;             // nested inside system (there is no top-level network key)
 }
 
 interface RaspiData {
-  cpu: RaspiCpu | null;
-  memory: RaspiMemory | null;
-  disk: RaspiDisk | null;
-  system: RaspiSystem | null;
-  data_freshness: "LIVE";           // always "LIVE" — raspi is on-demand, never stale
+  cpu: RaspiCpu;
+  memory: RaspiMemory;
+  disk: RaspiDisk;
+  system: RaspiSystem;
+  data_freshness: "LIVE";           // always "LIVE" — hardcoded by enrichment
 }
 ```
 
@@ -948,36 +1019,37 @@ interface RaspiData {
 ```json
 {
   "cpu": {
-    "usage_percent": 12.5
+    "cpu_percent": 12.5
   },
   "memory": {
-    "total_bytes": 8589934592,
-    "available_bytes": 6442450944,
     "used_bytes": 2147483648,
-    "usage_percent": 25.0
+    "total_bytes": 8589934592,
+    "percent": 25.0
   },
   "disk": {
-    "total_bytes": 64424509440,
     "used_bytes": 21474836480,
-    "free_bytes": 42949672960,
-    "usage_percent": 33.3,
+    "total_bytes": 64424509440,
+    "percent": 33.3,
     "mount_point": "/"
   },
   "system": {
-    "cpu_temp_celsius": 48.5,
+    "cpu_temperature": 48.5,
     "uptime_seconds": 864000,
-    "load_avg_1m": 0.42,
-    "load_avg_5m": 0.38,
-    "load_avg_15m": 0.31,
+    "load_avg_1": 0.42,
+    "load_avg_5": 0.38,
+    "load_avg_15": 0.31,
     "process_count": 142,
-    "net_bytes_sent": 1073741824,
-    "net_bytes_recv": 5368709120
+    "network": {
+      "bytes_sent": 1073741824,
+      "bytes_recv": 5368709120,
+      "interface": "eth0"
+    }
   },
   "data_freshness": "LIVE"
 }
 ```
 
-**Nullability:** `cpu`, `memory`, `disk`, and `system` are each independently nullable if the provider hasn't completed its first poll since server start. `data_freshness` is always `"LIVE"` — raspi data is collected on-demand.
+**Nullability:** No snapshot is sent until the first 15 s poll has populated the cache; after that all four sub-objects are always present. Only `system.cpu_temperature` can be `null`. `data_freshness` is always `"LIVE"`.
 
 ---
 
@@ -1596,6 +1668,8 @@ wscat -c "ws://localhost:8000/ws/live?api_key=YOUR_API_KEY"
 |------|---------|--------|
 | `1000` | Normal closure — server or client closed the connection cleanly | Reconnect if unexpected |
 | `1008` | Auth rejected — invalid, expired, or missing `api_key`/`token` | Check credentials; see [Authentication](./auth.md) |
+| `1011` | Internal error — a server-side send failed or exceeded the 5 s send timeout (slow/dead consumer) | Reconnect and re-subscribe |
 | `1013` | Try Again Later — server at `MAX_CONNECTIONS = 10` | Wait and reconnect; check for stale connections in dev |
+| `1006` | Abnormal closure (no close frame) — typically the Uvicorn keep-alive ping timed out or the network dropped | Reconnect with backoff |
 
 > **Tip for code 1013 in development:** React StrictMode may open a connection on the first render and a second on the second render before the first has closed. Disable StrictMode during WebSocket development, or ensure the hook's cleanup path closes the old connection before the new one opens. react-use-websocket handles this automatically when the component fully unmounts.

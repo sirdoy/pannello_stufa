@@ -11,6 +11,7 @@ jest.mock('@/lib/auth0', () => ({
 import { PUT } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { auth0 } from '@/lib/auth0';
+import type { HueCommandResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(auth0.getSession);
 const mockSetLightState = jest.mocked(hueProxy.setLightState);
@@ -23,7 +24,7 @@ const mockProxyResponse = {
   requested_state: { on: true, bri: 200 },
   suggested_poll_delay_s: 2,
   poll_endpoint: '/api/v1/hue/lights/1',
-};
+} as unknown as HueCommandResponse; // legacy 202 contract
 
 describe('PUT /api/v1/hue/lights/[lightId]/state', () => {
   beforeEach(() => {

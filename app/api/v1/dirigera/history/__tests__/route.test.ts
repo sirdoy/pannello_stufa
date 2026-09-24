@@ -17,7 +17,7 @@ const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockHistoryData = {
   events: [
-    { id: 1, sensor_id: 'abc', sensor_name: 'Door', event_type: 'open', recorded_at: 1 },
+    { id: 1, sensor_id: 'abc', event_type: 'open', timestamp: 1 },
   ],
   total: 1,
   limit: 100,

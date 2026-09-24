@@ -55,7 +55,12 @@ const baseData: DataShape = {
 let dataOverride: Partial<DataShape> = {};
 
 jest.mock('@/app/components/devices/tuya/hooks/useTuyaData', () => ({
-  useTuyaData: () => ({ ...baseData, ...dataOverride }),
+  useTuyaData: () => ({
+    ...baseData,
+    refetch: jest.fn(),
+    setPlugOptimistic: jest.fn(),
+    ...dataOverride,
+  }),
 }));
 
 beforeEach(() => {

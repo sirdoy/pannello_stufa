@@ -5,12 +5,13 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/v1/fritzbox/telephony/dect
- * Returns paginated list of registered DECT handsets from Fritz!Box.
+ * Returns the list of registered DECT handsets from Fritz!Box (not paginated).
  * Protected: Requires Auth0 authentication
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *
- * Success: { dect: { items, total_count, limit, offset } }
+ * Success: { dect: { handsets, handset_count, is_stale, fetched_at } }
+ *   (backend DectListResponse, see docs/api/fritzbox.md)
  * Errors:
  *   - 429 RATE_LIMITED: Too many requests
  *   - Plus all health endpoint errors (403, 504, 500)

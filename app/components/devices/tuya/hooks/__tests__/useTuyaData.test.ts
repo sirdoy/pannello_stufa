@@ -54,10 +54,9 @@ const mockPlug: TuyaPlug = {
   device_type: 'smart_plug',
 };
 
-// Mock WS payload (TuyaData shape)
+// Mock WS payload — real backend shape: GET /tuya/plugs items, no top-level freshness
 const mockWsPayload: TuyaData = {
   plugs: [mockPlug],
-  data_freshness: 'LIVE',
 };
 
 // Polling response (array of TuyaPlug)
@@ -239,6 +238,24 @@ describe('useTuyaData', () => {
     });
   });
 
+  it('WS message: stale follows per-plug freshness (LIVE → false, STALE → true)', async () => {
+    setWsConnected(true);
+    // HTTP bootstrap returns a STALE plug → only the WS message can clear stale.
+    (global.fetch as jest.Mock).mockImplementation(
+      makeFetchMock({ data: [{ ...mockPlug, data_freshness: 'STALE' }] }),
+    );
+
+    const { result } = renderHook(() => useTuyaData());
+    await waitFor(() => expect(result.current.stale).toBe(true));
+    const handler = mockSubscribe.mock.calls[0]?.[1] as (data: unknown) => void;
+
+    act(() => { handler({ plugs: [mockPlug] }); });
+    await waitFor(() => expect(result.current.stale).toBe(false));
+
+    act(() => { handler({ plugs: [{ ...mockPlug, data_freshness: 'STALE' }] }); });
+    await waitFor(() => expect(result.current.stale).toBe(true));
+  });
+
   it('guards against null plugs in WS payload', async () => {
     setWsConnected(true);
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
@@ -249,7 +266,7 @@ describe('useTuyaData', () => {
     expect(handler).toBeDefined();
 
     // Simulate WS message with null plugs
-    const nullPayload: TuyaData = { plugs: null, data_freshness: 'STALE' };
+    const nullPayload: TuyaData = { plugs: null };
     act(() => { handler(nullPayload); });
 
     // Should not crash or set plugs to null (retains previous value or stays null but no error)

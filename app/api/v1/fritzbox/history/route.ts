@@ -1,13 +1,16 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
-import { getDeviceEvents } from '@/lib/fritzbox';
+import { fritzboxClient } from '@/lib/fritzbox';
+import { MAC_PARAM } from '@/lib/fritzbox/fritzboxQuery';
 import type { DeviceHistoryTimeRange } from '@/app/components/devices/network/types';
 
 export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/v1/fritzbox/history
- * Retrieves device connection/disconnection events from Firebase RTDB.
+ * Retrieves device connection/disconnection events from the backend
+ * (/api/v1/fritzbox/history/device-events, computed from device snapshots).
  * Events are state changes only (connected/disconnected), not raw snapshots.
+ * (The legacy Firebase event log is no longer written by anything.)
  * Protected: Requires Auth0 authentication
  *
  * Query params:
@@ -37,15 +40,14 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     : '24h';
 
   const hours = getTimeRangeHours(range);
-  const now = Date.now();
-  const startTime = now - hours * 60 * 60 * 1000;
-  const endTime = now;
-  const allEvents = await getDeviceEvents(startTime, endTime);
 
-  // Filter by device MAC if specified
-  const events = deviceParam
-    ? allEvents.filter(e => e.deviceMac === deviceParam)
-    : allEvents;
+  // Invalid MAC filter → no match (same outcome as the old exact-match filter)
+  if (deviceParam && !MAC_PARAM.test(deviceParam)) {
+    return success({ events: [], range, totalCount: 0 });
+  }
+
+  const events = [...(await fritzboxClient.getDeviceEvents(hours, deviceParam ?? undefined))]
+    .sort((a, b) => b.timestamp - a.timestamp); // newest first
 
   return success({
     events,

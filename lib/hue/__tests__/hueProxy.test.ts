@@ -103,6 +103,7 @@ const mockHistoryResponse: HueHistoryResponse = {
       avg_brightness: null,
       min_brightness: null,
       max_brightness: null,
+      avg_color_temp: null,
       on_minutes: null,
       sample_count: null,
     },
@@ -115,14 +116,14 @@ const mockHistoryResponse: HueHistoryResponse = {
   to: 1773780000,
 };
 
-const mockCommandResponse: HueCommandResponse = {
+const mockCommandResponse = {
   command: 'set_light_state',
   status: 'accepted',
   light_id: '1',
   requested_state: { on: true, bri: 200 },
   suggested_poll_delay_s: 2,
   poll_endpoint: '/api/v1/hue/lights/1',
-};
+} as unknown as HueCommandResponse; // legacy 202 contract
 
 // ---------------------------------------------------------------------------
 
@@ -257,14 +258,14 @@ describe('setGroupAction', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('calls haPut with /api/v1/hue/groups/{groupId}/action and body', async () => {
-    const groupResponse: HueCommandResponse = {
+    const groupResponse = {
       ...mockCommandResponse,
       command: 'set_group_action',
       light_id: undefined,
       group_id: '3',
       requested_state: { on: false },
       poll_endpoint: '/api/v1/hue/groups/3',
-    };
+    } as unknown as HueCommandResponse; // legacy 202 contract
     mockHaPut.mockResolvedValue(groupResponse);
 
     const body: HueLightStateRequest = { on: false };
@@ -282,14 +283,14 @@ describe('activateScene', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('calls haPost with /api/v1/hue/groups/{groupId}/scenes/{sceneId} and empty body', async () => {
-    const sceneResponse: HueCommandResponse = {
+    const sceneResponse = {
       command: 'activate_scene',
       status: 'accepted',
       group_id: '1',
       scene_id: 'Ab1Cd2Ef3G',
       suggested_poll_delay_s: 2,
       poll_endpoint: '/api/v1/hue/groups/1',
-    };
+    } as unknown as HueCommandResponse; // legacy 202 contract
     mockHaPost.mockResolvedValue(sceneResponse);
 
     const result = await activateScene('1', 'Ab1Cd2Ef3G');

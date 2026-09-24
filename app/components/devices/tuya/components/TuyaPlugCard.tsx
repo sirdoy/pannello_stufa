@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import type { TuyaPlug } from '@/types/tuyaProxy';
 import TuyaEnergyChart from './TuyaEnergyChart';
 
+/** Backend POST /tuya/plugs/{id}/timer: seconds le=86400. */
+const MAX_TIMER_MINUTES = 1440;
+
 interface TuyaPlugCardProps {
   plug: TuyaPlug;
   onToggle: (deviceId: string, currentState: boolean) => void;
@@ -71,7 +74,8 @@ export function TuyaPlugCard({
 
   const handleSetTimer = () => {
     const minutes = parseInt(timerMinutes, 10);
-    if (!isNaN(minutes) && minutes > 0) {
+    // Backend accepts seconds 0..86400 (24 h): out-of-range values would get a silent 422.
+    if (!isNaN(minutes) && minutes > 0 && minutes <= MAX_TIMER_MINUTES) {
       onSetTimer(plug.device_id, minutes * 60);
       setTimerMinutes('');
     }
@@ -140,7 +144,7 @@ export function TuyaPlugCard({
             <input
               type="number"
               min={1}
-              max={1440}
+              max={MAX_TIMER_MINUTES}
               placeholder="min"
               value={timerMinutes}
               onChange={(e) => setTimerMinutes(e.target.value)}

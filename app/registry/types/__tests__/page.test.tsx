@@ -228,7 +228,7 @@ describe('/registry/types page', () => {
     expect(screen.getByText('Modifica tipo')).toBeInTheDocument();
   });
 
-  it('edit submits DELETE + POST for the custom type', async () => {
+  it('edit submits a single PUT with the new label (no DELETE + POST)', async () => {
     render(<DeviceTypesPage />);
     await waitFor(() => { expect(screen.getByText('Sensore custom')).toBeInTheDocument(); });
 
@@ -243,14 +243,14 @@ describe('/registry/types page', () => {
     fireEvent.click(screen.getByTestId('modal-submit'));
 
     await waitFor(() => {
-      // First call: DELETE old type
-      expect(fetchSpy).toHaveBeenCalledWith('/api/registry/types/custom_sensor', expect.objectContaining({ method: 'DELETE' }));
-      // Second call: POST new type with updated label
-      expect(fetchSpy).toHaveBeenCalledWith('/api/registry/types', expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({ slug: 'custom_sensor', label: 'Updated Label' }),
+      // Backend PUT /registry/types/{slug} keeps created_at and works for types in use
+      expect(fetchSpy).toHaveBeenCalledWith('/api/registry/types/custom_sensor', expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ label: 'Updated Label' }),
       }));
     });
+    expect(fetchSpy).not.toHaveBeenCalledWith('/api/registry/types/custom_sensor', expect.objectContaining({ method: 'DELETE' }));
+    expect(fetchSpy).not.toHaveBeenCalledWith('/api/registry/types', expect.objectContaining({ method: 'POST' }));
   });
 
   // Delete flow

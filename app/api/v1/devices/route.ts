@@ -147,7 +147,7 @@ function mapDirigera(payload: Awaited<ReturnType<typeof getSensors>>): Device[] 
 
     const item: Device = {
       id: `dirigera:${s.id}`,
-      name: s.custom_name,
+      name: s.custom_name ?? s.id,
       provider_type: 'dirigera',
       type: deviceType,
       status: s.is_reachable ? 1 : 0,

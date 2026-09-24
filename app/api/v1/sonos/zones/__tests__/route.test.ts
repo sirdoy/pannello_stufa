@@ -29,15 +29,24 @@ describe('GET /api/v1/sonos/zones', () => {
     expect(response.status).toBe(401);
   });
 
-  it('should return 200 with { zones: [...] } envelope', async () => {
+  it('should return 200 with a flat { zones: [...] } array from the backend wrapper', async () => {
     const mockZones = [
       { group_id: 'RINCON_A', coordinator_uid: 'RINCON_A', members: [] },
     ];
-    mockGetZones.mockResolvedValue(mockZones as any);
+    // Real backend shape: GET /api/v1/sonos/zones returns a wrapper, not a bare array
+    mockGetZones.mockResolvedValue({
+      zones: mockZones,
+      count: 1,
+      is_stale: false,
+      fetched_at: '2026-09-24T10:00:00Z',
+      data_freshness: 'LIVE',
+    } as any);
     const response = await GET({} as any, {} as any);
     const data = await response.json();
     expect(response.status).toBe(200);
+    expect(Array.isArray(data.zones)).toBe(true);
     expect(data.zones).toEqual(mockZones);
+    expect(data.data_freshness).toBe('LIVE');
     expect(mockGetZones).toHaveBeenCalledWith();
   });
 });

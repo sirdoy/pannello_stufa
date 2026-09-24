@@ -15,18 +15,26 @@ const mockUseVisibility = useVisibility as jest.MockedFunction<typeof useVisibil
 
 const mockStatsData = {
   aggregation: {
-    last_run_at: 1773244800,
-    last_run_status: 'ok',
-    rows_aggregated_last_run: 248,
+
+    last_run: 1773244800,
+
+    last_sensors_processed: 248,
+
     total_runs: 7,
-    total_rows_aggregated: 1736,
+
   },
   retention: {
-    last_run_at: 1773244800,
-    last_run_status: 'ok',
-    rows_deleted_last_run: 0,
+
+    last_run: 1773244800,
+
+    last_raw_events_deleted: 42,
+
+    last_daily_rows_deleted: 0,
+
+    last_telemetry_deleted: 0,
+
     total_runs: 7,
-    total_rows_deleted: 42,
+
   },
 };
 
@@ -76,7 +84,7 @@ describe('useDirigeraStats', () => {
       await capturedCallback?.();
     });
     expect(result.current.data?.aggregation.total_runs).toBe(7);
-    expect(result.current.data?.retention.total_rows_deleted).toBe(42);
+    expect(result.current.data?.retention.last_raw_events_deleted).toBe(42);
     expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
   });

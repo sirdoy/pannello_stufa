@@ -69,6 +69,22 @@ export function getStatusInfo(status: StoveState | null): StoveStatusInfo {
   }
 
   switch (status) {
+    // unknown - backend fallback when no status is cached yet (mutation response)
+    case 'unknown':
+      return {
+        label: 'SCONOSCIUTO',
+        icon: '❔',
+        textColor: 'text-slate-400',
+        bgColor: 'bg-slate-800/60',
+        borderColor: 'border-slate-700/50',
+        boxBgColor: 'bg-slate-800/80',
+        boxLabelColor: 'text-slate-400',
+        boxValueColor: 'text-slate-200',
+        boxSuffixColor: 'text-slate-500',
+        glowColor: '',
+        animated: false,
+      };
+
     // 🔥 working - In funzione (Ember glow - warm copper/amber)
     case 'working':
       return {
@@ -209,6 +225,17 @@ export function getStatusDisplay(status: StoveState | null): StoveStatusDisplay 
   }
 
   switch (status) {
+    // unknown - backend fallback when no status is cached yet (mutation response)
+    case 'unknown':
+      return {
+        label: 'SCONOSCIUTO',
+        icon: '',
+        variant: 'neutral',
+        pulse: false,
+        health: 'warning',
+        animated: false
+      };
+
     // working - In funzione (Ember)
     case 'working':
       return {

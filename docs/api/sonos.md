@@ -26,7 +26,7 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 | `PUT` | `/api/v1/sonos/speakers/{uid}/volume` | Set speaker volume (0-100) |
 | `PUT` | `/api/v1/sonos/speakers/{uid}/mute` | Set speaker mute state |
 | `PUT` | `/api/v1/sonos/zones/{group_id}/volume` | Set volume for all speakers in a zone |
-| `PUT` | `/api/v1/sonos/zones/{group_id}/seek` | Seek to position in current track (HH:MM:SS) |
+| `PUT` | `/api/v1/sonos/zones/{group_id}/seek` | Seek to position in current track (H:MM:SS) |
 | `GET` | `/api/v1/sonos/speakers/{uid}/eq` | Get speaker EQ settings (bass, treble, loudness) |
 | `PUT` | `/api/v1/sonos/speakers/{uid}/eq` | Set speaker EQ settings (partial update) |
 | `GET` | `/api/v1/sonos/zones/{group_id}/play-mode` | Get zone play mode |
@@ -55,6 +55,7 @@ All endpoints require authentication via JWT Bearer token or API Key (`X-API-Key
 - [Monitoring](#monitoring)
   - [GET /zones/{group_id}/playback](#get-zonesgroup_idplayback)
   - [GET /speakers/{uid}/volume](#get-speakersuidvolume)
+- [Mutation responses](#mutation-responses)
 - [Transport Controls](#transport-controls)
   - [POST /zones/{group_id}/play](#post-zonesgroup_idplay)
   - [POST /zones/{group_id}/pause](#post-zonesgroup_idpause)
@@ -113,8 +114,8 @@ Returns Sonos speaker connectivity status, data freshness, and device count. Rea
   "connected": true,
   "data_freshness": "LIVE",
   "device_count": 5,
-  "last_poll_at": "2026-03-20T09:45:30+00:00",
-  "last_success_at": "2026-03-20T09:45:30+00:00"
+  "last_poll_at": "2026-03-20T09:45:30.412345+00:00",
+  "last_success_at": "2026-03-20T09:45:30.412345+00:00"
 }
 ```
 
@@ -124,8 +125,8 @@ interface SonosHealthResponse {
   connected: boolean;
   data_freshness: "LIVE" | "STALE"; // UNREACHABLE triggers 503 — never in response body
   device_count: number;
-  last_poll_at: string | null;       // ISO 8601
-  last_success_at: string | null;    // ISO 8601
+  last_poll_at: string | null;       // ISO 8601 UTC with "+00:00" offset (REST); WS uses "Z"
+  last_success_at: string | null;    // ISO 8601 UTC with "+00:00" offset
 }
 ```
 
@@ -156,10 +157,11 @@ Returns all Sonos speakers with identity and topology snapshot. Includes invisib
 
 **Authentication:** Required (JWT Bearer or API Key)
 
-**Response (200):**
+**Response (200):** a wrapper object (not a bare array).
 
 ```json
-[
+{
+  "speakers": [
   {
     "uid": "RINCON_B8E9378A123401400",
     "name": "Soggiorno",
@@ -213,12 +215,30 @@ Returns all Sonos speakers with identity and topology snapshot. Includes invisib
     "serial": "F7:B3:5E:7A:45:6C:01",
     "role": "surround",
     "is_visible": false,
-    "is_coordinator": false
+    "is_coordinator": false,
+    "custom_name": null,
+    "device_type": null
   }
-]
+  ],
+  "count": 5,
+  "is_stale": false,
+  "fetched_at": "2026-03-20T09:45:30.412345+00:00",
+  "data_freshness": "LIVE"
+}
 ```
 
+(The first four speakers above are abbreviated: every item carries `custom_name` and `device_type`.)
+
 ```typescript
+// Source: api/providers/sonos/routes.py — get_sonos_devices
+interface SonosDevicesListResponse {
+  speakers: SonosDeviceResponse[];
+  count: number;
+  is_stale: boolean;               // true when data_freshness === "STALE"
+  fetched_at: string | null;       // ISO 8601 of last successful poll ("+00:00" offset)
+  data_freshness: "LIVE" | "STALE";
+}
+
 // Source: api/providers/sonos/routes.py — SonosDeviceResponse
 interface SonosDeviceResponse {
   uid: string;           // RINCON_... device UID
@@ -316,12 +336,13 @@ Returns all Sonos zone groups with coordinator and member info. A zone is a grou
 
 **Authentication:** Required (JWT Bearer or API Key)
 
-**Response (200):**
+**Response (200):** a wrapper object (not a bare array). `group_id` is always equal to `coordinator_uid`.
 
 ```json
-[
+{
+  "zones": [
   {
-    "group_id": "RINCON_B8E9378A123401400:1",
+    "group_id": "RINCON_B8E9378A123401400",
     "label": "Soggiorno",
     "coordinator_uid": "RINCON_B8E9378A123401400",
     "coordinator_name": "Soggiorno",
@@ -348,7 +369,7 @@ Returns all Sonos zone groups with coordinator and member info. A zone is a grou
     ]
   },
   {
-    "group_id": "RINCON_C4A81B3D567801400:1",
+    "group_id": "RINCON_C4A81B3D567801400",
     "label": "Camera da letto + Studio",
     "coordinator_uid": "RINCON_C4A81B3D567801400",
     "coordinator_name": "Camera da letto",
@@ -368,7 +389,12 @@ Returns all Sonos zone groups with coordinator and member info. A zone is a grou
       }
     ]
   }
-]
+  ],
+  "count": 2,
+  "is_stale": false,
+  "fetched_at": "2026-03-20T09:45:30.412345+00:00",
+  "data_freshness": "LIVE"
+}
 ```
 
 ```typescript
@@ -380,8 +406,16 @@ interface SonosZoneMemberResponse {
   role: "soundbar" | "sub" | "surround" | "speaker";
 }
 
+interface SonosZonesListResponse {
+  zones: SonosZoneResponse[];
+  count: number;
+  is_stale: boolean;
+  fetched_at: string | null;  // ISO 8601 of last successful poll ("+00:00" offset)
+  data_freshness: "LIVE" | "STALE";
+}
+
 interface SonosZoneResponse {
-  group_id: string;           // coordinator UID (use this as group_id for zone commands)
+  group_id: string;           // === coordinator_uid (plain RINCON_... UID, no ":N" suffix)
   label: string;              // human-readable zone label from SoCo
   coordinator_uid: string;    // UID of the zone coordinator
   coordinator_name: string;   // player name of the coordinator
@@ -443,7 +477,7 @@ Returns current playback state for a zone. Reads from in-memory cache only -- ne
 
 ```json
 {
-  "group_id": "RINCON_C4A81B3D567801400:1",
+  "group_id": "RINCON_C4A81B3D567801400",
   "transport_state": "PLAYING",
   "title": "Nuvole Bianche",
   "artist": "Ludovico Einaudi",
@@ -464,16 +498,21 @@ interface SonosPlaybackResponse {
   artist: string | null;
   album: string | null;
   album_art_url: string | null;
-  position: string | null;    // "HH:MM:SS" format
-  duration: string | null;    // "HH:MM:SS" format
+  position: string | null;    // "H:MM:SS" as returned by SoCo (e.g. "0:02:14"); null when 0:00:00 / NOT_IMPLEMENTED
+  duration: string | null;    // "H:MM:SS"; null for radio/TV/line-in or when 0:00:00
   source_type: "tv" | "streaming" | "radio" | "line_in" | "airplay" | "unknown" | null;
+                              // null only in the idle fallback (no cached snapshot)
 }
 ```
+
+If the zone exists but no playback snapshot is cached yet, the response is `{"group_id": ..., "transport_state": "STOPPED"}` with every other field `null`.
+
+`source_type` is derived from SoCo `music_source`: `TV`→`tv`, `LINE_IN`→`line_in`, `AIRPLAY`→`airplay`, `RADIO`→`radio`, `LIBRARY`/`WEB_FILE`→`streaming`, anything else→`unknown` (then falls back to `is_playing_tv` / `is_playing_radio` / `is_playing_line_in`).
 
 **curl:**
 
 ```bash
-curl YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/playback \
+curl YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/playback \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -535,6 +574,39 @@ curl YOUR_BASE_URL/api/v1/sonos/speakers/RINCON_C4A81B3D567801400/volume \
 
 ---
 
+## Mutation responses
+
+All mutation endpoints return **HTTP 200** after the command is sent to the speaker. The response is not a bare `{"status": "ok"}`: after the command the backend waits `REPOLL_DELAY_S`, re-reads the affected state from the speaker, updates the cache (and pushes the matching WS topic), and returns it:
+
+| Endpoint(s) | Response model | Body |
+|-------------|----------------|------|
+| `POST /zones/{group_id}/play\|pause\|stop\|next\|previous`, `PUT /zones/{group_id}/seek` | `SonosTransportMutationResponse` | `{data_confirmed, playback}` |
+| `PUT /speakers/{uid}/volume`, `PUT /speakers/{uid}/mute` | `SonosVolumeMutationResponse` | `{data_confirmed, volume: {uid, volume, mute}}` |
+| `PUT /zones/{group_id}/volume` | `SonosZoneVolumeMutationResponse` | `{data_confirmed, volumes: [{uid, volume, mute}]}` |
+| `PUT /speakers/{uid}/eq` | `SonosEQMutationResponse` | `{data_confirmed, eq_settings: {uid, bass, treble, loudness}}` |
+| `PUT /zones/{group_id}/play-mode` | `SonosPlayModeMutationResponse` | `{data_confirmed, play_mode: {group_id, play_mode}}` |
+| `PUT /speakers/{uid}/home-theater` | `SonosHomeTheaterMutationResponse` | `{data_confirmed, home_theater: {...}}` |
+| `POST /speakers/{uid}/source\|join\|unjoin` | `SonosTopologyMutationResponse` | `{data_confirmed, speakers, groups}` |
+| `PUT /zones/{group_id}/sleep-timer` | `SonosSleepTimerMutationResponse` | `{data_confirmed, sleep_timer: {group_id, remaining_seconds}}` |
+
+`data_confirmed` is `false` when the command succeeded but the re-read failed: the payload then contains the last cached value (or a placeholder with `null` fields), not a confirmed state.
+
+> **Structured errors:** routes that raise with an object detail (e.g. `{"error": ..., "message": ..., ...}`) are returned as RFC 9457 `application/problem+json`: `detail` is the `message` string and the remaining keys (`error`, ...) are top-level extension members next to `type`/`title`/`status` (`api/errors.py`).
+
+```typescript
+// Source: api/providers/sonos/routes.py — *MutationResponse models
+interface SonosTransportMutationResponse { data_confirmed: boolean; playback: SonosPlaybackResponse | {}; }
+interface SonosVolumeMutationResponse { data_confirmed: boolean; volume: SonosVolumeResponse | {}; }
+interface SonosZoneVolumeMutationResponse { data_confirmed: boolean; volumes: SonosVolumeResponse[]; }
+interface SonosEQMutationResponse { data_confirmed: boolean; eq_settings: SonosEqResponse; }
+interface SonosPlayModeMutationResponse { data_confirmed: boolean; play_mode: SonosPlayModeResponse; }
+interface SonosHomeTheaterMutationResponse { data_confirmed: boolean; home_theater: Partial<SonosHomeTheaterResponse> & { uid: string }; }
+interface SonosTopologyMutationResponse { data_confirmed: boolean; speakers: object[]; groups: SonosZoneResponse[]; }
+interface SonosSleepTimerMutationResponse { data_confirmed: boolean; sleep_timer: SonosSleepTimerResponse; }
+```
+
+---
+
 ## Transport Controls
 
 Transport commands require the zone **coordinator** UID as `group_id`. If a member/slave UID is supplied, the API returns 422 with the correct coordinator UID. See [Coordinator Routing](#coordinator-routing) for details.
@@ -559,15 +631,27 @@ Resumes playback on a zone coordinator.
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_C4A81B3D567801400:1"
+  "data_confirmed": true,
+  "playback": {
+    "group_id": "RINCON_C4A81B3D567801400",
+    "transport_state": "PLAYING",
+    "title": "Nuvole Bianche",
+    "artist": "Ludovico Einaudi",
+    "album": "Islands",
+    "album_art_url": "http://192.168.178.72:1400/getaa?s=1&u=...",
+    "position": "0:00:03",
+    "duration": "0:05:55",
+    "source_type": "streaming"
+  }
 }
 ```
+
+`playback` has the `SonosPlaybackResponse` shape (see [GET /zones/{group_id}/playback](#get-zonesgroup_idplayback)). See [Mutation responses](#mutation-responses).
 
 **curl:**
 
 ```bash
-curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/play \
+curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/play \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -583,12 +667,13 @@ curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/play 
 
 ```json
 {
-  "detail": {
-    "error": "not_coordinator",
-    "group_id": "RINCON_D2F93C5E890A01400",
-    "coordinator_uid": "RINCON_C4A81B3D567801400:1",
-    "message": "UID 'RINCON_D2F93C5E890A01400' is a zone member, not a coordinator. Use coordinator_uid 'RINCON_C4A81B3D567801400:1'"
-  }
+  "type": "about:blank",
+  "title": "Unprocessable Entity",
+  "status": 422,
+  "detail": "UID 'RINCON_D2F93C5E890A01400' is a zone member, not a coordinator. Use coordinator_uid 'RINCON_C4A81B3D567801400'",
+  "error": "not_coordinator",
+  "group_id": "RINCON_D2F93C5E890A01400",
+  "coordinator_uid": "RINCON_C4A81B3D567801400"
 }
 ```
 
@@ -612,15 +697,27 @@ Pauses playback on a zone coordinator.
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_C4A81B3D567801400:1"
+  "data_confirmed": true,
+  "playback": {
+    "group_id": "RINCON_C4A81B3D567801400",
+    "transport_state": "PLAYING",
+    "title": "Nuvole Bianche",
+    "artist": "Ludovico Einaudi",
+    "album": "Islands",
+    "album_art_url": "http://192.168.178.72:1400/getaa?s=1&u=...",
+    "position": "0:00:03",
+    "duration": "0:05:55",
+    "source_type": "streaming"
+  }
 }
 ```
+
+`playback` has the `SonosPlaybackResponse` shape (see [GET /zones/{group_id}/playback](#get-zonesgroup_idplayback)). See [Mutation responses](#mutation-responses).
 
 **curl:**
 
 ```bash
-curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/pause \
+curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/pause \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -652,15 +749,27 @@ Stops playback on a zone coordinator.
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_C4A81B3D567801400:1"
+  "data_confirmed": true,
+  "playback": {
+    "group_id": "RINCON_C4A81B3D567801400",
+    "transport_state": "PLAYING",
+    "title": "Nuvole Bianche",
+    "artist": "Ludovico Einaudi",
+    "album": "Islands",
+    "album_art_url": "http://192.168.178.72:1400/getaa?s=1&u=...",
+    "position": "0:00:03",
+    "duration": "0:05:55",
+    "source_type": "streaming"
+  }
 }
 ```
+
+`playback` has the `SonosPlaybackResponse` shape (see [GET /zones/{group_id}/playback](#get-zonesgroup_idplayback)). See [Mutation responses](#mutation-responses).
 
 **curl:**
 
 ```bash
-curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/stop \
+curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/stop \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -692,15 +801,27 @@ Skips to the next track on a zone coordinator.
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_C4A81B3D567801400:1"
+  "data_confirmed": true,
+  "playback": {
+    "group_id": "RINCON_C4A81B3D567801400",
+    "transport_state": "PLAYING",
+    "title": "Nuvole Bianche",
+    "artist": "Ludovico Einaudi",
+    "album": "Islands",
+    "album_art_url": "http://192.168.178.72:1400/getaa?s=1&u=...",
+    "position": "0:00:03",
+    "duration": "0:05:55",
+    "source_type": "streaming"
+  }
 }
 ```
+
+`playback` has the `SonosPlaybackResponse` shape (see [GET /zones/{group_id}/playback](#get-zonesgroup_idplayback)). See [Mutation responses](#mutation-responses).
 
 **curl:**
 
 ```bash
-curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/next \
+curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/next \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -732,15 +853,27 @@ Skips to the previous track on a zone coordinator.
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_C4A81B3D567801400:1"
+  "data_confirmed": true,
+  "playback": {
+    "group_id": "RINCON_C4A81B3D567801400",
+    "transport_state": "PLAYING",
+    "title": "Nuvole Bianche",
+    "artist": "Ludovico Einaudi",
+    "album": "Islands",
+    "album_art_url": "http://192.168.178.72:1400/getaa?s=1&u=...",
+    "position": "0:00:03",
+    "duration": "0:05:55",
+    "source_type": "streaming"
+  }
 }
 ```
+
+`playback` has the `SonosPlaybackResponse` shape (see [GET /zones/{group_id}/playback](#get-zonesgroup_idplayback)). See [Mutation responses](#mutation-responses).
 
 **curl:**
 
 ```bash
-curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/previous \
+curl -X POST YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/previous \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -787,11 +920,12 @@ interface SetVolumeRequest {
 
 ```json
 {
-  "status": "ok",
-  "uid": "RINCON_C4A81B3D567801400",
-  "volume": 35
+  "data_confirmed": true,
+  "volume": { "uid": "RINCON_C4A81B3D567801400", "volume": 35, "mute": false }
 }
 ```
+
+See [Mutation responses](#mutation-responses).
 
 **curl:**
 
@@ -844,11 +978,12 @@ interface SetMuteRequest {
 
 ```json
 {
-  "status": "ok",
-  "uid": "RINCON_C4A81B3D567801400",
-  "mute": true
+  "data_confirmed": true,
+  "volume": { "uid": "RINCON_C4A81B3D567801400", "volume": 35, "mute": false }
 }
 ```
+
+See [Mutation responses](#mutation-responses).
 
 **curl:**
 
@@ -901,17 +1036,21 @@ Sets volume on all speakers in a zone simultaneously. Iterates per member -- par
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_B8E9378A123401400:1",
-  "volume": 30,
-  "speakers_updated": 3
+  "data_confirmed": true,
+  "volumes": [
+    { "uid": "RINCON_B8E9378A123401400", "volume": 30, "mute": false },
+    { "uid": "RINCON_E5A24D6F123B01400", "volume": 30, "mute": false },
+    { "uid": "RINCON_F7B35E7A456C01400", "volume": 30, "mute": false }
+  ]
 }
 ```
+
+`volumes` has one `{uid, volume, mute}` entry per zone member; it is `[]` when the re-poll failed (`data_confirmed: false`). See [Mutation responses](#mutation-responses).
 
 **curl:**
 
 ```bash
-curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_B8E9378A123401400%3A1/volume \
+curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_B8E9378A123401400/volume \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"volume": 30}'
@@ -930,15 +1069,16 @@ curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_B8E9378A123401400%3A1/volume
 
 ```json
 {
-  "detail": {
-    "error": "partial_failure",
-    "failed_speakers": [
-      {
-        "uid": "RINCON_E5A24D6F123B01400",
-        "error": "UPnP Error [802]: ..."
-      }
-    ]
-  }
+  "type": "about:blank",
+  "title": "Bad Gateway",
+  "status": 502,
+  "error": "partial_failure",
+  "failed_speakers": [
+    {
+      "uid": "RINCON_E5A24D6F123B01400",
+      "error": "UPnP Error [802]: ..."
+    }
+  ]
 }
 ```
 
@@ -971,7 +1111,7 @@ Seeks to an absolute position in the currently playing track. Requires the zone 
 ```typescript
 // Source: api/providers/sonos/routes.py — SetSeekRequest
 interface SetSeekRequest {
-  position: string; // "HH:MM:SS" format (required)
+  position: string; // "H:MM:SS" (regex ^\d+:\d{2}:\d{2}$, e.g. "0:01:30") (required)
 }
 ```
 
@@ -979,16 +1119,27 @@ interface SetSeekRequest {
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_C4A81B3D567801400:1",
-  "position": "0:01:30"
+  "data_confirmed": true,
+  "playback": {
+    "group_id": "RINCON_C4A81B3D567801400",
+    "transport_state": "PLAYING",
+    "title": "Nuvole Bianche",
+    "artist": "Ludovico Einaudi",
+    "album": "Islands",
+    "album_art_url": "http://192.168.178.72:1400/getaa?s=1&u=...",
+    "position": "0:00:03",
+    "duration": "0:05:55",
+    "source_type": "streaming"
+  }
 }
 ```
+
+`playback` has the `SonosPlaybackResponse` shape (see [GET /zones/{group_id}/playback](#get-zonesgroup_idplayback)). See [Mutation responses](#mutation-responses).
 
 **curl:**
 
 ```bash
-curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/seek \
+curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/seek \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"position": "0:01:30"}'
@@ -998,7 +1149,7 @@ curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/seek \
 
 | Status | Condition |
 |--------|-----------|
-| `422 Unprocessable Entity` | Invalid position format (not HH:MM:SS) |
+| `422 Unprocessable Entity` | Invalid position format (must match `^\d+:\d{2}:\d{2}$`, e.g. `0:01:30`) |
 | `422 Unprocessable Entity` | Content does not support seek (radio, TV audio) |
 | `422 Unprocessable Entity` | `group_id` is a slave/member UID |
 | `502 Bad Gateway` | SoCo command failed |
@@ -1122,10 +1273,12 @@ interface SetEqRequest {
 
 ```json
 {
-  "status": "ok",
-  "uid": "RINCON_C4A81B3D567801400"
+  "data_confirmed": true,
+  "eq_settings": { "uid": "RINCON_C4A81B3D567801400", "bass": 3, "treble": -1, "loudness": false }
 }
 ```
+
+On re-read failure: `{"data_confirmed": false, "eq_settings": {"uid": "...", "bass": null, "treble": null, "loudness": null}}`.
 
 **curl:**
 
@@ -1163,7 +1316,7 @@ Returns the current play mode for a zone. Fetched on-demand from the zone coordi
 
 ```json
 {
-  "group_id": "RINCON_C4A81B3D567801400:1",
+  "group_id": "RINCON_C4A81B3D567801400",
   "play_mode": "SHUFFLE"
 }
 ```
@@ -1179,7 +1332,7 @@ interface SonosPlayModeResponse {
 **curl:**
 
 ```bash
-curl YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/play-mode \
+curl YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/play-mode \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -1236,16 +1389,15 @@ interface SetPlayModeRequest {
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_C4A81B3D567801400:1",
-  "mode": "SHUFFLE"
+  "data_confirmed": true,
+  "play_mode": { "group_id": "RINCON_C4A81B3D567801400", "play_mode": "SHUFFLE" }
 }
 ```
 
 **curl:**
 
 ```bash
-curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/play-mode \
+curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/play-mode \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"mode": "SHUFFLE"}'
@@ -1285,7 +1437,7 @@ Returns the playback queue for a zone with limit/offset pagination. Fetched on-d
 
 ```json
 {
-  "group_id": "RINCON_C4A81B3D567801400:1",
+  "group_id": "RINCON_C4A81B3D567801400",
   "items": [
     {
       "position": 1,
@@ -1332,11 +1484,11 @@ interface SonosQueueResponse {
 
 ```bash
 # First 100 items
-curl YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/queue \
+curl YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/queue \
   -H "X-API-Key: YOUR_API_KEY"
 
 # Page 2: items 101-200
-curl "YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/queue?limit=100&offset=100" \
+curl "YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/queue?limit=100&offset=100" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -1453,10 +1605,21 @@ interface SetHomeTheaterRequest {
 
 ```json
 {
-  "status": "ok",
-  "uid": "RINCON_B8E9378A123401400"
+  "data_confirmed": true,
+  "home_theater": {
+    "uid": "RINCON_B8E9378A123401400",
+    "night_mode": true,
+    "dialog_mode": true,
+    "sub_enabled": true,
+    "sub_gain": 0,
+    "surround_enabled": true,
+    "surround_volume_tv": 0,
+    "surround_volume_music": -3
+  }
 }
 ```
+
+On re-read failure: `{"data_confirmed": false, "home_theater": {"uid": "..."}}` (only `uid`).
 
 **curl:**
 
@@ -1516,11 +1679,17 @@ interface SwitchSourceRequest {
 
 ```json
 {
-  "status": "ok",
-  "uid": "RINCON_B8E9378A123401400",
-  "source": "tv"
+  "data_confirmed": true,
+  "speakers": [
+    { "uid": "RINCON_B8E9378A123401400", "name": "Soggiorno", "ip": "192.168.178.71", "model": "Sonos Beam (Gen 2)", "firmware": "77.4-52092", "serial": "B8:E9:37:8A:12:34:01", "role": "soundbar", "is_visible": true, "is_coordinator": true }
+  ],
+  "groups": [
+    { "group_id": "RINCON_B8E9378A123401400", "label": "Soggiorno", "coordinator_uid": "RINCON_B8E9378A123401400", "coordinator_name": "Soggiorno", "member_count": 3, "members": [ { "uid": "RINCON_B8E9378A123401400", "name": "Soggiorno", "ip": "192.168.178.71", "role": "soundbar" } ] }
+  ]
 }
 ```
+
+`speakers` are raw speaker snapshots (same fields as `GET /devices` items **without** `custom_name` / `device_type`); `groups` have the `SonosZoneResponse` shape. When the re-poll fails, the previously cached speakers/groups are returned with `data_confirmed: false`. See [Mutation responses](#mutation-responses).
 
 **curl:**
 
@@ -1580,10 +1749,17 @@ interface JoinRequest {
 
 ```json
 {
-  "status": "ok",
-  "uid": "RINCON_D2F93C5E890A01400"
+  "data_confirmed": true,
+  "speakers": [
+    { "uid": "RINCON_B8E9378A123401400", "name": "Soggiorno", "ip": "192.168.178.71", "model": "Sonos Beam (Gen 2)", "firmware": "77.4-52092", "serial": "B8:E9:37:8A:12:34:01", "role": "soundbar", "is_visible": true, "is_coordinator": true }
+  ],
+  "groups": [
+    { "group_id": "RINCON_B8E9378A123401400", "label": "Soggiorno", "coordinator_uid": "RINCON_B8E9378A123401400", "coordinator_name": "Soggiorno", "member_count": 3, "members": [ { "uid": "RINCON_B8E9378A123401400", "name": "Soggiorno", "ip": "192.168.178.71", "role": "soundbar" } ] }
+  ]
 }
 ```
+
+`speakers` are raw speaker snapshots (same fields as `GET /devices` items **without** `custom_name` / `device_type`); `groups` have the `SonosZoneResponse` shape. When the re-poll fails, the previously cached speakers/groups are returned with `data_confirmed: false`. See [Mutation responses](#mutation-responses).
 
 **curl:**
 
@@ -1623,10 +1799,17 @@ Removes a speaker from its current group, making it an independent player.
 
 ```json
 {
-  "status": "ok",
-  "uid": "RINCON_D2F93C5E890A01400"
+  "data_confirmed": true,
+  "speakers": [
+    { "uid": "RINCON_B8E9378A123401400", "name": "Soggiorno", "ip": "192.168.178.71", "model": "Sonos Beam (Gen 2)", "firmware": "77.4-52092", "serial": "B8:E9:37:8A:12:34:01", "role": "soundbar", "is_visible": true, "is_coordinator": true }
+  ],
+  "groups": [
+    { "group_id": "RINCON_B8E9378A123401400", "label": "Soggiorno", "coordinator_uid": "RINCON_B8E9378A123401400", "coordinator_name": "Soggiorno", "member_count": 3, "members": [ { "uid": "RINCON_B8E9378A123401400", "name": "Soggiorno", "ip": "192.168.178.71", "role": "soundbar" } ] }
+  ]
 }
 ```
+
+`speakers` are raw speaker snapshots (same fields as `GET /devices` items **without** `custom_name` / `device_type`); `groups` have the `SonosZoneResponse` shape. When the re-poll fails, the previously cached speakers/groups are returned with `data_confirmed: false`. See [Mutation responses](#mutation-responses).
 
 **curl:**
 
@@ -1661,7 +1844,7 @@ Returns the remaining sleep timer for a zone in seconds. Fetched on-demand from 
 
 ```json
 {
-  "group_id": "RINCON_C4A81B3D567801400:1",
+  "group_id": "RINCON_C4A81B3D567801400",
   "remaining_seconds": 1800
 }
 ```
@@ -1670,7 +1853,7 @@ Returns the remaining sleep timer for a zone in seconds. Fetched on-demand from 
 
 ```json
 {
-  "group_id": "RINCON_C4A81B3D567801400:1",
+  "group_id": "RINCON_C4A81B3D567801400",
   "remaining_seconds": null
 }
 ```
@@ -1686,7 +1869,7 @@ interface SonosSleepTimerResponse {
 **curl:**
 
 ```bash
-curl YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/sleep-timer \
+curl YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/sleep-timer \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -1732,22 +1915,24 @@ interface SetSleepTimerRequest {
 
 ```json
 {
-  "status": "ok",
-  "group_id": "RINCON_C4A81B3D567801400:1"
+  "data_confirmed": true,
+  "sleep_timer": { "group_id": "RINCON_C4A81B3D567801400", "remaining_seconds": 3600 }
 }
 ```
+
+`remaining_seconds` is `null` after cancelling (`duration: 0`).
 
 **curl:**
 
 ```bash
 # Set 60-minute sleep timer
-curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/sleep-timer \
+curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/sleep-timer \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"duration": 3600}'
 
 # Cancel sleep timer
-curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400%3A1/sleep-timer \
+curl -X PUT YOUR_BASE_URL/api/v1/sonos/zones/RINCON_C4A81B3D567801400/sleep-timer \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"duration": 0}'
@@ -1908,7 +2093,7 @@ Playback history is always `raw` (one event per track change -- not time-series)
   "items": [
     {
       "timestamp": 1774000000,
-      "group_id": "RINCON_C4A81B3D567801400:1",
+      "group_id": "RINCON_C4A81B3D567801400",
       "transport_state": "PLAYING",
       "title": "Nuvole Bianche",
       "artist": "Ludovico Einaudi",
@@ -1918,7 +2103,7 @@ Playback history is always `raw` (one event per track change -- not time-series)
     },
     {
       "timestamp": 1773999645,
-      "group_id": "RINCON_C4A81B3D567801400:1",
+      "group_id": "RINCON_C4A81B3D567801400",
       "transport_state": "PAUSED_PLAYBACK",
       "title": "Nuvole Bianche",
       "artist": "Ludovico Einaudi",
@@ -2005,7 +2190,7 @@ curl "YOUR_BASE_URL/api/v1/sonos/history?type=volume&speaker_uid=RINCON_C4A81B3D
   -H "X-API-Key: YOUR_API_KEY"
 
 # Playback history for one zone
-curl "YOUR_BASE_URL/api/v1/sonos/history?type=playback&group_id=RINCON_C4A81B3D567801400%3A1&limit=50" \
+curl "YOUR_BASE_URL/api/v1/sonos/history?type=playback&group_id=RINCON_C4A81B3D567801400&limit=50" \
   -H "X-API-Key: YOUR_API_KEY"
 
 # Paginate: next page
@@ -2046,7 +2231,7 @@ const res = await fetch(`${process.env.API_BASE_URL}/api/v1/sonos/devices`, {
   headers: { "X-API-Key": process.env.API_KEY! },
 });
 if (!res.ok) throw new Error(`Sonos devices error: ${res.status}`);
-const devices = await res.json() as SonosDeviceResponse[];
+const { speakers: devices } = await res.json() as SonosDevicesListResponse;
 
 // Filter to visible speakers only
 const visible = devices.filter(d => d.is_visible);
@@ -2062,7 +2247,7 @@ const zonesRes = await fetch(`${process.env.API_BASE_URL}/api/v1/sonos/zones`, {
   headers: { "X-API-Key": process.env.API_KEY! },
 });
 if (!zonesRes.ok) throw new Error(`Sonos zones error: ${zonesRes.status}`);
-const zones = await zonesRes.json() as SonosZoneResponse[];
+const { zones } = await zonesRes.json() as SonosZonesListResponse;
 
 // Use coordinator_uid as group_id for playback query
 const zone = zones[0];
@@ -2122,8 +2307,8 @@ async function setSpeakerVolume(uid: string, volume: number): Promise<void> {
     }
   );
   if (!res.ok) throw new Error(`Set volume failed: ${res.status}`);
-  const result = await res.json();
-  // result.volume echoes back the set value
+  const result = await res.json() as SonosVolumeMutationResponse;
+  // result.volume is the re-read {uid, volume, mute}; trust it only if result.data_confirmed
 }
 ```
 
@@ -2164,7 +2349,7 @@ if (history.total > 100) {
 | `SonosZoneResponse` fields (`group_id`, `label`, `coordinator_uid`, `coordinator_name`, `member_count`, `members`) | HIGH | `SonosZoneResponse` Pydantic model in `routes.py` | VERIFIED phases 78-82 — zone topology confirmed |
 | `SonosPlaybackResponse` fields (`group_id`, `transport_state`, `title`, `artist`, `album`, `album_art_url`, `position`, `duration`, `source_type`) | HIGH | `SonosPlaybackResponse` Pydantic model in `routes.py` | VERIFIED phase 79 — coordinator-only playback routing confirmed |
 | `SonosVolumeResponse` fields (`uid`, `volume`, `mute`) | HIGH | `SonosVolumeResponse` Pydantic model in `routes.py` | VERIFIED phase 79 — all 5 speakers incl. sub and surrounds |
-| Transport control responses (`{"status":"ok","group_id":"..."}`) | HIGH | Route handler return dicts in `routes.py` | VERIFIED phase 80 — play/pause/stop/next/previous |
+| Mutation responses (`{data_confirmed, <resource>}` — `SonosTransportMutationResponse` etc.) | HIGH | `*MutationResponse` models in `routes.py` | Re-verified 2026-09-24 (phase 106 re-poll pattern; replaces the old `{"status":"ok"}` bodies) |
 | Volume control responses (speaker volume, mute, zone volume with `speakers_updated`) | HIGH | Route handler return dicts in `routes.py` | VERIFIED phase 80 — partial failure with `failed_speakers` documented |
 | Seek 422 responses (format validation and UPnPException) | HIGH | `_POSITION_RE` and `SoCoUPnPException` catch in `routes.py` | VERIFIED phase 80 — two distinct 422 paths |
 | `SonosEqResponse` fields (`uid`, `bass`, `treble`, `loudness`) | HIGH | `SonosEqResponse` Pydantic model in `routes.py` | VERIFIED phase 82 |
@@ -2192,14 +2377,15 @@ Zone commands (play, pause, stop, next, previous, seek, zone volume, play-mode, 
 **The fix:** Always use `coordinator_uid` from `GET /zones` as the `group_id` for zone commands.
 
 ```json
-// 422 response when slave UID is used as group_id
+// 422 response (application/problem+json) when slave UID is used as group_id
 {
-  "detail": {
-    "error": "not_coordinator",
-    "group_id": "RINCON_E5A24D6F123B01400",
-    "coordinator_uid": "RINCON_B8E9378A123401400:1",
-    "message": "UID 'RINCON_E5A24D6F123B01400' is a zone member, not a coordinator. Use coordinator_uid 'RINCON_B8E9378A123401400:1'"
-  }
+  "type": "about:blank",
+  "title": "Unprocessable Entity",
+  "status": 422,
+  "detail": "UID 'RINCON_E5A24D6F123B01400' is a zone member, not a coordinator. Use coordinator_uid 'RINCON_B8E9378A123401400'",
+  "error": "not_coordinator",
+  "group_id": "RINCON_E5A24D6F123B01400",
+  "coordinator_uid": "RINCON_B8E9378A123401400"
 }
 ```
 
@@ -2298,6 +2484,6 @@ See [WebSocket API - sonos topic](./websocket.md#sonos) for the full payload sch
 | Topic | Description | Snapshot on Subscribe |
 |-------|-------------|----------------------|
 | `sonos` | Full speaker list with state | Yes |
-| `sonos_transport` | Playback state changes | No (push on mutation) |
-| `sonos_volume` | Volume/mute changes | No (push on mutation) |
-| `sonos_topology` | Speaker/group topology changes | No (push on mutation) |
+| `sonos_transport` | One zone's playback snapshot (`SonosPlaybackResponse` shape) | No (pushed by the 30 s poller on change and after transport mutations) |
+| `sonos_volume` | `{uid, volume, mute}` per speaker, or `{group_id, volumes}` after zone volume | No (pushed by the 30 s poller on change and after volume mutations) |
+| `sonos_topology` | `{speakers, groups}` | No (push only after join/unjoin/source) |

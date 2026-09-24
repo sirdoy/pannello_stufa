@@ -56,12 +56,16 @@ async function debugRequest(endpoint: string): Promise<unknown> {
 /**
  * Get network devices connected to Fritz!Box
  *
- * Raw: { items: [{ ip, name, mac, status: 0|1, provider_type }], total_count, limit, offset }
- * Returns: array of transformed devices
+ * Raw: { items: [{ ip, name, mac, status: 0|1, provider_type, custom_name, device_type }], total_count, limit, offset }
+ * Returns: array of transformed devices. `customName`/`deviceType` (device registry) are
+ * only present when set — the result is cached in Firebase, which rejects undefined values.
  */
-async function getDevices(): Promise<Array<{ id: string; name: string; ip: string; mac: string; active: boolean }>> {
+async function getDevices(): Promise<Array<{
+  id: string; name: string; ip: string; mac: string; active: boolean; customName?: string; deviceType?: string;
+}>> {
   const raw = await haGet<PaginatedResponse<{
     ip: string; name: string; mac: string; status: number; provider_type: string | null;
+    custom_name?: string | null; device_type?: string | null;
   }>>('/api/v1/fritzbox/devices?limit=1000');
 
   return (raw.items || []).map(d => ({
@@ -70,6 +74,8 @@ async function getDevices(): Promise<Array<{ id: string; name: string; ip: strin
     ip: d.ip,
     mac: d.mac,
     active: d.status === 1,
+    ...(d.custom_name ? { customName: d.custom_name } : {}),
+    ...(d.device_type ? { deviceType: d.device_type } : {}),
   }));
 }
 
@@ -96,38 +102,83 @@ async function getBandwidth(): Promise<{ download: number; upload: number; times
   };
 }
 
+/** Backend max page size for history endpoints (Query le=1000) */
+const HISTORY_PAGE_SIZE = 1000;
+/**
+ * Raw bandwidth samples are written every 30s (poller fast tier) → 2880 rows/24h.
+ * Up to this window the raw endpoint is paginated; older data comes from the hourly tier.
+ */
+const RAW_BANDWIDTH_MAX_HOURS = 24;
+/** Safety cap on raw pages per request (24h ≈ 3 pages of 1000) */
+const RAW_BANDWIDTH_MAX_PAGES = 4;
+
+type BandwidthPoint = { time: number; download: number; upload: number };
+
+/**
+ * Fetch every raw bandwidth sample of the last `hours` (≤ 24), following pagination.
+ * The backend returns rows newest-first, so a single limit=1000 page would silently
+ * cover only the most recent ~8.3h.
+ */
+async function fetchRawBandwidthPoints(hours: number): Promise<BandwidthPoint[]> {
+  const page = (offset: number) => haGet<PaginatedResponse<BandwidthHistoryRawRecord>>(
+    `/api/v1/fritzbox/history/bandwidth?hours=${hours}&limit=${HISTORY_PAGE_SIZE}&offset=${offset}`
+  );
+
+  const first = await page(0);
+  const records = [...(first.items ?? [])];
+  const total = first.total_count ?? records.length;
+
+  const offsets: number[] = [];
+  for (
+    let offset = HISTORY_PAGE_SIZE;
+    offset < total && offsets.length < RAW_BANDWIDTH_MAX_PAGES - 1;
+    offset += HISTORY_PAGE_SIZE
+  ) {
+    offsets.push(offset);
+  }
+  const rest = await Promise.all(offsets.map(page));
+  rest.forEach(r => records.push(...(r.items ?? [])));
+
+  // timestamp (Unix seconds) → ms, rates (bps) → Mbps
+  return records.map(item => ({
+    time: item.timestamp * 1000,
+    download: item.downstream_rate / 1_000_000,
+    upload: item.upstream_rate / 1_000_000,
+  }));
+}
+
 /**
  * Get historical bandwidth data
  *
- * Raw: { items: [{ timestamp, bytes_sent, bytes_received, upstream_rate, downstream_rate, ... }], total_count, limit, offset }
- * Returns: array of { time, download, upload } points sorted ascending
+ * - hours ≤ 24: every raw sample (30s resolution), paginated.
+ * - hours > 24: raw samples for the last 24h + hourly aggregates
+ *   (/history/bandwidth/hourly, avg rates) for the older part of the window.
+ * Returns: array of { time (ms), download (Mbps), upload (Mbps) } sorted ascending.
  */
-async function getBandwidthHistory(hours: number = 24): Promise<Array<{ time: number; download: number; upload: number }>> {
-  type HistoryRecord = {
-    timestamp: number;
-    bytes_sent: number;
-    bytes_received: number;
-    upstream_rate: number;
-    downstream_rate: number;
-    latency_ms: number | null;
-    connection_uptime: number | null;
-    external_ip: string | null;
-    connection_type: string | null;
-  };
+async function getBandwidthHistory(hours: number = 24): Promise<BandwidthPoint[]> {
+  const rawHours = Math.min(hours, RAW_BANDWIDTH_MAX_HOURS);
+  const rawPoints = await fetchRawBandwidthPoints(rawHours);
 
-  const data = await haGet<PaginatedResponse<HistoryRecord>>(
-    `/api/v1/fritzbox/history/bandwidth?hours=${hours}&limit=1000`
-  );
-  const records = data.items ?? [];
+  let olderPoints: BandwidthPoint[] = [];
+  if (hours > RAW_BANDWIDTH_MAX_HOURS) {
+    const days = Math.ceil(hours / 24);
+    const hourly = await haGet<PaginatedResponse<BandwidthHourlyRecord>>(
+      `/api/v1/fritzbox/history/bandwidth/hourly?days=${days}&limit=${HISTORY_PAGE_SIZE}`
+    );
+    const windowStart = Date.now() - hours * 3600 * 1000;
+    const rawStart = rawPoints.length
+      ? Math.min(...rawPoints.map(p => p.time))
+      : Date.now() - RAW_BANDWIDTH_MAX_HOURS * 3600 * 1000;
+    olderPoints = (hourly.items ?? [])
+      .map(item => ({
+        time: item.hour_timestamp * 1000,
+        download: item.avg_downstream_rate / 1_000_000,
+        upload: item.avg_upstream_rate / 1_000_000,
+      }))
+      .filter(p => p.time >= windowStart && p.time < rawStart);
+  }
 
-  // Transform: timestamp (Unix seconds) → ms, rates (bps) → Mbps
-  return records
-    .map(item => ({
-      time: item.timestamp * 1000,
-      download: item.downstream_rate / 1_000_000,
-      upload: item.upstream_rate / 1_000_000,
-    }))
-    .sort((a, b) => a.time - b.time);
+  return [...olderPoints, ...rawPoints].sort((a, b) => a.time - b.time);
 }
 
 /**
@@ -454,46 +505,80 @@ async function getBudgetStats(): Promise<BudgetStats> {
 }
 
 // --- Telephony (v19.0 FRITZ-01 through FRITZ-03) ---
+// Shapes mirror backend/api/models.py (DectListResponse, CallRecordModel,
+// TamStatusResponse) — see docs/api/fritzbox.md. Keep in sync with the backend.
 
-/** A DECT handset registered with the Fritz!Box */
-interface DectHandset {
-  id: string;
+/** A DECT handset registered with the Fritz!Box (backend DectHandsetModel) */
+export interface DectHandset {
+  dect_id: number;
   name: string;
-  model: string;
-  firmware_version: string;
-  battery_charge_level: number | null;
-  is_registered: boolean;
+  phonebook_id: number;
+  /** Always null: TR-064 does not expose the handset model */
+  model: string | null;
+  /** Always "registered": presence in the list implies registration */
+  registration_status: string;
 }
 
-/** A call log entry from Fritz!Box */
-interface CallRecord {
-  id: string;
-  call_type: string;
-  number: string;
+/** GET /api/v1/fritzbox/telephony/dect response (backend DectListResponse) — not paginated */
+export interface DectListResponse {
+  handsets: DectHandset[];
+  handset_count: number;
+  is_stale: boolean;
+  fetched_at: string | null;
+}
+
+/** Call type labels emitted by the backend (call_type_code 1/2/3/9/10/11) */
+export type CallType =
+  | 'received'
+  | 'missed'
+  | 'outgoing'
+  | 'active_received'
+  | 'rejected'
+  | 'active_outgoing';
+
+/** A call log entry from Fritz!Box (backend CallRecordModel) — no id field */
+export interface CallRecord {
+  call_type: CallType | string;
+  call_type_code: number;
   name: string | null;
-  duration_seconds: number;
-  timestamp: number;
+  caller: string | null;
+  called: string | null;
+  caller_number: string | null;
+  called_number: string | null;
+  /** ISO 8601 local time WITHOUT timezone, e.g. "2026-02-17T10:30:00" */
+  date: string | null;
+  duration_seconds: number | null;
+  device: string | null;
   port: string | null;
 }
 
-/** Answering machine (TAM) status response */
-interface TamStatusResponse {
-  enabled: boolean;
-  new_messages: number;
+/** GET /api/v1/fritzbox/telephony/calls response (backend PaginatedResponse[CallRecordModel]) */
+export type CallHistoryResponse = PaginatedResponse<CallRecord>;
+
+/** Answering machine (TAM) status (backend TamStatusModel) */
+export interface TamStatusModel {
   total_messages: number;
+  new_messages: number;
+  tam_enabled: boolean;
+  tam_name: string | null;
+}
+
+/** GET /api/v1/fritzbox/telephony/tam response (backend TamStatusResponse) */
+export interface TamStatusResponse {
+  tam: TamStatusModel;
   is_stale: boolean;
   fetched_at: string | null;
 }
 
 /** Get registered DECT handsets -- FRITZ-01 (v19.0). Raw pass-through per D-01. */
-async function getDectHandsets(): Promise<PaginatedResponse<DectHandset>> {
-  return haGet<PaginatedResponse<DectHandset>>('/api/v1/fritzbox/telephony/dect');
+async function getDectHandsets(): Promise<DectListResponse> {
+  return haGet<DectListResponse>('/api/v1/fritzbox/telephony/dect');
 }
 
-/** Get paginated call history -- FRITZ-02 (v19.0). Supports limit/offset per D-03. */
-async function getCallHistory(params?: URLSearchParams): Promise<PaginatedResponse<CallRecord>> {
+/** Get paginated call history -- FRITZ-02 (v19.0). Supports call_type/limit/offset per D-03. */
+async function getCallHistory(params?: URLSearchParams): Promise<CallHistoryResponse> {
   const query = params?.toString() ? `?${params.toString()}` : '';
-  return haGet<PaginatedResponse<CallRecord>>(`/api/v1/fritzbox/telephony/calls${query}`);
+  return haGet<CallHistoryResponse>(`/api/v1/fritzbox/telephony/calls${query}`);
 }
 
 /** Get answering machine status -- FRITZ-03 (v19.0). Raw pass-through per D-01. */
@@ -543,7 +628,9 @@ interface DevicePresenceRecord {
   mac: string;
   name: string;
   ip: string;
-  is_online: boolean;
+  /** Backend DeviceHistoryRecord.is_online is an int: 1=online, 0=offline */
+  is_online: number;
+  connection_type?: string | null;
 }
 
 /**
@@ -567,6 +654,28 @@ interface ServiceEntry {
 /** Service discovery response (TR-064 XML parsed to JSON per D-06) */
 interface ServiceDiscoveryResponse {
   services: ServiceEntry[];
+}
+
+/**
+ * Backend JSON shape (routes.py get_service_discovery): `services` is a dict keyed by
+ * service name ("WANIPConnection:1") → { version, service_type, control_url, actions, action_count }.
+ */
+interface BackendServiceDetails {
+  version?: string;
+  service_type?: string;
+  control_url?: string;
+  action_count?: number;
+}
+
+/** Normalize the backend dict (or an already-normalized array) into ServiceEntry[] */
+function normalizeServices(services: unknown): ServiceEntry[] {
+  if (Array.isArray(services)) return services as ServiceEntry[];
+  if (!services || typeof services !== 'object') return [];
+  return Object.entries(services as Record<string, BackendServiceDetails>).map(([name, details]) => ({
+    name,
+    type: details?.service_type ?? '',
+    url: details?.control_url ?? '',
+  }));
 }
 
 /**
@@ -604,7 +713,8 @@ async function getServiceDiscovery(): Promise<ServiceDiscoveryResponse> {
 
     // If the HA proxy returns JSON directly, use it
     if (contentType.includes('application/json')) {
-      return (await response.json()) as ServiceDiscoveryResponse;
+      const json = (await response.json()) as { services?: unknown };
+      return { services: normalizeServices(json.services) };
     }
 
     // Otherwise parse TR-064 XML

@@ -23,16 +23,21 @@ const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 describe('GET /api/v1/fritzbox/telephony/calls', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  // Real backend shape (PaginatedResponse[CallRecordModel], backend/api/models.py).
   const mockData = {
     items: [
       {
-        id: '1',
-        call_type: 'incoming',
-        number: '+39123456789',
+        call_type: 'received',
+        call_type_code: 1,
         name: 'Test Caller',
+        caller: '+39123456789',
+        called: '030987654',
+        caller_number: '+39123456789',
+        called_number: '030987654',
+        date: '2026-02-17T10:30:00',
         duration_seconds: 120,
-        timestamp: 1711324800,
-        port: 'DECT',
+        device: 'Wohnzimmer',
+        port: 'FON1',
       },
     ],
     total_count: 1,
@@ -91,18 +96,64 @@ describe('GET /api/v1/fritzbox/telephony/calls', () => {
     expect(mockGetCachedData).not.toHaveBeenCalled();
   });
 
-  it('should call getCachedData with correct cache key', async () => {
+  it('should call getCachedData with a default cache key when no params are given', async () => {
     mockGetCachedData.mockResolvedValue(mockData);
 
     await GET(mockRequest as any, {} as any);
 
-    expect(mockGetCachedData).toHaveBeenCalledWith('telephony-calls', expect.any(Function));
+    expect(mockGetCachedData).toHaveBeenCalledWith('telephony-calls-all-default-0', expect.any(Function));
 
     // Verify the fetch function calls the correct client method
     const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
     mockFritzboxClient.getCallHistory.mockResolvedValue(mockData as any);
     await fetchFn?.();
     expect(mockFritzboxClient.getCallHistory).toHaveBeenCalled();
+    const params = mockFritzboxClient.getCallHistory.mock.calls[0]?.[0] as URLSearchParams;
+    expect(params.toString()).toBe('');
+  });
+
+  it('should forward call_type, limit and offset and key the cache on them', async () => {
+    mockGetCachedData.mockResolvedValue(mockData);
+    const req = new Request(
+      'http://localhost:3000/api/v1/fritzbox/telephony/calls?call_type=missed&limit=50&offset=100'
+    );
+
+    await GET(req as any, {} as any);
+
+    expect(mockGetCachedData).toHaveBeenCalledWith('telephony-calls-missed-50-100', expect.any(Function));
+    const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
+    mockFritzboxClient.getCallHistory.mockResolvedValue(mockData as any);
+    await fetchFn?.();
+    const params = mockFritzboxClient.getCallHistory.mock.calls[0]?.[0] as URLSearchParams;
+    expect(params.get('call_type')).toBe('missed');
+    expect(params.get('limit')).toBe('50');
+    expect(params.get('offset')).toBe('100');
+  });
+
+  it('should use distinct cache keys for different pages', async () => {
+    mockGetCachedData.mockResolvedValue(mockData);
+
+    await GET(new Request('http://localhost:3000/x?limit=50&offset=0') as any, {} as any);
+    await GET(new Request('http://localhost:3000/x?limit=50&offset=50') as any, {} as any);
+
+    const keys = mockGetCachedData.mock.calls.map((c) => c[0]);
+    expect(keys[0]).not.toBe(keys[1]);
+  });
+
+  it('should drop malformed query params', async () => {
+    mockGetCachedData.mockResolvedValue(mockData);
+    const req = new Request(
+      'http://localhost:3000/x?call_type=../evil&limit=abc&offset=-1'
+    );
+
+    await GET(req as any, {} as any);
+
+    expect(mockGetCachedData).toHaveBeenCalledWith('telephony-calls-all-default-0', expect.any(Function));
+    const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
+    mockFritzboxClient.getCallHistory.mockResolvedValue(mockData as any);
+    await fetchFn?.();
+    const params = mockFritzboxClient.getCallHistory.mock.calls[0]?.[0] as URLSearchParams;
+    expect(params.toString()).toBe('');
   });
 
   it('should propagate errors', async () => {

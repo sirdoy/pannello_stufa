@@ -55,10 +55,12 @@ export function useFritzDeviceCountHistory(): {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/v1/fritzbox/history/devices/daily?days=${days}`)
+    // 24 rows per day; backend default limit is 100 (≈4 days) and max is 1000.
+    const limit = Math.min(days * 24, 1000);
+    fetch(`/api/v1/fritzbox/history/devices/daily?days=${days}&limit=${limit}`)
       .then((res) => res.json())
       .then((json: unknown) => {
-        const body = json as { deviceCounts: { items: DeviceDailyRecord[]; total: number } };
+        const body = json as { deviceCounts: { items: DeviceDailyRecord[]; total_count: number } };
         const items = body.deviceCounts?.items ?? [];
         setChartData(aggregateToDailyTotals(items));
       })

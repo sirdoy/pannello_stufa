@@ -37,6 +37,7 @@ import type {
   SetPlayModeRequest,
   SetHomeTheaterRequest,
   SetSleepTimerRequest,
+  SonosDataFreshness,
 } from '@/types/sonosProxy';
 
 // =============================================================================
@@ -55,7 +56,7 @@ export interface SonosDevicesPayload {
   speakers: SonosDeviceResponse[];
   count: number;
   is_stale: boolean;
-  fetched_at: number;
+  fetched_at: string | null;  // ISO 8601 string (not epoch)
 }
 
 /**
@@ -77,12 +78,21 @@ export async function getDevice(uid: string): Promise<SonosDeviceDetailResponse>
   return haGet<SonosDeviceDetailResponse>(`/api/v1/sonos/devices/${uid}`);
 }
 
+export interface SonosZonesPayload {
+  zones: SonosZoneResponse[];
+  count: number;
+  is_stale: boolean;
+  fetched_at: string | null;
+  data_freshness: SonosDataFreshness;
+}
+
 /**
  * Get the current zone topology (groupings of Sonos players).
- * Calls GET /api/v1/sonos/zones on the HA proxy.
+ * Calls GET /api/v1/sonos/zones on the HA proxy, which returns a wrapper
+ * `{ zones, count, is_stale, fetched_at, data_freshness }`, not a bare array.
  */
-export async function getZones(): Promise<SonosZoneResponse[]> {
-  return haGet<SonosZoneResponse[]>('/api/v1/sonos/zones');
+export async function getZones(): Promise<SonosZonesPayload> {
+  return haGet<SonosZonesPayload>('/api/v1/sonos/zones');
 }
 
 // =============================================================================

@@ -137,7 +137,8 @@ const mockHistory: SonosHistoryResponse = {
   offset: 0,
 };
 
-const mockCommandOk: SonosCommandOkResponse = { status: 'ok' };
+// Real backend mutation response: { data_confirmed, <re-polled resource> }
+const mockCommandOk: SonosCommandOkResponse = { data_confirmed: true, playback: { group_id: 'RINCON_A' } };
 
 // ---------------------------------------------------------------------------
 

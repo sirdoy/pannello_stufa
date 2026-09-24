@@ -17,24 +17,33 @@ jest.mock('@/lib/hooks/useVisibility', () => ({
 }));
 
 describe('useFritzCallHistory', () => {
+  // Real backend shape (CallRecordModel, backend/api/models.py) — no id/number/timestamp.
   const mockCalls = [
     {
-      id: 'c1',
-      call_type: 'incoming',
-      number: '+393331112233',
+      call_type: 'received',
+      call_type_code: 1,
       name: 'Mario',
+      caller: '+393331112233',
+      called: '0301234567',
+      caller_number: '+393331112233',
+      called_number: '0301234567',
+      date: '2026-02-17T10:30:00',
       duration_seconds: 125,
-      timestamp: 1713700000,
-      port: 'DECT-1',
+      device: 'Cucina',
+      port: 'FON1',
     },
     {
-      id: 'c2',
       call_type: 'outgoing',
-      number: '+393332223344',
+      call_type_code: 3,
       name: null,
+      caller: '0301234567',
+      called: '+393332223344',
+      caller_number: '0301234567',
+      called_number: '+393332223344',
+      date: '2026-02-16T09:00:00',
       duration_seconds: 60,
-      timestamp: 1713600000,
-      port: 'DECT-1',
+      device: 'Cucina',
+      port: 'FON1',
     },
   ];
 
@@ -62,8 +71,25 @@ describe('useFritzCallHistory', () => {
     expect(fetchUrl).toContain('/api/v1/fritzbox/telephony/calls');
     expect(fetchUrl).toContain('limit=50');
     expect(fetchUrl).toContain('offset=0');
-    expect(result.current.calls).toHaveLength(2);
+    expect(result.current.calls).toEqual(mockCalls);
     expect(result.current.totalCount).toBe(2);
+    expect(result.current.stale).toBe(false);
+  });
+
+  it('does not crash when items is missing (Firebase cache drops empty arrays)', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ calls: { total_count: 0, limit: 50, offset: 0 } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzCallHistory());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.calls).toEqual([]);
+    expect(result.current.totalCount).toBe(0);
   });
 
   it('sets stale=true and empties list on non-OK response', async () => {

@@ -12,6 +12,19 @@ export interface ServiceEntry {
   url: string;
 }
 
+/**
+ * The server client already normalizes the backend dict
+ * ({ "WANIPConnection:1": { service_type, control_url, ... } }) into an array;
+ * this guard keeps the tab working if a raw dict ever reaches the browser.
+ */
+function normalizeServices(services: unknown): ServiceEntry[] {
+  if (Array.isArray(services)) return services as ServiceEntry[];
+  if (!services || typeof services !== 'object') return [];
+  return Object.entries(services as Record<string, { service_type?: string; control_url?: string }>).map(
+    ([name, details]) => ({ name, type: details?.service_type ?? '', url: details?.control_url ?? '' })
+  );
+}
+
 interface UseFritzServiceDiscoveryReturn {
   services: ServiceEntry[];
   loading: boolean;
@@ -36,8 +49,8 @@ export function useFritzServiceDiscovery(): UseFritzServiceDiscoveryReturn {
     try {
       const res = await fetch('/api/v1/fritzbox/service-discovery');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = (await res.json()) as { discovery: { services: ServiceEntry[] } };
-      setServices(json.discovery.services ?? []);
+      const json = (await res.json()) as { discovery: { services: unknown } };
+      setServices(normalizeServices(json.discovery?.services));
     } catch (e) {
       setError(e instanceof Error ? e : new Error(String(e)));
     } finally {

@@ -164,6 +164,7 @@ export interface HueHistoryItem {
   avg_brightness: number | null;
   min_brightness: number | null;
   max_brightness: number | null;
+  avg_color_temp: number | null;       // mirek, aggregated tiers only
   on_minutes: number | null;
   sample_count: number | null;
 }
@@ -203,17 +204,16 @@ export interface HueLightStateRequest {
 }
 
 /**
- * Response from proxy command endpoints (202 Accepted).
- * Discriminated by 'command' field value.
- * Source: docs/api/hue.md — 202 response shapes
+ * Response from backend mutation endpoints (HTTP 200 after a re-poll).
+ * Source: docs/api/hue.md — Mutation responses
  */
-export interface HueCommandResponse {
-  command: 'set_light_state' | 'set_group_action' | 'activate_scene';
-  status: 'accepted';
-  light_id?: string;
-  group_id?: string;
-  scene_id?: string;
-  requested_state?: Partial<HueLightStateRequest>;
-  suggested_poll_delay_s: number;
-  poll_endpoint: string;
-}
+export interface HueLightStateMutationResponse extends HueLight { data_confirmed: boolean; }
+export interface HueGroupMutationResponse extends HueGroup { data_confirmed: boolean; }
+
+/**
+ * Command response as consumed by the UI: the mutation response, plus the
+ * optional `suggested_poll_delay_s` of the legacy 202 contract.
+ */
+export type HueCommandResponse = (HueLightStateMutationResponse | HueGroupMutationResponse) & {
+  suggested_poll_delay_s?: number;
+};

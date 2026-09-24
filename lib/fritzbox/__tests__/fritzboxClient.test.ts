@@ -57,6 +57,24 @@ describe('fritzboxClient', () => {
       ]);
     });
 
+    it('maps registry custom_name/device_type when set, omits them (no undefined) when null', async () => {
+      mockHaGet.mockResolvedValue({
+        items: [
+          { ip: '192.168.178.25', name: 'iPhone', mac: 'AA:BB:CC:DD:EE:FF', status: 1, provider_type: 'fritzbox', custom_name: 'Telefono Fede', device_type: 'phone' },
+          { ip: '192.168.178.30', name: 'Printer', mac: '11:22:33:44:55:66', status: 0, provider_type: 'fritzbox', custom_name: null, device_type: null },
+        ],
+        total_count: 2,
+        limit: 1000,
+        offset: 0,
+      });
+
+      const result = await fritzboxClient.getDevices();
+
+      expect(result[0]).toEqual(expect.objectContaining({ customName: 'Telefono Fede', deviceType: 'phone' }));
+      // Firebase cache rejects undefined values: keys must be absent, not undefined
+      expect(Object.keys(result[1]!)).toEqual(['id', 'name', 'ip', 'mac', 'active']);
+    });
+
     it('returns empty array when items is empty', async () => {
       mockHaGet.mockResolvedValue({ items: [], total_count: 0, limit: 1000, offset: 0 });
       const result = await fritzboxClient.getDevices();
@@ -145,23 +163,92 @@ describe('fritzboxClient', () => {
   });
 
   describe('getBandwidthHistory()', () => {
-    it('converts paginated timestamps to ms and rates to Mbps, sorted ascending', async () => {
-      mockHaGet.mockResolvedValue({
-        items: [
-          { timestamp: 1707840000, bytes_sent: 0, bytes_received: 0, upstream_rate: 10_000_000, downstream_rate: 100_000_000, latency_ms: null, connection_uptime: null, external_ip: null, connection_type: null },
-          { timestamp: 1707836400, bytes_sent: 0, bytes_received: 0, upstream_rate: 5_000_000, downstream_rate: 50_000_000, latency_ms: null, connection_uptime: null, external_ip: null, connection_type: null },
-        ],
-        total_count: 2,
-        limit: 1000,
-        offset: 0,
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    // Backend BandwidthHistoryRecord (raw 30s samples, returned newest-first)
+    const rawRecord = (timestamp: number, down = 50_000_000, up = 5_000_000) => ({
+      timestamp, bytes_sent: 0, bytes_received: 0, upstream_rate: up, downstream_rate: down,
+      latency_ms: null, connection_uptime: null, external_ip: null, connection_type: null,
+    });
+    // Backend BandwidthHourlyRecord
+    const hourlyRecord = (hour_timestamp: number, avgDown: number, avgUp: number) => ({
+      hour_timestamp,
+      avg_upstream_rate: avgUp, min_upstream_rate: 0, max_upstream_rate: avgUp,
+      avg_downstream_rate: avgDown, min_downstream_rate: 0, max_downstream_rate: avgDown,
+      avg_bytes_sent: 0, avg_bytes_received: 0, sample_count: 120,
+    });
+    const page = (items: unknown[], total_count: number, offset: number) =>
+      ({ items, total_count, limit: 1000, offset });
+
+    it('converts timestamps to ms and rates to Mbps, sorted ascending (single page)', async () => {
+      mockHaGet.mockResolvedValue(page([
+        rawRecord(1707840000, 100_000_000, 10_000_000),
+        rawRecord(1707836400, 50_000_000, 5_000_000),
+      ], 2, 0));
+
+      const result = await fritzboxClient.getBandwidthHistory(1);
+
+      expect(mockHaGet).toHaveBeenCalledTimes(1);
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth?hours=1&limit=1000&offset=0');
+      expect(result).toEqual([
+        { time: 1707836400000, download: 50, upload: 5 },
+        { time: 1707840000000, download: 100, upload: 10 },
+      ]);
+    });
+
+    it('paginates the raw endpoint so 24h is not truncated to the newest 1000 rows (~8.3h)', async () => {
+      // 24h at 30s = 2880 rows, newest first
+      const nowSec = 1_800_000_000;
+      const all = Array.from({ length: 2880 }, (_, i) => rawRecord(nowSec - i * 30));
+      mockHaGet.mockImplementation(async (url: string) => {
+        const offset = Number(new URL(`http://x${url}`).searchParams.get('offset'));
+        return page(all.slice(offset, offset + 1000), all.length, offset) as never;
       });
 
       const result = await fritzboxClient.getBandwidthHistory(24);
 
-      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth?hours=24&limit=1000');
+      const urls = mockHaGet.mock.calls.map(c => c[0]);
+      expect(urls).toEqual([
+        '/api/v1/fritzbox/history/bandwidth?hours=24&limit=1000&offset=0',
+        '/api/v1/fritzbox/history/bandwidth?hours=24&limit=1000&offset=1000',
+        '/api/v1/fritzbox/history/bandwidth?hours=24&limit=1000&offset=2000',
+      ]);
+      expect(result).toHaveLength(2880);
+      expect(result[0]!.time).toBe((nowSec - 2879 * 30) * 1000);
+      expect(result[result.length - 1]!.time).toBe(nowSec * 1000);
+      // Covers the full 24h window
+      expect(result[result.length - 1]!.time - result[0]!.time).toBeGreaterThan(23.9 * 3600 * 1000);
+    });
+
+    it('7d: raw samples for the last 24h + hourly aggregates for the older part', async () => {
+      const nowMs = 1_800_000_000_000;
+      jest.spyOn(Date, 'now').mockReturnValue(nowMs);
+      const nowSec = nowMs / 1000;
+      const rawNewest = rawRecord(nowSec - 30, 80_000_000, 8_000_000);
+      const rawOldest = rawRecord(nowSec - 24 * 3600 + 30, 60_000_000, 6_000_000);
+      mockHaGet.mockImplementation(async (url: string) => {
+        if (url.startsWith('/api/v1/fritzbox/history/bandwidth/hourly')) {
+          return page([
+            hourlyRecord(nowSec - 2 * 3600, 1_000_000, 1_000_000),       // overlaps raw window → dropped
+            hourlyRecord(nowSec - 3 * 86400, 30_000_000, 3_000_000),     // kept
+            hourlyRecord(nowSec - 6 * 86400, 20_000_000, 2_000_000),     // kept
+            hourlyRecord(nowSec - 7 * 86400 - 3600, 9_000_000, 9_000_000), // before 168h window → dropped
+          ], 4, 0) as never;
+        }
+        return page([rawNewest, rawOldest], 2, 0) as never;
+      });
+
+      const result = await fritzboxClient.getBandwidthHistory(168);
+
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth?hours=24&limit=1000&offset=0');
+      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/fritzbox/history/bandwidth/hourly?days=7&limit=1000');
       expect(result).toEqual([
-        { time: 1707836400000, download: 50, upload: 5 },
-        { time: 1707840000000, download: 100, upload: 10 },
+        { time: (nowSec - 6 * 86400) * 1000, download: 20, upload: 2 },
+        { time: (nowSec - 3 * 86400) * 1000, download: 30, upload: 3 },
+        { time: (nowSec - 24 * 3600 + 30) * 1000, download: 60, upload: 6 },
+        { time: (nowSec - 30) * 1000, download: 80, upload: 8 },
       ]);
     });
 
@@ -169,6 +256,58 @@ describe('fritzboxClient', () => {
       mockHaGet.mockResolvedValue({ items: [], total_count: 0, limit: 1000, offset: 0 });
       const result = await fritzboxClient.getBandwidthHistory(1);
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('getServiceDiscovery()', () => {
+    const originalFetch = global.fetch;
+    const originalEnv = { ...process.env };
+
+    beforeEach(() => {
+      process.env.HA_API_URL = 'http://pi:8000';
+      process.env.HA_API_KEY = 'k';
+    });
+    afterEach(() => {
+      global.fetch = originalFetch;
+      process.env = { ...originalEnv };
+    });
+
+    it('normalizes the backend services dict into [{ name, type, url }]', async () => {
+      // Backend routes.py get_service_discovery JSON shape
+      const backend = {
+        model: 'FRITZ!Box 7590 AX',
+        firmware: { model: 'FRITZ!Box 7590 AX', firmware_version: '8.20' },
+        service_count: 2,
+        services: {
+          'WANIPConnection:1': {
+            version: '1',
+            service_type: 'urn:schemas-upnp-org:service:WANIPConnection:1',
+            control_url: '/igdupnp/control/WANIPConn1',
+            actions: [],
+            action_count: 12,
+          },
+          'DeviceInfo:1': {
+            version: '1',
+            service_type: 'urn:dslforum-org:service:DeviceInfo:1',
+            control_url: '/upnp/control/deviceinfo',
+            actions: [],
+            action_count: 5,
+          },
+        },
+      };
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        headers: { get: () => 'application/json' },
+        json: () => Promise.resolve(backend),
+      }) as jest.Mock;
+
+      const result = await fritzboxClient.getServiceDiscovery();
+
+      expect(Array.isArray(result.services)).toBe(true);
+      expect(result.services).toEqual([
+        { name: 'WANIPConnection:1', type: 'urn:schemas-upnp-org:service:WANIPConnection:1', url: '/igdupnp/control/WANIPConn1' },
+        { name: 'DeviceInfo:1', type: 'urn:dslforum-org:service:DeviceInfo:1', url: '/upnp/control/deviceinfo' },
+      ]);
     });
   });
 

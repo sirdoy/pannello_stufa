@@ -6,7 +6,8 @@
 export interface DeviceType {
   slug: string;        // Pattern: ^[a-z0-9_]+$, max 64 chars
   label: string;       // Max 128 chars
-  is_builtin: boolean; // Built-in types cannot be deleted
+  is_builtin: 0 | 1 | boolean; // raw SQLite INTEGER (0/1) from the backend — use truthiness only
+  is_deletable?: boolean;       // only in GET /registry/types; true when no device uses the type
   created_at: number;  // Unix timestamp
 }
 
@@ -21,6 +22,7 @@ export interface RegistryDevice {
   device_id: string;        // Provider-internal device identifier
   custom_name: string;
   device_type_slug: string;
+  last_seen_at?: number | null; // last provider poll that saw this device; null until first seen
   created_at: number;       // Unix timestamp
   updated_at: number;       // Unix timestamp
 }

@@ -17,10 +17,14 @@ jest.mock('@/lib/hooks/useVisibility', () => ({
 }));
 
 describe('useFritzTamStatus', () => {
+  // Real backend shape (TamStatusResponse, backend/api/models.py) wrapped by the Next route.
   const mockTam = {
-    enabled: true,
-    new_messages: 2,
-    total_messages: 5,
+    tam: {
+      total_messages: 5,
+      new_messages: 2,
+      tam_enabled: true,
+      tam_name: 'Anrufbeantworter',
+    },
     is_stale: false,
     fetched_at: '2026-04-22T10:00:00Z',
   };
@@ -45,7 +49,42 @@ describe('useFritzTamStatus', () => {
     const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
     expect(fetchUrl).toBe('/api/v1/fritzbox/telephony/tam');
     expect(result.current.status).toEqual(mockTam);
+    expect(result.current.status?.tam.tam_enabled).toBe(true);
+    expect(result.current.status?.tam.new_messages).toBe(2);
     expect(result.current.stale).toBe(false);
+  });
+
+  it('propagates backend is_stale into stale', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ tam: { ...mockTam, is_stale: true } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzTamStatus());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.stale).toBe(true);
+    expect(result.current.status?.tam.total_messages).toBe(5);
+  });
+
+  it('treats a payload without the nested tam object as unavailable', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({ tam: { enabled: true, new_messages: 1, total_messages: 1 } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzTamStatus());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.status).toBeNull();
+    expect(result.current.stale).toBe(true);
   });
 
   it('sets stale=true and nulls status on non-OK response', async () => {

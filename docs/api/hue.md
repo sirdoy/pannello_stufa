@@ -123,10 +123,11 @@ Returns all Hue lights with state, capability tier, derived `ct_kelvin`, and roo
 
 **Authentication:** Required (JWT Bearer or API Key)
 
-**Response (200):**
+**Response (200):** a wrapper object (not a bare array).
 
 ```json
-[
+{
+  "lights": [
   {
     "light_id": "1",
     "name": "Bedside Lamp",
@@ -161,10 +162,26 @@ Returns all Hue lights with state, capability tier, derived `ct_kelvin`, and roo
     "model_id": "LST002",
     "light_type": "Extended color light"
   }
-]
+  ],
+  "count": 2,
+  "is_stale": false,
+  "fetched_at": "2026-03-19T08:51:32.123456Z",
+  "data_freshness": "LIVE"
+}
 ```
 
+(Every light item also carries `custom_name` and `device_type` from the device registry, `null` if not registered.)
+
 ```typescript
+// Source: api/providers/hue/routes.py — get_hue_lights
+interface HueLightsListResponse {
+  lights: HueLight[];
+  count: number;
+  is_stale: boolean;               // true when data_freshness === "STALE"
+  fetched_at: string | null;       // ISO 8601 UTC ending in "Z" (last successful poll)
+  data_freshness: "LIVE" | "STALE";
+}
+
 // Source: api/providers/hue/routes.py — HueLightStateResponse
 interface HueLight {
   light_id: string;                           // Bridge string key e.g. "1", "5"
@@ -222,7 +239,7 @@ Returns the current state of a single Hue light by its Bridge-assigned string ID
 |------|------|-------------|
 | `light_id` | string | Bridge-assigned string key (e.g. `"1"`, `"5"`) |
 
-**Response (200):** Same shape as a single item from `GET /lights`.
+**Response (200):** a single `HueLight` object (same shape as one item of `GET /lights` → `lights[]`).
 
 **curl:**
 
@@ -246,10 +263,11 @@ Returns all Hue groups (rooms, zones) with member light IDs and current action s
 
 **Authentication:** Required (JWT Bearer or API Key)
 
-**Response (200):**
+**Response (200):** a wrapper object (not a bare array).
 
 ```json
-[
+{
+  "groups": [
   {
     "group_id": "1",
     "name": "Living Room",
@@ -274,10 +292,24 @@ Returns all Hue groups (rooms, zones) with member light IDs and current action s
     "color_temp": null,
     "colormode": null
   }
-]
+  ],
+  "count": 2,
+  "is_stale": false,
+  "fetched_at": "2026-03-19T08:51:32.123456Z",
+  "data_freshness": "LIVE"
+}
 ```
 
 ```typescript
+// Source: api/providers/hue/routes.py — get_hue_groups
+interface HueGroupsListResponse {
+  groups: HueGroup[];
+  count: number;
+  is_stale: boolean;
+  fetched_at: string | null;       // ISO 8601 UTC ending in "Z"
+  data_freshness: "LIVE" | "STALE";
+}
+
 // Source: api/providers/hue/routes.py — HueGroupResponse
 interface HueGroup {
   group_id: string;
@@ -310,7 +342,7 @@ curl YOUR_BASE_URL/api/v1/hue/groups \
 
 ### GET /groups/{group_id}
 
-Returns a single Hue group by its Bridge-assigned string ID.
+Returns a single Hue group (`HueGroup` object) by its Bridge-assigned string ID.
 
 **Authentication:** Required (JWT Bearer or API Key)
 
@@ -320,7 +352,7 @@ Returns a single Hue group by its Bridge-assigned string ID.
 |------|------|-------------|
 | `group_id` | string | Bridge-assigned string key (e.g. `"1"`, `"3"`) |
 
-**Response (200):** Same shape as a single item from `GET /groups`.
+**Response (200):** a single `HueGroup` object (same shape as one item of `GET /groups` → `groups[]`).
 
 **curl:**
 
@@ -422,20 +454,23 @@ Activates a scene for a group on the Bridge. The path pattern is non-obvious: th
 
 **Request body:** None
 
-**Response (202):**
+**Response (200):** `HueGroupMutationResponse` -- the full group state after re-poll (see [Mutation responses](#mutation-responses)).
 
 ```json
 {
-  "command": "activate_scene",
-  "status": "accepted",
   "group_id": "1",
-  "scene_id": "Ab1Cd2Ef3G",
-  "suggested_poll_delay_s": 2,
-  "poll_endpoint": "/api/v1/hue/groups/1"
+  "name": "Living Room",
+  "type": "Room",
+  "group_class": "Living room",
+  "lights": ["5", "6", "7"],
+  "any_on": true,
+  "all_on": true,
+  "brightness": 144,
+  "color_temp": 447,
+  "colormode": "ct",
+  "data_confirmed": true
 }
 ```
-
-After `suggested_poll_delay_s` seconds, poll the `poll_endpoint` to read the updated group state.
 
 **curl:**
 
@@ -448,7 +483,7 @@ curl -X POST YOUR_BASE_URL/api/v1/hue/groups/1/scenes/Ab1Cd2Ef3G \
 
 | Status | Condition |
 |--------|-----------|
-| `404 Not Found` | `group_id` not found, or `scene_id` not found / does not belong to this group |
+| `404 Not Found` | `group_id` not found (`detail` string), or `scene_id` not found / not in this group / deleted on the Bridge (problem+json with extension members `error: "scene_not_found"`, `scene_id` -- see note below) |
 | `502 Bad Gateway` | Bridge returned an API error |
 | `503 Service Unavailable` | Bridge UNREACHABLE or client not initialized |
 | `504 Gateway Timeout` | Bridge request timed out |
@@ -457,11 +492,25 @@ curl -X POST YOUR_BASE_URL/api/v1/hue/groups/1/scenes/Ab1Cd2Ef3G \
 
 ## Control Endpoints
 
-### Polling After Commands
+### Mutation responses
 
-Hue light transitions are fast (typically <1 second) but the Bridge processes commands asynchronously. All control endpoints return **202 Accepted** immediately with a fire-and-forget pattern and include a `suggested_poll_delay_s` hint.
+All control endpoints (`PUT /lights/{id}/state`, `PUT /groups/{id}/action`, `POST /groups/{id}/scenes/{scene_id}`) return **HTTP 200** (not 202) with the full resource state. After the Bridge accepts the command, the backend waits `REPOLL_DELAY_S` (0.5 s), re-polls lights + groups, updates the cache (pushing the `hue` WS topic) and returns:
 
-After sending a command, wait `suggested_poll_delay_s` seconds then poll the `poll_endpoint` to read the updated state. Color and effect transitions may take slightly longer to complete.
+| Endpoint | Response model | Body |
+|----------|----------------|------|
+| `PUT /lights/{light_id}/state` | `HueLightStateMutationResponse` | `HueLight` fields + `data_confirmed` |
+| `PUT /groups/{group_id}/action` | `HueGroupMutationResponse` | `HueGroup` fields + `data_confirmed` |
+| `POST /groups/{group_id}/scenes/{scene_id}` | `HueGroupMutationResponse` | `HueGroup` fields + `data_confirmed` |
+
+```typescript
+// Source: api/providers/hue/routes.py
+interface HueLightStateMutationResponse extends HueLight { data_confirmed: boolean; }
+interface HueGroupMutationResponse extends HueGroup { data_confirmed: boolean; }
+```
+
+`data_confirmed: false` means the command was sent but the re-poll failed; fields then come from the previous cache. There is no `suggested_poll_delay_s` / `poll_endpoint`. `custom_name` / `device_type` in `HueLightStateMutationResponse` are always `null` (registry enrichment is only applied by the GET endpoints).
+
+> **Structured errors:** routes that raise with an object detail (e.g. `{"error": ..., "message": ..., ...}`) are returned as RFC 9457 `application/problem+json`: `detail` is the `message` string and the remaining keys (`error`, ...) are top-level extension members next to `type`/`title`/`status` (`api/errors.py`).
 
 ---
 
@@ -496,26 +545,50 @@ interface HueLightStateRequest {
   ct?: number;                      // 153-500 mirek (153=cool/6500K, 500=warm/2000K)
   hue?: number;                     // 0-65535 (activates colormode "hs" automatically)
   sat?: number;                     // 0-254 (activates colormode "hs" automatically)
+  xy?: [number, number];            // CIE 1931 [x, y], each float 0.0-1.0 (activates colormode "xy")
   effect?: "none" | "colorloop";    // "colorloop" for continuous color cycle
   alert?: "none" | "select" | "lselect"; // "select"=single flash, "lselect"=15s cycle
   // At least one field required -- 422 if all omitted
 }
 ```
 
-**Response (202):**
+**Request fields:**
+
+| Field | Type | Range | Notes |
+|-------|------|-------|-------|
+| `on` | boolean | -- | Turn on / off |
+| `bri` | integer | 0-254 | Bridge native brightness (not a percentage) |
+| `ct` | integer | 153-500 | Colour temperature in mirek (153 = 6500K cool, 500 = 2000K warm); colormode becomes `ct` |
+| `hue` | integer | 0-65535 | Hue angle; colormode becomes `hs` |
+| `sat` | integer | 0-254 | Saturation; colormode becomes `hs` |
+| `xy` | `[float, float]` | each 0.0-1.0 | CIE 1931 chromaticity `[x, y]`, exactly 2 items; forwarded as-is to the Bridge, which switches colormode to `xy` (xy takes precedence over `hue`/`sat` and `ct` on the Bridge). Values outside 0..1 or a list of length != 2 → 422 |
+| `effect` | string | `none`, `colorloop` | `colorloop` = continuous colour cycle |
+| `alert` | string | `none`, `select`, `lselect` | `select` = one flash, `lselect` = 15 s cycle |
+
+Only non-null fields are forwarded to the Bridge. The response does not echo `xy`: after an xy command `colormode` reads `"xy"` and `hue`/`saturation` reflect the Bridge-computed values.
+
+**Response (200):** `HueLightStateMutationResponse` (see [Mutation responses](#mutation-responses)).
 
 ```json
 {
-  "command": "set_light_state",
-  "status": "accepted",
   "light_id": "1",
-  "requested_state": {
-    "on": true,
-    "bri": 200,
-    "ct": 370
-  },
-  "suggested_poll_delay_s": 2,
-  "poll_endpoint": "/api/v1/hue/lights/1"
+  "name": "Bedside Lamp",
+  "on": true,
+  "brightness": 200,
+  "ct_mirek": 370,
+  "ct_kelvin": 2703,
+  "hue": null,
+  "saturation": null,
+  "colormode": "ct",
+  "reachable": true,
+  "capability_tier": "ambiance",
+  "room_id": "2",
+  "room_name": "Bedroom",
+  "model_id": "LTC001",
+  "light_type": "Color temperature light",
+  "custom_name": null,
+  "device_type": null,
+  "data_confirmed": true
 }
 ```
 
@@ -552,6 +625,12 @@ curl -X PUT YOUR_BASE_URL/api/v1/hue/lights/5/state \
   -H "Content-Type: application/json" \
   -d '{"hue": 10000, "sat": 200, "bri": 200}'
 
+# Set color via CIE xy (color lights only) -- e.g. a saturated red
+curl -X PUT YOUR_BASE_URL/api/v1/hue/lights/5/state \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"xy": [0.675, 0.322], "bri": 200}'
+
 # Enable colorloop effect
 curl -X PUT YOUR_BASE_URL/api/v1/hue/lights/5/state \
   -H "X-API-Key: YOUR_API_KEY" \
@@ -564,7 +643,7 @@ curl -X PUT YOUR_BASE_URL/api/v1/hue/lights/5/state \
 | Status | Condition |
 |--------|-----------|
 | `404 Not Found` | `light_id` not found in cache |
-| `409 Conflict` | Light is unreachable (last poll shows `reachable: false`) -- command not forwarded |
+| `409 Conflict` | Light is unreachable (last poll shows `reachable: false`) -- command not forwarded (problem+json with `error: "light_unreachable"`, `light_id`; see [Mutation responses](#mutation-responses)) |
 | `422 Unprocessable Entity` | Empty request body, or field value outside valid range |
 | `502 Bad Gateway` | Bridge returned an API error |
 | `503 Service Unavailable` | Bridge UNREACHABLE or light data not yet available |
@@ -574,11 +653,12 @@ curl -X PUT YOUR_BASE_URL/api/v1/hue/lights/5/state \
 
 ```json
 {
-  "detail": {
-    "error": "light_unreachable",
-    "light_id": "5",
-    "message": "Light 5 is unreachable \u2014 command not forwarded"
-  }
+  "type": "about:blank",
+  "title": "Conflict",
+  "status": 409,
+  "detail": "Light 5 is unreachable — command not forwarded",
+  "error": "light_unreachable",
+  "light_id": "5"
 }
 ```
 
@@ -598,21 +678,23 @@ Applies on/off, brightness, color temperature, or color to all lights in a group
 |------|------|-------------|
 | `group_id` | string | Bridge-assigned string group ID (e.g. `"1"`, `"3"`) |
 
-**Request body:** Same `HueLightStateRequest` shape as `PUT /lights/{id}/state` above. At least one field required.
+**Request body:** Same `HueLightStateRequest` shape as `PUT /lights/{id}/state` above (including `xy: [x, y]`). At least one field required.
 
-**Response (202):**
+**Response (200):** `HueGroupMutationResponse` (see [Mutation responses](#mutation-responses)).
 
 ```json
 {
-  "command": "set_group_action",
-  "status": "accepted",
   "group_id": "1",
-  "requested_state": {
-    "on": true,
-    "bri": 200
-  },
-  "suggested_poll_delay_s": 2,
-  "poll_endpoint": "/api/v1/hue/groups/1"
+  "name": "Living Room",
+  "type": "Room",
+  "group_class": "Living room",
+  "lights": ["5", "6", "7"],
+  "any_on": true,
+  "all_on": true,
+  "brightness": 200,
+  "color_temp": 370,
+  "colormode": "ct",
+  "data_confirmed": true
 }
 ```
 
@@ -630,6 +712,12 @@ curl -X PUT YOUR_BASE_URL/api/v1/hue/groups/1/action \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"on": true, "bri": 204, "ct": 370}'
+
+# Set group colour via CIE xy
+curl -X PUT YOUR_BASE_URL/api/v1/hue/groups/1/action \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"xy": [0.3227, 0.329]}'
 ```
 
 **Error responses:**
@@ -747,6 +835,7 @@ Returns paginated Hue light state history with automatic granularity selection. 
       "avg_brightness": null,
       "min_brightness": null,
       "max_brightness": null,
+      "avg_color_temp": null,
       "on_minutes": null,
       "sample_count": null
     }
@@ -780,6 +869,7 @@ Returns paginated Hue light state history with automatic granularity selection. 
       "avg_brightness": 185.3,
       "min_brightness": 100,
       "max_brightness": 254,
+      "avg_color_temp": 366.4,
       "on_minutes": 45,
       "sample_count": 120
     }
@@ -811,6 +901,7 @@ Returns paginated Hue light state history with automatic granularity selection. 
 | `avg_brightness` | null | float or null | float or null |
 | `min_brightness` | null | int or null | int or null |
 | `max_brightness` | null | int or null | int or null |
+| `avg_color_temp` | null | float or null (mirek) | float or null (mirek) |
 | `on_minutes` | null | int or null | int or null |
 | `sample_count` | null | int or null | int or null |
 
@@ -837,6 +928,7 @@ interface HueHistoryItem {
   avg_brightness: number | null;
   min_brightness: number | null;
   max_brightness: number | null;
+  avg_color_temp: number | null;  // mirek, aggregated tiers only
   on_minutes: number | null;
   sample_count: number | null;
 }
@@ -994,7 +1086,7 @@ const res = await fetch(`${process.env.API_BASE_URL}/api/v1/hue/lights`, {
   headers: { "X-API-Key": process.env.API_KEY! },
 });
 if (!res.ok) throw new Error(`Hue lights error: ${res.status}`);
-const lights = await res.json() as HueLight[];
+const { lights } = await res.json() as HueLightsListResponse;
 ```
 
 ### Control: Set Light State
@@ -1021,22 +1113,11 @@ if (res.status === 409) {
 }
 if (!res.ok) throw new Error(`Set light state error: ${res.status}`);
 
-const result = await res.json() as {
-  command: string;
-  status: string;
-  light_id: string;
-  requested_state: Partial<HueLightStateRequest>;
-  suggested_poll_delay_s: number;
-  poll_endpoint: string;
-};
-
-// Wait then poll for updated state
-await new Promise((r) => setTimeout(r, result.suggested_poll_delay_s * 1000));
-const updated = await fetch(
-  `${process.env.API_BASE_URL}${result.poll_endpoint}`,
-  { headers: { "X-API-Key": process.env.API_KEY! } }
-);
-const updatedLight = await updated.json() as HueLight;
+// 200 with the re-polled light state -- no follow-up GET needed
+const updatedLight = await res.json() as HueLightStateMutationResponse;
+if (!updatedLight.data_confirmed) {
+  // command sent, but values are from the previous cache
+}
 ```
 
 ### Scenes: List and Activate
@@ -1059,8 +1140,8 @@ const activateRes = await fetch(
   }
 );
 if (!activateRes.ok) throw new Error(`Activate scene error: ${activateRes.status}`);
-const activation = await activateRes.json();
-// activation.suggested_poll_delay_s and .poll_endpoint available for follow-up
+const group = await activateRes.json() as HueGroupMutationResponse;
+// group is the re-polled group state (any_on, brightness, ...) + data_confirmed
 ```
 
 ### History: Query with Pagination
@@ -1093,8 +1174,8 @@ const totalPages = Math.ceil(history.total / history.page_size);
 | `HueLight` fields (all 15 fields) | HIGH | Extracted from `HueLightStateResponse` Pydantic model in `routes.py` | VERIFIED 2026-03-19 -- 4 lights, all fields present including room enrichment; all 4 are `capability_tier: "color"` |
 | `HueGroup` fields (all 10 fields) | HIGH | Extracted from `HueGroupResponse` Pydantic model in `routes.py` | VERIFIED 2026-03-19 -- 5 groups (1 Room, 1 Entertainment, 2 Zone types, 1 Room); `lights` field confirmed (not `light_ids`) |
 | `HueScene` fields (all 6 fields) | HIGH | Extracted from `HueSceneResponse` Pydantic model in `routes.py` | VERIFIED 2026-03-19 -- 38 scenes across groups 1, 3, 4, 5; 1 scene has `group_id: "0"` (Hue special group) which is valid Bridge behavior |
-| `HueLightStateRequest` fields (`on`, `bri`, `ct`, `hue`, `sat`, `effect`, `alert`) | HIGH | Extracted from `HueLightStateRequest` Pydantic model in `routes.py` | VERIFIED 2026-03-19 -- PUT bri=100 returned 202 accepted |
-| 202 response bodies (control + scene endpoints) | HIGH | Extracted from `JSONResponse(content={...})` in route handlers | VERIFIED 2026-03-19 -- `command`, `status`, `light_id`, `requested_state`, `suggested_poll_delay_s`, `poll_endpoint` all present |
+| `HueLightStateRequest` fields (`on`, `bri`, `ct`, `hue`, `sat`, `xy`, `effect`, `alert`) | HIGH | Extracted from `HueLightStateRequest` Pydantic model in `routes.py` | VERIFIED 2026-03-19; `xy` added 2026-09-24 (code-verified) |
+| Control + scene response bodies (`HueLightStateMutationResponse` / `HueGroupMutationResponse`, HTTP 200 + `data_confirmed`) | HIGH | Pydantic `response_model` in route handlers | Code-verified 2026-09-24 (replaces the old 202 `suggested_poll_delay_s` bodies) |
 | `HueHistoryItem` raw fields (`on_state`, `reachable` as integer 0/1) | HIGH | Pydantic model `Optional[int]` + `database.py` `1 if state.get("on") else 0` | Integer not boolean -- verified in both model and DB layer |
 | `HueHistoryResponse` `from`/`to` serialization alias | HIGH | `Field(None, serialization_alias="from")` in `HueHistoryResponse` | VERIFIED 2026-03-19 -- response uses `from`/`to` keys |
 | Auto-granularity thresholds (48h raw, 30d hourly, >30d daily) | HIGH | `_resolve_hue_granularity()` in `routes.py` | VERIFIED 2026-03-19 -- defaults to daily when no range specified |
@@ -1117,14 +1198,9 @@ const totalPages = Math.ceil(history.total / history.page_size);
 
 Fetch subsequent pages by incrementing `page`. The `from`, `to`, and `light_id` parameters must be repeated on each page request -- they are not preserved server-side.
 
-### Polling After Commands
+### Control Responses
 
-Control endpoints (PUT /lights/{id}/state, PUT /groups/{id}/action, POST .../scenes/{id}) return 202 immediately. The response always includes:
-
-- `suggested_poll_delay_s`: number of seconds to wait before polling (typically 2)
-- `poll_endpoint`: URL path to poll for updated state
-
-This fire-and-forget pattern avoids blocking on Bridge round-trips. Wait `suggested_poll_delay_s` seconds, then GET the `poll_endpoint` to confirm the new state.
+Control endpoints (PUT /lights/{id}/state, PUT /groups/{id}/action, POST .../scenes/{id}) return **200** with the re-polled resource state plus `data_confirmed` (see [Mutation responses](#mutation-responses)). No follow-up polling is needed; the `hue` WS topic also receives the updated state.
 
 ### Data Freshness Handling
 

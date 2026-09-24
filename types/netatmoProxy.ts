@@ -37,6 +37,8 @@ export interface NetatmoProxyRoomMeasurement {
   therm_setpoint_temperature: number | null;
   heating_power_request: number | null;
   timestamp: number;
+  custom_name?: string | null;  // device registry (keyed by module_id)
+  device_type?: string | null;  // device registry type slug
 }
 
 /**
@@ -261,6 +263,8 @@ export interface StreamUrls {
 export interface CameraStreamResponse {
   camera_id: string;
   vpn_streams: StreamUrls;
+  /** Authenticated proxy URLs — the ones a browser can play (VPN URLs cannot). */
+  proxy_streams?: StreamUrls;
   is_local: boolean;
   local_streams?: StreamUrls;
 }
@@ -272,6 +276,8 @@ export interface CameraStreamResponse {
 export interface CameraSnapshotUrlResponse {
   camera_id: string;
   snapshot_url: string;
+  /** Backend-proxied JPEG endpoint (browser-safe). */
+  snapshot_proxy_url?: string;
 }
 
 /**

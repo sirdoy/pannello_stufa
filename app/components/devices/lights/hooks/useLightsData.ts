@@ -141,7 +141,9 @@ export function useLightsData(): UseLightsDataReturn {
         return;
       }
       const health = await response.json() as { connected?: boolean; data_freshness?: string; success?: boolean };
-      setConnected(health.connected ?? false);
+      // Backend `connected` is false on STALE cache too, while lights/groups are still
+      // served (200). Only UNREACHABLE (503, handled above) means no data.
+      setConnected(health.data_freshness !== 'UNREACHABLE');
       setStale(health.data_freshness === 'STALE');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
@@ -177,7 +179,7 @@ export function useLightsData(): UseLightsDataReturn {
     const handleMessage = (raw: unknown) => {
       const data = raw as Record<string, unknown>;
 
-      // WS sends Bridge v1 dicts — adapt to proxy-shaped arrays
+      // WS sends dicts keyed by id (REST-shaped entries) — adapt to proxy-shaped arrays
       const wsLights = adaptWsLights(data.lights);
       if (wsLights.length > 0) {
         setLights(wsLights);
@@ -193,9 +195,9 @@ export function useLightsData(): UseLightsDataReturn {
         setGroups(sortedGroups);
       }
 
-      // WS connection = live data
+      // Same rule as the HTTP health check: stale follows the backend cache freshness
       setConnected(true);
-      setStale(false);
+      setStale(data.data_freshness === 'STALE');
       setLoading(false);
       setError(null);
       setLastUpdatedAt(Date.now());

@@ -5,6 +5,12 @@ import type { BandwidthHistoryPoint } from '@/app/components/devices/network/typ
 
 export type BandwidthTier = 'realtime' | 'hourly' | 'daily' | 'auto';
 
+/**
+ * Backend default page size is 100 (7 days hourly = 168 rows would be truncated).
+ * 1000 = backend max (Query le=1000) and covers every tier requested here.
+ */
+const TIER_LIMIT = 1000;
+
 interface AggregatedRecord {
   timestamp: number;          // unified field (NOT hour_timestamp or day_timestamp)
   granularity: 'hourly' | 'daily';
@@ -85,7 +91,7 @@ export function useFritzBandwidthTiers(): {
 
     if (tier === 'auto') {
       setLoading(true);
-      fetch('/api/v1/fritzbox/history/bandwidth/auto?days=7')
+      fetch(`/api/v1/fritzbox/history/bandwidth/auto?days=7&limit=${TIER_LIMIT}`)
         .then((r) => r.json())
         .then((json: unknown) => {
           const data = json as { auto: { items: AggregatedRecord[] } };
@@ -108,8 +114,8 @@ export function useFritzBandwidthTiers(): {
 
     const endpoint =
       tier === 'hourly'
-        ? '/api/v1/fritzbox/history/bandwidth/hourly?days=7'
-        : '/api/v1/fritzbox/history/bandwidth/daily?days=30';
+        ? `/api/v1/fritzbox/history/bandwidth/hourly?days=7&limit=${TIER_LIMIT}`
+        : `/api/v1/fritzbox/history/bandwidth/daily?days=30&limit=${TIER_LIMIT}`;
 
     setLoading(true);
 

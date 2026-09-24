@@ -43,8 +43,9 @@ interface SonosTransportWsPayload {
   artist: string | null;
   album: string | null;
   album_art_url: string | null;
-  position: number | null;       // seconds (REST shape uses HH:MM:SS string)
-  duration: number | null;       // seconds
+  // Backend sends the raw SoCo "H:MM:SS" string (same as REST); seconds accepted too.
+  position: string | number | null;
+  duration: string | number | null;
   source_type: string | null;
 }
 
@@ -63,6 +64,13 @@ interface SonosVolumeWsZonePayload {
 interface SonosWsPayload {
   speakers?: SonosDeviceResponse[] | null;
   groups?: SonosZoneResponse[] | null;
+}
+
+const HMS_RE = /^\d+:\d{2}:\d{2}$/;
+
+function toHms(v: string | number | null): string | null {
+  if (typeof v === 'string') return HMS_RE.test(v) ? v : null;
+  return secondsToHms(v);
 }
 
 function secondsToHms(s: number | null): string | null {
@@ -96,8 +104,8 @@ function adaptTransport(raw: SonosTransportWsPayload): SonosPlaybackResponse {
     artist: raw.artist,
     album: raw.album,
     album_art_url: raw.album_art_url,
-    position: secondsToHms(raw.position),
-    duration: secondsToHms(raw.duration),
+    position: toHms(raw.position),
+    duration: toHms(raw.duration),
     source_type: isSourceType(raw.source_type),
   };
 }
@@ -246,6 +254,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
 
   // WS subscriptions — primary live channel. Subscribes to:
   //  - 'sonos'           → speakers + groups (snapshot on subscribe)
+  //  - 'sonos_topology'  → speakers + groups after group/ungroup (push-only)
   //  - 'sonos_transport' → playback per group_id (push-only)
   //  - 'sonos_volume'    → volume per speaker or zone (push-only)
   // EQ / home-theater / play-mode / sleep-timer are not on WS — they keep the
@@ -311,10 +320,12 @@ export function useSonosFullData(): UseSonosFullDataReturn {
     };
 
     subscribe('sonos', handleSonos);
+    subscribe('sonos_topology', handleSonos); // group/ungroup repoll — same {speakers, groups} shape
     subscribe('sonos_transport', handleTransport);
     subscribe('sonos_volume', handleVolume);
     return () => {
       unsubscribe('sonos', handleSonos);
+      unsubscribe('sonos_topology', handleSonos);
       unsubscribe('sonos_transport', handleTransport);
       unsubscribe('sonos_volume', handleVolume);
     };

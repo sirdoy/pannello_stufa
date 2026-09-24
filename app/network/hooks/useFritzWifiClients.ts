@@ -10,7 +10,7 @@ export interface WiFiClient {
   ip: string;
   band: string;               // "2.4GHz" or "5GHz"
   ssid: string;
-  signal_strength: number;    // dBm (negative integer)
+  signal_strength: number;    // quality 0-100 (Fritz!Box scale, not dBm)
   link_speed_mbps: number;
   is_active: boolean;
 }
@@ -63,9 +63,10 @@ export function useFritzWifiClients(options: UseFritzWifiClientsOptions = {}): {
         setStale(true);
         return;
       }
-      const json = await res.json() as { clients: { items: WiFiClient[]; total: number } };
+      // Backend PaginatedResponse: { items, total_count, limit, offset }
+      const json = await res.json() as { clients: { items: WiFiClient[]; total_count: number } };
       setClients(json.clients.items);
-      setTotal(json.clients.total);
+      setTotal(json.clients.total_count ?? json.clients.items.length);
       setStale(false);
     } catch {
       setStale(true);

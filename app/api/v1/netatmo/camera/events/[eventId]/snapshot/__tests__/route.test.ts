@@ -40,6 +40,8 @@ describe('GET /api/v1/netatmo/camera/events/[eventId]/snapshot', () => {
     mockGetCameraEventSnapshot.mockResolvedValue({
       body: mockBody,
       status: 200,
+      ok: true,
+      headers: new Headers({ 'Content-Type': 'image/jpeg' }),
     } as any);
 
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/events/evt_123/snapshot');
@@ -49,5 +51,21 @@ describe('GET /api/v1/netatmo/camera/events/[eventId]/snapshot', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('Content-Type')).toBe('image/jpeg');
     expect(mockGetCameraEventSnapshot).toHaveBeenCalledWith('evt_123');
+  });
+
+  it('forwards a backend 404 with no-store instead of a cached 200 JPEG', async () => {
+    mockGetCameraEventSnapshot.mockResolvedValue({
+      body: null,
+      status: 404,
+      ok: false,
+      headers: new Headers({ 'Content-Type': 'application/problem+json' }),
+    } as any);
+
+    const request = new Request('http://localhost:3000/api/v1/netatmo/camera/events/evt_123/snapshot');
+    const response = await GET(request as any, mockContext as any);
+
+    expect(response.status).toBe(404);
+    expect(response.headers.get('Content-Type')).toBe('application/problem+json');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
   });
 });

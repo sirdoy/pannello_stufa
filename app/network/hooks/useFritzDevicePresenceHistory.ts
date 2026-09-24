@@ -14,7 +14,9 @@ export interface DevicePresenceRecord {
   mac: string;
   name: string;
   ip: string;
-  is_online: boolean;
+  /** Backend DeviceHistoryRecord.is_online is an int: 1=online, 0=offline */
+  is_online: number;
+  connection_type?: string | null;
 }
 
 const PAGE_SIZE = 100;

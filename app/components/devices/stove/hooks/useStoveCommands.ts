@@ -11,7 +11,7 @@
  * - Persistent error toasts
  *
  * Commands return 202 Accepted (proxy convention).
- * Callers delay fetchStatusAndUpdate by suggested_poll_delay_s seconds.
+ * Callers refresh immediately when data_confirmed, else after a delay.
  * 409 Conflict indicates the proxy rejected the command due to current state.
  */
 
@@ -91,6 +91,15 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
   const setFanCmd = useRetryableCommand({ device: 'stove', action: 'setFan' });
   const setPowerCmd = useRetryableCommand({ device: 'stove', action: 'setPower' });
 
+  // The backend re-polls the stove before answering: when data_confirmed the status is
+  // already fresh, so refresh at once. Otherwise (re-poll failed, or a legacy backend
+  // with suggested_poll_delay_s) wait before reading the status again.
+  const waitBeforeRefresh = async (data: ThermorossiCommandResponse, fallbackDelayS: number) => {
+    if (data.data_confirmed) return;
+    const delayMs = (data.suggested_poll_delay_s ?? fallbackDelayS) * 1000;
+    await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+  };
+
   // Command handlers
   const handleIgnite = async () => {
     stoveData.setLoadingMessage('Accensione stufa...');
@@ -107,8 +116,7 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
         }
         const data = await response.json() as ThermorossiCommandResponse;
         await logStoveAction.ignite();
-        const delayMs = (data.suggested_poll_delay_s ?? 15) * 1000;
-        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+        await waitBeforeRefresh(data, 15);
         await stoveData.fetchStatusAndUpdate();
       }
       // If response is null, request was deduplicated (silently blocked)
@@ -132,8 +140,7 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
         }
         const data = await response.json() as ThermorossiCommandResponse;
         await logStoveAction.shutdown();
-        const delayMs = (data.suggested_poll_delay_s ?? 15) * 1000;
-        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+        await waitBeforeRefresh(data, 15);
         await stoveData.fetchStatusAndUpdate();
       }
       // If response is null, request was deduplicated (silently blocked)
@@ -158,8 +165,7 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
         }
         const data = await response.json() as ThermorossiCommandResponse;
         await logStoveAction.setFan(level);
-        const delayMs = (data.suggested_poll_delay_s ?? 5) * 1000;
-        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+        await waitBeforeRefresh(data, 5);
         await stoveData.fetchStatusAndUpdate();
       }
       // If response is null, request was deduplicated (silently blocked)
@@ -184,8 +190,7 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
         }
         const data = await response.json() as ThermorossiCommandResponse;
         await logStoveAction.setPower(level);
-        const delayMs = (data.suggested_poll_delay_s ?? 5) * 1000;
-        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+        await waitBeforeRefresh(data, 5);
         await stoveData.fetchStatusAndUpdate();
       }
       // If response is null, request was deduplicated (silently blocked)

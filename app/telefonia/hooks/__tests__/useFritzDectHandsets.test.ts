@@ -17,24 +17,20 @@ jest.mock('@/lib/hooks/useVisibility', () => ({
 }));
 
 describe('useFritzDectHandsets', () => {
+  // Real backend shape (DectListResponse, backend/api/models.py) wrapped by the Next route.
   const mockHandsets = [
-    {
-      id: '1',
-      name: 'Cucina',
-      model: 'C6',
-      firmware_version: '113.01',
-      battery_charge_level: 75,
-      is_registered: true,
-    },
-    {
-      id: '2',
-      name: 'Camera',
-      model: 'C5',
-      firmware_version: '112.00',
-      battery_charge_level: 15,
-      is_registered: true,
-    },
+    { dect_id: 1, name: 'Cucina', phonebook_id: 0, model: null, registration_status: 'registered' },
+    { dect_id: 2, name: 'Camera', phonebook_id: 0, model: null, registration_status: 'registered' },
   ];
+  const dectPayload = (overrides: Record<string, unknown> = {}) => ({
+    dect: {
+      handsets: mockHandsets,
+      handset_count: 2,
+      is_stale: false,
+      fetched_at: '2026-02-17T13:00:00Z',
+      ...overrides,
+    },
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -44,10 +40,7 @@ describe('useFritzDectHandsets', () => {
   it('fetches and stores handsets on success', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () =>
-        Promise.resolve({
-          dect: { items: mockHandsets, total_count: 2, limit: 50, offset: 0 },
-        }),
+      json: () => Promise.resolve(dectPayload()),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzDectHandsets());
@@ -58,9 +51,42 @@ describe('useFritzDectHandsets', () => {
 
     const fetchUrl = (global.fetch as jest.Mock).mock.calls[0][0] as string;
     expect(fetchUrl).toBe('/api/v1/fritzbox/telephony/dect');
-    expect(result.current.handsets).toHaveLength(2);
+    expect(result.current.handsets).toEqual(mockHandsets);
     expect(result.current.total).toBe(2);
     expect(result.current.stale).toBe(false);
+  });
+
+  it('uses handset_count for total and propagates is_stale', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(dectPayload({ handset_count: 5, is_stale: true })),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzDectHandsets());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.total).toBe(5);
+    expect(result.current.stale).toBe(true);
+  });
+
+  it('does not crash when handsets is missing (Firebase cache drops empty arrays)', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({ dect: { handset_count: 0, is_stale: false, fetched_at: null } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzDectHandsets());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.handsets).toEqual([]);
+    expect(result.current.total).toBe(0);
   });
 
   it('sets stale=true and empties list on non-OK response', async () => {
@@ -96,7 +122,7 @@ describe('useFritzDectHandsets', () => {
   it('stops polling (mockInterval === null) when paused: true', () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ dect: { items: [], total_count: 0, limit: 50, offset: 0 } }),
+      json: () => Promise.resolve(dectPayload({ handsets: [], handset_count: 0 })),
     }) as jest.Mock;
 
     renderHook(() => useFritzDectHandsets({ paused: true }));

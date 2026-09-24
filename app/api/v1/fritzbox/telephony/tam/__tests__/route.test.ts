@@ -23,12 +23,16 @@ const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 describe('GET /api/v1/fritzbox/telephony/tam', () => {
   let mockRequest: Request;
   const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  // Real backend shape (TamStatusResponse, backend/api/models.py).
   const mockData = {
-    enabled: true,
-    new_messages: 2,
-    total_messages: 5,
+    tam: {
+      total_messages: 5,
+      new_messages: 2,
+      tam_enabled: true,
+      tam_name: 'Anrufbeantworter',
+    },
     is_stale: false,
-    fetched_at: '2026-04-09T10:00:00+00:00',
+    fetched_at: '2026-04-09T10:00:00Z',
   };
 
   beforeEach(() => {
@@ -66,6 +70,7 @@ describe('GET /api/v1/fritzbox/telephony/tam', () => {
 
     expect(response.status).toBe(200);
     expect(data).toEqual({ success: true, tam: mockData });
+    expect(data.tam.tam.tam_enabled).toBe(true);
     expect(mockCheckRateLimit).toHaveBeenCalledWith('auth0|123', 'telephony-tam');
   });
 

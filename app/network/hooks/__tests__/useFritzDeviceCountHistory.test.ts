@@ -40,11 +40,11 @@ describe('useFritzDeviceCountHistory', () => {
     expect(result.current.chartData).toEqual([]);
   });
 
-  it('fetches /api/v1/fritzbox/history/devices/daily?days=30 on mount', async () => {
+  it('fetches devices/daily?days=30 with limit=720 (24 rows/day; backend default 100 would truncate) on mount', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
-        Promise.resolve({ deviceCounts: { items: mock48Records, total: 48 } }),
+        Promise.resolve({ deviceCounts: { items: mock48Records, total_count: 48, limit: 720, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzDeviceCountHistory());
@@ -54,7 +54,7 @@ describe('useFritzDeviceCountHistory', () => {
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      '/api/v1/fritzbox/history/devices/daily?days=30',
+      '/api/v1/fritzbox/history/devices/daily?days=30&limit=720',
     );
   });
 
@@ -62,7 +62,7 @@ describe('useFritzDeviceCountHistory', () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
-        Promise.resolve({ deviceCounts: { items: mock48Records, total: 48 } }),
+        Promise.resolve({ deviceCounts: { items: mock48Records, total_count: 48, limit: 720, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzDeviceCountHistory());
@@ -78,7 +78,7 @@ describe('useFritzDeviceCountHistory', () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
-        Promise.resolve({ deviceCounts: { items: mock48Records, total: 48 } }),
+        Promise.resolve({ deviceCounts: { items: mock48Records, total_count: 48, limit: 720, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzDeviceCountHistory());
@@ -100,7 +100,7 @@ describe('useFritzDeviceCountHistory', () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
-        Promise.resolve({ deviceCounts: { items: mock48Records, total: 48 } }),
+        Promise.resolve({ deviceCounts: { items: mock48Records, total_count: 48, limit: 720, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzDeviceCountHistory());
@@ -119,7 +119,7 @@ describe('useFritzDeviceCountHistory', () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
-        Promise.resolve({ deviceCounts: { items: reversedRecords, total: 48 } }),
+        Promise.resolve({ deviceCounts: { items: reversedRecords, total_count: 48, limit: 720, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzDeviceCountHistory());
@@ -137,7 +137,7 @@ describe('useFritzDeviceCountHistory', () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
-        Promise.resolve({ deviceCounts: { items: [], total: 0 } }),
+        Promise.resolve({ deviceCounts: { items: [], total_count: 0, limit: 720, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzDeviceCountHistory());
@@ -153,8 +153,28 @@ describe('useFritzDeviceCountHistory', () => {
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        '/api/v1/fritzbox/history/devices/daily?days=7',
+        '/api/v1/fritzbox/history/devices/daily?days=7&limit=168',
       );
+    });
+  });
+
+  it('caps limit at the backend max (1000) for long ranges', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ deviceCounts: { items: [], total_count: 0, limit: 1000, offset: 0 } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzDeviceCountHistory());
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    act(() => {
+      result.current.setDays(90);
+    });
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith('/api/v1/fritzbox/history/devices/daily?days=90&limit=1000');
     });
   });
 

@@ -89,7 +89,9 @@ export default function ScenesPage() {
       setError(null);
       const response = await fetch('/api/v1/hue/health');
       const data = await response.json();
-      if (data.connected) { setConnected(true); await fetchData(); }
+      // Backend returns 503 when UNREACHABLE; `connected` is false also on STALE
+      // cache, where lights/scenes are still served — don't block the page then.
+      if (response.ok && data.data_freshness !== 'UNREACHABLE') { setConnected(true); await fetchData(); }
       else { setConnected(false); }
     } catch (err) {
       console.error('Errore connessione Hue:', err);

@@ -185,7 +185,7 @@ export function DirigeraSheet({ sensors, loading }: DirigeraSheetProps) {
                   color: 'var(--text-1)',
                 }}
               >
-                <span>{s.custom_name}</span>
+                <span>{s.custom_name ?? s.id}</span>
                 <span style={{ color, fontWeight: 600 }}>{pct}%</span>
               </div>
             );
@@ -257,7 +257,7 @@ function SensorRow({ sensor }: SensorRowProps) {
   const isLow = typeof pct === 'number' && pct <= 25;
   return (
     <SheetRow
-      label={sensor.custom_name}
+      label={sensor.custom_name ?? sensor.id}
       value={`${room} · ${seen}`}
     >
       <div

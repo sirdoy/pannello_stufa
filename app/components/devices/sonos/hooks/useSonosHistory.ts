@@ -40,19 +40,18 @@ export function useSonosHistory(): UseSonosHistoryReturn {
     setLoading(true);
     setError(null);
     try {
-      const now = Date.now();
-      const start = new Date(now - TIME_RANGE_MS[timeRange]).toISOString();
-      const end = new Date(now).toISOString();
+      // Backend expects Unix epoch seconds (start/end: int), not ISO strings.
+      const nowS = Math.floor(Date.now() / 1000);
+      const params = new URLSearchParams({
+        type: historyType,
+        start: String(nowS - Math.floor(TIME_RANGE_MS[timeRange] / 1000)),
+        end: String(nowS),
+        limit: '200',
+      });
+      if (speakerFilter) params.set('speaker_uid', speakerFilter);
+      if (zoneFilter) params.set('group_id', zoneFilter);
 
-      let url = `/api/v1/sonos/history?type=${historyType}&start=${start}&end=${end}&limit=200`;
-      if (speakerFilter) {
-        url += `&speaker_uid=${speakerFilter}`;
-      }
-      if (zoneFilter) {
-        url += `&group_id=${zoneFilter}`;
-      }
-
-      const res = await fetch(url);
+      const res = await fetch(`/api/v1/sonos/history?${params.toString()}`);
       if (!res.ok) throw new Error('History failed');
       const json = (await res.json()) as SonosHistoryResponse;
       setData(json);

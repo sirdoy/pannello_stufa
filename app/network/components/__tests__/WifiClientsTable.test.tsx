@@ -37,7 +37,7 @@ describe('WifiClientsTable', () => {
       ip: '192.168.1.100',
       band: '5GHz',
       ssid: 'HomeWifi',
-      signal_strength: -45,
+      signal_strength: 85, // backend: quality 0-100, not dBm
       link_speed_mbps: 300,
       is_active: true,
     },
@@ -47,7 +47,7 @@ describe('WifiClientsTable', () => {
       ip: '192.168.1.101',
       band: '2.4GHz',
       ssid: 'HomeWifi',
-      signal_strength: -75,
+      signal_strength: 20,
       link_speed_mbps: 54,
       is_active: true,
     },
@@ -98,34 +98,35 @@ describe('WifiClientsTable', () => {
     expect(onBandChange).toHaveBeenCalledWith('all');
   });
 
-  it('renders SignalStrengthBars — 4 bars for strong signal (> -50)', () => {
+  const filledBars = (title: string) => {
+    const containers = document.querySelectorAll(`[title="${title}"]`);
+    expect(containers.length).toBe(1);
+    const barDivs = containers[0]!.querySelectorAll('.w-1\\.5');
+    expect(barDivs.length).toBe(4); // Always 4 bars
+    return Array.from(barDivs).filter((b) => b.classList.contains('bg-sage-400')).length;
+  };
+
+  it('renders SignalStrengthBars on the 0-100 quality scale — 4 bars for 85%', () => {
     render(<WifiClientsTable {...defaultProps} />);
-    // laptop has signal_strength -45 (> -50), should get 4 bars (all filled)
-    // We look for bar elements with the title showing the dBm value
-    const bars = document.querySelectorAll('[title="-45 dBm"]');
-    expect(bars.length).toBe(1); // The container div
-    // Check the bars inside: 4 divs, all with bg-sage-400
-    const container = bars[0];
-    const barDivs = container?.querySelectorAll('.w-1\\.5');
-    expect(barDivs?.length).toBe(4);
-    barDivs?.forEach((bar) => {
-      expect(bar).toHaveClass('bg-sage-400');
-    });
+    expect(filledBars('Segnale 85%')).toBe(4);
   });
 
-  it('renders SignalStrengthBars — 1 bar for weak signal (< -70)', () => {
+  it('renders SignalStrengthBars — 1 bar for weak quality (20%)', () => {
     render(<WifiClientsTable {...defaultProps} />);
-    // phone has signal_strength -75 (< -70), should get 1 bar
-    const bars = document.querySelectorAll('[title="-75 dBm"]');
-    expect(bars.length).toBe(1);
-    const container = bars[0];
-    const barDivs = container?.querySelectorAll('.w-1\\.5');
-    expect(barDivs?.length).toBe(4); // Always 4 bars, but only 1 filled
-    // First bar should be sage, rest should be slate
-    expect(barDivs?.[0]).toHaveClass('bg-sage-400');
-    expect(barDivs?.[1]).toHaveClass('bg-slate-600');
-    expect(barDivs?.[2]).toHaveClass('bg-slate-600');
-    expect(barDivs?.[3]).toHaveClass('bg-slate-600');
+    expect(filledBars('Segnale 20%')).toBe(1);
+  });
+
+  it.each([
+    [100, 4], [75, 4], [74, 3], [50, 3], [49, 2], [25, 2], [24, 1], [0, 1],
+  ])('quality %i%% → %i bars', (quality, expected) => {
+    const client = { ...mockClients[0]!, signal_strength: quality };
+    render(<WifiClientsTable {...defaultProps} clients={[client]} total={1} />);
+    expect(filledBars(`Segnale ${quality}%`)).toBe(expected);
+  });
+
+  it('never shows a dBm unit', () => {
+    render(<WifiClientsTable {...defaultProps} />);
+    expect(document.querySelector('[title*="dBm"]')).toBeNull();
   });
 
   it('renders ocean badge for 5GHz band', () => {

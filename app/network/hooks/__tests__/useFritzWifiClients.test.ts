@@ -26,7 +26,7 @@ describe('useFritzWifiClients', () => {
       ip: '192.168.1.100',
       band: '5GHz',
       ssid: 'HomeWifi',
-      signal_strength: -55,
+      signal_strength: 78,
       link_speed_mbps: 300,
       is_active: true,
     },
@@ -36,7 +36,7 @@ describe('useFritzWifiClients', () => {
       ip: '192.168.1.101',
       band: '2.4GHz',
       ssid: 'HomeWifi',
-      signal_strength: -70,
+      signal_strength: 40,
       link_speed_mbps: 54,
       is_active: true,
     },
@@ -50,7 +50,7 @@ describe('useFritzWifiClients', () => {
   it('fetches with no band param when band is "all"', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ clients: { items: mockClients, total: 2 } }),
+      json: () => Promise.resolve({ clients: { items: mockClients, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     renderHook(() => useFritzWifiClients());
@@ -68,7 +68,7 @@ describe('useFritzWifiClients', () => {
   it('fetches with band param when band is "5GHz"', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ clients: { items: [], total: 0 } }),
+      json: () => Promise.resolve({ clients: { items: [], total_count: 0, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzWifiClients());
@@ -95,7 +95,7 @@ describe('useFritzWifiClients', () => {
   it('stops polling (interval: null) when paused', () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ clients: { items: [], total: 0 } }),
+      json: () => Promise.resolve({ clients: { items: [], total_count: 0, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     renderHook(() => useFritzWifiClients({ paused: true }));
@@ -106,7 +106,7 @@ describe('useFritzWifiClients', () => {
   it('sets clients from json.clients.items on success', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ clients: { items: mockClients, total: 2 } }),
+      json: () => Promise.resolve({ clients: { items: mockClients, total_count: 2, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzWifiClients());
@@ -119,10 +119,25 @@ describe('useFritzWifiClients', () => {
     expect(result.current.total).toBe(2);
   });
 
+  it('reads total from backend total_count (not a non-existent total field)', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ clients: { items: mockClients, total_count: 7, limit: 2, offset: 0 } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzWifiClients());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.total).toBe(7);
+  });
+
   it('exposes setBand to change filter', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ clients: { items: [], total: 0 } }),
+      json: () => Promise.resolve({ clients: { items: [], total_count: 0, limit: 1000, offset: 0 } }),
     }) as jest.Mock;
 
     const { result } = renderHook(() => useFritzWifiClients());

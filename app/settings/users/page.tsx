@@ -365,7 +365,8 @@ function UsersSection() {
     };
   }, []);
 
-  if (forbidden) return null;
+  // Render nothing until /api/users answers: non-admins (403) never see the section
+  if (forbidden || (!users && !error)) return null;
 
   const upsert = (user: UserAdmin) =>
     setUsers((prev) => {
@@ -377,7 +378,6 @@ function UsersSection() {
     <GlassCard style={cardStyle} data-testid="users-card">
       <h2 style={{ fontSize: 17, fontWeight: 700, margin: '0 0 6px' }}>Utenti</h2>
       {error && <p role="alert" style={errorTextStyle}>{error}</p>}
-      {!users && !error && <p style={{ color: 'var(--text-2)', fontSize: 13 }}>Caricamento…</p>}
       {users && (
         <ul style={{ margin: 0, padding: 0 }}>
           {users.map((u) => (

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import UsersSettingsPage from '../page';
 
 const admin = {
@@ -22,12 +22,17 @@ describe('/settings/users page', () => {
     global.fetch = originalFetch;
   });
 
-  it('hides the admin section for non-admins but keeps password change', async () => {
-    mockFetch(() => ({ status: 403 }));
+  it('never shows the admin section to non-admins (not even while loading)', async () => {
+    let resolve: (v: Response) => void = () => {};
+    global.fetch = jest.fn(() => new Promise<Response>((r) => { resolve = r; })) as unknown as typeof fetch;
     render(<UsersSettingsPage />);
-    await waitFor(() => expect(calls().some(([u]) => u === '/api/users')).toBe(true));
     expect(screen.getByTestId('password-card')).toBeInTheDocument();
-    await waitFor(() => expect(screen.queryByTestId('users-card')).toBeNull());
+    expect(screen.queryByTestId('users-card')).toBeNull(); // pending request
+
+    await act(async () => {
+      resolve({ ok: false, status: 403, json: async () => ({}) } as Response);
+    });
+    expect(screen.queryByTestId('users-card')).toBeNull();
   });
 
   it('lists users for admins', async () => {

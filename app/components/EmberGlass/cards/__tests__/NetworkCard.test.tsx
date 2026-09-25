@@ -5,10 +5,11 @@
  *   - Large download Mbps + Italian subtitle ("{up} Mbps ↑ · {N} dispositivi").
  *   - StatusDot color flips from green (#6aa86a) → amber (#ffb84a) when WAN
  *     reports !connected (D-25 stale signal).
- *   - Tap opens placeholder Sheet with title "Rete".
- *   - Missing bandwidth/devices fall back to 0 (no crash).
+ *   - Tap opens the NetworkSheet; "Apri rete" navigates to /network.
+ *   - Nothing loaded (bandwidth/wan/devices empty) → "—" + "Non raggiungibile", red dot.
  */
 import { fireEvent, render } from '@testing-library/react';
+import { useRouter } from 'next/navigation';
 
 import NetworkCard from '../NetworkCard';
 
@@ -107,7 +108,9 @@ describe('NetworkCard (Phase 177 — DASH-08)', () => {
     ).toBe(true);
   });
 
-  test('(d) clicking card opens the placeholder sheet (data-state flips)', () => {
+  test('(d) clicking card opens the NetworkSheet; "Apri rete" navigates to /network', () => {
+    const push = jest.fn();
+    (useRouter as jest.Mock).mockReturnValue({ push });
     mockedUseNetworkData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,7 +120,7 @@ describe('NetworkCard (Phase 177 — DASH-08)', () => {
       })
     );
 
-    const { getByTestId, container } = render(<NetworkCard />);
+    const { getByTestId, getByText, container } = render(<NetworkCard />);
     const dialogBefore = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialogBefore?.getAttribute('data-state')).not.toBe('open');
 
@@ -125,16 +128,38 @@ describe('NetworkCard (Phase 177 — DASH-08)', () => {
 
     const dialogAfter = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialogAfter?.getAttribute('data-state')).toBe('open');
-    expect(dialogAfter?.textContent).toMatch(/Controlli in arrivo/i);
+    expect(dialogAfter?.textContent).toMatch(/120 ↓|350 ↓/);
+    expect(dialogAfter?.textContent).toMatch(/0 attivi · 0 totali/);
+
+    fireEvent.click(getByText('Apri rete'));
+    expect(push).toHaveBeenCalledWith('/network');
   });
 
-  test('(e) bandwidth=null + devices=[] fall back to 0 / "0 Mbps ↑ · 0 dispositivi"', () => {
+  test('(e) nothing loaded → "—" + "Non raggiungibile" + red dot', () => {
     mockedUseNetworkData.mockReturnValue(
       buildReturn({ bandwidth: null, devices: [], wan: null })
     );
 
     const { getByTestId, getByText } = render(<NetworkCard />);
-    expect(getByTestId('network-down')).toHaveTextContent('0');
-    expect(getByText(/0 Mbps ↑ · 0 dispositivi/)).toBeInTheDocument();
+    expect(getByTestId('network-down')).toHaveTextContent('—');
+    expect(getByText('Non raggiungibile')).toBeInTheDocument();
+    const bg = getByTestId('status-dot').style.background;
+    expect(bg.includes('#ff4d5c') || bg.includes('rgb(255, 77, 92)')).toBe(true);
+  });
+
+  test('(f) bandwidth loaded, no devices → "{up} Mbps ↑ · 0 dispositivi"', () => {
+    mockedUseNetworkData.mockReturnValue(
+      buildReturn({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        bandwidth: { download: 5.25, upload: 1.5, timestamp: Date.now() } as any,
+        devices: [],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        wan: { connected: true } as any,
+      })
+    );
+
+    const { getByTestId, getByText } = render(<NetworkCard />);
+    expect(getByTestId('network-down')).toHaveTextContent('5.3');
+    expect(getByText(/1.5 Mbps ↑ · 0 dispositivi/)).toBeInTheDocument();
   });
 });

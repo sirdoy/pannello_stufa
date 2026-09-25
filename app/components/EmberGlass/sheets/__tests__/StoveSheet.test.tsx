@@ -90,15 +90,16 @@ beforeEach(() => {
 });
 
 describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
-  test('renders OFF state hero + power/fan rows + Orari/Manutenzione + Accendi primary', () => {
+  test('renders OFF state hero + Orari/Manutenzione + Accendi primary, no power/fan rows', () => {
     stoveDataOverride = { isAccesa: false, powerLevel: 3, fanLevel: 2 };
     render(<StoveSheetSelfFetch />);
     expect(screen.getByTestId('stove-sheet')).toBeInTheDocument();
     expect(screen.getByTestId('stove-sheet-state')).toHaveTextContent('Spenta');
     expect(screen.getByTestId('stove-sheet-temp')).toHaveTextContent('3');
     expect(screen.getByTestId('stove-sheet-temp')).toHaveTextContent('/5');
-    expect(screen.getByText('Livello fiamma')).toBeInTheDocument();
-    expect(screen.getByText('Ventola')).toBeInTheDocument();
+    // Levels are hidden while the stove is off (68319047).
+    expect(screen.queryByTestId('stove-sheet-power-stepper')).toBeNull();
+    expect(screen.queryByTestId('stove-sheet-fan-stepper')).toBeNull();
     expect(screen.getByTestId('sheet-btn-orari')).toBeInTheDocument();
     expect(screen.getByTestId('sheet-btn-manutenzione')).toBeInTheDocument();
     expect(screen.getByTestId('stove-sheet-primary-action')).toHaveTextContent(
@@ -110,6 +111,8 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
     stoveDataOverride = { isAccesa: true, powerLevel: 4, fanLevel: 3 };
     render(<StoveSheetSelfFetch />);
     expect(screen.getByTestId('stove-sheet-state')).toHaveTextContent('In funzione');
+    expect(screen.getByText('Livello fiamma')).toBeInTheDocument();
+    expect(screen.getByText('Ventola')).toBeInTheDocument();
     expect(screen.getByTestId('stove-sheet-primary-action')).toHaveTextContent(
       'Spegni stufa',
     );
@@ -124,7 +127,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
   });
 
   test('clicking power stepper plus invokes handlePowerChange with String(value+1)', () => {
-    stoveDataOverride = { powerLevel: 3 };
+    stoveDataOverride = { isAccesa: true, powerLevel: 3 };
     render(<StoveSheetSelfFetch />);
     const powerWrap = screen.getByTestId('stove-sheet-power-stepper');
     const plus = powerWrap.querySelector(
@@ -137,7 +140,7 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05)', () => {
   });
 
   test('clicking fan stepper minus invokes handleFanChange with String(value-1)', () => {
-    stoveDataOverride = { fanLevel: 2 };
+    stoveDataOverride = { isAccesa: true, fanLevel: 2 };
     render(<StoveSheetSelfFetch />);
     const fanWrap = screen.getByTestId('stove-sheet-fan-stepper');
     const minus = fanWrap.querySelector(

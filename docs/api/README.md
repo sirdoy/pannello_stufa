@@ -289,6 +289,7 @@ Service health check. Returns overall status, cache age, per-provider health, an
     "last_run": 1771113600,
     "last_raw_bw_deleted": 8640,
     "last_raw_dev_deleted": 17280,
+    "last_raw_wifi_deleted": 604800,
     "last_hourly_bw_deleted": 0,
     "total_runs": 1
   }
@@ -321,6 +322,7 @@ interface RetentionStats {
   last_run: number | null;
   last_raw_bw_deleted: number | null;
   last_raw_dev_deleted: number | null;
+  last_raw_wifi_deleted: number | null;
   last_hourly_bw_deleted: number | null;
   total_runs: number;
 }

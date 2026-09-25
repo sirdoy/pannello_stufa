@@ -1,43 +1,94 @@
 /**
- * DirigeraCard — Phase 177 (DASH-10 sibling) — Jest unit tests
+ * DirigeraCard — Jest unit tests
  *
- * Per A-02 / RESEARCH LANDMINE #2: useDirigeraData() exposes sensors only, NOT plugs.
- * The card renders an empty-list mode (0W, "0 di 0 accese", no rows). The hook is
- * still consumed so that a future phase can replace the empty array without re-wiring.
+ * The card summarises DIRIGERA contact + occupancy sensors from
+ * useDirigeraFullData('all') (the Phase 177 empty-plug placeholder is gone).
  */
 import { fireEvent, render } from '@testing-library/react';
 
 import DirigeraCard from '../DirigeraCard';
+import type { DirigeraSensor } from '@/types/dirigeraProxy';
 
-const useDirigeraDataMock = jest.fn();
-jest.mock('@/app/components/devices/dirigera/hooks/useDirigeraData', () => ({
-  useDirigeraData: () => useDirigeraDataMock(),
+const useDirigeraFullDataMock = jest.fn();
+jest.mock('@/app/components/devices/dirigera/hooks/useDirigeraFullData', () => ({
+  useDirigeraFullData: (filter: string) => useDirigeraFullDataMock(filter),
 }));
 
-describe('DirigeraCard (Phase 177 — DASH-10 / A-02)', () => {
+function sensor(overrides: Partial<DirigeraSensor>): DirigeraSensor {
+  return {
+    id: 's1',
+    type: 'openCloseSensor',
+    custom_name: null,
+    room: null,
+    firmware_version: null,
+    battery_percentage: 80,
+    is_reachable: true,
+    last_seen: '2026-09-25T10:00:00Z',
+    ...overrides,
+  };
+}
+
+function mockSensors(sensors: DirigeraSensor[] | null) {
+  useDirigeraFullDataMock.mockReturnValue({
+    data: sensors === null ? null : { sensors },
+    loading: sensors === null,
+    error: null,
+    stale: false,
+  });
+}
+
+const SENSORS: DirigeraSensor[] = [
+  sensor({ id: 'door', custom_name: 'Porta ingresso', is_open: true }),
+  sensor({ id: 'window', custom_name: 'Finestra bagno', is_open: false }),
+  sensor({ id: 'motion', type: 'occupancySensor', custom_name: 'Corridoio', is_detected: false }),
+];
+
+describe('DirigeraCard', () => {
   beforeEach(() => {
-    useDirigeraDataMock.mockReset();
-    useDirigeraDataMock.mockReturnValue({
-      data: {
-        health: { firmware_version: '', connected_sensors: 0, is_reachable: true },
-        summary: { total_sensors: 0, offline_count: 0, low_battery_count: 0, open_count: 0, is_stale: false },
-      },
-      loading: false,
-      error: null,
-      stale: false,
-      health: 'ok',
-      lastUpdatedAt: 1,
-    });
+    useDirigeraFullDataMock.mockReset();
+    mockSensors(SENSORS);
   });
 
-  test('right slot shows "0W" (empty plug list per A-02)', () => {
-    const { getByText } = render(<DirigeraCard />);
-    expect(getByText('0W')).toBeInTheDocument();
+  test('reads all sensors from useDirigeraFullData', () => {
+    render(<DirigeraCard />);
+    expect(useDirigeraFullDataMock).toHaveBeenCalledWith('all');
   });
 
-  test('footer shows "0 di 0 accese"', () => {
+  test('lists sensors with their state', () => {
     const { getByText } = render(<DirigeraCard />);
-    expect(getByText('0 di 0 accese')).toBeInTheDocument();
+    expect(getByText('Porta ingresso')).toBeInTheDocument();
+    expect(getByText('Aperto')).toBeInTheDocument();
+    expect(getByText('Chiuso')).toBeInTheDocument();
+    expect(getByText('Fermo')).toBeInTheDocument();
+  });
+
+  test('right slot and footer count active sensors', () => {
+    const { getByText } = render(<DirigeraCard />);
+    expect(getByText('1 aperti')).toBeInTheDocument();
+    expect(getByText('1 attivi di 3 sensori')).toBeInTheDocument();
+  });
+
+  test('detected motion counts as active', () => {
+    mockSensors([sensor({ id: 'm', type: 'occupancySensor', custom_name: 'Sala', is_detected: true })]);
+    const { getByText } = render(<DirigeraCard />);
+    expect(getByText('Movimento')).toBeInTheDocument();
+    expect(getByText('1 attivi di 1 sensori')).toBeInTheDocument();
+  });
+
+  test('all closed shows OK', () => {
+    mockSensors([sensor({ is_open: false })]);
+    const { getByText } = render(<DirigeraCard />);
+    expect(getByText('OK')).toBeInTheDocument();
+  });
+
+  test('loading and empty states', () => {
+    mockSensors(null);
+    const { getByText, rerender } = render(<DirigeraCard />);
+    expect(getByText('Caricamento…')).toBeInTheDocument();
+    mockSensors([]);
+    rerender(<DirigeraCard />);
+    expect(getByText('Nessun sensore')).toBeInTheDocument();
+    expect(getByText('—')).toBeInTheDocument();
   });
 
   test('clicking the card opens a sheet titled "IKEA"', () => {
@@ -46,18 +97,11 @@ describe('DirigeraCard (Phase 177 — DASH-10 / A-02)', () => {
     const dialog = queryByRole('dialog');
     expect(dialog).not.toBeNull();
     expect(dialog!.getAttribute('style') ?? '').toContain('translateY(0)');
-    // Sheet title lives inside the dialog (CardHead also renders "IKEA"; scope to dialog).
     expect(dialog!.textContent ?? '').toContain('IKEA');
   });
 
   test('NO inline toggle in card body (DASH-10)', () => {
     const { getByTestId } = render(<DirigeraCard />);
-    const card = getByTestId('dirigera-card');
-    expect(card.querySelectorAll('[role="switch"]').length).toBe(0);
-  });
-
-  test('card root has data-testid="dirigera-card"', () => {
-    const { getByTestId } = render(<DirigeraCard />);
-    expect(getByTestId('dirigera-card')).toBeInTheDocument();
+    expect(getByTestId('dirigera-card').querySelectorAll('[role="switch"]').length).toBe(0);
   });
 });

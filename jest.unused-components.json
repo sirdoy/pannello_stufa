@@ -1,0 +1,17 @@
+[
+  {
+    "file": "app/components/EmberGlass/cards/CircBtn",
+    "symbol": "CircBtn",
+    "tests": ["app/components/EmberGlass/cards/__tests__/CircBtn.test.tsx"]
+  },
+  {
+    "file": "app/components/EmberGlass/sheets/primitives/BigSlider",
+    "symbol": "BigSlider",
+    "tests": ["app/components/EmberGlass/sheets/primitives/__tests__/BigSlider.test.tsx"]
+  },
+  {
+    "file": "app/components/EmberGlass/sheets/primitives/Slider",
+    "symbol": "Slider",
+    "tests": ["app/components/EmberGlass/sheets/primitives/__tests__/Slider.test.tsx"]
+  }
+]

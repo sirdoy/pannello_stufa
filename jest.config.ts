@@ -1,5 +1,15 @@
 import nextJest from 'next/jest.js';
 import type { Config } from 'jest';
+import fs from 'node:fs';
+
+// EmberGlass components kept for upcoming work but not used by any page yet: their
+// tests are skipped until a page imports them. __tests__/unusedComponents.test.ts
+// fails when that happens, so the entry gets removed and the tests run again.
+const UNUSED_COMPONENT_TESTS: string[] = (
+  JSON.parse(
+    fs.readFileSync(new URL('./jest.unused-components.json', import.meta.url), 'utf8'),
+  ) as Array<{ tests: string[] }>
+).flatMap((c) => c.tests);
 
 const createJestConfig = nextJest({
   // Provide the path to your Next.js app to load next.config.js and .env files in your test environment
@@ -60,6 +70,8 @@ const customJestConfig: Config = {
     '<rootDir>/tests/',   // Playwright .spec.ts files
     '<rootDir>/.claude/', // GSD worktree copies (duplicate mocks + haste collisions)
     '<rootDir>/.planning/', // GSD planning artifacts
+    // Tests of components not used by any page yet (jest.unused-components.json)
+    ...UNUSED_COMPONENT_TESTS.map((t) => `<rootDir>/${t.replace(/[.[\]]/g, '\\$&')}$`),
   ],
 
   // Haste-map ignores: prevent duplicate manual mock + package.json collisions

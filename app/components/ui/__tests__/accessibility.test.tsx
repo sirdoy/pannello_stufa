@@ -20,11 +20,9 @@ import RadioGroup from '../RadioGroup';
 import Select from '../Select';
 import Slider from '../Slider';
 import Input from '../Input';
-import Label from '../Label';
 
 // Feedback Components
 import Spinner from '../Spinner';
-import Progress from '../Progress';
 import Banner from '../Banner';
 import EmptyState from '../EmptyState';
 
@@ -42,7 +40,6 @@ import ControlButton from '../ControlButton';
 import ConnectionStatus from '../ConnectionStatus';
 import HealthIndicator from '../HealthIndicator';
 import SmartHomeCard from '../SmartHomeCard';
-import DeviceCard from '../DeviceCard';
 import StatusCard from '../StatusCard';
 
 expect.extend(toHaveNoViolations);
@@ -136,7 +133,7 @@ describe('Accessibility Test Suite - All Components', () => {
         const { container } = render(
           <div>
             <Checkbox id="terms" />
-            <Label htmlFor="terms">Accept terms and conditions</Label>
+            <label htmlFor="terms">Accept terms and conditions</label>
           </div>
         );
         const results = await axe(container);
@@ -337,7 +334,7 @@ describe('Accessibility Test Suite - All Components', () => {
       test('with Label has no violations', async () => {
         const { container } = render(
           <div>
-            <Label htmlFor="email">Email Address</Label>
+            <label htmlFor="email">Email Address</label>
             <Input id="email" type="email" placeholder="you@example.com" />
           </div>
         );
@@ -346,19 +343,6 @@ describe('Accessibility Test Suite - All Components', () => {
       });
     });
 
-    describe('Label', () => {
-      test('standalone has no violations', async () => {
-        const { container } = render(<Label>Form Label</Label>);
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('required state has no violations', async () => {
-        const { container } = render(<Label>Required Field</Label>);
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-    });
   });
 
   // ==================== FEEDBACK COMPONENTS ====================
@@ -372,38 +356,6 @@ describe('Accessibility Test Suite - All Components', () => {
 
       test.each(['sm', 'md', 'lg'] as const)('%s size has no violations', async (size) => {
         const { container } = render(<Spinner size={size} />);
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-    });
-
-    describe('Progress', () => {
-      test('determinate has no violations', async () => {
-        const { container } = render(
-          <Progress value={50} aria-label="Loading progress" />
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('indeterminate has no violations', async () => {
-        const { container } = render(<Progress aria-label="Loading" />);
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('0% progress has no violations', async () => {
-        const { container } = render(
-          <Progress value={0} aria-label="Progress 0%" />
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('100% progress has no violations', async () => {
-        const { container } = render(
-          <Progress value={100} aria-label="Progress 100%" />
-        );
         const results = await axe(container);
         expect(results).toHaveNoViolations();
       });
@@ -877,73 +829,6 @@ describe('Accessibility Test Suite - All Components', () => {
           <SmartHomeCard icon="🔒" title="Disabled" disabled>
             Content
           </SmartHomeCard>
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-    });
-
-    describe('DeviceCard', () => {
-      test('basic has no violations', async () => {
-        const { container } = render(
-          <DeviceCard icon="🔥" title="Test Device">
-            Content
-          </DeviceCard>
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('with statusBadge has no violations', async () => {
-        const { container } = render(
-          <DeviceCard
-            icon="🌡️"
-            title="Thermostat"
-            statusBadge={{ label: 'Active', color: 'ember' }}
-          >
-            Content
-          </DeviceCard>
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('with healthStatus has no violations', async () => {
-        const { container } = render(
-          <DeviceCard icon="💡" title="Lights" healthStatus="ok">
-            Content
-          </DeviceCard>
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('disconnected with onConnect has no violations', async () => {
-        const { container } = render(
-          <DeviceCard
-            icon="📱"
-            title="Device"
-            connected={false}
-            onConnect={() => {}}
-            connectionError="Device not found"
-          />
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('with footerActions has no violations', async () => {
-        const { container } = render(
-          <DeviceCard
-            icon="🏠"
-            title="Smart Home"
-            footerActions={[
-              { label: 'Settings', onClick: () => {} },
-              { label: 'Disconnect', variant: 'danger', onClick: () => {} },
-            ]}
-          >
-            Content
-          </DeviceCard>
         );
         const results = await axe(container);
         expect(results).toHaveNoViolations();

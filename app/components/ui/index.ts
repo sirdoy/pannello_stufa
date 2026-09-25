@@ -26,13 +26,9 @@ export { default as Modal } from './Modal';
 export { default as FormModal, ErrorSummary, SuccessOverlay } from './FormModal';
 export { default as BottomSheet } from './BottomSheet';
 export { default as ProgressBar } from './ProgressBar';
-export { default as Panel } from './Panel';
 export { default as InfoBox } from './InfoBox';
-export { default as RoomSelector } from './RoomSelector';
-export { default as DeviceCard } from './DeviceCard';
 
 // Layout components (v1.31.0+)
-export { default as Container } from './Container';
 export { default as Grid } from './Grid';
 export { default as Section } from './Section';
 
@@ -41,7 +37,6 @@ export { default as Heading } from './Heading';
 export { default as Text } from './Text';
 
 // Primitive components (v1.31.0+)
-export { default as Icon } from './Icon';
 export { default as Divider } from './Divider';
 
 // Misc components (v1.31.0+)
@@ -71,11 +66,9 @@ export { default as Kbd } from './Kbd';
 
 // Feedback components (v3.0+)
 export { default as Spinner, spinnerVariants } from './Spinner';
-export { default as Progress, progressVariants } from './Progress';
 
 // Page layout components (v3.0+)
 export { default as PageLayout, pageLayoutVariants, PageHeader, PageContent, PageFooter } from './PageLayout';
-export { default as DashboardLayout, useSidebar, sidebarVariants, mainContentVariants } from './DashboardLayout';
 
 // Smart home components (v3.0+)
 export { default as Badge, badgeVariants } from './Badge';
@@ -99,7 +92,6 @@ export type { InputProps } from './Input';
 export type { BadgeProps } from './Badge';
 
 // Layout components
-export type { ContainerProps } from './Container';
 export type { GridProps } from './Grid';
 export type { SectionProps } from './Section';
 
@@ -108,7 +100,6 @@ export type { HeadingProps } from './Heading';
 export type { TextProps } from './Text';
 
 // Primitive components
-export type { IconProps } from './Icon';
 export type { DividerProps } from './Divider';
 
 // Namespace components
@@ -120,16 +111,13 @@ export type { PopoverProps, PopoverContentProps, PopoverCloseProps, PopoverArrow
 
 // Smart home components
 export type { SmartHomeCardProps, SmartHomeCardHeaderProps, SmartHomeCardStatusProps, SmartHomeCardControlsProps } from './SmartHomeCard';
-export type { DeviceCardProps } from './DeviceCard';
 export type { StatusCardProps } from './StatusCard';
 
 // Feedback components
 export type { SpinnerProps } from './Spinner';
-export type { ProgressProps } from './Progress';
 
 // Page layout components
 export type { PageLayoutProps, PageHeaderProps, PageContentProps, PageFooterProps } from './PageLayout';
-export type { DashboardLayoutProps } from './DashboardLayout';
 
 // DataTable
 export type { DataTableProps } from './DataTable';

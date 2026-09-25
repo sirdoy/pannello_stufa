@@ -78,7 +78,9 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    // Exclude: public API routes and static files
-    "/((?!api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
+    // Exclude: public API routes and static files (incl. Serwist PWA assets in public/:
+    // swe-worker-*/workbox-*/fallback-* scripts, splash images). Not a blanket
+    // "has an extension" rule: authenticated API routes like camera HLS end in .m3u8/.ts.
+    "/((?!api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|splash|manifest.json|sw.js|firebase-messaging-sw.js|swe-worker-|workbox-|fallback-).*)",
   ],
 };

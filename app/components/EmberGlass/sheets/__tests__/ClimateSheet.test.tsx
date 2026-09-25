@@ -111,44 +111,37 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
     expect(screen.getByText('Termovalvola radiatore')).toBeInTheDocument();
   });
 
-  test("Test 4: zone.on derived from mode !== 'hg' (toggle aria-checked off when hg)", () => {
-    dataOverride = {
-      status: {
-        mode: 'schedule',
-        rooms: [
-          { room_id: 'r1', temperature: 21, setpoint: 20, mode: 'hg', heating: false },
-          { room_id: 'r2', temperature: 19, setpoint: 18, mode: 'manual', heating: false },
-        ],
-      } as unknown as Record<string, unknown>,
-    };
+  test('Test 4: Tipo row is informational — no switch, no room-mode write', () => {
     render(<ClimateSheetSelfFetch />);
-    const toggleWrap = screen.getByTestId('climate-sheet-tipo-toggle');
-    expect(toggleWrap).toBeInTheDocument();
-    const switchEl = toggleWrap.querySelector('[role="switch"]');
-    expect(switchEl).not.toBeNull();
-    expect(switchEl).toHaveAttribute('aria-checked', 'false');
+    expect(screen.queryByTestId('climate-sheet-tipo-toggle')).toBeNull();
+    const tipoRow = screen.getByText('Termostato di stanza').parentElement as HTMLElement;
+    expect(tipoRow.querySelector('[role="switch"]')).toBeNull();
   });
 
-  test('Test 5: debounces setpoint write 500ms after RadialDial plus click', () => {
+  test('Test 5: dial change does not write; "Applica" confirms the setpoint (c7749321)', () => {
     render(<ClimateSheetSelfFetch />);
+    expect(screen.queryByTestId('climate-sheet-apply-setpoint')).toBeNull();
     fireEvent.click(screen.getByTestId('radial-dial-plus'));
-    expect(mockSetRoomSetpoint).not.toHaveBeenCalled();
     act(() => {
-      jest.advanceTimersByTime(500);
+      jest.advanceTimersByTime(2000);
     });
+    expect(mockSetRoomSetpoint).not.toHaveBeenCalled();
+    const apply = screen.getByTestId('climate-sheet-apply-setpoint');
+    expect(apply).toHaveTextContent('Applica 21.0°');
+    fireEvent.click(apply);
+    expect(mockSetRoomSetpoint).toHaveBeenCalledTimes(1);
     expect(mockSetRoomSetpoint).toHaveBeenCalledWith('r1', 21);
   });
 
-  test('Test 6: debouncing collapses 5 rapid plus clicks into one setpoint write', () => {
+  test('Test 6: several dial clicks produce a single write with the final value', () => {
     render(<ClimateSheetSelfFetch />);
     for (let i = 0; i < 5; i++) {
       fireEvent.click(screen.getByTestId('radial-dial-plus'));
     }
-    act(() => {
-      jest.advanceTimersByTime(500);
-    });
+    expect(mockSetRoomSetpoint).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByTestId('climate-sheet-apply-setpoint'));
     expect(mockSetRoomSetpoint).toHaveBeenCalledTimes(1);
-    // Initial target was 20; +5 clicks → 25 (clamped at max=28).
+    // Initial target was 20; +5 clicks → 25 (max=28).
     expect(mockSetRoomSetpoint).toHaveBeenCalledWith('r1', 25);
   });
 
@@ -195,30 +188,25 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
     );
   });
 
-  test('Test 10a: Tipo InlineToggle click on zone with mode!==hg calls setRoomMode(zoneId, "home")', () => {
-    // r1 starts on (mode=schedule). Clicking the toggle flips off → 'home'.
-    render(<ClimateSheetSelfFetch />);
-    const toggleWrap = screen.getByTestId('climate-sheet-tipo-toggle');
-    const switchEl = toggleWrap.querySelector('[role="switch"]') as HTMLElement;
-    fireEvent.click(switchEl);
-    expect(mockSetRoomMode).toHaveBeenCalledWith('r1', 'home');
-  });
-
-  test('Test 10b: Tipo InlineToggle click on zone with mode==hg calls setRoomMode(zoneId, "manual")', () => {
+  test('Test 10: manual override shows "Torna al programma" → setRoomMode(zoneId, "home")', () => {
     dataOverride = {
       status: {
         mode: 'schedule',
         rooms: [
-          { room_id: 'r1', temperature: 21, setpoint: 20, mode: 'hg', heating: false },
+          { room_id: 'r1', temperature: 21, setpoint: 23, mode: 'manual', heating: true },
           { room_id: 'r2', temperature: 19, setpoint: 18, mode: 'home', heating: false },
         ],
       } as unknown as Record<string, unknown>,
     };
     render(<ClimateSheetSelfFetch />);
-    const toggleWrap = screen.getByTestId('climate-sheet-tipo-toggle');
-    const switchEl = toggleWrap.querySelector('[role="switch"]') as HTMLElement;
-    fireEvent.click(switchEl);
-    expect(mockSetRoomMode).toHaveBeenCalledWith('r1', 'manual');
+    fireEvent.click(screen.getByTestId('climate-sheet-clear-override'));
+    expect(mockSetRoomMode).toHaveBeenCalledTimes(1);
+    expect(mockSetRoomMode).toHaveBeenCalledWith('r1', 'home');
+  });
+
+  test('Test 10b: zone following the schedule has no "Torna al programma"', () => {
+    render(<ClimateSheetSelfFetch />);
+    expect(screen.queryByTestId('climate-sheet-clear-override')).toBeNull();
   });
 
   test('Test 11: renders empty state Nessuna zona configurata when topology has 0 rooms', () => {

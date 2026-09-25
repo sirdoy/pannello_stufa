@@ -12,11 +12,13 @@
  * Visual contract verbatim from bundle `sheets.jsx:131-197`. Italian copy frozen (D-20).
  *
  * Key behavioral details:
- *   - Setpoint debounced 500ms (ThermostatCard pattern, RESEARCH §Pattern 4).
+ *   - Setpoint written only via the "Applica" confirm button (c7749321).
  *   - Mode pills map IT labels → Netatmo backend (Pitfall 5: 'Manuale' is UI-only — no setHomeMode call).
  *   - zone.kind derived from topology.modules type (NATherm1 → termostato, NRV → termovalvola; Pitfall 6).
- *   - zone.on derived from `status.rooms[].mode !== 'hg'` (Pitfall 6).
- *   - Tipo toggle: when off → setRoomMode(id, 'manual'); when on → setRoomMode(id, 'home').
+ *   - zone.on = heating now OR central hardware (dot colour only).
+ *   - Tipo row is informational; room control = "Applica" (manual setpoint) +
+ *     "Torna al programma" (setRoomMode 'home'). The old Tipo toggle sent
+ *     mode 'manual' without temp (rejected by Netatmo) and read zone.on.
  *
  * No manual memoization hooks (D-33 — RC-clean).
  */
@@ -31,7 +33,6 @@ import {
   useThermostatCommands,
   type UseThermostatCommandsReturn,
 } from '@/app/components/devices/thermostat/hooks/useThermostatCommands';
-import { InlineToggle } from '../InlineToggle';
 import { SheetRow } from './primitives/SheetRow';
 import { RadialDial } from './primitives/RadialDial';
 import type { SetThermmodeRequest } from '@/types/netatmoProxy';
@@ -528,18 +529,7 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
       <SheetRow
         label="Tipo"
         value={zone.kind === 'termostato' ? 'Termostato di stanza' : 'Termovalvola radiatore'}
-      >
-        <div data-testid="climate-sheet-tipo-toggle">
-          <InlineToggle
-            on={zone.on}
-            color="#5eafff"
-            onChange={() => {
-              // Tipo toggle flips current state: on → 'home', off → 'manual' (Pitfall 6 option (a)).
-              void setRoomMode(zone.id, zone.on ? 'home' : 'manual');
-            }}
-          />
-        </div>
-      </SheetRow>
+      />
 
       {/* Low/critical battery valves — quick reference, hidden when all OK */}
       {lowBatteryValves.length > 0 && (

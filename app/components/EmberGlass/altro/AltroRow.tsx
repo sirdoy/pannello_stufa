@@ -8,7 +8,7 @@
  * Link consumer must opt into data-pressable-focusable manually).
  *
  * `external` prop renders <a href> instead of <Link>: used for /auth/logout
- * (Auth0 server-side redirect benefits from full navigation, not client push).
+ * (server-side logout redirect benefits from full navigation, not client push).
  *
  * Visual analog: app/components/EmberGlass/automations/AutomationRow.tsx
  * (inline-style glass row idiom). Visual values: bg

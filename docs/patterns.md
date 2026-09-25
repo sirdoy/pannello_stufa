@@ -148,10 +148,17 @@ useEffect(() => setIsOpen(false), [pathname]);
 
 ## Middleware Configuration
 
-```javascript
-// middleware.js
-import { auth0 } from '@/lib/auth0';
-export default auth0.middleware();
+```typescript
+// middleware.ts — valida il cookie di sessione ps_session (login proprio, Fase 8)
+import { SESSION_COOKIE, isSessionAlive, unsealSession } from '@/lib/auth/sessionCookie';
+
+export async function middleware(req: NextRequest) {
+  const stored = await unsealSession(req.cookies.get(SESSION_COOKIE)?.value);
+  if (!stored || !isSessionAlive(stored)) {
+    return NextResponse.redirect(new URL('/auth/login', req.url));
+  }
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: [

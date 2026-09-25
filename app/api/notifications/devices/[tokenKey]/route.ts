@@ -4,7 +4,7 @@
  * PATCH /api/notifications/devices/[tokenKey] - Update device display name
  * DELETE /api/notifications/devices/[tokenKey] - Remove device
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Security: Only device owner can modify their own devices
  */
 

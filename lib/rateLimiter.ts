@@ -84,7 +84,7 @@ const DEFAULT_RATE_LIMITS: Record<string, RateLimitConfig> = {
 /**
  * Check if notification is allowed by rate limit (in-memory implementation)
  *
- * @param userId - User ID (Auth0 sub)
+ * @param userId - User ID (session sub)
  * @param notifType - Notification type (e.g., 'scheduler_success', 'CRITICAL')
  * @param customLimits - Optional custom limits { windowMinutes, maxPerWindow }
  * @returns Result object with allowed status and timing info
@@ -228,7 +228,7 @@ if (typeof process !== 'undefined') {
  * Uses Firebase RTDB-backed persistent limiter when USE_PERSISTENT_RATE_LIMITER=true,
  * otherwise falls back to in-memory limiter.
  *
- * @param userId - User ID (Auth0 sub)
+ * @param userId - User ID (session sub)
  * @param notifType - Notification type (e.g., 'scheduler_success', 'CRITICAL')
  * @param customLimits - Optional custom limits { windowMinutes, maxPerWindow }
  * @returns Promise<Result object with allowed status and timing info>

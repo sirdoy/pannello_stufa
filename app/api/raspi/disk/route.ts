@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/raspi/disk
  * Returns disk usage for root partition
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await raspiClient.getDisk();

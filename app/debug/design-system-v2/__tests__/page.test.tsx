@@ -14,13 +14,13 @@
 
 // Phase 182: hook mocks — Section10SheetGallery mounts <*Sheet> components which
 // self-fetch via these hooks. Mocking prevents jsdom errors about missing
-// WebSocket context, missing Auth0 user, etc.
+// WebSocket context, missing session user, etc.
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn(), back: jest.fn() }),
 }));
 
-jest.mock('@auth0/nextjs-auth0/client', () => ({
+jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'auth0|test-182' }, isLoading: false, error: undefined }),
 }));
 

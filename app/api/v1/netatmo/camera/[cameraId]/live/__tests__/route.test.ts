@@ -4,16 +4,16 @@
  */
 
 jest.mock('@/lib/netatmo/netatmoProxy');
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 
 import { GET as getPlaylist } from '../[quality]/index.m3u8/route';
 import { GET as getSegment } from '../[quality]/seg/[...rest]/route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCameraLive = jest.mocked(netatmoProxy.getProxyCameraLive);
 const req = new Request('http://localhost:3000/x');
 

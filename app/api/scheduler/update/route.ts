@@ -22,7 +22,7 @@ interface UpdateSchedulerBody {
  * POST /api/scheduler/update
  * Update scheduler settings
  * Body: { operation, data }
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
   const body = await parseJsonOrThrow(request) as UpdateSchedulerBody;

@@ -5,8 +5,8 @@
  */
 
 jest.mock('@/lib/automations');
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 jest.mock('@/lib/core/requestParser', () => ({
   ...jest.requireActual('@/lib/core/requestParser'),
@@ -15,10 +15,10 @@ jest.mock('@/lib/core/requestParser', () => ({
 
 import { GET, PATCH, DELETE } from '../route';
 import { automationsProxy } from '@/lib/automations';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import { parseJson } from '@/lib/core/requestParser';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockAutomationsProxy = jest.mocked(automationsProxy);
 const mockParseJson = jest.mocked(parseJson);
 

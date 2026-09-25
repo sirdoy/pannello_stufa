@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/hue/groups
  * Returns all Hue groups from the HA proxy.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async () => {
   // The HA proxy already wraps the array as `{ groups, count, is_stale, fetched_at }`.

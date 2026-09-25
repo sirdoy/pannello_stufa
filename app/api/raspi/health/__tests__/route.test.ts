@@ -4,16 +4,16 @@
 
 // Mock dependencies before imports
 jest.mock('@/lib/raspi');
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 
 import { GET } from '../route';
 import { raspiClient } from '@/lib/raspi';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockRaspiClient = jest.mocked(raspiClient);
 const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 

@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 // BL-03 (REVIEW iteration 2): PATCH previously accepted ANY JSON without
 // validation and forwarded it verbatim to the HA backend. The API route is
-// the trust boundary between Auth0 sessions and the HA backend (which
+// the trust boundary between user sessions and the HA backend (which
 // trusts requests bearing X-API-Key); skipping validation here lets an
 // authenticated client smuggle arbitrary bodies through.
 //

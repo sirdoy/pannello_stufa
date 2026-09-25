@@ -3,7 +3,7 @@
  * /automazioni route — Phase 180 (Plan 180-08 / AUTO-01 / CONTEXT D-06).
  *
  * Mounts <AutomationsTab /> as a client route.
- * Auth0 wrap is automatic via app/layout.tsx ClientProviders.
+ * Session gate is automatic via app/layout.tsx ClientProviders.
  * Pattern mirrors app/stanze/page.tsx (Phase 179 RoomsTab analog).
  *
  * Tailwind layout class on <section> is the explicit carve-out per

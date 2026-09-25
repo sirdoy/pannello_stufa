@@ -13,7 +13,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import Tabs from '@/app/components/ui/Tabs';
 import Card from '@/app/components/ui/Card';

@@ -6,7 +6,7 @@
  * Syncs a home schedule definition to Netatmo via the HA proxy.
  * Returns 202 Accepted with suggested_poll_delay_s.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, parseJson, HTTP_STATUS } from '@/lib/core';

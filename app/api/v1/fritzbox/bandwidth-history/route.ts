@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/fritzbox/bandwidth-history
  * Proxies historical bandwidth data from external Fritz!Box API
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  *
  * Query params:
  *   - range: '1h' | '24h' | '7d' (default: '24h')

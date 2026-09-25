@@ -47,7 +47,7 @@ export interface UseStoveCommandsParams {
   >;
   /** Next.js router for navigation */
   router: AppRouterInstance;
-  /** Auth0 user object (for confirmCleaning) */
+  /** Session user object (for confirmCleaning) */
   user?: any;
 }
 

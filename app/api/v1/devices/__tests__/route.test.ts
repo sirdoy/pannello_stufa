@@ -23,7 +23,7 @@ jest.mock('@/lib/dirigera/dirigeraProxy');
 jest.mock('@/lib/tuya/tuyaProxy');
 jest.mock('@/lib/raspi');
 jest.mock('@/lib/stove/thermorossiProxy');
-jest.mock('@/lib/auth0', () => ({ auth0: { getSession: jest.fn() } }));
+jest.mock('@/lib/auth/session', () => ({ authSession: { getSession: jest.fn() } }));
 
 import { GET } from '../route';
 import { fritzboxClient } from '@/lib/fritzbox';
@@ -34,9 +34,9 @@ import { getSensors } from '@/lib/dirigera/dirigeraProxy';
 import { getPlugs } from '@/lib/tuya/tuyaProxy';
 import { raspiClient } from '@/lib/raspi';
 import { getHealth as getThermorossiHealth } from '@/lib/stove/thermorossiProxy';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockFritzGetDevices = jest.mocked(fritzboxClient.getDevices);
 const mockGetLights = jest.mocked(getLights);
 const mockGetSonosDevices = jest.mocked(getSonosDevices);

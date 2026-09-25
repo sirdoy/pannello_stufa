@@ -392,7 +392,7 @@ export function onForegroundMessage(callback?: (payload: unknown) => void) {
  *
  * Call this once when app loads (e.g., in a useEffect in layout or _app).
  *
- * @param {string} userId - User ID from Auth0
+ * @param {string} userId - User ID (session sub)
  * @returns {Promise<{
  *   hasToken: boolean,
  *   token: string|null,

@@ -163,7 +163,7 @@ export const DEFAULT_PREFERENCES = {
 
 /**
  * Get user notification preferences from Firebase via API
- * @param {string} userId - User ID (Auth0 sub)
+ * @param {string} userId - User ID (session sub)
  * @returns {Promise<Object>} User preferences
  */
 async function getUserPreferences(userId: string) {

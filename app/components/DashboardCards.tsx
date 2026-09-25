@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import StoveCard from './EmberGlass/cards/StoveCard';
 import ClimateCard from './EmberGlass/cards/ClimateCard';
 import LightsCard from './EmberGlass/cards/LightsCard';
@@ -61,7 +61,7 @@ const DEVICE_META: Record<string, { name: string; icon: string }> = {
  * error isolation.
  */
 export default async function DashboardCards() {
-  const session = await auth0.getSession();
+  const session = await authSession.getSession();
 
   // CRITICAL: If no valid session, redirect to login
   // This handles the case where cookie exists but session is invalid (e.g., after logout)

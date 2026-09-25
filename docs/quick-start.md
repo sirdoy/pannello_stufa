@@ -8,7 +8,7 @@ Guida rapida per iniziare con il progetto.
 - **npm**: 9+
 - **Git**: Latest version
 - **Firebase Account**: Free tier OK
-- **Auth0 Account**: Free tier OK
+- **Account utente**: creato sul backend Pi (`scripts/create_user.py`), nessun account esterno richiesto
 
 ## Installation
 
@@ -49,12 +49,8 @@ FIREBASE_ADMIN_PROJECT_ID=your-project-id
 FIREBASE_ADMIN_CLIENT_EMAIL=firebase-adminsdk@your-project.iam.gserviceaccount.com
 FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 
-# Auth0
-AUTH0_SECRET=your-secret-here
-AUTH0_BASE_URL=http://localhost:3000
-AUTH0_ISSUER_BASE_URL=https://your-tenant.auth0.com
-AUTH0_CLIENT_ID=your-client-id
-AUTH0_CLIENT_SECRET=your-client-secret
+# Login session (first-party, utenti sul Pi DB)
+SESSION_SECRET=use-openssl-rand-hex-32-to-generate
 
 # Thermorossi API
 THERMOROSSI_API_URL=https://api.thermorossi.com
@@ -65,7 +61,7 @@ THERMOROSSI_PASSWORD=your-password
 CRON_SECRET=your-random-secret
 
 # Admin
-ADMIN_USER_ID=auth0|your-user-id
+ADMIN_USER_ID=user:your-user-id
 ```
 
 ### 4. Firebase Setup
@@ -92,14 +88,10 @@ ADMIN_USER_ID=auth0|your-user-id
    }
    ```
 
-### 5. Auth0 Setup
+### 5. User Setup
 
-1. **Create Auth0 Application**: dashboard.auth0.com
-2. **Application Type**: Regular Web Application
-3. **Allowed Callback URLs**: `http://localhost:3000/auth/callback`
-4. **Allowed Logout URLs**: `http://localhost:3000`
-
-**Note**: Auth0 v4 usa route `/auth/*` invece di `/api/auth/*`
+1. **Create user on the Pi**: `python scripts/create_user.py` (backend, DB SQLite)
+2. **Login**: `/auth/login` (email/password), sessione via cookie `ps_session`
 
 ## Development
 
@@ -180,8 +172,8 @@ find app -name "*.js" -exec grep -l "useState" {} \;  # Find client components
 ### 1. Setup Authentication
 
 1. Visit http://localhost:3000
-2. Click "Login" (redirects to Auth0)
-3. Create account or login
+2. Click "Login" (redirects to `/auth/login`)
+3. Sign in with an account created on the Pi (`scripts/create_user.py`)
 
 ### 2. Configure Scheduler
 
@@ -238,12 +230,12 @@ Check:
 2. Firebase project exists and Realtime Database enabled
 3. Database rules allow read/write (test mode)
 
-### Auth0 Login Fails
+### Login Fails
 
 Check:
-1. Callback URLs configured in Auth0 dashboard
-2. `.env.local` has correct Auth0 config
-3. `AUTH0_BASE_URL` matches current URL
+1. `SESSION_SECRET` set in `.env.local` (>= 32 caratteri)
+2. Backend Pi raggiungibile (`HA_API_URL`) e utente esistente (`scripts/create_user.py`)
+3. `BYPASS_AUTH` / `NEXT_PUBLIC_BYPASS_AUTH` a `false` (a meno di dev bypass intenzionale)
 
 ### Tests Fail
 
@@ -269,7 +261,6 @@ npm test -- --clearCache
 - **React Docs**: https://react.dev
 - **Tailwind CSS**: https://tailwindcss.com
 - **Firebase Docs**: https://firebase.google.com/docs
-- **Auth0 Docs**: https://auth0.com/docs
 
 ---
 

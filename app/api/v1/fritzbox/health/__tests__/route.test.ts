@@ -5,18 +5,18 @@
 
 // Mock dependencies before imports
 jest.mock('@/lib/fritzbox');
-jest.mock('@/lib/auth0', () => ({
-  auth0: {
+jest.mock('@/lib/auth/session', () => ({
+  authSession: {
     getSession: jest.fn(),
   },
 }));
 
 import { GET } from '../route';
 import { fritzboxClient } from '@/lib/fritzbox';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockFritzboxClient = jest.mocked(fritzboxClient);
 
 describe('GET /api/v1/fritzbox/health', () => {

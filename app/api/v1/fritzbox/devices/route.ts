@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/fritzbox/devices
  * Retrieves network device list from Fritz!Box
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute
  * Cached: 60-second TTL
  *

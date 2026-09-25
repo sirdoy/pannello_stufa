@@ -13,7 +13,7 @@
  */
 
 import { useState } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { useVersion } from '@/app/context/VersionContext';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';

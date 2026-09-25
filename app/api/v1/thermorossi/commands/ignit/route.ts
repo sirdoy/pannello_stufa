@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * POST /api/v1/thermorossi/commands/ignit
  * Ignites the stove via HA proxy.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
 export const POST = withAuthAndErrorHandler(

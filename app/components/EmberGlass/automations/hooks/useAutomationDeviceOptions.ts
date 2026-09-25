@@ -3,7 +3,7 @@
  * useAutomationDeviceOptions — Phase 180.1
  *
  * Lazy per-category fetch hooks that surface device pickers for the action
- * forms. Each hook hits the existing Auth0-protected Next API route, which
+ * forms. Each hook hits the existing session-protected Next API route, which
  * proxies to the HA backend via the haClient module. Hooks short-circuit when
  * `enabled=false` so unused dropdowns don't trigger network traffic.
  *

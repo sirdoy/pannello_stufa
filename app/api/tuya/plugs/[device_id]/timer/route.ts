@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 /**
  * POST /api/tuya/plugs/[device_id]/timer
  * Sets countdown timer. seconds=0 cancels. Returns 200 with data_confirmed (D-01).
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 export const POST = withAuthAndErrorHandler(async (request, context) => {
   const deviceId = await getPathParam(context, 'device_id');

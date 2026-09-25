@@ -8,9 +8,9 @@ import { NextResponse } from 'next/server';
 import { ref, get, set } from 'firebase/database';
 import { db } from '@/lib/firebase';
 
-// Mock Auth0 before importing middleware
-jest.mock('@/lib/auth0', () => ({
-  auth0: {
+// Mock the session before importing middleware
+jest.mock('@/lib/auth/session', () => ({
+  authSession: {
     getSession: jest.fn(),
   },
 }));
@@ -345,8 +345,8 @@ describe('withAuthAndErrorHandler production auth', () => {
   });
 
   it('returns 401 when no session exists and BYPASS_AUTH is not set', async () => {
-    const mockAuth0 = jest.mocked((await import('@/lib/auth0')).auth0);
-    (mockAuth0.getSession as jest.Mock).mockResolvedValue(null);
+    const mockSessionModule = jest.mocked((await import('@/lib/auth/session')).authSession);
+    (mockSessionModule.getSession as jest.Mock).mockResolvedValue(null);
 
     const handler = jest.fn();
     const wrapped = withAuthAndErrorHandler(handler);
@@ -361,9 +361,9 @@ describe('withAuthAndErrorHandler production auth', () => {
   });
 
   it('passes session to handler when authenticated', async () => {
-    const mockAuth0 = jest.mocked((await import('@/lib/auth0')).auth0);
+    const mockSessionModule = jest.mocked((await import('@/lib/auth/session')).authSession);
     const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-    (mockAuth0.getSession as jest.Mock).mockResolvedValue(mockSession as any);
+    (mockSessionModule.getSession as jest.Mock).mockResolvedValue(mockSession as any);
 
     const handler = jest.fn().mockResolvedValue(
       NextResponse.json({ ok: true })

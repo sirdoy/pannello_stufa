@@ -23,12 +23,8 @@ NEXT_PUBLIC_FIREBASE_APP_ID=...
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=...
 NEXT_PUBLIC_FIREBASE_DATABASE_URL=...
 
-# Auth0
-AUTH0_SECRET=...
-AUTH0_BASE_URL=https://your-app.vercel.app
-AUTH0_ISSUER_BASE_URL=...
-AUTH0_CLIENT_ID=...
-AUTH0_CLIENT_SECRET=...
+# Login session (first-party, utenti sul Pi DB)
+SESSION_SECRET=... # >= 32 caratteri, openssl rand -hex 32
 
 # HA Proxy (Fritz!Box + Netatmo via HomeAssistant)
 HA_API_URL=http://your-homeassistant-host:port
@@ -152,7 +148,7 @@ node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require(
 
 ### API Route `/api/admin/sync-changelog`
 - ✅ Protetta da `Authorization: Bearer` header
-- ✅ Esclusa da Auth0 middleware
+- ✅ Esclusa dal middleware di autenticazione (route pubblica)
 - ✅ Risponde solo a POST con secret valido
 - ✅ GET disponibile per healthcheck
 

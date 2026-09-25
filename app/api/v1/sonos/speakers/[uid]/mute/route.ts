@@ -4,7 +4,7 @@
  * PUT /api/v1/sonos/speakers/{uid}/mute — toggle mute, returns 202
  * Body: { mute: boolean }
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, getPathParam, parseJson, HTTP_STATUS } from '@/lib/core';

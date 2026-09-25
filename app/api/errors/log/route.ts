@@ -41,7 +41,7 @@ interface LogErrorBody {
 /**
  * POST /api/errors/log
  * Log a stove error to Firebase
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
   const body = (await parseJsonOrThrow(request)) as LogErrorBody;

@@ -268,14 +268,6 @@ jest.mock('firebase/firestore', () => ({
   onSnapshot: jest.fn(),
 }));
 
-// Mock Auth0
-jest.mock('@auth0/nextjs-auth0', () => ({
-  getSession: jest.fn(),
-  withApiAuthRequired: jest.fn((handler) => handler),
-  withPageAuthRequired: jest.fn((component) => component),
-  handleAuth: jest.fn(),
-}));
-
 // Mock Next.js navigation
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(() => ({

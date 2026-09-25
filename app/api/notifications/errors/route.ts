@@ -7,7 +7,7 @@
  * POST /api/notifications/errors
  * Mark notification error as resolved
  *
- * Authentication: Required via Auth0
+ * Authentication: Required (session)
  */
 
 import { getAdminDatabase } from '@/lib/firebaseAdmin';

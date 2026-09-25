@@ -4,7 +4,7 @@
  * POST /api/v1/sonos/speakers/{uid}/join — join speaker to a group, returns 202
  * Body: { target_uid: string }
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, getPathParam, parseJson, HTTP_STATUS } from '@/lib/core';

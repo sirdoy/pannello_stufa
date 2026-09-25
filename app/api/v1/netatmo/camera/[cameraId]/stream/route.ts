@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/netatmo/camera/[cameraId]/stream
  * Returns camera stream URLs from proxy.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const cameraId = await getPathParam(context, 'cameraId');

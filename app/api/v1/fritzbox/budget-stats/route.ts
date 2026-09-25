@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/budget-stats
  * Returns data budget consumption statistics from Fritz!Box.
  * Raw pass-through from HA proxy — no field transformation.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

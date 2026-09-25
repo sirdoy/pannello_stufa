@@ -14,7 +14,7 @@ import { FlameViz } from './FlameViz';
  *   .planning/inbox/ember-glass-design/project/components/splash.jsx:1-91
  *
  * Pure presentational. Owns the 4-phase timer state machine (full-motion) and the
- * 2-phase variant (reduced-motion). Does NOT touch sessionStorage, Auth0, or
+ * 2-phase variant (reduced-motion). Does NOT touch sessionStorage, auth, or
  * matchMedia — those concerns are owned by <SplashGate> (Plan 03).
  *
  * Full-motion timeline (per CONTEXT.md D-13):
@@ -200,7 +200,7 @@ export function Splash({ onDone, reducedMotion = false }: SplashProps): React.Re
             animation: reducedMotion ? 'none' : 'pulse 1.6s infinite',
           }}
         />
-        Autenticato · Auth0
+        Autenticato · Casa
       </div>
     </div>
   );

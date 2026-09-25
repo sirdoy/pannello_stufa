@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/system
  * Returns Fritz!Box system info: model, firmware version, uptime.
  * Raw pass-through from HA proxy — no field transformation.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

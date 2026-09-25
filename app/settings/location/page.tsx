@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import { Text, Heading, Banner } from '@/app/components/ui';

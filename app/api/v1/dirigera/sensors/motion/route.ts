@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/dirigera/sensors/motion
  * Returns motion/occupancy sensors only, with light_level and data_freshness.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getMotionSensors();

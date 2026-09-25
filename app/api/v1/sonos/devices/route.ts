@@ -6,7 +6,7 @@
  * Returns the list of known Sonos devices from the HA proxy.
  * Response envelope: { success: true, data: { devices: SonosDeviceResponse[] } }
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

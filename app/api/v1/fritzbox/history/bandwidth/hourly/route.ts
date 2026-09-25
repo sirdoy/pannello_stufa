@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/history/bandwidth/hourly
  * Returns paginated hourly bandwidth aggregation from Fritz!Box.
  * Forwards optional days, limit and offset query params to the HA proxy.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/network/upnp
  * Returns UPnP status from Fritz!Box as a flat object.
  * NOT paginated — returns { enabled, upnp_ports[], is_stale, fetched_at }.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

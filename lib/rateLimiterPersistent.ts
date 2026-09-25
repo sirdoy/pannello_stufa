@@ -91,7 +91,7 @@ const DEFAULT_RATE_LIMITS: Record<string, RateLimitConfig> = {
  * Uses Firebase transaction for atomic read-modify-write
  * Filters expired timestamps on every check (sliding window + max retention)
  *
- * @param userId - User ID (Auth0 sub)
+ * @param userId - User ID (session sub)
  * @param notifType - Notification type (e.g., 'scheduler_success', 'CRITICAL')
  * @param customLimits - Optional custom limits { windowMinutes, maxPerWindow }
  * @returns Result object with allowed status and timing info

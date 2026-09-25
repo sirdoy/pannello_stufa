@@ -5,7 +5,7 @@
  *
  * Returns health status of the Netatmo proxy (token lifecycle, rate limits, freshness).
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

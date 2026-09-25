@@ -7,7 +7,7 @@ loadEnv();
 /**
  * Playwright E2E Test Configuration
  *
- * Authenticates via real Auth0 OAuth flow (not TEST_MODE bypass).
+ * Authenticates via the real /auth/login form with the `test` account (not TEST_MODE bypass).
  * Session caching via storageState ensures single login per test run.
  *
  * See tests/auth.setup.ts for authentication logic.

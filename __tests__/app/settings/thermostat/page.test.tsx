@@ -12,8 +12,8 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }));
 
-// Mock Auth0 useUser hook
-jest.mock('@auth0/nextjs-auth0/client', () => ({
+// Mock useUser hook
+jest.mock('@/lib/auth/useUser', () => ({
   useUser: jest.fn(),
 }));
 
@@ -37,7 +37,7 @@ jest.mock('@/app/components/netatmo/PidAutomationPanel', () => {
 
 describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
   const mockPush = jest.fn();
-  const mockUseUser = require('@auth0/nextjs-auth0/client').useUser;
+  const mockUseUser = require('@/lib/auth/useUser').useUser;
 
   beforeEach(() => {
     jest.clearAllMocks();

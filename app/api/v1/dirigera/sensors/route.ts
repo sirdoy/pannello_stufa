@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/dirigera/sensors
  * Returns all DIRIGERA sensors (contact + motion) with metadata.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getSensors();

@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
  * PUT /api/v1/sonos/zones/[groupId]/seek
  * Seeks to a position in the current track for a zone.
  * Body: { position: string } — "HH:MM:SS" format
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Returns: 202 Accepted with suggested_poll_delay_s
  */
 export const PUT = withAuthAndErrorHandler(async (request, context) => {

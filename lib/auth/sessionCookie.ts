@@ -1,12 +1,12 @@
 /**
- * First-party session cookie (roadmap Fase 8 — replaces the Auth0 session).
+ * First-party session cookie (roadmap Fase 8).
  *
  * The cookie holds the backend token pair plus the user, sealed with AES-GCM
  * (confidentiality + integrity) using only Web Crypto, so it works both in the
  * Edge middleware and in Node route handlers.
  *
- * Key: SHA-256 of SESSION_SECRET (falls back to AUTH0_SECRET, already set on
- * Vercel, until Auth0 is removed in 8.9).
+ * Key: SHA-256 of SESSION_SECRET. AUTH0_SECRET is still read as a legacy fallback
+ * so existing deployments keep their sessions until SESSION_SECRET is set.
  */
 
 export const SESSION_COOKIE = 'ps_session';

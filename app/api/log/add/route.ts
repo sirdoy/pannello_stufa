@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 /**
  * POST /api/log/add
  * Add a log entry
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;

@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/dirigera/sensors/summary
  * Returns fleet-wide sensor summary (total, open, offline, low battery).
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getSensorSummary();

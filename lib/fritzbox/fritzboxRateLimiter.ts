@@ -26,7 +26,7 @@ export const FRITZBOX_RATE_LIMIT: RateLimitConfig = {
  * Check rate limit for Fritz!Box API calls
  * Wraps persistent rate limiter with Fritz!Box-specific config
  *
- * @param userId - User ID (Auth0 sub)
+ * @param userId - User ID (session sub)
  * @param endpoint - API endpoint name (e.g., 'devices', 'bandwidth', 'wan')
  * @returns Rate limit result (allowed, suppressedCount, nextAllowedIn)
  */

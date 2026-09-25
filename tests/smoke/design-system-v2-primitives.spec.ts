@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  *   --accent to oklch(0.65 0.17 290); downstream primitive surfaces (CircBtn
  *   primary + BigSlider gradient fill) reflect the change without a reload.
  *
- * Auth: storageState from playwright.config.ts applies the test Auth0 session.
+ * Auth: storageState from playwright.config.ts applies the test login session.
  * No explicit auth setup needed in this spec.
  */
 

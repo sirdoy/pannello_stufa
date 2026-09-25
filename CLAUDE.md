@@ -23,7 +23,7 @@ npm run lint
 1. **NEVER** break existing functionality
 2. **WAIT** for user confirmation before version updates
 3. **PREFER** editing existing files over creating new
-4. **NEVER** execute `npm run build` or `npm install`
+4. **NEVER** execute `npm run build`. Adding/removing npm packages (`npm install <pkg>`, `npm uninstall <pkg>`) is allowed autonomously; commit `package.json` + `package-lock.json` together
 5. **ALWAYS** create/update unit tests
 6. **USE** design system → EmberGlass (`app/components/EmberGlass/`), preview `/debug/design-system-v2`
 7. **NEVER** commit/push without explicit request (push su `main` = deploy Vercel)
@@ -40,7 +40,7 @@ npm run lint
 | Route proxy (1:1 con backend `/api/v1/...`, sessione via `withAuthAndErrorHandler`) | `app/api/v1/<provider>/**/route.ts`; `app/api/{rooms,registry,raspi,tuya}` |
 | Tipi contratto | `types/*Proxy.ts`, `types/websocket.ts`, `types/automations.ts` (← `docs/api/automations.types.ts`) |
 | WebSocket | `app/components/ClientProviders.tsx` → `${NEXT_PUBLIC_WS_URL}/ws/live?token=` (token 60s da `/api/ws-token` a ogni connessione, `lib/ws/wsUrl.ts`), `lib/hooks/useWebSocketManager.ts`, `app/context/WebSocketContext.ts`; polling HTTP come fallback |
-| Login utenti (Fase 8) | `/auth/login` → `app/api/auth/session` → backend `/auth/session/*`; cookie cifrato `ps_session` (`lib/auth/sessionCookie.ts`), refresh in `middleware.ts`; `lib/auth0.ts` = shim `auth0.getSession()` (nome storico); `session.user.sub` = `legacy_sub` Auth0 o `user:<id>` |
+| Login utenti (Fase 8) | `/auth/login` → `app/api/auth/session` → backend `/auth/session/*`; cookie cifrato `ps_session` (`lib/auth/sessionCookie.ts`), refresh in `middleware.ts`; server `lib/auth/session.ts` (`authSession.getSession()`), client `lib/auth/useUser.tsx` (`useUser()`); `session.user.sub` = legacy Auth0 sub (account migrati) o `user:<id>` |
 | Backend JWT (solo gestione API key) | `lib/auth/authProxy.ts`, `app/api/auth/api-keys` |
 | Env | `HA_API_URL`, `HA_API_KEY`, `HA_ADMIN_USER`, `HA_ADMIN_PASSWORD`, `NEXT_PUBLIC_WS_URL`, `SESSION_SECRET` |
 

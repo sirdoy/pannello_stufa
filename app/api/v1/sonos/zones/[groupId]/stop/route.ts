@@ -5,7 +5,7 @@
  *
  * Stops playback for a zone.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Returns: 202 Accepted with suggested_poll_delay_s
  */
 

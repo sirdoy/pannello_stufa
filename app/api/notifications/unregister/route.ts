@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 /**
  * DELETE /api/notifications/unregister
  * Remove all FCM tokens for authenticated user
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const DELETE = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;

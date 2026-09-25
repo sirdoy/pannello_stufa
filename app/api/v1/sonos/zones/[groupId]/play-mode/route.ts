@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/sonos/zones/[groupId]/play-mode
  * Returns the current play mode (shuffle, repeat, crossfade) for a zone.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  *
  * PUT /api/v1/sonos/zones/[groupId]/play-mode
  * Sets the play mode for a zone.

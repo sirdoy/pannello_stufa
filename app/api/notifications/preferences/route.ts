@@ -93,7 +93,7 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
 /**
  * GET /api/notifications/preferences
  * Get notification preferences
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;
@@ -117,7 +117,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
 /**
  * PUT /api/notifications/preferences
  * Update notification preferences
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const PUT = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;

@@ -49,7 +49,7 @@ const DEFAULT_PID_CONFIG: PIDConfig = {
 /**
  * GET /api/user/pid-config
  * Get user PID automation config
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (_request, _context, session) => {
   const userId = session.user.sub;
@@ -65,7 +65,7 @@ export const GET = withAuthAndErrorHandler(async (_request, _context, session) =
 /**
  * POST /api/user/pid-config
  * Update user PID automation config
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const POST = withAuthAndErrorHandler(async (request, _context, session) => {
   const userId = session.user.sub;

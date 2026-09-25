@@ -8,7 +8,7 @@
  * - Data freshness (LIVE/STALE)
  * - Last poll timestamp
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

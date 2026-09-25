@@ -1,10 +1,9 @@
 /**
  * Server-side session access (roadmap Fase 8: first-party login on the Pi DB).
  *
- * Keeps the `auth0.getSession()` API the ~110 call sites and test mocks rely on,
- * but reads our own sealed session cookie (lib/auth/sessionCookie.ts) instead of
- * an Auth0 session. `session.user.sub` stays the per-user data key: the legacy
- * Auth0 sub for migrated accounts, `user:<id>` otherwise.
+ * Reads our own sealed session cookie (lib/auth/sessionCookie.ts).
+ * `session.user.sub` stays the per-user data key: the legacy Auth0 sub for
+ * migrated accounts, `user:<id>` otherwise.
  *
  * Token refresh happens in middleware.ts; here a session is valid until its
  * refresh token expires.
@@ -40,7 +39,7 @@ const MOCK_SESSION: AppSession = {
 // SESSION
 // =============================================================================
 
-/** Auth0-compatible session shape (user.sub/email/name/nickname/picture). */
+/** Session shape exposed to route handlers (user.sub/email/name/nickname/picture). */
 export interface AppSession {
   user: {
     sub: string;
@@ -86,4 +85,4 @@ async function getSession(request?: Pick<NextRequest, 'cookies'>): Promise<AppSe
   return toAppSession(stored.user);
 }
 
-export const auth0 = { getSession };
+export const authSession = { getSession };

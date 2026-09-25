@@ -34,7 +34,7 @@
  */
 
 import { useRouter } from 'next/navigation';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { AlertTriangle, Calendar, Power, TriangleAlert } from 'lucide-react';
 import {
   useStoveData,

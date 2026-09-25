@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/fritzbox/history/device-events
  * Returns raw device event log from Fritz!Box (untransformed pass-through).
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

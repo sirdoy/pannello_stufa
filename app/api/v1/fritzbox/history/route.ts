@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
  * (/api/v1/fritzbox/history/device-events, computed from device snapshots).
  * Events are state changes only (connected/disconnected), not raw snapshots.
  * (The legacy Firebase event log is no longer written by anything.)
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  *
  * Query params:
  *   - range: '1h' | '24h' | '7d' (default: '24h')

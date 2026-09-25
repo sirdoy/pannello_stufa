@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Returns paginated bandwidth with auto-granularity from Fritz!Box.
  * Server-side switch: days<=7 returns hourly records, days>7 returns daily records.
  * Forwards optional days, limit and offset query params to the HA proxy.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

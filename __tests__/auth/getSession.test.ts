@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  *
- * lib/auth0.ts getSession() on top of the first-party session cookie.
+ * lib/auth/session.ts getSession() on top of the first-party session cookie.
  */
 import { SESSION_COOKIE, sealSession, type StoredSession } from '@/lib/auth/sessionCookie';
 
@@ -21,7 +21,7 @@ function stored(overrides: Partial<StoredSession> = {}): StoredSession {
   };
 }
 
-describe('auth0.getSession (first-party)', () => {
+describe('authSession.getSession (first-party)', () => {
   const env = { ...process.env };
   beforeEach(() => {
     jest.resetModules();
@@ -33,10 +33,10 @@ describe('auth0.getSession (first-party)', () => {
     process.env = env;
   });
 
-  it('returns an Auth0-shaped user keyed by the legacy sub', async () => {
-    const { auth0 } = await import('@/lib/auth0');
+  it('returns a session user keyed by the legacy sub', async () => {
+    const { authSession } = await import('@/lib/auth/session');
     const value = await sealSession(stored());
-    const session = await auth0.getSession({ cookies: { get: (n: string) => (n === SESSION_COOKIE ? { value } : undefined) } } as never);
+    const session = await authSession.getSession({ cookies: { get: (n: string) => (n === SESSION_COOKIE ? { value } : undefined) } } as never);
     expect(session?.user).toMatchObject({
       sub: 'google-oauth2|5',
       email: 'me@example.com',
@@ -47,21 +47,21 @@ describe('auth0.getSession (first-party)', () => {
   });
 
   it('reads next/headers cookies when called without a request', async () => {
-    const { auth0 } = await import('@/lib/auth0');
+    const { authSession } = await import('@/lib/auth/session');
     cookieValue = await sealSession(stored());
-    expect((await auth0.getSession())?.user.sub).toBe('google-oauth2|5');
+    expect((await authSession.getSession())?.user.sub).toBe('google-oauth2|5');
   });
 
   it('returns null for missing or expired sessions', async () => {
-    const { auth0 } = await import('@/lib/auth0');
-    expect(await auth0.getSession()).toBeNull();
+    const { authSession } = await import('@/lib/auth/session');
+    expect(await authSession.getSession()).toBeNull();
     cookieValue = await sealSession(stored({ refreshExpiresAt: 1 }));
-    expect(await auth0.getSession()).toBeNull();
+    expect(await authSession.getSession()).toBeNull();
   });
 
   it('returns the mock session with BYPASS_AUTH', async () => {
     process.env.BYPASS_AUTH = 'true';
-    const { auth0 } = await import('@/lib/auth0');
-    expect((await auth0.getSession())?.user.sub).toBe('local-dev-user');
+    const { authSession } = await import('@/lib/auth/session');
+    expect((await authSession.getSession())?.user.sub).toBe('local-dev-user');
   });
 });

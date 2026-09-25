@@ -646,7 +646,7 @@ export async function sendPushNotification(
  * Invia notifica a tutti i dispositivi di un utente
  * Enhanced with preference filtering (type toggles + DND windows)
  *
- * @param {string} userId - User ID (Auth0 sub)
+ * @param {string} userId - User ID (session sub)
  * @param {Object} notification - Dati notifica
  */
 export async function sendNotificationToUser(userId: string, notification: NotificationPayload): Promise<any> {

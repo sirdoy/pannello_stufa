@@ -33,7 +33,7 @@ import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 export interface UseStoveDataParams {
   /** checkVersion function from VersionContext */
   checkVersion: () => Promise<void>;
-  /** User ID from Auth0 (for notifications) */
+  /** User ID (session sub) (for notifications) */
   userId?: string;
 }
 

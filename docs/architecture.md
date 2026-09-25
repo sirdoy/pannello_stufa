@@ -434,46 +434,48 @@ Context hook per enforcement versione obbligatoria.
 
 ## Authentication Middleware
 
-Pattern di autenticazione globale con validazione sessione Auth0 in middleware.
+Pattern di autenticazione globale con validazione sessione (login proprio, Fase 8) in middleware.
 
-**File**: `middleware.js`
+**File**: `middleware.ts`
 
 ### Implementazione
 
-```javascript
-import { NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+```typescript
+import { NextResponse, type NextRequest } from 'next/server';
+import { SESSION_COOKIE, isSessionAlive, needsAccessRefresh, unsealSession } from '@/lib/auth/sessionCookie';
 
-export async function middleware(req) {
-  // Step 1: Bypass in test mode
-  if (process.env.TEST_MODE === 'true') {
+export async function middleware(req: NextRequest) {
+  // Step 1: Bypass in test mode / dev bypass
+  if (process.env.TEST_MODE === 'true' || process.env.BYPASS_AUTH === 'true') {
     return NextResponse.next();
   }
 
-  // Step 2: Delega route auth ad Auth0 middleware
-  const authResponse = await auth0.middleware(req);
-  if (authResponse) {
-    return authResponse;
+  // Step 2: Route pubbliche (login, logout, profile, /api/auth/session)
+  if (isPublic(req.nextUrl.pathname)) {
+    return NextResponse.next();
   }
 
-  // Step 3: Valida sessione con Auth0
-  const session = await auth0.getSession(req);
-  if (!session) {
+  // Step 3: Valida il cookie di sessione (ps_session, sealed AES-GCM)
+  const stored = await unsealSession(req.cookies.get(SESSION_COOKIE)?.value);
+  if (!stored || !isSessionAlive(stored)) {
     const loginUrl = new URL('/auth/login', req.url);
     loginUrl.searchParams.set('returnTo', req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(loginUrl);
   }
 
-  // Step 4: Consenti accesso
+  // Step 4: Se l'access token sta per scadere, refresh via backend; altrimenti consenti accesso
+  if (needsAccessRefresh(stored)) {
+    // vedi middleware.ts per il refresh completo (rotazione cookie, gestione errori)
+  }
   return NextResponse.next();
 }
 ```
 
 ### Caratteristiche Principali
 
-1. **TEST_MODE Bypass**: Permette test E2E senza autenticazione
-2. **Gestione Route Auth**: Delega `/auth/*` routes ad Auth0 SDK
-3. **Validazione Sessione**: Usa `getSession(request)` per verifica completa token
+1. **TEST_MODE / BYPASS_AUTH**: Permette test E2E e dev locale senza autenticazione
+2. **Route Auth pubbliche**: `/auth/login`, `/auth/logout`, `/auth/profile`, `/api/auth/session`
+3. **Validazione Sessione**: Cookie `ps_session` sealed (AES-GCM); refresh automatico dell'access token
 4. **Return URL**: Preserva URL destinazione per redirect post-login
 5. **Compatibilità PWA**: Matcher esclude service workers e manifests
 
@@ -481,19 +483,18 @@ export async function middleware(req) {
 
 Middleware fornisce **primo layer** di protezione. Validare sempre sessione in:
 
-- **Server Components**: Usa `await auth0.getSession()` prima di renderizzare
-- **API Routes**: Usa `await auth0.getSession()` prima di accesso database
-- **Server Actions**: Usa `await auth0.getSession()` prima di mutazioni
+- **Server Components / API Routes**: `import { authSession } from '@/lib/auth/session'; const session = await authSession.getSession();`
+- **Route API**: preferire `withAuthAndErrorHandler` (`lib/core/middleware.ts`), che inietta la sessione già validata
 
 **Esempio Server Component**:
 
-```javascript
-// app/dashboard/page.js
-import { auth0 } from '@/lib/auth0';
+```typescript
+// app/dashboard/page.tsx
+import { authSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
-  const session = await auth0.getSession();
+  const session = await authSession.getSession();
 
   if (!session) {
     redirect('/auth/login?returnTo=/dashboard');
@@ -511,7 +512,7 @@ export default async function DashboardPage() {
 ```javascript
 export const config = {
   matcher: [
-    "/((?!api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|manifest.json|sw.js|firebase-messaging-sw.js).*)",
+    "/((?!api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|splash|manifest.json|sw.js|firebase-messaging-sw.js|swe-worker-|workbox-|fallback-).*)",
   ],
 };
 ```
@@ -523,7 +524,7 @@ export const config = {
 
 **Include**:
 - Tutte le route pagine (`/`, `/dashboard`, etc.)
-- Route auth (`/auth/login`, `/auth/callback`) - gestite da `auth0.middleware()`
+- Route auth (`/auth/login`, `/auth/logout`) - gestite dal login first-party
 
 ### Testing Manuale
 

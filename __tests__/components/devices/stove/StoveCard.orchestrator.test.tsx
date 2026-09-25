@@ -11,7 +11,7 @@ jest.mock('next/navigation', () => ({
   })),
 }));
 
-jest.mock('@auth0/nextjs-auth0/client', () => ({
+jest.mock('@/lib/auth/useUser', () => ({
   useUser: jest.fn(() => ({
     user: { sub: 'user-123' },
   })),

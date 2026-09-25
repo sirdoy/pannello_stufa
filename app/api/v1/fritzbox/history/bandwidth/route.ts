@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/history/bandwidth
  * Returns raw bandwidth history from Fritz!Box (untransformed pass-through).
  * Distinct from hourly/daily/auto sub-routes which return aggregated data.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

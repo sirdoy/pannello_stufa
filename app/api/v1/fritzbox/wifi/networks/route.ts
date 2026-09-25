@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/wifi/networks
  * Returns configured WiFi networks (SSIDs) with enabled/disabled status.
  * Raw pass-through from HA proxy — no field transformation.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

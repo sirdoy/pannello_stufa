@@ -265,7 +265,7 @@ test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
 // Mocking strategy mirrors the Phase 177 beforeEach (lines 134-180) — defensive
 // route-mock + DOM dismissal + storageState pre-prime. Each describe owns its
 // own beforeEach because Playwright route-mocks are per-context and do not
-// inherit across describe blocks. Auth0 storageState is reused via the global
+// inherit across describe blocks. The login storageState is reused via the global
 // playwright.config.ts setup; no per-describe login flow needed.
 //
 // Endpoint URLs verified against the live command hooks at runtime:
@@ -495,7 +495,7 @@ test.describe('SHEET-05 SonosSheet wires command', () => {
     } else {
       // No Sonos zones discovered in this run — assert the sheet at least mounted
       // its empty-state UX without throwing. The runtime smoke gate runs against
-      // a real Auth0 session; in environments without Sonos hardware the sheet
+      // a real login session; in environments without Sonos hardware the sheet
       // shows skeleton/error/empty. Assertion bound stays meaningful (sheet
       // visible) without false-failing on missing fixtures.
       await expect(sheet).toBeVisible();

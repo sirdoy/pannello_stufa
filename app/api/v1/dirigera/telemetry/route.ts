@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
  * Returns paginated sensor telemetry (battery, light_level) from the HA proxy.
  * Query params (sensor_id, start, end, limit, offset) forwarded.
  * Invalid numerics are dropped silently; HA proxy clamps limit 1-1000.
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 export const GET = withAuthAndErrorHandler(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);

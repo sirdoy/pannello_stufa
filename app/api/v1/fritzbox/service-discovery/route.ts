@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/service-discovery
  * Returns TR-064 service discovery data from Fritz!Box, parsed as JSON.
  * The HA proxy may return XML or JSON; the client function handles both.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

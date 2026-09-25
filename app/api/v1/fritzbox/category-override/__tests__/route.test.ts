@@ -5,17 +5,17 @@
 
 // Mock dependencies before imports
 jest.mock('@/lib/network/deviceCategories');
-jest.mock('@/lib/auth0', () => ({
-  auth0: {
+jest.mock('@/lib/auth/session', () => ({
+  authSession: {
     getSession: jest.fn(),
   },
 }));
 
 import { POST } from '../route';
 import { saveCategoryOverride } from '@/lib/network/deviceCategories';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockSaveCategoryOverride = jest.mocked(saveCategoryOverride);
 
 describe('POST /api/v1/fritzbox/category-override', () => {

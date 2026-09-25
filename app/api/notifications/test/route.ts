@@ -79,7 +79,7 @@ const TEMPLATES: Record<string, NotificationTemplate> = {
 /**
  * POST /api/notifications/test
  * Send a test notification to authenticated user
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;

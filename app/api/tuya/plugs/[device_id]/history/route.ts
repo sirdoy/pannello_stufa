@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/tuya/plugs/[device_id]/history
  * Returns paginated energy history with auto-granularity.
  * Query params: period, from, to, page, page_size
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 export const GET = withAuthAndErrorHandler(async (request, context) => {
   const deviceId = await getPathParam(context, 'device_id');

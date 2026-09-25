@@ -6,7 +6,7 @@
  * Returns volume or playback history for Sonos devices.
  * Query params (all optional): type, speaker_uid, group_id, start, end, limit, offset
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

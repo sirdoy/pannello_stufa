@@ -6,7 +6,7 @@
  * Returns the list of zones (speaker groups) from the HA proxy.
  * Response envelope: { success: true, zones: SonosZoneResponse[], count, is_stale, fetched_at, data_freshness }
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

@@ -30,7 +30,7 @@ interface NotificationHistoryFilter {
 /**
  * Get notification history for a user with pagination
  *
- * @param {string} userId - User ID (Auth0 sub)
+ * @param {string} userId - User ID (session sub)
  * @param {Object} [options] - Query options
  * @param {number} [options.limit=50] - Max notifications to return (default: 50, max: 100)
  * @param {string} [options.cursor=null] - Base64 encoded cursor from previous page

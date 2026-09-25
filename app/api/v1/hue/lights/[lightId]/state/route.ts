@@ -7,7 +7,7 @@
  * Accepts CLIP v1 flat body (on, bri, ct, xy).
  * Logs action to Firebase and returns 202 Accepted with suggested poll delay.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, getPathParam, parseJson } from '@/lib/core';

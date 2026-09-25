@@ -32,7 +32,7 @@ export function Section07Splash(): React.ReactElement {
           margin: '4px 0 8px 0',
         }}
       >
-        Splash post-Auth0
+        Splash post-login
       </h2>
       <p
         style={{

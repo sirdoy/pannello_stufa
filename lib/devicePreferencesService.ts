@@ -54,7 +54,7 @@ async function getDevicePreferences(userId: string): Promise<DevicePreferences> 
 /**
  * Get device preferences for a user (SERVER-SIDE - uses Admin SDK)
  * Use this from API routes to bypass security rules
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @returns {Promise<Object>} Device preferences object { deviceId: boolean }
  */
 export async function getDevicePreferencesAdmin(userId: string): Promise<DevicePreferences> {
@@ -83,7 +83,7 @@ export async function getDevicePreferencesAdmin(userId: string): Promise<DeviceP
 /**
  * Update device preferences for a user (SERVER-SIDE - uses Admin SDK)
  * MUST be called from API routes only - Admin SDK bypasses security rules
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @param {Object} preferences - Device preferences { deviceId: boolean }
  * @returns {Promise<boolean>} Success status
  */
@@ -104,7 +104,7 @@ export async function updateDevicePreferences(userId: string, preferences: Parti
 /**
  * Toggle a single device preference (SERVER-SIDE - uses Admin SDK)
  * MUST be called from API routes only
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @param {string} deviceId - Device ID to toggle
  * @returns {Promise<boolean>} New enabled state
  */
@@ -137,7 +137,7 @@ function getDefaultPreferences(): DevicePreferences {
 
 /**
  * Get enabled devices for a user (based on preferences)
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @returns {Promise<Array>} Array of enabled device configs
  */
 async function getEnabledDevicesForUser(userId: string): Promise<unknown[]> {
@@ -150,7 +150,7 @@ async function getEnabledDevicesForUser(userId: string): Promise<unknown[]> {
 
 /**
  * Check if a specific device is enabled for a user
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @param {string} deviceId - Device ID
  * @returns {Promise<boolean>} Whether device is enabled
  */

@@ -3,10 +3,10 @@ import { signIn } from '../helpers/auth.helpers';
 import { TEST_USER } from '../helpers/test-context';
 
 /**
- * SPLASH-01..05 — post-Auth0 splash animation (Phase 176).
+ * SPLASH-01..05 — post-login splash animation (Phase 176).
  *
  * Asserts:
- *   SPLASH-01: splash mounts within ~1500ms of dashboard landing post-Auth0.
+ *   SPLASH-01: splash mounts within ~1500ms of dashboard landing post-login.
  *   SPLASH-02: animation timeline beats (flame scale(0.4) → scale(1) → unmount).
  *   SPLASH-03: prefers-reduced-motion: reduce → opacity-only fade, no transform, ≤600ms.
  *   SPLASH-04: subsequent in-session route changes do NOT re-trigger the splash.
@@ -84,12 +84,12 @@ test.describe('SPLASH-01..05 — splash overlay', () => {
   // would be suppressed on the second test by the SPLASH-04 session-once flag).
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test('SPLASH-01 splash appears within ~1.5s of dashboard landing post-Auth0', async ({ page }) => {
+  test('SPLASH-01 splash appears within ~1.5s of dashboard landing post-login', async ({ page }) => {
     const { errors, cleanup } = collectConsoleErrors(page);
     await signIn(page, TEST_USER.email, TEST_USER.password);
     await dismissVersionEnforcerIfPresent(page);
 
-    // Splash must mount within ~1.5s after Auth0 redirect.
+    // Splash must mount within ~1.5s after login.
     await expect(page.getByTestId('splash-overlay')).toBeVisible({ timeout: 1500 });
     // Splash must dismiss within ~2.3s (2.1s phase 3 + jitter).
     await expect(page.getByTestId('splash-overlay')).toBeHidden({ timeout: 2300 });

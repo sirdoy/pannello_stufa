@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/history/devices
  * Returns raw device presence history from Fritz!Box (untransformed pass-through).
  * Per D-05: This endpoint may not exist on the HA proxy. If proxy returns 404, that is expected.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute per user
  * Cached: 60-second TTL
  *

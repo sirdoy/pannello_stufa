@@ -11,7 +11,7 @@ import { TEST_USER, AUTH_FILE } from './helpers/test-context';
  *
  * Two modes:
  *  - BYPASS_AUTH=true (dev default): writes empty storageState. Server returns
- *    MOCK_SESSION via lib/auth0.ts, so no real login is needed.
+ *    MOCK_SESSION via lib/auth/session.ts, so no real login is needed.
  *  - BYPASS_AUTH=false: real /auth/login form via signIn() (test account). Saves session state
  *    to tests/.auth/user.json for reuse.
  */

@@ -168,30 +168,32 @@ POST /api/log/add
 
 ---
 
-## Auth0 (`/auth/*`)
+## Login proprio (`/auth/*`)
 
-Auth0 v4 gestisce route automaticamente via middleware.
+Login first-party (Fase 8): utenti sulla tabella `users` del DB SQLite sul Pi, sessione cookie
+cifrata `ps_session` (`lib/auth/sessionCookie.ts`, AES-GCM, chiave da `SESSION_SECRET`).
 
 | Route | Funzione |
 |-------|----------|
-| `/auth/login` | Login redirect |
+| `/auth/login` | Form email/password (`app/auth/login/page.tsx`) |
+| `POST /api/auth/session` | Login: chiama backend `/auth/session/login`, imposta il cookie |
 | `/auth/logout` | Logout |
-| `/auth/callback` | OAuth callback |
-| `/auth/profile` | User profile |
+| `GET /auth/profile` | User profile (usato da `useUser`) |
 
 **Setup**:
 
-```javascript
-// lib/auth0.js
-import { Auth0Client } from '@auth0/nextjs-auth0/server';
-export const auth0 = new Auth0Client({ /* config */ });
+```typescript
+// Server: lib/auth/session.ts
+import { authSession } from '@/lib/auth/session';
+const session = await authSession.getSession();
 
-// middleware.js
-import { auth0 } from '@/lib/auth0';
-export default auth0.middleware();
+// Client: lib/auth/useUser.tsx
+import { useUser } from '@/lib/auth/useUser';
+const { user, error, isLoading } = useUser();
 ```
 
-**Migrazione v3→v4**: Route `/api/auth/*` → `/auth/*`
+Refresh del token in `middleware.ts`. Gestione utenti: pagina `/settings/users`, creazione via
+`scripts/create_user.py` sul Pi.
 
 ---
 

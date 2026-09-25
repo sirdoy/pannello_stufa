@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Returns camera events from proxy.
  * Query params:
  * - hours: Number of hours to look back (optional)
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);

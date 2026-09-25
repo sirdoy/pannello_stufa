@@ -6,12 +6,12 @@
  */
 
 jest.mock('@/lib/fritzbox');
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 
 import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import { GET as wifiClients } from '../wifi/clients/route';
 import { GET as dhcp } from '../network/dhcp/reservations/route';
 import { GET as portForwarding } from '../network/port-forwarding/route';
@@ -81,7 +81,7 @@ const call = (c: Case, query: string) =>
 describe('Fritz!Box parameterized routes: cache key + param forwarding', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.mocked(auth0.getSession).mockResolvedValue({ user: { sub: 'auth0|123' } } as never);
+    jest.mocked(authSession.getSession).mockResolvedValue({ user: { sub: 'auth0|123' } } as never);
     jest.mocked(checkRateLimitFritzBox).mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
     mockGetCachedData.mockImplementation(async (_key, fn) => fn());
     for (const c of cases) {

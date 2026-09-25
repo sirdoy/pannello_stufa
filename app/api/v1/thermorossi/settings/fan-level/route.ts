@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * POST /api/v1/thermorossi/settings/fan-level
  * Sets the fan level via HA proxy.
  * Body: { value: number }
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
 export const POST = withAuthAndErrorHandler(

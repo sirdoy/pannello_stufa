@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/tuya/plugs
  * Returns all configured Tuya smart plugs with current state and energy data.
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const plugs = await getPlugs();

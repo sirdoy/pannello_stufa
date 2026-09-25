@@ -21,7 +21,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import { unauthorized, handleError } from './apiResponse';
 import { ref, get, set } from 'firebase/database';
 import { db } from '@/lib/firebase';
@@ -30,7 +30,7 @@ import { db } from '@/lib/firebase';
 // TYPE DEFINITIONS
 // =============================================================================
 
-/** Auth0 session type */
+/** Session type */
 interface Session {
   user: {
     sub: string;
@@ -114,7 +114,7 @@ export function withErrorHandler(handler: UnauthHandler, logContext: string | nu
 // =============================================================================
 
 /**
- * Internal: Wraps a route handler with Auth0 authentication
+ * Internal: Wraps a route handler with session authentication
  * Automatically returns 401 if user is not authenticated.
  * When BYPASS_AUTH=true, provides a mock session (dev only).
  */
@@ -124,7 +124,7 @@ function withAuth(handler: AuthedHandler): UnauthHandler {
       return handler(request, context, DEV_SESSION);
     }
 
-    const session = await auth0.getSession(request);
+    const session = await authSession.getSession(request);
 
     if (!session?.user) {
       return unauthorized();

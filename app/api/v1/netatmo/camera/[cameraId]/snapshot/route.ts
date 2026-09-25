@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
  * fetches the VPN snapshot server-side and streams the JPEG bytes back, which
  * is what `<img src>` actually needs.
  *
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const cameraId = await getPathParam(context, 'cameraId');

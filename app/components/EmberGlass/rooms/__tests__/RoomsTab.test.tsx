@@ -17,8 +17,8 @@
 
 import { fireEvent, render, screen } from '@testing-library/react';
 
-// --- Auth0 / Version mocks -------------------------------------------
-jest.mock('@auth0/nextjs-auth0/client', () => ({
+// --- useUser / Version mocks -------------------------------------------
+jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'auth0|test-user' } }),
 }));
 

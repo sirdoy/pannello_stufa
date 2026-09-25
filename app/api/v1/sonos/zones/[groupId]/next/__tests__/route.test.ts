@@ -3,15 +3,15 @@
  */
 
 jest.mock('@/lib/sonos/sonosProxy');
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 
 import { POST } from '../route';
 import * as sonosProxy from '@/lib/sonos/sonosProxy';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockNext = jest.mocked(sonosProxy.next);
 const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 

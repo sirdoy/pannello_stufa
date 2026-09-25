@@ -18,7 +18,7 @@
  *   9. overlay has aria-hidden="true"
  *  10. wordmark text === 'Home'
  *  11. caption text contains 'Connessione al gateway…' (U+2026)
- *  12. badge text contains 'Autenticato · Auth0' (U+00B7)
+ *  12. badge text contains 'Autenticato · Casa' (U+00B7)
  *  13. overlay zIndex === 1000
  */
 import { act, render, screen } from '@testing-library/react';
@@ -172,14 +172,14 @@ describe('Splash (EmberGlass overlay — Phase 176)', () => {
       expect(screen.getByText(`Connessione al gateway${ellipsis}`)).toBeInTheDocument();
     });
 
-    test('badge text contains "Autenticato · Auth0" (U+00B7 middle dot)', () => {
+    test('badge text contains "Autenticato · Casa" (U+00B7 middle dot)', () => {
       const onDone = jest.fn();
       render(<Splash onDone={onDone} />);
 
       const badge = screen.getByTestId('splash-badge');
       // U+00B7 explicit codepoint check.
       const middleDot = '·';
-      expect(badge.textContent).toContain(`Autenticato ${middleDot} Auth0`);
+      expect(badge.textContent).toContain(`Autenticato ${middleDot} Casa`);
     });
 
     test('overlay zIndex === 1000 (D-06 reservation)', () => {

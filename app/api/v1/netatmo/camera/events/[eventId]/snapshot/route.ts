@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/netatmo/camera/events/[eventId]/snapshot
  * Streams binary JPEG snapshot for a specific camera event from proxy.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const eventId = await getPathParam(context, 'eventId');

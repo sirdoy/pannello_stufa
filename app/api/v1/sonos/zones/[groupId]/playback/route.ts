@@ -5,7 +5,7 @@
  *
  * Returns current playback state for a zone (transport state, track info, position).
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, getPathParam } from '@/lib/core';

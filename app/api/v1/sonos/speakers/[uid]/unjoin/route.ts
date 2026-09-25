@@ -4,7 +4,7 @@
  * POST /api/v1/sonos/speakers/{uid}/unjoin — remove speaker from its group, returns 202
  * No request body.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, getPathParam, HTTP_STATUS } from '@/lib/core';

@@ -3,7 +3,7 @@
  * /stanze route — Phase 179 (Plan 179-08 / ROOMS-01 / CONTEXT D-04).
  *
  * Mounts <RoomsTab /> as a client route.
- * Auth0 wrap is automatic via app/layout.tsx ClientProviders.
+ * Session gate is automatic via app/layout.tsx ClientProviders.
  * Pattern mirrors app/page.tsx (Phase 177 dashboard root).
  *
  * Tailwind layout class on <section> is the explicit carve-out per

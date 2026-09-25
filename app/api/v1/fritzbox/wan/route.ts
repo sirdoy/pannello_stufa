@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/fritzbox/wan
  * Retrieves WAN connection status from Fritz!Box
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Rate limited: 10 requests per minute
  * Cached: 60-second TTL
  *

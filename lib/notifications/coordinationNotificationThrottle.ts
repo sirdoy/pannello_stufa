@@ -29,7 +29,7 @@ interface ThrottleResult {
 }
 
 // In-memory storage: Map<userId, timestamp>
-// Key: userId (Auth0 sub)
+// Key: userId (session sub)
 // Value: Timestamp (ms) when last coordination notification was sent
 const lastNotificationSent = new Map<string, number>();
 

@@ -49,7 +49,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/config/dashboard
  *
  * Returns current user's dashboard preferences or defaults.
- * User ID is extracted from Auth0 session.
+ * User ID is extracted from the session.
  *
  * Response:
  * {
@@ -73,7 +73,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
  * POST /api/config/dashboard
  *
  * Save dashboard preferences for the current user.
- * User ID is extracted from Auth0 session.
+ * User ID is extracted from the session.
  *
  * Request body:
  * {

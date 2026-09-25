@@ -102,7 +102,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Text variant="secondary" size="sm">
           Network API endpoints proxy to the Fritz!Box Home Network API at{''}
-          <code className="text-xs">{EXTERNAL_BASE}</code>. All proxy routes require Auth0 authentication.
+          <code className="text-xs">{EXTERNAL_BASE}</code>. All proxy routes require an authenticated session.
           Devices endpoint is rate limited to 10 req/min with 60s cache.
         </Text>
       </div>

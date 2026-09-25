@@ -9,7 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 // @ts-expect-error - No type definitions available
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import {

@@ -6,7 +6,7 @@
  * Triggers calibration on all valves simultaneously via the HA proxy.
  * Returns 202 Accepted with suggested_poll_delay_s.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, HTTP_STATUS } from '@/lib/core';

@@ -2,7 +2,7 @@
  * GET /api/auth/api-keys  — List all API keys
  * POST /api/auth/api-keys — Create a new API key
  *
- * Both endpoints require Auth0 session (D-07, T-157-06).
+ * Both endpoints require an authenticated session (D-07, T-157-06).
  * HA proxy JWT is obtained server-side and never returned to client (D-03).
  *
  * POST returns the full api_key once at creation (APIKeyResponse) — this is

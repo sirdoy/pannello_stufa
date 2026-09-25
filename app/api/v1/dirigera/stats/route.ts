@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/dirigera/stats
  * Returns DIRIGERA aggregation and retention statistics from the HA proxy.
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getStats();

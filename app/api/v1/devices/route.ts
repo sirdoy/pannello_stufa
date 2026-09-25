@@ -17,7 +17,7 @@
  *   - limit (default 100, clamp 1..1000) (D-18)
  *   - offset (default 0, clamp >=0) (D-19)
  *
- * Protected: Requires Auth0 authentication via `withAuthAndErrorHandler`.
+ * Protected: Requires an authenticated session via `withAuthAndErrorHandler`.
  */
 
 import { withAuthAndErrorHandler, success, parseQuery } from '@/lib/core';

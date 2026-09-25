@@ -31,7 +31,7 @@ type DeviceStatus = 'active' | 'stale' | 'unknown';
 /**
  * GET /api/notifications/devices
  * Fetch all registered devices for the authenticated user
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;

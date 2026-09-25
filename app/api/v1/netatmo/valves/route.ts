@@ -5,7 +5,7 @@
  *
  * Returns all valve modules with battery level, RF signal, reachability, and calibration state.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

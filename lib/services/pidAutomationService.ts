@@ -71,7 +71,7 @@ export async function getPidConfig(userId: string | undefined): Promise<PIDConfi
  * Set PID automation config for a user via server-side API route.
  * Uses Admin SDK on the server to bypass client-side Firebase rules.
  *
- * @param {string} _userId - Auth0 user ID (kept for API compatibility, auth handled by session)
+ * @param {string} _userId - User ID (kept for API compatibility, auth handled by session)
  * @param {Object} config - Configuration to save
  * @param {boolean} config.enabled - Whether PID automation is enabled
  * @param {string|null} config.targetRoomId - Netatmo room ID to monitor
@@ -107,7 +107,7 @@ export async function setPidConfig(_userId: string, config: Partial<PIDConfig>):
 /**
  * Subscribe to PID automation config (real-time updates)
  *
- * @param {string} userId - Auth0 user ID (required)
+ * @param {string} userId - User ID (session sub) (required)
  * @param {Function} callback - Called with config on each update
  * @returns {Function} - Unsubscribe function (noop if no userId)
  *

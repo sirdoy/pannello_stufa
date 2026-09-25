@@ -17,13 +17,13 @@ import { fireEvent, render, screen } from '@testing-library/react';
 // dedicated test at the bottom of the file with explicit fixture props.
 import { StoveSheet, StoveSheetSelfFetch } from '../StoveSheet';
 
-// --- Router / Auth0 / Version mocks -------------------------------------
+// --- Router / useUser / Version mocks -------------------------------------
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-jest.mock('@auth0/nextjs-auth0/client', () => ({
+jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'auth0|test' } }),
 }));
 

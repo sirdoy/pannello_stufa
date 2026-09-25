@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/thermorossi/history
  * Returns paginated stove telemetry history from the HA proxy.
  * Query params forwarded: start, end, scale, limit, offset
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (request) => {
   const { searchParams } = request.nextUrl;

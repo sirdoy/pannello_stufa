@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Toggles camera monitoring on/off via proxy.
  * Body: { monitoring: "on" | "off" }
  * cameraId is taken from the URL path param (not from the body).
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Returns: 202 Accepted with suggested_poll_delay_s
  */
 export const POST = withAuthAndErrorHandler(async (request, context) => {

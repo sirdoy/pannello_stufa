@@ -13,7 +13,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { useVersion } from '@/app/context/VersionContext';
 import { Heading, Skeleton, LoadingOverlay, Toast } from '@/app/components/ui';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';

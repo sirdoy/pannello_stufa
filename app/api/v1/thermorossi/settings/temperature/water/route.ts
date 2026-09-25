@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * POST /api/v1/thermorossi/settings/temperature/water
  * Sets the water temperature setpoint via HA proxy.
  * Body: { value: number } — range 40-80 validated by proxy (422 on out-of-range)
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  * Idempotent: Returns cached response for duplicate Idempotency-Key
  */
 export const POST = withAuthAndErrorHandler(

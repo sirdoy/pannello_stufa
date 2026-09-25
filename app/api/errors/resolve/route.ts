@@ -37,7 +37,7 @@ interface ErrorData {
 /**
  * POST /api/errors/resolve
  * Mark a stove error as resolved
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
   const body = (await parseJsonOrThrow(request)) as ResolveErrorBody;

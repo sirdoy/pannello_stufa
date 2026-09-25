@@ -73,7 +73,7 @@ jest.mock('@/app/components/devices/stove/hooks/useStoveData', () => ({
   useStoveData: () => ({ ...baseStoveData, ...stoveDataOverride }),
 }));
 
-jest.mock('@auth0/nextjs-auth0/client', () => ({
+jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'user-123' } }),
 }));
 

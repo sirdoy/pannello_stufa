@@ -22,7 +22,7 @@ function formatTime(isoString: string | undefined): string | null {
  * GET /api/weather/forecast?lat=X&lon=Y
  * Retrieves weather forecast for given coordinates
  * Returns current conditions and 5-day forecast with Italian descriptions
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  *
  * Query params:
  * - lat: Latitude (-90 to 90)

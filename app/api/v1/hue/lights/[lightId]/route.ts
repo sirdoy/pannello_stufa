@@ -7,7 +7,7 @@
  * - On/off state, brightness, color temperature
  * - Room enrichment, capability tier, reachability
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, getPathParam } from '@/lib/core';

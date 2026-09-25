@@ -5,15 +5,15 @@
 jest.mock('@/lib/registry', () => ({
   registryProxy: { updateType: jest.fn(), deleteType: jest.fn() },
 }));
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 
 import { PUT } from '../route';
 import { registryProxy } from '@/lib/registry';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockUpdateType = jest.mocked(registryProxy.updateType);
 const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 

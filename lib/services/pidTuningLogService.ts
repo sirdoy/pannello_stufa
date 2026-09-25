@@ -24,7 +24,7 @@ function getTuningLogPath(userId: string): string {
 /**
  * Log a PID tuning entry to Firebase
  *
- * @param userId - Auth0 user ID
+ * @param userId - User ID (session sub)
  * @param entry - Tuning data to log (timestamp auto-added if not provided)
  * @returns Promise that resolves when log is saved
  *
@@ -59,7 +59,7 @@ export async function logPidTuningEntry(
 /**
  * Clean up old PID tuning logs (keeps last 14 days)
  *
- * @param userId - Auth0 user ID
+ * @param userId - User ID (session sub)
  * @param retentionDays - Number of days to retain (default: 14)
  * @returns Promise that resolves with number of entries deleted
  *

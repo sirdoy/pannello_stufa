@@ -7,7 +7,7 @@
  *   1. Dispositivi (data-driven from /api/devices/config + getNavigationStructureWithPreferences)
  *   2. Sistema (3 static rows)
  *   3. Impostazioni (7 static rows — only routes that EXIST on disk per UI-SPEC OQ-2)
- *   4. Account (1 row: Esci, flame-red, external Auth0 redirect)
+ *   4. Account (1 row: Esci, flame-red, full-page logout)
  *
  * Inline fetch of /api/devices/config (RESEARCH OQ-1: extract a hook only if
  * Phase 182 needs it). Mirrors legacy Navbar.tsx:140-167 idiom.

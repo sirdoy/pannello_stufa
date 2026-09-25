@@ -26,7 +26,7 @@
 import { useState } from 'react';
 import { Flame } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';

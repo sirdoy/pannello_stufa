@@ -100,16 +100,21 @@ npm run test:e2e:report   # Report HTML
 npm run test:e2e:clean    # Pulizia manuale
 ```
 
-### TEST_MODE
+### TEST_MODE / BYPASS_AUTH
 
-Bypassa Auth0 per test automatici:
+Bypassa il login (middleware + `lib/auth/session.ts`) per test automatici:
 
 ```env
 # .env.local (solo testing!)
 TEST_MODE=true
+BYPASS_AUTH=true
 ```
 
 **IMPORTANTE**: Riportare a `false` dopo i test!
+
+Con `BYPASS_AUTH=false`, `tests/auth.setup.ts` esegue un login reale via form `/auth/login`
+(`tests/helpers/auth.helpers.ts` → `signIn()`), usando l'account di test sul Pi
+(`E2E_TEST_USER_EMAIL` / `E2E_TEST_USER_PASSWORD` in `.env.local`).
 
 ### Theme Testing
 

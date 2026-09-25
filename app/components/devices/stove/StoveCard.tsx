@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { useVersion } from '@/app/context/VersionContext';
 import Card from '../../ui/Card';
 import Skeleton from '../../ui/Skeleton';

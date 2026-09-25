@@ -48,7 +48,7 @@ interface SendNotificationBody {
 /**
  * POST /api/notifications/send
  * Send push notification to a user
- * Protected: Requires Auth0 authentication + admin or self
+ * Protected: Requires an authenticated session + admin or self
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;

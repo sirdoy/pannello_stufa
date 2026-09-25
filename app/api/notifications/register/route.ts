@@ -62,7 +62,7 @@ function sanitizeFirebaseKey(token: string): string {
 /**
  * POST /api/notifications/register
  * Register FCM token for user with device deduplication
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const userId = session.user.sub;

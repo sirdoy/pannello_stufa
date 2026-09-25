@@ -45,7 +45,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       {/* Preconnect: critical API domains */}
       <link rel="preconnect" href="https://pannellostufa-default-rtdb.europe-west1.firebasedatabase.app" />
       <link rel="preconnect" href="https://pannellostufa.firebaseapp.com" />
-      <link rel="preconnect" href="https://pannellostufa.eu.auth0.com" />
       <AppleSplashScreens />
       <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png" />

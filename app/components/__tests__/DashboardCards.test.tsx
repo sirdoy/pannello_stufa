@@ -16,9 +16,9 @@ jest.mock('next/navigation', () => ({
   useParams: jest.fn(() => ({})),
 }));
 
-// Mock @/lib/auth0
-jest.mock('@/lib/auth0', () => ({
-  auth0: {
+// Mock @/lib/auth/session
+jest.mock('@/lib/auth/session', () => ({
+  authSession: {
     getSession: jest.fn(),
   },
 }));
@@ -89,7 +89,7 @@ jest.mock('@/app/components/ui', () => ({
 }));
 
 // Helper imports (after mocks are defined)
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
@@ -109,7 +109,7 @@ async function renderDashboardCards() {
 describe('DashboardCards', () => {
   beforeEach(() => {
     // Default: authenticated session
-    (auth0.getSession as jest.Mock).mockResolvedValue({
+    (authSession.getSession as jest.Mock).mockResolvedValue({
       user: { sub: 'test-user', email: 'test@example.com' },
     });
     // Default: empty device config
@@ -131,7 +131,7 @@ describe('DashboardCards', () => {
   });
 
   it('redirects to login when no session', async () => {
-    (auth0.getSession as jest.Mock).mockResolvedValue(null);
+    (authSession.getSession as jest.Mock).mockResolvedValue(null);
 
     // redirect() throws in Next.js, so we handle it
     const { redirect: mockRedirect } = require('next/navigation');

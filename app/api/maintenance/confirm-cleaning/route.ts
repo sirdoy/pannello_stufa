@@ -31,7 +31,7 @@ interface MaintenanceData {
 /**
  * POST /api/maintenance/confirm-cleaning
  * Confirm stove cleaning
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const POST = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;

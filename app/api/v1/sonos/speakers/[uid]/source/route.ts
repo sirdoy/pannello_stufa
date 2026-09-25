@@ -4,7 +4,7 @@
  * POST /api/v1/sonos/speakers/{uid}/source — switch source (tv | line_in), returns 202
  * Body: { source: 'tv' | 'line_in' }
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, getPathParam, parseJson, HTTP_STATUS } from '@/lib/core';

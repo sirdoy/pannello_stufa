@@ -17,7 +17,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Minus, Plus, Power } from 'lucide-react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { useVersion } from '@/app/context/VersionContext';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';

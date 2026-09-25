@@ -123,7 +123,7 @@ await runTransaction(ref(db, 'maintenance'), (current) => {
 
 ### Architettura
 
-- **Auth**: Auth0 (NO Firebase Authentication)
+- **Auth**: login proprio (utenti sul Pi DB, cookie `ps_session`) — NO Firebase Authentication
 - **Client SDK**: Read operations
 - **Admin SDK**: Write operations (bypassa rules)
 - **Rules**: Block ALL client writes, allow specific reads

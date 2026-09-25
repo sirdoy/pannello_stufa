@@ -1,6 +1,6 @@
 'use client';
 
-import { Auth0Provider } from '@auth0/nextjs-auth0/client';
+import { UserProvider } from '@/lib/auth/useUser';
 import { VersionProvider } from '@/app/context/VersionContext';
 import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 import { ToastProvider } from '@/app/components/ui';
@@ -42,9 +42,9 @@ const MOCK_USER = BYPASS_AUTH
  * Wrapper per tutti i provider client-side
  * Permette di usare Context in layout.js (Server Component)
  *
- * When NEXT_PUBLIC_BYPASS_AUTH=true: passes mock user to Auth0Provider as SWR
- * fallback, so useUser() returns the mock user immediately without Auth0 auth.
- * The /auth/profile route also returns the mock user in bypass mode, so SWR
+ * When NEXT_PUBLIC_BYPASS_AUTH=true: passes the mock user to UserProvider, so
+ * useUser() returns it immediately without signing in.
+ * The /auth/profile route also returns the mock user in bypass mode, so
  * revalidation keeps returning the mock user consistently.
  */
 export default function ClientProviders({ children }: ClientProvidersProps) {
@@ -54,7 +54,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
   const wsManager = useWebSocketManager(onAuthPage ? null : WS_URL);
 
   return (
-    <Auth0Provider user={MOCK_USER}>
+    <UserProvider user={MOCK_USER}>
       <WebSocketContext.Provider value={wsManager}>
         <OnlineStatusProvider>
           <PageTransitionProvider>
@@ -72,6 +72,6 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
           </PageTransitionProvider>
         </OnlineStatusProvider>
       </WebSocketContext.Provider>
-    </Auth0Provider>
+    </UserProvider>
   );
 }

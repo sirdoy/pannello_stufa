@@ -14,7 +14,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import {
   isNotificationSupported,
   isIOS,

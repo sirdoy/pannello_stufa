@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { Splash } from './Splash';
 
@@ -10,8 +10,8 @@ const SPLASH_FLAG_KEY = 'ember-glass-splash-shown';
 /**
  * SplashGate — Phase 176 (SPLASH-01, SPLASH-04, SPLASH-05)
  *
- * Orchestrator that gates the post-Auth0 splash animation:
- *   1. Reads useUser() from @auth0/nextjs-auth0/client.
+ * Orchestrator that gates the post-login splash animation:
+ *   1. Reads useUser() from @/lib/auth/useUser.
  *   2. Reads sessionStorage[SPLASH_FLAG_KEY] to enforce session-once (SPLASH-04).
  *   3. Reads useReducedMotion() to honor prefers-reduced-motion: reduce.
  *   4. Mounts <Splash> as a sibling overlay over {children}, NOT a wrapper —
@@ -19,7 +19,7 @@ const SPLASH_FLAG_KEY = 'ember-glass-splash-shown';
  *      the splash window (SPLASH-05; D-05 / D-20 / D-21).
  *
  * <Splash> is purely presentational; this orchestrator owns ALL integration
- * concerns. <Splash> never touches sessionStorage / Auth0 / matchMedia.
+ * concerns. <Splash> never touches sessionStorage / auth / matchMedia.
  *
  * Mount: inside ClientProviders, wrapping {children} between <OfflineBanner>
  * and <InstallPrompt> (CONTEXT.md D-04).

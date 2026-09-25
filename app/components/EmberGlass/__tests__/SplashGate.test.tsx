@@ -2,7 +2,7 @@
  * SplashGate Tests — Phase 176 (SPLASH-01, SPLASH-04, SPLASH-05)
  *
  * Covers full state matrix per CONTEXT.md decisions D-04..D-12, D-16, D-17, D-29:
- * Auth0 useUser() shape, sessionStorage persistence, useReducedMotion forwarding,
+ * useUser() shape, sessionStorage persistence, useReducedMotion forwarding,
  * sibling-overlay render contract (children always present so dashboard fetches
  * start during splash window — SPLASH-05), forceShow bypass, incognito graceful
  * no-op on sessionStorage write failure.
@@ -12,7 +12,7 @@ import { render, act } from '@testing-library/react';
 import { SplashGate } from '../SplashGate';
 
 const mockUseUser = jest.fn();
-jest.mock('@auth0/nextjs-auth0/client', () => ({
+jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => mockUseUser(),
 }));
 
@@ -60,7 +60,7 @@ describe('SplashGate (EmberGlass orchestrator — Phase 176)', () => {
     expect(queryByTestId('splash-overlay')).not.toBeInTheDocument();
   });
 
-  it('does NOT mount <Splash> while Auth0 isLoading (D-10 — flicker prevention)', () => {
+  it('does NOT mount <Splash> while useUser isLoading (D-10 — flicker prevention)', () => {
     mockUseUser.mockReturnValue({ user: undefined, isLoading: true });
     const { queryByTestId } = render(
       <SplashGate>

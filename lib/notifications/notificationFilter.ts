@@ -53,7 +53,7 @@ interface DndWindow {
 /**
  * Filter notification based on user preferences
  *
- * @param {string} userId - User ID (Auth0 sub)
+ * @param {string} userId - User ID (session sub)
  * @param {string} notifType - Notification type (e.g., 'scheduler_success', 'CRITICAL')
  * @param {Object} preferences - User notification preferences from Firebase
  * @param {Array<Object>} tokens - Array of FCM tokens with device info

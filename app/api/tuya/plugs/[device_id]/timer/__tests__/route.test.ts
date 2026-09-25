@@ -6,16 +6,16 @@
 
 // Mock dependencies before imports
 jest.mock('@/lib/tuya/tuyaProxy');
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 
 import { POST } from '../route';
 import { setTimer } from '@/lib/tuya/tuyaProxy';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetTimer = jest.mocked(setTimer);
 const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 

@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/tuya/plugs/[device_id]
  * Returns current state of a single Tuya plug.
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const deviceId = await getPathParam(context, 'device_id');

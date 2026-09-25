@@ -7,8 +7,8 @@
 
 // Mock dependencies before imports
 jest.mock('@/lib/tuya/tuyaProxy');
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 
 import { GET } from '../route';

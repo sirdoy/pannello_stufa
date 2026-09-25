@@ -6,7 +6,7 @@
  * Returns room measurement data from the HA proxy.
  * Forwards query params (home_id, room_id, scale, type required) to the proxy.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

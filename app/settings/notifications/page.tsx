@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { ref, onValue, off } from 'firebase/database';
 import { db } from '@/lib/firebase';
 import {

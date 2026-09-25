@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import { Card, Button, Banner, Skeleton, Heading, Text } from '@/app/components/ui';
 import Toggle from '@/app/components/ui/Toggle';
 import { NETATMO_ROUTES } from '@/lib/routes';

@@ -4,7 +4,7 @@
  * GET  /api/v1/sonos/speakers/{uid}/home-theater — read home-theater settings
  * PUT  /api/v1/sonos/speakers/{uid}/home-theater — update home-theater (partial), returns 202
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success, getPathParam, parseJson, HTTP_STATUS } from '@/lib/core';

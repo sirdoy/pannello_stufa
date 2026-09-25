@@ -98,7 +98,7 @@ interface DeviceConfigData {
 
 /**
  * Get unified device config (CLIENT-SIDE - uses client SDK)
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @returns {Promise<Object>} Device configuration
  */
 async function getUnifiedDeviceConfig(userId: string): Promise<DeviceConfigData> {
@@ -125,7 +125,7 @@ async function getUnifiedDeviceConfig(userId: string): Promise<DeviceConfigData>
 /**
  * Get unified device config (SERVER-SIDE - uses Admin SDK)
  * Includes on-demand migration from old data structures
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @returns {Promise<Object>} Device configuration
  */
 export async function getUnifiedDeviceConfigAdmin(userId: string): Promise<DeviceConfigData> {
@@ -165,7 +165,7 @@ export async function getUnifiedDeviceConfigAdmin(userId: string): Promise<Devic
 
 /**
  * Save unified device config (SERVER-SIDE - uses Admin SDK)
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @param {Object} config - Device configuration to save
  * @returns {Promise<void>}
  */
@@ -186,7 +186,7 @@ export async function saveUnifiedDeviceConfigAdmin(userId: string, config: Parti
 /**
  * Migrate from old data format to unified config
  * Handles both v2 (enabled + dashboardVisible) and v1 (separate stores)
- * @param {string} userId - Auth0 user ID
+ * @param {string} userId - User ID (session sub)
  * @param {Object|null} existingConfig - Existing config if any
  * @returns {Promise<Object>} Migrated config
  */

@@ -14,7 +14,7 @@ Soluzioni rapide per problemi comuni.
 
 ---
 
-## Authentication (Auth0)
+## Authentication (login proprio)
 
 ### Link Menu → Homepage (Mobile)
 
@@ -22,27 +22,18 @@ Soluzioni rapide per problemi comuni.
 
 **Causa**: Middleware non preserva URL destinazione.
 
-**Fix** (v1.10.1):
-```javascript
-// middleware.js - Auth0 v4 gestisce automaticamente
-import { auth0 } from '@/lib/auth0';
-export default auth0.middleware();
-```
+**Fix**: `middleware.ts` imposta `returnTo` nel redirect a `/auth/login`; il form (`app/auth/login/page.tsx`)
+naviga a `safeReturnTo(returnTo)` dopo il login.
 
 ### Redirect Loop (Mobile Production)
 
 **Sintomo**: Login OK ma navigazione causa re-login continuo.
 
-**Causa**: Cookie session non persiste su mobile.
+**Causa**: Cookie session non persiste (secret errata o cookie non impostato correttamente).
 
-**Fix**:
-```env
-AUTH0_COOKIE_SAME_SITE=lax
-AUTH0_SESSION_ROLLING=true
-AUTH0_SESSION_ROLLING_DURATION=86400
-```
-
-**Verifica Auth0 Dashboard**: Callback URLs devono includere `/auth/callback` (v4 usa `/auth/*` non `/api/auth/*`).
+**Fix**: verificare `SESSION_SECRET` (>= 32 caratteri) configurato su Vercel; le opzioni cookie
+(`httpOnly`, `sameSite: 'lax'`, `secure` in produzione) sono in `sessionCookieOptions()`
+(`lib/auth/sessionCookie.ts`) e non sono configurabili via env.
 
 ---
 

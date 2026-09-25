@@ -1,4 +1,4 @@
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import CameraEventsPage from './CameraEventsPage';
 
 export const dynamic = 'force-dynamic';
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 export default async function EventsPage() {
-  const session = await auth0.getSession();
+  const session = await authSession.getSession();
 
   if (!session || !session.user) {
     const { redirect } = await import('next/navigation');

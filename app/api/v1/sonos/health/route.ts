@@ -5,7 +5,7 @@
  *
  * Returns Sonos proxy health status and data freshness.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/sonos/zones/[groupId]/sleep-timer
  * Returns the current sleep timer state for a zone.
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  *
  * PUT /api/v1/sonos/zones/[groupId]/sleep-timer
  * Sets a sleep timer for a zone.

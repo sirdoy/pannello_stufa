@@ -1,6 +1,6 @@
 /**
  * Log Service - Centralized logging for user actions
- * Tracks all manual user actions with Auth0 user information
+ * Tracks all manual user actions with session user information
  */
 
 import { LOG_ROUTES } from './routes';

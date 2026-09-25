@@ -37,7 +37,7 @@ export const dynamic = 'force-dynamic';
  *   count: number
  * }
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (request, context, session) => {
   const user = session.user;

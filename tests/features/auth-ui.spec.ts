@@ -15,8 +15,8 @@ import { test, expect, type Route } from '@playwright/test';
  *     → row removed
  *
  * All /api/auth/* routes are stubbed via page.route() — Playwright fulfils
- * inside the browser process so neither Auth0 nor the HA proxy is hit.
- * The Auth0 session ships with the Playwright storageState (see
+ * inside the browser process so the HA proxy is never hit.
+ * The login session ships with the Playwright storageState (see
  * tests/auth.setup.ts) so /login and /settings/api-keys are reachable as
  * client-rendered pages.
  */

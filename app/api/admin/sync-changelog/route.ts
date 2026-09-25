@@ -5,12 +5,12 @@
  * POST /api/admin/sync-changelog - Sync changelog to Firebase
  *
  * Protected: Requires either:
- * - Auth0 authentication + ADMIN_USER_ID (manual use)
+ * - User session + ADMIN_USER_ID (manual use)
  * - Bearer token matching CRON_SECRET (GitHub Actions automation)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 import { syncVersionHistoryToFirebase } from '@/lib/changelogService';
 import { VERSION_HISTORY } from '@/lib/version';
 
@@ -18,11 +18,11 @@ export const dynamic = 'force-dynamic';
 
 interface AuthorizationResult {
   authorized: boolean;
-  method?: 'token' | 'auth0';
+  method?: 'token' | 'session';
 }
 
 /**
- * Helper to check admin access via Auth0
+ * Helper to check admin access via the user session
  */
 function isAdmin(session: any): boolean {
   return session?.user?.sub === process.env.ADMIN_USER_ID;
@@ -40,7 +40,7 @@ function isValidSecretToken(request: NextRequest): boolean {
 }
 
 /**
- * Helper to verify authorization (Auth0 session OR secret token)
+ * Helper to verify authorization (user session OR secret token)
  */
 async function verifyAuthorization(request: NextRequest): Promise<AuthorizationResult> {
   // First check secret token (for automated sync)
@@ -48,11 +48,11 @@ async function verifyAuthorization(request: NextRequest): Promise<AuthorizationR
     return { authorized: true, method: 'token' };
   }
 
-  // Then check Auth0 session (for manual admin use)
+  // Then check the user session (for manual admin use)
   try {
-    const session = await auth0.getSession(request);
+    const session = await authSession.getSession(request);
     if (session && isAdmin(session)) {
-      return { authorized: true, method: 'auth0' };
+      return { authorized: true, method: 'session' };
     }
   } catch {
     // Session check failed, continue

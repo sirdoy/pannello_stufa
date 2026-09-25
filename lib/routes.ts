@@ -102,7 +102,7 @@ const USER_ROUTES = {
   me: `${API_BASE}/user`,
 } as const;
 
-// Auth endpoints (Auth0 v4 - mounted by middleware)
+// Auth endpoints (first-party login, app/auth/*)
 const AUTH_ROUTES = {
   login: '/auth/login',
   logout: '/auth/logout',

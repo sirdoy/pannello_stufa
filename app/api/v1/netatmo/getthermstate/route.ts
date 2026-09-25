@@ -6,7 +6,7 @@
  * Returns thermostat state (current setpoint and program list) from the HA proxy.
  * Forwards query params (device_id required) to the proxy.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

@@ -5,7 +5,7 @@
  *
  * Returns current room temperatures and heating status from the HA proxy.
  *
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';

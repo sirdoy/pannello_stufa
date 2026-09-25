@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/sonos/zones/[groupId]/queue
  * Returns the paginated playback queue for a zone.
  * Query params: limit (optional), offset (optional)
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  */
 export const GET = withAuthAndErrorHandler(async (request, context) => {
   const groupId = await getPathParam(context, 'groupId');

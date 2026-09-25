@@ -1,20 +1,19 @@
 /**
- * Auth0 profile endpoint
+ * Profile endpoint
  *
- * Returns the authenticated user's profile for client-side useUser() calls.
- * Auth0 v4 client useUser() hook fetches from this endpoint via SWR.
+ * Returns the signed-in user for the client-side useUser() hook (lib/auth/useUser.tsx):
+ * 200 + user, or 204 when there is no session.
  *
- * When BYPASS_AUTH=true: returns mock user for local dev without Auth0 credentials.
- * When BYPASS_AUTH=false: reads session from auth0 (real Auth0 session).
+ * When BYPASS_AUTH=true: returns the mock dev user (lib/auth/session.ts).
  */
 
 import { NextResponse } from 'next/server';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const session = await auth0.getSession();
+  const session = await authSession.getSession();
 
   if (!session?.user) {
     return new NextResponse(null, { status: 204 });

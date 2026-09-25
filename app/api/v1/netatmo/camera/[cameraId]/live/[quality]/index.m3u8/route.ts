@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
  * HLS playlist relayed from the backend (`proxy_streams.{quality}`). The backend
  * rewrites segment URIs to /api/v1/netatmo/camera/{id}/live/{quality}/seg/..., which
  * resolve to the sibling Next route below — so every fetch stays same-origin and
- * Auth0-authenticated (Netatmo VPN URLs are not playable from a browser).
+ * Session-authenticated (Netatmo VPN URLs are not playable from a browser).
  */
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const cameraId = await getPathParam(context, 'cameraId');

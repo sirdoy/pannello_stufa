@@ -8,9 +8,9 @@
  * requests, forcing a fresh login. No HA-proxy call is made; this route is
  * a purely local-cookie mutation.
  *
- * Requires Auth0 session (D-07, T-157-06) via withAuthAndErrorHandler.
+ * Requires an authenticated session (D-07, T-157-06) via withAuthAndErrorHandler.
  * Threat mitigations — see plan threat_model (T-170-02 sameSite=lax, T-170-06
- * Auth0-session gate, T-170-08 httpOnly set at login).
+ * session gate, T-170-08 httpOnly set at login).
  */
 
 import { cookies } from 'next/headers';

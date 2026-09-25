@@ -4,7 +4,7 @@
  * GET /api/geocoding/reverse?lat=X&lon=Y - Get city name for coordinates
  *
  * Uses Open-Meteo Geocoding API to find the nearest city for given coordinates.
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 
 import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';

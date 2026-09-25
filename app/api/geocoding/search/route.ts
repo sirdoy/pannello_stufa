@@ -4,7 +4,7 @@
  * GET /api/geocoding/search?q=Milano - Search for cities matching query
  *
  * Returns up to 5 city suggestions from Open-Meteo Geocoding API.
- * Protected: Requires Auth0 authentication.
+ * Protected: Requires an authenticated session.
  */
 
 import { withAuthAndErrorHandler, success, badRequest } from '@/lib/core';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from '@/lib/auth/useUser';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import { Card, Button, Heading, Text, Skeleton, EmptyState, Banner } from '@/app/components/ui';
 import DeviceListItem from '@/components/notifications/DeviceListItem';

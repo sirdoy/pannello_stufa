@@ -6,8 +6,8 @@
 // Mock dependencies before imports
 jest.mock('@/lib/network/vendorCache');
 jest.mock('@/lib/network/deviceCategories');
-jest.mock('@/lib/auth0', () => ({
-  auth0: {
+jest.mock('@/lib/auth/session', () => ({
+  authSession: {
     getSession: jest.fn(),
   },
 }));
@@ -15,9 +15,9 @@ jest.mock('@/lib/auth0', () => ({
 import { GET } from '../route';
 import { getCachedVendor, cacheVendor, fetchVendorName } from '@/lib/network/vendorCache';
 import { categorizeByVendor, getCategoryOverride } from '@/lib/network/deviceCategories';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCachedVendor = jest.mocked(getCachedVendor);
 const mockCacheVendor = jest.mocked(cacheVendor);
 const mockFetchVendorName = jest.mocked(fetchVendorName);

@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/v1/fritzbox/health
  * Checks HomeAssistant Network API connectivity
- * Protected: Requires Auth0 authentication
+ * Protected: Requires an authenticated session
  *
  * Success: { status: 'connected', providers: {...} }
  * Errors:

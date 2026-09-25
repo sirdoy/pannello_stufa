@@ -4,15 +4,15 @@
 
 jest.mock('@/lib/hue/hueProxy');
 jest.mock('@/lib/firebaseAdmin', () => ({ adminDbPush: jest.fn() }));
-jest.mock('@/lib/auth0', () => ({
-  auth0: { getSession: jest.fn() },
+jest.mock('@/lib/auth/session', () => ({
+  authSession: { getSession: jest.fn() },
 }));
 
 import { POST } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
-import { auth0 } from '@/lib/auth0';
+import { authSession } from '@/lib/auth/session';
 
-const mockGetSession = jest.mocked(auth0.getSession);
+const mockGetSession = jest.mocked(authSession.getSession);
 const mockActivateScene = jest.mocked(hueProxy.activateScene);
 const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 

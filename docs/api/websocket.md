@@ -80,10 +80,15 @@ Authentication is provided via URL query parameters. The WebSocket browser API d
 |--------|----------------|---------|
 | API Key | `?api_key=ha_live_...` | `wss://host/ws/live?api_key=ha_live_abc123...` |
 | JWT Token | `?token=eyJ...` | `wss://host/ws/live?token=eyJhbGci...` |
+| User WS token (browsers) | `?token=eyJ...` | 60 s token from `POST /auth/ws-token` (JWT `typ: "ws"`, active user) |
 
 Credentials are validated before the connection is accepted. An invalid or missing credential results in close code `1008`.
 
-**How to get credentials:** See [Authentication](./auth.md) for API key creation (`POST /auth/api-keys`) and JWT login (`POST /auth/login`).
+**How to get credentials:** See [Authentication](./auth.md) for API key creation (`POST /auth/api-keys`), JWT login (`POST /auth/login`) and user WS tokens (`POST /auth/ws-token`).
+
+**Browsers (Pannello Stufa):** the Next.js server calls `POST /auth/ws-token` for the logged-in user and hands the
+token to the page, which connects with `?token=`. A new token is requested for every (re)connect; it is checked
+only at connect time, so an open connection outlives the token's 60 s.
 
 > **Security note:** `?api_key=` in the URL appears in server access logs, browser history, and network inspector tabs. Use short-lived **JWT tokens** for browser-side Next.js clients. Reserve API keys for server-side Next.js route handlers where the URL is not exposed to the browser.
 

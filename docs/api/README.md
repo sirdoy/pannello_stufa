@@ -30,7 +30,7 @@ See also: [Netatmo Setup Guide](../NETATMO_SETUP.md)
 | [Rooms](./rooms.md) | `/api/v1/rooms` | Room management — CRUD, device association, room/house status, health — 11 endpoints |
 | [Device Registry](./registry.md) | `/api/v1/registry` | Device types and device CRUD, health — 9 endpoints |
 | [Automations](./automations.md) | `/api/v1/automations` | Automation rules CRUD and execution history — 6 endpoints |
-| [Auth](./auth.md) | `/auth` | JWT login, API key management, user sessions and user management — 12 endpoints |
+| [Auth](./auth.md) | `/auth` | JWT login, API key management, user sessions, user management and WS tokens — 13 endpoints |
 | [Common](./common.md) | N/A | Global health check and aggregated device list — 2 endpoints |
 
 ---

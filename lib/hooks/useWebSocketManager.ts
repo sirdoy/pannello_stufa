@@ -32,9 +32,12 @@ export interface WebSocketManager {
  *   topic get the last payload replayed locally instead of a duplicate
  *   server snapshot fanned out to every existing callback
  *
- * @param wsUrl - Full WebSocket URL including auth query parameter, or null to disable connection
+ * @param wsUrl - Full WebSocket URL (or async resolver called on every connect, see
+ *   lib/ws/wsUrl.ts), or null to disable the connection
  */
-export function useWebSocketManager(wsUrl: string | null): WebSocketManager {
+export function useWebSocketManager(
+  wsUrl: string | (() => Promise<string>) | null
+): WebSocketManager {
   /** Per-topic callback registry. Keyed by Topic, value is a Set of callbacks. */
   const callbacksRef = useRef<Map<Topic, Set<TopicCallback>>>(new Map());
   /** Last payload received per topic — replayed to callbacks joining an active topic. */
@@ -71,6 +74,8 @@ export function useWebSocketManager(wsUrl: string | null): WebSocketManager {
       shouldReconnect: (event: CloseEvent) => event.code !== 1008,
       /** Max reconnect attempts */
       reconnectAttempts: 10,
+      /** Retry (with the same backoff) when the URL resolver fails, e.g. token fetch error */
+      retryOnError: true,
       /** Exponential backoff: 1s → 2s → 4s → ... capped at 30s (WS-04) */
       reconnectInterval: (attempt: number) => Math.min(1000 * 2 ** attempt, 30000),
     },

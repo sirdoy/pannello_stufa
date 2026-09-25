@@ -2,7 +2,7 @@
 
 **Base path:** `/auth`
 
-Authentication and API key management — JWT token login and CRUD operations for API keys. The auth module is mounted at `/auth` (not under `/api/v1`). Admin/API-key endpoints are rate-limited at 10 requests/minute per IP or auth credential. Also hosts the first-party user sessions (email/password on the Pi DB, replacing Auth0). 12 endpoints.
+Authentication and API key management — JWT token login and CRUD operations for API keys. The auth module is mounted at `/auth` (not under `/api/v1`). Admin/API-key endpoints are rate-limited at 10 requests/minute per IP or auth credential. Also hosts the first-party user sessions (email/password on the Pi DB, replacing Auth0). 13 endpoints.
 
 > **Note:** The auth prefix is `/auth`, NOT `/api/v1/auth`. All auth endpoint URLs start with `http://localhost:8000/auth/...`
 
@@ -21,6 +21,7 @@ Authentication and API key management — JWT token login and CRUD operations fo
 | `POST` | `/auth/session/logout` | Revoke a refresh token | API key |
 | `GET` | `/auth/me` | Current user of a user access token | API key + user Bearer |
 | `POST` | `/auth/me/password` | Change own password (rotates sessions) | API key + user Bearer |
+| `POST` | `/auth/ws-token` | 60 s token for `/ws/live?token=` | API key + user Bearer |
 | `GET` | `/auth/users` | List users | API key + admin Bearer |
 | `POST` | `/auth/users` | Create user | API key + admin Bearer |
 | `PATCH` | `/auth/users/{user_id}` | Update user (partial) | API key + admin Bearer |
@@ -344,6 +345,12 @@ until it expires (max 15 min): drop it from the cookie.
 Admin-only (role `admin` in the Bearer user access token, plus `X-API-Key`), except the self-service
 password change. Non-admin → `403`. Passwords: 10–256 chars.
 
+### POST /auth/ws-token
+
+Any active user (API key + user Bearer). **Response (200):** `{"token": "eyJ...", "expires_in": 60}` — a JWT with
+`typ: "ws"` accepted only by `/ws/live?token=` (not by REST routes), checked at connect time. Lets browsers open the
+WebSocket without holding an API key.
+
 ### POST /auth/me/password
 
 Any active user. **Body:** `{"current_password": "...", "new_password": "..."}`.
@@ -457,6 +464,8 @@ interface UserUpdateRequest {  // only present fields change
 }
 
 interface PasswordChangeRequest { current_password: string; new_password: string; }
+
+interface WsTokenResponse { token: string; expires_in: number; }
 
 interface SessionTokens {
   access_token: string;

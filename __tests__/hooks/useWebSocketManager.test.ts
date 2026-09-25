@@ -243,6 +243,20 @@ describe('Idempotent topic subscription', () => {
 // ---------------------------------------------------------------------------
 
 describe('WS-04: Reconnection config with exponential backoff', () => {
+  it('accepts an async URL resolver and retries when it fails (8.7 WS token)', () => {
+    const resolver = async () => 'wss://ha.local/ws/live?token=t';
+    renderHook(() => useWebSocketManager(resolver));
+
+    const [url, options, connect] = (useWebSocket as jest.Mock).mock.calls[0] as [
+      unknown,
+      Record<string, unknown>,
+      boolean,
+    ];
+    expect(url).toBe(resolver);
+    expect(connect).toBe(true);
+    expect(options['retryOnError']).toBe(true);
+  });
+
   it('passes reconnectAttempts: 10', () => {
     renderHook(() => useWebSocketManager(TEST_URL));
 

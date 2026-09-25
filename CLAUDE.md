@@ -39,10 +39,10 @@ npm run lint
 | Adapter per provider | `lib/<provider>/*Proxy.ts`, `*WsAdapter.ts` |
 | Route proxy (1:1 con backend `/api/v1/...`, sessione via `withAuthAndErrorHandler`) | `app/api/v1/<provider>/**/route.ts`; `app/api/{rooms,registry,raspi,tuya}` |
 | Tipi contratto | `types/*Proxy.ts`, `types/websocket.ts`, `types/automations.ts` (← `docs/api/automations.types.ts`) |
-| WebSocket | `app/components/ClientProviders.tsx` → `${NEXT_PUBLIC_WS_URL}/ws/live?api_key=`, `lib/hooks/useWebSocketManager.ts`, `app/context/WebSocketContext.ts`; polling HTTP come fallback |
+| WebSocket | `app/components/ClientProviders.tsx` → `${NEXT_PUBLIC_WS_URL}/ws/live?token=` (token 60s da `/api/ws-token` a ogni connessione, `lib/ws/wsUrl.ts`), `lib/hooks/useWebSocketManager.ts`, `app/context/WebSocketContext.ts`; polling HTTP come fallback |
 | Login utenti (Fase 8) | `/auth/login` → `app/api/auth/session` → backend `/auth/session/*`; cookie cifrato `ps_session` (`lib/auth/sessionCookie.ts`), refresh in `middleware.ts`; `lib/auth0.ts` = shim `auth0.getSession()` (nome storico); `session.user.sub` = `legacy_sub` Auth0 o `user:<id>` |
 | Backend JWT (solo gestione API key) | `lib/auth/authProxy.ts`, `app/api/auth/api-keys` |
-| Env | `HA_API_URL`, `HA_API_KEY`, `HA_ADMIN_USER`, `HA_ADMIN_PASSWORD`, `NEXT_PUBLIC_WS_URL`, `NEXT_PUBLIC_WS_API_KEY` |
+| Env | `HA_API_URL`, `HA_API_KEY`, `HA_ADMIN_USER`, `HA_ADMIN_PASSWORD`, `NEXT_PUBLIC_WS_URL`, `SESSION_SECRET` |
 
 **Aggiungere un endpoint backend al frontend**: sync `docs/api` → tipo in `types/` → funzione in
 `lib/<provider>/*Proxy.ts` → route `app/api/v1/...` (`export const dynamic = 'force-dynamic'`) → hook/componente → test.

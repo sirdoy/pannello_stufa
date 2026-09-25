@@ -13,6 +13,8 @@ import { SplashGate } from '@/app/components/EmberGlass';
 import { ReactNode } from 'react';
 import { WebSocketContext } from '@/app/context/WebSocketContext';
 import { useWebSocketManager } from '@/lib/hooks/useWebSocketManager';
+import { createWsUrlResolver } from '@/lib/ws/wsUrl';
+import { usePathname } from 'next/navigation';
 import { OnlineStatusProvider } from '@/app/context/OnlineStatusContext';
 
 interface ClientProvidersProps {
@@ -23,8 +25,8 @@ interface ClientProvidersProps {
 const BYPASS_AUTH = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true';
 
 const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL ?? '';
-const WS_API_KEY = process.env.NEXT_PUBLIC_WS_API_KEY ?? '';
-const WS_URL = WS_BASE_URL && WS_API_KEY ? `${WS_BASE_URL}/ws/live?api_key=${WS_API_KEY}` : null;
+// Stable resolver: fetches a short-lived WS token before every (re)connect (roadmap 8.7)
+const WS_URL = WS_BASE_URL ? createWsUrlResolver(WS_BASE_URL) : null;
 
 const MOCK_USER = BYPASS_AUTH
   ? {
@@ -46,7 +48,10 @@ const MOCK_USER = BYPASS_AUTH
  * revalidation keeps returning the mock user consistently.
  */
 export default function ClientProviders({ children }: ClientProvidersProps) {
-  const wsManager = useWebSocketManager(WS_URL);
+  const pathname = usePathname();
+  // No live connection on the sign-in screens (no session yet)
+  const onAuthPage = pathname === '/auth' || pathname?.startsWith('/auth/');
+  const wsManager = useWebSocketManager(onAuthPage ? null : WS_URL);
 
   return (
     <Auth0Provider user={MOCK_USER}>

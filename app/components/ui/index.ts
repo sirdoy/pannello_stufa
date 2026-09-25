@@ -46,7 +46,6 @@ export { default as EmptyState } from './EmptyState';
 export { default as OfflineBanner } from './OfflineBanner';
 
 // Tooltip (v3.0+)
-export { default as Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from './Tooltip';
 
 // Popover (v4.0+)
 export { default as Popover, PopoverTrigger, PopoverContent, PopoverClose, PopoverArrow } from './Popover';
@@ -55,10 +54,8 @@ export { default as Popover, PopoverTrigger, PopoverContent, PopoverClose, Popov
 export { default as Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 
 // Sheet (v4.0+)
-export { default as Sheet, SheetTrigger, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription, SheetClose } from './Sheet';
 
 // Accordion (v4.0+)
-export { default as Accordion, AccordionItem, AccordionTrigger, AccordionContent } from './Accordion';
 
 // Command Palette (v4.0+)
 export { default as CommandPalette } from './CommandPalette';
@@ -75,7 +72,6 @@ export { default as Badge, badgeVariants } from './Badge';
 export { default as ConnectionStatus, connectionStatusVariants, dotVariants } from './ConnectionStatus';
 export { default as HealthIndicator, healthIndicatorVariants } from './HealthIndicator';
 export { default as SmartHomeCard, smartHomeCardVariants, SmartHomeCardHeader, SmartHomeCardStatus, SmartHomeCardControls } from './SmartHomeCard';
-export { default as StatusCard } from './StatusCard';
 
 // DataTable (v4.0+)
 export { default as DataTable, dataTableVariants } from './DataTable';
@@ -104,14 +100,10 @@ export type { DividerProps } from './Divider';
 
 // Namespace components
 export type { TabsProps, TabsListProps, TabsTriggerProps, TabsContentProps } from './Tabs';
-export type { SheetProps, SheetOverlayProps, SheetContentProps, SheetHeaderProps, SheetFooterProps, SheetTitleProps, SheetDescriptionProps } from './Sheet';
-export type { AccordionProps, AccordionItemProps, AccordionTriggerProps, AccordionContentProps } from './Accordion';
-export type { TooltipProps, TooltipProviderProps, TooltipRootProps, TooltipContentProps } from './Tooltip';
 export type { PopoverProps, PopoverContentProps, PopoverCloseProps, PopoverArrowProps } from './Popover';
 
 // Smart home components
 export type { SmartHomeCardProps, SmartHomeCardHeaderProps, SmartHomeCardStatusProps, SmartHomeCardControlsProps } from './SmartHomeCard';
-export type { StatusCardProps } from './StatusCard';
 
 // Feedback components
 export type { SpinnerProps } from './Spinner';

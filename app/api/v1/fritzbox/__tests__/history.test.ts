@@ -15,13 +15,12 @@ jest.mock('@/lib/auth/session', () => ({
 }));
 
 import { GET } from '../history/route';
-import { fritzboxClient, getDeviceEvents } from '@/lib/fritzbox';
+import { fritzboxClient } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
 import type { DeviceEvent } from '@/app/components/devices/network/types';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockClientGetDeviceEvents = jest.fn();
-const mockFirebaseGetDeviceEvents = jest.mocked(getDeviceEvents);
 
 describe('GET /api/v1/fritzbox/history', () => {
   let mockRequest: Request;
@@ -50,7 +49,6 @@ describe('GET /api/v1/fritzbox/history', () => {
     const data = await response.json();
 
     expect(mockClientGetDeviceEvents).toHaveBeenCalledWith(24, undefined);
-    expect(mockFirebaseGetDeviceEvents).not.toHaveBeenCalled();
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.events).toEqual([mockEvents[1], mockEvents[0]]);

@@ -40,7 +40,6 @@ import ControlButton from '../ControlButton';
 import ConnectionStatus from '../ConnectionStatus';
 import HealthIndicator from '../HealthIndicator';
 import SmartHomeCard from '../SmartHomeCard';
-import StatusCard from '../StatusCard';
 
 expect.extend(toHaveNoViolations);
 
@@ -835,70 +834,6 @@ describe('Accessibility Test Suite - All Components', () => {
       });
     });
 
-    describe('StatusCard', () => {
-      test('basic has no violations', async () => {
-        const { container } = render(
-          <StatusCard icon="🌡️" title="Temperature" />
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('with status has no violations', async () => {
-        const { container } = render(
-          <StatusCard
-            icon="🔥"
-            title="Heater"
-            status="Heating"
-            statusVariant="ember"
-          />
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('with connectionStatus has no violations', async () => {
-        const { container } = render(
-          <StatusCard
-            icon="📡"
-            title="Router"
-            connectionStatus="online"
-          />
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test('compact size has no violations', async () => {
-        const { container } = render(
-          <StatusCard
-            icon="💡"
-            title="Light"
-            size="compact"
-            status="On"
-            statusVariant="sage"
-          />
-        );
-        const results = await axe(container);
-        expect(results).toHaveNoViolations();
-      });
-
-      test.each(['ember', 'sage', 'ocean', 'warning', 'danger', 'neutral'] as const)(
-        '%s statusVariant has no violations',
-        async (statusVariant) => {
-          const { container } = render(
-            <StatusCard
-              icon="📊"
-              title="Metric"
-              status="Status"
-              statusVariant={statusVariant}
-            />
-          );
-          const results = await axe(container);
-          expect(results).toHaveNoViolations();
-        }
-      );
-    });
   });
 
   // ==================== FOCUS INDICATOR VERIFICATION ====================

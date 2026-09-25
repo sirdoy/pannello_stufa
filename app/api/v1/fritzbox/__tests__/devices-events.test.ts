@@ -19,18 +19,12 @@ import {
   getCachedData,
   checkRateLimitFritzBox,
   fritzboxClient,
-  getDeviceStates,
-  updateDeviceStates,
-  logDeviceEvent,
 } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCachedData = jest.mocked(getCachedData);
 const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
-const mockGetDeviceStates = jest.mocked(getDeviceStates);
-const mockUpdateDeviceStates = jest.mocked(updateDeviceStates);
-const mockLogDeviceEvent = jest.mocked(logDeviceEvent);
 
 describe('GET /api/v1/fritzbox/devices', () => {
   let mockRequest: Request;
@@ -116,13 +110,4 @@ describe('GET /api/v1/fritzbox/devices', () => {
     }
   });
 
-  test('does not call any event detection functions', async () => {
-    mockGetCachedData.mockResolvedValue(mockDevices);
-
-    await GET(mockRequest as any, {} as any);
-
-    expect(mockGetDeviceStates).not.toHaveBeenCalled();
-    expect(mockUpdateDeviceStates).not.toHaveBeenCalled();
-    expect(mockLogDeviceEvent).not.toHaveBeenCalled();
-  });
 });

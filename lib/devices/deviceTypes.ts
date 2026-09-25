@@ -398,8 +398,8 @@ export const SETTINGS_MENU: Record<string, SettingsMenuItem> = {
       id: 'design-system',
       name: 'Design System',
       icon: '🎨',
-      route: '/debug/design-system',
-      description: 'Documentazione componenti UI',
+      route: '/debug/design-system-v2',
+      description: 'Documentazione componenti EmberGlass',
     },
   } : {}),
 };

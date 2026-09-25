@@ -11,4 +11,3 @@
 export { fritzboxClient } from './fritzboxClient';
 export { getCachedData } from './fritzboxCache';
 export { checkRateLimitFritzBox } from './fritzboxRateLimiter';
-export { logDeviceEvent, getDeviceEvents, getDeviceStates, updateDeviceStates } from './deviceEventLogger';

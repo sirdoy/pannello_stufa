@@ -2,7 +2,7 @@
 
 **Base path:** `/auth`
 
-Authentication and API key management — JWT token login and CRUD operations for API keys. The auth module is mounted at `/auth` (not under `/api/v1`). Admin/API-key endpoints are rate-limited at 10 requests/minute per IP or auth credential. Also hosts the first-party user sessions (email/password on the Pi DB, replacing Auth0). 8 endpoints.
+Authentication and API key management — JWT token login and CRUD operations for API keys. The auth module is mounted at `/auth` (not under `/api/v1`). Admin/API-key endpoints are rate-limited at 10 requests/minute per IP or auth credential. Also hosts the first-party user sessions (email/password on the Pi DB, replacing Auth0). 12 endpoints.
 
 > **Note:** The auth prefix is `/auth`, NOT `/api/v1/auth`. All auth endpoint URLs start with `http://localhost:8000/auth/...`
 
@@ -20,6 +20,10 @@ Authentication and API key management — JWT token login and CRUD operations fo
 | `POST` | `/auth/session/refresh` | Rotate refresh token → new pair | API key |
 | `POST` | `/auth/session/logout` | Revoke a refresh token | API key |
 | `GET` | `/auth/me` | Current user of a user access token | API key + user Bearer |
+| `POST` | `/auth/me/password` | Change own password (rotates sessions) | API key + user Bearer |
+| `GET` | `/auth/users` | List users | API key + admin Bearer |
+| `POST` | `/auth/users` | Create user | API key + admin Bearer |
+| `PATCH` | `/auth/users/{user_id}` | Update user (partial) | API key + admin Bearer |
 
 ---
 
@@ -31,6 +35,7 @@ Authentication and API key management — JWT token login and CRUD operations fo
 - [GET /auth/api-keys](#get-authapi-keys)
 - [DELETE /auth/api-keys/{key_id}](#delete-authapi-keyskey_id)
 - [User sessions](#user-sessions)
+- [User management](#user-management)
 - [TypeScript Interfaces](#typescript-interfaces)
 
 ---
@@ -249,7 +254,8 @@ curl -X DELETE http://localhost:8000/auth/api-keys/1 \
 ## User sessions
 
 First-party login for panel users, stored in the Pi SQLite DB (`users`, `user_sessions`, migration v27).
-Replaces Auth0 on the frontend. Accounts are created with `scripts/create_user.py` (roles `admin`, `user`, `test`).
+Replaces Auth0 on the frontend. Accounts are created with `scripts/create_user.py` (roles `admin`, `user`, `test`; `--legacy-sub` links an
+old Auth0 subject so existing Firebase data stays attached).
 
 **Server-to-server only:** every route requires `X-API-Key`. The browser never calls these directly: the
 Next.js server does, and keeps the tokens in an httpOnly cookie. Without a valid key → `401`.
@@ -288,7 +294,8 @@ Next.js server does, and keeps the tokens in an httpOnly cookie. Without a valid
     "email": "me@example.com",
     "display_name": "Me",
     "role": "admin",
-    "last_login_at": "2026-09-24T15:00:00.123456Z"
+    "last_login_at": "2026-09-24T15:00:00.123456Z",
+    "legacy_sub": "google-oauth2|103557629222504914139"
   }
 }
 ```
@@ -329,6 +336,42 @@ until it expires (max 15 min): drop it from the cookie.
 |--------|-------------|
 | `401` | Bearer missing/invalid/expired, not a user access token, or user deactivated |
 | `429` | 120 req/min |
+
+---
+
+## User management
+
+Admin-only (role `admin` in the Bearer user access token, plus `X-API-Key`), except the self-service
+password change. Non-admin → `403`. Passwords: 10–256 chars.
+
+### POST /auth/me/password
+
+Any active user. **Body:** `{"current_password": "...", "new_password": "..."}`.
+**Response (200):** new `SessionTokens` — every existing session of the user is revoked (other devices are
+logged out at their next refresh); store the returned pair. `401` wrong current password.
+
+### GET /auth/users
+
+**Response (200):** `{"users": UserAdmin[], "count": number}` ordered by id.
+
+### POST /auth/users
+
+**Body:** `{"email", "password"?, "display_name"?, "role"?: "admin"|"user"|"test" (default "user")}`.
+Email is trimmed and lower-cased.
+**Response (201):** `{"user": UserAdmin, "generated_password": string | null}` — without `password` a random one
+is generated and returned **once**. `409` email already registered, `422` invalid email/short password.
+
+### PATCH /auth/users/{user_id}
+
+Partial update: only the fields present change. **Body (all optional):** `display_name` (null/"" clears),
+`role`, `is_active`, `password` (admin reset), `legacy_sub` (null/"" clears).
+A password reset or `is_active: false` revokes all sessions of that user.
+**Response (200):** `UserAdmin`.
+
+| Status | Description |
+|--------|-------------|
+| `404` | Unknown user |
+| `409` | `legacy_sub` already linked to another user; an admin demoting/deactivating themselves; removing the last active admin |
 
 ---
 
@@ -373,6 +416,9 @@ interface UserPublic {
   display_name: string | null;
   role: UserRole;
   last_login_at: string | null; // ISO 8601 UTC ("Z")
+  // Auth0 subject this account inherits (Firebase data key, v29); null for new users.
+  // Frontend session `sub` = legacy_sub ?? `user:${id}`.
+  legacy_sub: string | null;
 }
 
 interface SessionLoginRequest {
@@ -384,6 +430,33 @@ interface SessionLoginRequest {
 interface RefreshRequest {
   refresh_token: string;
 }
+
+interface UserAdmin extends UserPublic {
+  is_active: boolean;
+  created_at: string; // ISO 8601 UTC
+  updated_at: string;
+}
+
+interface UserListResponse { users: UserAdmin[]; count: number; }
+
+interface UserCreateRequest {
+  email: string;
+  password?: string;          // 10-256; omit to generate
+  display_name?: string | null;
+  role?: UserRole;            // default "user"
+}
+
+interface UserCreateResponse { user: UserAdmin; generated_password: string | null; }
+
+interface UserUpdateRequest {  // only present fields change
+  display_name?: string | null;
+  role?: UserRole;
+  is_active?: boolean;
+  password?: string;
+  legacy_sub?: string | null;
+}
+
+interface PasswordChangeRequest { current_password: string; new_password: string; }
 
 interface SessionTokens {
   access_token: string;

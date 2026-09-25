@@ -27,4 +27,6 @@ export interface RFC9457ProblemDetail {
 export interface HaRequestOptions {
   /** Request timeout in milliseconds. Defaults to 15000. */
   timeout?: number;
+  /** User access token, sent as `Authorization: Bearer` next to X-API-Key (user-scoped /auth routes). */
+  bearer?: string;
 }

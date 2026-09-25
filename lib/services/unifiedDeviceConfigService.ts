@@ -227,6 +227,12 @@ async function migrateFromOldFormat(userId: string, existingConfig: DeviceConfig
   const oldDashboardPrefs = (await adminDbGet<{ cardOrder?: Array<{ id: string; visible?: boolean }> }>(`users/${userId}/dashboardPreferences`)) ?? {};
   const oldCardOrder = oldDashboardPrefs.cardOrder || [];
 
+  // Brand-new user (nothing to migrate): start from the defaults (all devices
+  // visible) instead of an all-hidden config and an empty dashboard.
+  if (!existingConfig && oldCardOrder.length === 0 && Object.keys(oldDevicePrefs).length === 0) {
+    return getDefaultDeviceConfig();
+  }
+
   const devices: Array<{ id: string; visible: boolean; order: number }> = [];
   const processedIds = new Set<string>();
 

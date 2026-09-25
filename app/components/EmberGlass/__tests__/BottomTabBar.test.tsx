@@ -66,4 +66,10 @@ describe('BottomTabBar', () => {
     const { container } = render(<BottomTabBar />);
     expect(container.querySelector('[data-bottom-tab="true"]')).not.toBeNull();
   });
+
+  test('renders nothing on the sign-in pages (/auth/*)', () => {
+    mockUsePathname.mockReturnValue('/auth/login');
+    const { container } = render(<BottomTabBar />);
+    expect(container.firstChild).toBeNull();
+  });
 });

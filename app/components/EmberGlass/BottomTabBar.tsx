@@ -46,8 +46,11 @@ function isActive(pathname: string, route: string): boolean {
   return pathname === route || pathname.startsWith(`${route}/`);
 }
 
-export function BottomTabBar(): React.ReactElement {
+export function BottomTabBar(): React.ReactElement | null {
   const pathname = usePathname();
+
+  // No app navigation on the sign-in screens
+  if (pathname === '/auth' || pathname?.startsWith('/auth/')) return null;
 
   return (
     <nav aria-label="Navigazione principale">

@@ -1,5 +1,22 @@
-import { Auth0Client } from '@auth0/nextjs-auth0/server';
-import { NextRequest, NextResponse } from 'next/server';
+/**
+ * Server-side session access (roadmap Fase 8: first-party login on the Pi DB).
+ *
+ * Keeps the `auth0.getSession()` API the ~110 call sites and test mocks rely on,
+ * but reads our own sealed session cookie (lib/auth/sessionCookie.ts) instead of
+ * an Auth0 session. `session.user.sub` stays the per-user data key: the legacy
+ * Auth0 sub for migrated accounts, `user:<id>` otherwise.
+ *
+ * Token refresh happens in middleware.ts; here a session is valid until its
+ * refresh token expires.
+ */
+
+import type { NextRequest } from 'next/server';
+import {
+  SESSION_COOKIE,
+  isSessionAlive,
+  unsealSession,
+  type SessionUser,
+} from '@/lib/auth/sessionCookie';
 
 // =============================================================================
 // DEV BYPASS
@@ -8,115 +25,65 @@ import { NextRequest, NextResponse } from 'next/server';
 const BYPASS_AUTH = process.env.BYPASS_AUTH === 'true';
 const DEV_USER_ID = 'local-dev-user';
 
-const MOCK_SESSION = {
+const MOCK_SESSION: AppSession = {
   user: {
     sub: DEV_USER_ID,
     email: 'dev@localhost',
     name: 'Local Dev User',
     nickname: 'dev',
     picture: '',
+    role: 'admin',
   },
-  accessToken: 'mock-access-token',
-  tokenType: 'Bearer',
 };
 
 // =============================================================================
-// AUTH0 CLIENT
+// SESSION
 // =============================================================================
 
-// Auth0 v4 configuration
-// Map existing env vars to v4 expected names
-const issuerBaseUrl = process.env.AUTH0_ISSUER_BASE_URL;
-const domain = issuerBaseUrl?.replace(/^https?:\/\//, '') || process.env.AUTH0_DOMAIN;
-
-// Guard config construction so it doesn't throw when env vars are missing in bypass mode
-const auth0Config = BYPASS_AUTH ? {} : {
-  domain,
-  clientId: process.env.AUTH0_CLIENT_ID,
-  clientSecret: process.env.AUTH0_CLIENT_SECRET,
-  appBaseUrl: process.env.AUTH0_BASE_URL || process.env.APP_BASE_URL,
-  secret: process.env.AUTH0_SECRET,
-
-  // Session configuration (REQUIRED for persistent cookies)
-  session: {
-    name: 'appSession',
-    rolling: true,
-    rollingDuration: 24 * 60 * 60,  // 1 day (seconds)
-    absoluteDuration: 7 * 24 * 60 * 60,  // 7 days (seconds)
-    cookie: {
-      httpOnly: true,
-      // secure: false for localhost, true for production
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
-      path: '/',
-    }
-  },
-
-  // Routes configuration
-  routes: {
-    login: '/auth/login',
-    logout: '/auth/logout',
-    callback: '/auth/callback',
-    postLogoutRedirect: '/auth/login',
-  },
-
-  // Explicit OIDC discovery configuration to avoid fetch failures in middleware
-  // This prevents automatic discovery requests that can fail in Edge runtime
-  discovery: {
-    authorization_endpoint: `${issuerBaseUrl}/authorize`,
-    token_endpoint: `${issuerBaseUrl}/oauth/token`,
-    userinfo_endpoint: `${issuerBaseUrl}/userinfo`,
-    jwks_uri: `${issuerBaseUrl}/.well-known/jwks.json`,
-    issuer: issuerBaseUrl,
-  }
-};
-
-// When BYPASS_AUTH=true, export a stub that returns MOCK_SESSION without calling real Auth0.
-// This ensures auth0.getSession() in server pages returns the mock session without any
-// changes to those pages.
-export const auth0 = BYPASS_AUTH
-  ? ({
-      getSession: async () => MOCK_SESSION,
-      middleware: async () => undefined,
-    } as unknown as Auth0Client)
-  : new Auth0Client(auth0Config);
-
-/** Route context interface */
-interface RouteContext {
-  params: Promise<Record<string, string>>;
+/** Auth0-compatible session shape (user.sub/email/name/nickname/picture). */
+export interface AppSession {
+  user: {
+    sub: string;
+    email: string;
+    name: string;
+    nickname: string;
+    picture: string;
+    role: SessionUser['role'];
+    id?: number;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
 }
 
-/**
- * Wrapper for App Router API routes that require authentication.
- * Fixes TypeScript compatibility issue with auth0.withApiAuthRequired.
- *
- * Usage:
- *   export const GET = withAuth(async (request) => { ... });
- *   export const POST = withAuth(async (request) => { ... });
- *
- * @param handler - Async function that receives NextRequest
- * @returns Wrapped handler compatible with App Router
- */
-function withAuth(
-  handler: (request: NextRequest, context: RouteContext) => Promise<NextResponse>
-): (request: NextRequest, context: RouteContext) => Promise<NextResponse> {
-  return async function wrappedHandler(request: NextRequest, context: RouteContext): Promise<NextResponse> {
-    try {
-      const session = await auth0.getSession(request);
-      if (!session?.user) {
-        return NextResponse.json(
-          { error: 'Unauthorized', message: 'Authentication required' },
-          { status: 401 }
-        );
-      }
-      // Attach session to request for convenience
-      (request as NextRequest & { auth?: unknown }).auth = session;
-      return handler(request, context);
-    } catch (error) {
-      return NextResponse.json(
-        { error: 'Authentication error', message: (error as Error).message },
-        { status: 401 }
-      );
-    }
+function toAppSession(user: SessionUser): AppSession {
+  const name = user.name || user.email;
+  return {
+    user: {
+      sub: user.sub,
+      email: user.email,
+      name,
+      nickname: user.email.split('@')[0] ?? name,
+      picture: '',
+      role: user.role,
+      id: user.id,
+    },
   };
 }
+
+async function readCookie(request?: Pick<NextRequest, 'cookies'>): Promise<string | undefined> {
+  if (request?.cookies) {
+    return request.cookies.get(SESSION_COOKIE)?.value;
+  }
+  // Server components / route handlers called without the request object
+  const { cookies } = await import('next/headers');
+  return (await cookies()).get(SESSION_COOKIE)?.value;
+}
+
+async function getSession(request?: Pick<NextRequest, 'cookies'>): Promise<AppSession | null> {
+  if (BYPASS_AUTH) return MOCK_SESSION;
+  const stored = await unsealSession(await readCookie(request));
+  if (!stored || !isSessionAlive(stored)) return null;
+  return toAppSession(stored.user);
+}
+
+export const auth0 = { getSession };

@@ -15,7 +15,7 @@
  * - haPost sends JSON body with Content-Type: application/json
  */
 
-import { haGet, haPost } from '@/lib/haClient';
+import { haGet, haPost, haPatch } from '@/lib/haClient';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
 
 // Mock global fetch
@@ -56,6 +56,20 @@ describe('haGet', () => {
     expect(mockFetch).toHaveBeenCalledTimes(1);
     const [_url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
     expect((options.headers as Record<string, string>)['X-API-Key']).toBe(TEST_API_KEY);
+  });
+
+  it('adds Authorization: Bearer only when a user token is given', async () => {
+    mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+
+    await haGet('/auth/users', { bearer: 'user-token' });
+    await haPatch('/auth/users/1', { role: 'user' }, { bearer: 'user-token' });
+    await haGet('/api/test');
+
+    const headersOf = (i: number) =>
+      (mockFetch.mock.calls[i] as [string, RequestInit])[1].headers as Record<string, string>;
+    expect(headersOf(0)).toMatchObject({ 'X-API-Key': TEST_API_KEY, Authorization: 'Bearer user-token' });
+    expect(headersOf(1)).toMatchObject({ Authorization: 'Bearer user-token', 'Content-Type': 'application/json' });
+    expect(headersOf(2).Authorization).toBeUndefined();
   });
 
   it('builds URL from HA_API_URL + endpoint path', async () => {

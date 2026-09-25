@@ -6,7 +6,7 @@ test.describe('Authentication Flows', () => {
   // Clear auth state - these tests verify the actual auth flow
   test.use({ storageState: { cookies: [], origins: [] } });
 
-  test('should complete signin flow via Auth0', async ({ page }) => {
+  test('should complete signin flow', async ({ page }) => {
     await signIn(page, TEST_USER.email, TEST_USER.password);
 
     // After successful login, user should be on the home page
@@ -20,8 +20,8 @@ test.describe('Authentication Flows', () => {
     // Try to access protected page without auth
     await page.goto('/');
 
-    // Should redirect to Auth0 login
-    await expect(page).toHaveURL(/auth\/login|auth0/);
+    // Should redirect to the login page
+    await expect(page).toHaveURL(/auth\/login/);
   });
 
   test('should complete signout flow', async ({ page }) => {

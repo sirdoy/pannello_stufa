@@ -145,6 +145,10 @@ function mapCaughtError(error: unknown): never {
   );
 }
 
+function authHeaders(apiKey: string, bearer?: string): Record<string, string> {
+  return bearer ? { 'X-API-Key': apiKey, Authorization: `Bearer ${bearer}` } : { 'X-API-Key': apiKey };
+}
+
 // =============================================================================
 // PUBLIC API
 // =============================================================================
@@ -162,14 +166,14 @@ export async function haGet<T>(
   options: HaRequestOptions = {}
 ): Promise<T> {
   const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS } = options;
+  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
     const response = await fetch(`${baseUrl}${endpoint}`, {
-      headers: { 'X-API-Key': apiKey },
+      headers: authHeaders(apiKey, bearer),
       signal: controller.signal,
     });
 
@@ -201,7 +205,7 @@ export async function haPost<T>(
   options: HaRequestOptions = {}
 ): Promise<T> {
   const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS } = options;
+  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -210,7 +214,7 @@ export async function haPost<T>(
     const response = await fetch(`${baseUrl}${endpoint}`, {
       method: 'POST',
       headers: {
-        'X-API-Key': apiKey,
+        ...authHeaders(apiKey, bearer),
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
@@ -245,7 +249,7 @@ export async function haPut<T>(
   options: HaRequestOptions = {}
 ): Promise<T> {
   const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS } = options;
+  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -254,7 +258,7 @@ export async function haPut<T>(
     const response = await fetch(`${baseUrl}${endpoint}`, {
       method: 'PUT',
       headers: {
-        'X-API-Key': apiKey,
+        ...authHeaders(apiKey, bearer),
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
@@ -289,7 +293,7 @@ export async function haPatch<T>(
   options: HaRequestOptions = {}
 ): Promise<T> {
   const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS } = options;
+  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -298,7 +302,7 @@ export async function haPatch<T>(
     const response = await fetch(`${baseUrl}${endpoint}`, {
       method: 'PATCH',
       headers: {
-        'X-API-Key': apiKey,
+        ...authHeaders(apiKey, bearer),
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
@@ -331,7 +335,7 @@ export async function haDelete(
   options: HaRequestOptions = {}
 ): Promise<void> {
   const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS } = options;
+  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
@@ -339,7 +343,7 @@ export async function haDelete(
   try {
     const response = await fetch(`${baseUrl}${endpoint}`, {
       method: 'DELETE',
-      headers: { 'X-API-Key': apiKey },
+      headers: authHeaders(apiKey, bearer),
       signal: controller.signal,
     });
 

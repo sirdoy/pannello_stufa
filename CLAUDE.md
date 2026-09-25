@@ -1,6 +1,6 @@
 # CLAUDE.md - Pannello Stufa (frontend)
 
-**Next.js 16 PWA** | React 19 · TypeScript · Tailwind 4 · Auth0 · Firebase · Vercel
+**Next.js 16 PWA** | React 19 · TypeScript · Tailwind 4 · login proprio (utenti sul Pi) · Firebase · Vercel
 Frontend del sistema domotico: il backend è `../backend` (FastAPI su Raspberry Pi). Workspace: [../CLAUDE.md](../CLAUDE.md).
 Device: stufa Thermorossi, Netatmo (termostato, valvole, camera), Hue, Sonos, Fritz!Box (rete, telefonia), IKEA Dirigera, Tuya, Raspberry Pi.
 
@@ -37,9 +37,10 @@ npm run lint
 |------|------|
 | REST client (server-only, `X-API-Key`, timeout 15s, RFC 9457 → `ApiError`) | `lib/haClient.ts` (`haGet/haPost/haPut/haPatch/haDelete`) |
 | Adapter per provider | `lib/<provider>/*Proxy.ts`, `*WsAdapter.ts` |
-| Route proxy (1:1 con backend `/api/v1/...`, Auth0 via `withAuthAndErrorHandler`) | `app/api/v1/<provider>/**/route.ts`; `app/api/{rooms,registry,raspi,tuya}` |
+| Route proxy (1:1 con backend `/api/v1/...`, sessione via `withAuthAndErrorHandler`) | `app/api/v1/<provider>/**/route.ts`; `app/api/{rooms,registry,raspi,tuya}` |
 | Tipi contratto | `types/*Proxy.ts`, `types/websocket.ts`, `types/automations.ts` (← `docs/api/automations.types.ts`) |
 | WebSocket | `app/components/ClientProviders.tsx` → `${NEXT_PUBLIC_WS_URL}/ws/live?api_key=`, `lib/hooks/useWebSocketManager.ts`, `app/context/WebSocketContext.ts`; polling HTTP come fallback |
+| Login utenti (Fase 8) | `/auth/login` → `app/api/auth/session` → backend `/auth/session/*`; cookie cifrato `ps_session` (`lib/auth/sessionCookie.ts`), refresh in `middleware.ts`; `lib/auth0.ts` = shim `auth0.getSession()` (nome storico); `session.user.sub` = `legacy_sub` Auth0 o `user:<id>` |
 | Backend JWT (solo gestione API key) | `lib/auth/authProxy.ts`, `app/api/auth/api-keys` |
 | Env | `HA_API_URL`, `HA_API_KEY`, `HA_ADMIN_USER`, `HA_ADMIN_PASSWORD`, `NEXT_PUBLIC_WS_URL`, `NEXT_PUBLIC_WS_API_KEY` |
 

@@ -3,42 +3,30 @@ import { Page } from '@playwright/test';
 /**
  * Reusable Auth Helpers for E2E Tests
  *
- * Centralizes Auth0 Universal Login interaction patterns.
- * If Auth0 UI changes, only these helpers need updating.
+ * First-party login (roadmap Fase 8): email/password form on /auth/login backed
+ * by the users table on the Pi. Use the internal `test` account
+ * (E2E_TEST_USER_EMAIL / E2E_TEST_USER_PASSWORD in .env.local).
  */
 
 /**
- * Sign in via Auth0 Universal Login
- *
- * Auth0 uses a 2-step flow:
- * 1. Email submission → Continue
- * 2. Password submission → Continue
+ * Sign in through the /auth/login form.
  *
  * @param page - Playwright page instance
- * @param email - Auth0 user email
- * @param password - Auth0 user password
+ * @param email - account email
+ * @param password - account password
  */
 export async function signIn(
   page: Page,
   email: string,
   password: string
 ): Promise<void> {
-  // Navigate to app login route (redirects to Auth0)
   await page.goto('/auth/login');
-
-  // Wait for Auth0 Universal Login page
-  await page.waitForURL(/.*auth0.*/);
-
-  // Step 1: Email submission
-  await page.getByLabel('Email address').fill(email);
-  await page.getByRole('button', { name: 'Continue' }).click();
-
-  // Step 2: Password submission
+  await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password').fill(password);
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Accedi' }).click();
 
-  // Wait for redirect back to app (any app page = success)
-  await page.waitForURL('http://localhost:3000/**');
+  // Any app page other than the login screen = success
+  await page.waitForURL((url) => !url.pathname.startsWith('/auth/'));
 }
 
 /**

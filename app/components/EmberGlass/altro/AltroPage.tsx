@@ -34,7 +34,7 @@ import { useEffect, useState } from 'react';
 import {
   Flame, Thermometer, Lightbulb, Music, Package, Plug, Wifi, Cpu, Phone,
   ScrollText, Boxes, History,
-  Settings, Bell, KeyRound, LayoutDashboard, MapPin,
+  Settings, Bell, KeyRound, LayoutDashboard, MapPin, Users,
   LogOut, MoreHorizontal,
   User,
   SlidersHorizontal,
@@ -159,6 +159,7 @@ export function AltroPage(): React.ReactElement {
           >
             <AltroRow icon={Settings} label="Generali" href="/settings" />
             <AltroRow icon={Bell} label="Notifiche" href="/settings/notifications" />
+            <AltroRow icon={Users} label="Account e utenti" href="/settings/users" />
             <AltroRow icon={KeyRound} label="API Keys" href="/settings/api-keys" />
             <AltroRow
               icon={LayoutDashboard}

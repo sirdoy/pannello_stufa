@@ -310,11 +310,12 @@ describe('DesignSystemV2Page (Phase 174 — DS-03, DS-05)', () => {
       expect(container.querySelector('.glass-surface')).not.toBeNull();
     });
 
+    // axe over the whole design-system page takes ~4 s alone: give it headroom.
     it('has no a11y violations', async () => {
       const { container } = render(<DesignSystemV2Page />);
       const results = await axe(container);
       expect(results).toHaveNoViolations();
-    });
+    }, 20000);
   });
 
   describe('Phase 182 — section decomposition (D-21)', () => {

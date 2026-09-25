@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/react';
 import React from 'react';
-import { toHaveNoViolations, configureAxe } from 'jest-axe';
+import type { configureAxe } from 'jest-axe';
 
 // Declare global test environment variables and utilities
 declare global {
@@ -362,20 +362,32 @@ afterEach(() => {
 });
 
 // ===== ACCESSIBILITY TESTING (jest-axe) =====
-// Import and extend jest-axe matchers for a11y assertions
-expect.extend(toHaveNoViolations);
-
-// Configure axe for better test stability in JSDOM
-// Note: Color contrast checks are disabled because JSDOM doesn't compute styles accurately
-const configuredAxe = configureAxe({
-  rules: {
-    // Disable rules that have known issues in JSDOM
-    'color-contrast': { enabled: false },
+// jest-axe (axe-core) costs ~200 ms to load and only a few dozen of ~480 suites
+// use it, so it is required lazily: on the first toHaveNoViolations call or
+// global.axe access.
+expect.extend({
+  toHaveNoViolations(this: jest.MatcherContext, ...args: unknown[]) {
+    const { toHaveNoViolations } = require('jest-axe');
+    return toHaveNoViolations.toHaveNoViolations.apply(this, args);
   },
 });
 
-// Export configured axe for test files that need custom configuration
-global.axe = configuredAxe;
+// Configured axe for test files that need custom configuration.
+// Note: Color contrast checks are disabled because JSDOM doesn't compute styles accurately
+Object.defineProperty(global, 'axe', {
+  configurable: true,
+  get() {
+    const { configureAxe: configure } = require('jest-axe');
+    const configuredAxe = configure({
+      rules: {
+        // Disable rules that have known issues in JSDOM
+        'color-contrast': { enabled: false },
+      },
+    });
+    Object.defineProperty(global, 'axe', { value: configuredAxe, configurable: true, writable: true });
+    return configuredAxe;
+  },
+});
 
 // Helper for jest-axe with fake timers (axe-core uses setTimeout internally)
 // Usage: await runAxeWithRealTimers(container)

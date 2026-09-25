@@ -5,8 +5,7 @@
  * (confidentiality + integrity) using only Web Crypto, so it works both in the
  * Edge middleware and in Node route handlers.
  *
- * Key: SHA-256 of SESSION_SECRET. AUTH0_SECRET is still read as a legacy fallback
- * so existing deployments keep their sessions until SESSION_SECRET is set.
+ * Key: SHA-256 of SESSION_SECRET.
  */
 
 export const SESSION_COOKIE = 'ps_session';
@@ -37,7 +36,7 @@ const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
 export function getSessionSecret(): string {
-  const secret = process.env.SESSION_SECRET || process.env.AUTH0_SECRET;
+  const secret = process.env.SESSION_SECRET;
   if (!secret || secret.length < 32) {
     throw new Error('Session not configured: set SESSION_SECRET (>= 32 chars)');
   }

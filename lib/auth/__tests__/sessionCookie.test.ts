@@ -59,11 +59,22 @@ describe('sessionCookie', () => {
   });
 
   it('requires a secret of at least 32 chars', async () => {
-    const saved = { s: process.env.SESSION_SECRET, a: process.env.AUTH0_SECRET };
+    const saved = process.env.SESSION_SECRET;
     process.env.SESSION_SECRET = 'short';
-    delete process.env.AUTH0_SECRET;
     await expect(sealSession(makeSession())).rejects.toThrow(/SESSION_SECRET/);
-    process.env.SESSION_SECRET = saved.s;
-    process.env.AUTH0_SECRET = saved.a;
+    process.env.SESSION_SECRET = saved;
+  });
+
+  it('ignores the legacy AUTH0_SECRET', async () => {
+    const saved = { s: process.env.SESSION_SECRET, a: process.env.AUTH0_SECRET };
+    try {
+      delete process.env.SESSION_SECRET;
+      process.env.AUTH0_SECRET = 'x'.repeat(64);
+      await expect(sealSession(makeSession())).rejects.toThrow(/SESSION_SECRET/);
+    } finally {
+      process.env.SESSION_SECRET = saved.s;
+      if (saved.a === undefined) delete process.env.AUTH0_SECRET;
+      else process.env.AUTH0_SECRET = saved.a;
+    }
   });
 });

@@ -32,7 +32,7 @@ jobs:
         run: npm run build
         env:
           # Session cookie key (lib/auth/sessionCookie.ts)
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET || secrets.AUTH0_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           # Firebase config (needed for build)
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY || 'dummy-for-build' }}
           NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'dummy-for-build' }}
@@ -46,7 +46,7 @@ jobs:
         run: npx playwright test
         env:
           # Session cookie key (lib/auth/sessionCookie.ts)
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET || secrets.AUTH0_SECRET }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
           # E2E test user credentials
           E2E_TEST_USER_EMAIL: ${{ secrets.E2E_TEST_USER_EMAIL }}
           E2E_TEST_USER_PASSWORD: ${{ secrets.E2E_TEST_USER_PASSWORD }}

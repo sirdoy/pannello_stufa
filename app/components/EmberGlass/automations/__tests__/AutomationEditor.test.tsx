@@ -75,6 +75,12 @@ jest.mock('../sections/ActionsSection', () => ({
   ),
 }));
 
+jest.mock('../sections/HistorySection', () => ({
+  HistorySection: ({ ruleId }: { ruleId: number }) => (
+    <div data-testid="history-section" data-rule-id={ruleId} />
+  ),
+}));
+
 jest.mock('../sections/AdvancedSection', () => ({
   AdvancedSection: ({ minInterval, maxPerHour }: { minInterval: number; maxPerHour: number }) => (
     <div data-testid="advanced-section">
@@ -173,6 +179,19 @@ describe('Tab navigation', () => {
     renderNew();
     fireEvent.click(screen.getByRole('tab', { name: /Azioni/ }));
     expect(screen.getByTestId('actions-section')).toBeInTheDocument();
+  });
+
+  it('edit mode adds a Storico tab showing the rule history', () => {
+    renderEdit();
+    expect(screen.getAllByRole('tab')).toHaveLength(5);
+    fireEvent.click(screen.getByRole('tab', { name: 'Storico' }));
+    expect(screen.getByTestId('history-section')).toHaveAttribute('data-rule-id', '1');
+  });
+
+  it('create mode has no Storico tab', () => {
+    renderNew();
+    expect(screen.getAllByRole('tab')).toHaveLength(4);
+    expect(screen.queryByRole('tab', { name: 'Storico' })).toBeNull();
   });
 
   it('navigates to AdvancedSection on tab click', () => {

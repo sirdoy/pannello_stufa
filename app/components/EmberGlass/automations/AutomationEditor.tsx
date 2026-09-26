@@ -36,11 +36,14 @@ import { TriggerSection } from './sections/TriggerSection';
 import { ConditionsSection } from './sections/ConditionsSection';
 import { ActionsSection } from './sections/ActionsSection';
 import { AdvancedSection } from './sections/AdvancedSection';
+import { HistorySection } from './sections/HistorySection';
 // ConfirmationDialog ships as a DEFAULT export — `import { ConfirmationDialog }` is incorrect.
 // Verified by direct read of app/components/ui/ConfirmationDialog.tsx.
 import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
 
 const TABS = ['Trigger', 'Condizioni', 'Azioni', 'Avanzate'] as const;
+// Execution log only exists for saved rules (edit mode).
+const HISTORY_TAB = 'Storico';
 
 // ─── Local helpers ────────────────────────────────────────────────────────────
 
@@ -135,6 +138,7 @@ export function AutomationEditor({
   const [original] = useState<UIDraft>(initialKeyed);
   const [draft, setDraft] = useState<UIDraft>(initialKeyed);
   const [activeTab, setActiveTab] = useState<number>(0);
+  const tabs: readonly string[] = !isNew && rule ? [...TABS, HISTORY_TAB] : TABS;
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -242,7 +246,7 @@ export function AutomationEditor({
         role="tablist"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
+          gridTemplateColumns: `repeat(${tabs.length}, 1fr)`,
           gap: 4,
           padding: 4,
           borderRadius: 12,
@@ -251,7 +255,7 @@ export function AutomationEditor({
           marginBottom: 16,
         }}
       >
-        {TABS.map((tab, i) => {
+        {tabs.map((tab, i) => {
           const active = activeTab === i;
           // Badge visible on Condizioni (i=1) and Azioni (i=2) tabs when count > 0.
           const badgeCount = i === 1 ? condCount : i === 2 ? actionCount : 0;
@@ -330,6 +334,7 @@ export function AutomationEditor({
           mintActionKey={withKey}
         />
       )}
+      {activeTab === 4 && rule && <HistorySection ruleId={rule.id} />}
       {activeTab === 3 && (
         <AdvancedSection
           minInterval={draft.min_interval_seconds}

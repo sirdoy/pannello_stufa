@@ -18,6 +18,8 @@ export { NetworkSheet, NetworkSheetSelfFetch } from './NetworkSheet';
 export type { NetworkSheetProps } from './NetworkSheet';
 export { DirigeraSheet, DirigeraSheetSelfFetch } from './DirigeraSheet';
 export type { DirigeraSheetProps } from './DirigeraSheet';
+export { CameraSheet, CameraSheetSelfFetch } from './CameraSheet';
+export type { CameraSheetProps } from './CameraSheet';
 
 // Sub-primitives (Plan 178-01)
 export { SheetRow } from './primitives/SheetRow';

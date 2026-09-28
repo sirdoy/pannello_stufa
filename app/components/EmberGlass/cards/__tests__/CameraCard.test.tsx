@@ -5,10 +5,14 @@
  *   - Snapshot <img> with cache-busting `?t=` query string built from useCameraData.
  *   - Mono label overlay reads `{name} · {resolution}` from the first camera.
  *   - LIVE pill (red 6×6 dot + 10px LIVE text) rendered in header right slot.
- *   - Tap opens placeholder Sheet with title "Camera".
+ *   - Tap opens the Camera sheet (CameraSheet body).
  *   - Empty cameras array renders no <img> and dash placeholder label.
  */
 import { fireEvent, render } from '@testing-library/react';
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: jest.fn() }),
+}));
 
 import CameraCard from '../CameraCard';
 
@@ -110,7 +114,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     expect(getByTestId('live-dot')).toBeInTheDocument();
   });
 
-  test('(d) clicking the card opens the placeholder sheet (dialog data-state flips to open)', () => {
+  test('(d) clicking the card opens the camera sheet (dialog data-state flips to open)', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -131,8 +135,8 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     const dialogAfter = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement | null;
     expect(dialogAfter).not.toBeNull();
     expect(dialogAfter?.getAttribute('data-state')).toBe('open');
-    // Sheet body renders the placeholder copy (forceMount keeps it mounted).
-    expect(dialogAfter?.textContent).toMatch(/Controlli in arrivo/i);
+    expect(dialogAfter?.textContent).not.toMatch(/Controlli in arrivo/i);
+    expect(dialogAfter?.querySelector('[data-testid="camera-sheet"]')).not.toBeNull();
   });
 
   test('(e) empty cameras: no <img> rendered, label shows em-dash placeholder', () => {
@@ -144,7 +148,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     expect(getByText(/—/)).toBeInTheDocument();
   });
 
-  test('(f) offline camera ("disconnected"): no snapshot request, no LIVE pill, "Camera offline"', () => {
+  test('(f) offline camera ("disconnected"): no snapshot request, no LIVE pill, "Camera disconnessa"', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -157,6 +161,22 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
 
     expect(container.querySelector('img')).toBeNull();
     expect(queryByTestId('live-dot')).toBeNull();
-    expect(getByText('Camera offline')).toBeInTheDocument();
+    expect(getByText('Camera disconnessa')).toBeInTheDocument();
+  });
+
+  test('(g) disconnected camera: sheet shows the disconnected state instead of a blank body', () => {
+    mockedUseCameraData.mockReturnValue(
+      buildReturn({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cameras: [{ camera_id: 'cam1', name: 'Garage1', device_type: 'NACamera', status: 'disconnected' } as any],
+        lastUpdatedAt: 1700000000,
+      })
+    );
+
+    const { getByTestId, container } = render(<CameraCard />);
+    fireEvent.click(getByTestId('camera-card'));
+
+    const dialog = container.ownerDocument.querySelector('[role="dialog"]') as HTMLElement;
+    expect(dialog.querySelector('[data-testid="camera-sheet-offline"]')?.textContent).toMatch(/Camera disconnessa/);
   });
 });

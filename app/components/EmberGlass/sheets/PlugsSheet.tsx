@@ -16,8 +16,8 @@
  *   - 36×36 plug-tile (orange tint when on, neutral when off)
  *   - InlineToggle (#ffb84a) per row
  *
- * Tuya only (CONTEXT Out of Scope). DirigeraCard keeps `<SheetPlaceholderBody>`
- * because the Dirigera proxy is read-only at this milestone.
+ * Tuya only (CONTEXT Out of Scope). DirigeraCard has its own read-only
+ * DirigeraSheet.
  *
  * Field adapter (RESEARCH Pitfall 8 + §"Field Gaps"):
  *   - `device_id` → `id`

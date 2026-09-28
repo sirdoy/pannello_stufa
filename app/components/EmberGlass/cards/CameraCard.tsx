@@ -15,29 +15,31 @@
  * bare `<img>` element renders directly. The framework image primitive is still
  * skipped because the proxy path is dynamic and not on `remotePatterns`.
  *
+ * Tapping the card opens <CameraSheet> (preview, live, monitoring, info).
+ *
  * Tone is the device-class forest green `#6aa86a` (D-09).
  * RC-clean — no manual memoization hooks (D-28 / React Compiler discipline).
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Video, VideoOff } from 'lucide-react';
 import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
 import { Sheet } from '../Sheet';
-import { SheetPlaceholderBody } from './SheetPlaceholderBody';
+import { useRouter } from 'next/navigation';
+import { CameraSheet } from '../sheets/CameraSheet';
 import { useCameraData } from '@/app/components/devices/camera/hooks/useCameraData';
 
 const TONE = '#6aa86a';
 
 export default function CameraCard() {
   const [open, setOpen] = useState(false);
-  const [snapshotError, setSnapshotError] = useState(false);
-  const { cameras, lastUpdatedAt } = useCameraData();
+  // src of the last snapshot that failed to load — a new poll cycle changes
+  // the ?t= query, so the error resets without an effect.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const router = useRouter();
+  const { cameras, loading, error, stale, lastUpdatedAt, refresh } = useCameraData();
   const cam = cameras[0] ?? null;
-  // Reset error state when the snapshot src changes (new poll cycle)
-  useEffect(() => {
-    setSnapshotError(false);
-  }, [lastUpdatedAt, cam?.camera_id]);
   // Hits the browser-safe snapshot proxy (server-streams JPEG bytes from the
   // HA proxy's /live/snapshot.jpg endpoint). The ?t= query busts the cache on
   // every poll cycle so the preview refreshes.
@@ -47,6 +49,7 @@ export default function CameraCard() {
   const src = cam && online
     ? `/api/v1/netatmo/camera/${cam.camera_id}/snapshot?t=${lastUpdatedAt ?? 0}`
     : null;
+  const snapshotError = src !== null && failedSrc === src;
   // CameraStatus does not expose a resolution field; use device_type as the
   // human-readable meta segment (e.g. "NACamera", "NOC").
   const meta = cam?.device_type ?? '';
@@ -96,7 +99,7 @@ export default function CameraCard() {
             <img
               src={src}
               alt=""
-              onError={() => setSnapshotError(true)}
+              onError={() => setFailedSrc(src)}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           )}
@@ -118,7 +121,10 @@ export default function CameraCard() {
             >
               <VideoOff size={28} strokeWidth={1.6} />
               <div style={{ fontSize: 11 }}>
-                {!cam ? 'Nessuna camera' : !online ? 'Camera offline' : 'Snapshot non disponibile'}
+                {!cam
+                  ? loading ? 'Caricamento…' : error ? 'Errore caricamento' : 'Nessuna camera'
+                  : cam.status === 'disconnected' ? 'Camera disconnessa'
+                  : !online ? 'Camera offline' : 'Snapshot non disponibile'}
               </div>
             </div>
           )}
@@ -137,7 +143,18 @@ export default function CameraCard() {
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Camera">
-        <SheetPlaceholderBody phase="178" device="camera" />
+        <CameraSheet
+          // Remount on open/close: closing drops live stream and transient state.
+          key={open ? 'open' : 'closed'}
+          cameras={cameras}
+          loading={loading}
+          error={error}
+          stale={stale}
+          lastUpdatedAt={lastUpdatedAt}
+          active={open}
+          onRefresh={refresh}
+          onNavigate={(p) => router.push(p)}
+        />
       </Sheet>
     </>
   );

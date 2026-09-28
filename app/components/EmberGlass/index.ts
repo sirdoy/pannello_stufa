@@ -31,8 +31,6 @@ export { default as NetworkCard } from './cards/NetworkCard';
 export { default as RaspiCard } from './cards/RaspiCard';
 export { default as TuyaCard } from './cards/TuyaCard';
 export { default as DirigeraCard } from './cards/DirigeraCard';
-export { SheetPlaceholderBody } from './cards/SheetPlaceholderBody';
-export type { SheetPlaceholderBodyProps, SheetPlaceholderDevice } from './cards/SheetPlaceholderBody';
 
 // Phase 178 — sheets (bodies + sub-primitives + helper)
 export * from './sheets';

@@ -25,7 +25,7 @@ export interface RFC9457ProblemDetail {
  * Options accepted by haGet and haPost.
  */
 export interface HaRequestOptions {
-  /** Request timeout in milliseconds. Defaults to 15000. */
+  /** Request timeout in milliseconds. Defaults to 8000 for GET, 15000 otherwise. */
   timeout?: number;
   /** User access token, sent as `Authorization: Bearer` next to X-API-Key (user-scoped /auth routes). */
   bearer?: string;

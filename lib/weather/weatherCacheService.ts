@@ -28,11 +28,12 @@ export interface CachedWeather {
 
 /**
  * Generate cache key for weather data
- * Uses 4-decimal precision (~11m accuracy) to balance caching and location accuracy
+ * Uses 4-decimal precision (~11m accuracy) to balance caching and location accuracy.
+ * RTDB keys cannot contain ".", so the decimal point is encoded as "_" (45.4642 → 45_4642).
  */
 function getCacheKey(lat: number, lon: number): string {
-  const latRounded = lat.toFixed(4);
-  const lonRounded = lon.toFixed(4);
+  const latRounded = lat.toFixed(4).replace('.', '_');
+  const lonRounded = lon.toFixed(4).replace('.', '_');
   return getEnvironmentPath(`weather/cache/${latRounded},${lonRounded}`);
 }
 

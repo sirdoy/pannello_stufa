@@ -11,6 +11,7 @@
  * Error handling:
  *   - RFC 9457 error responses parsed and mapped to ApiError instances
  *   - AbortError (timeout) → ApiError(TIMEOUT)
+ *   - 3 consecutive network errors/timeouts → circuit open: ApiError(SERVICE_UNAVAILABLE) for 30 s
  *   - 401 → ApiError(UNAUTHORIZED)
  *   - 429 → ApiError(RATE_LIMITED)
  *   - 503 → ApiError(SERVICE_UNAVAILABLE)
@@ -20,6 +21,9 @@
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 import type { RFC9457ProblemDetail, HaRequestOptions } from '@/types/haClient';
 
+// Reads get a shorter default than mutations: a healthy Pi answers in well under
+// a second, and every waiting second is billed as function duration.
+const DEFAULT_GET_TIMEOUT_MS = 8_000;
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 // =============================================================================
@@ -150,6 +154,96 @@ function authHeaders(apiKey: string, bearer?: string): Record<string, string> {
 }
 
 // =============================================================================
+// CIRCUIT BREAKER
+// =============================================================================
+// When the Pi is unreachable every proxied request would otherwise wait for the
+// full timeout, burning serverless function duration (billed wall time) for
+// nothing. After CIRCUIT_FAILURE_THRESHOLD consecutive transport failures
+// (network error or timeout — not HTTP error responses) the circuit opens and
+// requests fail fast with 503 for CIRCUIT_OPEN_MS; the first request after
+// that window probes the backend again. State is per function instance.
+
+const CIRCUIT_FAILURE_THRESHOLD = 3;
+const CIRCUIT_OPEN_MS = 30_000;
+
+let consecutiveFailures = 0;
+let circuitOpenUntil = 0;
+
+function recordTransportFailure(): void {
+  consecutiveFailures += 1;
+  if (consecutiveFailures >= CIRCUIT_FAILURE_THRESHOLD) {
+    circuitOpenUntil = Date.now() + CIRCUIT_OPEN_MS;
+  }
+}
+
+function recordTransportSuccess(): void {
+  consecutiveFailures = 0;
+  circuitOpenUntil = 0;
+}
+
+/** Resets the circuit breaker state. Exported for tests. */
+export function resetHaCircuit(): void {
+  recordTransportSuccess();
+}
+
+// =============================================================================
+// REQUEST
+// =============================================================================
+
+type HaMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+async function haRequest(
+  method: HaMethod,
+  endpoint: string,
+  body: Record<string, unknown> | object | undefined,
+  options: HaRequestOptions
+): Promise<Response> {
+  const { baseUrl, apiKey } = getEnvConfig();
+  const defaultTimeout = method === 'GET' ? DEFAULT_GET_TIMEOUT_MS : DEFAULT_TIMEOUT_MS;
+  const { timeout = defaultTimeout, bearer } = options;
+
+  if (Date.now() < circuitOpenUntil) {
+    throw ApiError.serviceUnavailable('HA proxy unreachable (circuit open)');
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}${endpoint}`, {
+      ...(method === 'GET' ? {} : { method }),
+      headers:
+        body === undefined
+          ? authHeaders(apiKey, bearer)
+          : { ...authHeaders(apiKey, bearer), 'Content-Type': 'application/json' },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    recordTransportFailure();
+    return mapCaughtError(error);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  recordTransportSuccess();
+
+  if (!response.ok) {
+    return await mapResponseError(response);
+  }
+  return response;
+}
+
+async function parseJson<T>(response: Response): Promise<T> {
+  try {
+    return (await response.json()) as T;
+  } catch (error) {
+    return mapCaughtError(error);
+  }
+}
+
+// =============================================================================
 // PUBLIC API
 // =============================================================================
 
@@ -157,7 +251,7 @@ function authHeaders(apiKey: string, bearer?: string): Record<string, string> {
  * Generic GET request to the HA proxy.
  *
  * @param endpoint - Path relative to HA_API_URL (e.g. '/api/devices')
- * @param options  - Optional { timeout } in milliseconds (default 15000)
+ * @param options  - Optional { timeout } in milliseconds (default 8000)
  * @returns Parsed JSON response as T
  * @throws ApiError on any failure
  */
@@ -165,29 +259,7 @@ export async function haGet<T>(
   endpoint: string,
   options: HaRequestOptions = {}
 ): Promise<T> {
-  const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      headers: authHeaders(apiKey, bearer),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      return await mapResponseError(response);
-    }
-
-    return (await response.json()) as T;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    return mapCaughtError(error);
-  }
+  return parseJson<T>(await haRequest('GET', endpoint, undefined, options));
 }
 
 /**
@@ -204,34 +276,7 @@ export async function haPost<T>(
   body: Record<string, unknown> | object,
   options: HaRequestOptions = {}
 ): Promise<T> {
-  const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        ...authHeaders(apiKey, bearer),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      return await mapResponseError(response);
-    }
-
-    return (await response.json()) as T;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    return mapCaughtError(error);
-  }
+  return parseJson<T>(await haRequest('POST', endpoint, body, options));
 }
 
 /**
@@ -248,34 +293,7 @@ export async function haPut<T>(
   body: Record<string, unknown> | object,
   options: HaRequestOptions = {}
 ): Promise<T> {
-  const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: 'PUT',
-      headers: {
-        ...authHeaders(apiKey, bearer),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      return await mapResponseError(response);
-    }
-
-    return (await response.json()) as T;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    return mapCaughtError(error);
-  }
+  return parseJson<T>(await haRequest('PUT', endpoint, body, options));
 }
 
 /**
@@ -292,34 +310,7 @@ export async function haPatch<T>(
   body: Record<string, unknown> | object,
   options: HaRequestOptions = {}
 ): Promise<T> {
-  const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: 'PATCH',
-      headers: {
-        ...authHeaders(apiKey, bearer),
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      return await mapResponseError(response);
-    }
-
-    return (await response.json()) as T;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    return mapCaughtError(error);
-  }
+  return parseJson<T>(await haRequest('PATCH', endpoint, body, options));
 }
 
 /**
@@ -334,28 +325,5 @@ export async function haDelete(
   endpoint: string,
   options: HaRequestOptions = {}
 ): Promise<void> {
-  const { baseUrl, apiKey } = getEnvConfig();
-  const { timeout = DEFAULT_TIMEOUT_MS, bearer } = options;
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-  try {
-    const response = await fetch(`${baseUrl}${endpoint}`, {
-      method: 'DELETE',
-      headers: authHeaders(apiKey, bearer),
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      return await mapResponseError(response);
-    }
-
-    // 204 No Content — no JSON body to parse
-  } catch (error) {
-    clearTimeout(timeoutId);
-    return mapCaughtError(error);
-  }
+  await haRequest('DELETE', endpoint, undefined, options);
 }

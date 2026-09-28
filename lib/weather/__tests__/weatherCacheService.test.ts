@@ -34,7 +34,16 @@ describe('weatherCacheService', () => {
       await getWeatherFromCache(lat, lon);
 
       // Verify cache key uses 4 decimals
-      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45.4642,9.1900');
+      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45_4642,9_1900');
+    });
+
+    it('should produce an RTDB-valid key (no ".", "#", "$", "[", "]")', async () => {
+      mockAdminDbGet.mockResolvedValue(null);
+
+      await getWeatherFromCache(44.4356, 10.4033);
+
+      const key = mockAdminDbGet.mock.calls[0]?.[0] as string;
+      expect(key.replace(/^weather\/cache\//, '')).not.toMatch(/[.#$[\]]/);
     });
 
     it('should round coordinates correctly', async () => {
@@ -42,18 +51,18 @@ describe('weatherCacheService', () => {
 
       // Test rounding (toFixed uses standard rounding)
       await getWeatherFromCache(45.46425, 9.18995);
-      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45.4642,9.1899');
+      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45_4642,9_1899');
 
       // Test another coordinate
       await getWeatherFromCache(45.46424, 9.18994);
-      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45.4642,9.1899');
+      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45_4642,9_1899');
     });
 
     it('should handle negative coordinates', async () => {
       mockAdminDbGet.mockResolvedValue(null);
 
       await getWeatherFromCache(-45.4642, -9.19);
-      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/-45.4642,-9.1900');
+      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/-45_4642,-9_1900');
     });
   });
 
@@ -66,8 +75,8 @@ describe('weatherCacheService', () => {
 
       await getWeatherFromCache(45.4642, 9.19);
 
-      expect(getEnvironmentPath).toHaveBeenCalledWith('weather/cache/45.4642,9.1900');
-      expect(adminDbGet).toHaveBeenCalledWith('dev/weather/cache/45.4642,9.1900');
+      expect(getEnvironmentPath).toHaveBeenCalledWith('weather/cache/45_4642,9_1900');
+      expect(adminDbGet).toHaveBeenCalledWith('dev/weather/cache/45_4642,9_1900');
     });
 
     it('should work without prefix in production', async () => {
@@ -78,7 +87,7 @@ describe('weatherCacheService', () => {
 
       await getWeatherFromCache(45.4642, 9.19);
 
-      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45.4642,9.1900');
+      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45_4642,9_1900');
     });
   });
 
@@ -97,7 +106,7 @@ describe('weatherCacheService', () => {
       const result = await getWeatherFromCache(45.4642, 9.19);
 
       expect(result).toEqual(mockCachedData);
-      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45.4642,9.1900');
+      expect(adminDbGet).toHaveBeenCalledWith('weather/cache/45_4642,9_1900');
     });
 
     it('should return null if cache does not exist', async () => {
@@ -143,7 +152,7 @@ describe('weatherCacheService', () => {
       await saveWeatherToCache(45.4642, 9.19, mockWeatherData);
 
       expect(mockAdminDbSet).toHaveBeenCalledWith(
-        'weather/cache/45.4642,9.1900',
+        'weather/cache/45_4642,9_1900',
         expect.objectContaining({
           data: mockWeatherData,
           timestamp: expect.any(Number),
@@ -164,7 +173,7 @@ describe('weatherCacheService', () => {
     it('should remove cache entry', async () => {
       await invalidateWeatherCache(45.4642, 9.19);
 
-      expect(adminDbRemove).toHaveBeenCalledWith('weather/cache/45.4642,9.1900');
+      expect(adminDbRemove).toHaveBeenCalledWith('weather/cache/45_4642,9_1900');
     });
 
     it('should throw error if Firebase remove fails', async () => {

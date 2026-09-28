@@ -13,9 +13,11 @@
  * - ApiError on missing env vars (HA_API_URL, HA_API_KEY)
  * - ApiError on network errors
  * - haPost sends JSON body with Content-Type: application/json
+ * - Default timeouts (GET 8 s, mutations 15 s)
+ * - Circuit breaker: fail fast after consecutive transport failures
  */
 
-import { haGet, haPost, haPatch } from '@/lib/haClient';
+import { haGet, haPost, haPatch, haDelete, resetHaCircuit } from '@/lib/haClient';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
 
 // Mock global fetch
@@ -32,6 +34,7 @@ const TEST_API_KEY = 'test-key-123';
 describe('haGet', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetHaCircuit();
     process.env.HA_API_URL = TEST_HA_URL;
     process.env.HA_API_KEY = TEST_API_KEY;
   });
@@ -321,6 +324,7 @@ describe('haGet', () => {
 describe('haPost', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    resetHaCircuit();
     process.env.HA_API_URL = TEST_HA_URL;
     process.env.HA_API_KEY = TEST_API_KEY;
   });
@@ -417,5 +421,139 @@ describe('haPost', () => {
     expect(caught).toBeInstanceOf(ApiError);
     expect(caught?.code).toBe(ERROR_CODES.EXTERNAL_API_ERROR);
     expect(caught?.message).toContain('HA_API_URL');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Default timeouts
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('default timeouts', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    resetHaCircuit();
+    process.env.HA_API_URL = TEST_HA_URL;
+    process.env.HA_API_KEY = TEST_API_KEY;
+    jest.spyOn(global, 'setTimeout');
+    mockFetch.mockResolvedValue({ ok: true, json: async () => ({}) });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    delete process.env.HA_API_URL;
+    delete process.env.HA_API_KEY;
+  });
+
+  it('uses 8 s for GET and 15 s for mutations', async () => {
+    await haGet('/api/test');
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 8_000);
+
+    await haPost('/api/command', {});
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 15_000);
+  });
+
+  it('honours an explicit timeout', async () => {
+    await haGet('/api/test', { timeout: 30_000 });
+    expect(setTimeout).toHaveBeenLastCalledWith(expect.any(Function), 30_000);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Circuit breaker
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('circuit breaker', () => {
+  const networkDown = () => mockFetch.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+  const ok = () => mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ ok: true }) });
+
+  async function codeOf(p: Promise<unknown>): Promise<string | undefined> {
+    try {
+      await p;
+      return undefined;
+    } catch (e) {
+      return (e as ApiError).code;
+    }
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockFetch.mockReset();
+    resetHaCircuit();
+    process.env.HA_API_URL = TEST_HA_URL;
+    process.env.HA_API_KEY = TEST_API_KEY;
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    delete process.env.HA_API_URL;
+    delete process.env.HA_API_KEY;
+  });
+
+  it('opens after 3 consecutive transport failures and fails fast without calling fetch', async () => {
+    networkDown();
+    networkDown();
+    networkDown();
+    for (let i = 0; i < 3; i++) {
+      expect(await codeOf(haGet('/api/test'))).toBe(ERROR_CODES.EXTERNAL_API_ERROR);
+    }
+
+    expect(await codeOf(haGet('/api/test'))).toBe(ERROR_CODES.SERVICE_UNAVAILABLE);
+    expect(await codeOf(haDelete('/api/test'))).toBe(ERROR_CODES.SERVICE_UNAVAILABLE);
+    expect(mockFetch).toHaveBeenCalledTimes(3);
+  });
+
+  it('counts timeouts as transport failures', async () => {
+    const abortError = new Error('aborted');
+    abortError.name = 'AbortError';
+    mockFetch.mockRejectedValue(abortError);
+    for (let i = 0; i < 3; i++) {
+      expect(await codeOf(haGet('/api/test'))).toBe(ERROR_CODES.TIMEOUT);
+    }
+
+    expect(await codeOf(haGet('/api/test'))).toBe(ERROR_CODES.SERVICE_UNAVAILABLE);
+  });
+
+  it('does not open on HTTP error responses (backend reachable)', async () => {
+    mockFetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Internal Server Error',
+      json: async () => ({ detail: 'boom' }),
+    });
+    for (let i = 0; i < 5; i++) {
+      expect(await codeOf(haGet('/api/test'))).toBe(ERROR_CODES.EXTERNAL_API_ERROR);
+    }
+    expect(mockFetch).toHaveBeenCalledTimes(5);
+  });
+
+  it('a success resets the failure count', async () => {
+    networkDown();
+    networkDown();
+    ok();
+    networkDown();
+    networkDown();
+    ok();
+    for (let i = 0; i < 6; i++) {
+      await codeOf(haGet('/api/test'));
+    }
+    expect(mockFetch).toHaveBeenCalledTimes(6);
+  });
+
+  it('probes the backend again after 30 s and closes on success', async () => {
+    jest.useFakeTimers({ now: new Date('2026-09-28T10:00:00Z') });
+    networkDown();
+    networkDown();
+    networkDown();
+    for (let i = 0; i < 3; i++) {
+      await codeOf(haGet('/api/test'));
+    }
+    expect(await codeOf(haGet('/api/test'))).toBe(ERROR_CODES.SERVICE_UNAVAILABLE);
+
+    jest.setSystemTime(new Date('2026-09-28T10:00:31Z'));
+    ok();
+    ok();
+    expect(await codeOf(haGet('/api/test'))).toBeUndefined();
+    expect(await codeOf(haGet('/api/test'))).toBeUndefined();
+    expect(mockFetch).toHaveBeenCalledTimes(5);
   });
 });

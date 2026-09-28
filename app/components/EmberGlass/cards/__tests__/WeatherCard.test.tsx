@@ -41,7 +41,23 @@ describe('WeatherCard (Phase 177 — DASH-06)', () => {
     expect(getByText(/Sereno · ↑25° ↓14°/)).toBeInTheDocument();
   });
 
-  test('(b) when loading=true and temp=null renders em-dash + "Non raggiungibile"', () => {
+  test('(b) when loaded with temp=null renders em-dash + "Non raggiungibile"', () => {
+    mockedUseWeatherSummary.mockReturnValue({
+      city: null,
+      temp: null,
+      condition: null,
+      high: null,
+      low: null,
+      loading: false,
+    });
+
+    const { getByTestId, getByText } = render(<WeatherCard />);
+
+    expect(getByTestId('weather-temp')).toHaveTextContent('—');
+    expect(getByText('Non raggiungibile')).toBeInTheDocument();
+  });
+
+  test('(b2) while loading renders the skeleton, not placeholder values (M15)', () => {
     mockedUseWeatherSummary.mockReturnValue({
       city: null,
       temp: null,
@@ -51,10 +67,10 @@ describe('WeatherCard (Phase 177 — DASH-06)', () => {
       loading: true,
     });
 
-    const { getByTestId, getByText } = render(<WeatherCard />);
+    const { getByTestId, queryByTestId } = render(<WeatherCard />);
 
-    expect(getByTestId('weather-temp')).toHaveTextContent('—');
-    expect(getByText('Non raggiungibile')).toBeInTheDocument();
+    expect(getByTestId('glass-card-skeleton')).toHaveAttribute('aria-label', 'Meteo: caricamento');
+    expect(queryByTestId('weather-card')).toBeNull();
   });
 
   test('(c) clicking card does NOT mount a sheet placeholder body (D-11 / SC-#3)', () => {

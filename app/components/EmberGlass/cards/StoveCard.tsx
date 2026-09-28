@@ -33,6 +33,8 @@ import { StatusDot } from '../StatusDot';
 import { FlameViz } from '../FlameViz';
 import { Sheet } from '../Sheet';
 import { StoveSheet } from '../sheets/StoveSheet';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
 import { useVersion } from '@/app/context/VersionContext';
@@ -74,6 +76,10 @@ export default function StoveCard() {
   const needsCleaning = stove.needsMaintenance;
   const cleaningHours = stove.maintenanceStatus?.currentHours;
   const tone = needsCleaning ? WARN : 'var(--accent)';
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!stove.initialLoading);
+  if (!ready) return <GlassCardSkeleton label="Stufa" />;
 
   return (
     <>

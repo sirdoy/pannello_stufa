@@ -25,6 +25,8 @@ import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
 import { PlugsSheet } from '../sheets/PlugsSheet';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useTuyaData } from '@/app/components/devices/tuya/hooks/useTuyaData';
 import { useTuyaCommands } from '@/app/components/devices/tuya/hooks/useTuyaCommands';
 
@@ -59,6 +61,10 @@ export default function TuyaCard() {
       {formatPower(totalPower)}
     </div>
   );
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!tuyaData.loading);
+  if (!ready) return <GlassCardSkeleton label="Prese smart" />;
 
   return (
     <>

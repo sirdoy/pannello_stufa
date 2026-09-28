@@ -22,6 +22,8 @@ import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
 import { NetworkSheet } from '../sheets/NetworkSheet';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 
 const TONE = '#5eafff';
@@ -50,6 +52,10 @@ export default function NetworkCard() {
     : !wanConnected
       ? '#ffb84a' // amber — WAN down / stale
       : '#6aa86a'; // green — healthy
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!network.loading);
+  if (!ready) return <GlassCardSkeleton label="Rete" />;
 
   return (
     <>

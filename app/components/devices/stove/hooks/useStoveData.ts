@@ -26,6 +26,7 @@ import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import type { ThermorossiData } from '@/types/websocket';
 import type { StoveState, ThermorossiStatusResponse } from '@/types/thermorossiProxy';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
+import { WS_SNAPSHOT_GRACE_MS } from '@/lib/ws/snapshotGrace';
 
 /**
  * Parameters required by useStoveData
@@ -302,6 +303,20 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     alwaysActive: true,
     immediate: true,
   });
+
+  // ROADMAP M15: WS already OPEN at mount → polling skips `immediate` (interval=null)
+  // and an empty backend cache sends no snapshot. Fetch once if no WS data came in
+  // time (delayed, so a late HTTP response cannot overwrite a fresher snapshot).
+  const initialLoadingRef = useRef(initialLoading);
+  initialLoadingRef.current = initialLoading;
+  useEffect(() => {
+    if (!isWsConnected) return;
+    const id = setTimeout(() => {
+      if (initialLoadingRef.current) void fetchStatusAndUpdate();
+    }, WS_SNAPSHOT_GRACE_MS);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     // Core state

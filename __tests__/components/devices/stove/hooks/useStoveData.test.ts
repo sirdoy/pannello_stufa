@@ -630,6 +630,58 @@ describe('useStoveData', () => {
       expect(lastPollingOpts.alwaysActive).toBe(true);
     });
 
+    it('bootstraps one HTTP fetch when WS is OPEN at mount and no snapshot arrives (M15)', async () => {
+      jest.useFakeTimers();
+      try {
+        jest.mocked(useWebSocketContext).mockReturnValue({
+          subscribe: mockSubscribe,
+          unsubscribe: mockUnsubscribe,
+          readyState: ReadyState.OPEN,
+        });
+        renderHook(() => useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId }));
+        expect(global.fetch).not.toHaveBeenCalledWith(expect.stringContaining('/api/v1/thermorossi/status'));
+        await act(async () => {
+          jest.advanceTimersByTime(1500);
+        });
+        expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining('/api/v1/thermorossi/status'));
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+
+    it('skips the bootstrap fetch when the WS snapshot arrives first (M15)', async () => {
+      jest.useFakeTimers();
+      try {
+        let capturedCallback: ((data: unknown) => void) | null = null;
+        mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
+          capturedCallback = cb;
+        });
+        jest.mocked(useWebSocketContext).mockReturnValue({
+          subscribe: mockSubscribe,
+          unsubscribe: mockUnsubscribe,
+          readyState: ReadyState.OPEN,
+        });
+        renderHook(() => useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId }));
+        await act(async () => {
+          capturedCallback?.({
+            stove_state: 'working',
+            power_level: 3,
+            fan_level: 4,
+            data_freshness: 'LIVE',
+            last_poll_at: '2026-03-19T12:00:00Z',
+            error_code: null,
+            error_description: null,
+          });
+        });
+        await act(async () => {
+          jest.advanceTimersByTime(1500);
+        });
+        expect(global.fetch).not.toHaveBeenCalledWith(expect.stringContaining('/api/v1/thermorossi/status'));
+      } finally {
+        jest.useRealTimers();
+      }
+    });
+
     it('maps WS message fields to hook state: status, fanLevel, powerLevel', async () => {
       let capturedCallback: ((data: unknown) => void) | null = null;
       mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {

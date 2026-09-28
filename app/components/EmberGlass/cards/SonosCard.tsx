@@ -29,6 +29,8 @@ import { CardHead } from '../CardHead';
 import { PlayingBars } from '../PlayingBars';
 import { Sheet } from '../Sheet';
 import { SonosSheet } from '../sheets/SonosSheet';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 import { useSonosCommands } from '@/app/components/devices/sonos/hooks/useSonosCommands';
 
@@ -77,6 +79,10 @@ export default function SonosCard() {
       {playingCount >= 1 ? `${playingCount} in riprod.` : 'In pausa'}
     </div>
   );
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!sonosData.loading);
+  if (!ready) return <GlassCardSkeleton label="Sonos" />;
 
   return (
     <>

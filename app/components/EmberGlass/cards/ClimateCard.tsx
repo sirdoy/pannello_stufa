@@ -32,6 +32,8 @@ import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
 import { ClimateSheet } from '../sheets/ClimateSheet';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 import { useThermostatCommands } from '@/app/components/devices/thermostat/hooks/useThermostatCommands';
 import type { RoomStatus, NetatmoTopology } from '@/app/components/devices/thermostat/hooks/useThermostatData';
@@ -109,6 +111,10 @@ export default function ClimateCard() {
       {mode}
     </div>
   );
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!data.loading && (status !== null || !data.connected || data.error !== null));
+  if (!ready) return <GlassCardSkeleton label="Temperature" />;
 
   return (
     <>

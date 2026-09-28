@@ -10,11 +10,14 @@
  * primitive (D-02 carve-out for the shimmer); all other visual values stay
  * inline + `var(--token)` for bundle fidelity.
  */
-export function GlassCardSkeleton() {
+export function GlassCardSkeleton({ label }: { label?: string } = {}) {
   return (
     <div
       data-testid="glass-card-skeleton"
       className="animate-pulse"
+      role={label ? 'status' : undefined}
+      aria-busy={label ? true : undefined}
+      aria-label={label ? `${label}: caricamento` : undefined}
       style={{
         aspectRatio: '1 / 1',
         borderRadius: 'var(--r-card)',

@@ -83,8 +83,9 @@ describe('DirigeraCard', () => {
 
   test('loading and empty states', () => {
     mockSensors(null);
-    const { getByText, rerender } = render(<DirigeraCard />);
-    expect(getByText('Caricamento…')).toBeInTheDocument();
+    const { getByTestId, getByText, rerender } = render(<DirigeraCard />);
+    // M15: skeleton until the first data
+    expect(getByTestId('glass-card-skeleton')).toBeInTheDocument();
     mockSensors([]);
     rerender(<DirigeraCard />);
     expect(getByText('Nessun sensore')).toBeInTheDocument();

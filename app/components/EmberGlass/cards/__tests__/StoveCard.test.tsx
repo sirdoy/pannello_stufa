@@ -183,4 +183,18 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
 
     expect(getByTestId('stove-maintenance-alert').textContent).toBe('Pulizia richiesta');
   });
+
+  test('(M15) renders the skeleton until the first status arrives', () => {
+    useStoveDataMock.mockReturnValue({
+      initialLoading: true,
+      isAccesa: false,
+      powerLevel: null,
+      fanLevel: null,
+      staleness: null,
+    });
+    const { getByTestId, queryByTestId, queryByText } = render(<StoveCard />);
+    expect(getByTestId('glass-card-skeleton')).toHaveAttribute('aria-label', 'Stufa: caricamento');
+    expect(queryByTestId('stove-card')).toBeNull();
+    expect(queryByText('Spenta')).toBeNull();
+  });
 });

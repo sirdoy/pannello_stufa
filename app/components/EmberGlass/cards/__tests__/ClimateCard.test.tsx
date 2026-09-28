@@ -179,4 +179,30 @@ describe('ClimateCard (Phase 177 — DASH-03)', () => {
     const { getByText } = render(<ClimateCard />);
     expect(getByText('0 di 0 attive')).toBeInTheDocument();
   });
+
+  test('(M15) renders the skeleton while connected but status not loaded yet', () => {
+    useThermostatDataMock.mockReturnValue({
+      loading: false,
+      connected: true,
+      error: null,
+      status: null,
+      topology: { rooms: [] },
+    });
+    const { getByTestId, queryByText } = render(<ClimateCard />);
+    expect(getByTestId('glass-card-skeleton')).toBeInTheDocument();
+    expect(queryByText('0 di 0 attive')).toBeNull();
+  });
+
+  test('(M15) renders the card when Netatmo is not connected (no data will come)', () => {
+    useThermostatDataMock.mockReturnValue({
+      loading: false,
+      connected: false,
+      error: null,
+      status: null,
+      topology: null,
+    });
+    const { getByTestId, queryByTestId } = render(<ClimateCard />);
+    expect(getByTestId('climate-card')).toBeInTheDocument();
+    expect(queryByTestId('glass-card-skeleton')).toBeNull();
+  });
 });

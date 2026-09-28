@@ -18,15 +18,21 @@ import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { MiniStat } from '../MiniStat';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useRaspiData } from '@/app/components/devices/raspi/hooks/useRaspiData';
 
 const TONE = '#6aa86a';
 
 export default function RaspiCard() {
-  const { data } = useRaspiData();
+  const { data, loading } = useRaspiData();
   const cpu = data?.cpuPercent ?? 0;
   const ram = data?.memoryPercent ?? 0;
   const temp = data?.cpuTemperature;
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!loading);
+  if (!ready) return <GlassCardSkeleton label="Raspberry" />;
 
   return (
     <GlassCard tone={TONE} data-testid="raspi-card">

@@ -18,6 +18,8 @@ import { CardHead } from '../CardHead';
 import { StatusDot } from '../StatusDot';
 import { Sheet } from '../Sheet';
 import { DirigeraSheet } from '../sheets/DirigeraSheet';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useDirigeraFullData } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
 import type { DirigeraSensor } from '@/types/dirigeraProxy';
 
@@ -36,7 +38,7 @@ function isSensorActive(s: DirigeraSensor): boolean {
 
 export default function DirigeraCard() {
   const [open, setOpen] = useState(false);
-  const { data } = useDirigeraFullData('all');
+  const { data, loading } = useDirigeraFullData('all');
   const sensors = data?.sensors ?? [];
   const visibleSensors = sensors.slice(0, 4);
   const activeCount = sensors.filter(isSensorActive).length;
@@ -55,6 +57,10 @@ export default function DirigeraCard() {
       {activeCount > 0 ? `${activeCount} aperti` : 'OK'}
     </div>
   );
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!loading);
+  if (!ready) return <GlassCardSkeleton label="IKEA" />;
 
   return (
     <>

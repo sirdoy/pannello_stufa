@@ -36,6 +36,8 @@ import { StatusDot } from '../StatusDot';
 import { InlineToggle } from '../InlineToggle';
 import { Sheet } from '../Sheet';
 import { LightsSheet } from '../sheets/LightsSheet';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
 import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
 
@@ -74,6 +76,10 @@ export default function LightsCard() {
       }}
     />
   );
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!lightsData.loading && (lightsData.lastUpdatedAt !== null || !lightsData.connected || lightsData.error !== null));
+  if (!ready) return <GlassCardSkeleton label="Luci" />;
 
   return (
     <>

@@ -28,6 +28,8 @@ import { CardHead } from '../CardHead';
 import { Sheet } from '../Sheet';
 import { useRouter } from 'next/navigation';
 import { CameraSheet } from '../sheets/CameraSheet';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useCameraData } from '@/app/components/devices/camera/hooks/useCameraData';
 
 const TONE = '#6aa86a';
@@ -78,6 +80,10 @@ export default function CameraCard() {
       </span>
     </div>
   );
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!loading);
+  if (!ready) return <GlassCardSkeleton label="Camera" />;
 
   return (
     <>

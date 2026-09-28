@@ -17,6 +17,8 @@
 import { Sun } from 'lucide-react';
 import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
+import { GlassCardSkeleton } from '../GlassCardSkeleton';
+import { useCardReady } from '../useCardReady';
 import { useWeatherSummary } from '@/app/components/devices/weather/hooks/useWeatherSummary';
 
 const TONE = '#ffb84a';
@@ -39,6 +41,10 @@ export default function WeatherCard() {
       {city ?? ''}
     </div>
   );
+
+  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
+  const ready = useCardReady(!loading);
+  if (!ready) return <GlassCardSkeleton label="Meteo" />;
 
   return (
     <GlassCard tone={TONE} data-testid="weather-card">

@@ -33,6 +33,7 @@ import type {
   UseNetworkDataReturn,
 } from '../types';
 import type { DeviceCategory } from '@/types/firebase/network';
+import { WS_SNAPSHOT_GRACE_MS } from '@/lib/ws/snapshotGrace';
 
 // 2h of data at 60s polling interval
 const SPARKLINE_MAX_POINTS = 120;
@@ -388,6 +389,20 @@ export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataR
     immediate: true,      // Fetch on mount
     initialDelay: 500,
   });
+
+  // ROADMAP M15: WS already OPEN at mount → polling skips `immediate` (interval=null)
+  // and an empty backend cache sends no snapshot. Fetch once if no WS data came in
+  // time (delayed, so a late HTTP response cannot overwrite a fresher snapshot).
+  const loadingRef = useRef(loading);
+  loadingRef.current = loading;
+  useEffect(() => {
+    if (!isWsConnected) return;
+    const id = setTimeout(() => {
+      if (loadingRef.current) void fetchData();
+    }, WS_SNAPSHOT_GRACE_MS);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Update a single device's category (used by manual overrides)
   const updateDeviceCategory = (mac: string, category: DeviceCategory) => {

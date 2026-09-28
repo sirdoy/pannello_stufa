@@ -23,6 +23,7 @@ import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
 import { adaptWsLights, adaptWsGroups } from '@/lib/hue/hueWsAdapter';
+import { WS_SNAPSHOT_GRACE_MS } from '@/lib/ws/snapshotGrace';
 
 /**
  * Adaptive classes for UI based on background contrast
@@ -265,6 +266,20 @@ export function useLightsData(): UseLightsDataReturn {
     immediate: true,
     initialDelay: 100,
   });
+
+  // ROADMAP M15: bridge reachable with WS already OPEN → polling stays off
+  // (interval=null). Fetch once if the 'hue' snapshot did not come in time
+  // (delayed, so a late HTTP response cannot overwrite a fresher snapshot).
+  const lastUpdatedAtRef = useRef(lastUpdatedAt);
+  lastUpdatedAtRef.current = lastUpdatedAt;
+  useEffect(() => {
+    if (!connected || !isWsConnected) return;
+    const id = setTimeout(() => {
+      if (lastUpdatedAtRef.current === null) void fetchData();
+    }, WS_SNAPSHOT_GRACE_MS);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connected]);
 
   // Auto-select first group
   useEffect(() => {

@@ -1,58 +1,35 @@
 /**
- * API Route: Confirm Stove Cleaning
- *
  * POST /api/maintenance/confirm-cleaning
  *
- * Conferma che la stufa e stata pulita
- * - Reset ore utilizzo a 0
- * - Disabilita flag needsCleaning
- * - Logga azione utente
- * - Sblocca accensione stufa
+ * Confirms the stove cleaning: resets the working-hours counter on the Pi
+ * (backend POST /thermorossi/maintenance/clean, workspace ROADMAP D2.3) and writes
+ * the entry in the activity log (Firebase `log`, unchanged).
  */
 
-import {
-  withAuthAndErrorHandler,
-  success,
-  notFound,
-} from '@/lib/core';
-import { adminDbGet, adminDbUpdate, adminDbPush } from '@/lib/firebaseAdmin';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
+import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
+import { confirmMaintenanceCleaning } from '@/lib/stove/schedulerProxy';
 
 export const dynamic = 'force-dynamic';
-
-interface MaintenanceData {
-  currentHours: number;
-  targetHours: number;
-  needsCleaning?: boolean;
-  lastCleanedAt?: string;
-  [key: string]: unknown;
-}
 
 /**
  * POST /api/maintenance/confirm-cleaning
  * Confirm stove cleaning
  * Protected: Requires an authenticated session
  */
-export const POST = withAuthAndErrorHandler(async (request, context, session) => {
+export const POST = withAuthAndErrorHandler(async (_request, _context, session) => {
   const user = session.user;
+  const result = await confirmMaintenanceCleaning();
+  const cleanedAt = new Date((result.last_cleaned_at ?? Date.now() / 1000) * 1000).toISOString();
 
-  // Get current maintenance data
-  const maintenanceData = (await adminDbGet('maintenance')) as MaintenanceData | null;
-
-  if (!maintenanceData) {
-    return notFound('Dati manutenzione non trovati');
-  }
-
-  const cleanedAt = new Date().toISOString();
-
-  // Log cleaning action
-  const logEntry = {
+  await adminDbPush('log', {
     action: 'Pulizia stufa',
     device: DEVICE_TYPES.STOVE,
-    details: `${maintenanceData.currentHours.toFixed(2)}h`,
+    details: `${result.previous_hours.toFixed(2)}h`,
     metadata: {
-      previousHours: maintenanceData.currentHours,
-      targetHours: maintenanceData.targetHours,
+      previousHours: result.previous_hours,
+      targetHours: result.target_hours,
       cleanedAt,
       source: 'manual',
     },
@@ -64,25 +41,11 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
       sub: user.sub,
     },
     source: 'user',
-  };
-
-  await adminDbPush('log', logEntry);
-
-  // Reset maintenance data using Admin SDK
-  const updates = {
-    currentHours: 0,
-    needsCleaning: false,
-    lastCleanedAt: cleanedAt,
-    lastUpdatedAt: cleanedAt,
-    lastNotificationLevel: 0,
-  };
-
-  await adminDbUpdate('maintenance', updates);
-
+  });
 
   return success({
     message: 'Pulizia confermata con successo',
-    previousHours: maintenanceData.currentHours,
+    previousHours: result.previous_hours,
     cleanedAt,
   });
 }, 'Maintenance/ConfirmCleaning');

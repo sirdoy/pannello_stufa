@@ -55,10 +55,14 @@ npm run lint
 `lib/<provider>/*Proxy.ts` → route `app/api/v1/...` (`export const dynamic = 'force-dynamic'`) → hook/componente → test.
 Nuovo topic WS: aggiornare `Topic` + `TopicDataMap` in `types/websocket.ts` (fonte: `../docs/api/websocket.md`).
 
-**Firebase** (RTDB + FCM) resta per: scheduler stufa (`lib/scheduler/`, cron esterno ~1/min →
-`/api/scheduler/check?secret=CRON_SECRET`),
-manutenzione, log/errori, changelog, preferenze e token FCM utenti, rate limiter, cache. I dati live dei device vengono
-dal backend.
+**Scheduler stufa e manutenzione** stanno sul Pi (ROADMAP D2): `lib/scheduler/*` e `lib/maintenance/maintenanceService.ts`
+chiamano le route `app/api/v1/thermorossi/{schedules,scheduler,maintenance}` (proxy `lib/stove/schedulerProxy.ts`,
+tipi `types/thermorossiScheduler.ts`); il Pi manda le notifiche a `/api/internal/stove-events` (`STOVE_EVENTS_SECRET`).
+Il cron esterno su `/api/scheduler/check?secret=CRON_SECRET` fa solo pulizie (heartbeat, calibrazione valvole, meteo,
+token FCM).
+
+**Firebase** (RTDB + FCM) resta per: log/errori, changelog, preferenze e token FCM utenti, rate limiter, cache. I dati
+live dei device vengono dal backend.
 
 ## Docs
 
@@ -98,8 +102,8 @@ export const dynamic = 'force-dynamic';
 |------|---------|
 | Multi-Device | Centralized registry, Self-Contained Pattern |
 | EmberGlass | UI attuale (GlassCard, CardHead, Sheet, cards/, sheets/), dark-only. `app/components/ui` = legacy Ember Noir in dismissione |
-| Scheduler | Manual / Automatic / Semi-Manual modes (Firebase) |
-| Maintenance | H24 tracking, blocks ignite if needsCleaning |
+| Scheduler | Manual / Automatic / Semi-Manual modes (sul Pi) |
+| Maintenance | Ore di lavoro contate sul Pi, accensione bloccata se needsCleaning |
 
 ---
 

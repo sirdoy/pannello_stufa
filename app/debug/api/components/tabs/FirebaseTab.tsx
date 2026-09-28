@@ -44,8 +44,8 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
 
   const fetchAllGetEndpoints = () => {
     fetchGetEndpoint('health', '/api/health');
-    fetchGetEndpoint('schedules', '/api/schedules');
-    fetchGetEndpoint('schedulesActive', '/api/schedules/active');
+    fetchGetEndpoint('schedules', '/api/v1/thermorossi/schedules');
+    fetchGetEndpoint('schedulesActive', '/api/v1/thermorossi/scheduler/mode');
     fetchGetEndpoint('locationConfig', '/api/config/location');
     fetchGetEndpoint('dashboardConfig', '/api/config/dashboard');
   };
@@ -98,25 +98,25 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
           />
 
           <EndpointCard
-            name="Schedules List"
-            url="/api/schedules"
+            name="Schedules List (Pi)"
+            url="/api/v1/thermorossi/schedules"
             response={getResponses.schedules}
             loading={loadingGet.schedules ?? false}
             timing={timings.schedules}
-            onRefresh={() => fetchGetEndpoint('schedules', '/api/schedules')}
-            onCopyUrl={() => copyUrlToClipboard('/api/schedules')}
-            isCopied={copiedUrl === '/api/schedules'}
+            onRefresh={() => fetchGetEndpoint('schedules', '/api/v1/thermorossi/schedules')}
+            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/schedules')}
+            isCopied={copiedUrl === '/api/v1/thermorossi/schedules'}
           />
 
           <EndpointCard
-            name="Active Schedule"
-            url="/api/schedules/active"
+            name="Scheduler Mode (Pi)"
+            url="/api/v1/thermorossi/scheduler/mode"
             response={getResponses.schedulesActive}
             loading={loadingGet.schedulesActive ?? false}
             timing={timings.schedulesActive}
-            onRefresh={() => fetchGetEndpoint('schedulesActive', '/api/schedules/active')}
-            onCopyUrl={() => copyUrlToClipboard('/api/schedules/active')}
-            isCopied={copiedUrl === '/api/schedules/active'}
+            onRefresh={() => fetchGetEndpoint('schedulesActive', '/api/v1/thermorossi/scheduler/mode')}
+            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/scheduler/mode')}
+            isCopied={copiedUrl === '/api/v1/thermorossi/scheduler/mode'}
           />
 
           <EndpointCard

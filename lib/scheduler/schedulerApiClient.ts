@@ -1,9 +1,10 @@
 /**
- * Scheduler API Client
+ * Stove scheduler — write side (browser).
  *
- * Client-side wrapper per operazioni scheduler che usano Admin SDK server-side.
- * Sostituisce le chiamate dirette a schedulerService che richiedono WRITE.
+ * Writes go to the scheduler on the Pi through the Next proxy routes
+ * (workspace ROADMAP D2). Signatures unchanged from the Firebase era.
  */
+import { API, activeScheduleId, apiFetch, dayIndex, isoToSeconds, toSlot } from './backendScheduler';
 
 /** Schedule interval */
 export interface ScheduleInterval {
@@ -19,86 +20,38 @@ interface ApiResponse {
   error?: string;
 }
 
+const post = (path: string, body: unknown, method = 'POST') =>
+  apiFetch<ApiResponse>(path, { method, body: JSON.stringify(body) });
+
 /**
- * Save schedule for a specific day
+ * Save the intervals of one day (Italian name) in the active schedule.
  */
 export async function saveSchedule(day: string, schedule: ScheduleInterval[]): Promise<ApiResponse> {
-  const response = await fetch('/api/scheduler/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'saveSchedule',
-      data: { day, schedule }
-    })
-  });
-
-  if (!response.ok) {
-    const error = await response.json() as { error?: string };
-    throw new Error(error.error || 'Failed to save schedule');
-  }
-
-  return response.json();
+  const id = await activeScheduleId();
+  await post(`${API}/schedules/${id}/days/${dayIndex(day)}/slots`, { slots: schedule.map(toSlot) }, 'PUT');
+  return { success: true };
 }
 
 /**
- * Set scheduler mode (enable/disable)
+ * Set scheduler mode (enabled = automatic, disabled = manual)
  */
 export async function setSchedulerMode(enabled: boolean): Promise<ApiResponse> {
-  const response = await fetch('/api/scheduler/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'setSchedulerMode',
-      data: { enabled }
-    })
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to set scheduler mode');
-  }
-
-  return response.json();
+  await post(`${API}/scheduler/mode`, { enabled });
+  return { success: true };
 }
 
 /**
- * Activate semi-manual mode
+ * Semi-manual override until returnToAutoAt (ISO)
  */
 export async function setSemiManualMode(returnToAutoAt: string): Promise<ApiResponse> {
-  const response = await fetch('/api/scheduler/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'setSemiManualMode',
-      data: { returnToAutoAt }
-    })
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to set semi-manual mode');
-  }
-
-  return response.json();
+  await post(`${API}/scheduler/override`, { return_to_auto_at: isoToSeconds(returnToAutoAt) });
+  return { success: true };
 }
 
 /**
- * Clear semi-manual mode (return to automatic)
+ * Clear semi-manual mode (back to automatic)
  */
 export async function clearSemiManualMode(): Promise<ApiResponse> {
-  const response = await fetch('/api/scheduler/update', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      operation: 'clearSemiManualMode',
-      data: {}
-    })
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to clear semi-manual mode');
-  }
-
-  return response.json();
+  await apiFetch(`${API}/scheduler/override`, { method: 'DELETE' });
+  return { success: true };
 }

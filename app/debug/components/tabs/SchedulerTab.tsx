@@ -123,17 +123,6 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
             onCopyUrl={() => copyUrlToClipboard('/api/scheduler/check?secret=<CRON_SECRET>')}
             isCopied={copiedUrl === '/api/scheduler/check?secret=<CRON_SECRET>'}
           />
-
-          <PostEndpointCard
-            name="Update Scheduler"
-            url="/api/scheduler/update"
-            response={postResponses.schedulerUpdate}
-            loading={loadingPost.schedulerUpdate ?? false}
-            timing={timings.schedulerUpdate}
-            onExecute={() => callPostEndpoint('schedulerUpdate', '/api/scheduler/update', {})}
-            onCopyUrl={() => copyUrlToClipboard('/api/scheduler/update')}
-            isCopied={copiedUrl === '/api/scheduler/update'}
-          />
         </div>
       </div>
 

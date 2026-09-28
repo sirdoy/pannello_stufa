@@ -19,7 +19,7 @@
 
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { getNextScheduledAction } from '@/lib/scheduler/schedulerService';
-import { clearSemiManualMode } from '@/lib/scheduler/schedulerApiClient';
+import { clearSemiManualMode, setSchedulerMode } from '@/lib/scheduler/schedulerApiClient';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logStoveAction, logSchedulerAction } from '@/lib/logService';
 import { confirmCleaning } from '@/lib/maintenance/maintenanceService';
@@ -210,39 +210,16 @@ export function useStoveCommands(params: UseStoveCommandsParams): UseStoveComman
   };
 
   const handleSetManualMode = async () => {
-    // Use existing API: operation setSchedulerMode with enabled: false
-    await fetch('/api/scheduler/update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        operation: 'setSchedulerMode',
-        data: { enabled: false }
-      })
-    });
+    await setSchedulerMode(false);
     stoveData.setSchedulerEnabled(false);
     stoveData.setSemiManualMode(false);
   };
 
   const handleSetAutomaticMode = async () => {
-    // Use existing API: operation clearSemiManualMode then setSchedulerMode
-    await fetch('/api/scheduler/update', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        operation: 'setSchedulerMode',
-        data: { enabled: true }
-      })
-    });
+    await setSchedulerMode(true);
     // Clear semi-manual if active
     if (stoveData.semiManualMode) {
-      await fetch('/api/scheduler/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          operation: 'clearSemiManualMode',
-          data: {}
-        })
-      });
+      await clearSemiManualMode();
     }
     stoveData.setSchedulerEnabled(true);
     stoveData.setSemiManualMode(false);

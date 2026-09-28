@@ -11,8 +11,9 @@ import {
   setActiveSchedule,
 } from '@/lib/scheduler/schedulesApiClient';
 import { logSchedulerAction } from '@/lib/logService';
-import { db } from '@/lib/firebase';
-import { ref, onValue } from 'firebase/database';
+import { useWebSocketContext } from '@/app/context/WebSocketContext';
+import { ReadyState } from '@/lib/hooks/useWebSocketManager';
+import type { SchedulerWsPayload } from '@/types/thermorossiScheduler';
 import { Card, Button, ModeIndicator, Skeleton, Toast, ConfirmDialog, Heading, PageLayout } from '@/app/components/ui';
 import WeeklyTimeline from '@/app/components/scheduler/WeeklyTimeline';
 import DayEditPanel from '@/app/components/scheduler/DayEditPanel';
@@ -101,7 +102,7 @@ export default function WeeklyScheduler() {
 
   // Multi-schedule management states
   const [schedules, setSchedules] = useState<any[]>([]);
-  const [activeScheduleId, setActiveScheduleId] = useState<string>('default');
+  const [activeScheduleId, setActiveScheduleId] = useState<string>('');
   const [loadingSchedules, setLoadingSchedules] = useState<boolean>(true);
   const [createScheduleModal, setCreateScheduleModal] = useState<boolean>(false);
   const [manageSchedulesModal, setManageSchedulesModal] = useState<boolean>(false);
@@ -112,7 +113,7 @@ export default function WeeklyScheduler() {
       try {
         const allSchedules = await getAllSchedules();
         setSchedules(allSchedules.schedules || []);
-        setActiveScheduleId(allSchedules.activeScheduleId || 'default');
+        setActiveScheduleId(allSchedules.activeScheduleId || '');
       } catch (error) {
         console.error('Error loading schedules:', error);
         setToast({
@@ -132,7 +133,7 @@ export default function WeeklyScheduler() {
       try {
         const data = await getWeeklySchedule();
         const filledData = daysOfWeek.reduce((acc, day) => {
-          // Ordina gli intervalli caricati da Firebase
+          // Ordina gli intervalli caricati dal Pi
           acc[day] = sortIntervals(data[day] || []);
           return acc;
         }, {} as DaySchedule);
@@ -155,57 +156,45 @@ export default function WeeklyScheduler() {
     fetchData();
   }, []);
 
-  // Feature 1: Real-Time Firebase Sync - Listen for remote changes
+  // Feature 1: real-time sync — the Pi pushes scheduler changes on the WS `scheduler` topic
+  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const isWsConnected = readyState === ReadyState.OPEN;
+
   useEffect(() => {
-    // Listen to active schedule ID changes first
-    let scheduleSlotsUnsubscribe: (() => void) | null = null;
+    if (!isWsConnected) return;
+    const SCHEDULE_EVENTS = ['slots.updated', 'week.updated', 'schedule.activated'];
+    const MODE_EVENTS = ['mode.changed', 'override.set', 'override.cleared'];
 
-    const activeIdRef = ref(db, 'schedules-v2/activeScheduleId');
-    const activeIdUnsubscribe = onValue(activeIdRef, async (idSnapshot) => {
-      const activeId = idSnapshot.val() || 'default';
+    const handleMessage = (raw: unknown) => {
+      const { event } = raw as SchedulerWsPayload;
+      // Ignore the echo of this page's own saves (2s window)
+      const isLocalUpdate = lastLocalSave && Date.now() - lastLocalSave < 2000;
 
-      // Unsubscribe from previous schedule if exists
-      if (scheduleSlotsUnsubscribe) {
-        scheduleSlotsUnsubscribe();
-      }
-
-      // Subscribe to active schedule's slots
-      const scheduleSlotsRef = ref(db, `schedules-v2/schedules/${activeId}/slots`);
-      scheduleSlotsUnsubscribe = onValue(scheduleSlotsRef, (slotsSnapshot) => {
-        const data = slotsSnapshot.val();
-        if (!data) return;
-
-        // Check if update is from another device (within 2s window)
-        const now = Date.now();
-        const isLocalUpdate = lastLocalSave && (now - lastLocalSave < 2000);
-
-        if (!isLocalUpdate) {
-
-          // Update local state with remote data
+      if (SCHEDULE_EVENTS.includes(event) && !isLocalUpdate) {
+        void getWeeklySchedule().then((data) => {
           const remoteSchedule = daysOfWeek.reduce((acc, day) => {
             acc[day] = sortIntervals(data[day] || []);
             return acc;
           }, {} as DaySchedule);
-
           setSchedule(remoteSchedule);
-
-          // Show toast notification
           setToast({
             message: 'Pianificazione aggiornata da altro dispositivo',
             icon: '🔄',
             variant: 'info',
           });
-        }
-      });
-    });
-
-    return () => {
-      activeIdUnsubscribe();
-      if (scheduleSlotsUnsubscribe) {
-        scheduleSlotsUnsubscribe();
+        }).catch((error) => console.error('Errore aggiornamento pianificazione:', error));
+      } else if (MODE_EVENTS.includes(event)) {
+        void getFullSchedulerMode().then((mode) => {
+          setSchedulerEnabled(mode.enabled);
+          setSemiManualModeState(mode.semiManual || false);
+          setReturnToAutoAt(mode.returnToAutoAt || null);
+        }).catch((error) => console.error('Errore aggiornamento modalità:', error));
       }
     };
-  }, [lastLocalSave]);
+
+    subscribe('scheduler', handleMessage);
+    return () => { unsubscribe('scheduler', handleMessage); };
+  }, [isWsConnected, subscribe, unsubscribe, lastLocalSave]);
 
   // Wrapper for saveSchedule that tracks local saves
   const saveSchedule = async (day: DayOfWeek, intervals: ScheduleInterval[]): Promise<void> => {
@@ -542,7 +531,7 @@ export default function WeeklyScheduler() {
         const duplicatedIntervals = sourceIntervals.map((interval: ScheduleInterval) => ({ ...interval }));
         updatedSchedule[targetDay] = sortIntervals(duplicatedIntervals);
 
-        // Save each day to Firebase
+        // Save each day on the Pi scheduler
         await saveSchedule(targetDay, duplicatedIntervals);
         await logSchedulerAction.duplicateDay(sourceDay, targetDay);
       }

@@ -107,6 +107,7 @@ describe('useStoveCommands', () => {
 
     // Mock scheduler functions
     jest.mocked(schedulerApiClient.clearSemiManualMode).mockResolvedValue({ success: true } as any);
+    jest.mocked(schedulerApiClient.setSchedulerMode).mockResolvedValue({ success: true });
     jest.mocked(schedulerService.getNextScheduledAction).mockResolvedValue(null);
 
     // Mock maintenance
@@ -524,16 +525,8 @@ describe('useStoveCommands', () => {
       await result.current.handleSetManualMode();
     });
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/scheduler/update',
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({
-          operation: 'setSchedulerMode',
-          data: { enabled: false },
-        }),
-      })
-    );
+    expect(schedulerApiClient.setSchedulerMode).toHaveBeenCalledWith(false);
+    expect(mockStoveData.setSchedulerEnabled).toHaveBeenCalledWith(false);
   });
 
   it('handleSetAutomaticMode calls scheduler API with enabled true', async () => {
@@ -549,16 +542,24 @@ describe('useStoveCommands', () => {
       await result.current.handleSetAutomaticMode();
     });
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      '/api/scheduler/update',
-      expect.objectContaining({
-        method: 'POST',
-        body: JSON.stringify({
-          operation: 'setSchedulerMode',
-          data: { enabled: true },
-        }),
+    expect(schedulerApiClient.setSchedulerMode).toHaveBeenCalledWith(true);
+    expect(mockStoveData.setSchedulerEnabled).toHaveBeenCalledWith(true);
+  });
+
+  it('handleSetAutomaticMode clears an active semi-manual override', async () => {
+    const { result } = renderHook(() =>
+      useStoveCommands({
+        stoveData: { ...mockStoveData, semiManualMode: true } as typeof mockStoveData,
+        router: mockRouter,
+        user: mockUser,
       })
     );
+
+    await act(async () => {
+      await result.current.handleSetAutomaticMode();
+    });
+
+    expect(schedulerApiClient.clearSemiManualMode).toHaveBeenCalled();
   });
 
   it('command handlers set loading state', async () => {

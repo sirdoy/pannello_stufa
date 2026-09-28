@@ -159,7 +159,8 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
       const mode = await getFullSchedulerMode();
       setSchedulerEnabled(mode.enabled);
       setSemiManualMode(mode.semiManual || false);
-      setReturnToAutoAt(mode.returnToAutoAt ? Number(mode.returnToAutoAt) : null);
+      // ISO string → ms (Number(iso) was NaN → "Invalid Date" in the hero)
+      setReturnToAutoAt(mode.returnToAutoAt ? Date.parse(mode.returnToAutoAt) : null);
 
       if (mode.enabled && !mode.semiManual) {
         const nextAction = await getNextScheduledAction();

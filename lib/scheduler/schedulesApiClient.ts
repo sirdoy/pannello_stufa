@@ -1,9 +1,11 @@
 /**
- * Schedules API Client
+ * Schedules API Client (browser).
  *
- * Client-side wrapper for schedule write operations (Admin SDK server-side).
- * All operations require authentication (handled by API routes).
+ * Named schedules on the Pi scheduler (workspace ROADMAP D2), through the Next
+ * proxy routes. Ids are numeric on the backend and strings in the UI.
  */
+import { API, apiFetch, fetchSchedule, fetchScheduleList, secondsToIso, toWeekly } from './backendScheduler';
+import type { ScheduleSummary } from '@/types/thermorossiScheduler';
 
 /** Schedule metadata */
 export interface ScheduleMetadata {
@@ -20,104 +22,73 @@ export interface Schedule extends ScheduleMetadata {
   slots: Record<string, unknown[]>;
 }
 
-/** API error response */
-interface ApiError {
-  error?: string;
-}
-
-/** Response from GET /api/schedules */
+/** Response of getAllSchedules */
 interface GetSchedulesResponse {
   schedules: ScheduleMetadata[];
   activeScheduleId: string;
 }
 
+function toMetadata(s: ScheduleSummary): ScheduleMetadata {
+  return {
+    id: String(s.id),
+    name: s.name,
+    enabled: s.enabled,
+    createdAt: secondsToIso(s.created_at) ?? '',
+    updatedAt: secondsToIso(s.updated_at) ?? '',
+    intervalCount: s.interval_count,
+  };
+}
+
+async function toSchedule(id: number): Promise<Schedule> {
+  const detail = await fetchSchedule(id);
+  return { ...toMetadata(detail), slots: toWeekly(detail) };
+}
+
 /**
- * Get all schedules (metadata only)
+ * Get all schedules (metadata only), oldest first
  */
 export async function getAllSchedules(): Promise<GetSchedulesResponse> {
-  const response = await fetch('/api/schedules', {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' }
-  });
-
-  if (!response.ok) {
-    const error = await response.json() as ApiError;
-    throw new Error(error.error || 'Failed to fetch schedules');
-  }
-
-  return response.json();
+  const { schedules, active_schedule_id: activeId } = await fetchScheduleList();
+  return {
+    schedules: [...schedules].sort((a, b) => a.created_at - b.created_at).map(toMetadata),
+    activeScheduleId: activeId === null ? '' : String(activeId),
+  };
 }
 
 /**
- * Create new schedule
+ * Create new schedule (empty, or a copy of copyFromId)
  */
 export async function createSchedule(name: string, copyFromId: string | null = null): Promise<Schedule> {
-  const response = await fetch('/api/schedules', {
+  const created = await apiFetch<ScheduleSummary>(`${API}/schedules`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name,
-      copyFromId
-    })
+    body: JSON.stringify(copyFromId ? { name, copy_from_id: Number(copyFromId) } : { name }),
   });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to create schedule');
-  }
-
-  return response.json();
+  return toSchedule(created.id);
 }
 
 /**
- * Update schedule
+ * Update schedule name / enabled
  */
 export async function updateSchedule(scheduleId: string, updates: Partial<Schedule>): Promise<Schedule> {
-  const response = await fetch(`/api/schedules/${scheduleId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates)
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to update schedule');
-  }
-
-  return response.json();
+  const body: { name?: string; enabled?: boolean } = {};
+  if (updates.name !== undefined) body.name = updates.name;
+  if (updates.enabled !== undefined) body.enabled = updates.enabled;
+  await apiFetch(`${API}/schedules/${scheduleId}`, { method: 'PATCH', body: JSON.stringify(body) });
+  return toSchedule(Number(scheduleId));
 }
 
 /**
- * Delete schedule
+ * Delete schedule (the backend refuses the active or the last one)
  */
 export async function deleteSchedule(scheduleId: string): Promise<{ success: boolean }> {
-  const response = await fetch(`/api/schedules/${scheduleId}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' }
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to delete schedule');
-  }
-
-  return response.json();
+  await apiFetch(`${API}/schedules/${scheduleId}`, { method: 'DELETE' });
+  return { success: true };
 }
 
 /**
  * Set active schedule
  */
 export async function setActiveSchedule(scheduleId: string): Promise<{ success: boolean }> {
-  const response = await fetch('/api/schedules/active', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ scheduleId })
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to set active schedule');
-  }
-
-  return response.json();
+  await apiFetch(`${API}/schedules/${scheduleId}/active`, { method: 'PUT' });
+  return { success: true };
 }

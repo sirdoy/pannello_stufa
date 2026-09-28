@@ -146,10 +146,11 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     });
     const { getByTestId, queryByText } = render(<StoveCard />);
 
-    expect(getByTestId('stove-cleaning-badge').textContent).toContain('Pulizia');
+    expect(getByTestId('stove-cleaning-badge')).toHaveAttribute('aria-label', 'Pulizia richiesta');
     const alert = getByTestId('stove-maintenance-alert');
     expect(alert).toHaveAttribute('role', 'status');
-    expect(alert.textContent).toContain('Pulizia richiesta · 4577 h');
+    expect(alert.textContent).toContain('Pulizia richiesta');
+    expect(alert.textContent).toContain('4577 h di lavoro');
     expect(queryByText('Spenta')).toBeNull();
   });
 

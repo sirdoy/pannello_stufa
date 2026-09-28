@@ -89,23 +89,25 @@ export default function StoveCard() {
           right={
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               {needsCleaning && (
+                // Icon-only: a text badge truncates the "Stufa" label on narrow cards.
                 <span
                   data-testid="stove-cleaning-badge"
+                  role="img"
+                  aria-label="Pulizia richiesta"
+                  title="Pulizia richiesta"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 3,
-                    padding: '2px 6px',
+                    justifyContent: 'center',
+                    width: 20,
+                    height: 20,
                     borderRadius: 999,
-                    fontSize: 10,
-                    fontWeight: 600,
                     color: WARN,
                     background: 'rgba(255, 184, 74, 0.14)',
                     border: '1px solid rgba(255, 184, 74, 0.35)',
                   }}
                 >
-                  <Wrench size={10} strokeWidth={2.4} aria-hidden />
-                  Pulizia
+                  <Wrench size={11} strokeWidth={2.4} aria-hidden />
                 </span>
               )}
               <StatusDot on={stove.isAccesa} color={dotColor} />
@@ -155,14 +157,19 @@ export default function StoveCard() {
                 fontWeight: 600,
                 color: WARN,
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-start',
                 gap: 4,
               }}
             >
               <Wrench size={12} strokeWidth={2.4} aria-hidden />
-              {cleaningHours !== undefined
-                ? `Pulizia richiesta · ${Math.round(cleaningHours)} h`
-                : 'Pulizia richiesta'}
+              <span>
+                Pulizia richiesta
+                {cleaningHours !== undefined && (
+                  <span style={{ display: 'block', fontWeight: 400, color: 'var(--text-2)' }}>
+                    {Math.round(cleaningHours)} h di lavoro
+                  </span>
+                )}
+              </span>
             </div>
           ) : (
             <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-2)' }}>

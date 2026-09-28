@@ -9,6 +9,7 @@
  */
 
 import { render, act } from '@testing-library/react';
+import { usePathname } from 'next/navigation';
 import { SplashGate } from '../SplashGate';
 
 const mockUseUser = jest.fn();
@@ -82,6 +83,22 @@ describe('SplashGate (EmberGlass orchestrator — Phase 176)', () => {
       </SplashGate>,
     );
     expect(queryByTestId('splash-overlay')).not.toBeInTheDocument();
+  });
+
+  it('does NOT mount <Splash> on sign-in screens even with a known user, and keeps the flag unset', () => {
+    (usePathname as jest.Mock).mockReturnValue('/auth/login');
+    try {
+      const { queryByTestId, getByTestId } = render(
+        <SplashGate>
+          <div>login</div>
+        </SplashGate>,
+      );
+      expect(queryByTestId('splash-overlay')).not.toBeInTheDocument();
+      expect(getByTestId('dashboard-wrapper').style.opacity).toBe('1');
+      expect(sessionStorage.getItem('ember-glass-splash-shown')).toBeNull();
+    } finally {
+      (usePathname as jest.Mock).mockReturnValue('/');
+    }
   });
 
   it('omits transform on dashboard-wrapper under reduced-motion (D-16/D-17)', () => {

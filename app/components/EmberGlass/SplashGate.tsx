@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import { useUser } from '@/lib/auth/useUser';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { Splash } from './Splash';
@@ -37,6 +38,11 @@ export interface SplashGateProps {
 export function SplashGate({ children, forceShow = false }: SplashGateProps) {
   const { user, isLoading } = useUser();
   const reducedMotion = useReducedMotion();
+  const pathname = usePathname();
+  // The splash is post-login: never play it on the sign-in screens, even when a user is
+  // already known there (auth bypass, stale session), or it would consume the
+  // session-once flag before the real landing page.
+  const onAuthPage = pathname === '/auth' || !!pathname?.startsWith('/auth/');
 
   const [hydrated, setHydrated] = useState(false);
   const [shownThisSession, setShownThisSession] = useState(false);
@@ -54,17 +60,17 @@ export function SplashGate({ children, forceShow = false }: SplashGateProps) {
     }
   }, []);
 
-  // When auth resolves with no user (logged-out / public route), splash never plays —
-  // surface content instead of leaving the wrapper at opacity:0 forever.
+  // When auth resolves with no user (logged-out / public route) or on a sign-in screen,
+  // splash never plays — surface content instead of leaving the wrapper at opacity:0 forever.
   useEffect(() => {
-    if (hydrated && !isLoading && !user && !ready && !forceShow) {
+    if (hydrated && !isLoading && (!user || onAuthPage) && !ready && !forceShow) {
       setReady(true);
     }
-  }, [hydrated, isLoading, user, ready, forceShow]);
+  }, [hydrated, isLoading, user, onAuthPage, ready, forceShow]);
 
   // SPLASH-01 trigger predicate (CONTEXT.md D-08): all four conditions hold OR forceShow.
   const shouldShowSplash =
-    forceShow || (hydrated && !shownThisSession && !isLoading && !!user && !ready);
+    forceShow || (hydrated && !shownThisSession && !isLoading && !!user && !onAuthPage && !ready);
 
   return (
     <>

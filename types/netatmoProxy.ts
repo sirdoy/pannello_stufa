@@ -384,6 +384,8 @@ export interface NetatmoHealthResponse {
   token_source: 'sqlite' | 'secrets_toml';
   requests_this_hour: number;
   rate_limit_ceiling: number;
+  /** OAuth scopes missing from the last token refresh; null until the first refresh (e.g. ["access_camera"]) */
+  missing_scopes?: string[] | null;
   last_poll_at: number | null;
 }
 

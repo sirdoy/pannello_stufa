@@ -38,6 +38,13 @@ const mockRule = {
   updated_at: 1735689600,
 };
 
+// Minimal body the backend accepts: condition + at least one action.
+const validBody = {
+  name: 'Test Rule',
+  condition: { type: 'always_true' },
+  actions: [{ type: 'log_event', message: 'test' }],
+};
+
 const mockPaginatedRules = {
   items: [mockRule],
   total_count: 1,
@@ -94,14 +101,14 @@ describe('POST /api/v1/automations', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     // Default: parseJson returns a valid body for POST tests
-    mockParseJson.mockResolvedValue({ name: 'Test Rule' } as any);
+    mockParseJson.mockResolvedValue(validBody as any);
   });
 
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/automations', {
       method: 'POST',
-      body: JSON.stringify({ name: 'Test Rule' }),
+      body: JSON.stringify(validBody),
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -116,7 +123,7 @@ describe('POST /api/v1/automations', () => {
     mockAutomationsProxy.createAutomation.mockResolvedValue(mockRule);
     const request = new Request('http://localhost:3000/api/v1/automations', {
       method: 'POST',
-      body: JSON.stringify({ name: 'Test Rule' }),
+      body: JSON.stringify(validBody),
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -131,13 +138,13 @@ describe('POST /api/v1/automations', () => {
     mockAutomationsProxy.createAutomation.mockResolvedValue(mockRule);
     const request = new Request('http://localhost:3000/api/v1/automations', {
       method: 'POST',
-      body: JSON.stringify({ name: 'Test Rule' }),
+      body: JSON.stringify(validBody),
       headers: { 'Content-Type': 'application/json' },
     });
 
     await POST(request as any, {} as any);
 
-    expect(mockAutomationsProxy.createAutomation).toHaveBeenCalledWith({ name: 'Test Rule' });
+    expect(mockAutomationsProxy.createAutomation).toHaveBeenCalledWith(validBody);
   });
 
   it('returns 400 when body is missing required name field', async () => {
@@ -151,6 +158,30 @@ describe('POST /api/v1/automations', () => {
     const response = await POST(request as any, {} as any);
 
     expect(response.status).toBe(400);
+  });
+
+  // M3: body aligned with the backend AutomationRuleCreate model.
+  it.each([
+    ['condition missing', { name: 'R', actions: [{ type: 'log_event' }] }],
+    ['condition not an object', { name: 'R', condition: 'x', actions: [{ type: 'log_event' }] }],
+    ['condition without type', { name: 'R', condition: {}, actions: [{ type: 'log_event' }] }],
+    ['actions missing', { name: 'R', condition: { type: 'always_true' } }],
+    ['actions empty', { name: 'R', condition: { type: 'always_true' }, actions: [] }],
+    ['action without type', { name: 'R', condition: { type: 'always_true' }, actions: [{}] }],
+    ['bad active_hours_start', { ...validBody, active_hours_start: '7:00' }],
+    ['bad active_hours_end', { ...validBody, active_hours_end: 'sera' }],
+  ])('returns 400 without calling the backend when %s', async (_label, body) => {
+    mockParseJson.mockResolvedValue(body);
+    const request = new Request('http://localhost:3000/api/v1/automations', {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const response = await POST(request as never, {} as never);
+
+    expect(response.status).toBe(400);
+    expect(mockAutomationsProxy.createAutomation).not.toHaveBeenCalled();
   });
 
   // BL-02 (REVIEW iteration 2): the schema previously stripped trigger,

@@ -170,6 +170,26 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
     expect(mockAutomationsProxy.updateAutomation).not.toHaveBeenCalled();
   });
 
+  // M3: shapes aligned with the backend AutomationRulePatch model.
+  it.each([
+    ['condition not an object', { condition: 'x' }],
+    ['condition without type', { condition: {} }],
+    ['action without type', { actions: [{}] }],
+    ['bad active_hours_start', { active_hours_start: '25' }],
+  ])('returns 400 without calling the backend when %s', async (_label, body) => {
+    mockParseJson.mockResolvedValue(body);
+    const request = new Request('http://localhost:3000/api/v1/automations/rule-123', {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const response = await PATCH(request as never, mockContext as never);
+
+    expect(response.status).toBe(400);
+    expect(mockAutomationsProxy.updateAutomation).not.toHaveBeenCalled();
+  });
+
   it('accepts the full AutomationRulePatch shape (no trigger)', async () => {
     const validPatch = {
       name: 'Updated',

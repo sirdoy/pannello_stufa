@@ -93,6 +93,15 @@ export function StoveBody({ device }: { device: RoomDevice }){
           }}
         />
       </ControlRow>
+      {needsCleaning && (
+        <div
+          role="status"
+          data-testid="stove-body-maintenance-alert"
+          style={{ fontSize: 12, fontWeight: 600, color: '#ffb84a' }}
+        >
+          Pulizia richiesta: accensione bloccata finché non la confermi
+        </div>
+      )}
     </div>
   );
 }

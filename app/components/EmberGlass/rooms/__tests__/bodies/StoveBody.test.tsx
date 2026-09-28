@@ -190,4 +190,16 @@ describe('StoveBody', () => {
     expect(screen.getByText('Power')).toBeInTheDocument();
     expect(screen.getByText('Più')).toBeInTheDocument();
   });
+
+  // ROADMAP M9: the room body explains why Power does nothing when cleaning is due.
+  test('Test 6: cleaning due shows the maintenance alert; not shown otherwise', () => {
+    stoveDataOverride = { needsMaintenance: true };
+    const { unmount } = render(<StoveBody device={makeDevice({ on: false })} />);
+    expect(screen.getByTestId('stove-body-maintenance-alert')).toHaveAttribute('role', 'status');
+    unmount();
+
+    stoveDataOverride = { needsMaintenance: false };
+    render(<StoveBody device={makeDevice({ on: false })} />);
+    expect(screen.queryByTestId('stove-body-maintenance-alert')).toBeNull();
+  });
 });

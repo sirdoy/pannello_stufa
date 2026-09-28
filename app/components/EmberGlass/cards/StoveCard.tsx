@@ -24,7 +24,7 @@
  */
 
 import { useState } from 'react';
-import { Flame } from 'lucide-react';
+import { Flame, Wrench } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/auth/useUser';
 import { GlassCard } from '../GlassCard';
@@ -36,6 +36,8 @@ import { StoveSheet } from '../sheets/StoveSheet';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
 import { useVersion } from '@/app/context/VersionContext';
+
+const WARN = '#ffb84a';
 
 export default function StoveCard() {
   const [open, setOpen] = useState(false);
@@ -66,20 +68,49 @@ export default function StoveCard() {
 
   // D-25: stale → amber StatusDot. `staleness` is StalenessInfo | null.
   const isStale = stove.staleness?.isStale ?? false;
-  const dotColor = isStale ? '#ffb84a' : undefined;
+  const dotColor = isStale ? WARN : undefined;
+
+  // ROADMAP M9: cleaning due (counted on the Pi) blocks ignition → visible on the card itself.
+  const needsCleaning = stove.needsMaintenance;
+  const cleaningHours = stove.maintenanceStatus?.currentHours;
+  const tone = needsCleaning ? WARN : 'var(--accent)';
 
   return (
     <>
       <GlassCard
-        tone="var(--accent)"
+        tone={tone}
         onOpen={() => setOpen(true)}
         data-testid="stove-card"
       >
         <CardHead
           Icon={Flame}
           label="Stufa"
-          tone="var(--accent)"
-          right={<StatusDot on={stove.isAccesa} color={dotColor} />}
+          tone={tone}
+          right={
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              {needsCleaning && (
+                <span
+                  data-testid="stove-cleaning-badge"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 3,
+                    padding: '2px 6px',
+                    borderRadius: 999,
+                    fontSize: 10,
+                    fontWeight: 600,
+                    color: WARN,
+                    background: 'rgba(255, 184, 74, 0.14)',
+                    border: '1px solid rgba(255, 184, 74, 0.35)',
+                  }}
+                >
+                  <Wrench size={10} strokeWidth={2.4} aria-hidden />
+                  Pulizia
+                </span>
+              )}
+              <StatusDot on={stove.isAccesa} color={dotColor} />
+            </span>
+          }
         />
         <div
           style={{
@@ -114,9 +145,30 @@ export default function StoveCard() {
           >
             {stove.isAccesa ? (stove.powerLevel ?? '—') : '—'}
           </div>
-          <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-2)' }}>
-            {stove.isAccesa ? `Fiamma ${stove.powerLevel} · Ventola ${stove.fanLevel}` : 'Spenta'}
-          </div>
+          {needsCleaning ? (
+            <div
+              role="status"
+              data-testid="stove-maintenance-alert"
+              style={{
+                marginTop: 6,
+                fontSize: 12,
+                fontWeight: 600,
+                color: WARN,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 4,
+              }}
+            >
+              <Wrench size={12} strokeWidth={2.4} aria-hidden />
+              {cleaningHours !== undefined
+                ? `Pulizia richiesta · ${Math.round(cleaningHours)} h`
+                : 'Pulizia richiesta'}
+            </div>
+          ) : (
+            <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-2)' }}>
+              {stove.isAccesa ? `Fiamma ${stove.powerLevel} · Ventola ${stove.fanLevel}` : 'Spenta'}
+            </div>
+          )}
         </div>
       </GlassCard>
       <Sheet open={open} onClose={() => setOpen(false)} title="Stufa">

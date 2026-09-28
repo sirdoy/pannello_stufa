@@ -133,4 +133,53 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     const dot = getByTestId('status-dot');
     expect(dot.getAttribute('style') ?? '').toContain('#ffb84a');
   });
+
+  // ROADMAP M9: cleaning due must be visible on the card, not only in the sheet.
+  test('(f) cleaning due: badge, amber alert with hours, instead of "Spenta"', () => {
+    useStoveDataMock.mockReturnValue({
+      isAccesa: false,
+      powerLevel: 0,
+      fanLevel: 1,
+      staleness: null,
+      needsMaintenance: true,
+      maintenanceStatus: { currentHours: 4577.28, targetHours: 100, needsCleaning: true },
+    });
+    const { getByTestId, queryByText } = render(<StoveCard />);
+
+    expect(getByTestId('stove-cleaning-badge').textContent).toContain('Pulizia');
+    const alert = getByTestId('stove-maintenance-alert');
+    expect(alert).toHaveAttribute('role', 'status');
+    expect(alert.textContent).toContain('Pulizia richiesta · 4577 h');
+    expect(queryByText('Spenta')).toBeNull();
+  });
+
+  test('(g) no cleaning alert when maintenance is not due', () => {
+    useStoveDataMock.mockReturnValue({
+      isAccesa: false,
+      powerLevel: 0,
+      fanLevel: 1,
+      staleness: null,
+      needsMaintenance: false,
+      maintenanceStatus: { currentHours: 12, targetHours: 50, needsCleaning: false },
+    });
+    const { queryByTestId, getByText } = render(<StoveCard />);
+
+    expect(queryByTestId('stove-cleaning-badge')).toBeNull();
+    expect(queryByTestId('stove-maintenance-alert')).toBeNull();
+    expect(getByText('Spenta')).toBeInTheDocument();
+  });
+
+  test('(h) cleaning due without loaded hours still shows the alert', () => {
+    useStoveDataMock.mockReturnValue({
+      isAccesa: false,
+      powerLevel: 0,
+      fanLevel: 1,
+      staleness: null,
+      needsMaintenance: true,
+      maintenanceStatus: null,
+    });
+    const { getByTestId } = render(<StoveCard />);
+
+    expect(getByTestId('stove-maintenance-alert').textContent).toBe('Pulizia richiesta');
+  });
 });

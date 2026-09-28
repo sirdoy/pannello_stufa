@@ -25,11 +25,14 @@ npm run lint
 1. **NEVER** break existing functionality
 2. **WAIT** for user confirmation before version updates
 3. **PREFER** editing existing files over creating new
-4. **NEVER** execute `npm run build`. Adding/removing npm packages (`npm install <pkg>`, `npm uninstall <pkg>`) is
-   allowed autonomously; commit `package.json` + `package-lock.json` together
+4. **ALWAYS** run `npm run build` right before a commit (and only then: never during development or verification);
+   a failing build blocks the commit and push. Enforced by the workspace hook
+   `../.claude/hooks/fe-build-before-commit.sh`. Adding/removing npm packages (`npm install <pkg>`,
+   `npm uninstall <pkg>`) is allowed autonomously; commit `package.json` + `package-lock.json` together
 5. **ALWAYS** create/update unit tests
 6. **USE** design system → EmberGlass (`app/components/EmberGlass/`), preview `/debug/design-system-v2`
-7. **NEVER** commit/push without explicit request (push su `main` = deploy Vercel)
+7. A task finito: test scoped, commit e push **senza chiedere** (push su `main` = deploy Vercel), poi verifica in
+   produzione — regola `../.claude/rules/task-closing.md`
 8. **USE** scoped test subsets in verification — NEVER `npm test` alone from agents or PLAN.md `<verify><automated>`
    blocks. Prefer `npm test -- <specific paths>` or the scoped scripts: `test:changed`, `test:quick`, `test:unit`,
    `test:api`, `test:components`, `test:pages`. The full suite is reserved for release gates and CI (`test:ci`).

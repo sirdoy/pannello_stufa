@@ -2,6 +2,7 @@
 
 import type React from 'react';
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Button from './Button';
 import Card from './Card';
 import Heading from './Heading';
@@ -94,9 +95,12 @@ export default function ConfirmDialog({
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onCancel]);
 
-  if (!isOpen) return null;
+  if (!isOpen || typeof document === 'undefined') return null;
 
-  return (
+  // Portal to <body>: inside a transformed ancestor (page transition / stagger
+  // wrappers) `position: fixed` is relative to that ancestor, so on mobile the
+  // dialog was off-centre and its buttons off-screen (ROADMAP M11).
+  return createPortal(
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn "
       onClick={onCancel}
@@ -106,7 +110,7 @@ export default function ConfirmDialog({
     >
       <Card
         variant="elevated"
-        className="max-w-md w-full p-6 animate-scaleIn"
+        className="max-w-md w-full max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 animate-scaleIn"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         <div className="text-center mb-6">
@@ -135,6 +139,7 @@ export default function ConfirmDialog({
           </Button>
         </div>
       </Card>
-    </div>
+    </div>,
+    document.body
   );
 }

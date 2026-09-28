@@ -32,7 +32,7 @@ export function SonosBody({ device }: { device: RoomDevice }){
   const data = useSonosFullData();
   // RESEARCH §Aggregator Reconciliation Sonos + Phase 178 SonosSheet precedent:
   // prefer handleSetZoneVolume(group_id, vol) — targets the whole group (Pitfall 7).
-  const cmds = useSonosCommands({ fetchData: data.fetchData, setError: () => {} });
+  const cmds = useSonosCommands({ fetchData: data.fetchData, applyMutation: data.applyMutation, setError: () => {} });
 
   // device.extra.id is the group_id for Sonos (== coordinator_uid per AggregatorState.sonos)
   const groupId = String(device.extra.id ?? '');

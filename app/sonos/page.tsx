@@ -25,9 +25,9 @@ import SonosHistoryChart from '@/app/components/devices/sonos/components/SonosHi
  */
 export default function SonosPage() {
   const router = useRouter();
-  const { data, loading, stale, error, fetchData } = useSonosFullData();
+  const { data, loading, stale, error, fetchData, applyMutation } = useSonosFullData();
   const [commandError, setCommandError] = useState<string | null>(null);
-  const commands = useSonosCommands({ fetchData, setError: setCommandError });
+  const commands = useSonosCommands({ fetchData, applyMutation, setError: setCommandError });
 
   // Loading guard — only on initial load (no cached data)
   if (loading && !data) {

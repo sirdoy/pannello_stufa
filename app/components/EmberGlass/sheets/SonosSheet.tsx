@@ -339,6 +339,7 @@ export function SonosSheetSelfFetch() {
   const [, setCommandError] = useState<string | null>(null);
   const cmds = useSonosCommands({
     fetchData: sonosData.fetchData,
+    applyMutation: sonosData.applyMutation,
     setError: setCommandError,
   });
   return <SonosSheet sonosData={sonosData} cmds={cmds} />;

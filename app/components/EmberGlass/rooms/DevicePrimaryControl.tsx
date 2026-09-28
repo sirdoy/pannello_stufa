@@ -63,7 +63,7 @@ export function DevicePrimaryControl({ device }: { device: RoomDevice }){
 
 function SonosControl({ device }: { device: RoomDevice }) {
   const sonosData = useSonosFullData();
-  const cmds = useSonosCommands({ fetchData: sonosData.fetchData, setError: () => {} });
+  const cmds = useSonosCommands({ fetchData: sonosData.fetchData, applyMutation: sonosData.applyMutation, setError: () => {} });
   const groupId = String(device.extra['id'] ?? '');
   const playing = device.on;
   return (

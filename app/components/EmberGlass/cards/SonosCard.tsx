@@ -47,6 +47,7 @@ export default function SonosCard() {
   const [, setCommandError] = useState<string | null>(null);
   const cmds = useSonosCommands({
     fetchData: sonosData.fetchData,
+    applyMutation: sonosData.applyMutation,
     setError: setCommandError,
   });
 

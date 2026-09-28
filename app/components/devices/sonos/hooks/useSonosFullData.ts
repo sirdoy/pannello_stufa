@@ -14,6 +14,7 @@ import type {
   SonosSleepTimerResponse,
   SonosEqResponse,
   SonosHomeTheaterResponse,
+  SonosCommandOkResponse,
 } from '@/types/sonosProxy';
 
 export interface SonosFullData {
@@ -33,6 +34,12 @@ export interface UseSonosFullDataReturn {
   error: string | null;
   stale: boolean;
   fetchData: () => Promise<void>;
+  /**
+   * Merges a confirmed mutation response into the current snapshot.
+   * Returns false when nothing could be applied (unconfirmed, no snapshot yet,
+   * or no known resource in the body) — the caller should then refetch.
+   */
+  applyMutation: (body: SonosCommandOkResponse) => boolean;
 }
 
 // WS sonos_transport payload (push-only, per docs/api/websocket.md)
@@ -108,6 +115,85 @@ function adaptTransport(raw: SonosTransportWsPayload): SonosPlaybackResponse {
     duration: toHms(raw.duration),
     source_type: isSourceType(raw.source_type),
   };
+}
+
+function isObj(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v);
+}
+
+/**
+ * Pure merge of a Sonos mutation response (docs/api/sonos.md "Mutation responses")
+ * into a snapshot. Returns null when the body is unconfirmed or carries no
+ * resource this hook tracks.
+ */
+export function mergeSonosMutation(
+  prev: SonosFullData,
+  body: SonosCommandOkResponse
+): SonosFullData | null {
+  if (!body.data_confirmed) return null;
+  let next = prev;
+  let applied = false;
+
+  const pb = body['playback'];
+  if (isObj(pb) && typeof pb['group_id'] === 'string') {
+    const playback = pb as unknown as SonosPlaybackResponse;
+    next = { ...next, playback: { ...next.playback, [playback.group_id]: playback } };
+    applied = true;
+  }
+
+  const vol = body['volume'];
+  const vols = body['volumes'];
+  const volumeList = [
+    ...(isObj(vol) && typeof vol['uid'] === 'string' ? [vol] : []),
+    ...(Array.isArray(vols) ? vols.filter(v => isObj(v) && typeof v['uid'] === 'string') : []),
+  ] as unknown as SonosVolumeResponse[];
+  if (volumeList.length > 0) {
+    const volumes = { ...next.volumes };
+    for (const v of volumeList) volumes[v.uid] = { uid: v.uid, volume: v.volume, mute: v.mute };
+    next = { ...next, volumes };
+    applied = true;
+  }
+
+  const eq = body['eq_settings'];
+  if (isObj(eq) && typeof eq['uid'] === 'string') {
+    const eqSettings = eq as unknown as SonosEqResponse;
+    next = { ...next, eqData: { ...next.eqData, [eqSettings.uid]: eqSettings } };
+    applied = true;
+  }
+
+  const pm = body['play_mode'];
+  if (isObj(pm) && typeof pm['group_id'] === 'string') {
+    const playMode = pm as unknown as SonosPlayModeResponse;
+    next = { ...next, playModes: { ...next.playModes, [playMode.group_id]: playMode } };
+    applied = true;
+  }
+
+  const st = body['sleep_timer'];
+  if (isObj(st) && typeof st['group_id'] === 'string') {
+    const sleepTimer = st as unknown as SonosSleepTimerResponse;
+    next = { ...next, sleepTimers: { ...next.sleepTimers, [sleepTimer.group_id]: sleepTimer } };
+    applied = true;
+  }
+
+  const ht = body['home_theater'];
+  if (isObj(ht) && typeof ht['uid'] === 'string') {
+    // Partial by contract: merge over the known settings for that soundbar.
+    const uid = ht['uid'];
+    const merged = { ...next.homeTheaterData[uid], ...ht } as SonosHomeTheaterResponse;
+    next = { ...next, homeTheaterData: { ...next.homeTheaterData, [uid]: merged } };
+    applied = true;
+  }
+
+  if (Array.isArray(body['speakers']) && Array.isArray(body['groups'])) {
+    next = {
+      ...next,
+      devices: body['speakers'] as SonosDeviceResponse[],
+      zones: body['groups'] as SonosZoneResponse[],
+    };
+    applied = true;
+  }
+
+  return applied ? next : null;
 }
 
 export function useSonosFullData(): UseSonosFullDataReturn {
@@ -346,5 +432,14 @@ export function useSonosFullData(): UseSonosFullDataReturn {
     initialDelay: 200,
   });
 
-  return { data, loading, error, stale, fetchData };
+  const applyMutation = (body: SonosCommandOkResponse): boolean => {
+    if (!dataRef.current) return false;
+    const next = mergeSonosMutation(dataRef.current, body);
+    if (!next) return false;
+    dataRef.current = next;
+    setData(next);
+    return true;
+  };
+
+  return { data, loading, error, stale, fetchData, applyMutation };
 }

@@ -343,4 +343,57 @@ describe('useSonosCommands', () => {
     );
     expect(mockFetchData).toHaveBeenCalled();
   });
+
+  describe('confirmed mutation responses (M2)', () => {
+    const confirmed = { data_confirmed: true, playback: { group_id: 'RINCON_A' }, suggested_poll_delay_s: 1 };
+
+    function respond(cmd: ReturnType<typeof makeMockCommand>, body: object) {
+      cmd.execute.mockResolvedValue({ ok: true, status: 202, json: () => Promise.resolve(body) } as Response);
+    }
+
+    it('applies a confirmed body and skips the wait + full refetch', async () => {
+      respond(mockTransportCmd, confirmed);
+      const applyMutation = jest.fn().mockReturnValue(true);
+      const { result } = renderHook(() =>
+        useSonosCommands({ fetchData: mockFetchData, setError: mockSetError, applyMutation })
+      );
+
+      await act(async () => {
+        await result.current.handlePlay('RINCON_A');
+      });
+
+      expect(applyMutation).toHaveBeenCalledWith(expect.objectContaining({ data_confirmed: true }));
+      expect(mockFetchData).not.toHaveBeenCalled();
+    });
+
+    it('refetches when the backend could not confirm the state', async () => {
+      respond(mockVolumeCmd, { data_confirmed: false, volume: {}, suggested_poll_delay_s: 0 });
+      const applyMutation = jest.fn().mockReturnValue(true);
+      const { result } = renderHook(() =>
+        useSonosCommands({ fetchData: mockFetchData, setError: mockSetError, applyMutation })
+      );
+
+      await act(async () => {
+        await result.current.handleSetVolume('RINCON_B', 30);
+      });
+
+      expect(applyMutation).not.toHaveBeenCalled();
+      expect(mockFetchData).toHaveBeenCalledTimes(1);
+    });
+
+    it('refetches when the confirmed body cannot be applied', async () => {
+      respond(mockExtendedCmd, { ...confirmed, suggested_poll_delay_s: 0 });
+      const applyMutation = jest.fn().mockReturnValue(false);
+      const { result } = renderHook(() =>
+        useSonosCommands({ fetchData: mockFetchData, setError: mockSetError, applyMutation })
+      );
+
+      await act(async () => {
+        await result.current.handleUnjoinGroup('RINCON_B');
+      });
+
+      expect(mockExtendedCmd.execute).toHaveBeenCalledWith('/api/v1/sonos/speakers/RINCON_B/unjoin', { method: 'POST' });
+      expect(mockFetchData).toHaveBeenCalledTimes(1);
+    });
+  });
 });

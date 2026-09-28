@@ -2,6 +2,7 @@
 
 import { UserProvider } from '@/lib/auth/useUser';
 import { VersionProvider } from '@/app/context/VersionContext';
+import NewVersionBanner from './NewVersionBanner';
 import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 import { ToastProvider } from '@/app/components/ui';
 import { OfflineBanner } from '@/app/components/ui';
@@ -64,6 +65,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
                   <AxeDevtools />
                   <PWAInitializer />
                   <OfflineBanner fixed showPendingCount />
+                  {!onAuthPage && <NewVersionBanner />}
                   <SplashGate>{children}</SplashGate>
                   <InstallPrompt />
                 </CommandPaletteProvider>

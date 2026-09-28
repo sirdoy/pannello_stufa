@@ -19,6 +19,8 @@ const nextConfig: NextConfig = {
   reactCompiler: true, // Phase 71: auto-memoization via React Compiler 1.0
   env: {
     NEXT_PUBLIC_TEST_MODE: process.env.TEST_MODE || 'false',
+    // M17: build commit, compared with /api/version to prompt a reload after a deploy
+    NEXT_PUBLIC_BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 12) || 'dev',
   },
   images: {
     remotePatterns: [

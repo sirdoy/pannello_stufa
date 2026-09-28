@@ -101,18 +101,20 @@ export class DeduplicationManager {
 }
 
 /**
- * Creates a consistent request key from device and action
+ * Creates a consistent request key from device, action and optional target
  *
  * @param device - Device name (e.g., "stove", "netatmo", "hue")
  * @param action - Action name (e.g., "ignite", "shutdown", "sync")
- * @returns Request key in format "device:action"
+ * @param target - Optional target (e.g. request URL) so commands on different
+ *   lights/rooms of the same action are not deduplicated against each other
+ * @returns Request key in format "device:action" or "device:action:target"
  *
  * @example
  * const key = createRequestKey('stove', 'ignite');
  * // Returns: "stove:ignite"
  */
-export function createRequestKey(device: string, action: string): string {
-  return `${device}:${action}`;
+export function createRequestKey(device: string, action: string, target?: string): string {
+  return target ? `${device}:${action}:${target}` : `${device}:${action}`;
 }
 
 /**

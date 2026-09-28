@@ -114,6 +114,14 @@ describe('deduplicationManager', () => {
       expect(key1).not.toBe(key3);
       expect(key2).not.toBe(key3);
     });
+
+    it('scopes the key by target so different targets do not collide', () => {
+      const group1 = createRequestKey('hue', 'room', '/api/v1/hue/groups/1/action');
+      const group2 = createRequestKey('hue', 'room', '/api/v1/hue/groups/2/action');
+
+      expect(group1).toBe('hue:room:/api/v1/hue/groups/1/action');
+      expect(group1).not.toBe(group2);
+    });
   });
 
   describe('singleton', () => {

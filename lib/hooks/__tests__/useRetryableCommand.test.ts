@@ -74,7 +74,8 @@ describe('useRetryableCommand', () => {
     });
 
     // Default mock implementations
-    mockCreateRequestKey.mockImplementation((device, action) => `${device}:${action}`);
+    mockCreateRequestKey.mockImplementation((device, action, target) =>
+      target ? `${device}:${action}:${target}` : `${device}:${action}`);
     mockDeduplicationManager.isDuplicate.mockReturnValue(false);
     mockIdempotencyManager.registerKey.mockResolvedValue('test-idempotency-key-123');
   });
@@ -127,7 +128,7 @@ describe('useRetryableCommand', () => {
       });
 
       expect(response).toBeNull();
-      expect(mockCreateRequestKey).toHaveBeenCalledWith('stove', 'ignite');
+      expect(mockCreateRequestKey).toHaveBeenCalledWith('stove', 'ignite', '/api/v1/thermorossi/commands/ignit');
       expect(mockRetryFetch).not.toHaveBeenCalled();
     });
 
@@ -223,7 +224,7 @@ describe('useRetryableCommand', () => {
         await result.current.execute('/api/v1/thermorossi/commands/ignit');
       });
 
-      expect(mockDeduplicationManager.clear).toHaveBeenCalledWith('stove:ignite');
+      expect(mockDeduplicationManager.clear).toHaveBeenCalledWith('stove:ignite:/api/v1/thermorossi/commands/ignit');
     });
   });
 

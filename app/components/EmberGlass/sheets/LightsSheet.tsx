@@ -55,11 +55,8 @@ function slugify(s: string): string {
  *     bundle: `byRoom` is built from `groups[]` filtered by `type === 'Room'`,
  *     and each group's `lights[]` (string[] of light_ids) is reverse-mapped
  *     against the global `lights[]` array.
- *   - Per-light row InlineToggle invokes `handleRoomToggle(group.group_id,
- *     !groupOn)` — semantically a ROOM-level write. The bundle visual implies
- *     per-light control, but the existing `useLightsCommands` surface only
- *     exposes a room-level toggle. Acceptable UX trade-off; documented in
- *     `<threat_model>` T-178-06-02 (accept).
+ *   - Per-light row InlineToggle invokes `handleLightToggle(light_id, !on)`
+ *     — a single-light write (M14: it used to toggle the whole room).
  *
  * Scene activation: each of the 4 scene buttons looks up its match via
  * `findSceneByName(scenes, name)` (case-insensitive). On hit, the button
@@ -290,7 +287,6 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
 
       {/* Per-room sections — for each Room group, a labeled rounded list */}
       {byRoom.map((section) => {
-        const groupOn = section.group.any_on === true;
         return (
           <div
             key={section.group.group_id}
@@ -366,10 +362,8 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
                       {l.name}
                     </div>
                     {/*
-                     * Pitfall 9: InlineToggle's `onChange` receives a MouseEvent
-                     * (not a boolean). The handler computes the next group state
-                     * from the group's current `any_on` and fires
-                     * `handleRoomToggle(group_id, !any_on)` — a ROOM-level write.
+                     * InlineToggle's `onChange` receives a MouseEvent (not a
+                     * boolean): the next state is computed from the light's `on`.
                      */}
                     <div
                       data-testid={`lights-sheet-light-${slugify(l.name)}-toggle`}
@@ -377,12 +371,8 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
                       <InlineToggle
                         on={l.on}
                         color="#f5c84a"
-                        onChange={() =>
-                          void cmds.handleRoomToggle(
-                            section.group.group_id,
-                            !groupOn,
-                          )
-                        }
+                        aria-label={`${l.on ? 'Spegni' : 'Accendi'} ${l.name}`}
+                        onChange={() => void cmds.handleLightToggle(l.light_id, !l.on)}
                       />
                     </div>
                   </div>

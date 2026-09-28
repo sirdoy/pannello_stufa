@@ -124,10 +124,12 @@ describe('useLightsCommands', () => {
     );
 
     expect(typeof result.current.handleRoomToggle).toBe('function');
+    expect(typeof result.current.handleLightToggle).toBe('function');
     expect(typeof result.current.handleBrightnessChange).toBe('function');
     expect(typeof result.current.handleSceneActivate).toBe('function');
     expect(typeof result.current.handleAllLightsToggle).toBe('function');
     expect(result.current.hueRoomCmd).toBeDefined();
+    expect(result.current.hueLightCmd).toBeDefined();
     expect(result.current.hueSceneCmd).toBeDefined();
   });
 
@@ -293,6 +295,57 @@ describe('useLightsCommands', () => {
       })
     );
     expect(mockLightsData.fetchData).toHaveBeenCalled();
+  });
+
+  it('handleLightToggle targets the single light, not its group (M14)', async () => {
+    mockExecute.mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useLightsCommands({
+        lightsData: mockLightsData,
+        router: mockRouter,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleLightToggle('5', false);
+    });
+
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    expect(mockExecute).toHaveBeenCalledWith(
+      '/api/v1/hue/lights/5/state',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ on: false }),
+      })
+    );
+    expect(mockLightsData.fetchData).toHaveBeenCalled();
+    expect(mockLightsData.setRefreshing).toHaveBeenCalledWith(false);
+  });
+
+  it('handleLightToggle sets error "Luce non raggiungibile" on 409', async () => {
+    mockExecute.mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: jest.fn().mockResolvedValue({}),
+    });
+
+    const { result } = renderHook(() =>
+      useLightsCommands({
+        lightsData: mockLightsData,
+        router: mockRouter,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleLightToggle('5', true);
+    });
+
+    expect(mockLightsData.setError).toHaveBeenCalledWith('Luce non raggiungibile');
+    expect(mockLightsData.fetchData).not.toHaveBeenCalled();
   });
 
   it('handleRoomToggle sets error "Luce non raggiungibile" on 409', async () => {

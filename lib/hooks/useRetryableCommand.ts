@@ -101,7 +101,8 @@ export function useRetryableCommand(options: CommandOptions): CommandResult {
    */
   const execute = useCallback(async (url: string, fetchOptions?: RequestInit): Promise<Response | null> => {
       // 1. Deduplication check
-      const dedupKey = createRequestKey(device, action);
+      // Keyed by URL too: parallel commands on different targets (e.g. one per Hue group) must all run.
+      const dedupKey = createRequestKey(device, action, url);
       if (deduplicationManager.isDuplicate(dedupKey)) {
         // Silently block duplicate request
         return null;

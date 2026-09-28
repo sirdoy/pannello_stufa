@@ -10,8 +10,8 @@
  *
  * Pitfall 9 (verified):
  *   - lights[] has NO `room` or `groupId` fields. byRoom is built from groups[].lights[].
- *   - Per-light row InlineToggle invokes `handleRoomToggle(group.group_id, !groupOn)` —
- *     semantically a ROOM-level write (per-light Hue PUT not currently wired).
+ *   - Per-light row InlineToggle invokes `handleLightToggle(light_id, !on)` — a
+ *     single-light write (M14: it used to toggle the whole room).
  *
  * jsdom serialization notes:
  *   - inline-style commas get a space inserted after each comma; tests normalize via
@@ -34,12 +34,14 @@ jest.mock('next/navigation', () => ({
 const mockHandleAllLightsToggle = jest.fn().mockResolvedValue(undefined);
 const mockHandleSceneActivate = jest.fn().mockResolvedValue(undefined);
 const mockHandleRoomToggle = jest.fn().mockResolvedValue(undefined);
+const mockHandleLightToggle = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('@/app/components/devices/lights/hooks/useLightsCommands', () => ({
   useLightsCommands: () => ({
     handleAllLightsToggle: mockHandleAllLightsToggle,
     handleSceneActivate: mockHandleSceneActivate,
     handleRoomToggle: mockHandleRoomToggle,
+    handleLightToggle: mockHandleLightToggle,
   }),
 }));
 
@@ -200,22 +202,25 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
     );
   });
 
-  test('per-light toggle in "Salotto" invokes handleRoomToggle("g1", false) when group is on', () => {
+  test('per-light toggle turns off only that light (M14)', () => {
     render(<LightsSheetSelfFetch />);
     const wrap = screen.getByTestId('lights-sheet-light-plafoniera-toggle');
     const toggle = wrap.querySelector('[role="switch"]') as HTMLElement;
+    expect(toggle).toHaveAttribute('aria-label', 'Spegni Plafoniera');
     fireEvent.click(toggle);
-    // Salotto group g1 has any_on=true → next state is !any_on = false → handleRoomToggle('g1', false).
-    expect(mockHandleRoomToggle).toHaveBeenCalledWith('g1', false);
+    expect(mockHandleLightToggle).toHaveBeenCalledWith('l1', false);
+    expect(mockHandleRoomToggle).not.toHaveBeenCalled();
+    expect(mockHandleAllLightsToggle).not.toHaveBeenCalled();
   });
 
-  test('per-light toggle in "Camera" invokes handleRoomToggle("g2", true) when group is off', () => {
+  test('per-light toggle turns on only that light (M14)', () => {
     render(<LightsSheetSelfFetch />);
     const wrap = screen.getByTestId('lights-sheet-light-comodino-toggle');
     const toggle = wrap.querySelector('[role="switch"]') as HTMLElement;
+    expect(toggle).toHaveAttribute('aria-label', 'Accendi Comodino');
     fireEvent.click(toggle);
-    // Camera group g2 has any_on=false → next state is !any_on = true → handleRoomToggle('g2', true).
-    expect(mockHandleRoomToggle).toHaveBeenCalledWith('g2', true);
+    expect(mockHandleLightToggle).toHaveBeenCalledWith('l4', true);
+    expect(mockHandleRoomToggle).not.toHaveBeenCalled();
   });
 
   test('count card uses yellow tint when onCount > 0', () => {
@@ -272,6 +277,7 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
       handleAllLightsToggle: mockHandleAllLightsToggle,
       handleSceneActivate: mockHandleSceneActivate,
       handleRoomToggle: mockHandleRoomToggle,
+      handleLightToggle: mockHandleLightToggle,
     } as unknown as Parameters<typeof LightsSheet>[0]['cmds'];
     render(<LightsSheet lightsData={propData} cmds={propCmds} />);
     expect(screen.getByTestId('lights-sheet')).toBeInTheDocument();

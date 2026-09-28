@@ -47,12 +47,14 @@ export interface UseLightsCommandsParams {
  */
 export interface UseLightsCommandsReturn {
   handleRoomToggle: (groupId: string | null | undefined, on: boolean) => Promise<void>;
+  handleLightToggle: (lightId: string, on: boolean) => Promise<void>;
   handleBrightnessChange: (groupId: string | null | undefined, brightness: string) => Promise<void>;
   handleSceneActivate: (sceneId: string, groupId: string) => Promise<void>;
   handleAllLightsToggle: (on: boolean) => Promise<void>;
 
   // Retry command objects (for error banners)
   hueRoomCmd: ReturnType<typeof useRetryableCommand>;
+  hueLightCmd: ReturnType<typeof useRetryableCommand>;
   hueSceneCmd: ReturnType<typeof useRetryableCommand>;
 }
 
@@ -71,6 +73,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
 
   // Retry infrastructure - one hook per command type (React hooks rules)
   const hueRoomCmd = useRetryableCommand({ device: 'hue', action: 'room' });
+  const hueLightCmd = useRetryableCommand({ device: 'hue', action: 'light' });
   const hueSceneCmd = useRetryableCommand({ device: 'hue', action: 'scene' });
 
   /**
@@ -86,6 +89,40 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ on }),  // v1 flat: { on: true }, NOT { on: { on: true } }
+      });
+      if (response) {
+        if (!response.ok) {
+          if (response.status === 409) throw new Error('Luce non raggiungibile');
+          throw new Error(`Comando fallito: ${response.status}`);
+        }
+        const data = await response.json() as HueCommandResponse;
+        // Backend re-polled before answering: no wait when the new state is confirmed.
+        const delayMs = data.data_confirmed ? 0 : (data.suggested_poll_delay_s ?? 2) * 1000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+        await lightsData.fetchData();
+      }
+      // If response is null, request was deduplicated (silently blocked)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      lightsData.setError(message);
+    } finally {
+      lightsData.setRefreshing(false);
+    }
+  };
+
+  /**
+   * Toggle a single light on or off
+   * PUT /api/v1/hue/lights/{lightId}/state with v1 flat body: { on: true }
+   */
+  const handleLightToggle = async (lightId: string, on: boolean) => {
+    try {
+      lightsData.setLoadingMessage(on ? 'Accensione luce...' : 'Spegnimento luce...');
+      lightsData.setRefreshing(true);
+      lightsData.setError(null);
+      const response = await hueLightCmd.execute(`/api/v1/hue/lights/${lightId}/state`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ on }),
       });
       if (response) {
         if (!response.ok) {
@@ -209,12 +246,14 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
   return {
     // Room commands
     handleRoomToggle,
+    handleLightToggle,
     handleBrightnessChange,
     handleSceneActivate,
     handleAllLightsToggle,
 
     // Retry command objects
     hueRoomCmd,
+    hueLightCmd,
     hueSceneCmd,
   };
 }

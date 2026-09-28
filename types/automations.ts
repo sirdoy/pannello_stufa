@@ -2,7 +2,9 @@
  * types/automations.ts — Phase 180 (CONTEXT D-05).
  *
  * Re-exports the authoritative discriminated unions from
- * docs/api/automations.types.ts (which mirrors api/automations/models.py).
+ * types/automations.contract.ts — a byte-identical copy of the workspace-root
+ * contract docs/api/automations.types.ts (which mirrors the backend's
+ * api/automations/models.py). Never edit the copy: edit the root file and re-sync.
  *
  * Breaking shape change vs prior stub:
  *   - AutomationRule.id flips string -> number
@@ -13,17 +15,17 @@
  * Three legacy consumers patched in same wave: app/automations/page.tsx,
  * app/automations/[rule_id]/page.tsx, __tests__/lib/automationsProxy.test.ts.
  *
- * Frontend imports MUST come from this file (NOT from @/docs/api/...).
+ * Frontend imports MUST come from this file (NOT from ./automations.contract directly).
  */
 
-export * from '@/docs/api/automations.types';
+export * from './automations.contract';
 
 import type {
   AutomationRule,
   AutomationRuleCreate,
   AutomationRulePatch,
   AutomationExecution,
-} from '@/docs/api/automations.types';
+} from './automations.contract';
 
 export type { AutomationRule, AutomationRuleCreate, AutomationRulePatch, AutomationExecution };
 

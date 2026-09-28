@@ -48,7 +48,7 @@ npm run lint
 `lib/<provider>/*Proxy.ts` → route `app/api/v1/...` (`export const dynamic = 'force-dynamic'`) → hook/componente → test.
 Nuovo topic WS: aggiornare `Topic` + `TopicDataMap` in `types/websocket.ts` (fonte: `docs/api/websocket.md`).
 
-**Firebase** (RTDB + FCM) resta per: scheduler stufa (`lib/scheduler/`, cron GitHub → `/api/scheduler/check`),
+**Firebase** (RTDB + FCM) resta per: scheduler stufa (`lib/scheduler/`, cron esterno ~1/min → `/api/scheduler/check?secret=CRON_SECRET`),
 manutenzione, log/errori, changelog, preferenze e token FCM utenti, rate limiter, cache. I dati live dei device vengono dal backend.
 
 ## Docs

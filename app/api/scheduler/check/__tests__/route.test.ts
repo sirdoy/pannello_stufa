@@ -6,15 +6,11 @@ jest.mock('@/lib/auth/session', () => ({ authSession: { getSession: jest.fn() } 
 jest.mock('@/lib/firebaseAdmin', () => ({ adminDbGet: jest.fn(), adminDbSet: jest.fn() }));
 jest.mock('@/lib/environmentHelper', () => ({ getEnvironmentPath: (p: string) => p }));
 jest.mock('@/lib/services/tokenCleanupService', () => ({ cleanupStaleTokens: jest.fn() }));
-jest.mock('@/lib/weather/openMeteo', () => ({ fetchWeatherForecast: jest.fn() }));
-jest.mock('@/lib/weather/weatherCacheService', () => ({ saveWeatherToCache: jest.fn() }));
 jest.mock('@/lib/stove/thermorossiProxy');
 
 import { GET } from '../route';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
-import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
-import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 import * as stove from '@/lib/stove/thermorossiProxy';
 
 const SECRET = 'cron-secret';
@@ -32,12 +28,10 @@ beforeEach(() => {
   jest.spyOn(console, 'error').mockImplementation(() => {});
   process.env.CRON_SECRET = SECRET;
   for (const k of Object.keys(store)) delete store[k];
-  store['config/location'] = { latitude: 45.1, longitude: 9.2, name: 'Casa' };
   jest.mocked(adminDbGet).mockImplementation(async (path: string) => store[path] as never);
   jest.mocked(adminDbSet).mockImplementation(async (path: string, value: unknown) => {
     store[path] = value;
   });
-  jest.mocked(fetchWeatherForecast).mockResolvedValue({ temp: 20 } as never);
   jest.mocked(cleanupStaleTokens).mockResolvedValue({ cleaned: true, tokensRemoved: 2 } as never);
 });
 
@@ -49,50 +43,38 @@ it('401 without the cron secret', async () => {
   expect(adminDbSet).not.toHaveBeenCalled();
 });
 
-it('first run: weather + token cleanup, no heartbeat (V8) nor calibration (V9)', async () => {
+it('first run: only the token cleanup (heartbeat V8, calibration V9, weather V10 gone)', async () => {
   const res = await call();
   const body = await res.json();
 
   expect(res.status).toBe(200);
-  expect(store['cronHealth/lastCall']).toBeUndefined();
-  expect(body.calibration).toBeUndefined(); // on the Pi since V9
-  expect(body.weather).toMatchObject({ ran: true, refreshed: true });
   expect(body.tokenCleanup).toMatchObject({ ran: true, cleaned: true });
-  expect(saveWeatherToCache).toHaveBeenCalledWith(45.1, 9.2, { temp: 20 });
+  expect(body.calibration).toBeUndefined();
+  expect(body.weather).toBeUndefined();
+  expect(store['cronHealth/lastCall']).toBeUndefined();
   expect(store['netatmo/lastAutoCalibration']).toBeUndefined();
-  expect(store['cron/lastWeatherRefresh']).toBe(NOW);
+  expect(store['cron/lastWeatherRefresh']).toBeUndefined();
   expect(store['cron/lastTokenCleanup']).toBe(NOW);
 });
 
-it('tasks respect their intervals', async () => {
-  store['cron/lastWeatherRefresh'] = NOW - 31 * 60 * 1000; // 31 min ago (> 30 min)
+it('token cleanup respects its 7-day interval', async () => {
   store['cron/lastTokenCleanup'] = NOW - 24 * 60 * 60 * 1000; // 1 day ago (< 7 d)
 
   const body = await (await call()).json();
 
-  expect(body.weather.ran).toBe(true);
   expect(body.tokenCleanup).toMatchObject({ ran: false, reason: 'too_soon' });
   expect(cleanupStaleTokens).not.toHaveBeenCalled();
 });
 
-it('a failed task is retried next run and does not break the others', async () => {
-  jest.mocked(fetchWeatherForecast).mockRejectedValue(new Error('open-meteo down'));
+it('a failing cleanup is reported and retried next run', async () => {
+  jest.mocked(cleanupStaleTokens).mockRejectedValue(new Error('firebase down'));
 
   const res = await call();
   const body = await res.json();
 
   expect(res.status).toBe(200);
-  expect(body.weather).toMatchObject({ ran: false, reason: 'exception', error: 'open-meteo down' });
-  expect(body.tokenCleanup.ran).toBe(true);
-});
-
-it('weather is skipped without a configured location', async () => {
-  delete store['config/location'];
-
-  const body = await (await call()).json();
-
-  expect(body.weather).toMatchObject({ ran: true, refreshed: false, reason: 'no_location' });
-  expect(store['cron/lastWeatherRefresh']).toBeUndefined();
+  expect(body.tokenCleanup).toMatchObject({ ran: false, reason: 'exception', error: 'firebase down' });
+  expect(store['cron/lastTokenCleanup']).toBeUndefined();
 });
 
 it('never commands the stove (the schedule runs on the Pi)', async () => {

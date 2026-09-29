@@ -112,8 +112,9 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       {/* Weather Info */}
       <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Text variant="secondary" size="sm">
-          Weather data is fetched from Open-Meteo API and cached for 30 minutes. The scheduler automatically refreshes
-          weather data every 30 minutes via the cron endpoint.
+          Weather data is fetched from Open-Meteo API by <code className="text-xs">/api/weather/forecast</code> and
+          cached in memory for 15 minutes (stale-while-revalidate: stale data is served while a refresh runs). No cron
+          refresh since ROADMAP V10.
         </Text>
       </div>
 
@@ -150,11 +151,9 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
           📍 Cache Configuration
         </Heading>
         <Text variant="secondary" size="sm">
-          <strong>Firebase Path:</strong> <code className="text-xs">cron/lastWeatherRefresh</code>
+          <strong>Cache:</strong> in memory per server instance, key = coordinates (4 decimals)
           <br />
-          <strong>Refresh Interval:</strong> 30 minutes
-          <br />
-          <strong>Auto-refresh via:</strong> /api/scheduler/check (cron job)
+          <strong>TTL:</strong> 15 minutes, refreshed on read
         </Text>
       </div>
     </div>

@@ -5,8 +5,8 @@
  *
  * Since workspace ROADMAP D2 the stove schedule, maintenance hours, ignition /
  * shutdown and their notifications run on the Pi. This external cron only does the
- * frontend-side housekeeping that used to piggyback on it:
- * - weather cache refresh every 30 min
+ * frontend-side housekeeping that used to piggyback on it (only one task left,
+ * moving to the Pi with ROADMAP V11):
  * - stale FCM token cleanup every 7 days
  *
  * Protected: Requires CRON_SECRET
@@ -16,12 +16,9 @@ import { withCronSecret, success } from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
-import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
-import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 
 export const dynamic = 'force-dynamic';
 
-const THIRTY_MINUTES = 30 * 60 * 1000;
 const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
 type TaskResult = Record<string, unknown>;
@@ -43,18 +40,6 @@ async function everyInterval(
   return { ran: true, ...result };
 }
 
-async function refreshWeather(): Promise<{ done: boolean; result: TaskResult }> {
-  const location = await adminDbGet<{ latitude: number; longitude: number; name?: string }>(
-    getEnvironmentPath('config/location')
-  );
-  if (!location?.latitude || !location?.longitude) {
-    return { done: false, result: { refreshed: false, reason: 'no_location' } };
-  }
-  const { latitude, longitude, name } = location;
-  await saveWeatherToCache(latitude, longitude, await fetchWeatherForecast(latitude, longitude));
-  return { done: true, result: { refreshed: true, location: { latitude, longitude, name } } };
-}
-
 async function cleanupTokens(): Promise<{ done: boolean; result: TaskResult }> {
   const result = await cleanupStaleTokens();
   return { done: Boolean(result.cleaned), result: { ...result } };
@@ -72,12 +57,12 @@ async function safely(name: string, run: () => Promise<TaskResult>): Promise<Tas
 
 // Moved to the Pi: the heartbeat `cronHealth/lastCall` (the UI watches the stove
 // engine, ROADMAP V8) and the 12 h valve calibration (ROADMAP V9,
-// GET /api/v1/netatmo/valves/calibration-status).
+// GET /api/v1/netatmo/valves/calibration-status). The weather refresh is gone: nobody
+// read its Firebase cache, /api/weather/forecast refreshes on read (ROADMAP V10).
 export const GET = withCronSecret(async () => {
-  const [weather, tokenCleanup] = await Promise.all([
-    safely('weather', () => everyInterval('cron/lastWeatherRefresh', THIRTY_MINUTES, refreshWeather)),
-    safely('tokenCleanup', () => everyInterval('cron/lastTokenCleanup', SEVEN_DAYS, cleanupTokens)),
-  ]);
+  const tokenCleanup = await safely('tokenCleanup', () =>
+    everyInterval('cron/lastTokenCleanup', SEVEN_DAYS, cleanupTokens)
+  );
 
-  return success({ status: 'OK', weather, tokenCleanup });
+  return success({ status: 'OK', tokenCleanup });
 }, 'Scheduler/Check');

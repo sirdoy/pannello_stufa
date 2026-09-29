@@ -156,8 +156,6 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
             <br />
             <code className="text-xs">cronHealth/lastCall</code> - Scheduler last execution
             <br />
-            <code className="text-xs">cron/lastWeatherRefresh</code> - Weather cache timestamp
-            <br />
             <code className="text-xs">cron/lastTokenCleanup</code> - FCM token cleanup timestamp
             <br />
             <code className="text-xs">hue/tokens/</code> - Hue OAuth tokens

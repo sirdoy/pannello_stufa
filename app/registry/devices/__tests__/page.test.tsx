@@ -259,7 +259,7 @@ function mockFetchMulti() {
       return Promise.resolve({
         ok: true,
         status: 200,
-        json: async () => [],
+        json: async () => ({ success: true, types: [] }),
       } as Response);
     }
     return Promise.reject(new Error(`Unexpected fetch: ${url}`));

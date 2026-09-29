@@ -138,7 +138,7 @@ function mockFetchSuccess(data: DeviceType[] = mockTypes) {
   global.fetch = jest.fn().mockResolvedValue({
     ok: true,
     status: 200,
-    json: async () => data,
+    json: async () => ({ success: true, types: data }),
   } as Response);
 }
 
@@ -160,7 +160,7 @@ describe('/registry/types page', () => {
   it('renders Skeleton while loading', async () => {
     global.fetch = jest.fn().mockImplementation(
       () => new Promise(resolve => setTimeout(() => resolve({
-        ok: true, status: 200, json: async () => mockTypes,
+        ok: true, status: 200, json: async () => ({ success: true, types: mockTypes }),
       } as Response), 200))
     );
     render(<DeviceTypesPage />);
@@ -236,7 +236,7 @@ describe('/registry/types page', () => {
     fireEvent.click(modificaButton);
 
     const fetchSpy = jest.fn().mockResolvedValue({
-      ok: true, status: 200, json: async () => mockTypes,
+      ok: true, status: 200, json: async () => ({ success: true, types: mockTypes }),
     } as Response);
     global.fetch = fetchSpy;
 
@@ -267,7 +267,7 @@ describe('/registry/types page', () => {
 
   it('confirming delete calls DELETE /api/registry/types/{slug}', async () => {
     const fetchSpy = jest.fn().mockResolvedValue({
-      ok: true, status: 200, json: async () => mockTypes,
+      ok: true, status: 200, json: async () => ({ success: true, types: mockTypes }),
     } as Response);
     global.fetch = fetchSpy;
 

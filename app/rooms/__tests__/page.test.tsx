@@ -194,7 +194,7 @@ describe('RoomsPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
       if (url === '/api/rooms') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: mockRooms }) });
       }
       return Promise.resolve({ ok: false, status: 500 });
     });
@@ -221,7 +221,7 @@ describe('RoomsPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
       if (url === '/api/rooms') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(roomsWithOne) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: roomsWithOne }) });
       }
       return Promise.resolve({ ok: false, status: 500 });
     });
@@ -243,7 +243,7 @@ describe('RoomsPage', () => {
             () =>
               resolve({
                 ok: true,
-                json: () => Promise.resolve(mockRooms),
+                json: () => Promise.resolve({ success: true, rooms: mockRooms }),
               }),
             200
           )
@@ -274,7 +274,7 @@ describe('RoomsPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
       if (url === '/api/rooms') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: [] }) });
       }
       return Promise.resolve({ ok: false, status: 500 });
     });
@@ -349,7 +349,7 @@ describe('RoomsPage', () => {
       if (url === '/api/rooms/health') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: mockRooms }) });
     });
     global.fetch = postSpy;
 
@@ -390,7 +390,7 @@ describe('RoomsPage', () => {
       if (url === '/api/rooms/health') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: mockRooms }) });
     });
 
     const submitButton = screen.getByTestId('form-modal-create-submit');
@@ -445,7 +445,7 @@ describe('RoomsPage', () => {
       if (url === '/api/rooms/health') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: mockRooms }) });
     });
     global.fetch = putSpy;
 
@@ -482,7 +482,7 @@ describe('RoomsPage', () => {
       if (url === '/api/rooms/health') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: mockRooms }) });
     });
 
     const submitButton = screen.getByTestId('form-modal-edit-submit');
@@ -513,7 +513,7 @@ describe('RoomsPage', () => {
       if (url === '/api/rooms/health') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: mockRooms }) });
     });
 
     const submitButton = screen.getByTestId('form-modal-edit-submit');
@@ -572,7 +572,7 @@ describe('RoomsPage', () => {
       if (url === '/api/rooms/health') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: mockRooms }) });
     });
     global.fetch = deleteSpy;
 
@@ -609,7 +609,7 @@ describe('RoomsPage', () => {
       if (url === '/api/rooms/health') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
       }
-      return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRooms) });
+      return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, rooms: mockRooms }) });
     });
 
     const confirmButton = screen.getByTestId('confirm-button');
@@ -624,7 +624,7 @@ describe('RoomsPage', () => {
   it('Test 18 (D-05): navigates to /rooms/status when Stato button is clicked', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => [],
+      json: async () => ({ success: true, rooms: [] }),
     });
     render(<RoomsPage />);
     await waitFor(() => {

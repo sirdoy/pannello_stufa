@@ -67,7 +67,7 @@ function useRoomDevices(roomId: number) {
     try {
       const res = await fetch(`/api/rooms/${roomId}/devices`);
       if (!res.ok) throw new Error('Errore nel caricamento dei dispositivi');
-      const data = (await res.json()) as RegistryDevice[];
+      const { devices: data } = (await res.json()) as { devices: RegistryDevice[] };
       setDevices([...data].sort((a, b) => a.custom_name.localeCompare(b.custom_name, 'it')));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore sconosciuto');

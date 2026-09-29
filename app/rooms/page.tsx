@@ -40,7 +40,7 @@ function useRooms() {
       if (!res.ok) {
         throw new Error('Errore nel caricamento delle stanze');
       }
-      const data: Room[] = await res.json();
+      const { rooms: data } = (await res.json()) as { rooms: Room[] };
       const sorted = [...data].sort((a, b) => a.name.localeCompare(b.name, 'it'));
       setRooms(sorted);
     } catch (err) {

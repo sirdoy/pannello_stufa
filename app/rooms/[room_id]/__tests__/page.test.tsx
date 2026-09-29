@@ -207,7 +207,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRoom) });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -267,7 +267,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: false, status: 404 });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -308,7 +308,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRoom) });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve([]) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: [] }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -359,7 +359,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockRoom) });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(unsortedDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: unsortedDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -407,7 +407,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockAssignResponse) });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -452,7 +452,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockAssignResponse) });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -492,7 +492,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve(mockAssignResponse) });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -526,7 +526,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: false, status: 404 });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -590,7 +590,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: true, status: 204 });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -631,7 +631,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: true, status: 204 });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });
@@ -668,7 +668,7 @@ describe('RoomDetailPage', () => {
         return Promise.resolve({ ok: false, status: 404 });
       }
       if (url === '/api/rooms/1/devices') {
-        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockDevices) });
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, devices: mockDevices }) });
       }
       if (url === '/api/registry/devices?limit=1000') {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ items: mockAllDevices, total: 3, limit: 1000, offset: 0 }) });

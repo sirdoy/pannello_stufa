@@ -271,7 +271,7 @@ function useDeviceTypesForSelect() {
     try {
       const res = await fetch('/api/registry/types');
       if (!res.ok) return;
-      setTypes((await res.json()) as DeviceType[]);
+      setTypes(((await res.json()) as { types: DeviceType[] }).types);
     } catch { /* non-critical */ }
   }, []);
   useEffect(() => { void refetch(); }, [refetch]);

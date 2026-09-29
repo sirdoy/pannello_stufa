@@ -49,7 +49,7 @@ function useDeviceTypes() {
     try {
       const res = await fetch('/api/registry/types');
       if (!res.ok) throw new Error('Errore nel caricamento dei tipi');
-      const data = (await res.json()) as DeviceType[];
+      const { types: data } = (await res.json()) as { types: DeviceType[] };
       const sorted = [...data].sort((a, b) =>
         a.label.localeCompare(b.label, 'it')
       );

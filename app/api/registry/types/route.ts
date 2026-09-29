@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import { withErrorHandler, withAuthAndErrorHandler, created } from '@/lib/core';
+import { withErrorHandler, withAuthAndErrorHandler, created, success } from '@/lib/core';
 import { registryProxy } from '@/lib/registry';
 import type { DeviceTypeCreate } from '@/types/registry';
 
@@ -8,11 +7,11 @@ export const dynamic = 'force-dynamic';
 /**
  * GET /api/registry/types
  * Returns all device types (built-in + custom). Public — no auth required.
- * Returns raw array — success() wrapper would spread array into object.
+ * Array wrapped under `types` — success() would spread a bare array into an object.
  */
 export const GET = withErrorHandler(async () => {
   const data = await registryProxy.getTypes();
-  return NextResponse.json(data);
+  return success({ types: data });
 }, 'Registry/Types');
 
 /**

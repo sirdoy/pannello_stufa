@@ -30,8 +30,9 @@ export default function RaspiCard() {
   const ram = data?.memoryPercent ?? 0;
   const temp = data?.cpuTemperature;
 
-  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
-  const ready = useCardReady(!loading);
+  // ROADMAP M15/M16: skeleton until the first fresh data (REST or WS snapshot),
+  // and again after a return to foreground until the topic sends a new frame.
+  const ready = useCardReady(!loading, 'raspi');
   if (!ready) return <GlassCardSkeleton label="Raspberry" />;
 
   return (

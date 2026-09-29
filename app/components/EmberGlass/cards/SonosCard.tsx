@@ -80,8 +80,9 @@ export default function SonosCard() {
     </div>
   );
 
-  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
-  const ready = useCardReady(!sonosData.loading);
+  // ROADMAP M15/M16: skeleton until the first fresh data (REST or WS snapshot),
+  // and again after a return to foreground until the topic sends a new frame.
+  const ready = useCardReady(!sonosData.loading, 'sonos');
   if (!ready) return <GlassCardSkeleton label="Sonos" />;
 
   return (

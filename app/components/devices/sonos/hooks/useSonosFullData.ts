@@ -207,7 +207,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
   const isVisible = useVisibility();
   const interval = isVisible ? 60000 : 300000;
 
-  const { subscribe, unsubscribe, readyState } = useWebSocketContext();
+  const { subscribe, unsubscribe, readyState, resumeEpoch = 0 } = useWebSocketContext();
   const isWsConnected = readyState === ReadyState.OPEN;
 
   const fetchData = async () => {
@@ -341,6 +341,12 @@ export function useSonosFullData(): UseSonosFullDataReturn {
     initialFetchDoneRef.current = true;
     void fetchDataRef.current();
   }, []);
+
+  // ROADMAP M16: back to foreground → the WS reconnects, but playback/volume are
+  // push-only (no snapshot): refetch over REST.
+  useEffect(() => {
+    if (resumeEpoch > 0) void fetchDataRef.current();
+  }, [resumeEpoch]);
 
   // WS subscriptions — primary live channel. Subscribes to:
   //  - 'sonos'           → speakers + groups (snapshot on subscribe)

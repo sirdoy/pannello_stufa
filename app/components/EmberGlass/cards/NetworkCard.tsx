@@ -53,8 +53,9 @@ export default function NetworkCard() {
       ? '#ffb84a' // amber — WAN down / stale
       : '#6aa86a'; // green — healthy
 
-  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
-  const ready = useCardReady(!network.loading);
+  // ROADMAP M15/M16: skeleton until the first fresh data (REST or WS snapshot),
+  // and again after a return to foreground until the topic sends a new frame.
+  const ready = useCardReady(!network.loading, 'fritzbox');
   if (!ready) return <GlassCardSkeleton label="Rete" />;
 
   return (

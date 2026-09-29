@@ -351,3 +351,86 @@ describe('WS-05: Re-subscribe all active topics on reconnect', () => {
     expect(sendJsonMessage).not.toHaveBeenCalledWith({ action: 'subscribe', topic: 'hue' });
   });
 });
+
+// ---------------------------------------------------------------------------
+// ROADMAP M16 — fresh connection on return to foreground
+// ---------------------------------------------------------------------------
+
+describe('M16: resume after background', () => {
+  let hidden = false;
+  beforeAll(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => hidden });
+  });
+  afterEach(() => {
+    hidden = false;
+    jest.useRealTimers();
+  });
+
+  const setHidden = (value: boolean) => {
+    hidden = value;
+    document.dispatchEvent(new Event('visibilitychange'));
+  };
+  const lastUrlArg = () => {
+    const calls = (useWebSocket as jest.Mock).mock.calls;
+    return calls[calls.length - 1]![0];
+  };
+
+  it('forces a new connection (new url identity) after >= 15 s hidden', () => {
+    jest.useFakeTimers();
+    const { result } = renderHook(() => useWebSocketManager(TEST_URL));
+    expect(result.current.resumeEpoch).toBe(0);
+
+    act(() => setHidden(true));
+    act(() => {
+      jest.advanceTimersByTime(15_000);
+    });
+    act(() => setHidden(false));
+
+    expect(result.current.resumeEpoch).toBe(1);
+    const url = lastUrlArg() as () => string;
+    expect(typeof url).toBe('function');
+    expect(url()).toBe(TEST_URL);
+  });
+
+  it('keeps the connection after a short background trip', () => {
+    jest.useFakeTimers();
+    const { result } = renderHook(() => useWebSocketManager(TEST_URL));
+    act(() => setHidden(true));
+    act(() => {
+      jest.advanceTimersByTime(5_000);
+    });
+    act(() => setHidden(false));
+    expect(result.current.resumeEpoch).toBe(0);
+    expect(lastUrlArg()).toBe(TEST_URL);
+  });
+
+  it('reconnects on "online" and on pageshow from bfcache', () => {
+    const { result } = renderHook(() => useWebSocketManager(TEST_URL));
+    act(() => {
+      window.dispatchEvent(new Event('online'));
+    });
+    expect(result.current.resumeEpoch).toBe(1);
+    act(() => {
+      const e = new Event('pageshow') as PageTransitionEvent;
+      Object.defineProperty(e, 'persisted', { value: true });
+      window.dispatchEvent(e);
+    });
+    expect(result.current.resumeEpoch).toBe(2);
+  });
+
+  it('records the resume epoch of the first frame per topic', () => {
+    const { result } = renderHook(() => useWebSocketManager(TEST_URL));
+    act(() => {
+      __mockHelpers.emitMessage(JSON.stringify({ type: 'snapshot', topic: 'raspi', data: {}, ts: 1 }));
+    });
+    expect(result.current.topicEpochs?.get('raspi')).toBe(0);
+    act(() => {
+      window.dispatchEvent(new Event('online'));
+    });
+    expect(result.current.topicEpochs?.get('raspi')).toBe(0);
+    act(() => {
+      __mockHelpers.emitMessage(JSON.stringify({ type: 'snapshot', topic: 'raspi', data: {}, ts: 2 }));
+    });
+    expect(result.current.topicEpochs?.get('raspi')).toBe(1);
+  });
+});

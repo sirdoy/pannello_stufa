@@ -77,8 +77,9 @@ export default function LightsCard() {
     />
   );
 
-  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
-  const ready = useCardReady(!lightsData.loading && (lightsData.lastUpdatedAt !== null || !lightsData.connected || lightsData.error !== null));
+  // ROADMAP M15/M16: skeleton until the first fresh data (REST or WS snapshot),
+  // and again after a return to foreground until the topic sends a new frame.
+  const ready = useCardReady(!lightsData.loading && (lightsData.lastUpdatedAt !== null || !lightsData.connected || lightsData.error !== null), 'hue');
   if (!ready) return <GlassCardSkeleton label="Luci" />;
 
   return (

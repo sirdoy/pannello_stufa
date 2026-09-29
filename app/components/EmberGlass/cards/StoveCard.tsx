@@ -77,8 +77,9 @@ export default function StoveCard() {
   const cleaningHours = stove.maintenanceStatus?.currentHours;
   const tone = needsCleaning ? WARN : 'var(--accent)';
 
-  // ROADMAP M15: skeleton until the first fresh data (REST or WS snapshot).
-  const ready = useCardReady(!stove.initialLoading);
+  // ROADMAP M15/M16: skeleton until the first fresh data (REST or WS snapshot),
+  // and again after a return to foreground until the topic sends a new frame.
+  const ready = useCardReady(!stove.initialLoading, 'thermorossi');
   if (!ready) return <GlassCardSkeleton label="Stufa" />;
 
   return (

@@ -163,3 +163,32 @@ describe('SonosCard (Phase 177 — DASH-05)', () => {
     expect(screen.getByTestId('sonos-sheet')).toBeInTheDocument();
   });
 });
+
+describe('SonosCard ordering (ROADMAP M18)', () => {
+  test('playing zones come first, keeping the backend order otherwise', () => {
+    mockUseSonosFullData.mockReturnValue(
+      makeReturn(
+        [
+          { group_id: 'g1', coordinator_name: 'Bagno' },
+          { group_id: 'g2', coordinator_name: 'Cucina' },
+          { group_id: 'g3', coordinator_name: 'Salotto' },
+          { group_id: 'g4', coordinator_name: 'Studio' },
+          { group_id: 'g5', coordinator_name: 'Camera' },
+        ],
+        {
+          g1: { transport_state: 'STOPPED', title: null },
+          g2: { transport_state: 'PAUSED_PLAYBACK', title: null },
+          g3: { transport_state: 'STOPPED', title: null },
+          g4: { transport_state: 'STOPPED', title: null },
+          g5: { transport_state: 'PLAYING', title: 'Imagine' },
+        },
+      ),
+    );
+
+    render(<SonosCard />);
+
+    const names = ['Camera', 'Bagno', 'Cucina', 'Salotto'];
+    const rendered = screen.getAllByText(/^(Bagno|Cucina|Salotto|Studio|Camera)$/).map((el) => el.textContent);
+    expect(rendered).toEqual(names); // 5th zone (Studio) is beyond the 4 visible rows
+  });
+});

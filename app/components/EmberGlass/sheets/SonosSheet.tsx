@@ -11,6 +11,7 @@ import {
   type UseSonosCommandsReturn,
 } from '@/app/components/devices/sonos/hooks/useSonosCommands';
 import { useDebounce } from '@/app/hooks/useDebounce';
+import { sortZonesPlayingFirst } from '@/lib/sonos/sortZones';
 import { PlayingBars } from '../PlayingBars';
 
 interface SonosGroup {
@@ -64,7 +65,9 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
   const { handleSetZoneVolume, handlePlay, handlePause } = cmds;
 
   // Field adapter (Pitfall 7): zone.coordinator_uid is FLAT, not nested.
-  const groups: SonosGroup[] = (sonosData.data?.zones ?? []).map((zone) => {
+  // ROADMAP M18: playing zones first.
+  const zones = sortZonesPlayingFirst(sonosData.data?.zones ?? [], sonosData.data?.playback);
+  const groups: SonosGroup[] = zones.map((zone) => {
     const playback = sonosData.data?.playback?.[zone.group_id];
     return {
       id: zone.group_id,
@@ -77,25 +80,38 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
     };
   });
 
-  const [selectedIdx, setSelectedIdx] = useState(0);
-  const safeIdx = Math.min(selectedIdx, Math.max(0, groups.length - 1));
-  const selected: SonosGroup | undefined = groups[safeIdx];
+  // Selection by zone id, not index: the order changes when a zone starts or
+  // stops playing, and the volume slider must stay on the zone the user picked.
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected: SonosGroup | undefined = groups.find((g) => g.id === selectedId) ?? groups[0];
 
-  const [pendingVolume, setPendingVolume] = useState<number>(selected?.volume ?? 0);
-  const debouncedVolume = useDebounce(pendingVolume, 250);
+  // The pending volume carries the zone it belongs to: after a selection change
+  // the debounced value still holds the previous zone's volume for 250 ms and
+  // must not be written to the newly selected zone.
+  const [pending, setPending] = useState<{ id: string | undefined; volume: number }>({
+    id: selected?.id,
+    volume: selected?.volume ?? 0,
+  });
+  const pendingVolume = pending.volume;
+  const setPendingVolume = (volume: number) => setPending({ id: selected?.id, volume });
+  const debounced = useDebounce(pending, 250);
 
-  // Reset pending on selection change to prevent cross-zone writes.
-  useEffect(() => {
-    if (selected) setPendingVolume(selected.volume);
-    // selected.volume is a primitive — safe in the dep list.
-  }, [safeIdx, selected?.id, selected?.volume]);
+  // Reset pending on selection change (or a new server volume) to prevent
+  // cross-zone writes. Adjusted during render, not in an effect.
+  const selectedKey = selected ? `${selected.id}:${selected.volume}` : '';
+  const [syncedKey, setSyncedKey] = useState(selectedKey);
+  if (syncedKey !== selectedKey) {
+    setSyncedKey(selectedKey);
+    setPending({ id: selected?.id, volume: selected?.volume ?? 0 });
+  }
 
   // Fire volume write on debounced change (only when value diverges from server-side).
   useEffect(() => {
     if (!selected) return;
-    if (debouncedVolume === selected.volume) return;
-    void handleSetZoneVolume(selected.id, debouncedVolume);
-  }, [debouncedVolume, selected, handleSetZoneVolume]);
+    if (debounced.id !== selected.id) return;
+    if (debounced.volume === selected.volume) return;
+    void handleSetZoneVolume(selected.id, debounced.volume);
+  }, [debounced, selected, handleSetZoneVolume]);
 
   // Loading skeleton (CONTEXT D-26).
   if (sonosData.loading && !sonosData.data) {
@@ -156,13 +172,13 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
       >
         {groups.map((g, i) => {
           const isLast = i === groups.length - 1;
-          const isSelected = safeIdx === i;
+          const isSelected = selected?.id === g.id;
           return (
             <div
               key={g.id}
               data-testid={`sonos-sheet-group-${i}`}
               aria-selected={isSelected}
-              onClick={() => setSelectedIdx(i)}
+              onClick={() => setSelectedId(g.id)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -221,7 +237,7 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
                 aria-label={g.playing ? 'Pausa' : 'Riproduci'}
                 onClick={(e) => {
                   e.stopPropagation();
-                  setSelectedIdx(i);
+                  setSelectedId(g.id);
                   if (g.playing) void handlePause(g.id);
                   else void handlePlay(g.id);
                 }}

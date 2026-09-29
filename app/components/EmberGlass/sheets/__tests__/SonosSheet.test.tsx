@@ -213,3 +213,44 @@ describe('SonosSheet (SHEET-05 / CONTEXT D-08)', () => {
     expect(screen.getByTestId('sonos-sheet-group-0')).toHaveTextContent('Salotto');
   });
 });
+
+describe('SonosSheet ordering and selection (ROADMAP M18)', () => {
+  const zones = [
+    { group_id: 'z1', label: 'Z1', coordinator_name: 'Salotto', coordinator_uid: 'uid-1' },
+    { group_id: 'z2', label: 'Z2', coordinator_name: 'Camera', coordinator_uid: 'uid-2' },
+  ];
+  const volumes = { 'uid-1': { volume: 30 }, 'uid-2': { volume: 60 } };
+  const withPlayback = (playback: Record<string, unknown>) =>
+    ({ ...baseData, data: { zones, playback, volumes } }) as unknown as Parameters<
+      typeof SonosSheet
+    >[0]['sonosData'];
+  const cmds = {
+    handlePlay: mockHandlePlay,
+    handlePause: mockHandlePause,
+    handleSetZoneVolume: mockHandleSetZoneVolume,
+    handleSetVolume: mockHandleSetVolume,
+  } as unknown as Parameters<typeof SonosSheet>[0]['cmds'];
+
+  it('lists the playing zone first', () => {
+    render(<SonosSheet sonosData={withPlayback({ z2: { transport_state: 'PLAYING' } })} cmds={cmds} />);
+    expect(screen.getByTestId('sonos-sheet-group-0')).toHaveTextContent('Camera');
+    expect(screen.getByTestId('sonos-sheet-group-1')).toHaveTextContent('Salotto');
+  });
+
+  it('keeps the selected zone when the order changes', () => {
+    const { rerender } = render(<SonosSheet sonosData={withPlayback({})} cmds={cmds} />);
+    fireEvent.click(screen.getByTestId('sonos-sheet-group-1')); // Camera
+    rerender(<SonosSheet sonosData={withPlayback({ z2: { transport_state: 'PLAYING' } })} cmds={cmds} />);
+    expect(screen.getByText(/Volume · Camera/)).toBeInTheDocument();
+    expect(screen.getByTestId('sonos-sheet-group-0')).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('never writes the previous zone volume to the newly selected zone', () => {
+    render(<SonosSheet sonosData={withPlayback({})} cmds={cmds} />);
+    fireEvent.click(screen.getByTestId('sonos-sheet-group-1'));
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(mockHandleSetZoneVolume).not.toHaveBeenCalled();
+  });
+});

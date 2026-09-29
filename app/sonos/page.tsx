@@ -12,6 +12,7 @@ import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosF
 import { useSonosCommands } from '@/app/components/devices/sonos/hooks/useSonosCommands';
 import SonosZoneSection from '@/app/components/devices/sonos/components/SonosZoneSection';
 import SonosHistoryChart from '@/app/components/devices/sonos/components/SonosHistoryChart';
+import { sortZonesPlayingFirst } from '@/lib/sonos/sortZones';
 
 /**
  * /sonos page — Zone-based playback controls and per-speaker volume sliders
@@ -73,7 +74,8 @@ export default function SonosPage() {
         )}
 
         {/* Zone sections */}
-        {data?.zones.map(zone => (
+        {/* ROADMAP M18: playing zones first */}
+        {data && sortZonesPlayingFirst(data.zones, data.playback).map(zone => (
           <SonosZoneSection
             key={zone.group_id}
             zone={zone}

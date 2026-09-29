@@ -33,6 +33,7 @@ import { GlassCardSkeleton } from '../GlassCardSkeleton';
 import { useCardReady } from '../useCardReady';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 import { useSonosCommands } from '@/app/components/devices/sonos/hooks/useSonosCommands';
+import { sortZonesPlayingFirst } from '@/lib/sonos/sortZones';
 
 const TONE = '#b080ff';
 
@@ -53,7 +54,8 @@ export default function SonosCard() {
     setError: setCommandError,
   });
 
-  const allZones = data?.zones ?? [];
+  // ROADMAP M18: playing zones first, so the 4 visible rows show what is on.
+  const allZones = sortZonesPlayingFirst(data?.zones ?? [], data?.playback);
   const groups = allZones.map((z) => {
     const pb = data?.playback?.[z.group_id];
     const playing = pb?.transport_state === 'PLAYING';

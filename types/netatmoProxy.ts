@@ -390,34 +390,6 @@ export interface NetatmoHealthResponse {
 }
 
 // =============================================================================
-// THERMSTATE TYPES
-// =============================================================================
-
-/** GET /getthermstate response */
-interface NetatmoSetpoint {
-  setpoint_mode: string;
-  setpoint_temp: number | null;
-  setpoint_endtime: number | null;
-}
-interface NetatmoThermProgram {
-  program_id: string;
-  name: string;
-  selected: number;
-  timetable: Record<string, unknown>[];
-}
-export interface NetatmoThermstateResponse {
-  body: {
-    status: string;
-    setpoint: NetatmoSetpoint;
-    therm_program_list: NetatmoThermProgram[];
-    device_id: string;
-  };
-  status: string;
-  time_exec: number;
-  time_server: number;
-}
-
-// =============================================================================
 // RENAME HOME TYPES
 // =============================================================================
 

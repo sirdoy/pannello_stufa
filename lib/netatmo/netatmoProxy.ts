@@ -41,7 +41,6 @@ import type {
   CalibrateBatchResponse,
   NetatmoHealthResponse,
   RoomMeasureResponse,
-  NetatmoThermstateResponse,
   RenameHomeRequest,
   NetatmoHomedataResponse,
   CalibrateValveResponse,
@@ -221,16 +220,8 @@ export async function getProxyRoomMeasure(params: URLSearchParams): Promise<Room
 }
 
 // =============================================================================
-// THERMSTATE / HOME / VALVE SINGLE CALIBRATE WRAPPERS
+// HOME / VALVE SINGLE CALIBRATE WRAPPERS
 // =============================================================================
-
-/**
- * Get thermostat state (current setpoint and program list) from the proxy.
- * Calls GET /api/v1/netatmo/getthermstate on the HA proxy.
- */
-export async function getProxyThermState(params: URLSearchParams): Promise<NetatmoThermstateResponse> {
-  return haGet<NetatmoThermstateResponse>(`/api/v1/netatmo/getthermstate?${params.toString()}`);
-}
 
 /**
  * Calibrate a single valve by module ID.

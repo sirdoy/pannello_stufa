@@ -141,7 +141,7 @@ export function CameraSheet({
         return;
       }
       const data = await res.json() as Parameters<typeof pickStreamUrl>[0];
-      const url = pickStreamUrl(data, window.location.protocol === 'https:');
+      const url = pickStreamUrl(data);
       setStream({ cameraId, state: url ? 'playing' : 'error', url });
     } catch {
       setStream({ cameraId, state: 'error', url: null });

@@ -121,7 +121,7 @@ export default function CameraDashboard() {
         return;
       }
       const data = await response.json() as Parameters<typeof pickStreamUrl>[0];
-      const url = pickStreamUrl(data, window.location.protocol === 'https:');
+      const url = pickStreamUrl(data);
       if (url) {
         setStreamUrl(url);
       } else {

@@ -1,5 +1,6 @@
 import { withAuthAndErrorHandler, success, getPathParam } from '@/lib/core';
 import { getProxyCameraStream } from '@/lib/netatmo/netatmoProxy';
+import { stripSignedUrls } from '@/lib/netatmo/stripSignedUrls';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,5 +12,6 @@ export const dynamic = 'force-dynamic';
 export const GET = withAuthAndErrorHandler(async (_request, context) => {
   const cameraId = await getPathParam(context, 'cameraId');
   const data = await getProxyCameraStream(cameraId);
-  return success(data as unknown as Record<string, unknown>);
+  // S11: only proxy_streams reach the browser (vpn/local stream URLs are signed)
+  return success(stripSignedUrls(data) as unknown as Record<string, unknown>);
 }, 'Netatmo/Camera/Stream');

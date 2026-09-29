@@ -1,5 +1,6 @@
 import { withAuthAndErrorHandler, success } from '@/lib/core';
 import { getProxyCameraEvents } from '@/lib/netatmo/netatmoProxy';
+import { proxyEventSnapshots } from '@/lib/netatmo/stripSignedUrls';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -16,5 +17,6 @@ export const GET = withAuthAndErrorHandler(async (request: NextRequest) => {
   const hoursParam = searchParams.get('hours');
   const hours = hoursParam ? Number(hoursParam) : undefined;
   const data = await getProxyCameraEvents(hours);
-  return success(data as unknown as Record<string, unknown>);
+  // S11: event images go through the authenticated snapshot proxy, not signed Netatmo URLs
+  return success(proxyEventSnapshots(data) as unknown as Record<string, unknown>);
 }, 'Netatmo/Camera/Events');

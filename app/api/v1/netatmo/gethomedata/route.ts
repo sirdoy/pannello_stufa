@@ -10,10 +10,11 @@
 
 import { withAuthAndErrorHandler, success } from '@/lib/core';
 import { getProxyHomeData } from '@/lib/netatmo/netatmoProxy';
+import { stripSignedUrls } from '@/lib/netatmo/stripSignedUrls';
 
 export const dynamic = 'force-dynamic';
 
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getProxyHomeData();
-  return success(data as unknown as Record<string, unknown>);
+  return success(stripSignedUrls(data) as unknown as Record<string, unknown>);
 }, 'Netatmo/GetHomeData');

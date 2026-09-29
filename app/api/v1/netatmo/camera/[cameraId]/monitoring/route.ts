@@ -1,5 +1,6 @@
 import { withAuthAndErrorHandler, success, getPathParam, parseJson, HTTP_STATUS } from '@/lib/core';
 import { proxySetCameraMonitoring } from '@/lib/netatmo/netatmoProxy';
+import { stripSignedUrls } from '@/lib/netatmo/stripSignedUrls';
 import type { SetMonitoringRequest } from '@/types/netatmoProxy';
 
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,7 @@ export const POST = withAuthAndErrorHandler(async (request, context) => {
   const body = await parseJson(request) as SetMonitoringRequest;
   const data = await proxySetCameraMonitoring(cameraId, body);
   return success(
-    { ...data, suggested_poll_delay_s: 1 } as unknown as Record<string, unknown>,
+    { ...stripSignedUrls(data), suggested_poll_delay_s: 1 } as unknown as Record<string, unknown>,
     null,
     HTTP_STATUS.ACCEPTED
   );

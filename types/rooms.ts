@@ -73,7 +73,8 @@ export interface StoveStatus {
 
 export interface CameraStatus {
   status: 'available';
-  vpn_url: string | null;
+  /** Backend only: the Next rooms status routes strip this signed URL (ROADMAP S11). */
+  vpn_url?: string | null;
   is_reachable: boolean;
 }
 

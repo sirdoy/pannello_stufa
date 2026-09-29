@@ -93,8 +93,8 @@ export function useCameraData(): UseCameraDataReturn {
   }, []);
 
   // WS subscription — extracts the cameras array from the netatmo topic payload.
-  // The WS NetatmoCamera shape is a superset of CameraStatus (adds vpn_url,
-  // proxy_streams, etc.) — we read the CameraStatus-compatible subset here so
+  // The WS NetatmoCamera shape is a superset of CameraStatus (adds proxy_streams,
+  // snapshot_proxy_url; no signed URLs since S11) — we read the CameraStatus-compatible subset here so
   // the card/sheet keep their existing field contract.
   useEffect(() => {
     if (!isWsConnected) return;

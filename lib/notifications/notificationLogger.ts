@@ -141,71 +141,8 @@ export async function getDeliveryStats(hours = 24) {
 
 /**
  * Rate Alert Tracking
- * Used for automated alerting when delivery rate drops below threshold
+ * Last alert record (systemConfig/rateAlert), shown by /api/notifications/stats
  */
-
-const RATE_THRESHOLD = 85; // Alert if below 85%
-const ALERT_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour between alerts
-
-/**
- * Check if a rate alert should be sent
- *
- * @param {number} currentRate - Current delivery rate percentage
- * @returns {Promise<Object>} { shouldAlert: boolean, reason: string }
- */
-export async function shouldSendRateAlert(currentRate: number) {
-  try {
-    if (currentRate >= RATE_THRESHOLD) {
-      return { shouldAlert: false, reason: 'Rate above threshold' };
-    }
-
-    const db = getAdminFirestore();
-    const alertDoc = await db.collection('systemConfig').doc('rateAlert').get();
-
-    if (!alertDoc.exists) {
-      return { shouldAlert: true, reason: 'First alert check' };
-    }
-
-    const data = alertDoc.data();
-    const lastAlert = data?.lastAlertSent?.toDate();
-    if (!lastAlert) {
-      return { shouldAlert: true, reason: 'No previous alert' };
-    }
-
-    const elapsed = Date.now() - lastAlert.getTime();
-    if (elapsed < ALERT_COOLDOWN_MS) {
-      const remaining = Math.ceil((ALERT_COOLDOWN_MS - elapsed) / 60000);
-      return { shouldAlert: false, reason: `Alert cooldown (${remaining}min remaining)` };
-    }
-
-    return { shouldAlert: true, reason: 'Cooldown expired' };
-  } catch (error) {
-    console.error('❌ Error checking rate alert:', error);
-    // On error, don't send alert (fail safe)
-    return { shouldAlert: false, reason: 'Error checking cooldown' };
-  }
-}
-
-/**
- * Record that a rate alert was sent
- *
- * @param {number} rate - Delivery rate at time of alert
- * @returns {Promise<void>}
- */
-export async function recordRateAlert(rate: number) {
-  try {
-    const db = getAdminFirestore();
-
-    await db.collection('systemConfig').doc('rateAlert').set({
-      lastAlertSent: Timestamp.now(),
-      deliveryRate: rate,
-    });
-
-  } catch (error) {
-    console.error('❌ Error recording rate alert:', error);
-    // Don't throw - recording failures shouldn't break alert flow
-  }
-}
 
 /**
  * Get last rate alert information

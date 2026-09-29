@@ -57,9 +57,6 @@ THERMOROSSI_API_URL=https://api.thermorossi.com
 THERMOROSSI_USERNAME=your-username
 THERMOROSSI_PASSWORD=your-password
 
-# Scheduler
-CRON_SECRET=your-random-secret
-
 # Admin
 ADMIN_USER_ID=user:your-user-id
 ```

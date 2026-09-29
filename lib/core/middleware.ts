@@ -159,51 +159,6 @@ export function withAuthAndErrorHandler(handler: AuthedHandler, logContext: stri
 
 
 // =============================================================================
-// CRON/SECRET MIDDLEWARE
-// =============================================================================
-
-/**
- * Wraps a route handler with cron secret validation
- * For routes called by cron jobs (e.g., /api/notifications/cleanup)
- *
- * Supports both:
- * - Query param: ?secret=xxx
- * - Header: Authorization: Bearer xxx
- *
- * @param handler - Route handler function
- * @param logContext - Context for error logging (optional)
- * @returns Wrapped handler
- *
- * @example
- * export const GET = withCronSecret(async (request, context) => {
- *   await schedulerCheck();
- *   return success({ checked: true });
- * }, 'SchedulerCheck');
- */
-export function withCronSecret(handler: UnauthHandler, logContext: string | null = null): UnauthHandler {
-  return withErrorHandler(async (request: NextRequest, context: RouteContext) => {
-    const cronSecret = process.env.CRON_SECRET;
-
-    if (!cronSecret) {
-      return unauthorized('CRON_SECRET non configurato');
-    }
-
-    // Support both query param and header
-    const querySecret = request.nextUrl?.searchParams?.get('secret');
-    const authHeader = request.headers.get('authorization');
-    const headerSecret = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
-
-    const isValid = querySecret === cronSecret || headerSecret === cronSecret;
-
-    if (!isValid) {
-      return unauthorized('Token cron non valido');
-    }
-
-    return handler(request, context);
-  }, logContext);
-}
-
-// =============================================================================
 // IDEMPOTENCY MIDDLEWARE
 // =============================================================================
 

@@ -8,7 +8,6 @@
  * - scheduleTokenCleanup() → maybeCleanupStaleTokens(): at most every 7 days, after
  *   /api/internal/stove-events (Pi webhook) and /api/notifications/register
  *   (workspace ROADMAP V11, no external cron)
- * - /api/notifications/cleanup (manual trigger)
  */
 
 import { after } from 'next/server';

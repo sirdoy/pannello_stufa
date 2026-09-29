@@ -15,7 +15,7 @@
 
 /**
  * Token lifecycle management is handled server-side via Admin SDK.
- * See /api/notifications/cleanup + lib/services/tokenCleanupService.ts
+ * See lib/services/tokenCleanupService.ts
  */
 
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';

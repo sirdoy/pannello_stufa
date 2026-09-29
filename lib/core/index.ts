@@ -52,7 +52,6 @@ export {
   withAuthAndErrorHandler,
 
   // Special
-  withCronSecret,
   withIdempotency,
 } from './middleware';
 

@@ -4,9 +4,7 @@
  * GET /api/admin/sync-changelog - Info (no sync)
  * POST /api/admin/sync-changelog - Sync changelog to Firebase
  *
- * Protected: Requires either:
- * - User session + ADMIN_USER_ID (manual use)
- * - Bearer token matching CRON_SECRET (GitHub Actions automation)
+ * Protected: user session + ADMIN_USER_ID (manual use)
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -18,7 +16,7 @@ export const dynamic = 'force-dynamic';
 
 interface AuthorizationResult {
   authorized: boolean;
-  method?: 'token' | 'session';
+  method?: 'session';
 }
 
 /**
@@ -29,26 +27,9 @@ function isAdmin(session: any): boolean {
 }
 
 /**
- * Helper to check secret token (for GitHub Actions)
- */
-function isValidSecretToken(request: NextRequest): boolean {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader?.startsWith('Bearer ')) return false;
-
-  const token = authHeader.substring(7);
-  return token === process.env.CRON_SECRET;
-}
-
-/**
- * Helper to verify authorization (user session OR secret token)
+ * Helper to verify authorization (admin user session)
  */
 async function verifyAuthorization(request: NextRequest): Promise<AuthorizationResult> {
-  // First check secret token (for automated sync)
-  if (isValidSecretToken(request)) {
-    return { authorized: true, method: 'token' };
-  }
-
-  // Then check the user session (for manual admin use)
   try {
     const session = await authSession.getSession(request);
     if (session && isAdmin(session)) {
@@ -70,7 +51,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   if (!authorized) {
     return NextResponse.json(
-      { error: 'Unauthorized', message: 'Admin access or valid token required' },
+      { error: 'Unauthorized', message: 'Admin access required' },
       { status: 401 }
     );
   }
@@ -92,7 +73,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   if (!authorized) {
     return NextResponse.json(
-      { error: 'Unauthorized', message: 'Admin access or valid token required' },
+      { error: 'Unauthorized', message: 'Admin access required' },
       { status: 401 }
     );
   }

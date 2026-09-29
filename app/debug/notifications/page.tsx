@@ -360,16 +360,9 @@ export default function NotificationsDashboard() {
               ℹ️ About Rate Alerting
             </Text>
             <Text variant="secondary" size="xs">
-              Automatic alerts are sent when delivery rate drops below 85%. Alerts are rate-limited to max 1 per hour to prevent alert fatigue.
+              Last alert recorded in Firestore (systemConfig/rateAlert). The automatic rate check was removed
+              (workspace ROADMAP V13): it was never scheduled.
             </Text>
-            <div className="mt-3 pt-3 border-t border-white/[0.06]">
-              <Text variant="tertiary" size="xs">
-                <strong>Endpoint:</strong> POST /api/notifications/check-rate
-              </Text>
-              <Text variant="tertiary" size="xs" className="mt-1">
-                <strong>Setup:</strong> Schedule with cron-job.org for automated monitoring
-              </Text>
-            </div>
           </div>
         </Card>
       )}

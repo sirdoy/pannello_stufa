@@ -12,12 +12,13 @@
 
 import { Banner, Button } from '@/app/components/ui';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
+import type { MaintenanceStatus } from '@/lib/maintenance/maintenanceService';
 
 export interface StovePageBannersProps {
   errorCode: number;
   errorDescription: string;
   needsMaintenance: boolean;
-  maintenanceStatus: any;
+  maintenanceStatus: MaintenanceStatus | null;
   cleaningInProgress: boolean;
   hasPendingCommands: boolean;
   pendingCommands: unknown[];

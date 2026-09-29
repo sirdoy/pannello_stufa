@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { EndpointCard } from '@/app/debug/components/ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -14,11 +14,11 @@ interface WeatherTabProps {
 
 export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabProps) {
   const [location, setLocation] = useState<Location | null>(null);
-  const [getResponses, setGetResponses] = useState<Record<string, any>>({});
+  const [getResponses, setGetResponses] = useState<Record<string, unknown>>({});
   const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
   const [timings, setTimings] = useState<Record<string, number>>({});
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
-  const [cacheStatus, setCacheStatus] = useState<any>(null);
+  const [cacheStatus, setCacheStatus] = useState<'cached' | 'fresh' | null>(null);
 
   const copyUrlToClipboard = async (url: string) => {
     try {
@@ -30,7 +30,9 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     }
   };
 
-  const fetchGetEndpoint = async (name: string, url: string) => {
+  // Stable callbacks: the effects below depend on them (a new function per render
+  // re-ran the fetch effect after every response, polling in a loop)
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -49,7 +51,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  };
+  }, []);
 
   // Subscribe to location updates
   useEffect(() => {
@@ -61,10 +63,10 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     ? `/api/weather/forecast?lat=${location.latitude}&lon=${location.longitude}`
     : null;
 
-  const fetchAllGetEndpoints = () => {
+  const fetchAllGetEndpoints = useCallback(() => {
     if (!forecastUrl) return;
     fetchGetEndpoint('forecast', forecastUrl);
-  };
+  }, [forecastUrl, fetchGetEndpoint]);
 
   // Initial fetch
   useEffect(() => {
@@ -90,7 +92,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
     <div className="space-y-6">
       {/* Location waiting state */}
       {!location && (
-        <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4">
+        <div className="rounded-lg border border-amber-700/50 bg-amber-900/20 p-4">
           <Text variant="secondary" size="sm">
             Waiting for location data from Firebase config...
           </Text>
@@ -110,7 +112,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       )}
 
       {/* Weather Info */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
         <Text variant="secondary" size="sm">
           Weather data is fetched from Open-Meteo API by <code className="text-xs">/api/weather/forecast</code> and
           cached in memory for 15 minutes (stale-while-revalidate: stale data is served while a refresh runs). No cron
@@ -146,7 +148,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       </div>
 
       {/* Additional Info */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
         <Heading level={3} size="sm" className="mb-2">
           📍 Cache Configuration
         </Heading>

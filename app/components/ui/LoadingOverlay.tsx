@@ -13,7 +13,6 @@ export interface LoadingOverlayProps {
   message?: string;
   /** Emoji or React element icon */
   icon?: string | React.ReactNode;
-  liquid?: boolean; // Legacy prop - ignored
 }
 
 /**
@@ -32,7 +31,6 @@ export default function LoadingOverlay({
   show = false,
   message = 'Caricamento...',
   icon = '⏳',
-  liquid = true, // Legacy prop - ignored
 }: LoadingOverlayProps) {
   // Block body scroll when overlay is shown
   useEffect(() => {
@@ -50,50 +48,50 @@ export default function LoadingOverlay({
 
   const overlay = (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center animate-fadeIn"
+      className="animate-fadeIn fixed inset-0 z-[9999] flex items-center justify-center"
       aria-live="assertive"
       aria-busy="true"
     >
       {/* Backdrop - Ember Noir dark/light blur */}
-      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-xl will-change-[backdrop-filter] transform-gpu " />
+      <div className="absolute inset-0 transform-gpu bg-slate-950/70 backdrop-blur-xl will-change-[backdrop-filter] " />
 
       {/* Loading card */}
-      <div className="relative z-10 animate-spring-in will-change-transform transform-gpu">
+      <div className="animate-spring-in relative z-10 transform-gpu will-change-transform">
         <div className="
-          bg-slate-800/90 backdrop-blur-2xl
-          border border-slate-700/60
-          shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-          rounded-3xl
-          px-8 py-10 sm:px-10 sm:py-12
-          flex flex-col items-center gap-5 sm:gap-6
-          min-w-[280px] sm:min-w-[320px]
-          relative overflow-hidden
+          ,0,0,0.15)] relative
+          flex min-w-[280px]
+          flex-col
+          items-center
+          gap-5 overflow-hidden rounded-3xl border
+          border-slate-700/60 bg-slate-800/90 px-8 py-10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+          backdrop-blur-2xl sm:min-w-[320px]
+          sm:gap-6 sm:px-10
           
           
-          ,0,0,0.15)]
+          sm:py-12
         ">
           {/* Animated spinner icon */}
           <div className="relative">
             {/* Pulse ring effect */}
-            <div className="absolute inset-0 -m-4 rounded-full bg-ember-500/20 animate-ping" />
+            <div className="bg-ember-500/20 absolute inset-0 -m-4 animate-ping rounded-full" />
 
             {/* Icon container */}
             <div className="
-              relative
-              bg-gradient-to-br from-ember-500 to-flame-600
-              rounded-2xl p-5 sm:p-6
-              shadow-ember-glow
-              border border-white/10
-              animate-pulse
+              from-ember-500
+              to-flame-600 shadow-ember-glow relative
+              animate-pulse rounded-2xl border
+              border-white/10
+              bg-gradient-to-br p-5
+              sm:p-6
             ">
-              <span className="text-5xl sm:text-6xl inline-block animate-bounce">
+              <span className="inline-block animate-bounce text-5xl sm:text-6xl">
                 {icon}
               </span>
             </div>
           </div>
 
           {/* Message */}
-          <div className="text-center space-y-2 relative z-10">
+          <div className="relative z-10 space-y-2 text-center">
             <Text variant="body" size="lg" className="sm:text-xl">
               {message}
             </Text>
@@ -104,9 +102,9 @@ export default function LoadingOverlay({
 
           {/* Loading dots */}
           <div className="flex gap-2">
-            <span className="w-2.5 h-2.5 bg-ember-500 rounded-full animate-bounce [animation-delay:0ms]" />
-            <span className="w-2.5 h-2.5 bg-ember-500 rounded-full animate-bounce [animation-delay:150ms]" />
-            <span className="w-2.5 h-2.5 bg-ember-500 rounded-full animate-bounce [animation-delay:300ms]" />
+            <span className="bg-ember-500 h-2.5 w-2.5 animate-bounce rounded-full [animation-delay:0ms]" />
+            <span className="bg-ember-500 h-2.5 w-2.5 animate-bounce rounded-full [animation-delay:150ms]" />
+            <span className="bg-ember-500 h-2.5 w-2.5 animate-bounce rounded-full [animation-delay:300ms]" />
           </div>
         </div>
       </div>

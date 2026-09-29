@@ -25,6 +25,12 @@ import { getAdminDatabase, adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 const mockAdminDbSet = jest.mocked(adminDbSet);
 
+interface MockSnapshotChild {
+  key: string;
+  val: () => unknown;
+  child: (path: string) => { val: () => unknown };
+}
+
 describe('cleanupStaleTokens', () => {
   let mockRef: jest.Mock;
 
@@ -34,7 +40,7 @@ describe('cleanupStaleTokens', () => {
     jest.clearAllMocks();
     jest.spyOn(console, 'log').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});
-    mockAdminDbSet.mockResolvedValue(undefined as any);
+    mockAdminDbSet.mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -45,7 +51,7 @@ describe('cleanupStaleTokens', () => {
   /**
    * Helper to create mock Firebase database with ref/once/update
    */
-  function createMockDatabase(usersData: Record<string, any>, errorsData?: Record<string, any>) {
+  function createMockDatabase(usersData: Record<string, unknown>, errorsData?: Record<string, unknown>) {
     const mockUpdate = jest.fn().mockResolvedValue(undefined);
 
     mockRef = jest.fn().mockImplementation((path: string) => ({
@@ -61,18 +67,18 @@ describe('cleanupStaleTokens', () => {
       update: mockUpdate,
     }));
 
-    jest.mocked(getAdminDatabase).mockReturnValue({ ref: mockRef } as any);
+    jest.mocked(getAdminDatabase).mockReturnValue({ ref: mockRef } as never);
     return mockUpdate;
   }
 
   /**
    * Helper to create mock Firebase snapshot
    */
-  function createSnapshot(data: Record<string, any>) {
+  function createSnapshot(data: Record<string, unknown>) {
     const entries = Object.entries(data);
     return {
       exists: () => entries.length > 0,
-      forEach: (callback: (snap: any) => void) => {
+      forEach: (callback: (snap: MockSnapshotChild) => void) => {
         entries.forEach(([key, value]) => {
           callback({
             key,
@@ -81,9 +87,9 @@ describe('cleanupStaleTokens', () => {
               val: () => {
                 // Navigate nested path
                 const parts = childPath.split('/');
-                let current = value;
+                let current: unknown = value;
                 for (const part of parts) {
-                  current = current?.[part];
+                  current = (current as Record<string, unknown> | undefined)?.[part];
                 }
                 return current ?? {};
               },
@@ -157,7 +163,7 @@ describe('cleanupStaleTokens', () => {
       tokenKey: 'staleToken',
       lastActivity: '2025-10-01T00:00:00.000Z',
     });
-    expect((result.deletedTokens[0] as any)?.ageDays).toBeGreaterThan(90);
+    expect(result.deletedTokens[0]?.ageDays).toBeGreaterThan(90);
 
     // Verify update was called with token path set to null
     expect(mockUpdate).toHaveBeenCalledWith({
@@ -286,7 +292,7 @@ describe('cleanupStaleTokens', () => {
     const auditCall = mockAdminDbSet.mock.calls[0]!;
     expect(auditCall[0]).toMatch(/tokenCleanupHistory/);
 
-    const auditData = auditCall[1] as any;
+    const auditData = auditCall[1] as { deletedTokens: unknown[] };
     expect(auditData).toMatchObject({
       timestamp: Date.now(),
       tokensScanned: 1,

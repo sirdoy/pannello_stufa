@@ -14,10 +14,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { getFullSchedulerMode, getNextScheduledAction } from '@/lib/scheduler/schedulerService';
+import {
+  getFullSchedulerMode,
+  getNextScheduledAction,
+  type NextScheduledAction,
+} from '@/lib/scheduler/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
 import { logError, shouldNotify } from '@/lib/errorMonitor';
-import { getMaintenanceStatus } from '@/lib/maintenance/maintenanceService';
+import { getMaintenanceStatus, type MaintenanceStatus } from '@/lib/maintenance/maintenanceService';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
@@ -54,14 +58,14 @@ export interface UseStoveDataReturn {
   schedulerEnabled: boolean;
   semiManualMode: boolean;
   returnToAutoAt: number | null;
-  nextScheduledAction: any;
+  nextScheduledAction: NextScheduledAction | null;
 
   // Error state
   errorCode: number;
   errorDescription: string;
 
   // Maintenance state
-  maintenanceStatus: any;
+  maintenanceStatus: MaintenanceStatus | null;
   cleaningInProgress: boolean;
 
   loadingMessage: string;
@@ -88,7 +92,7 @@ export interface UseStoveDataReturn {
   setSchedulerEnabled: (enabled: boolean) => void;
   setSemiManualMode: (semiManual: boolean) => void;
   setReturnToAutoAt: (timestamp: number | null) => void;
-  setNextScheduledAction: (action: any) => void;
+  setNextScheduledAction: (action: NextScheduledAction | null) => void;
   fetchMaintenanceStatus: () => Promise<void>;
   fetchSchedulerMode: () => Promise<void>;
 }
@@ -100,7 +104,7 @@ export interface UseStoveDataReturn {
  * @returns All stove state and actions
  */
 export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
-  const { checkVersion, userId } = params;
+  const { checkVersion } = params;
 
   // PWA hooks
   const { isOnline } = useOnlineStatus();
@@ -115,14 +119,14 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
   const [fanLevel, setFanLevel] = useState<number | null>(null);
   const [powerLevel, setPowerLevel] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [refreshing] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
   // Scheduler state
   const [schedulerEnabled, setSchedulerEnabled] = useState(false);
   const [semiManualMode, setSemiManualMode] = useState(false);
   const [returnToAutoAt, setReturnToAutoAt] = useState<number | null>(null);
-  const [nextScheduledAction, setNextScheduledAction] = useState<any>(null);
+  const [nextScheduledAction, setNextScheduledAction] = useState<NextScheduledAction | null>(null);
 
   // Error monitoring states
   const [errorCode, setErrorCode] = useState(0);
@@ -130,7 +134,7 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
   const previousErrorCode = useRef(0);
 
   // Maintenance states
-  const [maintenanceStatus, setMaintenanceStatus] = useState<any>(null);
+  const [maintenanceStatus, setMaintenanceStatus] = useState<MaintenanceStatus | null>(null);
   const [cleaningInProgress, setCleaningInProgress] = useState(false);
 
   // Loading overlay message
@@ -289,12 +293,17 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
     }
   };
 
+  // Ref: a new fetchStatusAndUpdate per render in the deps re-ran this effect after
+  // every status update, polling in a loop once a command had been synced
+  const fetchStatusAndUpdateRef = useRef(fetchStatusAndUpdate);
+  fetchStatusAndUpdateRef.current = fetchStatusAndUpdate;
+
   // Refresh status when background sync command completes
   useEffect(() => {
     if (lastSyncedCommand) {
-      fetchStatusAndUpdate();
+      void fetchStatusAndUpdateRef.current();
     }
-  }, [lastSyncedCommand, fetchStatusAndUpdate]);
+  }, [lastSyncedCommand]);
 
   // Polling fallback: suppressed when WS is live (per D-01), alwaysActive preserved (per D-08)
   useAdaptivePolling({

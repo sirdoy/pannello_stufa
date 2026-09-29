@@ -102,7 +102,7 @@ export default function ConfirmDialog({
   // dialog was off-centre and its buttons off-screen (ROADMAP M11).
   return createPortal(
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn "
+      className="animate-fadeIn fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm "
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
@@ -110,11 +110,11 @@ export default function ConfirmDialog({
     >
       <Card
         variant="elevated"
-        className="max-w-md w-full max-h-[calc(100dvh-2rem)] overflow-y-auto p-6 animate-scaleIn"
+        className="animate-scaleIn max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto p-6"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-4">{icon}</div>
+        <div className="mb-6 text-center">
+          <div className="mb-4 text-5xl">{icon}</div>
           <Heading level={2} size="xl" id="dialog-title" className="mb-2">
             {title}
           </Heading>

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useSyncExternalStore, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import ActionButton, { type ActionButtonProps } from './ActionButton';
@@ -24,6 +24,8 @@ export interface BottomSheetProps {
   zIndex?: number;
 }
 
+const subscribeNoop = () => () => {};
+
 export default function BottomSheet({
   isOpen,
   onClose,
@@ -36,15 +38,9 @@ export default function BottomSheet({
   className = '',
   zIndex = 8999,
 }: BottomSheetProps) {
-  // In test environment, skip mounted check (JSDOM is always client-side)
-  // In production, prevent SSR hydration mismatch for portals
-  // Check: typeof window !== 'undefined' means we're client-side (browser or JSDOM)
-  const [mounted, setMounted] = useState(typeof window !== 'undefined');
-
-  // Client-side only mounting (production)
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // Portals need document.body: false on the server and during hydration (no
+  // mismatch), true on the client (JSDOM included) without a setState in an effect
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
 
   // Scroll lock quando aperto
   useEffect(() => {
@@ -91,7 +87,7 @@ export default function BottomSheet({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm animate-fadeIn"
+        className="animate-fadeIn fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
         style={{ zIndex }}
         onClick={handleBackdropClick}
         aria-hidden="true"
@@ -99,7 +95,7 @@ export default function BottomSheet({
 
       {/* Bottom Sheet */}
       <div
-        className="fixed inset-x-0 bottom-0 animate-slide-in-from-bottom"
+        className="animate-slide-in-from-bottom fixed inset-x-0 bottom-0"
         style={{ zIndex: zIndex + 1 }}
         role="dialog"
         aria-modal="true"
@@ -107,24 +103,24 @@ export default function BottomSheet({
       >
         <div
           className={`
-            bg-slate-900/95 
-            backdrop-blur-3xl
+            shadow-liquid-lg 
+            max-h-[85vh]
+            overflow-y-auto
             rounded-t-3xl
-            shadow-liquid-lg
             border-t border-slate-700/50 
-            p-6
-            max-h-[85vh] overflow-y-auto
+            bg-slate-900/95
+            p-6 backdrop-blur-3xl
             ${className}
           `}
         >
           {/* Drag Handle */}
           {showHandle && (
-            <div className="w-12 h-1.5 bg-slate-600/50 rounded-full mx-auto mb-6" />
+            <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-slate-600/50" />
           )}
 
           {/* Header */}
           {(title || showCloseButton) && (
-            <div className="flex items-start justify-between mb-6">
+            <div className="mb-6 flex items-start justify-between">
               {/* Title */}
               {title && (
                 <Heading level={2} size="2xl" id="bottom-sheet-title" className="flex items-center gap-2">

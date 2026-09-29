@@ -562,6 +562,34 @@ describe('useStoveData', () => {
     });
   });
 
+  it('refetches once after a background-synced command, not in a loop (M32)', async () => {
+    // WS open: polling suppressed, so every status fetch comes from the sync effect
+    jest.mocked(useWebSocketContext).mockReturnValue({
+      subscribe: mockSubscribe,
+      unsubscribe: mockUnsubscribe,
+      readyState: ReadyState.OPEN,
+    });
+    jest.mocked(useBackgroundSync).mockReturnValue({
+      ...jest.mocked(useBackgroundSync)(),
+      lastSyncedCommand: { id: 1, endpoint: 'ignite' } as never,
+    });
+    const statusCalls = () =>
+      jest.mocked(global.fetch).mock.calls.filter(([url]) => String(url).includes('status')).length;
+
+    renderHook(() => useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId }));
+
+    await waitFor(() => expect(statusCalls()).toBeGreaterThan(0));
+    const settled = statusCalls();
+    // Let several render/update cycles pass: the count must not keep growing
+    for (let i = 0; i < 5; i++) {
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      });
+    }
+    expect(statusCalls()).toBe(settled);
+    expect(settled).toBeLessThanOrEqual(2);
+  });
+
   describe('WebSocket integration', () => {
     it('subscribes to thermorossi topic when readyState is OPEN', () => {
       jest.mocked(useWebSocketContext).mockReturnValue({

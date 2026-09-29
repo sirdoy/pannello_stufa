@@ -14,10 +14,11 @@ import { Card, Heading, Text, Badge, Button } from '@/app/components/ui';
 import MaintenanceBar from '@/app/components/MaintenanceBar';
 import SchedulerEngineBanner from '@/app/components/SchedulerEngineBanner';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
+import type { MaintenanceStatus } from '@/lib/maintenance/maintenanceService';
 
 export interface StovePageNavigationProps {
   schedulerEnabled: boolean;
-  maintenanceStatus: any;
+  maintenanceStatus: MaintenanceStatus | null;
   errorCode: number;
 }
 
@@ -36,22 +37,22 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           </Heading>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           {/* Scheduler Card */}
-          <Link href="/stove/scheduler" className="block group">
+          <Link href="/stove/scheduler" className="group block">
             <Card
               variant="glass"
-              className="h-full transition-all duration-300 hover:shadow-sage-glow hover:scale-[1.02] hover:border-sage-500/40"
+              className="hover:shadow-sage-glow hover:border-sage-500/40 h-full transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-sage-900/50 flex items-center justify-center border border-sage-500/30 group-hover:border-sage-500/60 transition-colors flex-shrink-0">
+                <div className="bg-sage-900/50 border-sage-500/30 group-hover:border-sage-500/60 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-colors">
                   <span className="text-3xl">📅</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-sage-400 transition-colors mb-1"
+                    className="group-hover:text-sage-400 mb-1 transition-colors"
                   >
                     Pianificazione
                   </Heading>
@@ -69,20 +70,20 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           </Link>
 
           {/* Maintenance Card */}
-          <Link href="/stove/maintenance" className="block group">
+          <Link href="/stove/maintenance" className="group block">
             <Card
               variant="glass"
-              className="h-full transition-all duration-300 hover:shadow-ocean-glow hover:scale-[1.02] hover:border-ocean-500/40"
+              className="hover:shadow-ocean-glow hover:border-ocean-500/40 h-full transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-ocean-900/50 flex items-center justify-center border border-ocean-500/30 group-hover:border-ocean-500/60 transition-colors flex-shrink-0">
+                <div className="bg-ocean-900/50 border-ocean-500/30 group-hover:border-ocean-500/60 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-colors">
                   <span className="text-3xl">🔧</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-ocean-400 transition-colors mb-1"
+                    className="group-hover:text-ocean-400 mb-1 transition-colors"
                   >
                     Manutenzione
                   </Heading>
@@ -104,20 +105,20 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           </Link>
 
           {/* Errors Card */}
-          <Link href="/stove/errors" className="block group">
+          <Link href="/stove/errors" className="group block">
             <Card
               variant="glass"
-              className="h-full transition-all duration-300 hover:shadow-ember-glow hover:scale-[1.02] hover:border-ember-500/40"
+              className="hover:shadow-ember-glow hover:border-ember-500/40 h-full transition-all duration-300 hover:scale-[1.02]"
             >
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-ember-900/50 flex items-center justify-center border border-ember-500/30 group-hover:border-ember-500/60 transition-colors flex-shrink-0">
+                <div className="bg-ember-900/50 border-ember-500/30 group-hover:border-ember-500/60 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-colors">
                   <span className="text-3xl">🚨</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-ember-400 transition-colors mb-1"
+                    className="group-hover:text-ember-400 mb-1 transition-colors"
                   >
                     Storico Allarmi
                   </Heading>

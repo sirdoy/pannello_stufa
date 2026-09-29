@@ -310,6 +310,63 @@ describe('RoomStatusPage', () => {
     });
   });
 
+  it('renders tuya plug and Pi host data (backend M26)', async () => {
+    (global.fetch as jest.Mock) = jest.fn((url: string) => {
+      if (url === '/api/rooms/house/status') {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              rooms: [
+                {
+                  room_id: 1,
+                  room_name: 'Studio',
+                  device_count: 2,
+                  available_count: 2,
+                  unavailable_count: 0,
+                  devices: [
+                    {
+                      device_registry_id: 10,
+                      custom_name: 'Presa TV',
+                      provider_name: 'tuya',
+                      device_type: 'plug',
+                      status: 'available',
+                      data: { status: 'available', switch_on: true, power_w: 12.5, energy_kwh: 3.2 },
+                    },
+                    {
+                      device_registry_id: 11,
+                      custom_name: 'Raspberry',
+                      provider_name: 'raspi',
+                      device_type: 'ha',
+                      status: 'available',
+                      data: {
+                        status: 'available',
+                        cpu_percent: 7.5,
+                        cpu_temperature: 52.34,
+                        memory_percent: 41,
+                      },
+                    },
+                  ],
+                },
+              ],
+              total_devices: 2,
+              total_available: 2,
+              total_unavailable: 0,
+            }),
+        });
+      }
+      if (url === '/api/rooms/health') {
+        return Promise.resolve({ ok: true, json: () => Promise.resolve(mockHealth) });
+      }
+      return Promise.resolve({ ok: false, status: 500 });
+    });
+    render(<RoomStatusPage />);
+    await waitFor(() => {
+      expect(screen.getByText('Accesa · 12.5 W · 3.2 kWh')).toBeInTheDocument();
+    });
+    expect(screen.getByText('CPU 7.5% · 52.3°C · RAM 41%')).toBeInTheDocument();
+  });
+
   it('shows empty room message', async () => {
     (global.fetch as jest.Mock) = jest.fn((url: string) => {
       if (url === '/api/rooms/house/status') {

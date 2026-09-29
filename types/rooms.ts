@@ -78,13 +78,38 @@ export interface CameraStatus {
   is_reachable: boolean;
 }
 
+/** Tuya smart plug (backend M26). */
+export interface PlugStatus {
+  status: 'available';
+  switch_on: boolean | null;
+  power_w: number | null;
+  energy_kwh: number | null;
+}
+
+/** Raspberry Pi host stats (backend M26). */
+export interface HostStatus {
+  status: 'available';
+  cpu_percent: number | null;
+  cpu_temperature: number | null;
+  memory_percent: number | null;
+}
+
 export interface DeviceStatus {
   device_registry_id: number;
   custom_name: string;
   provider_name: string;
   device_type: string;
   status: 'available' | 'unavailable';
-  data: LightStatus | SensorStatus | ThermostatStatus | SpeakerStatus | StoveStatus | CameraStatus | null;
+  data:
+    | LightStatus
+    | SensorStatus
+    | ThermostatStatus
+    | SpeakerStatus
+    | StoveStatus
+    | CameraStatus
+    | PlugStatus
+    | HostStatus
+    | null;
 }
 
 export interface RoomStatusResponse {

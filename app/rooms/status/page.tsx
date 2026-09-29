@@ -12,6 +12,8 @@ import type {
   SpeakerStatus,
   StoveStatus,
   CameraStatus,
+  HostStatus,
+  PlugStatus,
 } from '@/types/rooms';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
@@ -79,6 +81,22 @@ function getProviderBadgeVariant(provider: string): 'ocean' | 'ember' | 'neutral
 // --- renderDeviceData helper (per D-16, D-17) ---
 function renderDeviceData(device: DeviceStatus): string | null {
   if (!device.data) return null;
+  // Provider-specific payloads whose registry type is free-form (backend M26)
+  if (device.provider_name === 'tuya') {
+    const d = device.data as PlugStatus;
+    const parts = [d.switch_on ? 'Accesa' : 'Spenta'];
+    if (d.power_w !== null) parts.push(`${d.power_w} W`);
+    if (d.energy_kwh !== null) parts.push(`${d.energy_kwh} kWh`);
+    return parts.join(' · ');
+  }
+  if (device.provider_name === 'raspi') {
+    const d = device.data as HostStatus;
+    const parts: string[] = [];
+    if (d.cpu_percent !== null) parts.push(`CPU ${d.cpu_percent}%`);
+    if (d.cpu_temperature !== null) parts.push(`${d.cpu_temperature.toFixed(1)}°C`);
+    if (d.memory_percent !== null) parts.push(`RAM ${d.memory_percent}%`);
+    return parts.join(' · ') || null;
+  }
   switch (device.device_type) {
     case 'light': {
       const d = device.data as LightStatus;

@@ -106,12 +106,6 @@
       ".indexOn": ["timestamp", "severity", "resolved"]
     },
 
-    "changelog": {
-      ".read": true,
-      ".write": false,
-      ".indexOn": ["timestamp"]
-    },
-
     "users": {
       "$userId": {
         ".read": true,

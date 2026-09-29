@@ -1,4 +1,5 @@
 import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { waitForHydration } from '../helpers/hydration';
 import type { AutomationRule } from '@/types/automations';
 
 /**
@@ -53,92 +54,6 @@ function collectConsoleErrors(page: Page): { errors: string[]; cleanup: () => vo
   };
   page.on('console', handler);
   return { errors, cleanup: () => page.off('console', handler) };
-}
-
-/**
- * Best-effort dismissal of the VersionEnforcer / ForceUpdateModal overlay
- * (Phase 175 known blocker per CONTEXT.md D-28).
- *
- * WR-06 (REVIEW iteration 2): widened to a 4-attempt poll mirroring
- * dismissWhatsNewModalIfPresent. The previous single-shot 500ms poll
- * raced against VersionEnforcer's Firebase-backed checkVersion(): on
- * slower CI runners the overlay can mount AFTER 500ms and intercept
- * the click on `Nuova automazione`. Polling for ~3s closes the race.
- */
-async function dismissVersionEnforcerIfPresent(page: Page): Promise<void> {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const overlay = page
-      .locator(
-        'text=/Aggiornamento Disponibile/i, [data-version-enforcer], [data-testid="version-enforcer"]'
-      )
-      .first();
-    const visible = await overlay.isVisible({ timeout: 750 }).catch(() => false);
-    if (!visible) return;
-    const dismiss = page
-      .getByRole('button', { name: /aggiorna|ricarica|reload|chiudi|ignora|dismiss/i })
-      .first();
-    if (await dismiss.isVisible({ timeout: 200 }).catch(() => false)) {
-      await dismiss.click({ force: true, trial: false }).catch(() => undefined);
-    } else {
-      await page.keyboard.press('Escape').catch(() => undefined);
-    }
-    await overlay.waitFor({ state: 'hidden', timeout: 1500 }).catch(() => undefined);
-  }
-}
-
-/**
- * Best-effort dismissal of the WhatsNewModal (`<h2>Novità!</h2>` heading) which
- * mounts via useVersionCheck() when localStorage.lastSeenVersion !== APP_VERSION.
- * In smoke mode each test gets a fresh storage state, so the modal mounts on
- * every cold-load and intercepts pointer events on top of the page.
- *
- * Strategy: poll up to 4× over ~3s, since the hook fetches from Firebase async
- * and the modal can race the dashboard hydration. Each iteration: detect the
- * Radix dialog by role + heading, click the close button (aria-label "Chiudi")
- * or press Escape.
- */
-async function dismissWhatsNewModalIfPresent(page: Page): Promise<void> {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const overlay = page.getByText('Novità!', { exact: true }).first();
-    const visible = await overlay.isVisible({ timeout: 750 }).catch(() => false);
-    if (!visible) return;
-    const closeBtn = page.getByRole('button', { name: /chiudi/i }).first();
-    if (await closeBtn.isVisible({ timeout: 150 }).catch(() => false)) {
-      await closeBtn.click({ force: true, trial: false }).catch(() => undefined);
-    } else {
-      await page.keyboard.press('Escape').catch(() => undefined);
-    }
-    await overlay.waitFor({ state: 'hidden', timeout: 1500 }).catch(() => undefined);
-  }
-}
-
-/**
- * Pre-goto setup: pre-prime localStorage to suppress WhatsNewModal +
- * defensive version-check route mock so the changelog dialog cannot intercept
- * clicks. Mirrors primeDashboardForSheetTest from rooms-tab.spec.ts.
- */
-async function primeForAutomationsTest(page: Page): Promise<void> {
-  await page.route('**/api/version*', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ version: '99.99.99' }),
-    })
-  );
-  await page.addInitScript(() => {
-    try {
-      window.localStorage.setItem('lastSeenVersion', '99.99.99');
-      const dismissed = [
-        '99.99.99',
-        '1.77.0', '1.77.1', '1.77.2',
-        '1.78.0', '1.79.0', '1.80.0',
-        '2.0.0',
-      ];
-      window.localStorage.setItem('dismissedVersions', JSON.stringify(dismissed));
-    } catch {
-      // localStorage may be unavailable in some Playwright contexts — no-op.
-    }
-  });
 }
 
 // ─── Route mock fixtures ─────────────────────────────────────────────────────
@@ -220,11 +135,9 @@ test.describe('AUTO-01: List rendering', () => {
   test('renders rows from /api/v1/automations with all 4 status pills', async ({ page }) => {
     const { errors, cleanup } = collectConsoleErrors(page);
     await mockAutomationsApi(page);
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     // Row is a role="button" with aria-label="Apri automazione {name}".
     await expect(
@@ -244,11 +157,9 @@ test.describe('AUTO-01: List rendering', () => {
   test('empty state renders when no rules', async ({ page }) => {
     const { errors, cleanup } = collectConsoleErrors(page);
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     // Anchor on the full empty-state sentence to avoid false matches on
     // hypothetical strings like "Nessuna automazione attiva" elsewhere.
@@ -262,11 +173,9 @@ test.describe('AUTO-01: List rendering', () => {
 test.describe('AUTO-02: Editor open + 4 tabs', () => {
   test('Nuova opens Sheet titled "Nuova automazione" with 4 tabs', async ({ page }) => {
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Nuova automazione' }).click();
 
@@ -286,11 +195,9 @@ test.describe('AUTO-02: Editor open + 4 tabs', () => {
 test.describe('AUTO-03: 2-tile trigger picker (D-08)', () => {
   test('Trigger tab shows EXACTLY 2 tiles (Pianificazione + Manuale)', async ({ page }) => {
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Nuova automazione' }).click();
     await page.getByRole('tab', { name: 'Trigger' }).click();
@@ -305,11 +212,9 @@ test.describe('AUTO-03: 2-tile trigger picker (D-08)', () => {
 test.describe('AUTO-05: 11-tile action picker (D-09)', () => {
   test('Azioni picker shows EXACTLY 11 tiles in locked order', async ({ page }) => {
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Nuova automazione' }).click();
     await page.getByRole('tab', { name: 'Azioni' }).click();
@@ -340,11 +245,9 @@ test.describe('AUTO-05: 11-tile action picker (D-09)', () => {
 test.describe('AUTO-04: Conditions AND/OR toggle', () => {
   test('operator toggle flips between TUTTE (E) and ALMENO UNA (O)', async ({ page }) => {
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Nuova automazione' }).click();
     await page.getByRole('tab', { name: 'Condizioni' }).click();
@@ -366,11 +269,9 @@ test.describe('AUTO-04: Conditions AND/OR toggle', () => {
 test.describe('AUTO-06: Avanzate fields', () => {
   test('renders min_interval + max_per_hour with Italian hints', async ({ page }) => {
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Nuova automazione' }).click();
     await page.getByRole('tab', { name: 'Avanzate' }).click();
@@ -387,11 +288,9 @@ test.describe('AUTO-06: Avanzate fields', () => {
 test.describe('AUTO-07: Save guard + unsaved-changes (D-14, D-15)', () => {
   test('Crea automazione disabled with empty name (D-14)', async ({ page }) => {
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Nuova automazione' }).click();
 
@@ -403,11 +302,9 @@ test.describe('AUTO-07: Save guard + unsaved-changes (D-14, D-15)', () => {
 
   test('Crea automazione enabled with name + 1 action (D-14)', async ({ page }) => {
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Nuova automazione' }).click();
     // TextInput aria-label="Nome automazione" — exact match avoids collision
@@ -425,11 +322,9 @@ test.describe('AUTO-07: Save guard + unsaved-changes (D-14, D-15)', () => {
 
   test('unsaved-changes dialog spawns on Annulla after edit (D-15)', async ({ page }) => {
     await mockAutomationsApi(page, { rules: [] });
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Nuova automazione' }).click();
     await page.getByLabel('Nome automazione', { exact: true }).fill('Edited');
@@ -454,11 +349,9 @@ test.describe('AUTO-07: Save guard + unsaved-changes (D-14, D-15)', () => {
 test.describe('AUTO-08: Edit + delete + toggle (D-12, D-16)', () => {
   test('opening existing rule shows "Modifica automazione" + Elimina footer button', async ({ page }) => {
     await mockAutomationsApi(page);
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Apri automazione Sveglia mattutina' }).click();
 
@@ -474,11 +367,9 @@ test.describe('AUTO-08: Edit + delete + toggle (D-12, D-16)', () => {
 
   test('Trigger tab tiles disabled in edit mode (D-12)', async ({ page }) => {
     await mockAutomationsApi(page);
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Apri automazione Sveglia mattutina' }).click();
     await page.getByRole('tab', { name: 'Trigger' }).click();
@@ -498,11 +389,9 @@ test.describe('AUTO-08: Edit + delete + toggle (D-12, D-16)', () => {
 
   test('delete confirm flow — confirm path closes sheet (D-16)', async ({ page }) => {
     await mockAutomationsApi(page);
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Apri automazione Sveglia mattutina' }).click();
 
@@ -531,11 +420,9 @@ test.describe('AUTO-08: Edit + delete + toggle (D-12, D-16)', () => {
 
   test('delete confirm flow — cancel keeps editor open (D-16)', async ({ page }) => {
     await mockAutomationsApi(page);
-    await primeForAutomationsTest(page);
     await page.goto('/automazioni');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
 
     await page.getByRole('button', { name: 'Apri automazione Sveglia mattutina' }).click();
     await page.getByRole('button', { name: 'Elimina', exact: true }).click();
@@ -557,11 +444,9 @@ test.describe('AUTO-08: Edit + delete + toggle (D-12, D-16)', () => {
 test('full create flow generates no console errors (D-27)', async ({ page }) => {
   const { errors, cleanup } = collectConsoleErrors(page);
   await mockAutomationsApi(page, { rules: [] });
-  await primeForAutomationsTest(page);
   await page.goto('/automazioni');
   await page.waitForLoadState('domcontentloaded');
-  await dismissVersionEnforcerIfPresent(page);
-  await dismissWhatsNewModalIfPresent(page);
+  await waitForHydration(page);
 
   await page.getByRole('button', { name: 'Nuova automazione' }).click();
   await page.getByLabel('Nome automazione', { exact: true }).fill('E2E test');

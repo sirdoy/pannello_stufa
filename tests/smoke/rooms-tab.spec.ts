@@ -1,4 +1,5 @@
 import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { waitForHydration } from '../helpers/hydration';
 
 /**
  * Phase 179 — ROOMS-01..05 Playwright smoke spec.
@@ -44,94 +45,12 @@ function collectConsoleErrors(page: Page): { errors: string[]; cleanup: () => vo
   return { errors, cleanup: () => page.off('console', handler) };
 }
 
-/**
- * Best-effort dismissal of the VersionEnforcer / ForceUpdateModal overlay
- * (Phase 175 known blocker per CONTEXT.md D-28). Verbatim copy of the helper
- * established in tests/smoke/splash.spec.ts:60-80 — this IS the canonical
- * analog (W5 hard requirement satisfied).
- */
-async function dismissVersionEnforcerIfPresent(page: Page): Promise<void> {
-  const overlay = page
-    .locator(
-      'text=/Aggiornamento Disponibile/i, [data-version-enforcer], [data-testid="version-enforcer"]'
-    )
-    .first();
-
-  if (await overlay.isVisible({ timeout: 500 }).catch(() => false)) {
-    const dismiss = page
-      .getByRole('button', { name: /aggiorna|ricarica|reload|chiudi|ignora|dismiss/i })
-      .first();
-    if (await dismiss.isVisible({ timeout: 200 }).catch(() => false)) {
-      await dismiss.click({ trial: false }).catch(() => undefined);
-    } else {
-      await page.keyboard.press('Escape').catch(() => undefined);
-    }
-  }
-}
-
-/**
- * Best-effort dismissal of the WhatsNewModal (`<h2>Novità!</h2>` heading) which
- * mounts via useVersionCheck() when localStorage.lastSeenVersion !== APP_VERSION.
- * In smoke mode each test gets a fresh storage state, so the modal mounts on
- * every cold-load and intercepts pointer events on top of the dashboard grid.
- *
- * Strategy: poll up to 4× over ~3s, since the hook fetches from Firebase async
- * and the modal can race the dashboard hydration. Each iteration: detect the
- * Radix dialog by role + heading, click the close button (aria-label "Chiudi")
- * or press Escape. Companion to dismissVersionEnforcerIfPresent.
- */
-async function dismissWhatsNewModalIfPresent(page: Page): Promise<void> {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const overlay = page.getByText('Novità!', { exact: true }).first();
-    const visible = await overlay.isVisible({ timeout: 750 }).catch(() => false);
-    if (!visible) return;
-    // Try the close (X) action first, then ESC, then click the overlay backdrop.
-    const closeBtn = page.getByRole('button', { name: /chiudi/i }).first();
-    if (await closeBtn.isVisible({ timeout: 150 }).catch(() => false)) {
-      await closeBtn.click({ force: true, trial: false }).catch(() => undefined);
-    } else {
-      await page.keyboard.press('Escape').catch(() => undefined);
-    }
-    await overlay.waitFor({ state: 'hidden', timeout: 1500 }).catch(() => undefined);
-  }
-}
-
-/**
- * Shared pre-goto setup mirroring the Phase 177 describe-level beforeEach
- * (lines 134-180). Each SHEET-* describe calls this BEFORE goto + dismissals.
- * Pre-primes localStorage to suppress WhatsNewModal + installs a defensive
- * version-check route mock so the changelog dialog cannot intercept clicks.
- */
-async function primeDashboardForSheetTest(page: Page): Promise<void> {
-  await page.route('**/api/version*', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ version: '99.99.99' }),
-    })
-  );
-  await page.addInitScript(() => {
-    try {
-      window.localStorage.setItem('lastSeenVersion', '99.99.99');
-      const dismissed = [
-        '99.99.99',
-        '1.77.0', '1.77.1', '1.77.2',
-        '1.78.0', '1.79.0', '1.80.0',
-        '2.0.0',
-      ];
-      window.localStorage.setItem('dismissedVersions', JSON.stringify(dismissed));
-    } catch {
-      // localStorage may be unavailable in some Playwright contexts — no-op.
-    }
-  });
-}
-
 // ----- Route mocks: non-empty fixtures so 6 RoomCards render -----
 
 /**
  * Mocks all 5 device endpoints with non-empty fixture data.
  * Ensures each RoomCard has ≥1 device to render (satisfies ROOMS-01).
- * Called in beforeEach before primeDashboardForSheetTest.
+ * Called in beforeEach before page.goto.
  */
 async function mockDeviceEndpoints(page: Page): Promise<void> {
   // Hue lights — fixture: 7 lights across 5 rooms (one orphan dropped by aggregator).
@@ -251,14 +170,11 @@ async function mockDeviceEndpoints(page: Page): Promise<void> {
 
 test.describe('Phase 179 — Rooms tab (ROOMS-01..05)', () => {
   test.beforeEach(async ({ page }) => {
-    // Install route mocks FIRST — before primeDashboardForSheetTest installs
-    // the /api/version mock (order matters: page.route() is last-wins for overlapping patterns).
+    // Install route mocks before page.goto.
     await mockDeviceEndpoints(page);
-    await primeDashboardForSheetTest(page);
     await page.goto('/stanze');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
   });
 
   test('ROOMS-01: 6 RoomCards render with non-zero device counts (data-driven)', async ({ page }) => {

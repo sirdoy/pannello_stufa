@@ -1,4 +1,5 @@
 import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { waitForHydration } from '../helpers/hydration';
 import { signIn } from '../helpers/auth.helpers';
 import { TEST_USER } from '../helpers/test-context';
 
@@ -23,11 +24,6 @@ import { TEST_USER } from '../helpers/test-context';
  * Helpers reused:
  *   - signIn() — tests/helpers/auth.helpers.ts (Phase 51 pattern).
  *   - collectConsoleErrors() — tests/smoke/page-loads.spec.ts (Phase 97 pattern).
- *
- * VersionEnforcer overlay handling (CONTEXT.md D-28; RESEARCH §"Pitfall 6"):
- *   The pre-existing app-level <ForceUpdateModal> can intercept clicks and pin the
- *   z-index above 9999. If it appears, dismiss it before measurement using the
- *   Phase 175 best-effort strategy (`dismissVersionEnforcerIfPresent`).
  */
 
 /**
@@ -47,43 +43,6 @@ function collectConsoleErrors(page: Page): { errors: string[]; cleanup: () => vo
   };
   page.on('console', handler);
   return { errors, cleanup: () => page.off('console', handler) };
-}
-
-/**
- * Best-effort dismissal of the VersionEnforcer / ForceUpdateModal overlay
- * (Phase 175 known blocker per CONTEXT.md D-28).
- *
- * Strategy:
- *   1. Look for the visible "Aggiornamento Disponibile" heading or an
- *      `Aggiorna|Ricarica|Reload|Dismiss|Chiudi|Ignora` button.
- *   2. If found, click it (this triggers `window.location.reload()` in the
- *      production component but at least clears the modal from the DOM).
- *   3. If no button is exposed (the prod modal disables onClose), fall back
- *      to ESC and pressing Escape on the modal node.
- *
- * If dismissal fails, the test will time out at the splash-overlay assertion
- * and the SUMMARY documents the blocker per Phase 175 precedent.
- */
-async function dismissVersionEnforcerIfPresent(page: Page): Promise<void> {
-  // Markers we know about: the modal renders a heading "Aggiornamento Disponibile"
-  // (see app/components/ForceUpdateModal.tsx) and may also expose attributes like
-  // [data-version-enforcer] or [data-testid="version-enforcer"] in future revisions.
-  const overlay = page
-    .locator(
-      'text=/Aggiornamento Disponibile/i, [data-version-enforcer], [data-testid="version-enforcer"]'
-    )
-    .first();
-
-  if (await overlay.isVisible({ timeout: 500 }).catch(() => false)) {
-    const dismiss = page
-      .getByRole('button', { name: /aggiorna|ricarica|reload|chiudi|ignora|dismiss/i })
-      .first();
-    if (await dismiss.isVisible({ timeout: 200 }).catch(() => false)) {
-      await dismiss.click({ trial: false }).catch(() => undefined);
-    } else {
-      await page.keyboard.press('Escape').catch(() => undefined);
-    }
-  }
 }
 
 interface SplashRecord {
@@ -179,7 +138,7 @@ test.describe('SPLASH-01..05 — splash overlay', () => {
     const { errors, cleanup } = collectConsoleErrors(page);
     await installSplashRecorder(page);
     await signIn(page, TEST_USER.email, TEST_USER.password);
-    await dismissVersionEnforcerIfPresent(page);
+    await waitForHydration(page);
 
     const rec = await waitForSplashCycle(page);
     // Full-motion timeline ends at t=2100ms (onDone → unmount).
@@ -196,7 +155,7 @@ test.describe('SPLASH-01..05 — splash overlay', () => {
   test('SPLASH-02 sequence beats: flame scale(0.4) → scale(1) → scale(1.08) → unmount', async ({ page }) => {
     await installSplashRecorder(page);
     await signIn(page, TEST_USER.email, TEST_USER.password);
-    await dismissVersionEnforcerIfPresent(page);
+    await waitForHydration(page);
 
     const rec = await waitForSplashCycle(page);
     const beats = rec.flame.map((f) => f.transform);
@@ -219,7 +178,7 @@ test.describe('SPLASH-01..05 — splash overlay', () => {
     try {
       await installSplashRecorder(page);
       await signIn(page, TEST_USER.email, TEST_USER.password);
-      await dismissVersionEnforcerIfPresent(page);
+      await waitForHydration(page);
 
       const rec = await waitForSplashCycle(page);
       expect(
@@ -241,7 +200,7 @@ test.describe('SPLASH-01..05 — splash overlay', () => {
   test('SPLASH-04 no re-trigger on in-session route change (Home → Rooms → Automations → Home)', async ({ page }) => {
     await installSplashRecorder(page);
     await signIn(page, TEST_USER.email, TEST_USER.password);
-    await dismissVersionEnforcerIfPresent(page);
+    await waitForHydration(page);
     await waitForSplashCycle(page);
 
     for (const path of ['/rooms', '/automations', '/']) {
@@ -255,7 +214,7 @@ test.describe('SPLASH-01..05 — splash overlay', () => {
   test('SPLASH-05 ≥1 device data request fires during splash window', async ({ page }) => {
     await installSplashRecorder(page);
     await signIn(page, TEST_USER.email, TEST_USER.password);
-    await dismissVersionEnforcerIfPresent(page);
+    await waitForHydration(page);
 
     const rec = await waitForSplashCycle(page);
     // Same clock as the recorder: resource timing startTime is performance.now()-based.

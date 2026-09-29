@@ -1,4 +1,5 @@
 import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { waitForHydration } from '../helpers/hydration';
 
 /**
  * DASH-01..DASH-12 — equal-size dashboard glass cards (Phase 177).
@@ -13,13 +14,6 @@ import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
  *
  * Helpers reused (verbatim):
  *   - collectConsoleErrors() — tests/smoke/page-loads.spec.ts:7-20.
- *   - dismissVersionEnforcerIfPresent() — tests/smoke/splash.spec.ts:60-80.
- *
- * VersionEnforcer mitigation (W5 hard requirement, no soft-OR):
- *   The pre-existing app-level <ForceUpdateModal> can intercept clicks and pin its
- *   z-index above 9999 (Phase 175 D-17 / 177 CONTEXT D-28). beforeEach installs
- *   a defensive route-mock for any HTTP-based version check AND calls the DOM-
- *   side dismissal helper after page.goto.
  */
 
 /**
@@ -39,58 +33,6 @@ function collectConsoleErrors(page: Page): { errors: string[]; cleanup: () => vo
   };
   page.on('console', handler);
   return { errors, cleanup: () => page.off('console', handler) };
-}
-
-/**
- * Best-effort dismissal of the VersionEnforcer / ForceUpdateModal overlay
- * (Phase 175 known blocker per CONTEXT.md D-28). Verbatim copy of the helper
- * established in tests/smoke/splash.spec.ts:60-80 — this IS the canonical
- * analog (W5 hard requirement satisfied).
- */
-async function dismissVersionEnforcerIfPresent(page: Page): Promise<void> {
-  const overlay = page
-    .locator(
-      'text=/Aggiornamento Disponibile/i, [data-version-enforcer], [data-testid="version-enforcer"]'
-    )
-    .first();
-
-  if (await overlay.isVisible({ timeout: 500 }).catch(() => false)) {
-    const dismiss = page
-      .getByRole('button', { name: /aggiorna|ricarica|reload|chiudi|ignora|dismiss/i })
-      .first();
-    if (await dismiss.isVisible({ timeout: 200 }).catch(() => false)) {
-      await dismiss.click({ trial: false }).catch(() => undefined);
-    } else {
-      await page.keyboard.press('Escape').catch(() => undefined);
-    }
-  }
-}
-
-/**
- * Best-effort dismissal of the WhatsNewModal (`<h2>Novità!</h2>` heading) which
- * mounts via useVersionCheck() when localStorage.lastSeenVersion !== APP_VERSION.
- * In smoke mode each test gets a fresh storage state, so the modal mounts on
- * every cold-load and intercepts pointer events on top of the dashboard grid.
- *
- * Strategy: poll up to 4× over ~3s, since the hook fetches from Firebase async
- * and the modal can race the dashboard hydration. Each iteration: detect the
- * Radix dialog by role + heading, click the close button (aria-label "Chiudi")
- * or press Escape. Companion to dismissVersionEnforcerIfPresent.
- */
-async function dismissWhatsNewModalIfPresent(page: Page): Promise<void> {
-  for (let attempt = 0; attempt < 4; attempt++) {
-    const overlay = page.getByText('Novità!', { exact: true }).first();
-    const visible = await overlay.isVisible({ timeout: 750 }).catch(() => false);
-    if (!visible) return;
-    // Try the close (X) action first, then ESC, then click the overlay backdrop.
-    const closeBtn = page.getByRole('button', { name: /chiudi/i }).first();
-    if (await closeBtn.isVisible({ timeout: 150 }).catch(() => false)) {
-      await closeBtn.click({ force: true, trial: false }).catch(() => undefined);
-    } else {
-      await page.keyboard.press('Escape').catch(() => undefined);
-    }
-    await overlay.waitFor({ state: 'hidden', timeout: 1500 }).catch(() => undefined);
-  }
 }
 
 /** 8 interactive cards (DASH-11 positive). */
@@ -123,57 +65,10 @@ const ALL_CARDS: string[] = [
 ];
 
 test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
-  // HARD MITIGATION (W5 fix — no soft-OR fallback):
-  //   1. Defensive route-mock — short-circuits any HTTP-based version check
-  //      BEFORE page.goto so the modal cannot mount from an /api/version probe.
-  //      This is a no-op when the canonical app reads from Firebase RTDB
-  //      (current implementation per app/context/VersionContext.tsx) but stays
-  //      defensive against future refactors.
-  //   2. DOM-side dismissal helper — handles the modal that VersionContext
-  //      may mount during the initial subscription tick.
   test.beforeEach(async ({ page }) => {
-    await page.route('**/api/version*', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ version: '99.99.99' }),
-      })
-    );
-    // Pre-populate localStorage to suppress the WhatsNewModal cold-load mount
-    // (useVersionCheck() — keys: lastSeenVersion + dismissedVersions). Without
-    // this, the changelog Radix dialog overlays the dashboard and intercepts
-    // every pointer click in DASH-11 assertions.
-    //
-    // The hook gates on `lastSeen !== APP_VERSION && !dismissed.includes(APP_VERSION)`
-    // (see useVersionCheck.ts:68). Setting both to a high sentinel (covers any
-    // future bumps) plus a wildcard dismissal of every plausible runtime APP_VERSION
-    // ensures the modal stays suppressed regardless of what `lib/version.ts` exports.
-    await page.addInitScript(() => {
-      try {
-        // Sentinel matches/exceeds any plausible APP_VERSION; also match the
-        // route-mock semver above so `getLatestVersion()` Firebase responses
-        // are out-classed even if the comparator runs.
-        window.localStorage.setItem('lastSeenVersion', '99.99.99');
-        // Pre-dismiss a wide range of versions so `dismissed.includes(APP_VERSION)`
-        // returns true for any 1.x.x or 99.x.x APP_VERSION the bundled lib/version.ts
-        // exports. Cheap defensive list.
-        const dismissed = [
-          '99.99.99',
-          '1.77.0', '1.77.1', '1.77.2',
-          '1.78.0', '1.79.0', '1.80.0',
-          '2.0.0',
-        ];
-        window.localStorage.setItem('dismissedVersions', JSON.stringify(dismissed));
-      } catch {
-        // localStorage may be unavailable in some Playwright contexts — no-op.
-      }
-    });
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    // Defensive: even with localStorage primed, race conditions around hydration
-    // can leave the modal briefly mounted; dismiss it before measuring the grid.
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
     // Wait for at least one dashboard card to render so subsequent assertions
     // do not race the async server component hydration.
     await expect(page.locator('.grid.grid-cols-2').first()).toBeVisible({ timeout: 15000 });
@@ -259,13 +154,9 @@ test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
 // and that an interactive control fires the expected API endpoint via a
 // page.route() mock. Reuses (verbatim):
 //   - collectConsoleErrors (lines 30-42)
-//   - dismissVersionEnforcerIfPresent (lines 50-67)
-//   - dismissWhatsNewModalIfPresent (lines 80-94)
 //
-// Mocking strategy mirrors the Phase 177 beforeEach (lines 134-180) — defensive
-// route-mock + DOM dismissal + storageState pre-prime. Each describe owns its
-// own beforeEach because Playwright route-mocks are per-context and do not
-// inherit across describe blocks. The login storageState is reused via the global
+// Each describe owns its own beforeEach because Playwright route-mocks are
+// per-context and do not inherit across describe blocks. The login storageState is reused via the global
 // playwright.config.ts setup; no per-describe login flow needed.
 //
 // Endpoint URLs verified against the live command hooks at runtime:
@@ -275,36 +166,6 @@ test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
 //   useSonosCommands.handlePlay/handlePause → POST /api/v1/sonos/zones/{id}/play|pause
 //   useTuyaCommands.togglePlug       → POST /api/tuya/plugs/{id}/state
 // ============================================================================
-
-/**
- * Shared pre-goto setup mirroring the Phase 177 describe-level beforeEach
- * (lines 134-180). Each SHEET-* describe calls this BEFORE goto + dismissals.
- * Pre-primes localStorage to suppress WhatsNewModal + installs a defensive
- * version-check route mock so the changelog dialog cannot intercept clicks.
- */
-async function primeDashboardForSheetTest(page: Page): Promise<void> {
-  await page.route('**/api/version*', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify({ version: '99.99.99' }),
-    })
-  );
-  await page.addInitScript(() => {
-    try {
-      window.localStorage.setItem('lastSeenVersion', '99.99.99');
-      const dismissed = [
-        '99.99.99',
-        '1.77.0', '1.77.1', '1.77.2',
-        '1.78.0', '1.79.0', '1.80.0',
-        '2.0.0',
-      ];
-      window.localStorage.setItem('dismissedVersions', JSON.stringify(dismissed));
-    } catch {
-      // localStorage may be unavailable in some Playwright contexts — no-op.
-    }
-  });
-}
 
 test.describe('SHEET-02 StoveSheet wires command', () => {
   let powerRequests: string[];
@@ -324,11 +185,9 @@ test.describe('SHEET-02 StoveSheet wires command', () => {
         powerRequests.push(req.url());
       }
     });
-    await primeDashboardForSheetTest(page);
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
   });
 
   test('clicking + on power stepper fires Thermorossi setPower command', async ({ page }) => {
@@ -370,11 +229,9 @@ test.describe('SHEET-03 ClimateSheet wires command', () => {
         setpointRequests.push({ url: req.url(), body: req.postData() ?? '' });
       }
     });
-    await primeDashboardForSheetTest(page);
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
   });
 
   test('clicking + on RadialDial then Applica fires setroomthermpoint', async ({ page }) => {
@@ -418,11 +275,9 @@ test.describe('SHEET-04 LightsSheet wires command', () => {
         hueRequests.push(req.url());
       }
     });
-    await primeDashboardForSheetTest(page);
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
   });
 
   test('clicking Tutte off fires hue group action endpoint', async ({ page }) => {
@@ -473,11 +328,9 @@ test.describe('SHEET-05 SonosSheet wires command', () => {
         sonosRequests.push(u);
       }
     });
-    await primeDashboardForSheetTest(page);
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
   });
 
   test('clicking play/pause on first group row fires sonos zones endpoint', async ({ page }) => {
@@ -527,11 +380,9 @@ test.describe('SHEET-06 PlugsSheet wires command', () => {
         tuyaRequests.push(req.url());
       }
     });
-    await primeDashboardForSheetTest(page);
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
-    await dismissVersionEnforcerIfPresent(page);
-    await dismissWhatsNewModalIfPresent(page);
+    await waitForHydration(page);
   });
 
   test('DASH-10 / SHEET-06 cross-check — TuyaCard dashboard tile has NO toggle', async ({ page }) => {

@@ -158,9 +158,6 @@ npm run test:watch       # Watch mode
 npm run test:coverage    # Coverage report
 npm run test:ci          # CI mode
 
-# Firebase
-node -e "require('./lib/changelogService').syncVersionHistoryToFirebase(require('./lib/version').VERSION_HISTORY)"
-
 # Debugging
 find app -name "*.js" -exec grep -l "useState" {} \;  # Find client components
 ```
@@ -241,7 +238,7 @@ npm test -- --clearCache
 - [Architecture](./architecture.md) - Understand project structure
 - [API Routes](./api-routes.md) - API documentation
 - [UI Components](./ui-components.md) - Component library
-- [Versioning](./versioning.md) - Version management workflow
+- [Versioning](./versioning.md) - Build commit as release id
 - [Troubleshooting](./troubleshooting.md) - Common issues
 
 ## Resources

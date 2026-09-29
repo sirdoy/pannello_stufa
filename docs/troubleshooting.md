@@ -41,9 +41,7 @@ naviga a `safeReturnTo(returnTo)` dopo il login.
 
 | Problema | Check | Fix |
 |----------|-------|-----|
-| ForceUpdateModal sempre visibile | `window.location.hostname` (dev?) | Modal disabilitata su localhost |
-| Badge NEW non appare | `localStorage.getItem('lastSeenVersion')` | `localStorage.removeItem('lastSeenVersion')` |
-| Versioni ordine sbagliato | Ordine Firebase (date) | Applica `sortVersions()` dopo fetch |
+| Banner "nuova versione" non appare dopo deploy | `GET /api/version` vs `NEXT_PUBLIC_BUILD_ID` | In locale il build id è `dev`: banner disattivato |
 
 ---
 

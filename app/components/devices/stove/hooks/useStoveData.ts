@@ -36,8 +36,6 @@ import { WS_SNAPSHOT_GRACE_MS } from '@/lib/ws/snapshotGrace';
  * Parameters required by useStoveData
  */
 export interface UseStoveDataParams {
-  /** checkVersion function from VersionContext */
-  checkVersion: () => Promise<void>;
   /** User ID (session sub) (for notifications) */
   userId?: string;
 }
@@ -103,9 +101,7 @@ export interface UseStoveDataReturn {
  * @param params - Configuration parameters
  * @returns All stove state and actions
  */
-export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
-  const { checkVersion } = params;
-
+export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataReturn {
   // PWA hooks
   const { isOnline } = useOnlineStatus();
   const { hasPendingCommands, pendingCommands, lastSyncedCommand } = useBackgroundSync();
@@ -192,8 +188,6 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
   fetchSchedulerModeRef.current = fetchSchedulerMode;
   const fetchMaintenanceStatusRef = useRef(fetchMaintenanceStatus);
   fetchMaintenanceStatusRef.current = fetchMaintenanceStatus;
-  const checkVersionRef = useRef(checkVersion);
-  checkVersionRef.current = checkVersion;
 
   // WS subscription: primary data channel (MIG-01)
   useEffect(() => {
@@ -237,7 +231,6 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
       // Trigger side-fetches via refs to avoid stale closure (per D-06, D-07)
       void fetchSchedulerModeRef.current();
       void fetchMaintenanceStatusRef.current();
-      void checkVersionRef.current();
     };
 
     subscribe('thermorossi', handleMessage);
@@ -284,7 +277,6 @@ export function useStoveData(params: UseStoveDataParams): UseStoveDataReturn {
 
       await fetchSchedulerMode();
       await fetchMaintenanceStatus();
-      await checkVersion();
     } catch (err) {
       console.error('Errore stato:', err);
       setStatus('off');

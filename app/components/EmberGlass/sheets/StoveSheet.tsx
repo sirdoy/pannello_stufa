@@ -44,7 +44,6 @@ import {
   useStoveCommands,
   type UseStoveCommandsReturn,
 } from '@/app/components/devices/stove/hooks/useStoveCommands';
-import { useVersion } from '@/app/context/VersionContext';
 import { FlameViz } from '../FlameViz';
 import { SheetRow } from './primitives/SheetRow';
 import { Stepper } from './primitives/Stepper';
@@ -276,9 +275,8 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
  */
 export function StoveSheetSelfFetch() {
   const router = useRouter();
-  const { checkVersion } = useVersion();
   const { user } = useUser();
-  const stoveData = useStoveData({ checkVersion, userId: user?.sub });
+  const stoveData = useStoveData({ userId: user?.sub });
   const cmds = useStoveCommands({
     stoveData: {
       setLoading: stoveData.setLoading,

@@ -22,10 +22,6 @@ jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'auth0|test-user' } }),
 }));
 
-jest.mock('@/app/context/VersionContext', () => ({
-  useVersion: () => ({ checkVersion: jest.fn() }),
-}));
-
 // --- Device hook mocks -----------------------------------------------
 jest.mock('@/app/components/devices/stove/hooks/useStoveData', () => ({
   useStoveData: jest.fn(() => ({

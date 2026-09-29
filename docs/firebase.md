@@ -5,6 +5,7 @@ Firebase Realtime Database: schema, operazioni e sicurezza.
 ## Overview
 
 Dati gestiti:
+
 - **Scheduler**: Pianificazioni settimanali
 - **Maintenance**: Tracking ore stufa
 - **Logs/Errors**: Storico azioni e errori
@@ -29,7 +30,7 @@ const path = getEnvironmentPath('netatmo/refresh_token');
 
 ## Schema
 
-```
+```text
 firebase-root/
 ├── dev/                       # Development namespace
 ├── stoveScheduler/
@@ -39,7 +40,7 @@ firebase-root/
 ├── cronHealth/lastCall        # ISO UTC string
 ├── log/{logId}/               # action, device, timestamp, source, user
 ├── errors/{errorId}/          # errorCode, severity, resolved, timestamp
-├── changelog/{version}/       # version, date, type, changes
+├── changelog/{version}/       # legacy, non più usato (M36)
 ├── users/{userId}/
 │   ├── fcmTokens/             # FCM tokens per device
 │   └── notificationPreferences/
@@ -137,7 +138,7 @@ await runTransaction(ref(db, 'maintenance'), (current) => {
 | `stove/state` | Stove real-time state |
 | `maintenance` | Card manutenzione |
 | `log`, `errors` | Storico |
-| `changelog` | Version check |
+| `changelog` | Legacy, non più letto (M36) |
 | `netatmo/currentStatus, topology, deviceConfig` | ThermostatCard |
 | `hue/lights, groups` | LightsCard |
 
@@ -160,6 +161,7 @@ firebase deploy --only database
 ```
 
 Verifica nel **Rules Playground**:
+
 - `cronHealth/lastCall` READ → ALLOW
 - `users/*/fcmTokens` READ → DENY
 

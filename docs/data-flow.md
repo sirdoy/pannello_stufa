@@ -51,13 +51,11 @@ Vedi [Systems - Notifications](./systems/notifications.md).
 ## Version Check
 
 ```text
-StoveCard polling (5s)
+useNewVersion (poll GET /api/version)
   ↓
-checkVersion()
+Compare FRONTEND_BUILD_ID / backend commit vs deployed
   ↓
-Compare APP_VERSION vs Firebase
-  ↓
-If outdated: show ForceUpdateModal
+If changed: show NewVersionBanner (reload)
 ```
 
 Vedi [Versioning](./versioning.md).

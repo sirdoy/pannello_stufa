@@ -432,17 +432,13 @@ Hook per notifica soft nuove versioni.
 
 **Implementazione**: `app/hooks/useVersionCheck.js`
 
-### useVersion (Hard Enforcement)
+### useNewVersion (reload dopo deploy)
 
-Context hook per enforcement versione obbligatoria.
+Confronta il commit della build in esecuzione con `GET /api/version` e mostra `NewVersionBanner` quando il frontend
+o il backend deployati cambiano (M17). Il vecchio enforcement semver su Firebase (`VersionContext`,
+`ForceUpdateModal`) è stato rimosso con M36.
 
-**Features**:
-
-- Global context state
-- On-demand check ogni 5s (integrato in polling)
-- ForceUpdateModal bloccante SOLO se versione locale < Firebase
-
-**Implementazione**: `app/context/VersionContext.js`
+**Implementazione**: `lib/hooks/useNewVersion.ts`, `lib/buildVersion.ts`
 
 ## Authentication Middleware
 

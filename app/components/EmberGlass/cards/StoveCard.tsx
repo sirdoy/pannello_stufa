@@ -37,20 +37,18 @@ import { GlassCardSkeleton } from '../GlassCardSkeleton';
 import { useCardReady } from '../useCardReady';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
-import { useVersion } from '@/app/context/VersionContext';
 
 const WARN = '#ffb84a';
 
 export default function StoveCard() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const { checkVersion } = useVersion();
   const { user } = useUser();
   // Hook lifted from StoveSheet body to this card (260506-d45 Fix B): the
   // sheet was previously calling useStoveData/useStoveCommands too, doubling
   // the WS subscription + adaptive-polling cost on every open. Now the card
   // owns the single mount and threads the live data into the sheet via props.
-  const stove = useStoveData({ checkVersion, userId: user?.sub });
+  const stove = useStoveData({ userId: user?.sub });
   const cmds = useStoveCommands({
     stoveData: {
       setLoading: stove.setLoading,

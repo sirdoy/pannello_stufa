@@ -7,7 +7,6 @@
  * Self-fetches via useStoveData + useStoveCommands (D-39 per-body self-fetch pattern).
  *
  * Critical pitfalls observed:
- * - useStoveData requires { checkVersion, userId } (RESEARCH Pitfall 9)
  * - Target chip shows powerLevel/5 — no temp/target fields on live hook (RESEARCH Pitfall 1)
  * - Power level clamped 1..5 before dispatch (T-179-05-01 mitigate)
  * - handleIgnite gated on !needsCleaning (Phase 178 D-05)
@@ -18,7 +17,6 @@
 import { useRouter } from 'next/navigation';
 import { Minus, Plus, Power } from 'lucide-react';
 import { useUser } from '@/lib/auth/useUser';
-import { useVersion } from '@/app/context/VersionContext';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
 import { StatChip } from '../primitives/StatChip';
@@ -28,9 +26,8 @@ import type { RoomDevice } from '../types';
 
 export function StoveBody({ device }: { device: RoomDevice }){
   const router = useRouter();
-  const { checkVersion } = useVersion();
   const { user } = useUser();
-  const stoveData = useStoveData({ checkVersion, userId: user?.sub });
+  const stoveData = useStoveData({ userId: user?.sub });
 
   const cmds = useStoveCommands({
     stoveData: {

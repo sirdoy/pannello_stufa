@@ -27,10 +27,6 @@ jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'auth0|test' } }),
 }));
 
-jest.mock('@/app/context/VersionContext', () => ({
-  useVersion: () => ({ checkVersion: jest.fn() }),
-}));
-
 // --- Stove command mocks ------------------------------------------------
 const mockHandleIgnite = jest.fn().mockResolvedValue(undefined);
 const mockHandleShutdown = jest.fn().mockResolvedValue(undefined);

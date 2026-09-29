@@ -17,7 +17,7 @@ npm run test:e2e:ui       # E2E con UI interattiva
 
 ### Struttura
 
-```
+```text
 ├── lib/__tests__/              # Utility functions
 ├── app/components/ui/__tests__/ # Componenti UI
 ├── app/hooks/__tests__/        # Custom hooks
@@ -189,7 +189,6 @@ await testPageWithTheme(context, 'http://localhost:3000/new-page', 'newpage', 'd
 
 ## Limitazioni Note
 
-- **VersionContext**: 7 test con limitazioni JSDOM (`window.location`)
 - **Server Components**: Non testabili con Jest (usa E2E)
 - **Firebase**: Completamente mockato (no real DB)
 

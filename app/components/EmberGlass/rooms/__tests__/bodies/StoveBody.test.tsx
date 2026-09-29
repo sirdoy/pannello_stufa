@@ -77,10 +77,6 @@ jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'user-123' } }),
 }));
 
-jest.mock('@/app/context/VersionContext', () => ({
-  useVersion: () => ({ checkVersion: jest.fn() }),
-}));
-
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
 }));

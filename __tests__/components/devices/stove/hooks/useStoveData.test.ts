@@ -36,7 +36,6 @@ jest.mock('@/lib/hooks/useAdaptivePolling', () => ({
 }));
 
 describe('useStoveData', () => {
-  const mockCheckVersion = jest.fn().mockResolvedValue(undefined);
   const mockUserId = 'user123';
 
   let mockSubscribe: jest.Mock;
@@ -121,7 +120,6 @@ describe('useStoveData', () => {
   it('returns initialLoading true on first render', () => {
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -132,7 +130,6 @@ describe('useStoveData', () => {
   it('calls fetch for status on mount', async () => {
     renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -145,7 +142,6 @@ describe('useStoveData', () => {
   it('does not call /stove/getFan or /stove/getPower endpoints', async () => {
     renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -172,7 +168,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -199,7 +194,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -226,7 +220,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -253,7 +246,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -280,7 +272,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -308,7 +299,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -335,7 +325,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -361,7 +350,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -387,7 +375,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -413,7 +400,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -439,7 +425,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -467,7 +452,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -493,7 +477,6 @@ describe('useStoveData', () => {
 
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -506,7 +489,6 @@ describe('useStoveData', () => {
   it('exposes fetchStatusAndUpdate function', () => {
     const { result } = renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -532,7 +514,6 @@ describe('useStoveData', () => {
 
     renderHook(() =>
       useStoveData({
-        checkVersion: mockCheckVersion,
         userId: mockUserId,
       })
     );
@@ -546,19 +527,6 @@ describe('useStoveData', () => {
           source: 'status_monitor',
         })
       );
-    });
-  });
-
-  it('calls checkVersion on status fetch', async () => {
-    renderHook(() =>
-      useStoveData({
-        checkVersion: mockCheckVersion,
-        userId: mockUserId,
-      })
-    );
-
-    await waitFor(() => {
-      expect(mockCheckVersion).toHaveBeenCalled();
     });
   });
 
@@ -576,7 +544,7 @@ describe('useStoveData', () => {
     const statusCalls = () =>
       jest.mocked(global.fetch).mock.calls.filter(([url]) => String(url).includes('status')).length;
 
-    renderHook(() => useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId }));
+    renderHook(() => useStoveData({ userId: mockUserId }));
 
     await waitFor(() => expect(statusCalls()).toBeGreaterThan(0));
     const settled = statusCalls();
@@ -599,7 +567,7 @@ describe('useStoveData', () => {
       });
 
       renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       expect(mockSubscribe).toHaveBeenCalled();
@@ -614,7 +582,7 @@ describe('useStoveData', () => {
       });
 
       renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       expect(lastPollingOpts).not.toBeNull();
@@ -624,7 +592,7 @@ describe('useStoveData', () => {
     it('activates polling (interval=60000) when readyState is CLOSED', () => {
       // Default mock is CLOSED
       renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       expect(lastPollingOpts).not.toBeNull();
@@ -640,7 +608,7 @@ describe('useStoveData', () => {
       });
 
       const { unmount } = renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
       expect(lastPollingOpts.alwaysActive).toBe(true);
       unmount();
@@ -653,7 +621,7 @@ describe('useStoveData', () => {
       });
 
       renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
       expect(lastPollingOpts.alwaysActive).toBe(true);
     });
@@ -666,7 +634,7 @@ describe('useStoveData', () => {
           unsubscribe: mockUnsubscribe,
           readyState: ReadyState.OPEN,
         });
-        renderHook(() => useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId }));
+        renderHook(() => useStoveData({ userId: mockUserId }));
         expect(global.fetch).not.toHaveBeenCalledWith(expect.stringContaining('/api/v1/thermorossi/status'));
         await act(async () => {
           jest.advanceTimersByTime(1500);
@@ -689,7 +657,7 @@ describe('useStoveData', () => {
           unsubscribe: mockUnsubscribe,
           readyState: ReadyState.OPEN,
         });
-        renderHook(() => useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId }));
+        renderHook(() => useStoveData({ userId: mockUserId }));
         await act(async () => {
           capturedCallback?.({
             stove_state: 'working',
@@ -723,7 +691,7 @@ describe('useStoveData', () => {
       });
 
       const { result } = renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       await act(async () => {
@@ -756,7 +724,7 @@ describe('useStoveData', () => {
       });
 
       const { result } = renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       await act(async () => {
@@ -794,7 +762,7 @@ describe('useStoveData', () => {
       });
 
       const { result } = renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       // Initially still loading (no data yet)
@@ -815,7 +783,7 @@ describe('useStoveData', () => {
       expect(result.current.initialLoading).toBe(false);
     });
 
-    it('triggers side-fetches (scheduler, maintenance, checkVersion) on WS message', async () => {
+    it('triggers side-fetches (scheduler, maintenance) on WS message', async () => {
       let capturedCallback: ((data: unknown) => void) | null = null;
       mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
         capturedCallback = cb;
@@ -833,7 +801,7 @@ describe('useStoveData', () => {
       });
 
       renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       // Clear mocks from any previous calls
@@ -870,8 +838,7 @@ describe('useStoveData', () => {
       await waitFor(() => {
         expect(schedulerService.getFullSchedulerMode).toHaveBeenCalled();
         expect(maintenanceService.getMaintenanceStatus).toHaveBeenCalled();
-        expect(mockCheckVersion).toHaveBeenCalled();
-      });
+        });
     });
 
     it('handles alarm state from WS message: sets errorCode and errorDescription', async () => {
@@ -887,7 +854,7 @@ describe('useStoveData', () => {
       });
 
       const { result } = renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       await act(async () => {
@@ -914,7 +881,7 @@ describe('useStoveData', () => {
       });
 
       const { unmount } = renderHook(() =>
-        useStoveData({ checkVersion: mockCheckVersion, userId: mockUserId })
+        useStoveData({ userId: mockUserId })
       );
 
       unmount();

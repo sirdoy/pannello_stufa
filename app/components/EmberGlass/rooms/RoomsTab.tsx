@@ -3,7 +3,7 @@
  * RoomsTab — Phase 179 (Plan 179-08 / ROOMS-01 / CONTEXT D-41..D-44)
  *
  * Top-level orchestrator for the /stanze route.
- * - Calls 5 device-data hooks + useUser + useVersion
+ * - Calls 5 device-data hooks + useUser
  * - Builds AggregatorState literal per RESEARCH §Aggregator Reconciliation (Pitfalls 1-9)
  * - Owns selectedRoomName state; renders 6 RoomCards + 1 shared RoomSheet
  * - <RoomSheet key={selectedRoomName ?? 'closed'}> remounts on room change (RESEARCH §Pattern 4)
@@ -14,7 +14,6 @@
 
 import { useState } from 'react';
 import { useUser } from '@/lib/auth/useUser';
-import { useVersion } from '@/app/context/VersionContext';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
@@ -29,10 +28,8 @@ import type { AggregatorState } from './types';
 export function RoomsTab(){
   const [selectedRoomName, setSelectedRoomName] = useState<string | null>(null);
 
-  // Pitfall 9: useStoveData requires { checkVersion, userId }
-  const { checkVersion } = useVersion();
   const { user } = useUser();
-  const stove = useStoveData({ checkVersion, userId: user?.sub });
+  const stove = useStoveData({ userId: user?.sub });
 
   const thermostat = useThermostatData();
   const lights = useLightsData();

@@ -1,7 +1,6 @@
 'use client';
 
 import { UserProvider } from '@/lib/auth/useUser';
-import { VersionProvider } from '@/app/context/VersionContext';
 import NewVersionBanner from './NewVersionBanner';
 import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 import { ToastProvider } from '@/app/components/ui';
@@ -59,18 +58,16 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
       <WebSocketContext.Provider value={wsManager}>
         <OnlineStatusProvider>
           <PageTransitionProvider>
-            <VersionProvider>
-              <ToastProvider>
-                <CommandPaletteProvider>
-                  <AxeDevtools />
-                  <PWAInitializer />
-                  <OfflineBanner fixed showPendingCount />
-                  {!onAuthPage && <NewVersionBanner />}
-                  <SplashGate>{children}</SplashGate>
-                  <InstallPrompt />
-                </CommandPaletteProvider>
-              </ToastProvider>
-            </VersionProvider>
+            <ToastProvider>
+              <CommandPaletteProvider>
+                <AxeDevtools />
+                <PWAInitializer />
+                <OfflineBanner fixed showPendingCount />
+                {!onAuthPage && <NewVersionBanner />}
+                <SplashGate>{children}</SplashGate>
+                <InstallPrompt />
+              </CommandPaletteProvider>
+            </ToastProvider>
           </PageTransitionProvider>
         </OnlineStatusProvider>
       </WebSocketContext.Provider>

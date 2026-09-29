@@ -3,7 +3,6 @@ import './globals.css';
 import { outfit, inter } from './fonts';
 import { WebVitals } from './_components/WebVitals';
 import ClientProviders from './components/ClientProviders';
-import VersionEnforcer from './components/VersionEnforcer';
 import AppleSplashScreens from './components/AppleSplashScreens';
 import AmbientBg from './components/EmberGlass/AmbientBg';
 import { BottomTabBar } from './components/EmberGlass';
@@ -67,7 +66,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
     <ClientProviders>
       <WebVitals />
-      <VersionEnforcer />
       <NavbarConnectionStatusChip />
       <main
         id="main-content"

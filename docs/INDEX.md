@@ -55,7 +55,7 @@ Indice documentazione Pannello Stufa. **Ottimizzato per token efficiency**.
 | [pwa.md](pwa.md) | Serwist, offline, Background Sync |
 | [testing.md](testing.md) | Unit + E2E tests |
 | [sandbox.md](sandbox.md) | Sandbox mode |
-| [versioning.md](versioning.md) | Semantic versioning |
+| [versioning.md](versioning.md) | Versione = commit della build |
 | [deployment.md](deployment.md) | Deploy workflow |
 
 ## Reference

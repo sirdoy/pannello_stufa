@@ -1,17 +1,9 @@
 /**
- * Application Version Management
+ * Application version history (archive).
  *
- * Update this file whenever significant changes are made to the application.
- *
- * Version format: MAJOR.MINOR.PATCH
- * - MAJOR: Breaking changes or major feature releases
- * - MINOR: New features, non-breaking changes
- * - PATCH: Bug fixes, minor improvements
- *
- * IMPORTANTE: Dopo ogni aggiornamento, sincronizzare con Firebase e CHANGELOG.md:
- * 1. Aggiorna APP_VERSION, LAST_UPDATE e VERSION_HISTORY
- * 2. Esegui script di sync: node scripts/syncChangelog.js (opzionale, sync automatico su deploy)
- * 3. Aggiorna CHANGELOG.md manualmente con le modifiche
+ * Semantic versioning stopped at 1.77.0 (2026-01-25) and is no longer bumped (ROADMAP M36):
+ * each deploy is identified by its build commit (lib/buildVersion.ts, M17), which also drives
+ * the "new version available" banner. /changelog renders VERSION_HISTORY from the bundle.
  */
 
 export interface VersionEntry {

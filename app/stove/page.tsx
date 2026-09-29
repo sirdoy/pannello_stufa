@@ -14,7 +14,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/auth/useUser';
-import { useVersion } from '@/app/context/VersionContext';
 import { Heading, Skeleton, LoadingOverlay, Toast } from '@/app/components/ui';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
@@ -27,11 +26,10 @@ import StovePageNavigation from './components/StovePageNavigation';
 
 export default function StovePage() {
   const router = useRouter();
-  const { checkVersion } = useVersion();
   const { user } = useUser();
 
   // Reuse StoveCard hooks - SAME state management and polling via useAdaptivePolling
-  const stoveData = useStoveData({ checkVersion, userId: user?.sub });
+  const stoveData = useStoveData({ userId: user?.sub });
   const commands = useStoveCommands({
     stoveData: {
       setLoading: stoveData.setLoading,

@@ -36,9 +36,6 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'test-user' } }),
 }));
-jest.mock('@/app/context/VersionContext', () => ({
-  useVersion: () => ({ checkVersion: jest.fn() }),
-}));
 // Mock the real StoveSheet body (Phase 178-09 swap; 260506-d45 props lifted)
 // so the card-level test does not exercise StoveSheet's render branch. The
 // stub ignores all props (it now receives stoveData/cmds/onNavigate from the

@@ -1,18 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { getChangelogFromFirebase } from '@/lib/changelogService';
-import { VERSION_HISTORY, APP_VERSION, VersionEntry } from '@/lib/version';
-import { Card, Skeleton, Heading, Text, StatusBadge, Divider } from '@/app/components/ui';
+import { useState } from 'react';
+import { VERSION_HISTORY, APP_VERSION } from '@/lib/version';
+import { FRONTEND_BUILD_ID } from '@/lib/buildVersion';
+import { Card, Heading, Text, StatusBadge, Divider } from '@/app/components/ui';
 
 const ITEMS_PER_PAGE = 10;
 
-type Source = 'local' | 'firebase';
+/** Short commit of the running build ("dev" locally) */
+const BUILD_LABEL = FRONTEND_BUILD_ID === 'dev' ? 'dev' : FRONTEND_BUILD_ID.slice(0, 7);
 
 export default function ChangelogPage() {
-  const [changelog, setChangelog] = useState<VersionEntry[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [source, setSource] = useState<Source>('local');
+  // Semantic versioning stopped at APP_VERSION (M36): the history is a bundled archive,
+  // deploys are identified by the build commit (M17)
+  const changelog = VERSION_HISTORY;
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   // Pagination calculations
@@ -25,46 +26,6 @@ export default function ChangelogPage() {
     setCurrentPage(page);
     // Scroll to top of timeline
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    const fetchChangelog = async (): Promise<void> => {
-      try {
-        // Prova prima Firebase
-        const firebaseChangelog = await getChangelogFromFirebase();
-
-        if (firebaseChangelog.length > 0) {
-          // Ordina per versione semantica decrescente
-          const sorted = sortVersions(firebaseChangelog);
-          setChangelog(sorted);
-          setSource('firebase');
-        } else {
-          // Fallback a VERSION_HISTORY locale (già ordinato)
-          setChangelog(VERSION_HISTORY);
-          setSource('local');
-        }
-      } catch (error) {
-        console.error('Errore caricamento changelog:', error);
-        setChangelog(VERSION_HISTORY);
-        setSource('local');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchChangelog();
-  }, []);
-
-  // Ordina versioni in modo semantico decrescente
-  const sortVersions = (versions: VersionEntry[]): VersionEntry[] => {
-    return [...versions].sort((a, b) => {
-      const [aMajor = 0, aMinor = 0, aPatch = 0] = a.version.split('.').map(Number);
-      const [bMajor = 0, bMinor = 0, bPatch = 0] = b.version.split('.').map(Number);
-
-      if (bMajor !== aMajor) return bMajor - aMajor;
-      if (bMinor !== aMinor) return bMinor - aMinor;
-      return bPatch - aPatch;
-    });
   };
 
   // Version type configuration with proper dark-first styling
@@ -94,14 +55,6 @@ export default function ChangelogPage() {
 
   const getConfig = (type?: string) => versionConfig[type as keyof typeof versionConfig] || versionConfig.patch;
 
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto">
-        <Skeleton.Changelog />
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
       {/* Header Card */}
@@ -122,24 +75,17 @@ export default function ChangelogPage() {
                 </div>
               </div>
               <Text variant="secondary" size="sm" className="max-w-md">
-                Tutte le modifiche, nuove funzionalità e fix dell&apos;applicazione.
+                Storico delle versioni fino alla v{APP_VERSION}. Da allora ogni rilascio è identificato dal commit
+                della build.
               </Text>
             </div>
 
-            {/* Current Version Badge */}
+            {/* Current Build Badge */}
             <div className="flex flex-col items-start sm:items-end gap-2">
-              <Text variant="label" size="xs">Versione Corrente</Text>
-              <div className="flex items-center gap-2">
-                <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/25">
-                  <Text as="span" variant="body" size="xl" className="!text-white">
-                    v{APP_VERSION}
-                  </Text>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                <div className={`w-2 h-2 rounded-full ${source === 'firebase' ? 'bg-sage-500' : 'bg-ocean-500'}`} />
-                <Text variant="tertiary" size="xs">
-                  {source === 'firebase' ? 'Sincronizzato' : 'Locale'}
+              <Text variant="label" size="xs">Build Corrente</Text>
+              <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/25">
+                <Text as="span" variant="body" size="xl" className="!text-white font-mono">
+                  {BUILD_LABEL}
                 </Text>
               </div>
             </div>
@@ -178,7 +124,7 @@ export default function ChangelogPage() {
                           size="sm"
                         />
 
-                        {/* Latest badge */}
+                        {/* Last versioned release */}
                         {isLatest && (
                           <span className="px-2.5 py-1 text-xs font-bold font-display rounded-full bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/30 animate-pulse-ember">
                             LATEST

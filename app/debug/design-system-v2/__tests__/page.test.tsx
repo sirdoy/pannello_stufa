@@ -24,10 +24,6 @@ jest.mock('@/lib/auth/useUser', () => ({
   useUser: () => ({ user: { sub: 'auth0|test-182' }, isLoading: false, error: undefined }),
 }));
 
-jest.mock('@/app/context/VersionContext', () => ({
-  useVersion: () => ({ checkVersion: jest.fn(), version: 'test' }),
-}));
-
 jest.mock('@/app/components/devices/stove/hooks/useStoveData', () => ({
   useStoveData: () => ({
     isAccesa: false,

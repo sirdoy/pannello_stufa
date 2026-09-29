@@ -23,7 +23,7 @@ npm run lint
 ## Rules
 
 1. **NEVER** break existing functionality
-2. **WAIT** for user confirmation before version updates
+2. **NO** version bumps: `lib/version.ts` is an archive, releases are identified by the build commit (M36)
 3. **PREFER** editing existing files over creating new
 4. **ALWAYS** run `npm run build` right before a commit (and only then: never during development or verification);
    a failing build blocks the commit and push. Enforced by the workspace hook
@@ -65,7 +65,7 @@ Il cron esterno `/api/scheduler/check` non c'è più (ROADMAP V12: calibrazione 
 token FCM dopo eventi e registrazioni); il banner della pagina stufa guarda il battito del motore sul Pi
 (`SchedulerEngineBanner`).
 
-**Firebase** (RTDB + FCM) resta per: log/errori, changelog, preferenze e token FCM utenti, rate limiter, cache. I dati
+**Firebase** (RTDB + FCM) resta per: log/errori, preferenze e token FCM utenti, rate limiter, cache. I dati
 live dei device vengono dal backend.
 
 ## Docs
@@ -111,4 +111,4 @@ export const dynamic = 'force-dynamic';
 
 ---
 
-**v20.0 Ember Glass** (app 1.77.0) | GSD in `.planning/`
+**v20.0 Ember Glass** | versione = commit della build (semver fermo a 1.77.0, M36) | GSD in `.planning/`

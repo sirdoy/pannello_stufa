@@ -2,7 +2,6 @@
 
 import type React from 'react';
 import { useEffect } from 'react';
-// @ts-expect-error - react-dom types are available but strict mode check fails
 import { createPortal } from 'react-dom';
 import Button from './Button';
 import Card from './Card';

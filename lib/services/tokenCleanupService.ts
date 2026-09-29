@@ -5,11 +5,14 @@
  * Provides audit trail logging for compliance and monitoring.
  *
  * Used by:
- * - /api/scheduler/check (cron cleanup)
+ * - scheduleTokenCleanup() → maybeCleanupStaleTokens(): at most every 7 days, after
+ *   /api/internal/stove-events (Pi webhook) and /api/notifications/register
+ *   (workspace ROADMAP V11, no external cron)
  * - /api/notifications/cleanup (manual trigger)
  */
 
-import { getAdminDatabase, adminDbSet } from '@/lib/firebaseAdmin';
+import { after } from 'next/server';
+import { getAdminDatabase, adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 
 export interface CleanupResult {
@@ -184,4 +187,41 @@ export async function cleanupStaleTokens(): Promise<CleanupResult> {
       deletedTokens: [],
     };
   }
+}
+
+export const CLEANUP_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+const LAST_CLEANUP_PATH = 'cron/lastTokenCleanup';
+
+export type ThrottledCleanupResult =
+  | { ran: false; reason: 'too_soon'; next: string }
+  | { ran: false; reason: 'exception'; error: string }
+  | ({ ran: true } & CleanupResult);
+
+/**
+ * Run cleanupStaleTokens() when 7 days have passed since the last successful run.
+ *
+ * The timestamp lives at `cron/lastTokenCleanup` (same path the old external cron
+ * used) and advances only when the cleanup succeeds, so a failure is retried on the
+ * next call. Never throws: callers run it in `after()` of unrelated requests.
+ */
+export async function maybeCleanupStaleTokens(): Promise<ThrottledCleanupResult> {
+  try {
+    const statePath = getEnvironmentPath(LAST_CLEANUP_PATH);
+    const last = await adminDbGet<number>(statePath);
+    const now = Date.now();
+    if (last && now - last < CLEANUP_INTERVAL_MS) {
+      return { ran: false, reason: 'too_soon', next: new Date(last + CLEANUP_INTERVAL_MS).toISOString() };
+    }
+    const result = await cleanupStaleTokens();
+    if (result.cleaned) await adminDbSet(statePath, now);
+    return { ran: true, ...result };
+  } catch (error) {
+    console.error('Throttled token cleanup failed:', error);
+    return { ran: false, reason: 'exception', error: error instanceof Error ? error.message : String(error) };
+  }
+}
+
+/** Queue maybeCleanupStaleTokens() to run after the current route handler responds. */
+export function scheduleTokenCleanup(): void {
+  after(maybeCleanupStaleTokens);
 }

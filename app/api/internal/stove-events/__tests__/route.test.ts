@@ -9,8 +9,11 @@ jest.mock('@/lib/notifications/stoveEvents', () => ({
   dispatchStoveEvent: jest.fn().mockResolvedValue({ success: true }),
 }));
 
+jest.mock('@/lib/services/tokenCleanupService', () => ({ scheduleTokenCleanup: jest.fn() }));
+
 import { POST } from '../route';
 import { dispatchStoveEvent } from '@/lib/notifications/stoveEvents';
+import { scheduleTokenCleanup } from '@/lib/services/tokenCleanupService';
 
 const mockDispatch = jest.mocked(dispatchStoveEvent);
 const SECRET = 'a'.repeat(64);
@@ -48,6 +51,12 @@ describe('POST /api/internal/stove-events', () => {
     expect((await res.json()).delivered).toBe(true);
   });
 
+  it('schedules the weekly token cleanup after a valid event (ROADMAP V11)', async () => {
+    await post(BODY);
+
+    expect(scheduleTokenCleanup).toHaveBeenCalledTimes(1);
+  });
+
   it.each([
     ['missing header', null],
     ['wrong secret', `Bearer ${'b'.repeat(64)}`],
@@ -58,6 +67,7 @@ describe('POST /api/internal/stove-events', () => {
 
     expect(res.status).toBe(401);
     expect(mockDispatch).not.toHaveBeenCalled();
+    expect(scheduleTokenCleanup).not.toHaveBeenCalled();
   });
 
   it('401 when the secret is not configured', async () => {

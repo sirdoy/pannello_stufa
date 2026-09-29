@@ -26,6 +26,7 @@ import {
   validateRequired,
 } from '@/lib/core';
 import { getAdminDatabase } from '@/lib/firebaseAdmin';
+import { scheduleTokenCleanup } from '@/lib/services/tokenCleanupService';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,6 +72,9 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
   // Validate required field
   validateRequired(token, 'token');
+
+  // Weekly stale-token cleanup piggybacks on registrations (ROADMAP V11)
+  scheduleTokenCleanup();
 
   const db = getAdminDatabase();
   const tokensRef = db.ref(`users/${userId}/fcmTokens`);

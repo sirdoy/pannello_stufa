@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { withErrorHandler, success, badRequest, parseJson } from '@/lib/core';
 import { unauthorized } from '@/lib/core/apiResponse';
 import { STOVE_EVENTS, dispatchStoveEvent } from '@/lib/notifications/stoveEvents';
+import { scheduleTokenCleanup } from '@/lib/services/tokenCleanupService';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,8 @@ function hasValidSecret(authHeader: string | null): boolean {
  * POST /api/internal/stove-events
  * Webhook called by the Pi scheduler (Bearer STOVE_EVENTS_SECRET, no user
  * session): sends the push notification for a stove event to ADMIN_USER_ID.
+ * After the response it also runs the weekly stale FCM token cleanup (ROADMAP V11):
+ * the Pi calls this daily, so no external cron is needed.
  */
 export const POST = withErrorHandler(async (request) => {
   if (!hasValidSecret(request.headers.get('authorization'))) {
@@ -33,6 +36,7 @@ export const POST = withErrorHandler(async (request) => {
   if (!parsed.success) {
     return badRequest(parsed.error.issues.map((i) => i.message).join(', '));
   }
+  scheduleTokenCleanup();
   const adminUserId = process.env.ADMIN_USER_ID;
   if (!adminUserId) {
     return success({ delivered: false, reason: 'no_admin_user' });

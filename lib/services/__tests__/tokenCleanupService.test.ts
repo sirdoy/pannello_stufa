@@ -11,8 +11,17 @@
 
 jest.mock('@/lib/firebaseAdmin');
 
-import { cleanupStaleTokens } from '../tokenCleanupService';
-import { getAdminDatabase, adminDbSet } from '@/lib/firebaseAdmin';
+jest.mock('next/server', () => ({ after: jest.fn() }));
+jest.mock('@/lib/environmentHelper', () => ({ getEnvironmentPath: (p: string) => p }));
+
+import { after } from 'next/server';
+import {
+  cleanupStaleTokens,
+  maybeCleanupStaleTokens,
+  scheduleTokenCleanup,
+  CLEANUP_INTERVAL_MS,
+} from '../tokenCleanupService';
+import { getAdminDatabase, adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 
 const mockAdminDbSet = jest.mocked(adminDbSet);
 
@@ -411,5 +420,86 @@ describe('cleanupStaleTokens', () => {
 
     // Verify update was never called
     expect(mockUpdate).not.toHaveBeenCalled();
+  });
+});
+
+describe('maybeCleanupStaleTokens (weekly, no external cron — ROADMAP V11)', () => {
+  const NOW = new Date('2026-09-29T12:00:00.000Z').getTime();
+  const store: Record<string, unknown> = {};
+  const emptySnapshot = { exists: () => false, forEach: () => {} };
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(NOW);
+    jest.clearAllMocks();
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    for (const k of Object.keys(store)) delete store[k];
+    jest.mocked(adminDbGet).mockImplementation(async (path: string) => (store[path] ?? null) as never);
+    jest.mocked(adminDbSet).mockImplementation(async (path: string, value: unknown) => {
+      store[path] = value;
+    });
+    jest.mocked(getAdminDatabase).mockReturnValue({
+      ref: jest.fn(() => ({ once: jest.fn().mockResolvedValue(emptySnapshot), update: jest.fn() })),
+    } as never);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('runs when never run before and stores the timestamp', async () => {
+    const result = await maybeCleanupStaleTokens();
+
+    expect(result).toMatchObject({ ran: true, cleaned: true, tokensScanned: 0 });
+    expect(store['cron/lastTokenCleanup']).toBe(NOW);
+  });
+
+  it('skips when the last cleanup is less than 7 days old', async () => {
+    store['cron/lastTokenCleanup'] = NOW - 24 * 60 * 60 * 1000;
+
+    const result = await maybeCleanupStaleTokens();
+
+    expect(result).toEqual({
+      ran: false,
+      reason: 'too_soon',
+      next: new Date(NOW - 24 * 60 * 60 * 1000 + CLEANUP_INTERVAL_MS).toISOString(),
+    });
+    expect(getAdminDatabase).not.toHaveBeenCalled();
+  });
+
+  it('runs again once 7 days have passed', async () => {
+    store['cron/lastTokenCleanup'] = NOW - CLEANUP_INTERVAL_MS;
+
+    expect(await maybeCleanupStaleTokens()).toMatchObject({ ran: true });
+    expect(store['cron/lastTokenCleanup']).toBe(NOW);
+  });
+
+  it('a failed cleanup keeps the old timestamp, so the next call retries', async () => {
+    store['cron/lastTokenCleanup'] = NOW - CLEANUP_INTERVAL_MS - 1;
+    jest.mocked(getAdminDatabase).mockImplementation(() => {
+      throw new Error('firebase down');
+    });
+
+    expect(await maybeCleanupStaleTokens()).toMatchObject({ ran: true, cleaned: false });
+    expect(store['cron/lastTokenCleanup']).toBe(NOW - CLEANUP_INTERVAL_MS - 1);
+  });
+
+  it('never throws (runs in after() of unrelated requests)', async () => {
+    jest.mocked(adminDbGet).mockRejectedValue(new Error('rtdb unavailable'));
+
+    expect(await maybeCleanupStaleTokens()).toEqual({
+      ran: false,
+      reason: 'exception',
+      error: 'rtdb unavailable',
+    });
+  });
+});
+
+describe('scheduleTokenCleanup', () => {
+  it('queues the throttled cleanup after the response', () => {
+    scheduleTokenCleanup();
+
+    expect(after).toHaveBeenCalledWith(maybeCleanupStaleTokens);
   });
 });

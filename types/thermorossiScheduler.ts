@@ -72,7 +72,14 @@ export interface MaintenanceCleanResponse extends MaintenanceState {
 export interface ExecutionLogItem {
   id: number;
   timestamp: number;
-  action: 'ignite' | 'shutdown' | 'adjust' | 'safety_blocked' | 'stale_cache' | 'ignite_failed';
+  action:
+    | 'ignite'
+    | 'shutdown'
+    | 'adjust'
+    | 'safety_blocked'
+    | 'stale_cache'
+    | 'ignite_failed'
+    | 'adjust_failed';
   stoveState: string | null;
   matchedSlot: ScheduleSlot | null;
   executionDurationMs: number | null;

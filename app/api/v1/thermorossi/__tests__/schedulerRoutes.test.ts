@@ -17,6 +17,7 @@ import * as active from '../schedules/[id]/active/route';
 import * as daySlots from '../schedules/[id]/days/[day]/slots/route';
 import * as week from '../schedules/[id]/week/route';
 import * as mode from '../scheduler/mode/route';
+import * as engine from '../scheduler/engine/route';
 import * as override from '../scheduler/override/route';
 import * as log from '../scheduler/log/route';
 import * as maintenance from '../maintenance/route';
@@ -151,5 +152,16 @@ describe('maintenance', () => {
       action: 'Pulizia stufa',
       details: '45.50h',
     }));
+  });
+});
+
+describe('scheduler engine heartbeat (ROADMAP V8)', () => {
+  it('forwards GET /scheduler/engine', async () => {
+    const health = { initialized: true, last_tick_at: 1790673240, healthy: true };
+    mocked.getEngineHealth.mockResolvedValue(health as never);
+    const res = await engine.GET(req(), ctx());
+    expect(res.status).toBe(200);
+    expect(mocked.getEngineHealth).toHaveBeenCalledTimes(1);
+    expect(await res.json()).toMatchObject(health);
   });
 });

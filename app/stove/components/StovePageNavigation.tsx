@@ -2,7 +2,7 @@
  * StovePageNavigation Component
  *
  * Quick navigation cards (Scheduler, Maintenance, Errors)
- * + System Status section (MaintenanceBar + CronHealthBanner)
+ * + System Status section (MaintenanceBar + SchedulerEngineBanner)
  * + Back to Home button
  *
  * Props in, JSX out. No state management.
@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card, Heading, Text, Badge, Button } from '@/app/components/ui';
 import MaintenanceBar from '@/app/components/MaintenanceBar';
-import CronHealthBanner from '@/app/components/CronHealthBanner';
+import SchedulerEngineBanner from '@/app/components/SchedulerEngineBanner';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
 
 export interface StovePageNavigationProps {
@@ -150,7 +150,7 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
             <MaintenanceBar maintenanceStatus={maintenanceStatus} />
           </Card>
 
-          <CronHealthBanner variant="inline" />
+          <SchedulerEngineBanner variant="inline" />
         </div>
       )}
 

@@ -52,12 +52,12 @@ it('401 without the cron secret', async () => {
   expect(adminDbSet).not.toHaveBeenCalled();
 });
 
-it('first run: heartbeat + all three tasks, timestamps saved', async () => {
+it('first run: all three tasks, timestamps saved, no cron heartbeat (V8)', async () => {
   const res = await call();
   const body = await res.json();
 
   expect(res.status).toBe(200);
-  expect(store['cronHealth/lastCall']).toBe(new Date(NOW).toISOString());
+  expect(store['cronHealth/lastCall']).toBeUndefined();
   expect(body.calibration.ran).toBe(true);
   expect(body.weather).toMatchObject({ ran: true, refreshed: true });
   expect(body.tokenCleanup).toMatchObject({ ran: true, cleaned: true });

@@ -36,7 +36,7 @@ Indice documentazione Pannello Stufa. **Ottimizzato per token efficiency**.
 | File | Contenuto |
 |------|-----------|
 | [systems/maintenance.md](systems/maintenance.md) | Tracking ore H24 |
-| [systems/monitoring.md](systems/monitoring.md) | Cron health |
+| [systems/monitoring.md](systems/monitoring.md) | Battito del motore stufa sul Pi |
 | [systems/errors.md](systems/errors.md) | Error detection |
 | [systems/notifications.md](systems/notifications.md) | FCM push |
 
@@ -71,6 +71,7 @@ Indice documentazione Pannello Stufa. **Ottimizzato per token efficiency**.
 ---
 
 **Principi**:
+
 - Tabelle > prose verbose
 - Reference > duplicazione
 - Pattern comuni estratti

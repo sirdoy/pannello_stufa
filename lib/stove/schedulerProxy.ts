@@ -14,6 +14,7 @@ import type {
   ScheduleDetail,
   ScheduleListResponse,
   ScheduleSlot,
+  SchedulerEngineHealth,
   SchedulerMode,
   ScheduleSummary,
 } from '@/types/thermorossiScheduler';
@@ -49,6 +50,9 @@ export const replaceWeek = (id: number, days: Record<string, ScheduleSlot[]>) =>
 // Mode / override / next action / log -----------------------------------------
 
 export const getMode = () => haGet<SchedulerMode>(`${BASE}/scheduler/mode`);
+
+/** Engine heartbeat (ROADMAP V8). */
+export const getEngineHealth = () => haGet<SchedulerEngineHealth>(`${BASE}/scheduler/engine`);
 
 export const setMode = (enabled: boolean) =>
   haPost<SchedulerMode>(`${BASE}/scheduler/mode`, { enabled });

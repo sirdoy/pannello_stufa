@@ -93,12 +93,24 @@ export interface ExecutionLogResponse {
   pageSize: number;
 }
 
+/** GET /scheduler/engine and WS `scheduler` snapshot `data.engine` (ROADMAP V8). */
+export interface SchedulerEngineHealth {
+  initialized: boolean;
+  started_at: number | null; // Unix seconds
+  last_tick_at: number | null; // Unix seconds
+  last_action: string | null;
+  tick_interval_s: number;
+  stale_after_s: number;
+  healthy: boolean;
+}
+
 /** WS topic `scheduler` snapshot `data`. */
 export interface SchedulerSnapshotData {
   schedules: ScheduleSummary[];
   active_schedule_id: number | null;
   mode: SchedulerMode;
   maintenance: MaintenanceState | null;
+  engine?: SchedulerEngineHealth; // absent on backends before V8
 }
 
 /** WS topic `scheduler` payload (snapshot or event); `data` shape depends on `event`. */

@@ -6,7 +6,6 @@
  * Since workspace ROADMAP D2 the stove schedule, maintenance hours, ignition /
  * shutdown and their notifications run on the Pi. This external cron only does the
  * frontend-side housekeeping that used to piggyback on it:
- * - heartbeat `cronHealth/lastCall` (CronHealthBanner)
  * - Netatmo valve calibration every 12 h
  * - weather cache refresh every 30 min
  * - stale FCM token cleanup every 7 days
@@ -82,9 +81,9 @@ async function safely(name: string, run: () => Promise<TaskResult>): Promise<Tas
   }
 }
 
+// The heartbeat `cronHealth/lastCall` is gone: the UI watches the stove engine on
+// the Pi instead (ROADMAP V8, GET /api/v1/thermorossi/scheduler/engine).
 export const GET = withCronSecret(async () => {
-  await adminDbSet('cronHealth/lastCall', new Date(Date.now()).toISOString());
-
   const [calibration, weather, tokenCleanup] = await Promise.all([
     safely('calibration', () => everyInterval('netatmo/lastAutoCalibration', TWELVE_HOURS, calibrateValves)),
     safely('weather', () => everyInterval('cron/lastWeatherRefresh', THIRTY_MINUTES, refreshWeather)),

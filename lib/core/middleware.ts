@@ -164,7 +164,7 @@ export function withAuthAndErrorHandler(handler: AuthedHandler, logContext: stri
 
 /**
  * Wraps a route handler with cron secret validation
- * For routes called by cron jobs (e.g., /api/scheduler/check)
+ * For routes called by cron jobs (e.g., /api/notifications/cleanup)
  *
  * Supports both:
  * - Query param: ?secret=xxx

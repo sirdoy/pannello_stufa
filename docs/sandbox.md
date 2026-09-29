@@ -32,7 +32,7 @@ La variabile d'ambiente `SANDBOX_MODE=true` attiva automaticamente la sandbox se
 #### Metodo B: Via UI Toggle (Per sviluppo manuale)
 
 1. Avvia l'app in locale: `npm run dev`
-2. Vai alla homepage (http://localhost:3000)
+2. Vai alla homepage (<http://localhost:3000>)
 3. Troverai un toggle **🧪 Sandbox Mode** in alto
 4. Attiva il toggle
 5. La pagina si ricaricherà e vedrai il pannello di controllo sandbox
@@ -42,26 +42,31 @@ La variabile d'ambiente `SANDBOX_MODE=true` attiva automaticamente la sandbox se
 Il pannello sandbox ti permette di:
 
 #### Stato Stufa
+
 - Clicca sui bottoni per cambiare stato istantaneamente
 - Gli stati disponibili sono: OFF, START, WORK, CLEAN, FINAL, ERROR
 - Ogni stato ha un colore distintivo
 
 #### Controlli Potenza e Ventola
+
 - Usa gli slider per impostare potenza (1-5) e ventola (0-5)
 - Clicca "Set" per applicare i valori
 - I valori si aggiornano immediatamente
 
 #### Temperatura
+
 - Imposta la temperatura simulata (0-100°C)
 - Utile per testare interfacce dipendenti dalla temperatura
 
 #### Manutenzione
+
 - **Ore lavorate**: Imposta manualmente le ore simulate
 - **Progress bar**: Visualizza progresso verso soglia manutenzione (150h)
 - **Reset**: Azzera ore e flag manutenzione
 - Quando >= 150h, `needsCleaning=true` e accensione bloccata
 
 #### Simulazione Errori
+
 - Seleziona un errore specifico da simulare:
   - `AL01`: Temperatura troppo alta
   - `AL02`: Pressione insufficiente
@@ -71,11 +76,13 @@ Il pannello sandbox ti permette di:
 - Il sistema di notifiche errori funzionerà normalmente
 
 #### Impostazioni Simulazione
+
 - **Progressione automatica stati**: OFF→START→WORK, CLEAN→FINAL→OFF
 - **Simula ritardi realistici**: Aggiunge delay alle transizioni
 - **Genera errori casuali**: Per stress testing (non consigliato)
 
 #### Storico Azioni
+
 - Clicca "Mostra History" per vedere tutte le azioni sandbox
 - Ogni azione include timestamp e parametri
 - Utile per debugging
@@ -85,11 +92,13 @@ Il pannello sandbox ti permette di:
 Sezione dedicata per testare modalità scheduler e transizioni automatiche.
 
 **Visual Mode Badges**:
+
 - 🔧 **MANUAL**: Scheduler disattivato
 - ⏰ **AUTO**: Modalità automatica attiva
 - ⚙️ **SEMI-MANUAL**: Override temporaneo attivo
 
 **Quick Test Setup**:
+
 1. **Toggle Scheduler**: Attiva/disattiva modalità automatica
 2. **Crea Intervallo Test**:
    - Imposta orario inizio/fine
@@ -99,6 +108,7 @@ Sezione dedicata per testare modalità scheduler e transizioni automatiche.
 3. **Clear Intervallo**: Rimuove l'intervallo di test
 
 **Test Transizione Semi-Manual**:
+
 1. Crea un intervallo di test
 2. Metti la stufa in stato WORK
 3. Vai sulla StoveCard e modifica Fan o Power
@@ -109,6 +119,7 @@ Sezione dedicata per testare modalità scheduler e transizioni automatiche.
    - Pulsante "↩️ Torna in Automatico" appare
 
 **Controlli**:
+
 - **Clear Semi-Manual**: Ritorna in modalità automatica (visibile solo in semi-manual)
 - **Clear**: Cancella l'intervallo di test creato
 
@@ -149,7 +160,7 @@ export async function getStoveStatus() {
 
 Tutti i dati sandbox sono salvati in Firebase Realtime Database sotto `sandbox/`:
 
-```
+```text
 sandbox/
 ├── enabled: boolean              # Sandbox attivo/disattivo
 ├── stoveState/
@@ -183,16 +194,19 @@ sandbox/
 ### Componenti
 
 #### `SandboxToggle` (`app/components/sandbox/SandboxToggle.js`)
+
 - Toggle per abilitare/disabilitare sandbox
 - Visibile SOLO in localhost
 - Include SandboxPanel quando abilitato
 
 #### `SandboxPanel` (`app/components/sandbox/SandboxPanel.js`)
+
 - Pannello di controllo completo
 - Gestisce tutti i parametri simulati
 - Mostra storico azioni
 
 #### `sandboxService` (`lib/sandboxService.js`)
+
 - Service layer per operazioni sandbox
 - Gestisce stato Firebase
 - Implementa logica simulazione
@@ -212,6 +226,7 @@ if (isLocalEnvironment()) {
 ```
 
 **Nota**: `isSandboxEnabled()` verifica:
+
 1. Prima la variabile d'ambiente `SANDBOX_MODE` (priorità per test automatici)
 2. Poi il flag Firebase `sandbox/enabled` (per toggle UI manuale)
 
@@ -267,7 +282,7 @@ await sandboxSetPower(3);
 await sandboxSetFan(2);
 ```
 
-### Manutenzione
+### Ore Manutenzione
 
 ```javascript
 import {
@@ -366,9 +381,8 @@ await resetSandbox();
 
 1. Abilita sandbox
 2. Configura scheduler per accensione automatica
-3. Verifica che `/api/scheduler/check` usi sandbox
-4. Verifica azioni scheduler funzionano
-5. Verifica semi-manual mode override
+3. Verifica azioni scheduler funzionano
+4. Verifica semi-manual mode override
 
 ## 🎨 UI Indicators
 
@@ -407,7 +421,7 @@ console.log(status.isSandbox); // true in sandbox, false altrimenti
 - ✅ Nessun rischio di attivazione in production
 - ✅ Dati sandbox isolati in Firebase path dedicato
 
-### Verifica Ambiente
+### Verifica Ambiente (Guard)
 
 ```javascript
 // Client-side
@@ -448,6 +462,7 @@ npm run build
 ### Testing CI/CD
 
 I test automatici dovrebbero:
+
 - Verificare che sandbox funzioni in development
 - Verificare che sandbox sia disabilitato in production
 - Testare wrapper functions con e senza sandbox
@@ -474,7 +489,8 @@ SANDBOX_MODE=true npx playwright test
 SANDBOX_MODE=true npm run test:e2e
 ```
 
-Questo attiverà automaticamente la sandbox mode all'avvio dell'app, permettendo di testare tutte le funzionalità UI senza hardware reale.
+Questo attiverà automaticamente la sandbox mode all'avvio dell'app, permettendo di testare tutte le funzionalità UI
+senza hardware reale.
 
 ## 🐛 Troubleshooting
 
@@ -483,6 +499,7 @@ Questo attiverà automaticamente la sandbox mode all'avvio dell'app, permettendo
 **Problema**: Toggle sandbox non visibile in localhost
 
 **Soluzione**:
+
 1. Verifica URL: deve essere `localhost` o `127.0.0.1`
 2. Controlla console per errori
 3. Verifica Firebase connesso
@@ -492,6 +509,7 @@ Questo attiverà automaticamente la sandbox mode all'avvio dell'app, permettendo
 **Problema**: Anche con sandbox attivo, chiamate vanno a API reale
 
 **Soluzione**:
+
 1. Ricarica pagina dopo aver attivato sandbox
 2. Verifica badge "🧪 SANDBOX" in StoveCard
 3. Controlla `isSandbox` in response API
@@ -502,7 +520,8 @@ Questo attiverà automaticamente la sandbox mode all'avvio dell'app, permettendo
 **Problema**: Modifico ore ma non cambiano
 
 **Soluzione**:
-1. Il cron `/api/scheduler/check` NON aggiorna ore in sandbox
+
+1. Il tracking ore sul Pi NON aggiorna ore in sandbox
 2. Devi usare il pannello sandbox per modificare ore manualmente
 3. Sandbox ha tracking separato da produzione
 
@@ -511,6 +530,7 @@ Questo attiverà automaticamente la sandbox mode all'avvio dell'app, permettendo
 **Problema**: Azioni non appaiono in history
 
 **Soluzione**:
+
 1. Verifica permessi Firebase
 2. History tiene max 100 azioni (FIFO)
 3. Reset sandbox cancella history

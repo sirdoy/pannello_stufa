@@ -81,6 +81,6 @@ export const config = {
     // Exclude: public API routes (api/internal: Pi webhooks, Bearer secret) and static files (incl. Serwist PWA assets in public/:
     // swe-worker-*/workbox-*/fallback-* scripts, splash images). Not a blanket
     // "has an extension" rule: authenticated API routes like camera HLS end in .m3u8/.ts.
-    "/((?!api/scheduler/check|api/internal|api/stove|api/admin|offline|_next|favicon.ico|icons|splash|manifest.json|sw.js|firebase-messaging-sw.js|swe-worker-|workbox-|fallback-).*)",
+    "/((?!api/internal|api/stove|api/admin|offline|_next|favicon.ico|icons|splash|manifest.json|sw.js|firebase-messaging-sw.js|swe-worker-|workbox-|fallback-).*)",
   ],
 };

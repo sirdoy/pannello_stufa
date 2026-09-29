@@ -66,9 +66,10 @@ ADMIN_USER_ID=user:your-user-id
 
 ### 4. Firebase Setup
 
-1. **Create Firebase Project**: https://console.firebase.google.com
+1. **Create Firebase Project**: <https://console.firebase.google.com>
 2. **Enable Realtime Database**: Database → Create Database → Test mode
 3. **Initialize Schema**: Use Firebase console to create base nodes:
+
    ```json
    {
      "stoveScheduler": {
@@ -101,7 +102,7 @@ ADMIN_USER_ID=user:your-user-id
 npm run dev
 ```
 
-Open http://localhost:3000
+Open <http://localhost:3000>
 
 ### Run Tests
 
@@ -125,7 +126,7 @@ npm run start
 
 ## Project Structure
 
-```
+```text
 pannello-stufa/
 ├── app/                      # Next.js 15 App Router
 │   ├── api/                  # API Routes
@@ -171,7 +172,7 @@ find app -name "*.js" -exec grep -l "useState" {} \;  # Find client components
 
 ### 1. Setup Authentication
 
-1. Visit http://localhost:3000
+1. Visit <http://localhost:3000>
 2. Click "Login" (redirects to `/auth/login`)
 3. Sign in with an account created on the Pi (`scripts/create_user.py`)
 
@@ -186,17 +187,6 @@ find app -name "*.js" -exec grep -l "useState" {} \;  # Find client components
 1. Navigate to `/maintenance`
 2. Set target hours (default: 50h)
 3. System will auto-track usage
-
-### 4. Setup Cronjob (Optional)
-
-For automatic scheduler execution:
-
-```bash
-# Add to crontab
-* * * * * curl -s "http://localhost:3000/api/scheduler/check?secret=YOUR_SECRET" > /dev/null
-```
-
-Or use external service (cron-job.org, EasyCron, etc.)
 
 ## External Integrations (Optional)
 
@@ -226,6 +216,7 @@ npm run build
 ### Firebase Connection Error
 
 Check:
+
 1. `.env.local` has correct Firebase config
 2. Firebase project exists and Realtime Database enabled
 3. Database rules allow read/write (test mode)
@@ -233,6 +224,7 @@ Check:
 ### Login Fails
 
 Check:
+
 1. `SESSION_SECRET` set in `.env.local` (>= 32 caratteri)
 2. Backend Pi raggiungibile (`HA_API_URL`) e utente esistente (`scripts/create_user.py`)
 3. `BYPASS_AUTH` / `NEXT_PUBLIC_BYPASS_AUTH` a `false` (a meno di dev bypass intenzionale)
@@ -257,10 +249,10 @@ npm test -- --clearCache
 
 ## Resources
 
-- **Next.js Docs**: https://nextjs.org/docs
-- **React Docs**: https://react.dev
-- **Tailwind CSS**: https://tailwindcss.com
-- **Firebase Docs**: https://firebase.google.com/docs
+- **Next.js Docs**: <https://nextjs.org/docs>
+- **React Docs**: <https://react.dev>
+- **Tailwind CSS**: <https://tailwindcss.com>
+- **Firebase Docs**: <https://firebase.google.com/docs>
 
 ---
 

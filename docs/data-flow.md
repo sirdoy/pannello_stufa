@@ -4,7 +4,7 @@ Flussi dati principali dell'applicazione.
 
 ## Polling Status (ogni 5s)
 
-```
+```text
 StoveCard useEffect
   ↓
 Fetch: status + fan + power + mode
@@ -19,28 +19,16 @@ Update UI
 **Frequency**: 5 secondi  
 **Implementation**: `app/components/devices/stove/StoveCard.js`
 
-## Scheduler Cron (ogni minuto)
+## Scheduler stufa
 
-```
-GET /api/scheduler/check?secret=xxx
-  ↓
-1. Verify CRON_SECRET
-2. Save cronHealth/lastCall
-3. Check mode (manual/auto/semi-manual)
-4. If auto: execute scheduled actions
-5. If IGNITE: check maintenance (canIgnite)
-6. If scheduled change: clear semi-manual
-7. Track usage: trackUsageHours(status)
-```
-
-**Frequency**: 1 minuto  
-**Implementation**: `app/api/scheduler/check/route.js`
+Scheduler e tracking manutenzione girano sul Pi (ROADMAP D2); il Pi notifica il frontend su
+`/api/internal/stove-events`. Il cron esterno `/api/scheduler/check` è stato rimosso (ROADMAP V12).
 
 Vedi [Systems - Maintenance](./systems/maintenance.md) e [Systems - Monitoring](./systems/monitoring.md).
 
 ## OAuth Token Flow
 
-```
+```text
 Client → API route
   ↓
 getValidAccessToken()
@@ -62,7 +50,7 @@ Vedi [Systems - Notifications](./systems/notifications.md).
 
 ## Version Check
 
-```
+```text
 StoveCard polling (5s)
   ↓
 checkVersion()

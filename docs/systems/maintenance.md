@@ -7,6 +7,7 @@ Sistema autonomo H24 per tracking ore utilizzo e gestione pulizia periodica.
 Il sistema di manutenzione traccia automaticamente le ore di utilizzo della stufa e gestisce il ciclo di pulizia periodica.
 
 **Caratteristiche**:
+
 - ✅ Tracking automatico server-side (cron ogni minuto)
 - ✅ Funziona H24, anche con app chiusa
 - ✅ Blocco automatico **solo accensione** quando pulizia richiesta
@@ -30,6 +31,7 @@ Il sistema di manutenzione traccia automaticamente le ore di utilizzo della stuf
 ```
 
 **Fields**:
+
 - `currentHours` - Ore utilizzo attuali (4 decimali precisione)
 - `targetHours` - Soglia pulizia configurabile (default 50h)
 - `lastCleanedAt` - Timestamp ultima pulizia (null se mai pulita)
@@ -46,6 +48,7 @@ Vedi [Firebase - Maintenance Schema](../firebase.md#maintenance-schema) per dett
 ### Stati del Lifecycle
 
 1. **Init** (nuovo sistema)
+
    ```javascript
    {
      currentHours: 0,
@@ -57,6 +60,7 @@ Vedi [Firebase - Maintenance Schema](../firebase.md#maintenance-schema) per dett
    ```
 
 2. **Primo evento WORK**
+
    ```javascript
    // trackUsageHours() vede lastUpdatedAt === null
    // → Inizializza timestamp senza aggiungere ore
@@ -67,6 +71,7 @@ Vedi [Firebase - Maintenance Schema](../firebase.md#maintenance-schema) per dett
    ```
 
 3. **Tracking continuo**
+
    ```javascript
    // trackUsageHours() ogni minuto calcola elapsed
    const elapsed = (now - lastUpdatedAt) / 60000; // ms to minutes
@@ -77,6 +82,7 @@ Vedi [Firebase - Maintenance Schema](../firebase.md#maintenance-schema) per dett
    ```
 
 4. **Config change** (updateTargetHours)
+
    ```javascript
    // updateTargetHours() NON tocca lastUpdatedAt
    await update(ref(db, 'maintenance'), {
@@ -85,7 +91,8 @@ Vedi [Firebase - Maintenance Schema](../firebase.md#maintenance-schema) per dett
    });
    ```
 
-**Motivazione**: Se `updateTargetHours()` aggiornasse `lastUpdatedAt`, il prossimo `trackUsageHours()` calcolerebbe elapsed time errato (tempo dall'update config invece che dall'ultimo tracking).
+**Motivazione**: Se `updateTargetHours()` aggiornasse `lastUpdatedAt`, il prossimo `trackUsageHours()` calcolerebbe
+elapsed time errato (tempo dall'update config invece che dall'ultimo tracking).
 
 ## Service Functions (`lib/maintenanceService.js`)
 
@@ -123,12 +130,12 @@ await updateTargetHours(60);  // Nuova soglia: 60 ore
 
 ### `trackUsageHours(status)` (CRITICO)
 
-**Tracking automatico chiamato da cron ogni minuto**.
+**Tracking automatico ogni minuto sul Pi** (ROADMAP D2; prima era nel cron `/api/scheduler/check`, rimosso in V12).
 
 ```javascript
 import { trackUsageHours } from '@/lib/maintenanceService';
 
-// In /api/scheduler/check
+// Logica storica (ora sul Pi)
 const statusRes = await fetch('http://localhost:3000/api/stove/status');
 const { status } = await statusRes.json();
 
@@ -136,11 +143,13 @@ await trackUsageHours(status);
 ```
 
 **Logica**:
+
 1. Check `status === 'WORK' || status === 'MODULATION'` → se no, skip (entrambi sono working states)
 2. Se `lastUpdatedAt === null` → inizializza timestamp, skip tracking
 3. Calcola `elapsed = now - lastUpdatedAt` (minuti)
 4. Se `elapsed < 0.5` minuti → skip (troppo presto)
 5. Update Firebase **via Transaction** (concurrency-safe):
+
    ```javascript
    await runTransaction(ref(db, 'maintenance'), (current) => {
      if (!current) return current;
@@ -159,7 +168,8 @@ await trackUsageHours(status);
 
 **Auto-recovery**: Se cron salta chiamate, prossima esecuzione recupera minuti persi automaticamente (elapsed time based).
 
-**Concurrency Safe**: Usa Firebase Transactions per garantire data integrity anche con multiple cron instances (Cloud Functions scalabili).
+**Concurrency Safe**: Usa Firebase Transactions per garantire data integrity anche con multiple cron instances
+(Cloud Functions scalabili).
 
 **⚠️ CRITICO**: Tracking DEVE essere server-side via cron. Client-side tracking funziona SOLO se app aperta.
 
@@ -179,6 +189,7 @@ await confirmCleaning({
 ```
 
 **Operazioni**:
+
 1. Reset `currentHours = 0`
 2. Set `lastCleanedAt = now` (ISO UTC)
 3. Set `needsCleaning = false`
@@ -222,6 +233,7 @@ const status = await getMaintenanceStatus();
 ```
 
 **Fields**:
+
 - `percentage` - Percentuale completamento (0-100+)
 - `remainingHours` - Ore rimanenti prima pulizia
 - `isNearLimit` - `true` se ≥80% (trigger warnings)
@@ -234,6 +246,7 @@ const status = await getMaintenanceStatus();
 Barra progresso integrata in card "Stato Stufa" con collapse/expand intelligente.
 
 **Features**:
+
 - Auto-expand SOLO prima volta quando percentage ≥80%
 - localStorage persistence preferenza utente
 - Colori dinamici: verde (0-59%) → giallo (60-79%) → arancione (80-99%) → rosso (100%+)
@@ -242,6 +255,7 @@ Barra progresso integrata in card "Stato Stufa" con collapse/expand intelligente
 **Implementazione**: `app/components/MaintenanceBar.js:89-180`
 
 **Pattern Collapse**:
+
 ```javascript
 const [isExpanded, setIsExpanded] = useState(false);
 
@@ -272,6 +286,7 @@ const handleToggle = () => {
 Card bloccante quando `needsCleaning=true` con conferma pulizia.
 
 **Pattern**:
+
 ```jsx
 {needsCleaning && (
   <Banner
@@ -299,33 +314,10 @@ Card bloccante quando `needsCleaning=true` con conferma pulizia.
 
 **Perché server-side**: Client-side tracking funziona SOLO se app aperta. Server-side cron funziona H24.
 
-### Implementazione Cron
+### Implementazione
 
-```javascript
-// app/api/scheduler/check/route.js
-
-import { trackUsageHours } from '@/lib/maintenanceService';
-
-export async function GET(request) {
-  // ... verifiche auth e mode ...
-
-  // Fetch current status
-  const statusRes = await fetch('http://localhost:3000/api/stove/status');
-  const { status } = await statusRes.json();
-
-  // Track usage (CRITICO - chiamato ogni minuto)
-  await trackUsageHours(status);
-
-  // ... resto logica scheduler ...
-}
-```
-
-**Cronjob**: Configurato per chiamare `/api/scheduler/check?secret=xxx` ogni minuto.
-
-**Vantaggi**:
-- ✅ Tracking H24 indipendente da app aperta
-- ✅ Auto-recovery se cron salta chiamate (elapsed time based)
-- ✅ Zero config client-side
+Il tracking gira sul Pi (ROADMAP D2), H24 e indipendente dall'app aperta; il vecchio cron Vercel
+`/api/scheduler/check` è stato rimosso (ROADMAP V12).
 
 ## Push Notifications
 
@@ -374,6 +366,7 @@ Preferenze utente per notifiche manutenzione.
 ```
 
 **Check prima invio**:
+
 ```javascript
 import { shouldSendMaintenanceNotification } from '@/lib/notificationPreferencesService';
 
@@ -425,7 +418,7 @@ export async function POST(request) {
 Blocco accensione schedulata se manutenzione richiesta.
 
 ```javascript
-// app/api/scheduler/check/route.js
+// Motore scheduler sul Pi (logica equivalente)
 
 // Se azione è IGNITE
 if (action === 'IGNITE') {
@@ -444,6 +437,7 @@ if (action === 'IGNITE') {
 Pagina `/maintenance` per configurazione ore target e conferma pulizia.
 
 **Features**:
+
 - Input configurazione `targetHours`
 - Display status corrente (percentage, remaining, last cleaned)
 - Pulsante conferma pulizia (con modal conferma)
@@ -502,6 +496,7 @@ Vedi [Testing](../testing.md) per pattern completi.
 ### Ore non incrementano
 
 **Check**:
+
 1. Cron running? → Vedi [Systems - Monitoring](./monitoring.md)
 2. `lastUpdatedAt` settato? → Deve essere ISO UTC string, non null
 3. Status WORK? → Tracking solo quando status = 'WORK'
@@ -510,6 +505,7 @@ Vedi [Testing](../testing.md) per pattern completi.
 ### Ore fantasma (currentHours incrementa senza stufa accesa)
 
 **Cause**:
+
 1. `lastUpdatedAt` init errato → Deve essere `null`, non timestamp corrente
 2. `updateTargetHours()` aggiorna `lastUpdatedAt` → NON deve toccarlo
 

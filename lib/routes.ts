@@ -53,11 +53,6 @@ export const STOVE_ROUTES = {
   setPower: `${API_BASE}/v1/thermorossi/settings/power`,
 } as const;
 
-// Scheduler endpoints
-const SCHEDULER_ROUTES = {
-  check: (secret: string): string => `${API_BASE}/scheduler/check?secret=${secret}`,
-} as const;
-
 // Netatmo endpoints
 export const NETATMO_ROUTES = {
   // Topology
@@ -113,7 +108,6 @@ const AUTH_ROUTES = {
 // All routes combined for easy export
 const API_ROUTES = {
   stove: STOVE_ROUTES,
-  scheduler: SCHEDULER_ROUTES,
   netatmo: NETATMO_ROUTES,
   camera: CAMERA_ROUTES,
   log: LOG_ROUTES,

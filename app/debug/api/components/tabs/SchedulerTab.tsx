@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { EndpointCard, PostEndpointCard } from '../ApiTab';
+import { EndpointCard } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
@@ -12,9 +12,7 @@ interface SchedulerTabProps {
 
 export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerTabProps) {
   const [getResponses, setGetResponses] = useState<Record<string, any>>({});
-  const [postResponses, setPostResponses] = useState<Record<string, any>>({});
   const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
-  const [loadingPost, setLoadingPost] = useState<Record<string, boolean>>({});
   const [timings, setTimings] = useState<Record<string, number>>({});
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
 
@@ -48,31 +46,6 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
     fetchGetEndpoint('notificationStats', '/api/notifications/stats');
   };
 
-  const callPostEndpoint = async (name: string, url: string, body: any) => {
-    setLoadingPost((prev) => ({ ...prev, [name]: true }));
-    const startTime = Date.now();
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      const timing = Date.now() - startTime;
-      setTimings((prev) => ({ ...prev, [name]: timing }));
-      setPostResponses((prev) => ({ ...prev, [name]: data }));
-
-      // Refresh GET endpoints after successful POST
-      if (res.ok) {
-        setTimeout(fetchAllGetEndpoints, 1000);
-      }
-    } catch (error) {
-      setPostResponses((prev) => ({ ...prev, [name]: { error: error instanceof Error ? error.message : String(error) } }));
-    } finally {
-      setLoadingPost((prev) => ({ ...prev, [name]: false }));
-    }
-  };
-
   // Initial fetch
   useEffect(() => {
     fetchAllGetEndpoints();
@@ -95,37 +68,6 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
 
   return (
     <div className="space-y-6">
-      {/* Scheduler Info */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
-        <Text variant="secondary" size="sm">
-          The scheduler cron endpoint (<code className="text-xs">/api/scheduler/check</code>) is called every minute by
-          an external cron service (cron-job.org). Since ROADMAP D2/V8/V9 it only refreshes the weather and cleans up
-          FCM tokens: stove scheduling, its heartbeat and the 12 h valve calibration run on the Pi.
-        </Text>
-      </div>
-
-      {/* POST Endpoints */}
-      <div>
-        <Heading level={2} size="lg" className="mb-4">
-          📤 POST Endpoints
-        </Heading>
-        <div className="space-y-3">
-          <PostEndpointCard
-            name="Scheduler Check (Cron Endpoint)"
-            url="/api/scheduler/check"
-            params={[
-              { name: 'secret', label: 'CRON_SECRET', type: 'text', defaultValue: '' },
-            ]}
-            response={postResponses.schedulerCheck}
-            loading={loadingPost.schedulerCheck ?? false}
-            timing={timings.schedulerCheck}
-            onExecute={(values) => callPostEndpoint('schedulerCheck', `/api/scheduler/check?secret=${values.secret}`, {})}
-            onCopyUrl={() => copyUrlToClipboard('/api/scheduler/check?secret=<CRON_SECRET>')}
-            isCopied={copiedUrl === '/api/scheduler/check?secret=<CRON_SECRET>'}
-          />
-        </div>
-      </div>
-
       {/* GET Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
@@ -161,9 +103,9 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
             <br />
             <strong>Maintenance Tracking:</strong> Every minute (H24 hours counter)
             <br />
-            <strong>Weather Refresh:</strong> Every 30 minutes (Open-Meteo API)
+            <strong>Weather Refresh:</strong> On read, at most every 30 minutes (Open-Meteo API)
             <br />
-            <strong>FCM Token Cleanup:</strong> Every 7 days (remove stale tokens)
+            <strong>FCM Token Cleanup:</strong> After stove events / token registration (stale tokens)
             <br />
             <strong>Hue Token Refresh:</strong> Proactive (24h before expiry)
             <br />

@@ -52,6 +52,7 @@ naviga a `safeReturnTo(returnTo)` dopo il login.
 ### Non Esegue Azioni
 
 **Checklist**:
+
 1. Mode: `stoveScheduler/mode.enabled = true`, `semiManual = false`
 2. Cron: CronHealthBanner nascosto = OK
 3. Schedule: Intervalli validi in Firebase
@@ -62,6 +63,7 @@ naviga a `safeReturnTo(returnTo)` dopo il login.
 **Check**: `returnToAutoAt` deve essere timestamp futuro.
 
 **Force clear**:
+
 ```javascript
 // Firebase: stoveScheduler/mode
 { semiManual: false, returnToAutoAt: null }
@@ -132,6 +134,7 @@ useEffect(() => {
 ### Shortcuts iOS Non Funzionano
 
 **Checklist**:
+
 1. Manifest: URL corretti, `type: "image/png"` nelle icons, max 4 shortcuts
 2. Meta tags: `apple-mobile-web-app-capable`, `apple-mobile-web-app-title`
 3. Reinstalla: Rimuovi PWA → Safari → Add to Home Screen
@@ -141,6 +144,7 @@ useEffect(() => {
 **Sintomo**: Pagine non si aggiornano, redirect cachati.
 
 **Fix**: Navigation requests con `NetworkFirst`:
+
 ```javascript
 // next.config.mjs - runtimeCaching
 {
@@ -151,6 +155,7 @@ useEffect(() => {
 ```
 
 **Force update SW**:
+
 ```javascript
 navigator.serviceWorker.getRegistrations()
   .then(regs => regs.forEach(r => r.unregister()))
@@ -159,12 +164,10 @@ navigator.serviceWorker.getRegistrations()
 
 ---
 
-## Cron Health
+## Scheduler Engine Health
 
-| Problema | Check | Fix |
-|----------|-------|-----|
-| Banner sempre visibile | `cronHealth/lastCall` aggiornato? CRON_SECRET corretto? | Verifica cron service |
-| Banner mai visibile (cron fermo) | Listener setup? Threshold 5 min? | Verifica `CronHealthBanner.js` |
+Il banner della pagina stufa (`SchedulerEngineBanner`) guarda il battito del motore scheduler sul Pi (ROADMAP V8),
+non più il cron esterno: se resta visibile, controllare servizio e `/health` sul Pi.
 
 ---
 

@@ -5,6 +5,7 @@ Architettura multi-device scalabile per gestione dispositivi smart home.
 ## Overview
 
 Il progetto utilizza un'architettura modulare basata su device registry centralizzato che permette di:
+
 - Aggiungere/rimuovere dispositivi senza modificare il core
 - Gestire configurazione dispositivi in un unico posto
 - Scalare facilmente con nuovi dispositivi (luci, termostato, sonos, etc.)
@@ -62,6 +63,7 @@ export const DEVICE_CONFIG = {
 ```
 
 **Config Structure**:
+
 - `id` - Identificatore unico device
 - `name` - Nome visualizzato
 - `icon` - Emoji rappresentativa
@@ -98,7 +100,7 @@ const stoveConfig = getDeviceConfig('stove');
 
 Ogni device ha card dedicata in `app/components/devices/{device}/`:
 
-```
+```text
 app/components/devices/
 ├── stove/
 │   └── StoveCard.js         # Polling 5s, controls, maintenance bar
@@ -113,12 +115,14 @@ app/components/devices/
 **Principio fondamentale**: Ogni device card è **auto-contenuta** e include **tutte le informazioni** specifiche del device.
 
 **✅ CORRETTO - Dentro la card**:
+
 - Banner specifici del device (manutenzione, errori connessione, warning)
 - Stato e metriche del device
 - Controlli e azioni
 - Link a pagine dedicate
 
 **❌ SCORRETTO - Fuori dalla card**:
+
 - Banner device-specific fuori dalla card principale
 - Informazioni frammentate in più card separate
 
@@ -145,7 +149,9 @@ app/components/devices/
 
 **Eccezione**: Alert critici di sistema che riguardano più device o errori globali possono stare fuori dalle card.
 
-**Implementazione**: `app/components/devices/stove/StoveCard.js:376-413` (maintenance banner), `app/components/devices/thermostat/ThermostatCard.js:248-260` (error banner), `app/components/devices/lights/LightsCard.js:281-293` (error banner)
+**Implementazione**: `app/components/devices/stove/StoveCard.js:376-413` (maintenance banner),
+`app/components/devices/thermostat/ThermostatCard.js:248-260` (error banner),
+`app/components/devices/lights/LightsCard.js:281-293` (error banner)
 
 ### Pattern Comune
 
@@ -157,7 +163,7 @@ Tutte le device cards seguono lo stesso pattern:
 4. **Controls** - Interfaccia controllo device
 5. **Link Pagina Dedicata** - Link a pagina full-featured (se esiste)
 
-**Esempio: StoveCard**
+Esempio: StoveCard.
 
 ```javascript
 'use client';
@@ -234,6 +240,7 @@ export default function HomePage() {
 ```
 
 **Responsive Behavior**:
+
 - **Mobile** (< 1024px): Stack verticale (1 colonna)
 - **Desktop** (≥ 1024px): Grid 2 colonne
 
@@ -360,7 +367,8 @@ Pattern per integrare API esterne (OAuth, REST, etc.).
 Vedi [API Routes](./api-routes.md) per dettagli completi.
 
 **Struttura base**:
-```
+
+```text
 app/api/[device-api]/
 ├── callback/route.js        # OAuth callback (se necessario)
 ├── status/route.js          # Status endpoint
@@ -390,6 +398,7 @@ Menu dropdown in navbar per navigazione rapida tra device.
 Menu dropdown impostazioni in navbar.
 
 **Voci**:
+
 - Gestione Dispositivi (`/settings/devices`)
 - Gestione Notifiche (`/settings/notifications`)
 - Tema (`/settings/theme`)
@@ -401,6 +410,7 @@ Menu dropdown impostazioni in navbar.
 
 **Struttura Gerarchica**:
 Il menu supporta submenu gerarchici. Le voci con `submenu` vengono renderizzate come:
+
 - **Desktop**: Header non cliccabile + voci indentate nel dropdown
 - **Mobile**: Header separatore + voci indentate nell'accordion
 
@@ -415,6 +425,7 @@ Il menu supporta submenu gerarchici. Le voci con `submenu` vengono renderizzate 
 Hook per notifica soft nuove versioni.
 
 **Features**:
+
 - Semantic version comparison
 - localStorage tracking per dismissione
 - Badge "NEW" + WhatsNewModal dismissibile
@@ -426,6 +437,7 @@ Hook per notifica soft nuove versioni.
 Context hook per enforcement versione obbligatoria.
 
 **Features**:
+
 - Global context state
 - On-demand check ogni 5s (integrato in polling)
 - ForceUpdateModal bloccante SOLO se versione locale < Firebase
@@ -512,17 +524,19 @@ export default async function DashboardPage() {
 ```javascript
 export const config = {
   matcher: [
-    "/((?!api/scheduler/check|api/stove|api/admin|offline|_next|favicon.ico|icons|splash|manifest.json|sw.js|firebase-messaging-sw.js|swe-worker-|workbox-|fallback-).*)",
+    "/((?!api/internal|api/stove|api/admin|offline|_next|favicon.ico|icons|splash|manifest.json|sw.js|firebase-messaging-sw.js|swe-worker-|workbox-|fallback-).*)",
   ],
 };
 ```
 
 **Esclude**:
-- API pubbliche (`/api/scheduler/check`, `/api/admin`, etc.)
+
+- API pubbliche (`/api/internal`, `/api/admin`, etc.)
 - Asset PWA (`/offline`, `/manifest.json`, `/sw.js`, etc.)
 - Internal Next.js (`/_next/*`, `/favicon.ico`)
 
 **Include**:
+
 - Tutte le route pagine (`/`, `/dashboard`, etc.)
 - Route auth (`/auth/login`, `/auth/logout`) - gestite dal login first-party
 

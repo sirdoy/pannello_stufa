@@ -61,8 +61,9 @@ Nuovo topic WS: aggiornare `Topic` + `TopicDataMap` in `types/websocket.ts` (fon
 **Scheduler stufa e manutenzione** stanno sul Pi (ROADMAP D2): `lib/scheduler/*` e `lib/maintenance/maintenanceService.ts`
 chiamano le route `app/api/v1/thermorossi/{schedules,scheduler,maintenance}` (proxy `lib/stove/schedulerProxy.ts`,
 tipi `types/thermorossiScheduler.ts`); il Pi manda le notifiche a `/api/internal/stove-events` (`STOVE_EVENTS_SECRET`).
-Il cron esterno su `/api/scheduler/check?secret=CRON_SECRET` fa solo pulizie (calibrazione valvole, meteo, token FCM;
-da togliere, ROADMAP V5); il banner della pagina stufa guarda il battito del motore sul Pi (`SchedulerEngineBanner`).
+Il cron esterno `/api/scheduler/check` non c'è più (ROADMAP V12: calibrazione valvole sul Pi, meteo alla lettura,
+token FCM dopo eventi e registrazioni); il banner della pagina stufa guarda il battito del motore sul Pi
+(`SchedulerEngineBanner`).
 
 **Firebase** (RTDB + FCM) resta per: log/errori, changelog, preferenze e token FCM utenti, rate limiter, cache. I dati
 live dei device vengono dal backend.

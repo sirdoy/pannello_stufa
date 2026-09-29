@@ -46,14 +46,6 @@ async function ping(): Promise<unknown> {
 }
 
 /**
- * Debug: Make a request and return the raw response.
- * Used by debug endpoints to inspect external API response format.
- */
-async function debugRequest(endpoint: string): Promise<unknown> {
-  return haGet<unknown>(endpoint);
-}
-
-/**
  * Get network devices connected to Fritz!Box
  *
  * Raw: { items: [{ ip, name, mac, status: 0|1, provider_type, custom_name, device_type }], total_count, limit, offset }
@@ -758,7 +750,6 @@ function parseServiceDiscoveryXml(xml: string): ServiceDiscoveryResponse {
  */
 export const fritzboxClient = {
   ping,
-  debugRequest,
   getDevices,
   getBandwidth,
   getBandwidthHistory,

@@ -738,6 +738,16 @@ describe('useNetworkData', () => {
       });
 
       expect(result.current.devices[0]?.active).toBe(false);
+
+      // T5: older backends sent the raw fritzconnection boolean
+      await act(async () => {
+        capturedCallback?.({
+          ...mockWsPayload,
+          devices: [{ ip: '192.168.1.1', name: 'TestDevice', mac: 'AA:BB:CC:DD:EE:FF', status: true }],
+        });
+      });
+
+      expect(result.current.devices[0]?.active).toBe(true);
     });
 
     it('WS handleMessage maps WAN fields (is_connected → connected, max_downstream_bps/1_000_000 → linkSpeed)', async () => {

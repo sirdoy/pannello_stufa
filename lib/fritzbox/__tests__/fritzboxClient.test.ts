@@ -27,15 +27,6 @@ describe('fritzboxClient', () => {
     });
   });
 
-  describe('debugRequest()', () => {
-    it('passes endpoint directly to haGet', async () => {
-      mockHaGet.mockResolvedValue({ some: 'data' });
-      const result = await fritzboxClient.debugRequest('/api/v1/custom');
-      expect(mockHaGet).toHaveBeenCalledWith('/api/v1/custom');
-      expect(result).toEqual({ some: 'data' });
-    });
-  });
-
   describe('getDevices()', () => {
     it('transforms paginated device response (status->active, mac->id)', async () => {
       mockHaGet.mockResolvedValue({

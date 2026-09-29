@@ -49,7 +49,8 @@ export default function SonosQueueViewer({ groupId }: SonosQueueViewerProps) {
               {items.map(item => (
                 <div key={item.position} className="flex items-center gap-3 py-1.5">
                   <span className="w-6 text-right text-xs text-slate-500 flex-shrink-0">
-                    {item.position}
+                    {/* position is 0-based (backend offset + index) */}
+                    {item.position + 1}
                   </span>
                   <span className="flex-1 truncate text-sm text-slate-200">
                     {item.title ?? '—'}

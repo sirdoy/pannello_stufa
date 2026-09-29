@@ -217,7 +217,8 @@ export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataR
           name: d.name,
           ip: d.ip,
           mac: d.mac,
-          active: d.status === 1,
+          // Boolean(): backends before T5 sent the raw fritzconnection boolean on WS
+          active: Boolean(d.status),
         }));
         setDevices(rawDevices);
         // Fire-and-forget enrichment — only when enrichVendors enabled (D-10)

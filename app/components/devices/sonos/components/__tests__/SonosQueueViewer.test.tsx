@@ -59,6 +59,18 @@ describe('SonosQueueViewer', () => {
     expect(screen.getByText('Song Two')).toBeInTheDocument();
   });
 
+  it('numbers the 0-based queue positions from 1 (T5)', () => {
+    mockReturnValue = {
+      ...defaultMockReturn,
+      items: [{ position: 0, title: 'First', artist: 'A', album: null, album_art_url: null }],
+      total: 1,
+    };
+    render(<SonosQueueViewer groupId="zone-1" />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.queryByText('0')).toBeNull();
+  });
+
   it('shows Coda vuota when items empty and not loading', () => {
     mockReturnValue = { ...defaultMockReturn, items: [], total: 0, loading: false };
     render(<SonosQueueViewer groupId="zone-1" />);

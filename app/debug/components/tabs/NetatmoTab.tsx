@@ -174,6 +174,17 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
           />
 
           <EndpointCard
+            name="Valve Calibration Status (auto 12 h sul Pi)"
+            url="/api/v1/netatmo/valves/calibration-status"
+            response={getResponses.calibrationStatus}
+            loading={loadingGet.calibrationStatus ?? false}
+            timing={timings.calibrationStatus}
+            onRefresh={() => fetchGetEndpoint('calibrationStatus', '/api/v1/netatmo/valves/calibration-status')}
+            onCopyUrl={() => copyUrlToClipboard('/api/v1/netatmo/valves/calibration-status')}
+            isCopied={copiedUrl === '/api/v1/netatmo/valves/calibration-status'}
+          />
+
+          <EndpointCard
             name="Camera Status"
             url="/api/v1/netatmo/camera/status"
             response={getResponses.cameraStatus}

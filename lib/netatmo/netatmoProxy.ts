@@ -44,6 +44,7 @@ import type {
   RenameHomeRequest,
   NetatmoHomedataResponse,
   CalibrateValveResponse,
+  ValveCalibrationStatus,
 } from '@/types/netatmoProxy';
 
 const DEFAULT_TIMEOUT_MS = 15_000;
@@ -192,6 +193,11 @@ export async function getProxyValves(): Promise<ValveStatusResponse> {
  */
 export async function proxyCalibrateValves(): Promise<CalibrateBatchResponse> {
   return haPost<CalibrateBatchResponse>('/api/v1/netatmo/valves/calibrate', {});
+}
+
+/** Last calibration run and next automatic one (12 h on the Pi, ROADMAP V9). */
+export async function getProxyValveCalibrationStatus(): Promise<ValveCalibrationStatus> {
+  return haGet<ValveCalibrationStatus>('/api/v1/netatmo/valves/calibration-status');
 }
 
 // =============================================================================

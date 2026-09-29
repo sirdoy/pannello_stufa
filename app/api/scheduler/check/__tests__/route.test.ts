@@ -6,7 +6,6 @@ jest.mock('@/lib/auth/session', () => ({ authSession: { getSession: jest.fn() } 
 jest.mock('@/lib/firebaseAdmin', () => ({ adminDbGet: jest.fn(), adminDbSet: jest.fn() }));
 jest.mock('@/lib/environmentHelper', () => ({ getEnvironmentPath: (p: string) => p }));
 jest.mock('@/lib/services/tokenCleanupService', () => ({ cleanupStaleTokens: jest.fn() }));
-jest.mock('@/lib/netatmo/netatmoCalibrationService', () => ({ calibrateValvesServer: jest.fn() }));
 jest.mock('@/lib/weather/openMeteo', () => ({ fetchWeatherForecast: jest.fn() }));
 jest.mock('@/lib/weather/weatherCacheService', () => ({ saveWeatherToCache: jest.fn() }));
 jest.mock('@/lib/stove/thermorossiProxy');
@@ -14,7 +13,6 @@ jest.mock('@/lib/stove/thermorossiProxy');
 import { GET } from '../route';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
-import { calibrateValvesServer } from '@/lib/netatmo/netatmoCalibrationService';
 import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
 import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 import * as stove from '@/lib/stove/thermorossiProxy';
@@ -39,7 +37,6 @@ beforeEach(() => {
   jest.mocked(adminDbSet).mockImplementation(async (path: string, value: unknown) => {
     store[path] = value;
   });
-  jest.mocked(calibrateValvesServer).mockResolvedValue({ calibrated: true } as never);
   jest.mocked(fetchWeatherForecast).mockResolvedValue({ temp: 20 } as never);
   jest.mocked(cleanupStaleTokens).mockResolvedValue({ cleaned: true, tokensRemoved: 2 } as never);
 });
@@ -52,44 +49,39 @@ it('401 without the cron secret', async () => {
   expect(adminDbSet).not.toHaveBeenCalled();
 });
 
-it('first run: all three tasks, timestamps saved, no cron heartbeat (V8)', async () => {
+it('first run: weather + token cleanup, no heartbeat (V8) nor calibration (V9)', async () => {
   const res = await call();
   const body = await res.json();
 
   expect(res.status).toBe(200);
   expect(store['cronHealth/lastCall']).toBeUndefined();
-  expect(body.calibration.ran).toBe(true);
+  expect(body.calibration).toBeUndefined(); // on the Pi since V9
   expect(body.weather).toMatchObject({ ran: true, refreshed: true });
   expect(body.tokenCleanup).toMatchObject({ ran: true, cleaned: true });
   expect(saveWeatherToCache).toHaveBeenCalledWith(45.1, 9.2, { temp: 20 });
-  expect(store['netatmo/lastAutoCalibration']).toBe(NOW);
+  expect(store['netatmo/lastAutoCalibration']).toBeUndefined();
   expect(store['cron/lastWeatherRefresh']).toBe(NOW);
   expect(store['cron/lastTokenCleanup']).toBe(NOW);
 });
 
 it('tasks respect their intervals', async () => {
-  store['netatmo/lastAutoCalibration'] = NOW - 60 * 60 * 1000; // 1 h ago (< 12 h)
   store['cron/lastWeatherRefresh'] = NOW - 31 * 60 * 1000; // 31 min ago (> 30 min)
   store['cron/lastTokenCleanup'] = NOW - 24 * 60 * 60 * 1000; // 1 day ago (< 7 d)
 
   const body = await (await call()).json();
 
-  expect(body.calibration).toMatchObject({ ran: false, reason: 'too_soon' });
   expect(body.weather.ran).toBe(true);
   expect(body.tokenCleanup).toMatchObject({ ran: false, reason: 'too_soon' });
-  expect(calibrateValvesServer).not.toHaveBeenCalled();
   expect(cleanupStaleTokens).not.toHaveBeenCalled();
 });
 
 it('a failed task is retried next run and does not break the others', async () => {
-  jest.mocked(calibrateValvesServer).mockResolvedValue({ calibrated: false, reason: 'api' } as never);
   jest.mocked(fetchWeatherForecast).mockRejectedValue(new Error('open-meteo down'));
 
   const res = await call();
   const body = await res.json();
 
   expect(res.status).toBe(200);
-  expect(store['netatmo/lastAutoCalibration']).toBeUndefined();
   expect(body.weather).toMatchObject({ ran: false, reason: 'exception', error: 'open-meteo down' });
   expect(body.tokenCleanup.ran).toBe(true);
 });

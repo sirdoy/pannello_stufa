@@ -423,6 +423,17 @@ export interface NetatmoHomedataResponse {
 // CALIBRATE VALVE TYPES
 // =============================================================================
 
+/** GET /valves/calibration-status response (ROADMAP V9: 12 h auto calibration on the Pi) */
+export interface ValveCalibrationStatus {
+  last_run_at: number | null; // Unix seconds
+  last_trigger: 'auto' | 'manual' | null;
+  last_ok: boolean | null;
+  last_results: { module_id: string; status: 'accepted' | 'error'; error?: string }[];
+  last_error: string | null;
+  auto_interval_s: number;
+  next_auto_at: number | null; // Unix seconds
+}
+
 /** POST /valves/{module_id}/calibrate response */
 export interface CalibrateValveResponse {
   status: 'accepted';

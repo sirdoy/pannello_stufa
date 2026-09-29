@@ -6,7 +6,6 @@
  * Since workspace ROADMAP D2 the stove schedule, maintenance hours, ignition /
  * shutdown and their notifications run on the Pi. This external cron only does the
  * frontend-side housekeeping that used to piggyback on it:
- * - Netatmo valve calibration every 12 h
  * - weather cache refresh every 30 min
  * - stale FCM token cleanup every 7 days
  *
@@ -17,13 +16,11 @@ import { withCronSecret, success } from '@/lib/core';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { getEnvironmentPath } from '@/lib/environmentHelper';
 import { cleanupStaleTokens } from '@/lib/services/tokenCleanupService';
-import { calibrateValvesServer } from '@/lib/netatmo/netatmoCalibrationService';
 import { fetchWeatherForecast } from '@/lib/weather/openMeteo';
 import { saveWeatherToCache } from '@/lib/weather/weatherCacheService';
 
 export const dynamic = 'force-dynamic';
 
-const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 const THIRTY_MINUTES = 30 * 60 * 1000;
 const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
@@ -44,14 +41,6 @@ async function everyInterval(
   const { done, result } = await task();
   if (done) await adminDbSet(statePath, now);
   return { ran: true, ...result };
-}
-
-async function calibrateValves(): Promise<{ done: boolean; result: TaskResult }> {
-  const result = await calibrateValvesServer();
-  if (!result.calibrated) {
-    console.error('❌ Calibrazione automatica fallita:', result.error || result.reason);
-  }
-  return { done: result.calibrated, result: { ...result } };
 }
 
 async function refreshWeather(): Promise<{ done: boolean; result: TaskResult }> {
@@ -81,14 +70,14 @@ async function safely(name: string, run: () => Promise<TaskResult>): Promise<Tas
   }
 }
 
-// The heartbeat `cronHealth/lastCall` is gone: the UI watches the stove engine on
-// the Pi instead (ROADMAP V8, GET /api/v1/thermorossi/scheduler/engine).
+// Moved to the Pi: the heartbeat `cronHealth/lastCall` (the UI watches the stove
+// engine, ROADMAP V8) and the 12 h valve calibration (ROADMAP V9,
+// GET /api/v1/netatmo/valves/calibration-status).
 export const GET = withCronSecret(async () => {
-  const [calibration, weather, tokenCleanup] = await Promise.all([
-    safely('calibration', () => everyInterval('netatmo/lastAutoCalibration', TWELVE_HOURS, calibrateValves)),
+  const [weather, tokenCleanup] = await Promise.all([
     safely('weather', () => everyInterval('cron/lastWeatherRefresh', THIRTY_MINUTES, refreshWeather)),
     safely('tokenCleanup', () => everyInterval('cron/lastTokenCleanup', SEVEN_DAYS, cleanupTokens)),
   ]);
 
-  return success({ status: 'OK', calibration, weather, tokenCleanup });
+  return success({ status: 'OK', weather, tokenCleanup });
 }, 'Scheduler/Check');

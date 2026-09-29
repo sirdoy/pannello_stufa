@@ -99,8 +99,8 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
         <Text variant="secondary" size="sm">
           The scheduler cron endpoint (<code className="text-xs">/api/scheduler/check</code>) is called every minute by
-          an external cron service (e.g., cron-job.org). It handles all automated tasks: stove scheduling, Netatmo
-          calibration, weather refresh, token cleanup, and health monitoring.
+          an external cron service (cron-job.org). Since ROADMAP D2/V8/V9 it only refreshes the weather and cleans up
+          FCM tokens: stove scheduling, its heartbeat and the 12 h valve calibration run on the Pi.
         </Text>
       </div>
 
@@ -155,7 +155,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
           <Text variant="secondary" size="sm">
             <strong>Stove Scheduler:</strong> Every minute (checks active schedule)
             <br />
-            <strong>Netatmo Calibration:</strong> Every 12 hours (valve maintenance)
+            <strong>Netatmo Calibration:</strong> Every 12 hours on the Pi (valve maintenance)
             <br />
             <strong>Netatmo Sync:</strong> Every minute (temperature updates)
             <br />

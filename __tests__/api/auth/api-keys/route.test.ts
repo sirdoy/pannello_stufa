@@ -7,10 +7,14 @@
 import { GET, POST } from '@/app/api/auth/api-keys/route';
 import { login, listApiKeys, createApiKey } from '@/lib/auth/authProxy';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
+import { requireAdminSession } from '@/lib/auth/storedSession';
 import type { APIKeyListResponse, APIKeyResponse } from '@/types/authProxy';
 
 // Mock dependencies
 jest.mock('@/lib/auth/authProxy');
+jest.mock('@/lib/auth/storedSession', () => ({
+  requireAdminSession: jest.fn().mockResolvedValue({ user: { role: 'admin' } }),
+}));
 jest.mock('@/lib/core', () => ({
   withAuthAndErrorHandler: <T,>(fn: T) => fn,
   success: (data: unknown) => ({ ok: true, data }),
@@ -20,6 +24,8 @@ jest.mock('@/lib/core', () => ({
 const mockLogin = login as jest.MockedFunction<typeof login>;
 const mockListApiKeys = listApiKeys as jest.MockedFunction<typeof listApiKeys>;
 const mockCreateApiKey = createApiKey as jest.MockedFunction<typeof createApiKey>;
+
+const mockRequireAdmin = requireAdminSession as jest.MockedFunction<typeof requireAdminSession>;
 
 const mockToken = { access_token: 'test-token', token_type: 'bearer' as const };
 
@@ -123,5 +129,30 @@ describe('POST /api/auth/api-keys', () => {
     ).rejects.toMatchObject({ code: ERROR_CODES.VALIDATION_ERROR });
 
     expect(mockLogin).not.toHaveBeenCalled();
+  });
+});
+
+describe('admin guard (S13)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockRequireAdmin.mockRejectedValueOnce(new ApiError(ERROR_CODES.FORBIDDEN, 'Admin role required', HTTP_STATUS.FORBIDDEN));
+  });
+
+  it('GET rejects non-admin sessions before calling the HA proxy', async () => {
+    await expect(
+      (GET as unknown as (req: Request) => Promise<unknown>)({} as Request)
+    ).rejects.toMatchObject({ code: ERROR_CODES.FORBIDDEN });
+    expect(mockLogin).not.toHaveBeenCalled();
+    expect(mockListApiKeys).not.toHaveBeenCalled();
+  });
+
+  it('POST rejects non-admin sessions before calling the HA proxy', async () => {
+    await expect(
+      (POST as unknown as (req: Request) => Promise<unknown>)({
+        json: () => Promise.resolve({ name: 'x' }),
+      } as unknown as Request)
+    ).rejects.toMatchObject({ code: ERROR_CODES.FORBIDDEN });
+    expect(mockLogin).not.toHaveBeenCalled();
+    expect(mockCreateApiKey).not.toHaveBeenCalled();
   });
 });

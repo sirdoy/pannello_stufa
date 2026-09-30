@@ -2,7 +2,7 @@
  * GET /api/auth/api-keys  — List all API keys
  * POST /api/auth/api-keys — Create a new API key
  *
- * Both endpoints require an authenticated session (D-07, T-157-06).
+ * Both endpoints require an admin session (D-07, T-157-06, S13).
  * HA proxy JWT is obtained server-side and never returned to client (D-03).
  *
  * POST returns the full api_key once at creation (APIKeyResponse) — this is
@@ -12,6 +12,7 @@
 import { NextResponse } from 'next/server';
 import { withAuthAndErrorHandler, created } from '@/lib/core';
 import { login, listApiKeys, createApiKey } from '@/lib/auth/authProxy';
+import { requireAdminSession } from '@/lib/auth/storedSession';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 import type { APIKeyCreate } from '@/types/authProxy';
 
@@ -37,7 +38,8 @@ function getAdminCredentials(): { username: string; password: string } {
  * GET /api/auth/api-keys
  * Returns list of API keys. JWT never exposed to client.
  */
-export const GET = withAuthAndErrorHandler(async () => {
+export const GET = withAuthAndErrorHandler(async (request) => {
+  await requireAdminSession(request);
   const { username, password } = getAdminCredentials();
   const { access_token } = await login(username, password);
   const data = await listApiKeys(access_token);
@@ -50,6 +52,7 @@ export const GET = withAuthAndErrorHandler(async () => {
  * Creates a new API key. Requires { name } in request body.
  */
 export const POST = withAuthAndErrorHandler(async (request) => {
+  await requireAdminSession(request);
   const body = (await request.json()) as Partial<APIKeyCreate>;
 
   if (!body.name || typeof body.name !== 'string' || body.name.trim().length === 0) {

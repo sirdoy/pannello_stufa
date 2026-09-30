@@ -2,7 +2,7 @@
  * DELETE /api/auth/api-keys/[keyId]
  *
  * Revokes the specified API key permanently via the HA proxy.
- * Requires an authenticated session (D-07, T-157-06).
+ * Requires an admin session (D-07, T-157-06, S13).
  * HA proxy JWT is obtained server-side and never returned to client (D-03).
  *
  * Security (T-157-03): keyId is validated as a finite positive integer
@@ -11,11 +11,13 @@
 
 import { withAuthAndErrorHandler, noContent } from '@/lib/core';
 import { login, deleteApiKey } from '@/lib/auth/authProxy';
+import { requireAdminSession } from '@/lib/auth/storedSession';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 
 export const dynamic = 'force-dynamic';
 
-export const DELETE = withAuthAndErrorHandler(async (_request, context) => {
+export const DELETE = withAuthAndErrorHandler(async (request, context) => {
+  await requireAdminSession(request);
   const params = await context.params;
   const keyIdRaw = params['keyId'] ?? '';
   const keyId = Number(keyIdRaw);

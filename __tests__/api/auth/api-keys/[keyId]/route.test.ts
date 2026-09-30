@@ -7,9 +7,13 @@
 import { DELETE } from '@/app/api/auth/api-keys/[keyId]/route';
 import { login, deleteApiKey } from '@/lib/auth/authProxy';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
+import { requireAdminSession } from '@/lib/auth/storedSession';
 
 // Mock dependencies
 jest.mock('@/lib/auth/authProxy');
+jest.mock('@/lib/auth/storedSession', () => ({
+  requireAdminSession: jest.fn().mockResolvedValue({ user: { role: 'admin' } }),
+}));
 jest.mock('@/lib/core', () => ({
   withAuthAndErrorHandler: <T,>(fn: T) => fn,
   noContent: () => ({ ok: true, status: 204 }),
@@ -17,6 +21,8 @@ jest.mock('@/lib/core', () => ({
 
 const mockLogin = login as jest.MockedFunction<typeof login>;
 const mockDeleteApiKey = deleteApiKey as jest.MockedFunction<typeof deleteApiKey>;
+
+const mockRequireAdmin = requireAdminSession as jest.MockedFunction<typeof requireAdminSession>;
 
 const mockToken = { access_token: 'test-token', token_type: 'bearer' as const };
 
@@ -95,5 +101,15 @@ describe('DELETE /api/auth/api-keys/[keyId]', () => {
         makeContext('999')
       )
     ).rejects.toMatchObject({ code: ERROR_CODES.NOT_FOUND });
+  });
+
+  it('rejects non-admin sessions before calling the HA proxy (S13)', async () => {
+    mockRequireAdmin.mockRejectedValueOnce(new ApiError(ERROR_CODES.FORBIDDEN, 'Admin role required', HTTP_STATUS.FORBIDDEN));
+
+    await expect(
+      (DELETE as unknown as (_req: unknown, ctx: unknown) => Promise<unknown>)({}, makeContext('1'))
+    ).rejects.toMatchObject({ code: ERROR_CODES.FORBIDDEN });
+    expect(mockLogin).not.toHaveBeenCalled();
+    expect(mockDeleteApiKey).not.toHaveBeenCalled();
   });
 });

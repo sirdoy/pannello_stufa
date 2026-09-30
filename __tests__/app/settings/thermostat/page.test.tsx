@@ -6,6 +6,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 import ThermostatSettingsPage from '@/app/settings/thermostat/page';
+import { useUser } from '@/lib/auth/useUser';
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
@@ -37,7 +38,7 @@ jest.mock('@/app/components/netatmo/PidAutomationPanel', () => {
 
 describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
   const mockPush = jest.fn();
-  const mockUseUser = require('@/lib/auth/useUser').useUser;
+  const mockUseUser = useUser as jest.Mock;
 
   beforeEach(() => {
     jest.clearAllMocks();

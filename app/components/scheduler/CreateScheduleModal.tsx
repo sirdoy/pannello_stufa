@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useDepsChanged } from '@/lib/hooks/useDepsChanged';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
@@ -35,15 +36,14 @@ export default function CreateScheduleModal({
   const [copyFromId, setCopyFromId] = useState('');
   const [error, setError] = useState('');
 
-  // Reset state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setName('');
-      setMode('scratch');
-      setCopyFromId('');
-      setError('');
-    }
-  }, [isOpen]);
+  // Reset state when modal opens (during render, not in an effect)
+  const openChanged = useDepsChanged([isOpen]);
+  if (openChanged && isOpen) {
+    setName('');
+    setMode('scratch');
+    setCopyFromId('');
+    setError('');
+  }
 
   const handleConfirm = () => {
     // Validation

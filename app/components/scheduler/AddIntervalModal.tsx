@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useDepsChanged } from '@/lib/hooks/useDepsChanged';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
@@ -49,38 +50,37 @@ export default function AddIntervalModal({
   const [power, setPower] = useState(2);
   const [fan, setFan] = useState(3);
 
-  // Update state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      if (mode === 'edit' && initialInterval) {
-        // Edit mode: precompila con dati esistenti
-        setStart(initialInterval.start);
-        setEnd(initialInterval.end);
-        setPower(initialInterval.power);
-        setFan(initialInterval.fan);
-        setInputMode('endTime'); // Default to endTime for edit
+  // Update state when modal opens (or its inputs change while open), during render
+  const openedOrChanged = useDepsChanged([isOpen, mode, initialInterval, suggestedStart]);
+  if (openedOrChanged && isOpen) {
+    if (mode === 'edit' && initialInterval) {
+      // Edit mode: precompila con dati esistenti
+      setStart(initialInterval.start);
+      setEnd(initialInterval.end);
+      setPower(initialInterval.power);
+      setFan(initialInterval.fan);
+      setInputMode('endTime'); // Default to endTime for edit
 
-        // Calculate duration for duration mode
-        const [startH, startM] = initialInterval.start.split(':').map(Number);
-        const [endH, endM] = initialInterval.end.split(':').map(Number);
-        const durationMin = (endH! * 60 + endM!) - (startH! * 60 + startM!);
-        if ([15, 30, 60, 120].includes(durationMin)) {
-          setDurationPreset(durationMin);
-        } else {
-          setDurationPreset('custom');
-          setCustomMinutes(durationMin);
-        }
+      // Calculate duration for duration mode
+      const [startH, startM] = initialInterval.start.split(':').map(Number);
+      const [endH, endM] = initialInterval.end.split(':').map(Number);
+      const durationMin = (endH! * 60 + endM!) - (startH! * 60 + startM!);
+      if ([15, 30, 60, 120].includes(durationMin)) {
+        setDurationPreset(durationMin);
       } else {
-        // Add mode: reset to defaults
-        setStart(suggestedStart);
-        setDurationPreset(30);
-        setCustomMinutes(60);
-        setPower(2);
-        setFan(3);
-        setInputMode('duration');
+        setDurationPreset('custom');
+        setCustomMinutes(durationMin);
       }
+    } else {
+      // Add mode: reset to defaults
+      setStart(suggestedStart);
+      setDurationPreset(30);
+      setCustomMinutes(60);
+      setPower(2);
+      setFan(3);
+      setInputMode('duration');
     }
-  }, [isOpen, mode, initialInterval, suggestedStart]);
+  }
 
   // Calculate end time based on input mode
   const calculateEnd = () => {

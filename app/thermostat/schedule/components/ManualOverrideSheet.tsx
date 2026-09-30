@@ -185,7 +185,7 @@ export default function ManualOverrideSheet({
 
           {/* Help text */}
           <Text variant="tertiary" size="xs" className="text-center">
-            L'override terminerà automaticamente. La programmazione normale riprenderà al termine.
+            L&apos;override terminerà automaticamente. La programmazione normale riprenderà al termine.
           </Text>
         </div>
       )}

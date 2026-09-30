@@ -21,7 +21,7 @@ jest.mock('next/headers', () => ({
 }));
 
 jest.mock('@/lib/core', () => ({
-  withAuthAndErrorHandler: (fn: Function) => fn,
+  withAuthAndErrorHandler: <T,>(fn: T) => fn,
   success: (data: unknown) => ({ ok: true, data }),
 }));
 

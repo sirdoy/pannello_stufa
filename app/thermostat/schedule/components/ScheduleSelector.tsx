@@ -105,7 +105,7 @@ export default function ScheduleSelector({
         <div className="flex items-center gap-2 text-sage-400">
           <Check size={16} />
           <Text variant="sage" size="sm">
-            "{activeSchedule.name}" è la programmazione attiva
+            &quot;{activeSchedule.name}&quot; è la programmazione attiva
           </Text>
         </div>
       )}
@@ -113,7 +113,7 @@ export default function ScheduleSelector({
       {/* Pending change indicator */}
       {hasChanged && !switching && (
         <Text variant="warning" size="sm">
-          Premi "Applica" per cambiare programmazione
+          Premi &quot;Applica&quot; per cambiare programmazione
         </Text>
       )}
 

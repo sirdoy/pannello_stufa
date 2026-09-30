@@ -77,8 +77,7 @@ const arrowVariants = cva([
 /**
  * PopoverArrow - Arrow indicator pointing to trigger
  */
-export interface PopoverArrowProps
-  extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Arrow> {}
+export type PopoverArrowProps = React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Arrow>;
 
 const PopoverArrow = forwardRef<React.ElementRef<typeof PopoverPrimitive.Arrow>, PopoverArrowProps>(
   function PopoverArrow({ className, ...props }, ref) {
@@ -143,8 +142,7 @@ PopoverTrigger.displayName = 'PopoverTrigger';
 /**
  * PopoverClose - Close button primitive
  */
-export interface PopoverCloseProps
-  extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Close> {}
+export type PopoverCloseProps = React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Close>;
 
 const PopoverClose = forwardRef<React.ElementRef<typeof PopoverPrimitive.Close>, PopoverCloseProps>(
   function PopoverClose({ className, children, ...props }, ref) {

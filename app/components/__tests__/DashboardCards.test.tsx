@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { redirect as mockRedirect } from 'next/navigation';
 import DashboardCards from '../DashboardCards';
 
 // Mock next/navigation (redirect)
@@ -134,7 +135,6 @@ describe('DashboardCards', () => {
     (authSession.getSession as jest.Mock).mockResolvedValue(null);
 
     // redirect() throws in Next.js, so we handle it
-    const { redirect: mockRedirect } = require('next/navigation');
 
     await DashboardCards().catch(() => {});
 

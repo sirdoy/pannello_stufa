@@ -39,6 +39,66 @@ interface CustomTooltipProps {
   }>;
 }
 
+// Custom tooltip (module level: a component defined in render would remount every render)
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+  if (!active || !payload || payload.length === 0) return null;
+
+  const data = payload[0]?.payload;
+  if (!data) return null;
+
+  return (
+    <div className="bg-slate-900 border border-white/10 rounded-lg p-3 shadow-xl">
+      <Text size="xs" className="mb-2">
+        {format(parseISO(data.date), 'MMMM dd, yyyy')}
+      </Text>
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between gap-4">
+          <Text size="xs" variant="secondary">
+            Total:
+          </Text>
+          <Text size="xs">
+            {data.total}
+          </Text>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-sage-500" />
+            <Text size="xs" variant="secondary">
+              Sent:
+            </Text>
+          </div>
+          <Text size="xs" className="text-sage-500">
+            {data.sent}
+          </Text>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-ember-500" />
+            <Text size="xs" variant="secondary">
+              Failed:
+            </Text>
+          </div>
+          <Text size="xs" className="text-ember-500">
+            {data.failed}
+          </Text>
+        </div>
+        <div className="h-px bg-white/10 my-1" />
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-ocean-500" />
+            <Text size="xs" variant="secondary">
+              Rate:
+            </Text>
+          </div>
+          <Text size="xs" className="text-ocean-500">
+            {data.deliveryRate}%
+          </Text>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /**
  * DeliveryChart Component
  *
@@ -80,66 +140,6 @@ export default function DeliveryChart({ data = [], loading = false }: DeliveryCh
     // Round delivery rate for cleaner display
     deliveryRate: parseFloat(item.deliveryRate.toFixed(1)),
   }));
-
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
-    if (!active || !payload || payload.length === 0) return null;
-
-    const data = payload[0]?.payload;
-    if (!data) return null;
-
-    return (
-      <div className="bg-slate-900 border border-white/10 rounded-lg p-3 shadow-xl">
-        <Text size="xs" className="mb-2">
-          {format(parseISO(data.date), 'MMMM dd, yyyy')}
-        </Text>
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between gap-4">
-            <Text size="xs" variant="secondary">
-              Total:
-            </Text>
-            <Text size="xs">
-              {data.total}
-            </Text>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-sage-500" />
-              <Text size="xs" variant="secondary">
-                Sent:
-              </Text>
-            </div>
-            <Text size="xs" className="text-sage-500">
-              {data.sent}
-            </Text>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-ember-500" />
-              <Text size="xs" variant="secondary">
-                Failed:
-              </Text>
-            </div>
-            <Text size="xs" className="text-ember-500">
-              {data.failed}
-            </Text>
-          </div>
-          <div className="h-px bg-white/10 my-1" />
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-ocean-500" />
-              <Text size="xs" variant="secondary">
-                Rate:
-              </Text>
-            </div>
-            <Text size="xs" className="text-ocean-500">
-              {data.deliveryRate}%
-            </Text>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <ResponsiveContainer width="100%" height={300}>

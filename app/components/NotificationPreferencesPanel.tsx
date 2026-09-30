@@ -8,7 +8,7 @@
  * Changes propagate instantly across devices.
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useUser } from '@/lib/auth/useUser';
 // @ts-expect-error - No type definitions available
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
@@ -188,12 +188,12 @@ export default function NotificationPreferencesPanel() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Sync hook error to local error state
-  useEffect(() => {
-    if (hookError) {
-      setError('Errore sincronizzazione preferenze');
-    }
-  }, [hookError]);
+  // Sync hook error to local error state (adjusted during render, not in an effect)
+  const [seenHookError, setSeenHookError] = useState<unknown>(null);
+  if (hookError !== seenHookError) {
+    setSeenHookError(hookError);
+    if (hookError) setError('Errore sincronizzazione preferenze');
+  }
 
   // Save section preferences using real-time sync
   const saveSection = async (section: string, sectionPrefs: any) => {

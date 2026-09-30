@@ -5,16 +5,16 @@
  * The hook's integration with React is tested via integration tests.
  */
 
+import useOnlineStatusDefault, { useOnlineStatus } from '../useOnlineStatus';
+
 describe('useOnlineStatus', () => {
   describe('module exports', () => {
     it('exports useOnlineStatus function', () => {
-      const { useOnlineStatus } = require('../useOnlineStatus');
       expect(typeof useOnlineStatus).toBe('function');
     });
 
     it('exports default as useOnlineStatus', () => {
-      const defaultExport = require('../useOnlineStatus').default;
-      expect(typeof defaultExport).toBe('function');
+      expect(typeof useOnlineStatusDefault).toBe('function');
     });
   });
 

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
+import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import type { SonosPlaybackResponse } from '@/types/sonosProxy';
 
 interface SonosSeekControlProps {
@@ -44,25 +45,19 @@ export default function SonosSeekControl({ playback, groupId, onSeek }: SonosSee
   const durationSeconds = playback?.duration ? hhmmssToSeconds(playback.duration) : 0;
   const positionSeconds = playback?.position ? hhmmssToSeconds(playback.position) : 0;
 
-  const [localPosition, setLocalPosition] = useState(positionSeconds);
-  const isDragging = useRef(false);
-
+  const [isDragging, setIsDragging] = useState(false);
   // Sync from server when not dragging
-  useEffect(() => {
-    if (!isDragging.current) {
-      setLocalPosition(positionSeconds);
-    }
-  }, [positionSeconds]);
+  const [localPosition, setLocalPosition] = useSyncedState(positionSeconds, isDragging);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    isDragging.current = true;
+    setIsDragging(true);
     setLocalPosition(parseInt(e.target.value, 10));
   };
 
   const handleRelease = () => {
     const hhmmssString = secondsToHhmmss(localPosition);
     void onSeek(groupId, hhmmssString);
-    isDragging.current = false;
+    setIsDragging(false);
   };
 
   return (

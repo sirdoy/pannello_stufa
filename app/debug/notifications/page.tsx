@@ -223,7 +223,7 @@ export default function NotificationsDashboard() {
           {/* Today's Notifications */}
           <Card className="p-6 bg-ocean-50 border-2 border-ocean-200">
             <Text variant="tertiary" size="xs" className="mb-2">
-              Today's Notifications
+              Today&apos;s Notifications
             </Text>
             <Text variant="tertiary" className="text-4xl">
               {stats.notifications.total}

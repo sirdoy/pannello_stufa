@@ -20,7 +20,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import {
   incrementVisitCount,
   isDismissed,
@@ -47,18 +47,17 @@ interface UseInstallPromptReturn {
 
 const MIN_VISITS = 2;
 
+const subscribeNoop = () => () => {};
+
 export function useInstallPrompt(): UseInstallPromptReturn {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [canInstall, setCanInstall] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
+  // false on the server and during hydration, real value on the client
+  const isIOS = useSyncExternalStore(subscribeNoop, isIOSDevice, () => false);
 
   useEffect(() => {
     // Increment visit count on mount
     const visitCount = incrementVisitCount();
-
-    // Detect iOS
-    const iosDetected = isIOSDevice();
-    setIsIOS(iosDetected);
 
     // Check if should show prompt
     const shouldShow =
@@ -67,7 +66,10 @@ export function useInstallPrompt(): UseInstallPromptReturn {
       !isDismissed();
 
     // For iOS, show if conditions met (no beforeinstallprompt event)
-    if (iosDetected && shouldShow) {
+    if (isIOSDevice() && shouldShow) {
+      // Eligibility depends on the visit counter bumped just above, a mount-only
+      // side effect: it cannot be computed during render
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCanInstall(true);
     }
 

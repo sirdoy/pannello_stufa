@@ -182,26 +182,39 @@ async function fetchProviderDevices(provider: string): Promise<ProviderDevice[]>
 
 /** Fetches available device IDs from the selected provider */
 function useProviderDevices(provider: string) {
-  const [devices, setDevices] = useState<ProviderDevice[]>([]);
-  const [loading, setLoading] = useState(false);
+  // Last loaded list, tagged with its provider: loading = selected provider not loaded yet
+  const [result, setResult] = useState<{ provider: string; devices: ProviderDevice[] } | null>(null);
+  const active = !!provider && provider !== PROVIDER_ALL;
 
   useEffect(() => {
-    if (!provider || provider === PROVIDER_ALL) {
-      setDevices([]);
-      return;
-    }
+    if (!active) return;
     let cancelled = false;
-    setLoading(true);
-    void fetchProviderDevices(provider).then(result => {
-      if (!cancelled) {
-        setDevices(result);
-        setLoading(false);
-      }
+    void fetchProviderDevices(provider).then(devices => {
+      if (!cancelled) setResult({ provider, devices });
     });
     return () => { cancelled = true; };
-  }, [provider]);
+  }, [provider, active]);
 
-  return { devices, loading };
+  const current = active && result?.provider === provider ? result : null;
+  return { devices: current?.devices ?? [], loading: active && current === null };
+}
+
+/** All registered device_ids grouped by provider, or null when the request fails */
+async function fetchRegisteredByProvider(): Promise<Record<string, Set<string>> | null> {
+  try {
+    // Fetch all registered devices (no pagination limit)
+    const res = await fetch('/api/registry/devices?limit=1000');
+    if (!res.ok) return null;
+    const data = (await res.json()) as PaginatedResponse<RegistryDevice>;
+    const map: Record<string, Set<string>> = {};
+    for (const d of data.items) {
+      if (!map[d.provider_name]) map[d.provider_name] = new Set();
+      map[d.provider_name]!.add(d.device_id);
+    }
+    return map;
+  } catch {
+    return null; /* non-critical */
+  }
 }
 
 // --- useRegisteredDeviceIds: fetches all registered device_ids grouped by provider ---
@@ -209,37 +222,34 @@ function useRegisteredDeviceIds() {
   const [byProvider, setByProvider] = useState<Record<string, Set<string>>>({});
   const [loaded, setLoaded] = useState(false);
 
-  const refetch = useCallback(async () => {
-    try {
-      // Fetch all registered devices (no pagination limit)
-      const res = await fetch('/api/registry/devices?limit=1000');
-      if (!res.ok) return;
-      const data = (await res.json()) as PaginatedResponse<RegistryDevice>;
-      const map: Record<string, Set<string>> = {};
-      for (const d of data.items) {
-        if (!map[d.provider_name]) map[d.provider_name] = new Set();
-        map[d.provider_name]!.add(d.device_id);
-      }
-      setByProvider(map);
-    } catch { /* non-critical */ }
+  const apply = useCallback((map: Record<string, Set<string>> | null) => {
+    if (map) setByProvider(map);
     setLoaded(true);
   }, []);
 
-  useEffect(() => { void refetch(); }, [refetch]);
+  const refetch = useCallback(async () => {
+    apply(await fetchRegisteredByProvider());
+  }, [apply]);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchRegisteredByProvider().then(map => {
+      if (!cancelled) apply(map);
+    });
+    return () => { cancelled = true; };
+  }, [apply]);
 
   return { byProvider, loaded, refetch };
 }
 
 // --- Preload all provider devices to determine which providers still have unregistered devices ---
 function useAvailableProviders(registeredByProvider: Record<string, Set<string>>, registeredLoaded: boolean) {
-  const [availableProviders, setAvailableProviders] = useState<string[]>(PROVIDERS);
-  const [allRegistered, setAllRegistered] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // Result tagged with the registered map it was computed from: loading = not computed for the current one
+  const [result, setResult] = useState<{ source: Record<string, Set<string>>; available: string[] } | null>(null);
 
   useEffect(() => {
     if (!registeredLoaded) return;
     let cancelled = false;
-    setLoading(true);
 
     void (async () => {
       const available: string[] = [];
@@ -252,29 +262,36 @@ function useAvailableProviders(registeredByProvider: Record<string, Set<string>>
         }
       }
       if (!cancelled) {
-        setAvailableProviders(available);
-        setAllRegistered(available.length === 0);
-        setLoading(false);
+        setResult({ source: registeredByProvider, available });
       }
     })();
 
     return () => { cancelled = true; };
   }, [registeredByProvider, registeredLoaded]);
 
-  return { availableProviders, allRegistered, loading };
+  return {
+    // Previous result stays visible while recomputing
+    availableProviders: result?.available ?? PROVIDERS,
+    allRegistered: result ? result.available.length === 0 : false,
+    loading: !registeredLoaded || result?.source !== registeredByProvider,
+  };
 }
 
 // --- useDeviceTypesForSelect hook (per D-32) ---
 function useDeviceTypesForSelect() {
   const [types, setTypes] = useState<DeviceType[]>([]);
-  const refetch = useCallback(async () => {
-    try {
-      const res = await fetch('/api/registry/types');
-      if (!res.ok) return;
-      setTypes(((await res.json()) as { types: DeviceType[] }).types);
-    } catch { /* non-critical */ }
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch('/api/registry/types');
+        if (!res.ok) return;
+        const data = (await res.json()) as { types: DeviceType[] };
+        if (!cancelled) setTypes(data.types);
+      } catch { /* non-critical */ }
+    })();
+    return () => { cancelled = true; };
   }, []);
-  useEffect(() => { void refetch(); }, [refetch]);
   return { types };
 }
 

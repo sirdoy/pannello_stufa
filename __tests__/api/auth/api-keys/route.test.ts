@@ -12,7 +12,7 @@ import type { APIKeyListResponse, APIKeyResponse } from '@/types/authProxy';
 // Mock dependencies
 jest.mock('@/lib/auth/authProxy');
 jest.mock('@/lib/core', () => ({
-  withAuthAndErrorHandler: (fn: Function) => fn,
+  withAuthAndErrorHandler: <T,>(fn: T) => fn,
   success: (data: unknown) => ({ ok: true, data }),
   created: (data: unknown) => ({ ok: true, created: true, data }),
 }));

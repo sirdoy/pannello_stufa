@@ -156,8 +156,7 @@ const Toast = forwardRef<
 );
 Toast.displayName = 'Toast';
 
-export interface ToastViewportProps
-  extends React.ComponentPropsWithoutRef<typeof ToastPrimitive.Viewport> {}
+export type ToastViewportProps = React.ComponentPropsWithoutRef<typeof ToastPrimitive.Viewport>;
 
 /**
  * ToastViewport Component

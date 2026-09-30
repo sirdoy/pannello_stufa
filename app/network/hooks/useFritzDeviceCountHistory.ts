@@ -50,27 +50,32 @@ export function useFritzDeviceCountHistory(): {
   loading: boolean;
 } {
   const [days, setDays] = useState(30);
-  const [chartData, setChartData] = useState<DeviceCountPoint[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Last loaded result, tagged with its `days`: loading = requested range not loaded yet
+  const [result, setResult] = useState<{ days: number; chartData: DeviceCountPoint[] } | null>(null);
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
     // 24 rows per day; backend default limit is 100 (≈4 days) and max is 1000.
     const limit = Math.min(days * 24, 1000);
     fetch(`/api/v1/fritzbox/history/devices/daily?days=${days}&limit=${limit}`)
       .then((res) => res.json())
       .then((json: unknown) => {
         const body = json as { deviceCounts: { items: DeviceDailyRecord[]; total_count: number } };
-        const items = body.deviceCounts?.items ?? [];
-        setChartData(aggregateToDailyTotals(items));
+        return aggregateToDailyTotals(body.deviceCounts?.items ?? []);
       })
-      .catch(() => {
-        setChartData([]);
-      })
-      .finally(() => {
-        setLoading(false);
+      .catch((): DeviceCountPoint[] => [])
+      .then((chartData) => {
+        // Drop responses of a range the user already left
+        if (!cancelled) setResult({ days, chartData });
       });
+    return () => {
+      cancelled = true;
+    };
   }, [days]);
+
+  // While a new range loads the previous chart stays visible
+  const chartData = result?.chartData ?? [];
+  const loading = result?.days !== days;
 
   return { days, setDays, chartData, loading };
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 import { Pressable } from '@/app/components/EmberGlass';
 
 // AUDIT-EXCEPTION (DS-02): the 6 oklch literal strings below are the source-of-truth
@@ -34,22 +34,27 @@ function setAccent(value: string): void {
   }
 }
 
-export function Section01Hue(): React.ReactElement {
-  const [activeHue, setActiveHue] = useState<HueName>('copper');
+const subscribeNoop = () => () => {};
 
-  useEffect(() => {
-    try {
-      const persistedAccent = localStorage.getItem('ember-glass-accent');
-      if (persistedAccent) {
-        const match = (Object.entries(ACCENT_PRESETS) as Array<[HueName, string]>).find(
-          ([, v]) => v === persistedAccent
-        );
-        if (match) setActiveHue(match[0]);
-      }
-    } catch {
-      /* T-174-03-04: localStorage read failure — fall back to defaults. */
-    }
-  }, []);
+function readPersistedHue(): HueName | null {
+  try {
+    const persistedAccent = localStorage.getItem('ember-glass-accent');
+    if (!persistedAccent) return null;
+    const match = (Object.entries(ACCENT_PRESETS) as Array<[HueName, string]>).find(
+      ([, v]) => v === persistedAccent
+    );
+    return match ? match[0] : null;
+  } catch {
+    /* T-174-03-04: localStorage read failure — fall back to defaults. */
+    return null;
+  }
+}
+
+export function Section01Hue(): React.ReactElement {
+  // Persisted accent (null on the server and during hydration), overridden by a click
+  const persistedHue = useSyncExternalStore(subscribeNoop, readPersistedHue, () => null);
+  const [pickedHue, setActiveHue] = useState<HueName | null>(null);
+  const activeHue: HueName = pickedHue ?? persistedHue ?? 'copper';
 
   const onSwatchClick = (hue: HueName): void => {
     setAccent(ACCENT_PRESETS[hue]);

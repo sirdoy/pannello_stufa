@@ -365,9 +365,9 @@ afterEach(() => {
 // use it, so it is required lazily: on the first toHaveNoViolations call or
 // global.axe access.
 expect.extend({
-  toHaveNoViolations(this: jest.MatcherContext, ...args: unknown[]) {
-    const { toHaveNoViolations } = require('jest-axe');
-    return toHaveNoViolations.toHaveNoViolations.apply(this, args);
+  toHaveNoViolations(this: jest.MatcherContext, results?: Parameters<typeof import('jest-axe').toHaveNoViolations.toHaveNoViolations>[0]) {
+    const { toHaveNoViolations } = jest.requireActual<typeof import('jest-axe')>('jest-axe');
+    return toHaveNoViolations.toHaveNoViolations.call(this, results);
   },
 });
 
@@ -376,7 +376,7 @@ expect.extend({
 Object.defineProperty(global, 'axe', {
   configurable: true,
   get() {
-    const { configureAxe: configure } = require('jest-axe');
+    const { configureAxe: configure } = jest.requireActual<typeof import('jest-axe')>('jest-axe');
     const configuredAxe = configure({
       rules: {
         // Disable rules that have known issues in JSDOM
@@ -398,7 +398,7 @@ global.runAxeWithRealTimers = async (container: Element) => {
     jest.useRealTimers();
   }
 
-  const { axe } = require('jest-axe');
+  const { axe } = jest.requireActual<typeof import('jest-axe')>('jest-axe');
   const results = await axe(container);
 
   if (isUsingFakeTimers) {

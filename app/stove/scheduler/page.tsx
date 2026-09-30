@@ -327,7 +327,8 @@ export default function WeeklyScheduler() {
         if (field === 'start' || field === 'end') {
           const intervalToUpdate = updated[index];
           if (!intervalToUpdate) return;
-          let { start, end } = intervalToUpdate;
+          const { start } = intervalToUpdate;
+          let { end } = intervalToUpdate;
 
           // Validazione: end deve essere > start di almeno 15 minuti
           if (end <= start) {

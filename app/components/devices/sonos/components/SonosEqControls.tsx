@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
+import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import { ChevronDown } from 'lucide-react';
 import type { SonosEqResponse, SetEqRequest } from '@/types/sonosProxy';
 
@@ -12,19 +13,11 @@ interface SonosEqControlsProps {
 
 export default function SonosEqControls({ uid, eqData, onSetEq }: SonosEqControlsProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [localBass, setLocalBass] = useState(eqData?.bass ?? 0);
-  const [localTreble, setLocalTreble] = useState(eqData?.treble ?? 0);
+  // Local slider values, re-synced from server data
+  const [localBass, setLocalBass] = useSyncedState(eqData?.bass ?? 0);
+  const [localTreble, setLocalTreble] = useSyncedState(eqData?.treble ?? 0);
   const bassDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const trebleDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Sync local slider values from server data
-  useEffect(() => {
-    setLocalBass(eqData?.bass ?? 0);
-  }, [eqData?.bass]);
-
-  useEffect(() => {
-    setLocalTreble(eqData?.treble ?? 0);
-  }, [eqData?.treble]);
 
   // Return null if no EQ data or all fields are null
   if (!eqData || (eqData.bass === null && eqData.treble === null && eqData.loudness === null)) {

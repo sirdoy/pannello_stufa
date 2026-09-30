@@ -53,7 +53,7 @@ export default function LoginPage() {
   });
 
   // Rate-limit countdown tick (triggers re-render once per second while locked).
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (rateLimitedUntil <= Date.now()) return;
     const id = setInterval(() => setNow(Date.now()), 1000);

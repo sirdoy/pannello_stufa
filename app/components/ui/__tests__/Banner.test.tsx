@@ -237,7 +237,7 @@ describe('Banner', () => {
     });
 
     it('checks localStorage on mount with dismissKey', () => {
-      localStorageMock.getItem.mockReturnValueOnce('true');
+      localStorageMock.setItem('banner-dismissed-already-dismissed', 'true');
 
       const { container } = render(
         <Banner

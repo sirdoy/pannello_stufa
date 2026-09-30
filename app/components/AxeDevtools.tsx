@@ -22,11 +22,8 @@ export default function AxeDevtools() {
     if (typeof window === 'undefined') return;
 
     // Dynamic import to avoid bundling in production
-    import('@axe-core/react')
-      .then((axe) => {
-        const React = require('react');
-        const ReactDOM = require('react-dom');
-
+    Promise.all([import('@axe-core/react'), import('react'), import('react-dom')])
+      .then(([axe, React, ReactDOM]) => {
         // Initialize with 1 second debounce to avoid spam during rapid updates
         axe.default(React, ReactDOM, 1000);
 

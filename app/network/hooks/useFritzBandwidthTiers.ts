@@ -70,6 +70,12 @@ function mapToChartPoints(
  *
  * @returns { tier, setTier, tierData, loading }
  */
+interface TierResult {
+  tier: BandwidthTier;
+  data: BandwidthHistoryPoint[];
+  granularity: 'hourly' | 'daily' | null;
+}
+
 export function useFritzBandwidthTiers(): {
   tier: BandwidthTier;
   setTier: (tier: BandwidthTier) => void;
@@ -78,64 +84,57 @@ export function useFritzBandwidthTiers(): {
   autoGranularity: 'hourly' | 'daily' | null;
 } {
   const [tier, setTier] = useState<BandwidthTier>('realtime');
-  const [tierData, setTierData] = useState<BandwidthHistoryPoint[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [autoGranularity, setAutoGranularity] = useState<'hourly' | 'daily' | null>(null);
+  // Last loaded result, tagged with its tier: loading = requested tier not loaded yet
+  const [result, setResult] = useState<TierResult | null>(null);
 
   useEffect(() => {
-    if (tier === 'realtime') {
-      setTierData([]);
-      setAutoGranularity(null);
-      return;
-    }
+    if (tier === 'realtime') return;
+    let cancelled = false;
 
-    if (tier === 'auto') {
-      setLoading(true);
-      fetch(`/api/v1/fritzbox/history/bandwidth/auto?days=7&limit=${TIER_LIMIT}`)
-        .then((r) => r.json())
-        .then((json: unknown) => {
-          const data = json as { auto: { items: AggregatedRecord[] } };
-          const items = data.auto?.items ?? [];
-          const chosen = items[0]?.granularity ?? null;
-          setAutoGranularity(chosen);
-          setTierData(mapAutoToChartPoints(items));
-        })
-        .catch(() => {
-          setTierData([]);
-          setAutoGranularity(null);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-      return;
-    }
+    const request: Promise<Omit<TierResult, 'tier'>> =
+      tier === 'auto'
+        ? fetch(`/api/v1/fritzbox/history/bandwidth/auto?days=7&limit=${TIER_LIMIT}`)
+            .then((r) => r.json())
+            .then((json: unknown) => {
+              const data = json as { auto: { items: AggregatedRecord[] } };
+              const items = data.auto?.items ?? [];
+              return {
+                data: mapAutoToChartPoints(items),
+                granularity: items[0]?.granularity ?? null,
+              };
+            })
+        : fetch(
+            tier === 'hourly'
+              ? `/api/v1/fritzbox/history/bandwidth/hourly?days=7&limit=${TIER_LIMIT}`
+              : `/api/v1/fritzbox/history/bandwidth/daily?days=30&limit=${TIER_LIMIT}`
+          )
+            .then((r) => r.json())
+            .then((json: unknown) => {
+              const data = json as Record<string, { items: (HourlyRecord | DailyRecord)[] }>;
+              const items =
+                tier === 'hourly'
+                  ? (data.hourly?.items ?? [])
+                  : (data.daily?.items ?? []);
+              return { data: mapToChartPoints(items, tier), granularity: null };
+            });
 
-    setAutoGranularity(null);
-
-    const endpoint =
-      tier === 'hourly'
-        ? `/api/v1/fritzbox/history/bandwidth/hourly?days=7&limit=${TIER_LIMIT}`
-        : `/api/v1/fritzbox/history/bandwidth/daily?days=30&limit=${TIER_LIMIT}`;
-
-    setLoading(true);
-
-    fetch(endpoint)
-      .then((r) => r.json())
-      .then((json: unknown) => {
-        const data = json as Record<string, { items: (HourlyRecord | DailyRecord)[] }>;
-        const items =
-          tier === 'hourly'
-            ? (data.hourly?.items ?? [])
-            : (data.daily?.items ?? []);
-        setTierData(mapToChartPoints(items, tier));
-      })
-      .catch(() => {
-        setTierData([]);
-      })
-      .finally(() => {
-        setLoading(false);
+    request
+      .catch(() => ({ data: [], granularity: null }))
+      .then((loaded) => {
+        // Drop responses of a tier the user already left
+        if (!cancelled) setResult({ tier, ...loaded });
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [tier]);
+
+  const current = result?.tier === tier ? result : null;
+  // While a new tier loads the previous chart stays visible
+  const tierData = tier === 'realtime' ? [] : (result?.data ?? []);
+  const loading = tier !== 'realtime' && current === null;
+  const autoGranularity = current?.granularity ?? null;
 
   return { tier, setTier, tierData, loading, autoGranularity };
 }

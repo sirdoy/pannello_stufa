@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { TuyaPlug } from '@/types/tuyaProxy';
+import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import TuyaEnergyChart from './TuyaEnergyChart';
 
 /** Backend POST /tuya/plugs/{id}/timer: seconds le=86400. */
@@ -40,12 +41,8 @@ export function TuyaPlugCard({
 }: TuyaPlugCardProps) {
   const [expanded, setExpanded] = useState(false);
   const [timerMinutes, setTimerMinutes] = useState('');
-  const [remaining, setRemaining] = useState<number>(plug.countdown_s ?? 0);
-
-  // Sync remaining when plug.countdown_s changes (e.g. from WS push)
-  useEffect(() => {
-    setRemaining(plug.countdown_s ?? 0);
-  }, [plug.countdown_s]);
+  // Re-synced when plug.countdown_s changes (e.g. from WS push)
+  const [remaining, setRemaining] = useSyncedState<number>(plug.countdown_s ?? 0);
 
   // Client-side countdown tick
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);

@@ -160,8 +160,7 @@ SelectTrigger.displayName = 'SelectTrigger';
 const SelectValue = SelectPrimitive.Value;
 SelectValue.displayName = 'SelectValue';
 
-export interface SelectContentProps
-  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> {}
+export type SelectContentProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>;
 
 /**
  * SelectContent - Dropdown content container
@@ -236,8 +235,7 @@ SelectItem.displayName = 'SelectItem';
 const SelectGroup = SelectPrimitive.Group;
 SelectGroup.displayName = 'SelectGroup';
 
-export interface SelectLabelProps
-  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label> {}
+export type SelectLabelProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>;
 
 /**
  * SelectLabel - Label for a group
@@ -254,8 +252,7 @@ const SelectLabel = forwardRef<HTMLDivElement, SelectLabelProps>(({ className, .
 ));
 SelectLabel.displayName = 'SelectLabel';
 
-export interface SelectSeparatorProps
-  extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator> {}
+export type SelectSeparatorProps = React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>;
 
 /**
  * SelectSeparator - Visual separator between items

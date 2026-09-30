@@ -5,16 +5,17 @@
  * The hook's integration with React and API calls is tested via integration tests.
  */
 
+import { useCallback, useEffect, useState } from 'react';
+import useScheduleDataDefault, { useScheduleData } from '@/lib/hooks/useScheduleData';
+
 describe('useScheduleData', () => {
   describe('module exports', () => {
     it('exports useScheduleData function', () => {
-      const { useScheduleData } = require('@/lib/hooks/useScheduleData');
       expect(typeof useScheduleData).toBe('function');
     });
 
     it('exports default as useScheduleData', () => {
-      const defaultExport = require('@/lib/hooks/useScheduleData').default;
-      expect(typeof defaultExport).toBe('function');
+      expect(typeof useScheduleDataDefault).toBe('function');
     });
   });
 
@@ -47,17 +48,14 @@ describe('useScheduleData', () => {
 
   describe('React hooks availability', () => {
     it('useState is available', () => {
-      const { useState } = require('react');
       expect(typeof useState).toBe('function');
     });
 
     it('useEffect is available', () => {
-      const { useEffect } = require('react');
       expect(typeof useEffect).toBe('function');
     });
 
     it('useCallback is available', () => {
-      const { useCallback } = require('react');
       expect(typeof useCallback).toBe('function');
     });
   });

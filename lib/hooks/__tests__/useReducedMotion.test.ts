@@ -26,6 +26,7 @@ function installMatchMediaMock(initialMatches: boolean): MqMock {
     addEventListener,
     removeEventListener,
     _emit: (matches: boolean) => {
+      mq.matches = matches;
       if (registered) registered({ matches });
     },
   };

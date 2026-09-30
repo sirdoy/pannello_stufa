@@ -117,29 +117,33 @@ export interface TabsListProps
   extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>,
     VariantProps<typeof listVariants> {}
 
+// Hidden until the first measurement; stable object so re-renders never reset the measured values
+const INDICATOR_INITIAL_STYLE: React.CSSProperties = { opacity: 0 };
+
 const TabsList = forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsListProps>(
   function TabsList({ children, className, orientation = 'horizontal', overflow, ...props }, ref) {
     const { value } = useContext(TabsContext);
-    const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({ width: 0, left: 0, opacity: 0 });
     const listRef = useRef<HTMLDivElement | null>(null);
+    const indicatorRef = useRef<HTMLSpanElement | null>(null);
 
+    // Measure the active tab and move the indicator imperatively: a DOM-to-DOM sync
+    // needs no React state (and no second render)
     useLayoutEffect(() => {
       const activeTab = listRef.current?.querySelector('[data-state="active"]') as HTMLElement | null;
-      if (activeTab) {
-        if (orientation === 'horizontal') {
-          setIndicatorStyle({
-            width: activeTab.offsetWidth,
-            left: activeTab.offsetLeft,
-            opacity: 1,
-          });
-        } else {
-          setIndicatorStyle({
-            height: activeTab.offsetHeight,
-            top: activeTab.offsetTop,
-            opacity: 1,
-          });
-        }
+      const style = indicatorRef.current?.style;
+      if (!activeTab || !style) return;
+      if (orientation === 'horizontal') {
+        style.width = `${activeTab.offsetWidth}px`;
+        style.left = `${activeTab.offsetLeft}px`;
+        style.height = '';
+        style.top = '';
+      } else {
+        style.height = `${activeTab.offsetHeight}px`;
+        style.top = `${activeTab.offsetTop}px`;
+        style.width = '';
+        style.left = '';
       }
+      style.opacity = '1';
     }, [value, orientation]);
 
     return (
@@ -165,7 +169,8 @@ const TabsList = forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsLis
               ? 'bottom-0 h-0.5'
               : 'right-0 w-0.5',
           )}
-          style={indicatorStyle}
+          ref={indicatorRef}
+          style={INDICATOR_INITIAL_STYLE}
           aria-hidden="true"
           data-testid="tabs-indicator"
         />
@@ -205,8 +210,7 @@ TabsTrigger.displayName = 'TabsTrigger';
 /**
  * TabsContent - Content panel for each tab
  */
-export interface TabsContentProps
-  extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content> {}
+export type TabsContentProps = React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>;
 
 const TabsContent = forwardRef<React.ElementRef<typeof TabsPrimitive.Content>, TabsContentProps>(
   function TabsContent({ children, className, ...props }, ref) {
@@ -232,8 +236,7 @@ TabsContent.displayName = 'TabsContent';
 /**
  * Tabs - Root component with context provider
  */
-export interface TabsProps
-  extends React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root> {}
+export type TabsProps = React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root>;
 
 function Tabs({ children, value, defaultValue, onValueChange, orientation, ...props }: TabsProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);

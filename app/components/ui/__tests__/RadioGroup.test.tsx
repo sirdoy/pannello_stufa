@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
-import { RadioGroup, RadioGroupItem } from '../RadioGroup';
+import RadioGroupWithItem, { RadioGroup, RadioGroupItem } from '../RadioGroup';
 
 describe('RadioGroup Component', () => {
   describe('Rendering', () => {
@@ -515,7 +515,6 @@ describe('RadioGroup Component', () => {
 
   describe('Compound Component Pattern', () => {
     test('works with RadioGroup.Item syntax', () => {
-      const RadioGroupWithItem = require('../RadioGroup').default;
 
       render(
         <RadioGroupWithItem defaultValue="a">

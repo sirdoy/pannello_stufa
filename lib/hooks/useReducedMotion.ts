@@ -1,6 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+
+const QUERY = '(prefers-reduced-motion: reduce)';
+
+function subscribe(onChange: () => void): () => void {
+  const mq = window.matchMedia(QUERY);
+  mq.addEventListener('change', onChange);
+  return () => mq.removeEventListener('change', onChange);
+}
 
 /**
  * SSR-safe `prefers-reduced-motion: reduce` detection.
@@ -18,15 +26,9 @@ import { useEffect, useState } from 'react';
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
  */
 export function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false); // SSR-safe default — full motion
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  return reduced;
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(QUERY).matches,
+    () => false // SSR + hydration: full motion
+  );
 }

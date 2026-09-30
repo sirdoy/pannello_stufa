@@ -32,16 +32,24 @@ jest.mock('@/app/components/ui', () => {
       {children}
     </div>
   );
-  MockPageLayout.Header = ({ title, description }: { title: string; description: string }) => (
-    <header data-testid="page-header">
-      <h1>{title}</h1>
-      <p>{description}</p>
-    </header>
-  );
+  MockPageLayout.Header = function MockHeader({ title, description }: { title: string; description: string }) {
+    return (
+      <header data-testid="page-header">
+        <h1>{title}</h1>
+        <p>{description}</p>
+      </header>
+    );
+  };
   const MockTabs = ({ children }: { children: React.ReactNode }) => <div data-testid="tabs">{children}</div>;
-  MockTabs.List = ({ children }: { children: React.ReactNode }) => <div data-testid="tabs-list">{children}</div>;
-  MockTabs.Trigger = ({ children, value }: { children: React.ReactNode; value: string }) => <button data-value={value}>{children}</button>;
-  MockTabs.Content = ({ children }: { children: React.ReactNode }) => <div>{children}</div>;
+  MockTabs.List = function MockTabsList({ children }: { children: React.ReactNode }) {
+    return <div data-testid="tabs-list">{children}</div>;
+  };
+  MockTabs.Trigger = function MockTabsTrigger({ children, value }: { children: React.ReactNode; value: string }) {
+    return <button data-value={value}>{children}</button>;
+  };
+  MockTabs.Content = function MockTabsContent({ children }: { children: React.ReactNode }) {
+    return <div>{children}</div>;
+  };
 
   return {
     Card: ({ children }: { children: React.ReactNode }) => <div data-testid="card">{children}</div>,

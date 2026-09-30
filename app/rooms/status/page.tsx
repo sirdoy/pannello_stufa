@@ -50,23 +50,35 @@ function useHouseStatus() {
   return { houseStatus, loading, error, refetch };
 }
 
+/** Rooms health, or null on failure (silently ignored) */
+async function fetchRoomsHealth(): Promise<RoomsHealthResponse | null> {
+  try {
+    const res = await fetch('/api/rooms/health');
+    if (!res.ok) return null;
+    return (await res.json()) as RoomsHealthResponse;
+  } catch {
+    return null;
+  }
+}
+
 // --- useRoomsHealth hook (per D-19 — copy from rooms/page.tsx) ---
 function useRoomsHealth() {
   const [health, setHealth] = useState<RoomsHealthResponse | null>(null);
 
   const refetch = useCallback(async () => {
-    try {
-      const res = await fetch('/api/rooms/health');
-      if (!res.ok) return;
-      setHealth((await res.json()) as RoomsHealthResponse);
-    } catch {
-      // silently ignore
-    }
+    const data = await fetchRoomsHealth();
+    if (data) setHealth(data);
   }, []);
 
   useEffect(() => {
-    void refetch();
-  }, [refetch]);
+    let cancelled = false;
+    void fetchRoomsHealth().then((data) => {
+      if (data && !cancelled) setHealth(data);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return { health, refetch };
 }

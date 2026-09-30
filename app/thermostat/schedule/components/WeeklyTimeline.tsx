@@ -177,7 +177,7 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
 
       {/* Scroll hint (mobile) */}
       <div className="md:hidden text-center">
-        <Text variant="tertiary" size="xs">← Scorri per vedere l'intera giornata →</Text>
+        <Text variant="tertiary" size="xs">← Scorri per vedere l&apos;intera giornata →</Text>
       </div>
     </div>
   );

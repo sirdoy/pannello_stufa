@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { forwardRef, useId, useState, useEffect } from 'react';
+import { forwardRef, useId, useState, useSyncExternalStore } from 'react';
 import * as Label from '@radix-ui/react-label';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
@@ -70,6 +70,8 @@ export interface InputProps
   /** Container classes */
   containerClassName?: string;
 }
+
+const subscribeNoop = () => () => {};
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   {
@@ -164,8 +166,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
 
   // Defer input rendering to avoid hydration mismatch from browser extensions
   // (e.g. LastPass injecting data-lastpass-icon-root into the DOM before hydration)
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
 
   // Determine if we need extra padding for clear button
   const needsClearPadding = clearable && currentValue;

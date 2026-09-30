@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useSyncExternalStore } from 'react';
 
 // AUDIT-EXCEPTION (DS-02): the 6 oklch literal strings below are the source-of-truth
 // preset map (D-05). Every other visual value on this page is a token reference.
@@ -39,26 +39,24 @@ const TOKEN_NAMES = [
 ] as const;
 type TokenName = typeof TOKEN_NAMES[number];
 
+const subscribeNoop = () => () => {};
+
+/** Computed value of a CSS custom property on :root ('' on the server and during hydration). */
+function TokenValue({ name }: { name: TokenName }): React.ReactElement {
+  const value = useSyncExternalStore(
+    subscribeNoop,
+    () => getComputedStyle(document.documentElement).getPropertyValue(name).trim(),
+    () => ''
+  );
+  return <>{value || '—'}</>;
+}
+
 export function Section03Tokens(): React.ReactElement {
   // activeHue is read from the live --accent CSS variable for the description;
   // this section is stateless — the token grid is purely declarative.
   // We use a fixed fallback for the static token description.
   const activeHue: HueName = 'copper';
 
-  const [tokens, setTokens] = useState<Record<TokenName, string>>(() => {
-    const init = {} as Record<TokenName, string>;
-    for (const name of TOKEN_NAMES) init[name] = '';
-    return init;
-  });
-
-  useEffect(() => {
-    const cs = getComputedStyle(document.documentElement);
-    const next = {} as Record<TokenName, string>;
-    for (const name of TOKEN_NAMES) {
-      next[name] = cs.getPropertyValue(name).trim();
-    }
-    setTokens(next);
-  }, []);
 
   return (
     <section aria-labelledby="sec-03-heading" style={{ marginBottom: 48 }}>
@@ -187,7 +185,7 @@ export function Section03Tokens(): React.ReactElement {
                   wordBreak: 'break-all',
                 }}
               >
-                {tokens[name] || '—'}
+                <TokenValue name={name} />
               </dd>
             </React.Fragment>
           ))}

@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
@@ -123,6 +123,8 @@ export interface BannerProps extends VariantProps<typeof bannerVariants> {
   children?: React.ReactNode;
 }
 
+const subscribeNoop = () => () => {};
+
 /**
  * Banner Component - Ember Noir Design System
  *
@@ -151,17 +153,15 @@ export default function Banner({
   className = '',
   children,
 }: BannerProps) {
-  const [isDismissed, setIsDismissed] = useState(false);
+  const [dismissedNow, setIsDismissed] = useState(false);
 
-  // Check persistent dismissal
-  useEffect(() => {
-    if (dismissKey && typeof window !== 'undefined') {
-      const dismissed = localStorage.getItem(`banner-dismissed-${dismissKey}`);
-      if (dismissed === 'true') {
-        setIsDismissed(true);
-      }
-    }
-  }, [dismissKey]);
+  // Check persistent dismissal (false on the server and during hydration)
+  const dismissedStored = useSyncExternalStore(
+    subscribeNoop,
+    () => !!dismissKey && localStorage.getItem(`banner-dismissed-${dismissKey}`) === 'true',
+    () => false
+  );
+  const isDismissed = dismissedNow || dismissedStored;
 
   // Handle dismiss
   const handleDismiss = () => {

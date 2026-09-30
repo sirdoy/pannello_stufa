@@ -4,6 +4,12 @@ import nextTypescript from "eslint-config-next/typescript";
 import tailwindcss from "eslint-plugin-tailwindcss";
 
 const eslintConfig = [
+  // Generated output, reports and agent worktrees are not source
+  {
+    name: "project/ignores",
+    ignores: [".claude/**", ".planning/**", "coverage/**", "playwright-report/**", "test-results/**", "public/sw.js", "public/workbox-*.js", "public/fallback-*.js", "public/swe-worker*.js"],
+  },
+
   // Next.js base config (native flat config format in Next.js 16+)
   ...nextConfig,
 

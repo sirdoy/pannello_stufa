@@ -1,12 +1,23 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useState, useSyncExternalStore, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import { useUser } from '@/lib/auth/useUser';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { Splash } from './Splash';
 
 const SPLASH_FLAG_KEY = 'ember-glass-splash-shown';
+
+const subscribeNoop = () => () => {};
+
+function readShownFlag(): boolean {
+  try {
+    return sessionStorage.getItem(SPLASH_FLAG_KEY) === 'true';
+  } catch {
+    // Incognito or sessionStorage disabled — graceful no-op (splash plays).
+    return false;
+  }
+}
 
 /**
  * SplashGate — Phase 176 (SPLASH-01, SPLASH-04, SPLASH-05)
@@ -44,29 +55,23 @@ export function SplashGate({ children, forceShow = false }: SplashGateProps) {
   // session-once flag before the real landing page.
   const onAuthPage = pathname === '/auth' || !!pathname?.startsWith('/auth/');
 
-  const [hydrated, setHydrated] = useState(false);
-  const [shownThisSession, setShownThisSession] = useState(false);
+  // SSR-safe sessionStorage hydration (RESEARCH §"Pattern 1"; UI-SPEC §"<SplashGate> ... SSR safety"):
+  // false on the server and during hydration, real values right after.
+  const hydrated = useSyncExternalStore(subscribeNoop, () => true, () => false);
+  const storedShown = useSyncExternalStore(subscribeNoop, readShownFlag, () => false);
+  const [playedNow, setPlayedNow] = useState(false);
+  const shownThisSession = storedShown || playedNow;
   const [ready, setReady] = useState(false);
 
-  // SSR-safe sessionStorage hydration (RESEARCH §"Pattern 1"; UI-SPEC §"<SplashGate> ... SSR safety").
-  useEffect(() => {
-    setHydrated(true);
-    try {
-      const shown = sessionStorage.getItem(SPLASH_FLAG_KEY) === 'true';
-      setShownThisSession(shown);
-      if (shown) setReady(true);
-    } catch {
-      // Incognito or sessionStorage disabled — graceful no-op (splash plays).
-    }
-  }, []);
-
-  // When auth resolves with no user (logged-out / public route) or on a sign-in screen,
-  // splash never plays — surface content instead of leaving the wrapper at opacity:0 forever.
-  useEffect(() => {
-    if (hydrated && !isLoading && (!user || onAuthPage) && !ready && !forceShow) {
-      setReady(true);
-    }
-  }, [hydrated, isLoading, user, onAuthPage, ready, forceShow]);
+  // Latch `ready` once the splash is known to be skipped: already shown this session, or
+  // auth resolved with no user (logged-out / public route) or on a sign-in screen — surface
+  // content instead of leaving the wrapper at opacity:0 forever. Adjusting state during
+  // render (not in an effect) avoids an extra commit.
+  const skipSplash =
+    hydrated && (storedShown || (!isLoading && (!user || onAuthPage) && !forceShow));
+  if (skipSplash && !ready) {
+    setReady(true);
+  }
 
   // SPLASH-01 trigger predicate (CONTEXT.md D-08): all four conditions hold OR forceShow.
   const shouldShowSplash =
@@ -91,7 +96,7 @@ export function SplashGate({ children, forceShow = false }: SplashGateProps) {
           reducedMotion={reducedMotion}
           onDone={() => {
             setReady(true);
-            setShownThisSession(true);
+            setPlayedNow(true);
             try {
               sessionStorage.setItem(SPLASH_FLAG_KEY, 'true');
             } catch {

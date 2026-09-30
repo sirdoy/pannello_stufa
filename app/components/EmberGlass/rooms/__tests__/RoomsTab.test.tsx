@@ -15,7 +15,7 @@
  *   8. AggregatorState is built: getDevicesForRoom called with roomName
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 // --- useUser / Version mocks -------------------------------------------
 jest.mock('@/lib/auth/useUser', () => ({
@@ -184,7 +184,6 @@ describe('RoomsTab (ROOMS-01 / CONTEXT D-41..D-44)', () => {
     // The simplest way: re-render after state update by clicking close
     // capturedSheetProps.onClose triggers state via React event
     // Since we can't call setState directly in tests, trigger via React act:
-    const { act } = require('@testing-library/react');
     act(() => {
       capturedSheetProps?.onClose();
     });

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useDepsChanged } from '@/lib/hooks/useDepsChanged';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
 import Card from '../ui/Card';
@@ -23,12 +24,11 @@ export interface DuplicateDayModalProps {
 export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [], onConfirm, onCancel }: DuplicateDayModalProps) {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
 
-  // Reset selected days when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setSelectedDays([]);
-    }
-  }, [isOpen]);
+  // Reset selected days when modal opens (during render, not in an effect)
+  const openChanged = useDepsChanged([isOpen]);
+  if (openChanged && isOpen) {
+    setSelectedDays([]);
+  }
 
   const availableDays = daysOfWeek.filter(day => !excludeDays.includes(day));
 

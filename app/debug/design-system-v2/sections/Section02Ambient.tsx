@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useSyncExternalStore } from 'react';
 
 function setAmbient(on: boolean): void {
   try {
@@ -12,17 +12,22 @@ function setAmbient(on: boolean): void {
   window.dispatchEvent(new CustomEvent<boolean>('ember-glass-ambient-change', { detail: on }));
 }
 
-export function Section02Ambient(): React.ReactElement {
-  const [ambientOn, setAmbientOn] = useState<boolean>(false);
+const subscribeNoop = () => () => {};
 
-  useEffect(() => {
-    try {
-      const persistedAmbient = localStorage.getItem('ember-glass-ambient');
-      if (persistedAmbient === 'true') setAmbientOn(true);
-    } catch {
-      /* T-174-03-04: localStorage read failure — fall back to defaults. */
-    }
-  }, []);
+function readPersistedAmbient(): boolean {
+  try {
+    return localStorage.getItem('ember-glass-ambient') === 'true';
+  } catch {
+    /* T-174-03-04: localStorage read failure — fall back to defaults. */
+    return false;
+  }
+}
+
+export function Section02Ambient(): React.ReactElement {
+  // Persisted value (false on the server and during hydration), overridden by the toggle
+  const persistedAmbient = useSyncExternalStore(subscribeNoop, readPersistedAmbient, () => false);
+  const [toggledAmbient, setAmbientOn] = useState<boolean | null>(null);
+  const ambientOn = toggledAmbient ?? persistedAmbient;
 
   const onAmbientToggle = (): void => {
     const next = !ambientOn;

@@ -82,8 +82,7 @@ const contentVariants = cva(
 /**
  * Modal Overlay - Background overlay with blur
  */
-export interface ModalOverlayProps
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> {}
+export type ModalOverlayProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>;
 
 const ModalOverlay = forwardRef<React.ElementRef<typeof DialogPrimitive.Overlay>, ModalOverlayProps>(
   function ModalOverlay({ className, ...props }, ref) {
@@ -130,7 +129,7 @@ ModalContent.displayName = 'ModalContent';
 /**
  * Modal Header - Container for title and close button
  */
-export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type ModalHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(
   function ModalHeader({ className, children, ...props }, ref) {
@@ -153,8 +152,7 @@ ModalHeader.displayName = 'ModalHeader';
 /**
  * Modal Title - Accessible title (Radix DialogTitle)
  */
-export interface ModalTitleProps
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title> {}
+export type ModalTitleProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>;
 
 const ModalTitle = forwardRef<React.ElementRef<typeof DialogPrimitive.Title>, ModalTitleProps>(
   function ModalTitle({ className, children, ...props }, ref) {
@@ -178,8 +176,7 @@ ModalTitle.displayName = 'ModalTitle';
 /**
  * Modal Description - Accessible description (Radix DialogDescription)
  */
-export interface ModalDescriptionProps
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description> {}
+export type ModalDescriptionProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>;
 
 const ModalDescription = forwardRef<React.ElementRef<typeof DialogPrimitive.Description>, ModalDescriptionProps>(
   function ModalDescription({ className, children, ...props }, ref) {
@@ -202,7 +199,7 @@ ModalDescription.displayName = 'ModalDescription';
 /**
  * Modal Footer - Container for action buttons
  */
-export interface ModalFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type ModalFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(
   function ModalFooter({ className, children, ...props }, ref) {
@@ -225,8 +222,7 @@ ModalFooter.displayName = 'ModalFooter';
 /**
  * Modal Close - Close button with X icon
  */
-export interface ModalCloseProps
-  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close> {}
+export type ModalCloseProps = React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>;
 
 const ModalClose = forwardRef<React.ElementRef<typeof DialogPrimitive.Close>, ModalCloseProps>(
   function ModalClose({ className, children, ...props }, ref) {

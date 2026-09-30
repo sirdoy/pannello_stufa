@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
@@ -15,21 +15,23 @@ import SchedulerTab from './components/tabs/SchedulerTab';
 
 type TabValue = 'stove' | 'netatmo' | 'hue' | 'weather' | 'firebase' | 'scheduler';
 
+const subscribeNoop = () => () => {};
+
+function readHashTab(): TabValue | null {
+  const hash = window.location.hash.replace('#', '') as TabValue;
+  return ['stove', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler'].includes(hash) ? hash : null;
+}
+
 export default function ApiDebugPage() {
-  const [activeTab, setActiveTab] = useState<TabValue>('stove');
+  // Tab from the URL hash (null on the server and during hydration), overridden by user choice
+  const hashTab = useSyncExternalStore(subscribeNoop, readHashTab, () => null);
+  const [pickedTab, setActiveTab] = useState<TabValue | null>(null);
+  const activeTab: TabValue = pickedTab ?? hashTab ?? 'stove';
   const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
   const [lastRefresh, setLastRefresh] = useState<number | null>(null);
 
   // Detect environment
   const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-
-  // Read tab from URL hash on mount
-  useEffect(() => {
-    const hash = window.location.hash.replace('#', '') as TabValue;
-    if (hash && ['stove', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler'].includes(hash)) {
-      setActiveTab(hash);
-    }
-  }, []);
 
   // Update URL hash when tab changes
   useEffect(() => {
@@ -42,7 +44,7 @@ export default function ApiDebugPage() {
       // Cmd/Ctrl + R: Refresh current tab (prevent default browser refresh)
       if ((e.metaKey || e.ctrlKey) && e.key === 'r') {
         e.preventDefault();
-        handleRefreshAll();
+        setLastRefresh(Date.now());
       }
       // Number keys 1-6: Switch tabs
       if (!e.metaKey && !e.ctrlKey && !e.altKey) {

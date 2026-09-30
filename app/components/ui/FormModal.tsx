@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Check, X } from 'lucide-react';
 import Modal from './Modal';
 import Button from './Button';
+import { useDepsChanged } from '@/lib/hooks/useDepsChanged';
 import { cn } from '@/lib/utils/cn';
 
 export interface FormModalProps {
@@ -205,13 +206,18 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   const { errors, isSubmitting } = rhfFormState;
   const isLoading = formState === 'submitting' || isSubmitting;
 
-  // Reset form when modal opens (not when it's already open)
+  // Reset local state when modal opens (closed → open transition), during render
+  const openChanged = useDepsChanged([isOpen]);
+  if (openChanged && isOpen) {
+    setFormState('idle');
+    setHasSubmitted(false);
+  }
+
+  // Reset the react-hook-form store (external to React state) on the same transition
   useEffect(() => {
     // Only reset when transitioning from closed to open
     if (isOpen && !wasOpenRef.current) {
       reset(defaultValues);
-      setFormState('idle');
-      setHasSubmitted(false);
     }
     wasOpenRef.current = isOpen;
   }, [isOpen, reset]); // Note: defaultValues intentionally excluded to prevent infinite loop
@@ -324,7 +330,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
 
         <form
           ref={formRef}
-          onSubmit={handleSubmit(onFormSubmit, onFormError)}
+          onSubmit={(e) => void handleSubmit(onFormSubmit, onFormError)(e)}
           noValidate
         >
           {/* Form fields via render prop */}

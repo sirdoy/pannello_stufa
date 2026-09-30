@@ -29,24 +29,14 @@ export function formatRelativeTime(tsMs: number): string {
  * @param tsMs - Timestamp in milliseconds (e.g. Date.now()), or null
  */
 export function useRelativeTime(tsMs: number | null): string | null {
-  const [relative, setRelative] = useState<string | null>(
-    tsMs !== null ? formatRelativeTime(tsMs) : null
-  );
+  // The string is derived at render time; the interval only forces a re-render
+  const [, setTick] = useState(0);
 
   useEffect(() => {
-    if (tsMs === null) {
-      setRelative(null);
-      return;
-    }
-
-    setRelative(formatRelativeTime(tsMs));
-
-    const id = setInterval(() => {
-      setRelative(formatRelativeTime(tsMs));
-    }, 10_000);
-
+    if (tsMs === null) return;
+    const id = setInterval(() => setTick((t) => t + 1), 10_000);
     return () => clearInterval(id);
   }, [tsMs]);
 
-  return relative;
+  return tsMs !== null ? formatRelativeTime(tsMs) : null;
 }

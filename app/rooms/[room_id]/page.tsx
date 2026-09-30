@@ -84,17 +84,29 @@ function useRoomDevices(roomId: number) {
 }
 
 // --- useRegistryDevicesForSelect hook ---
+async function fetchAllRegistryDevices(): Promise<RegistryDevice[] | null> {
+  try {
+    const res = await fetch('/api/registry/devices?limit=1000');
+    if (!res.ok) return null;
+    return ((await res.json()) as PaginatedResponse<RegistryDevice>).items;
+  } catch {
+    return null; /* non-critical */
+  }
+}
+
 function useRegistryDevicesForSelect() {
   const [allDevices, setAllDevices] = useState<RegistryDevice[]>([]);
   const refetch = useCallback(async () => {
-    try {
-      const res = await fetch('/api/registry/devices?limit=1000');
-      if (!res.ok) return;
-      const data = (await res.json()) as PaginatedResponse<RegistryDevice>;
-      setAllDevices(data.items);
-    } catch { /* non-critical */ }
+    const items = await fetchAllRegistryDevices();
+    if (items) setAllDevices(items);
   }, []);
-  useEffect(() => { void refetch(); }, [refetch]);
+  useEffect(() => {
+    let cancelled = false;
+    void fetchAllRegistryDevices().then(items => {
+      if (items && !cancelled) setAllDevices(items);
+    });
+    return () => { cancelled = true; };
+  }, []);
   return { allDevices, refetch };
 }
 

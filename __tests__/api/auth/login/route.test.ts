@@ -11,7 +11,7 @@ import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
 // Mock dependencies
 jest.mock('@/lib/auth/authProxy');
 jest.mock('@/lib/core', () => ({
-  withAuthAndErrorHandler: (fn: Function) => fn,
+  withAuthAndErrorHandler: <T,>(fn: T) => fn,
   success: (data: unknown) => ({ ok: true, data }),
 }));
 

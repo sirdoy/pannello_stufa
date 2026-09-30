@@ -29,7 +29,14 @@ export default function LogPage() {
   const [log, setLog] = useState<LogEntryData[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
-  const [deviceFilter, setDeviceFilter] = useState<DeviceFilter>('all');
+  const [deviceFilter, setDeviceFilterState] = useState<DeviceFilter>('all');
+
+  // Changing filter goes back to the first page
+  const setDeviceFilter = (filter: DeviceFilter) => {
+    if (filter === deviceFilter) return;
+    setDeviceFilterState(filter);
+    setCurrentPage(0);
+  };
 
   useEffect(() => {
     const logRef = ref(db, 'log');
@@ -149,11 +156,6 @@ export default function LogPage() {
 
   const hasNext = startIndex + PAGE_SIZE < filteredLog.length;
   const hasPrev = currentPage > 0;
-
-  // Reset page when filter changes
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [deviceFilter]);
 
   if (loading) {
     return <Skeleton.LogPage />;

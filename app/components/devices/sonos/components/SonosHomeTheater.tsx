@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
+import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import { ChevronDown } from 'lucide-react';
 import type { SonosHomeTheaterResponse, SetHomeTheaterRequest } from '@/types/sonosProxy';
 
@@ -13,25 +14,13 @@ interface SonosHomeTheaterProps {
 
 export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }: SonosHomeTheaterProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [localSubGain, setLocalSubGain] = useState(htData?.sub_gain ?? 0);
-  const [localSurroundTv, setLocalSurroundTv] = useState(htData?.surround_volume_tv ?? 0);
-  const [localSurroundMusic, setLocalSurroundMusic] = useState(htData?.surround_volume_music ?? 0);
+  // Local slider values, re-synced from server data
+  const [localSubGain, setLocalSubGain] = useSyncedState(htData?.sub_gain ?? 0);
+  const [localSurroundTv, setLocalSurroundTv] = useSyncedState(htData?.surround_volume_tv ?? 0);
+  const [localSurroundMusic, setLocalSurroundMusic] = useSyncedState(htData?.surround_volume_music ?? 0);
   const subGainDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const surroundTvDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const surroundMusicDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Sync local slider values from server data
-  useEffect(() => {
-    setLocalSubGain(htData?.sub_gain ?? 0);
-  }, [htData?.sub_gain]);
-
-  useEffect(() => {
-    setLocalSurroundTv(htData?.surround_volume_tv ?? 0);
-  }, [htData?.surround_volume_tv]);
-
-  useEffect(() => {
-    setLocalSurroundMusic(htData?.surround_volume_music ?? 0);
-  }, [htData?.surround_volume_music]);
 
   // Only render for soundbar role
   if (role !== 'soundbar') {

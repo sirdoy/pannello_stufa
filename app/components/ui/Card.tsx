@@ -106,7 +106,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
 /**
  * CardHeader - Header section for cards
  */
-export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   function CardHeader({ children, className, ...props }, ref) {
@@ -147,7 +147,7 @@ const CardTitle = forwardRef<HTMLDivElement, CardTitleProps>(
 /**
  * CardContent - Main content area
  */
-export interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardContentProps = React.HTMLAttributes<HTMLDivElement>;
 
 const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
   function CardContent({ children, className, ...props }, ref) {
@@ -162,7 +162,7 @@ const CardContent = forwardRef<HTMLDivElement, CardContentProps>(
 /**
  * CardFooter - Footer section for actions
  */
-export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   function CardFooter({ children, className, ...props }, ref) {
@@ -185,7 +185,7 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
 /**
  * CardDivider - Visual separator within cards
  */
-export interface CardDividerProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardDividerProps = React.HTMLAttributes<HTMLDivElement>;
 
 const CardDivider = forwardRef<HTMLDivElement, CardDividerProps>(
   function CardDivider({ className, ...props }, ref) {

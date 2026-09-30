@@ -5,6 +5,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import { WifiOff, X } from 'lucide-react';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
+import { useDepsChanged } from '@/lib/hooks/useDepsChanged';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { cn } from '@/lib/utils/cn';
 import Heading from './Heading';
@@ -59,7 +60,13 @@ export default function OfflineBanner({
 }: OfflineBannerProps) {
   const { isOnline, wasOffline, lastOnlineAt } = useOnlineStatus();
   const { pendingCommands, lastSyncedCommand, cancelCommand } = useBackgroundSync();
-  const [showReconnected, setShowReconnected] = useState(false);
+  // "Reconnected" shows while wasOffline, until its 3s timer expires; reset each time wasOffline flips
+  const [reconnectedExpired, setReconnectedExpired] = useState(false);
+  const wasOfflineChanged = useDepsChanged([wasOffline]);
+  if (wasOfflineChanged && reconnectedExpired) {
+    setReconnectedExpired(false);
+  }
+  const showReconnected = wasOffline && !reconnectedExpired;
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Cast pending commands to typed array
@@ -68,8 +75,7 @@ export default function OfflineBanner({
   // Show reconnected message briefly when coming back online
   useEffect(() => {
     if (wasOffline) {
-      setShowReconnected(true);
-      const timer = setTimeout(() => setShowReconnected(false), 3000);
+      const timer = setTimeout(() => setReconnectedExpired(true), 3000);
       return () => clearTimeout(timer);
     }
   }, [wasOffline]);

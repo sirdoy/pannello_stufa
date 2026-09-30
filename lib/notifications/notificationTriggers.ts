@@ -306,6 +306,18 @@ export const NOTIFICATION_TYPES = {
     priority: 'high',
     url: '/stove',
   },
+  // Sent by the Pi via /api/internal/stove-events (ROADMAP D9)
+  monitoring_dirigera_unreachable: {
+    id: 'monitoring_dirigera_unreachable',
+    category: 'monitoring',
+    preferenceKey: 'monitoring.dirigeraUnreachable',
+    defaultEnabled: true,
+    title: () => 'Sensori IKEA Offline',
+    body: (data: NotificationData) => data.message || 'Uno o più sensori Dirigera non rispondono da ore',
+    icon: '/icons/icon-192.png',
+    priority: 'high',
+    url: '/dirigera',
+  },
 
   // === GENERIC ===
   generic: {

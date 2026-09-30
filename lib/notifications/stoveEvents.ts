@@ -1,11 +1,13 @@
 /**
  * Stove events sent by the Pi scheduler (workspace ROADMAP D2.4) → push notifications.
+ * The same webhook also carries `dirigera_sensors_unreachable` (ROADMAP D9).
  *
  * The Pi reports what happened (`POST /api/internal/stove-events`); this module
  * turns each event into the existing server-side trigger + Italian message.
  * Contract: ../docs/api/scheduler.md#notifications-webhook.
  */
 import {
+  triggerHealthMonitoringAlertServer,
   triggerMaintenanceAlertServer,
   triggerSchedulerActionServer,
   triggerStoveStatusWorkServer,
@@ -22,6 +24,7 @@ export const STOVE_EVENTS = [
   'maintenance_80',
   'maintenance_90',
   'maintenance_100',
+  'dirigera_sensors_unreachable',
 ] as const;
 
 export type StoveEvent = (typeof STOVE_EVENTS)[number];
@@ -44,6 +47,14 @@ const hhmm = (minutes: number): string =>
 
 const slotRange = (slot: Slot | undefined): string =>
   slot ? `${hhmm(slot.start_minutes)}-${hhmm(slot.end_minutes)}` : '';
+
+interface UnreachableSensor {
+  name?: string | null;
+  room?: string | null;
+}
+
+const sensorLabel = (s: UnreachableSensor): string =>
+  s.room ? `${s.name || 'Sensore'} (${s.room})` : s.name || 'Sensore';
 
 const romeTime = (ts: number): string =>
   new Intl.DateTimeFormat('it-IT', {
@@ -82,6 +93,13 @@ export function stoveEventMessage({ event, data, ts }: StoveEventBody): string {
       }
       return `${remaining.toFixed(1)}h rimanenti prima della manutenzione (${Number(data.percentage).toFixed(0)}%)`;
     }
+    case 'dirigera_sensors_unreachable': {
+      const sensors = Array.isArray(data.sensors) ? (data.sensors as UnreachableSensor[]) : [];
+      const hours = String(data.threshold_hours ?? '?');
+      const who = sensors.map(sensorLabel).join(', ') || 'Sensori IKEA';
+      const verb = sensors.length > 1 ? 'non rispondono' : 'non risponde';
+      return `${who} ${verb} da oltre ${hours} h: ricollega all'hub o cambia la batteria`;
+    }
   }
 }
 
@@ -109,5 +127,7 @@ export async function dispatchStoveEvent(userId: string, body: StoveEventBody) {
       );
       return triggerMaintenanceAlertServer(userId, threshold, { message, remainingHours });
     }
+    case 'dirigera_sensors_unreachable':
+      return triggerHealthMonitoringAlertServer(userId, 'dirigera_unreachable', { message });
   }
 }

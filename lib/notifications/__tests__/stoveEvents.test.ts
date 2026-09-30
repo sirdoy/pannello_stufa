@@ -1,4 +1,5 @@
 jest.mock('@/lib/notifications/notificationTriggersServer', () => ({
+  triggerHealthMonitoringAlertServer: jest.fn().mockResolvedValue({ success: true }),
   triggerMaintenanceAlertServer: jest.fn().mockResolvedValue({ success: true }),
   triggerSchedulerActionServer: jest.fn().mockResolvedValue({ success: true }),
   triggerStoveStatusWorkServer: jest.fn().mockResolvedValue({ success: true }),
@@ -6,6 +7,7 @@ jest.mock('@/lib/notifications/notificationTriggersServer', () => ({
 }));
 
 import {
+  triggerHealthMonitoringAlertServer,
   triggerMaintenanceAlertServer,
   triggerSchedulerActionServer,
   triggerStoveStatusWorkServer,
@@ -46,6 +48,20 @@ describe('stoveEventMessage', () => {
       { event: 'maintenance_100', data: { current_hours: 50, target_hours: 50, percentage: 100 } },
       "Manutenzione richiesta! L'accensione è bloccata fino alla pulizia.",
     ],
+    [
+      {
+        event: 'dirigera_sensors_unreachable',
+        data: { sensors: [{ name: 'Finestra camera', room: 'Camera' }], threshold_hours: 6 },
+      },
+      "Finestra camera (Camera) non risponde da oltre 6 h: ricollega all'hub o cambia la batteria",
+    ],
+    [
+      {
+        event: 'dirigera_sensors_unreachable',
+        data: { sensors: [{ name: 'Finestra sala', room: 'Sala' }, { name: null, room: null }], threshold_hours: 6 },
+      },
+      "Finestra sala (Sala), Sensore non rispondono da oltre 6 h: ricollega all'hub o cambia la batteria",
+    ],
   ])('%o', (partial, expected) => {
     expect(stoveEventMessage({ ts: TS, ...partial } as never)).toBe(expected);
   });
@@ -72,6 +88,17 @@ describe('dispatchStoveEvent', () => {
   it('stove_status_work uses the status trigger', async () => {
     await dispatchStoveEvent('u1', { event: 'stove_status_work', data: {}, ts: TS });
     expect(triggerStoveStatusWorkServer).toHaveBeenCalledTimes(1);
+  });
+
+  it('dirigera_sensors_unreachable uses the monitoring trigger', async () => {
+    await dispatchStoveEvent('u1', {
+      event: 'dirigera_sensors_unreachable',
+      data: { sensors: [{ name: 'Finestra cucina', room: 'Cucina' }], threshold_hours: 6 },
+      ts: TS,
+    });
+    expect(triggerHealthMonitoringAlertServer).toHaveBeenCalledWith('u1', 'dirigera_unreachable', {
+      message: "Finestra cucina (Cucina) non risponde da oltre 6 h: ricollega all'hub o cambia la batteria",
+    });
   });
 
   it('maintenance levels pass threshold and remaining hours', async () => {

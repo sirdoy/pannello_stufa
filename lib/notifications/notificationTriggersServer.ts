@@ -84,6 +84,7 @@ const LEGACY_TYPE_MAPPING = {
   'monitoring_connection_lost': 'ERROR',
   'monitoring_state_mismatch': 'ERROR',
   'monitoring_stove_error': 'CRITICAL',
+  'monitoring_dirigera_unreachable': 'ERROR',
 };
 
 /**
@@ -317,7 +318,7 @@ export async function triggerMaintenanceAlertServer(userId: string, threshold: n
 /**
  * Trigger health monitoring alert
  * @param {string} userId - User ID
- * @param {string} alertType - 'connection_lost' | 'state_mismatch' | 'stove_error'
+ * @param {string} alertType - 'connection_lost' | 'state_mismatch' | 'stove_error' | 'dirigera_unreachable'
  * @param {Object} data - Alert data (expected, actual, errorCode, errorDescription, message)
  */
 export async function triggerHealthMonitoringAlertServer(userId: string, alertType: string, data: Record<string, unknown> = {}) {

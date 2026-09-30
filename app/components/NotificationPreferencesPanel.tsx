@@ -27,17 +27,17 @@ import { Heading, Text } from './ui';
 /**
  * Get nested value from object using dot notation
  */
-function getNestedValue(obj: any, path: string): any {
+function getNestedValue(obj: unknown, path: string): unknown {
   if (!obj || !path) return undefined;
-  return path.split('.').reduce((acc, key) => acc?.[key], obj);
+  return path.split('.').reduce<unknown>((acc, key) => (acc as Record<string, unknown> | null | undefined)?.[key], obj);
 }
 
 /**
  * Set nested value in object using dot notation
  */
-function setNestedValue(obj: any, path: string, value: any): any {
+function setNestedValue(obj: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
   const keys = path.split('.');
-  const result = { ...obj };
+  const result: Record<string, unknown> = { ...obj };
   const firstKey = keys[0];
 
   if (!firstKey) return result;
@@ -47,12 +47,13 @@ function setNestedValue(obj: any, path: string, value: any): any {
     return result;
   }
 
-  let current: any = result;
+  let current: Record<string, unknown> = result;
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i];
     if (!key) continue;
-    current[key] = { ...current[key] };
-    current = current[key];
+    const next: Record<string, unknown> = { ...(current[key] as Record<string, unknown> | undefined) };
+    current[key] = next;
+    current = next;
   }
   const lastKey = keys[keys.length - 1];
   if (lastKey) {
@@ -99,11 +100,32 @@ function PreferenceToggle({ label, description, checked, onChange, disabled = fa
   );
 }
 
+interface CategoryField {
+  key: string;
+  label: string;
+  description?: string;
+  icon?: string;
+  isMaster?: boolean;
+}
+
+interface CategoryConfig {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  fields: CategoryField[];
+}
+
+type PreferenceSection = Record<string, unknown>;
+
+const DEFAULT_SECTIONS: Record<string, PreferenceSection | undefined> = DEFAULT_PREFERENCES;
+const CATEGORY_CONFIGS: Record<string, CategoryConfig | undefined> = NOTIFICATION_CATEGORIES_CONFIG;
+
 interface CategorySectionProps {
   categoryId: string;
-  config: any;
-  preferences: any;
-  onSave: (categoryId: string, prefs: any) => void;
+  config: CategoryConfig;
+  preferences: Record<string, PreferenceSection | undefined>;
+  onSave: (categoryId: string, prefs: PreferenceSection) => void;
   isSaving: boolean;
 }
 
@@ -111,16 +133,16 @@ interface CategorySectionProps {
  * Category Section Component
  */
 function CategorySection({ categoryId, config, preferences, onSave, isSaving }: CategorySectionProps) {
-  const categoryPrefs = (preferences as Record<string, any>)[categoryId] || {};
-  const isEnabled = categoryPrefs.enabled ?? (DEFAULT_PREFERENCES as Record<string, any>)[categoryId]?.enabled ?? true;
+  const categoryPrefs: PreferenceSection = preferences[categoryId] || {};
+  const isEnabled = (categoryPrefs.enabled ?? DEFAULT_SECTIONS[categoryId]?.enabled ?? true) as boolean;
 
-  const handleFieldChange = (fieldKey: string, value: any) => {
+  const handleFieldChange = (fieldKey: string, value: boolean) => {
     const newPrefs = setNestedValue(categoryPrefs, fieldKey, value);
     onSave(categoryId, newPrefs);
   };
 
-  const masterField = config.fields.find((f: any) => f.isMaster);
-  const subFields = config.fields.filter((f: any) => !f.isMaster);
+  const masterField = config.fields.find((f) => f.isMaster);
+  const subFields = config.fields.filter((f) => !f.isMaster);
 
   return (
     <Card variant="glass" className="p-6">
@@ -142,7 +164,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
           <PreferenceToggle
             label={masterField.label}
             description={masterField.description}
-            checked={getNestedValue(categoryPrefs, masterField.key) ?? getNestedValue((DEFAULT_PREFERENCES as Record<string, any>)[categoryId], masterField.key) ?? true}
+            checked={(getNestedValue(categoryPrefs, masterField.key) ?? getNestedValue(DEFAULT_SECTIONS[categoryId], masterField.key) ?? true) as boolean}
             onChange={(value) => handleFieldChange(masterField.key, value)}
             disabled={isSaving}
           />
@@ -151,13 +173,13 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
         {/* Sub fields (only visible when master is enabled) */}
         {isEnabled && subFields.length > 0 && (
           <div className="ml-4 pl-4 border-l-2 border-slate-700/50 space-y-1">
-            {subFields.map((field: any) => (
+            {subFields.map((field) => (
               <PreferenceToggle
                 key={field.key}
                 label={field.label}
                 description={field.description}
                 icon={field.icon}
-                checked={getNestedValue(categoryPrefs, field.key) ?? getNestedValue((DEFAULT_PREFERENCES as Record<string, any>)[categoryId], field.key) ?? true}
+                checked={(getNestedValue(categoryPrefs, field.key) ?? getNestedValue(DEFAULT_SECTIONS[categoryId], field.key) ?? true) as boolean}
                 onChange={(value) => handleFieldChange(field.key, value)}
                 disabled={isSaving}
               />
@@ -196,7 +218,7 @@ export default function NotificationPreferencesPanel() {
   }
 
   // Save section preferences using real-time sync
-  const saveSection = async (section: string, sectionPrefs: any) => {
+  const saveSection = async (section: string, sectionPrefs: PreferenceSection) => {
     if (!user?.sub) return;
 
     setError(null);
@@ -306,7 +328,7 @@ export default function NotificationPreferencesPanel() {
 
       {/* Render each category */}
       {categoryOrder.map((categoryId) => {
-        const config = (NOTIFICATION_CATEGORIES_CONFIG as Record<string, any>)[categoryId];
+        const config = CATEGORY_CONFIGS[categoryId];
         if (!config) return null;
 
         return (

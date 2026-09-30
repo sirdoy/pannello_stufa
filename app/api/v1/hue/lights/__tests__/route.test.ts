@@ -10,34 +10,54 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { HueLight } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetLights = jest.mocked(hueProxy.getLights);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+
+/** GET /lights wrapper as documented in docs/api/hue.md. */
+interface HueLightsPayload {
+  lights: HueLight[];
+  count: number;
+  is_stale: boolean;
+  fetched_at: string | null;
+}
 
 describe('GET /api/v1/hue/lights', () => {
-  const mockLightsData = [
+  const baseLight: HueLight = {
+    light_id: '1',
+    name: 'Desk Lamp',
+    on: true,
+    brightness: 254,
+    ct_mirek: null,
+    ct_kelvin: null,
+    hue: null,
+    saturation: null,
+    colormode: null,
+    reachable: true,
+    capability_tier: 'color',
+    room_id: null,
+    room_name: null,
+    model_id: null,
+    light_type: 'Extended color light',
+  };
+  const mockLightsData: HueLight[] = [
+    baseLight,
     {
-      light_id: '1',
-      name: 'Desk Lamp',
-      on: true,
-      brightness: 254,
-      reachable: true,
-      type: 'Extended color light',
-    },
-    {
+      ...baseLight,
       light_id: '2',
       name: 'Ceiling',
       on: false,
       brightness: 0,
-      reachable: true,
-      type: 'Color temperature light',
+      capability_tier: 'ambiance',
+      light_type: 'Color temperature light',
     },
   ];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -46,7 +66,7 @@ describe('GET /api/v1/hue/lights', () => {
     mockGetSession.mockResolvedValue(null);
     const req = new Request('http://localhost:3000/api/v1/hue/lights');
 
-    const response = await GET(req as any, {} as any);
+    const response = await GET(asNextRequest(req), routeContext());
 
     expect(response.status).toBe(401);
   });
@@ -54,15 +74,17 @@ describe('GET /api/v1/hue/lights', () => {
   it('should return 200 with lights array', async () => {
     // HA proxy wraps the array as `{ lights, count, is_stale, fetched_at }`;
     // route spreads the wrapper so the response is `{ success, lights, count, … }`.
-    mockGetLights.mockResolvedValue({
+    const payload: HueLightsPayload = {
       lights: mockLightsData,
       count: mockLightsData.length,
       is_stale: false,
-      fetched_at: 0,
-    } as any);
+      fetched_at: '2026-03-19T08:51:32.123456Z',
+    };
+    // getLights() is typed HueLight[] but returns this wrapper (docs/api/hue.md GET /lights).
+    mockGetLights.mockResolvedValue(payload as unknown as HueLight[]);
     const req = new Request('http://localhost:3000/api/v1/hue/lights');
 
-    const response = await GET(req as any, {} as any);
+    const response = await GET(asNextRequest(req), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);

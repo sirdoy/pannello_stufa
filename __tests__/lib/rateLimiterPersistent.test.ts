@@ -170,22 +170,22 @@ describe('rateLimiterPersistent', () => {
 
       const existingTimestamps = [recentTimestamp, oldButInWindow, veryOldTimestamp];
 
-      let finalData: any;
+      let finalData: { timestamps: number[] } | undefined;
       mockTransaction.mockImplementation(async (path, updateFn) => {
         const currentData = {
           timestamps: existingTimestamps,
           windowStart: veryOldTimestamp,
         };
         const result = updateFn(currentData);
-        finalData = result;
+        finalData = result as { timestamps: number[] };
         return result;
       });
 
       await checkRateLimitPersistent('user1', 'test');
 
       // Very old timestamp should be filtered out
-      expect(finalData.timestamps).not.toContain(veryOldTimestamp);
-      expect(finalData.timestamps.length).toBeLessThan(existingTimestamps.length + 1);
+      expect(finalData?.timestamps).not.toContain(veryOldTimestamp);
+      expect(finalData?.timestamps.length).toBeLessThan(existingTimestamps.length + 1);
     });
 
     it('should enforce limits concurrently via transactions', async () => {

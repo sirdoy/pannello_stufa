@@ -17,6 +17,14 @@ import { useNetworkData } from '@/app/components/devices/network/hooks/useNetwor
 import { useBandwidthHistory } from '../hooks/useBandwidthHistory';
 import { useDeviceHistory } from '../hooks/useDeviceHistory';
 import type { UseNetworkDataReturn } from '@/app/components/devices/network/types';
+import type { ComponentProps } from 'react';
+import type WanStatusCard from '../components/WanStatusCard';
+import type DeviceListTable from '../components/DeviceListTable';
+import type BandwidthChart from '../components/BandwidthChart';
+import type DeviceHistoryTimeline from '../components/DeviceHistoryTimeline';
+import type BudgetStatsCard from '../components/BudgetStatsCard';
+import type WifiNetworksTable from '../components/WifiNetworksTable';
+import type DeviceCountChart from '../components/DeviceCountChart';
 
 // Mock useNetworkData hook
 jest.mock('@/app/components/devices/network/hooks/useNetworkData', () => ({
@@ -65,7 +73,7 @@ jest.mock('next/navigation', () => ({
 // Mock sub-components to isolate page logic
 jest.mock('../components/WanStatusCard', () => ({
   __esModule: true,
-  default: ({ wan, isStale, lastUpdated }: any) => (
+  default: ({ wan, isStale, lastUpdated }: ComponentProps<typeof WanStatusCard>) => (
     <div
       data-testid="wan-status-card"
       data-connected={wan?.connected}
@@ -77,7 +85,7 @@ jest.mock('../components/WanStatusCard', () => ({
 
 jest.mock('../components/DeviceListTable', () => ({
   __esModule: true,
-  default: ({ devices, isStale, onCategoryChange }: any) => (
+  default: ({ devices, isStale, onCategoryChange }: ComponentProps<typeof DeviceListTable>) => (
     <div
       data-testid="device-list-table"
       data-count={devices.length}
@@ -89,7 +97,7 @@ jest.mock('../components/DeviceListTable', () => ({
 
 jest.mock('../components/BandwidthChart', () => ({
   __esModule: true,
-  default: ({ data, timeRange, onTimeRangeChange, isEmpty, isCollecting, pointCount }: any) => (
+  default: ({ data, timeRange, onTimeRangeChange, isEmpty, isCollecting, pointCount }: ComponentProps<typeof BandwidthChart>) => (
     <div
       data-testid="bandwidth-chart"
       data-point-count={pointCount}
@@ -103,7 +111,7 @@ jest.mock('../components/BandwidthChart', () => ({
 
 jest.mock('../components/DeviceHistoryTimeline', () => ({
   __esModule: true,
-  default: ({ events, isLoading, isEmpty, timeRange, deviceFilter, devices }: any) => (
+  default: ({ events, isLoading, isEmpty, timeRange, deviceFilter, devices }: ComponentProps<typeof DeviceHistoryTimeline>) => (
     <div
       data-testid="device-history-timeline"
       data-event-count={events.length}
@@ -118,7 +126,7 @@ jest.mock('../components/DeviceHistoryTimeline', () => ({
 
 jest.mock('../components/BudgetStatsCard', () => ({
   __esModule: true,
-  default: ({ data, loading, error }: any) => (
+  default: ({ data, loading, error }: ComponentProps<typeof BudgetStatsCard>) => (
     <div
       data-testid="budget-stats-card"
       data-loading={loading}
@@ -130,7 +138,7 @@ jest.mock('../components/BudgetStatsCard', () => ({
 
 jest.mock('../components/WifiNetworksTable', () => ({
   __esModule: true,
-  default: ({ networks, loading, stale }: any) => (
+  default: ({ networks, loading, stale }: ComponentProps<typeof WifiNetworksTable>) => (
     <div
       data-testid="wifi-networks-table"
       data-count={networks.length}
@@ -142,7 +150,7 @@ jest.mock('../components/WifiNetworksTable', () => ({
 
 jest.mock('../components/DeviceCountChart', () => ({
   __esModule: true,
-  default: ({ data, loading }: any) => (
+  default: ({ data, loading }: ComponentProps<typeof DeviceCountChart>) => (
     <div
       data-testid="device-count-chart"
       data-count={data.length}

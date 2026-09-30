@@ -25,6 +25,11 @@ let mockSubscribe: jest.Mock;
 let mockUnsubscribe: jest.Mock;
 let lastPollingOpts: Record<string, unknown> = {};
 
+/** Routes fetch by URL; stub responses only carry the members the hook reads (ok, status, json). */
+function mockFetchByUrl(impl: (url: string) => Promise<Partial<Response>>): typeof fetch {
+  return jest.fn((input: RequestInfo | URL) => impl(String(input)) as Promise<Response>);
+}
+
 describe('useLightsData', () => {
   const mockLight: HueLight = {
     light_id: '1',
@@ -124,7 +129,7 @@ describe('useLightsData', () => {
     jest.mocked(colorUtils.getCurrentColorHex).mockReturnValue(null);
 
     // Mock fetch globally — proxy-wrapped responses
-    (global as any).fetch = jest.fn((url: string) => {
+    global.fetch = mockFetchByUrl((url) => {
       if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
@@ -133,27 +138,27 @@ describe('useLightsData', () => {
             connected: true,
             data_freshness: 'LIVE',
           }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, groups: [mockGroup, mockGroupCasa] }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/lights')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, lights: [mockLight, mockLightOff] }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/scenes')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, scenes: [mockScene] }),
-        }) as any;
+        });
       }
-      return Promise.reject(new Error('Unknown URL')) as any;
+      return Promise.reject(new Error('Unknown URL'));
     });
   });
 
@@ -177,14 +182,15 @@ describe('useLightsData', () => {
   it('does NOT have pairing state in return object', () => {
     const { result } = renderHook(() => useLightsData());
 
-    expect((result.current as any).pairing).toBeUndefined();
-    expect((result.current as any).pairingStep).toBeUndefined();
-    expect((result.current as any).discoveredBridges).toBeUndefined();
-    expect((result.current as any).selectedBridge).toBeUndefined();
-    expect((result.current as any).pairingCountdown).toBeUndefined();
-    expect((result.current as any).pairingError).toBeUndefined();
-    expect((result.current as any).connectionMode).toBeUndefined();
-    expect((result.current as any).remoteConnected).toBeUndefined();
+    const current: Record<string, unknown> = { ...result.current };
+    expect(current.pairing).toBeUndefined();
+    expect(current.pairingStep).toBeUndefined();
+    expect(current.discoveredBridges).toBeUndefined();
+    expect(current.selectedBridge).toBeUndefined();
+    expect(current.pairingCountdown).toBeUndefined();
+    expect(current.pairingError).toBeUndefined();
+    expect(current.connectionMode).toBeUndefined();
+    expect(current.remoteConnected).toBeUndefined();
   });
 
   it('calls checkConnection on mount (fetches /api/v1/hue/health)', async () => {
@@ -206,14 +212,14 @@ describe('useLightsData', () => {
   });
 
   it('sets stale=true when data_freshness is STALE', async () => {
-    (global as any).fetch = jest.fn((url: string) => {
+    global.fetch = mockFetchByUrl((url) => {
       if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'STALE' }),
-        }) as any;
+        });
       }
-      return Promise.reject(new Error('Unknown URL')) as any;
+      return Promise.reject(new Error('Unknown URL'));
     });
 
     const { result } = renderHook(() => useLightsData());
@@ -244,14 +250,14 @@ describe('useLightsData', () => {
 
   it('stays connected on STALE cache even when backend reports connected=false', async () => {
     // backend /hue/health: connected = (freshness == LIVE); STALE still serves lights/groups (200)
-    (global as any).fetch = jest.fn((url: string) => {
+    global.fetch = mockFetchByUrl((url) => {
       if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: false, data_freshness: 'STALE' }),
-        }) as any;
+        });
       }
-      return Promise.reject(new Error('Unknown URL')) as any;
+      return Promise.reject(new Error('Unknown URL'));
     });
 
     const { result } = renderHook(() => useLightsData());
@@ -263,15 +269,15 @@ describe('useLightsData', () => {
   });
 
   it('sets connected=false on 503 (Bridge UNREACHABLE)', async () => {
-    (global as any).fetch = jest.fn((url: string) => {
+    global.fetch = mockFetchByUrl((url) => {
       if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: false,
           status: 503,
           json: () => Promise.resolve({}),
-        }) as any;
+        });
       }
-      return Promise.reject(new Error('Unknown URL')) as any;
+      return Promise.reject(new Error('Unknown URL'));
     });
 
     const { result } = renderHook(() => useLightsData());
@@ -437,7 +443,7 @@ describe('useLightsData', () => {
   });
 
   it('handles checkConnection error gracefully', async () => {
-    (global as any).fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useLightsData());
 
@@ -449,32 +455,32 @@ describe('useLightsData', () => {
   });
 
   it('handles fetchData error from groups response', async () => {
-    (global as any).fetch = jest.fn((url: string) => {
+    global.fetch = mockFetchByUrl((url) => {
       if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ error: 'Rooms fetch failed' }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/lights')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, lights: [mockLight] }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/scenes')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, scenes: [mockScene] }),
-        }) as any;
+        });
       }
-      return Promise.reject(new Error('Unknown URL')) as any;
+      return Promise.reject(new Error('Unknown URL'));
     });
 
     const { result } = renderHook(() => useLightsData());
@@ -485,20 +491,20 @@ describe('useLightsData', () => {
   });
 
   it('handles reconnect flag in fetchData response', async () => {
-    (global as any).fetch = jest.fn((url: string) => {
+    global.fetch = mockFetchByUrl((url) => {
       if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ reconnect: true }),
-        }) as any;
+        });
       }
-      return Promise.reject(new Error('Unknown URL')) as any;
+      return Promise.reject(new Error('Unknown URL'));
     });
 
     const { result } = renderHook(() => useLightsData());
@@ -562,32 +568,32 @@ describe('useLightsData', () => {
       capability_tier: 'color',
     };
 
-    (global as any).fetch = jest.fn((url: string) => {
+    global.fetch = mockFetchByUrl((url) => {
       if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, groups: [mockGroup] }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/lights')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, lights: [brightLight] }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/scenes')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, scenes: [] }),
-        }) as any;
+        });
       }
-      return Promise.reject(new Error('Unknown URL')) as any;
+      return Promise.reject(new Error('Unknown URL'));
     });
 
     const { result } = renderHook(() => useLightsData());
@@ -614,32 +620,32 @@ describe('useLightsData', () => {
       colormode: null,
     };
 
-    (global as any).fetch = jest.fn((url: string) => {
+    global.fetch = mockFetchByUrl((url) => {
       if (url.includes('/api/v1/hue/health')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, connected: true, data_freshness: 'LIVE' }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/groups')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, groups: [groupAllOff] }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/lights')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, lights: [mockLightOff] }),
-        }) as any;
+        });
       }
       if (url.includes('/api/v1/hue/scenes')) {
         return Promise.resolve({
           ok: true,
           json: () => Promise.resolve({ success: true, scenes: [] }),
-        }) as any;
+        });
       }
-      return Promise.reject(new Error('Unknown URL')) as any;
+      return Promise.reject(new Error('Unknown URL'));
     });
 
     const { result } = renderHook(() => useLightsData());
@@ -863,14 +869,14 @@ describe('useLightsData', () => {
       // Clear fetch calls from mount (checkConnection)
       jest.clearAllMocks();
       // Re-setup fetch mock for scenes
-      (global as any).fetch = jest.fn((url: string) => {
+      global.fetch = mockFetchByUrl((url) => {
         if (url.includes('/api/v1/hue/scenes')) {
           return Promise.resolve({
             ok: true,
             json: () => Promise.resolve({ success: true, scenes: [] }),
-          }) as any;
+          });
         }
-        return Promise.reject(new Error('Unknown URL')) as any;
+        return Promise.reject(new Error('Unknown URL'));
       });
 
       await act(async () => {

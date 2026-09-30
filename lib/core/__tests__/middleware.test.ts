@@ -6,7 +6,9 @@
 
 import { NextResponse } from 'next/server';
 import { ref, get, set } from 'firebase/database';
+import type { DatabaseReference, DataSnapshot } from 'firebase/database';
 import { db } from '@/lib/firebase';
+import { asNextRequest, mockAppSession } from '@/__tests__/__utils__/routeHelpers';
 
 // Mock the session before importing middleware
 jest.mock('@/lib/auth/session', () => ({
@@ -64,7 +66,7 @@ describe('withIdempotency', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Mock ref to return a reference object
-    mockRef.mockReturnValue({} as any);
+    mockRef.mockReturnValue({} as DatabaseReference);
   });
 
   it('executes handler normally when no Idempotency-Key header is present', async () => {
@@ -79,7 +81,7 @@ describe('withIdempotency', () => {
     const context = createMockContext();
     const session = createMockSession();
 
-    await wrappedHandler(request as any, context, session);
+    await wrappedHandler(asNextRequest(request), context, session);
 
     // Handler should be called
     expect(mockHandler).toHaveBeenCalledTimes(1);
@@ -106,9 +108,9 @@ describe('withIdempotency', () => {
     mockGet.mockResolvedValue({
       exists: () => false,
       val: () => null,
-    } as any);
+    } as DataSnapshot);
 
-    const response = await wrappedHandler(request as any, context, session);
+    const response = await wrappedHandler(asNextRequest(request), context, session);
 
     // Handler should be called
     expect(mockHandler).toHaveBeenCalledTimes(1);
@@ -158,9 +160,9 @@ describe('withIdempotency', () => {
     mockGet.mockResolvedValue({
       exists: () => true,
       val: () => cachedResult,
-    } as any);
+    } as DataSnapshot);
 
-    const response = await wrappedHandler(request as any, context, session);
+    const response = await wrappedHandler(asNextRequest(request), context, session);
 
     // Handler should NOT be called
     expect(mockHandler).not.toHaveBeenCalled();
@@ -193,7 +195,7 @@ describe('withIdempotency', () => {
     mockGet.mockResolvedValue({
       exists: () => false,
       val: () => null,
-    } as any);
+    } as DataSnapshot);
 
     // Mock cache write failure
     mockSet.mockRejectedValue(new Error('Firebase write failed'));
@@ -201,7 +203,7 @@ describe('withIdempotency', () => {
     // Spy on console.warn
     const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
 
-    const response = await wrappedHandler(request as any, context, session);
+    const response = await wrappedHandler(asNextRequest(request), context, session);
 
     // Handler should be called
     expect(mockHandler).toHaveBeenCalledTimes(1);
@@ -236,9 +238,9 @@ describe('withIdempotency', () => {
     mockGet.mockResolvedValue({
       exists: () => false,
       val: () => null,
-    } as any);
+    } as DataSnapshot);
 
-    const response = await wrappedHandler(request as any, context, session);
+    const response = await wrappedHandler(asNextRequest(request), context, session);
 
     // Handler should be called
     expect(mockHandler).toHaveBeenCalledTimes(1);
@@ -271,9 +273,9 @@ describe('withIdempotency', () => {
     mockGet.mockResolvedValueOnce({
       exists: () => false,
       val: () => null,
-    } as any);
+    } as DataSnapshot);
 
-    await wrappedHandler(request1 as any, context, session);
+    await wrappedHandler(asNextRequest(request1), context, session);
 
     expect(mockHandler).toHaveBeenCalledTimes(1);
     expect(mockRef).toHaveBeenCalledWith(db, 'idempotency/results/key-1');
@@ -284,9 +286,9 @@ describe('withIdempotency', () => {
     mockGet.mockResolvedValueOnce({
       exists: () => false,
       val: () => null,
-    } as any);
+    } as DataSnapshot);
 
-    await wrappedHandler(request2 as any, context, session);
+    await wrappedHandler(asNextRequest(request2), context, session);
 
     // Handler should be called again (different key)
     expect(mockHandler).toHaveBeenCalledTimes(2);
@@ -309,10 +311,10 @@ describe('withIdempotency', () => {
     mockGet.mockResolvedValue({
       exists: () => false,
       val: () => null,
-    } as any);
+    } as DataSnapshot);
 
     const beforeTime = Date.now();
-    await wrappedHandler(request as any, context, session);
+    await wrappedHandler(asNextRequest(request), context, session);
     const afterTime = Date.now();
 
     // Check that TTL is 1 hour (3600000ms)
@@ -324,7 +326,7 @@ describe('withIdempotency', () => {
       })
     );
 
-    const cachedData = mockSet.mock.calls[0]?.[1] as any;
+    const cachedData = mockSet.mock.calls[0]?.[1] as { timestamp: number; expiresAt: number };
     const ttl = cachedData.expiresAt - cachedData.timestamp;
 
     // TTL should be 1 hour (allow small variance due to execution time)
@@ -351,7 +353,7 @@ describe('withAuthAndErrorHandler production auth', () => {
     const handler = jest.fn();
     const wrapped = withAuthAndErrorHandler(handler);
 
-    const request = createMockRequest() as any;
+    const request = asNextRequest(createMockRequest());
     const context = createMockContext();
 
     const response = await wrapped(request, context);
@@ -362,15 +364,15 @@ describe('withAuthAndErrorHandler production auth', () => {
 
   it('passes session to handler when authenticated', async () => {
     const mockSessionModule = jest.mocked((await import('@/lib/auth/session')).authSession);
-    const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-    (mockSessionModule.getSession as jest.Mock).mockResolvedValue(mockSession as any);
+    const mockSession = mockAppSession({ sub: 'auth0|123', email: 'test@test.com' });
+    (mockSessionModule.getSession as jest.Mock).mockResolvedValue(mockSession);
 
     const handler = jest.fn().mockResolvedValue(
       NextResponse.json({ ok: true })
     );
     const wrapped = withAuthAndErrorHandler(handler);
 
-    const request = createMockRequest() as any;
+    const request = asNextRequest(createMockRequest());
     const context = createMockContext();
 
     await wrapped(request, context);

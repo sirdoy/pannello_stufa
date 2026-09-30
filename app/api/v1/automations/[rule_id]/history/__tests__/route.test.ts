@@ -10,12 +10,12 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import { automationsProxy } from '@/lib/automations';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockAutomationsProxy = jest.mocked(automationsProxy);
 
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-const mockContext = { params: Promise.resolve({ rule_id: 'rule-123' }) };
+const mockContext = routeContext({ rule_id: 'rule-123' });
 
 const mockExecution = {
   id: 1,
@@ -36,7 +36,7 @@ const mockPaginatedExecutions = {
 describe('GET /api/v1/automations/[rule_id]/history', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -45,7 +45,7 @@ describe('GET /api/v1/automations/[rule_id]/history', () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123/history');
 
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -56,7 +56,7 @@ describe('GET /api/v1/automations/[rule_id]/history', () => {
     mockAutomationsProxy.getExecutions.mockResolvedValue(mockPaginatedExecutions);
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123/history');
 
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -68,7 +68,7 @@ describe('GET /api/v1/automations/[rule_id]/history', () => {
     mockAutomationsProxy.getExecutions.mockResolvedValue(mockPaginatedExecutions);
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123/history?limit=20&offset=0');
 
-    await GET(request as any, mockContext as any);
+    await GET(asNextRequest(request), mockContext);
 
     expect(mockAutomationsProxy.getExecutions).toHaveBeenCalledWith('rule-123', { limit: 20, offset: 0 });
   });

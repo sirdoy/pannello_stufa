@@ -8,7 +8,21 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import DeviceTypesPage from '../page';
-import type { DeviceType } from '@/types/registry';
+import type { DeviceType, DeviceTypeCreate } from '@/types/registry';
+
+// Minimal view of a TanStack column as consumed by the DataTable mock
+interface MockColumn<TData> {
+  id?: string;
+  accessorKey?: string;
+  cell?: (ctx: { row: { original: TData } }) => React.ReactNode;
+}
+
+// Props of FormModal read by the mock below
+interface MockFormModalProps {
+  isOpen: boolean;
+  title?: string;
+  onSubmit: (data: DeviceTypeCreate | { label: string }) => Promise<void> | void;
+}
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -29,11 +43,11 @@ jest.mock('@/app/components/SettingsLayout', () => ({
 // Mock DataTable — renders data items via column definitions
 jest.mock('@/app/components/ui/DataTable', () => ({
   __esModule: true,
-  default: ({ data, columns }: { data: DeviceType[]; columns: any[] }) => (
+  default: ({ data, columns }: { data: DeviceType[]; columns: MockColumn<DeviceType>[] }) => (
     <div data-testid="data-table">
       {data.map((item: DeviceType) => (
         <div key={item.slug} data-testid={`row-${item.slug}`}>
-          {columns.map((col: any) => {
+          {columns.map((col) => {
             if (col.id === 'actions') {
               return <div key="actions">{col.cell?.({ row: { original: item } })}</div>;
             }
@@ -53,10 +67,10 @@ jest.mock('@/app/components/ui/DataTable', () => ({
 }));
 
 // Mock FormModal — captures title and renders submit button
-let lastFormModalProps: any = null;
+let lastFormModalProps: MockFormModalProps | null = null;
 jest.mock('@/app/components/ui/FormModal', () => ({
   __esModule: true,
-  default: (props: any) => {
+  default: (props: MockFormModalProps) => {
     lastFormModalProps = props;
     if (!props.isOpen) return null;
     const handleSubmit = () => {
@@ -78,7 +92,17 @@ jest.mock('@/app/components/ui/FormModal', () => ({
 // Mock ConfirmationDialog
 jest.mock('@/app/components/ui/ConfirmationDialog', () => ({
   __esModule: true,
-  default: ({ isOpen, onConfirm, description, title }: any) => {
+  default: ({
+    isOpen,
+    onConfirm,
+    description,
+    title,
+  }: {
+    isOpen: boolean;
+    onConfirm?: () => void | Promise<void>;
+    description?: React.ReactNode;
+    title?: string;
+  }) => {
     if (!isOpen) return null;
     return (
       <div data-testid="confirmation-dialog">
@@ -125,7 +149,7 @@ jest.mock('@/app/hooks/useToast', () => ({
 
 jest.mock('@/app/components/ui/Input', () => ({
   __esModule: true,
-  default: (props: any) => <input {...props} />,
+  default: (props: React.InputHTMLAttributes<HTMLInputElement>) => <input {...props} />,
 }));
 
 // --- Mock data ---

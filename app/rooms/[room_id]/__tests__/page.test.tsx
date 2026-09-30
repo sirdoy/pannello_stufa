@@ -14,6 +14,13 @@ import RoomDetailPage from '../page';
 import type { Room } from '@/types/rooms';
 import type { RegistryDevice } from '@/types/registry';
 
+// Minimal view of a TanStack column as consumed by the DataTable mock
+interface MockColumn<TData> {
+  id?: string;
+  accessorKey?: string;
+  cell?: (ctx: { row: { original: TData } }) => React.ReactNode;
+}
+
 // Mock next/navigation
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
@@ -35,11 +42,11 @@ jest.mock('@/app/components/SettingsLayout', () => ({
 // Mock DataTable — renders data items mapping columns including actions cells
 jest.mock('@/app/components/ui/DataTable', () => ({
   __esModule: true,
-  default: ({ data, columns }: { data: RegistryDevice[]; columns: any[] }) => (
+  default: ({ data, columns }: { data: RegistryDevice[]; columns: MockColumn<RegistryDevice>[] }) => (
     <div data-testid="data-table">
       {data.map((item: RegistryDevice) => (
         <div key={item.id} data-testid={`row-${item.id}`}>
-          {columns.map((col: any) => {
+          {columns.map((col) => {
             if (col.id === 'actions') {
               const cellContent = col.cell?.({ row: { original: item } });
               return <div key="actions">{cellContent}</div>;
@@ -62,7 +69,7 @@ jest.mock('@/app/components/ui/DataTable', () => ({
 // Mock FormModal — handle 'Assegna dispositivo' title with submit button
 jest.mock('@/app/components/ui/FormModal', () => ({
   __esModule: true,
-  default: ({ isOpen, onSubmit, title }: { isOpen: boolean; onSubmit: (data: any) => Promise<void>; title?: string }) => {
+  default: ({ isOpen, onSubmit, title }: { isOpen: boolean; onSubmit: (data: { device_registry_id?: number }) => Promise<void>; title?: string }) => {
     if (!isOpen) return null;
     const isAssign = title === 'Assegna dispositivo';
     const testid = isAssign ? 'form-modal-assign' : 'form-modal-other';

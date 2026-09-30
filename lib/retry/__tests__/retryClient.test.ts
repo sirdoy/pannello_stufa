@@ -37,7 +37,7 @@ if (typeof Response === 'undefined') {
         headers: Object.fromEntries(this.headers),
       });
     }
-  } as any;
+  } as unknown as typeof Response; // partial polyfill: status/ok/headers/json/text/clone only
 }
 
 // Mock fetch globally
@@ -289,8 +289,8 @@ describe('retryClient', () => {
         })
       );
 
-      let thrownError: any;
-      const promise = retryFetch('https://api.example.com/test', {}, { maxAttempts: 3 }).catch(e => {
+      let thrownError: RetryError | undefined;
+      const promise = retryFetch('https://api.example.com/test', {}, { maxAttempts: 3 }).catch((e: RetryError) => {
         thrownError = e;
       });
 
@@ -298,7 +298,7 @@ describe('retryClient', () => {
       await promise;
 
       expect(thrownError).toBeInstanceOf(RetryError);
-      expect(thrownError.attempts).toBe(3);
+      expect(thrownError?.attempts).toBe(3);
     });
 
     it('retries on network TypeError (fetch fails entirely)', async () => {

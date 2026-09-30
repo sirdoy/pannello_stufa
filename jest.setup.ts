@@ -9,7 +9,7 @@ declare global {
   var __CLIENT_SIDE_MOUNTED__: boolean;
   var IS_REACT_ACT_ENVIRONMENT: boolean;
   var axe: ReturnType<typeof configureAxe>;
-  var runAxeWithRealTimers: (container: Element) => Promise<any>;
+  var runAxeWithRealTimers: (container: Element) => ReturnType<ReturnType<typeof configureAxe>>;
 }
 
 // Mock aria-hidden (used by Radix Dialog) to prevent hideOthers from aria-hiding
@@ -88,25 +88,30 @@ global.__CLIENT_SIDE_MOUNTED__ = true;
 
 // Add React.act polyfill for React 19
 // Standalone implementation that doesn't create circular dependencies
+const isThenable = (value: unknown): value is PromiseLike<unknown> =>
+  value !== null && typeof value === 'object' && 'then' in value && typeof value.then === 'function';
+
 if (!React.act) {
-  React.act = function (callback: () => any) {
-    try {
-      const result = callback();
-      // If it's a promise, wait for it
-      if (result !== null && typeof result === 'object' && typeof result.then === 'function') {
-        return result.then(
-          (value: any) => value,
-          (error: any) => {
-            throw error;
-          }
-        );
+  Object.assign(React, {
+    act(callback: () => unknown) {
+      try {
+        const result = callback();
+        // If it's a promise, wait for it
+        if (isThenable(result)) {
+          return result.then(
+            (value) => value,
+            (error: unknown) => {
+              throw error;
+            }
+          );
+        }
+        // Otherwise return the result directly
+        return Promise.resolve(result);
+      } catch (error) {
+        return Promise.reject(error);
       }
-      // Otherwise return the result directly
-      return Promise.resolve(result);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  } as any;
+    },
+  });
 }
 
 // Mock environment variables for testing
@@ -147,7 +152,7 @@ global.IntersectionObserver = class IntersectionObserver {
   readonly root: Element | Document | null = null;
   readonly rootMargin: string = '';
   readonly thresholds: ReadonlyArray<number> = [];
-} as any;
+};
 
 // Mock Pointer Capture API (required for Radix UI Select)
 // JSDOM doesn't support Pointer Capture API, so we need to polyfill it
@@ -169,7 +174,7 @@ global.ResizeObserver = class ResizeObserver {
   disconnect() {}
   observe(target: Element, options?: ResizeObserverOptions) {}
   unobserve(target: Element) {}
-} as any;
+};
 
 // Mock DOMRect (required for Radix floating UI)
 global.DOMRect = global.DOMRect || class DOMRect {
@@ -198,7 +203,7 @@ global.DOMRect = global.DOMRect || class DOMRect {
   toJSON() {
     return { x: this.x, y: this.y, width: this.width, height: this.height };
   }
-} as any;
+};
 
 // Mock getBoundingClientRect to return a valid DOMRect
 if (typeof Element !== 'undefined') {
@@ -217,8 +222,8 @@ if (typeof Request === 'undefined') {
   global.Request = class Request {
     url: string;
     method: string;
-    headers: any;
-    body: any;
+    headers: HeadersInit;
+    body: BodyInit | null | undefined;
 
     constructor(url: string, init?: RequestInit) {
       this.url = url;
@@ -226,7 +231,7 @@ if (typeof Request === 'undefined') {
       this.headers = init?.headers || {};
       this.body = init?.body;
     }
-  } as any;
+  } as unknown as typeof Request; // partial polyfill: only url/method/headers/body
 }
 
 // Mock localStorage
@@ -236,7 +241,7 @@ const localStorageMock: Record<string, jest.Mock> = {
   removeItem: jest.fn(),
   clear: jest.fn(),
 };
-global.localStorage = localStorageMock as any;
+global.localStorage = localStorageMock as unknown as Storage; // partial double: jest.fn methods only
 
 // Mock Firebase to prevent initialization issues
 jest.mock('firebase/app', () => ({
@@ -298,7 +303,7 @@ const nextResponseJsonImpl = (body: unknown, init?: { status?: number; headers?:
 };
 
 // Create NextResponse as a constructor function with static methods
-function NextResponseMock(body: any, init?: { status?: number; headers?: HeadersInit }) {
+function NextResponseMock(body: unknown, init?: { status?: number; headers?: HeadersInit }) {
   const status = init?.status || 200;
   return {
     body,
@@ -311,7 +316,7 @@ function NextResponseMock(body: any, init?: { status?: number; headers?: Headers
 }
 
 // Add static json method
-(NextResponseMock as any).json = jest.fn().mockImplementation(nextResponseJsonImpl);
+NextResponseMock.json = jest.fn().mockImplementation(nextResponseJsonImpl);
 
 // Static redirect method — mirrors Next.js NextResponse.redirect(url, init?)
 // Used by the v1 camera snapshot route (Phase 168 Plan 02 Q3: 302 redirect preserves <img src> compat)
@@ -333,7 +338,7 @@ const nextResponseRedirectImpl = (
   };
   return response;
 };
-(NextResponseMock as any).redirect = jest.fn().mockImplementation(nextResponseRedirectImpl);
+NextResponseMock.redirect = jest.fn().mockImplementation(nextResponseRedirectImpl);
 
 jest.mock('next/server', () => ({
   __esModule: true,
@@ -346,12 +351,12 @@ afterEach(() => {
   jest.clearAllMocks();
 
   // Restore NextResponse.json implementation after clearAllMocks
-  if ((NextResponseMock as any).json.mockImplementation) {
-    (NextResponseMock as any).json.mockImplementation(nextResponseJsonImpl);
+  if (NextResponseMock.json.mockImplementation) {
+    NextResponseMock.json.mockImplementation(nextResponseJsonImpl);
   }
   // Restore NextResponse.redirect implementation after clearAllMocks
-  if ((NextResponseMock as any).redirect.mockImplementation) {
-    (NextResponseMock as any).redirect.mockImplementation(nextResponseRedirectImpl);
+  if (NextResponseMock.redirect.mockImplementation) {
+    NextResponseMock.redirect.mockImplementation(nextResponseRedirectImpl);
   }
 
   localStorageMock.getItem?.mockClear();

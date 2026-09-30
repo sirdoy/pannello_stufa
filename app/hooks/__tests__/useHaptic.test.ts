@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useHaptic } from '../useHaptic';
+import { useHaptic, type HapticPattern } from '../useHaptic';
 import * as vibration from '@/lib/pwa/vibration';
 
 // Mock vibration module
@@ -66,7 +66,7 @@ describe('useHaptic', () => {
   });
 
   it('should default to vibrateShort for unknown pattern', () => {
-    const { result } = renderHook(() => useHaptic('unknown' as any));
+    const { result } = renderHook(() => useHaptic('unknown' as string as HapticPattern));
 
     act(() => {
       result.current.trigger();

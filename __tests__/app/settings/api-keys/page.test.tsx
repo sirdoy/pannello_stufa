@@ -15,6 +15,7 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { APIKeyInfo } from '@/types/authProxy';
 
 // --- Hook mocks (must be declared before importing the SUT) ------------------
 
@@ -23,7 +24,7 @@ const mockRevoke = jest.fn();
 const mockRefetch = jest.fn();
 
 type HookState = {
-  keys: any[];
+  keys: APIKeyInfo[];
   loading: boolean;
   error: 'SESSION_EXPIRED' | 'Errore nel caricamento delle API key' | null;
   refetch: jest.Mock;
@@ -84,7 +85,7 @@ import ApiKeysPage from '@/app/settings/api-keys/page';
 
 // --- Fixtures ----------------------------------------------------------------
 
-const ACTIVE_KEY = {
+const ACTIVE_KEY: APIKeyInfo = {
   id: 1,
   name: 'Prod',
   created_at: '2026-04-20T10:00:00Z',
@@ -92,7 +93,7 @@ const ACTIVE_KEY = {
   is_active: true,
 };
 
-const REVOKED_KEY = {
+const REVOKED_KEY: APIKeyInfo = {
   id: 2,
   name: 'OldKey',
   created_at: '2026-04-15T10:00:00Z',

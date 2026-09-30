@@ -21,6 +21,7 @@ import {
   fritzboxClient,
 } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCachedData = jest.mocked(getCachedData);
@@ -28,7 +29,7 @@ const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
 describe('GET /api/v1/fritzbox/devices', () => {
   let mockRequest: Request;
-  const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  const mockSession = mockAppSession({ sub: 'auth0|123', email: 'test@test.com' });
 
   const mockDevices = [
     { id: 'AA:BB:CC:DD:EE:FF', mac: 'AA:BB:CC:DD:EE:FF', name: 'Device 1', ip: '192.168.1.100', active: true },
@@ -40,7 +41,7 @@ describe('GET /api/v1/fritzbox/devices', () => {
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/devices');
 
     // Default: authenticated user
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockSession);
 
     // Default: rate limit allows
     mockCheckRateLimit.mockResolvedValue({
@@ -56,7 +57,7 @@ describe('GET /api/v1/fritzbox/devices', () => {
   test('returns devices list on success', async () => {
     mockGetCachedData.mockResolvedValue(mockDevices);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -68,7 +69,7 @@ describe('GET /api/v1/fritzbox/devices', () => {
   test('returns empty array when no devices', async () => {
     mockGetCachedData.mockResolvedValue([]);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -83,7 +84,7 @@ describe('GET /api/v1/fritzbox/devices', () => {
       nextAllowedIn: 30,
     });
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
 
     expect(response.status).toBe(429);
   });
@@ -91,7 +92,7 @@ describe('GET /api/v1/fritzbox/devices', () => {
   test('passes session user sub to rate limit check', async () => {
     mockGetCachedData.mockResolvedValue(mockDevices);
 
-    await GET(mockRequest as any, {} as any);
+    await GET(asNextRequest(mockRequest), routeContext());
 
     expect(mockCheckRateLimit).toHaveBeenCalledWith('auth0|123', 'devices');
   });
@@ -100,7 +101,7 @@ describe('GET /api/v1/fritzbox/devices', () => {
     mockGetCachedData.mockResolvedValue(mockDevices);
     jest.mocked(fritzboxClient).getDevices = jest.fn().mockResolvedValue(mockDevices);
 
-    await GET(mockRequest as any, {} as any);
+    await GET(asNextRequest(mockRequest), routeContext());
 
     const fetcher = mockGetCachedData.mock.calls[0]?.[1];
     expect(fetcher).toBeDefined();

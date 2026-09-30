@@ -17,13 +17,13 @@ import { GET, PATCH, DELETE } from '../route';
 import { automationsProxy } from '@/lib/automations';
 import { authSession } from '@/lib/auth/session';
 import { parseJson } from '@/lib/core/requestParser';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockAutomationsProxy = jest.mocked(automationsProxy);
 const mockParseJson = jest.mocked(parseJson);
 
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-const mockContext = { params: Promise.resolve({ rule_id: 'rule-123' }) };
+const mockContext = routeContext({ rule_id: 'rule-123' });
 
 const mockRule = {
   id: 1,
@@ -43,7 +43,7 @@ const mockRule = {
 describe('GET /api/v1/automations/[rule_id]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -52,7 +52,7 @@ describe('GET /api/v1/automations/[rule_id]', () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123');
 
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -63,7 +63,7 @@ describe('GET /api/v1/automations/[rule_id]', () => {
     mockAutomationsProxy.getAutomation.mockResolvedValue(mockRule);
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123');
 
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -74,7 +74,7 @@ describe('GET /api/v1/automations/[rule_id]', () => {
     mockAutomationsProxy.getAutomation.mockResolvedValue(mockRule);
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123');
 
-    await GET(request as any, mockContext as any);
+    await GET(asNextRequest(request), mockContext);
 
     expect(mockAutomationsProxy.getAutomation).toHaveBeenCalledWith('rule-123');
   });
@@ -83,12 +83,12 @@ describe('GET /api/v1/automations/[rule_id]', () => {
 describe('PATCH /api/v1/automations/[rule_id]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     // Default: parseJson returns { name: 'Updated' } — matches the existing
     // PATCH test fixtures so legacy tests stay green.
-    mockParseJson.mockResolvedValue({ name: 'Updated' } as any);
+    mockParseJson.mockResolvedValue({ name: 'Updated' });
   });
 
   it('returns 401 when not authenticated', async () => {
@@ -99,7 +99,7 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PATCH(request as any, mockContext as any);
+    const response = await PATCH(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -115,7 +115,7 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PATCH(request as any, mockContext as any);
+    const response = await PATCH(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -130,7 +130,7 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    await PATCH(request as any, mockContext as any);
+    await PATCH(asNextRequest(request), mockContext);
 
     expect(mockAutomationsProxy.updateAutomation).toHaveBeenCalledWith('rule-123', expect.any(Object));
   });
@@ -143,28 +143,28 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
     mockParseJson.mockResolvedValue({
       name: 'Updated',
       trigger: { type: 'schedule_cron', cron_expression: '0 0 * * *' },
-    } as any);
+    });
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123', {
       method: 'PATCH',
       body: JSON.stringify({}),
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PATCH(request as any, mockContext as any);
+    const response = await PATCH(asNextRequest(request), mockContext);
 
     expect(response.status).toBe(400);
     expect(mockAutomationsProxy.updateAutomation).not.toHaveBeenCalled();
   });
 
   it('returns 400 when body contains an unknown key (strict mode rejects)', async () => {
-    mockParseJson.mockResolvedValue({ name: 'Updated', smuggled_field: 'evil' } as any);
+    mockParseJson.mockResolvedValue({ name: 'Updated', smuggled_field: 'evil' });
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123', {
       method: 'PATCH',
       body: JSON.stringify({}),
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PATCH(request as any, mockContext as any);
+    const response = await PATCH(asNextRequest(request), mockContext);
 
     expect(response.status).toBe(400);
     expect(mockAutomationsProxy.updateAutomation).not.toHaveBeenCalled();
@@ -184,7 +184,7 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PATCH(request as never, mockContext as never);
+    const response = await PATCH(asNextRequest(request), mockContext);
 
     expect(response.status).toBe(400);
     expect(mockAutomationsProxy.updateAutomation).not.toHaveBeenCalled();
@@ -202,7 +202,7 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
       active_hours_start: '08:00',
       active_hours_end: '20:00',
     };
-    mockParseJson.mockResolvedValue(validPatch as any);
+    mockParseJson.mockResolvedValue(validPatch);
     mockAutomationsProxy.updateAutomation.mockResolvedValue({ ...mockRule, name: 'Updated' });
     const request = new Request('http://localhost:3000/api/v1/automations/rule-123', {
       method: 'PATCH',
@@ -210,7 +210,7 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PATCH(request as any, mockContext as any);
+    const response = await PATCH(asNextRequest(request), mockContext);
 
     expect(response.status).toBe(200);
     expect(mockAutomationsProxy.updateAutomation).toHaveBeenCalledWith('rule-123', validPatch);
@@ -220,7 +220,7 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
 describe('DELETE /api/v1/automations/[rule_id]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -231,7 +231,7 @@ describe('DELETE /api/v1/automations/[rule_id]', () => {
       method: 'DELETE',
     });
 
-    const response = await DELETE(request as any, mockContext as any);
+    const response = await DELETE(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -244,7 +244,7 @@ describe('DELETE /api/v1/automations/[rule_id]', () => {
       method: 'DELETE',
     });
 
-    const response = await DELETE(request as any, mockContext as any);
+    const response = await DELETE(asNextRequest(request), mockContext);
 
     expect(response.status).toBe(204);
   });
@@ -255,7 +255,7 @@ describe('DELETE /api/v1/automations/[rule_id]', () => {
       method: 'DELETE',
     });
 
-    await DELETE(request as any, mockContext as any);
+    await DELETE(asNextRequest(request), mockContext);
 
     expect(mockAutomationsProxy.deleteAutomation).toHaveBeenCalledWith('rule-123');
   });

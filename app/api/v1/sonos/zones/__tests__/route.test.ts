@@ -10,28 +10,36 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as sonosProxy from '@/lib/sonos/sonosProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { SonosZoneResponse } from '@/types/sonosProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetZones = jest.mocked(sonosProxy.getZones);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('GET /api/v1/sonos/zones', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const response = await GET({} as any, {} as any);
+    const response = await GET(asNextRequest({}), routeContext());
     expect(response.status).toBe(401);
   });
 
   it('should return 200 with a flat { zones: [...] } array from the backend wrapper', async () => {
-    const mockZones = [
-      { group_id: 'RINCON_A', coordinator_uid: 'RINCON_A', members: [] },
+    const mockZones: SonosZoneResponse[] = [
+      {
+        group_id: 'RINCON_A',
+        label: 'Living Room',
+        coordinator_uid: 'RINCON_A',
+        coordinator_name: 'Living Room',
+        member_count: 0,
+        members: [],
+      },
     ];
     // Real backend shape: GET /api/v1/sonos/zones returns a wrapper, not a bare array
     mockGetZones.mockResolvedValue({
@@ -40,8 +48,8 @@ describe('GET /api/v1/sonos/zones', () => {
       is_stale: false,
       fetched_at: '2026-09-24T10:00:00Z',
       data_freshness: 'LIVE',
-    } as any);
-    const response = await GET({} as any, {} as any);
+    });
+    const response = await GET(asNextRequest({}), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(Array.isArray(data.zones)).toBe(true);

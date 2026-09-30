@@ -24,7 +24,7 @@ describe('logService', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
-    delete (global as any).fetch;
+    Reflect.deleteProperty(global, 'fetch');
   });
 
   describe('logUserAction', () => {
@@ -35,7 +35,7 @@ describe('logService', () => {
       ) as jest.MockedFunction<typeof fetch>;
 
       // ACT
-      await logUserAction('Test action', 'Test value', { key: 'metadata' } as any, {});
+      await logUserAction('Test action', 'Test value', 'high', {});
 
       // ASSERT
       expect(global.fetch).toHaveBeenCalledWith('/api/log/add', {
@@ -46,7 +46,7 @@ describe('logService', () => {
         body: JSON.stringify({
           action: 'Test action',
           device: 'Test value',
-          value: { key: 'metadata' },
+          value: 'high',
         }),
       });
     });

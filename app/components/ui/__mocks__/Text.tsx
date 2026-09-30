@@ -3,7 +3,7 @@ import React from 'react';
 interface TextProps {
   children: React.ReactNode;
   as?: React.ElementType;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Mock Text component for testing

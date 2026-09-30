@@ -8,7 +8,7 @@
  */
 import { render, screen } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import ConnectionStatus from '../ConnectionStatus';
+import ConnectionStatus, { type ConnectionStatusProps } from '../ConnectionStatus';
 
 expect.extend(toHaveNoViolations);
 
@@ -187,10 +187,10 @@ describe('ConnectionStatus', () => {
     });
 
     it('has no accessibility violations with all statuses', async () => {
-      const statuses = ['online', 'offline', 'connecting', 'unknown'];
+      const statuses: NonNullable<ConnectionStatusProps['status']>[] = ['online', 'offline', 'connecting', 'unknown'];
 
       for (const status of statuses) {
-        const { container } = render(<ConnectionStatus status={status as any} />);
+        const { container } = render(<ConnectionStatus status={status} />);
         const results = await axe(container);
         expect(results).toHaveNoViolations();
       }

@@ -9,6 +9,7 @@ import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { createRef } from 'react';
+import type { Row } from '@tanstack/react-table';
 import DataTable, { dataTableVariants } from '../DataTable';
 
 expect.extend(toHaveNoViolations);
@@ -19,6 +20,7 @@ const mockData = [
   { id: '2', name: 'Beta', status: 'pending' },
   { id: '3', name: 'Gamma', status: 'inactive' },
 ];
+type MockRow = (typeof mockData)[number];
 
 // Mock columns for tests
 const mockColumns = [
@@ -296,7 +298,7 @@ describe('DataTable', () => {
 
   describe('Custom Row ID', () => {
     it('uses custom getRowId function', () => {
-      const customGetRowId = (row: any) => `custom-${row.id}`;
+      const customGetRowId = (row: MockRow) => `custom-${row.id}`;
       render(
         <DataTable
           data={mockData}
@@ -650,7 +652,7 @@ describe('DataTable', () => {
 
     it('renderExpandedContent shows custom content', async () => {
       const user = userEvent.setup();
-      const renderExpandedContent = (row: any) => (
+      const renderExpandedContent = (row: Row<MockRow>) => (
         <div data-testid="custom-content">Custom: {row.original.name}</div>
       );
 
@@ -689,7 +691,7 @@ describe('DataTable', () => {
     });
 
     it('getRowCanExpand controls which rows can expand', () => {
-      const getRowCanExpand = (row: any) => row.original.status === 'active';
+      const getRowCanExpand = (row: Row<MockRow>) => row.original.status === 'active';
 
       render(
         <DataTable

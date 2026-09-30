@@ -54,6 +54,7 @@ jest.mock('@/app/stove/components/StovePageNavigation', () => ({
 
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
+import type { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import StovePageBanners from '@/app/stove/components/StovePageBanners';
 import StovePageHero from '@/app/stove/components/StovePageHero';
 import StovePageAdjustments from '@/app/stove/components/StovePageAdjustments';
@@ -101,6 +102,16 @@ const createMockStoveData = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+const createMockCommand = (): ReturnType<typeof useRetryableCommand> => ({
+  execute: jest.fn(),
+  isRetrying: false,
+  attemptCount: 0,
+  lastError: null,
+  isExecuting: false,
+  retry: jest.fn(),
+  clearError: jest.fn(),
+});
+
 const createMockCommands = () => ({
   handleIgnite: jest.fn(),
   handleShutdown: jest.fn(),
@@ -111,10 +122,10 @@ const createMockCommands = () => ({
   handleSetAutomaticMode: jest.fn(),
   handleConfirmCleaning: jest.fn(),
   handleManualRefresh: jest.fn(),
-  igniteCmd: {} as any,
-  shutdownCmd: {} as any,
-  setFanCmd: {} as any,
-  setPowerCmd: {} as any,
+  igniteCmd: createMockCommand(),
+  shutdownCmd: createMockCommand(),
+  setFanCmd: createMockCommand(),
+  setPowerCmd: createMockCommand(),
 });
 
 describe('StovePage', () => {

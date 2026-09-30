@@ -10,15 +10,15 @@ jest.mock('@/lib/auth/session', () => ({
 import { POST } from '../route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockProxySetThermMode = jest.mocked(netatmoProxy.proxySetThermMode);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('POST /api/v1/netatmo/setthermmode', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -26,16 +26,16 @@ describe('POST /api/v1/netatmo/setthermmode', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/netatmo/setthermmode', { method: 'POST', body: JSON.stringify({}), headers: { 'Content-Type': 'application/json' } });
-    const response = await POST(request as any, {} as any);
+    const response = await POST(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(401);
     expect(data.code).toBe('UNAUTHORIZED');
   });
 
   it('should return 202 with suggested_poll_delay_s', async () => {
-    mockProxySetThermMode.mockResolvedValue({ status: 'ok' } as any);
+    mockProxySetThermMode.mockResolvedValue({ status: 'ok', confirmed_mode: 'schedule', netatmo_response: {} });
     const request = new Request('http://localhost:3000/api/v1/netatmo/setthermmode', { method: 'POST', body: JSON.stringify({ home_id: 'abc', mode: 'schedule' }), headers: { 'Content-Type': 'application/json' } });
-    const response = await POST(request as any, {} as any);
+    const response = await POST(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(202);
     expect(data.success).toBe(true);

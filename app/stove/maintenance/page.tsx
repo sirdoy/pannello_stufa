@@ -7,18 +7,17 @@ import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import ConfirmDialog from '@/app/components/ui/ConfirmDialog';
 import Input from '@/app/components/ui/Input';
-import { getMaintenanceData, updateTargetHours, confirmCleaning } from '@/lib/maintenance/maintenanceService';
+import {
+  getMaintenanceData,
+  updateTargetHours,
+  confirmCleaning,
+  type MaintenanceData,
+} from '@/lib/maintenance/maintenanceService';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
 export const dynamic = 'force-dynamic';
-
-interface MaintenanceData {
-  currentHours: number;
-  targetHours: number;
-  lastCleanedAt?: number;
-}
 
 interface SaveMessage {
   type: 'success' | 'error';
@@ -43,7 +42,7 @@ export default function MaintenancePage() {
 
   const loadMaintenanceData = async (): Promise<void> => {
     try {
-      const data: any = await getMaintenanceData();
+      const data = await getMaintenanceData();
       setMaintenanceData(data);
       setTargetHours(data.targetHours);
       setLoading(false);

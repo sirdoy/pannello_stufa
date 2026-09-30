@@ -10,14 +10,15 @@ jest.mock('@/lib/auth/session', () => ({
   authSession: { getSession: jest.fn() },
 }));
 
+import type { NextRequest } from 'next/server';
 import { POST } from '../route';
 import { setState } from '@/lib/tuya/tuyaProxy';
 import { authSession } from '@/lib/auth/session';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
+import { asNextRequest, mockAppSession } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetState = jest.mocked(setState);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockPlug = {
   device_id: 'bf123',
@@ -35,8 +36,8 @@ const mockPlug = {
 const mockMutation = { ...mockPlug, data_confirmed: true };
 
 /** Helper to create a mock POST request with JSON body */
-function createPostRequest(body: object): any {
-  return {
+function createPostRequest(body: object): NextRequest {
+  return asNextRequest({
     url: 'http://localhost:3000/api/tuya/plugs/bf123/state',
     headers: {
       get: (name: string) => {
@@ -45,7 +46,7 @@ function createPostRequest(body: object): any {
       },
     },
     text: async () => JSON.stringify(body),
-  };
+  });
 }
 
 describe('POST /api/tuya/plugs/[device_id]/state', () => {
@@ -54,7 +55,7 @@ describe('POST /api/tuya/plugs/[device_id]/state', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockContext = { params: Promise.resolve({ device_id: 'bf123' }) };
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -62,7 +63,7 @@ describe('POST /api/tuya/plugs/[device_id]/state', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await POST(createPostRequest({ on: true }), mockContext as any);
+    const response = await POST(createPostRequest({ on: true }), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -72,7 +73,7 @@ describe('POST /api/tuya/plugs/[device_id]/state', () => {
   it('should return 200 (not 202) with TuyaPlugMutation including data_confirmed', async () => {
     mockSetState.mockResolvedValue(mockMutation);
 
-    const response = await POST(createPostRequest({ on: true }), mockContext as any);
+    const response = await POST(createPostRequest({ on: true }), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -84,7 +85,7 @@ describe('POST /api/tuya/plugs/[device_id]/state', () => {
   it('should call setState with parsed body { on: true } and device_id from path param', async () => {
     mockSetState.mockResolvedValue(mockMutation);
 
-    await POST(createPostRequest({ on: true }), mockContext as any);
+    await POST(createPostRequest({ on: true }), mockContext);
 
     expect(mockSetState).toHaveBeenCalledWith('bf123', { on: true });
   });
@@ -92,7 +93,7 @@ describe('POST /api/tuya/plugs/[device_id]/state', () => {
   it('should call setState with { on: false } when toggling off', async () => {
     mockSetState.mockResolvedValue({ ...mockMutation, switch_on: false });
 
-    await POST(createPostRequest({ on: false }), mockContext as any);
+    await POST(createPostRequest({ on: false }), mockContext);
 
     expect(mockSetState).toHaveBeenCalledWith('bf123', { on: false });
   });
@@ -106,7 +107,7 @@ describe('POST /api/tuya/plugs/[device_id]/state', () => {
       )
     );
 
-    const response = await POST(createPostRequest({ on: true }), mockContext as any);
+    const response = await POST(createPostRequest({ on: true }), mockContext);
 
     expect(response.status).toBe(503);
   });

@@ -13,11 +13,26 @@ jest.mock('@/lib/firebaseAdmin', () => ({
   getAdminFirestore: jest.fn(),
 }));
 
+/** Firestore test doubles: only the members notificationHistoryService touches */
+interface MockSnapshot {
+  size: number;
+  docs: Array<{ id: string; data: () => Record<string, unknown> }>;
+  forEach: jest.Mock;
+}
+
+interface MockQuery {
+  where: jest.Mock;
+  orderBy: jest.Mock;
+  limit: jest.Mock;
+  startAfter: jest.Mock;
+  get: jest.Mock;
+}
+
 describe('notificationHistoryService', () => {
-  let mockDb: any;
-  let mockCollection: any;
-  let mockQuery: any;
-  let mockSnapshot: any;
+  let mockDb: { collection: jest.Mock };
+  let mockCollection: jest.Mock;
+  let mockQuery: MockQuery;
+  let mockSnapshot: MockSnapshot;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -70,7 +85,7 @@ describe('notificationHistoryService', () => {
 
       // Find the timestamp filter call
       const timestampFilterCall = mockQuery.where.mock.calls.find(
-        (call: any) => call[0] === 'timestamp'
+        (call: unknown[]) => call[0] === 'timestamp'
       );
 
       expect(timestampFilterCall).toBeDefined();
@@ -84,7 +99,7 @@ describe('notificationHistoryService', () => {
 
       // Find the timestamp filter call
       const timestampFilterCall = mockQuery.where.mock.calls.find(
-        (call: any) => call[0] === 'timestamp'
+        (call: unknown[]) => call[0] === 'timestamp'
       );
 
       expect(timestampFilterCall).toBeDefined();
@@ -240,7 +255,7 @@ describe('notificationHistoryService', () => {
       await getNotificationHistory('auth0|123');
 
       const timestampFilterCall = mockQuery.where.mock.calls.find(
-        (call: any) => call[0] === 'timestamp'
+        (call: unknown[]) => call[0] === 'timestamp'
       );
 
       expect(timestampFilterCall[1]).toBe('>=');

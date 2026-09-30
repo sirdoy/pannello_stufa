@@ -10,16 +10,21 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCameraEventSnapshot = jest.mocked(netatmoProxy.getProxyCameraEventSnapshot);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-const mockContext = { params: Promise.resolve({ eventId: 'evt_123' }) };
+const mockContext = routeContext({ eventId: 'evt_123' });
+
+/** Partial Response double: jsdom has no global Response, and the route only reads ok/status/body/headers. */
+function upstream(status: number, contentType: string) {
+  return { ok: status < 400, status, body: null, headers: new Headers({ 'Content-Type': contentType }) } as unknown as Response;
+}
 
 describe('GET /api/v1/netatmo/camera/events/[eventId]/snapshot', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -28,7 +33,7 @@ describe('GET /api/v1/netatmo/camera/events/[eventId]/snapshot', () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/events/evt_123/snapshot');
 
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -36,17 +41,12 @@ describe('GET /api/v1/netatmo/camera/events/[eventId]/snapshot', () => {
   });
 
   it('should return 200 with binary JPEG response', async () => {
-    const mockBody = null; // body is piped through, not read in test
-    mockGetCameraEventSnapshot.mockResolvedValue({
-      body: mockBody,
-      status: 200,
-      ok: true,
-      headers: new Headers({ 'Content-Type': 'image/jpeg' }),
-    } as any);
+    // body is piped through, not read in test
+    mockGetCameraEventSnapshot.mockResolvedValue(upstream(200, 'image/jpeg'));
 
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/events/evt_123/snapshot');
 
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
 
     expect(response.status).toBe(200);
     expect(response.headers.get('Content-Type')).toBe('image/jpeg');
@@ -54,15 +54,10 @@ describe('GET /api/v1/netatmo/camera/events/[eventId]/snapshot', () => {
   });
 
   it('forwards a backend 404 with no-store instead of a cached 200 JPEG', async () => {
-    mockGetCameraEventSnapshot.mockResolvedValue({
-      body: null,
-      status: 404,
-      ok: false,
-      headers: new Headers({ 'Content-Type': 'application/problem+json' }),
-    } as any);
+    mockGetCameraEventSnapshot.mockResolvedValue(upstream(404, 'application/problem+json'));
 
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/events/evt_123/snapshot');
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
 
     expect(response.status).toBe(404);
     expect(response.headers.get('Content-Type')).toBe('application/problem+json');

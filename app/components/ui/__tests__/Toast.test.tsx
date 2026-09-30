@@ -11,7 +11,7 @@ import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import { ToastProvider, ToastContext, type ToastContextValue } from '../ToastProvider';
 import { useToast } from '@/app/hooks/useToast';
-import Toast, { ToastViewport, toastVariants } from '../Toast';
+import Toast, { ToastViewport, toastVariants, type ToastProps } from '../Toast';
 import * as ToastPrimitive from '@radix-ui/react-toast';
 
 expect.extend(toHaveNoViolations);
@@ -249,7 +249,7 @@ describe('useToast', () => {
 
 describe('Toast Component', () => {
   // Wrap Toast in Provider for Radix context
-  const renderToast = (props: any) =>
+  const renderToast = (props: Partial<ToastProps>) =>
     render(
       <ToastPrimitive.Provider>
         <Toast open={true} {...props}>

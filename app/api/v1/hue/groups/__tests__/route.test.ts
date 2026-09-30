@@ -10,13 +10,22 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { HueGroup } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetGroups = jest.mocked(hueProxy.getGroups);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+
+/** GET /groups wrapper as documented in docs/api/hue.md. */
+interface HueGroupsPayload {
+  groups: HueGroup[];
+  count: number;
+  is_stale: boolean;
+  fetched_at: string | null;
+}
 
 describe('GET /api/v1/hue/groups', () => {
-  const mockGroupsData = [
+  const mockGroupsData: HueGroup[] = [
     {
       group_id: '1',
       name: 'Living Room',
@@ -45,7 +54,7 @@ describe('GET /api/v1/hue/groups', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -54,7 +63,7 @@ describe('GET /api/v1/hue/groups', () => {
     mockGetSession.mockResolvedValue(null);
     const req = new Request('http://localhost:3000/api/v1/hue/groups');
 
-    const response = await GET(req as any, {} as any);
+    const response = await GET(asNextRequest(req), routeContext());
 
     expect(response.status).toBe(401);
   });
@@ -62,15 +71,17 @@ describe('GET /api/v1/hue/groups', () => {
   it('should return 200 with groups array', async () => {
     // HA proxy wraps the array as `{ groups, count, is_stale, fetched_at }`;
     // route spreads the wrapper so the response is `{ success, groups, count, … }`.
-    mockGetGroups.mockResolvedValue({
+    const payload: HueGroupsPayload = {
       groups: mockGroupsData,
       count: mockGroupsData.length,
       is_stale: false,
-      fetched_at: 0,
-    } as any);
+      fetched_at: '2026-03-19T08:51:32.123456Z',
+    };
+    // getGroups() is typed HueGroup[] but returns this wrapper (docs/api/hue.md GET /groups).
+    mockGetGroups.mockResolvedValue(payload as unknown as HueGroup[]);
     const req = new Request('http://localhost:3000/api/v1/hue/groups');
 
-    const response = await GET(req as any, {} as any);
+    const response = await GET(asNextRequest(req), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { z } from 'zod';
-import { Controller, useWatch } from 'react-hook-form';
+import { Controller, useWatch, type Control, type UseFormSetValue } from 'react-hook-form';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { RegistryDevice, RegistryHealthResponse, DeviceCreate, DeviceUpdate, DeviceType } from '@/types/registry';
 import type { PaginatedResponse } from '@/types/common';
@@ -297,8 +297,8 @@ function useDeviceTypesForSelect() {
 
 // --- RegisterFormFields: watches provider, fetches available devices ---
 function RegisterFormFields({ control, setValue, deviceTypes, availableProviders, registeredByProvider }: {
-  control: any;
-  setValue: any;
+  control: Control<DeviceCreate>;
+  setValue: UseFormSetValue<DeviceCreate>;
   deviceTypes: DeviceType[];
   availableProviders: string[];
   registeredByProvider: Record<string, Set<string>>;
@@ -620,7 +620,7 @@ export default function DeviceRegistryPage() {
             submitLabel="Registra"
             cancelLabel="Annulla"
           >
-            {({ control, setValue }: any) => (
+            {({ control, setValue }) => (
               <RegisterFormFields
                 control={control}
                 setValue={setValue}
@@ -642,7 +642,7 @@ export default function DeviceRegistryPage() {
             submitLabel="Salva"
             cancelLabel="Annulla"
           >
-            {({ control }: any) => (
+            {({ control }) => (
               <>
                 {/* Read-only context (per D-22) */}
                 <div className="text-sm text-slate-400 mb-2">

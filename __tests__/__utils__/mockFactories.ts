@@ -88,7 +88,7 @@ export function createMockQuerySnapshot(
 ): QuerySnapshot {
   const mockDocs = docs.map((doc) => ({
     id: doc.id,
-    ref: {} as any,
+    ref: {},
     data: jest.fn(doc.data),
     exists: jest.fn(() => true),
     get: jest.fn(),
@@ -102,7 +102,7 @@ export function createMockQuerySnapshot(
     forEach: jest.fn((callback) => {
       mockDocs.forEach((doc, index) => callback(doc));
     }),
-    query: {} as any,
+    query: {},
     metadata: { hasPendingWrites: false, fromCache: false, isEqual: jest.fn() },
   } as unknown as QuerySnapshot;
 }
@@ -136,7 +136,7 @@ export function createMockFetchResponse(
     url: '',
     body: null,
     bodyUsed: false,
-    clone: jest.fn() as any,
+    clone: jest.fn(),
     arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
     blob: jest.fn().mockResolvedValue(new Blob()),
     formData: jest.fn().mockResolvedValue(new FormData()),

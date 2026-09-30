@@ -10,35 +10,36 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as sonosProxy from '@/lib/sonos/sonosProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { SonosQueueResponse } from '@/types/sonosProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetQueue = jest.mocked(sonosProxy.getQueue);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-const mockContext = { params: Promise.resolve({ groupId: 'RINCON_123' }) };
+const mockContext = routeContext({ groupId: 'RINCON_123' });
 
-const mockQueueData = { items: [], total: 0 };
+const mockQueueData: SonosQueueResponse = { group_id: 'RINCON_123', items: [], total: 0, limit: 100, offset: 0 };
 
 describe('GET /api/v1/sonos/zones/[groupId]/queue', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const mockRequest = { nextUrl: { searchParams: new URLSearchParams() } } as any;
+    const mockRequest = asNextRequest({ nextUrl: { searchParams: new URLSearchParams() } });
 
-    const response = await GET(mockRequest, mockContext as any);
+    const response = await GET(mockRequest, mockContext);
     expect(response.status).toBe(401);
   });
 
   it('should return 200 with queue data (no query params)', async () => {
-    mockGetQueue.mockResolvedValue(mockQueueData as any);
-    const mockRequest = { nextUrl: { searchParams: new URLSearchParams() } } as any;
+    mockGetQueue.mockResolvedValue(mockQueueData);
+    const mockRequest = asNextRequest({ nextUrl: { searchParams: new URLSearchParams() } });
 
-    const response = await GET(mockRequest, mockContext as any);
+    const response = await GET(mockRequest, mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -47,10 +48,10 @@ describe('GET /api/v1/sonos/zones/[groupId]/queue', () => {
   });
 
   it('should pass limit and offset query params to getQueue', async () => {
-    mockGetQueue.mockResolvedValue(mockQueueData as any);
-    const mockRequest = { nextUrl: { searchParams: new URLSearchParams('limit=10&offset=5') } } as any;
+    mockGetQueue.mockResolvedValue(mockQueueData);
+    const mockRequest = asNextRequest({ nextUrl: { searchParams: new URLSearchParams('limit=10&offset=5') } });
 
-    const response = await GET(mockRequest, mockContext as any);
+    const response = await GET(mockRequest, mockContext);
 
     expect(response.status).toBe(200);
     expect(mockGetQueue).toHaveBeenCalledWith('RINCON_123', '10', '5');

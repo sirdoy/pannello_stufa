@@ -11,24 +11,30 @@ jest.mock('@/lib/auth/session', () => ({
 import { PUT } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { HueCommandResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetGroupAction = jest.mocked(hueProxy.setGroupAction);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('PUT /api/v1/hue/groups/[groupId]/action', () => {
-  const mockProxyResponse = {
-    command: 'set_group_action' as const,
-    status: 'accepted' as const,
+  const mockProxyResponse: HueCommandResponse = {
     group_id: '1',
-    requested_state: { on: true },
-    suggested_poll_delay_s: 2,
-    poll_endpoint: '/api/v1/hue/groups/1',
+    name: 'Living Room',
+    type: 'Room',
+    group_class: 'Living room',
+    lights: ['1', '2'],
+    any_on: true,
+    all_on: true,
+    brightness: 254,
+    color_temp: null,
+    colormode: null,
+    data_confirmed: true,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -41,28 +47,25 @@ describe('PUT /api/v1/hue/groups/[groupId]/action', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PUT(req as any, {
-      params: Promise.resolve({ groupId: '1' }),
-    } as any);
+    const response = await PUT(asNextRequest(req), routeContext({ groupId: '1' }));
 
     expect(response.status).toBe(401);
   });
 
   it('should call setGroupAction and return 202', async () => {
-    mockSetGroupAction.mockResolvedValue(mockProxyResponse as never);
+    mockSetGroupAction.mockResolvedValue(mockProxyResponse);
     const req = new Request('http://localhost:3000/api/v1/hue/groups/1/action', {
       method: 'PUT',
       body: JSON.stringify({ on: true }),
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PUT(req as any, {
-      params: Promise.resolve({ groupId: '1' }),
-    } as any);
+    const response = await PUT(asNextRequest(req), routeContext({ groupId: '1' }));
     const data = await response.json();
 
     expect(response.status).toBe(202);
-    expect(data.command).toBe('set_group_action');
+    expect(data.group_id).toBe('1');
+    expect(data.data_confirmed).toBe(true);
     expect(mockSetGroupAction).toHaveBeenCalledWith('1', expect.any(Object));
   });
 });

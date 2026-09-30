@@ -16,6 +16,7 @@ import { GET } from '../route';
 import { getCachedVendor, cacheVendor, fetchVendorName } from '@/lib/network/vendorCache';
 import { categorizeByVendor, getCategoryOverride } from '@/lib/network/deviceCategories';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCachedVendor = jest.mocked(getCachedVendor);
@@ -25,13 +26,13 @@ const mockCategorizeByVendor = jest.mocked(categorizeByVendor);
 const mockGetCategoryOverride = jest.mocked(getCategoryOverride);
 
 describe('GET /api/v1/fritzbox/vendor-lookup', () => {
-  const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  const mockSession = mockAppSession({ sub: 'auth0|123', email: 'test@test.com' });
   const testMac = 'AA:BB:CC:DD:EE:FF';
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Default: authenticated user
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockSession);
     // Default: no override
     mockGetCategoryOverride.mockResolvedValue(null);
     // Mock console methods to suppress output
@@ -43,7 +44,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
     mockGetSession.mockResolvedValue(null);
     const mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/vendor-lookup?mac=${testMac}`);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -54,7 +55,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
   it('should return 400 when MAC parameter missing', async () => {
     const mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/vendor-lookup');
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -71,7 +72,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
     });
     const mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/vendor-lookup?mac=${testMac}`);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -91,7 +92,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
     mockCategorizeByVendor.mockReturnValue('mobile');
     const mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/vendor-lookup?mac=${testMac}`);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -116,7 +117,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
     mockCategorizeByVendor.mockReturnValue('unknown');
     const mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/vendor-lookup?mac=${testMac}`);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -135,7 +136,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
     mockCategorizeByVendor.mockReturnValue('unknown');
     const mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/vendor-lookup?mac=${testMac}`);
 
-    await GET(mockRequest as any, {} as any);
+    await GET(asNextRequest(mockRequest), routeContext());
 
     expect(mockCacheVendor).toHaveBeenCalledWith(testMac, {
       vendor: '',
@@ -150,7 +151,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
     mockCategorizeByVendor.mockReturnValue('unknown');
     const mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/vendor-lookup?mac=${testMac}`);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -162,7 +163,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
     mockGetCategoryOverride.mockResolvedValue('pc');
     const mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/vendor-lookup?mac=${testMac}`);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -185,7 +186,7 @@ describe('GET /api/v1/fritzbox/vendor-lookup', () => {
     mockCategorizeByVendor.mockReturnValue('pc');
     const mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/vendor-lookup?mac=${testMac}`);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);

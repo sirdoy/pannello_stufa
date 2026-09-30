@@ -12,10 +12,10 @@ import { GET } from '../route';
 import { getPlug } from '@/lib/tuya/tuyaProxy';
 import { authSession } from '@/lib/auth/session';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
+import { asNextRequest, mockAppSession } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetPlug = jest.mocked(getPlug);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockPlug = {
   device_id: 'bf123',
@@ -39,7 +39,7 @@ describe('GET /api/tuya/plugs/[device_id]', () => {
     jest.clearAllMocks();
     mockRequest = new Request('http://localhost:3000/api/tuya/plugs/bf123');
     mockContext = { params: Promise.resolve({ device_id: 'bf123' }) };
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -47,7 +47,7 @@ describe('GET /api/tuya/plugs/[device_id]', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await GET(mockRequest as any, mockContext as any);
+    const response = await GET(asNextRequest(mockRequest), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -57,7 +57,7 @@ describe('GET /api/tuya/plugs/[device_id]', () => {
   it('should return 200 with single plug data and call getPlug with device_id', async () => {
     mockGetPlug.mockResolvedValue(mockPlug);
 
-    const response = await GET(mockRequest as any, mockContext as any);
+    const response = await GET(asNextRequest(mockRequest), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -74,7 +74,7 @@ describe('GET /api/tuya/plugs/[device_id]', () => {
       )
     );
 
-    const response = await GET(mockRequest as any, mockContext as any);
+    const response = await GET(asNextRequest(mockRequest), mockContext);
 
     expect(response.status).toBe(404);
   });

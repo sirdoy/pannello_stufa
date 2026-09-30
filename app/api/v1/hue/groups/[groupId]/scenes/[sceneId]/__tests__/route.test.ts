@@ -11,24 +11,31 @@ jest.mock('@/lib/auth/session', () => ({
 import { POST } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { HueCommandResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockActivateScene = jest.mocked(hueProxy.activateScene);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('POST /api/v1/hue/groups/[groupId]/scenes/[sceneId]', () => {
-  const mockProxyResponse = {
-    command: 'activate_scene' as const,
-    status: 'accepted' as const,
+  const mockProxyResponse: HueCommandResponse = {
     group_id: '1',
-    scene_id: 'Ab1Cd2Ef3G',
+    name: 'Living Room',
+    type: 'Room',
+    group_class: 'Living room',
+    lights: ['1', '2'],
+    any_on: true,
+    all_on: true,
+    brightness: 254,
+    color_temp: null,
+    colormode: null,
+    data_confirmed: true,
     suggested_poll_delay_s: 2,
-    poll_endpoint: '/api/v1/hue/groups/1',
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -39,26 +46,23 @@ describe('POST /api/v1/hue/groups/[groupId]/scenes/[sceneId]', () => {
       method: 'POST',
     });
 
-    const response = await POST(req as any, {
-      params: Promise.resolve({ groupId: '1', sceneId: 'Ab1Cd2Ef3G' }),
-    } as any);
+    const response = await POST(asNextRequest(req), routeContext({ groupId: '1', sceneId: 'Ab1Cd2Ef3G' }));
 
     expect(response.status).toBe(401);
   });
 
   it('should return 202 with proxy response body', async () => {
-    mockActivateScene.mockResolvedValue(mockProxyResponse as never);
+    mockActivateScene.mockResolvedValue(mockProxyResponse);
     const req = new Request('http://localhost:3000/api/v1/hue/groups/1/scenes/Ab1Cd2Ef3G', {
       method: 'POST',
     });
 
-    const response = await POST(req as any, {
-      params: Promise.resolve({ groupId: '1', sceneId: 'Ab1Cd2Ef3G' }),
-    } as any);
+    const response = await POST(asNextRequest(req), routeContext({ groupId: '1', sceneId: 'Ab1Cd2Ef3G' }));
     const data = await response.json();
 
     expect(response.status).toBe(202);
-    expect(data.command).toBe('activate_scene');
+    expect(data.group_id).toBe('1');
+    expect(data.data_confirmed).toBe(true);
     expect(data.suggested_poll_delay_s).toBe(2);
     expect(mockActivateScene).toHaveBeenCalledWith('1', 'Ab1Cd2Ef3G');
   });

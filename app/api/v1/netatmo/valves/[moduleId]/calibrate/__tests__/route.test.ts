@@ -10,17 +10,17 @@ jest.mock('@/lib/auth/session', () => ({
 import { POST } from '../route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockProxyCalibrateValve = jest.mocked(netatmoProxy.proxyCalibrateValve);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('POST /api/v1/netatmo/valves/[moduleId]/calibrate', () => {
-  const mockContext = { params: Promise.resolve({ moduleId: '04:00:00:aa:bb:cc' }) };
+  const mockContext = routeContext({ moduleId: '04:00:00:aa:bb:cc' });
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -28,16 +28,16 @@ describe('POST /api/v1/netatmo/valves/[moduleId]/calibrate', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/netatmo/valves/04:00:00:aa:bb:cc/calibrate', { method: 'POST', body: JSON.stringify({}), headers: { 'Content-Type': 'application/json' } });
-    const response = await POST(request as any, mockContext as any);
+    const response = await POST(asNextRequest(request), mockContext);
     const data = await response.json();
     expect(response.status).toBe(401);
     expect(data.code).toBe('UNAUTHORIZED');
   });
 
   it('should return 202 with suggested_poll_delay_s', async () => {
-    mockProxyCalibrateValve.mockResolvedValue({ status: 'accepted', module_id: '04:00:00:aa:bb:cc', poll_endpoint: '/status' } as any);
+    mockProxyCalibrateValve.mockResolvedValue({ status: 'accepted', module_id: '04:00:00:aa:bb:cc', poll_endpoint: '/status' });
     const request = new Request('http://localhost:3000/api/v1/netatmo/valves/04:00:00:aa:bb:cc/calibrate', { method: 'POST', body: JSON.stringify({}), headers: { 'Content-Type': 'application/json' } });
-    const response = await POST(request as any, mockContext as any);
+    const response = await POST(asNextRequest(request), mockContext);
     const data = await response.json();
     expect(response.status).toBe(202);
     expect(data.success).toBe(true);

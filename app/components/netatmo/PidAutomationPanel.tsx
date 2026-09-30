@@ -23,7 +23,7 @@ interface RoomData {
   room_name: string;
   temperature?: number;
   setpoint?: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface RoomSelectorProps {

@@ -5,6 +5,15 @@
  */
 
 import { PIDController, createPIDController, DEFAULT_PID_CONFIG } from '../pidController';
+import type { PIDState } from '../pidController';
+
+/** Untyped callers (e.g. JSON payloads) may pass non-numbers: widen the parameters to exercise validation */
+const computeUnchecked = (pid: PIDController, setpoint: unknown, measured: unknown, dt: number) =>
+  (pid.compute as (setpoint: unknown, measured: unknown, dt: number) => number).call(pid, setpoint, measured, dt);
+
+/** Persisted state may be missing at runtime: widen the parameter to exercise the guard */
+const setStateUnchecked = (pid: PIDController, state: Partial<PIDState> | null | undefined) =>
+  (pid.setState as (state: Partial<PIDState> | null | undefined) => void).call(pid, state);
 
 describe('PIDController', () => {
   describe('constructor', () => {
@@ -132,8 +141,8 @@ describe('PIDController', () => {
     it('should throw error for invalid inputs', () => {
       const pid = new PIDController();
 
-      expect(() => pid.compute('21' as any, 20, 1)).toThrow('setpoint and measured must be numbers');
-      expect(() => pid.compute(21, '20' as any, 1)).toThrow('setpoint and measured must be numbers');
+      expect(() => computeUnchecked(pid, '21', 20, 1)).toThrow('setpoint and measured must be numbers');
+      expect(() => computeUnchecked(pid, 21, '20', 1)).toThrow('setpoint and measured must be numbers');
       expect(() => pid.compute(21, 20, 0)).toThrow('dt must be a positive number');
       expect(() => pid.compute(21, 20, -1)).toThrow('dt must be a positive number');
     });
@@ -202,10 +211,10 @@ describe('PIDController', () => {
 
     it('should handle null/undefined state gracefully', () => {
       const pid = new PIDController();
-      pid.setState(null as any);
+      setStateUnchecked(pid, null);
       expect(pid.getState().integral).toBe(0);
 
-      pid.setState(undefined as any);
+      setStateUnchecked(pid, undefined);
       expect(pid.getState().integral).toBe(0);
 
       pid.setState({});
@@ -222,8 +231,8 @@ describe('createPIDController', () => {
 
   it('should pass options to constructor', () => {
     const pid = createPIDController({ kp: 0.8, outputMax: 3 });
-    expect((pid as any).kp).toBe(0.8);
-    expect((pid as any).outputMax).toBe(3);
+    expect(pid['kp']).toBe(0.8);
+    expect(pid['outputMax']).toBe(3);
   });
 });
 

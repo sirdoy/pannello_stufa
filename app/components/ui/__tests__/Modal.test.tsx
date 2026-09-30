@@ -7,6 +7,7 @@ import Modal, {
   ModalDescription,
   ModalFooter,
   ModalClose,
+  type ModalProps,
 } from '../Modal';
 
 /**
@@ -19,7 +20,7 @@ const TestModal = ({
   size = 'md' as const,
   children,
   ...props
-}: any) => (
+}: Partial<ModalProps>) => (
   <Modal isOpen={isOpen} onClose={onClose} size={size} {...props}>
     <Modal.Header>
       <Modal.Title>Test Modal</Modal.Title>
@@ -74,7 +75,7 @@ describe('Modal Component', () => {
       ['lg', 'max-w-lg'],
       ['xl', 'max-w-xl'],
       ['full', 'max-w-none'],
-    ])('renders with size="%s" applying %s class', (size, expectedClass) => {
+    ] as const)('renders with size="%s" applying %s class', (size, expectedClass) => {
       render(<TestModal size={size} />);
       const dialog = screen.getByRole('dialog');
       expect(dialog).toHaveClass(expectedClass);

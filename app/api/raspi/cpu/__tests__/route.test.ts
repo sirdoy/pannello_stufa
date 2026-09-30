@@ -12,10 +12,10 @@ import { GET } from '../route';
 import { raspiClient } from '@/lib/raspi';
 import { authSession } from '@/lib/auth/session';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockRaspiClient = jest.mocked(raspiClient);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('GET /api/raspi/cpu', () => {
   let mockRequest: Request;
@@ -23,7 +23,7 @@ describe('GET /api/raspi/cpu', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockRequest = new Request('http://localhost:3000/api/raspi/cpu');
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -31,7 +31,7 @@ describe('GET /api/raspi/cpu', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -42,7 +42,7 @@ describe('GET /api/raspi/cpu', () => {
     const mockData = { cpu_percent: 42.1, data_freshness: 'LIVE' as const };
     mockRaspiClient.getCpu.mockResolvedValue(mockData);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -56,7 +56,7 @@ describe('GET /api/raspi/cpu', () => {
       new ApiError(ERROR_CODES.SERVICE_UNAVAILABLE, 'HA proxy unavailable', HTTP_STATUS.SERVICE_UNAVAILABLE)
     );
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
 
     expect(response.status).toBe(503);
   });

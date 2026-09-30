@@ -16,14 +16,14 @@ describe('useNetworkQuality', () => {
   beforeEach(() => {
     // Remove any existing navigator.connection mock
     if ('connection' in navigator) {
-      delete (navigator as any).connection;
+      Reflect.deleteProperty(navigator, 'connection');
     }
   });
 
   afterEach(() => {
     // Clean up mock
     if ('connection' in navigator) {
-      delete (navigator as any).connection;
+      Reflect.deleteProperty(navigator, 'connection');
     }
   });
 

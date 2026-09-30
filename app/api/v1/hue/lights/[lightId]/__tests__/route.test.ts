@@ -10,20 +10,20 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { HueLight } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetLight = jest.mocked(hueProxy.getLight);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('GET /api/v1/hue/lights/[lightId]', () => {
   let mockRequest: Request;
-  let mockContext: { params: Promise<{ lightId: string }> };
+  const mockContext = routeContext({ lightId: '5' });
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockRequest = new Request('http://localhost:3000/api/v1/hue/lights/5');
-    mockContext = { params: Promise.resolve({ lightId: '5' }) };
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -31,7 +31,7 @@ describe('GET /api/v1/hue/lights/[lightId]', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await GET(mockRequest as any, mockContext as any);
+    const response = await GET(asNextRequest(mockRequest), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -39,7 +39,7 @@ describe('GET /api/v1/hue/lights/[lightId]', () => {
   });
 
   it('should return 200 with single light data', async () => {
-    const mockData = {
+    const mockData: HueLight = {
       light_id: '5',
       name: 'Bedroom Light',
       on: false,
@@ -50,15 +50,15 @@ describe('GET /api/v1/hue/lights/[lightId]', () => {
       saturation: null,
       colormode: null,
       reachable: true,
-      capability_tier: 'white' as const,
+      capability_tier: 'white',
       room_id: '2',
       room_name: 'Bedroom',
       model_id: 'LWA001',
       light_type: 'Dimmable light',
     };
-    mockGetLight.mockResolvedValue(mockData as any);
+    mockGetLight.mockResolvedValue(mockData);
 
-    const response = await GET(mockRequest as any, mockContext as any);
+    const response = await GET(asNextRequest(mockRequest), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);

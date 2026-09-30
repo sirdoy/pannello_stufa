@@ -10,16 +10,17 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
 import { authSession } from '@/lib/auth/session';
+import type { CameraStreamResponse } from '@/types/netatmoProxy';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCameraStream = jest.mocked(netatmoProxy.getProxyCameraStream);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-const mockContext = { params: Promise.resolve({ cameraId: 'cam_001' }) };
+const mockContext = routeContext({ cameraId: 'cam_001' });
 
 describe('GET /api/v1/netatmo/camera/[cameraId]/stream', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -28,7 +29,7 @@ describe('GET /api/v1/netatmo/camera/[cameraId]/stream', () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/cam_001/stream');
 
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -36,12 +37,20 @@ describe('GET /api/v1/netatmo/camera/[cameraId]/stream', () => {
   });
 
   it('should return 200 with stream URLs', async () => {
-    const mockData = { vpn_url: 'https://vpn.example.com', local_url: 'http://192.168.1.10' };
-    mockGetCameraStream.mockResolvedValue(mockData as any);
+    const mockData: CameraStreamResponse = {
+      camera_id: 'cam_001',
+      vpn_streams: {
+        high: 'https://vpn.example.com/live/files/high/index.m3u8',
+        medium: 'https://vpn.example.com/live/files/medium/index.m3u8',
+        low: 'https://vpn.example.com/live/files/low/index.m3u8',
+      },
+      is_local: false,
+    };
+    mockGetCameraStream.mockResolvedValue(mockData);
 
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/cam_001/stream');
 
-    const response = await GET(request as any, mockContext as any);
+    const response = await GET(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);

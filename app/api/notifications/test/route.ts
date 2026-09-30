@@ -35,6 +35,23 @@ interface TestNotificationBody {
   priority?: 'high' | 'normal' | 'low';
 }
 
+interface DeliveryError {
+  tokenPrefix: string;
+  errorCode: string;
+}
+
+/** FCM error (FirebaseError) or the raw error of a single-token send → trace entry */
+function describeSendError(error: unknown): DeliveryError {
+  const { message, code } = (typeof error === 'object' && error !== null ? error : {}) as {
+    message?: unknown;
+    code?: unknown;
+  };
+  return {
+    tokenPrefix: typeof message === 'string' && message ? message.substring(0, 20) : 'unknown',
+    errorCode: typeof code === 'string' && code ? code : 'unknown',
+  };
+}
+
 interface NotificationTemplate {
   title: string;
   body: string;
@@ -140,27 +157,27 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
     result = await sendNotificationToUser(user.sub, notification);
   }
 
-  // Build delivery trace
+  // Build delivery trace (a skipped send has no counts or per-token responses)
+  const sent = 'successCount' in result ? result : null;
+  const errors: DeliveryError[] = [];
+
+  // Extract errors if any
+  if (sent && sent.failureCount > 0 && sent.responses) {
+    for (const r of sent.responses) {
+      if (!r.success) errors.push(describeSendError(r.error));
+    }
+  }
+
   const trace = {
     sentAt,
     targetDevices,
     template: template || null,
     deliveryResults: {
-      successCount: result.successCount || 0,
-      failureCount: result.failureCount || 0,
-      errors: []
+      successCount: sent?.successCount || 0,
+      failureCount: sent?.failureCount || 0,
+      errors
     }
   };
-
-  // Extract errors if any
-  if (result.failureCount > 0 && result.responses) {
-    trace.deliveryResults.errors = result.responses
-      .filter((r: any) => !r.success)
-      .map((r: any) => ({
-        tokenPrefix: r.error?.message?.substring(0, 20) || 'unknown',
-        errorCode: r.error?.code || 'unknown'
-      }));
-  }
 
   if (result.success) {
     return success({
@@ -169,8 +186,9 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
     });
   } else {
     // Return error with trace
-    return badRequest(result.message || 'Impossibile inviare notifica', {
-      errorCode: result.error || 'SEND_FAILED',
+    const skipped = 'successCount' in result ? null : result;
+    return badRequest(skipped?.message || 'Impossibile inviare notifica', {
+      errorCode: skipped?.error || 'SEND_FAILED',
       trace
     });
   }

@@ -18,7 +18,7 @@ import {
 import { ApiError, ERROR_CODES } from '../apiErrors';
 
 // Helper to extract data from NextResponse
-async function getResponseData(response: any) {
+async function getResponseData(response: Response) {
   const data = await response.json();
   return { data, status: response.status };
 }

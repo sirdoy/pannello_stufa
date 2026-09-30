@@ -10,15 +10,16 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
 import { authSession } from '@/lib/auth/session';
+import type { CameraEventsResponse } from '@/types/netatmoProxy';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCameraEvents = jest.mocked(netatmoProxy.getProxyCameraEvents);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('GET /api/v1/netatmo/camera/events', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -27,7 +28,7 @@ describe('GET /api/v1/netatmo/camera/events', () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/events');
 
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -35,12 +36,12 @@ describe('GET /api/v1/netatmo/camera/events', () => {
   });
 
   it('should return 200 with events data (no hours param)', async () => {
-    const mockData = { events: [], freshness: 'LIVE' };
-    mockGetCameraEvents.mockResolvedValue(mockData as any);
+    const mockData: CameraEventsResponse = { events: [], count: 0 };
+    mockGetCameraEvents.mockResolvedValue(mockData);
 
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/events');
 
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -49,12 +50,12 @@ describe('GET /api/v1/netatmo/camera/events', () => {
   });
 
   it('should return 200 with events data and pass hours param', async () => {
-    const mockData = { events: [], freshness: 'LIVE' };
-    mockGetCameraEvents.mockResolvedValue(mockData as any);
+    const mockData: CameraEventsResponse = { events: [], count: 0 };
+    mockGetCameraEvents.mockResolvedValue(mockData);
 
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/events?hours=24');
 
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);

@@ -13,6 +13,7 @@ import * as maintenanceService from '@/lib/maintenance/maintenanceService';
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import type { UseStoveDataReturn } from '@/app/components/devices/stove/hooks/useStoveData';
 import type { ThermorossiCommandResponse } from '@/types/thermorossiProxy';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 // Mock dependencies
 jest.mock('@/lib/logService');
@@ -22,14 +23,14 @@ jest.mock('@/lib/maintenance/maintenanceService');
 jest.mock('@/lib/hooks/useRetryableCommand');
 
 describe('useStoveCommands', () => {
-  const mockRouter = {
+  const mockRouter: AppRouterInstance = {
     push: jest.fn(),
     replace: jest.fn(),
     refresh: jest.fn(),
     back: jest.fn(),
     forward: jest.fn(),
     prefetch: jest.fn(),
-  } as any;
+  };
 
   const mockStoveData: Pick<
     UseStoveDataReturn,
@@ -94,19 +95,19 @@ describe('useStoveCommands', () => {
     });
 
     // Mock logService (logStoveAction and logSchedulerAction are objects, not functions)
-    (logService.logStoveAction as any) = {
+    Object.assign(logService.logStoveAction, {
       ignite: jest.fn().mockResolvedValue(undefined),
       shutdown: jest.fn().mockResolvedValue(undefined),
       setFan: jest.fn().mockResolvedValue(undefined),
       setPower: jest.fn().mockResolvedValue(undefined),
-    };
+    });
 
-    (logService.logSchedulerAction as any) = {
+    Object.assign(logService.logSchedulerAction, {
       clearSemiManual: jest.fn().mockResolvedValue(undefined),
-    };
+    });
 
     // Mock scheduler functions
-    jest.mocked(schedulerApiClient.clearSemiManualMode).mockResolvedValue({ success: true } as any);
+    jest.mocked(schedulerApiClient.clearSemiManualMode).mockResolvedValue({ success: true });
     jest.mocked(schedulerApiClient.setSchedulerMode).mockResolvedValue({ success: true });
     jest.mocked(schedulerService.getNextScheduledAction).mockResolvedValue(null);
 
@@ -114,7 +115,7 @@ describe('useStoveCommands', () => {
     jest.mocked(maintenanceService.confirmCleaning).mockResolvedValue(true);
 
     // Mock global fetch
-    (global as any).fetch = jest.fn().mockResolvedValue({
+    global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({}),
     });

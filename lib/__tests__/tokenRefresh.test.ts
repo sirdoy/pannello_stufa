@@ -15,11 +15,12 @@ global.fetch = jest.fn().mockResolvedValue(
 ) as jest.MockedFunction<typeof fetch>;
 
 // Mock Notification
-global.Notification = {
-  permission: 'granted',
+const mockNotification = {
+  permission: 'granted' as NotificationPermission,
   prototype: {} as Notification,
   requestPermission: jest.fn().mockResolvedValue('granted' as NotificationPermission),
-} as any;
+};
+global.Notification = mockNotification as unknown as typeof Notification; // static members only
 
 // Mock navigator.serviceWorker
 Object.defineProperty(global.navigator, 'serviceWorker', {
@@ -50,6 +51,19 @@ const mockGetTokenAge = jest.mocked(getTokenAge);
 const mockUpdateLastUsed = jest.mocked(updateLastUsed);
 const mockGetToken = jest.mocked(getToken);
 const mockDeleteToken = jest.mocked(deleteToken);
+
+type StoredToken = NonNullable<Awaited<ReturnType<typeof loadToken>>>;
+
+/** Stored token record as returned by tokenStorage.loadToken */
+const storedToken = (overrides: Partial<StoredToken>): StoredToken => ({
+  id: 'current',
+  token: 'token',
+  createdAt: '2026-01-01T00:00:00.000Z',
+  lastUsed: '2026-01-01T00:00:00.000Z',
+  deviceId: null,
+  deviceInfo: null,
+  ...overrides,
+});
 
 describe('tokenRefresh', () => {
   beforeEach(() => {
@@ -102,7 +116,7 @@ describe('tokenRefresh', () => {
     });
 
     it('updates lastUsed when token is fresh', async () => {
-      mockLoadToken.mockResolvedValue({ token: 'fresh-token' } as any);
+      mockLoadToken.mockResolvedValue(storedToken({ token: 'fresh-token' }));
       mockGetTokenAge.mockResolvedValue(10);
 
       const result = await checkAndRefreshToken('user123');
@@ -114,10 +128,10 @@ describe('tokenRefresh', () => {
     });
 
     it('refreshes token when older than 30 days', async () => {
-      mockLoadToken.mockResolvedValue({
+      mockLoadToken.mockResolvedValue(storedToken({
         token: 'old-token',
         deviceId: 'device-123',
-      } as any);
+      }));
       mockGetTokenAge.mockResolvedValue(45);
       mockGetToken.mockResolvedValue('new-token-abc');
 
@@ -134,22 +148,22 @@ describe('tokenRefresh', () => {
     });
 
     it('returns error when no permission', async () => {
-      const originalPermission = Notification.permission;
-      (Notification as any).permission = 'denied';
+      const originalPermission = mockNotification.permission;
+      mockNotification.permission = 'denied';
 
       const result = await checkAndRefreshToken('user123');
 
       expect(result.refreshed).toBe(false);
       expect(result.error).toBe('No permission');
 
-      (Notification as any).permission = originalPermission;
+      mockNotification.permission = originalPermission;
     });
 
     it('continues on mockDeleteToken failure', async () => {
-      mockLoadToken.mockResolvedValue({
+      mockLoadToken.mockResolvedValue(storedToken({
         token: 'old-token',
         deviceId: 'device-123',
-      } as any);
+      }));
       mockGetTokenAge.mockResolvedValue(45);
       mockDeleteToken.mockRejectedValue(new Error('Delete failed'));
       mockGetToken.mockResolvedValue('new-token-xyz');
@@ -163,16 +177,16 @@ describe('tokenRefresh', () => {
     });
 
     it('saves locally even if server registration fails', async () => {
-      mockLoadToken.mockResolvedValue({
+      mockLoadToken.mockResolvedValue(storedToken({
         token: 'old-token',
         deviceId: 'device-123',
-      } as any);
+      }));
       mockGetTokenAge.mockResolvedValue(45);
       mockGetToken.mockResolvedValue('new-token-fail');
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
         json: () => Promise.resolve({ error: 'Server error' }),
-      } as any);
+      });
 
       const result = await checkAndRefreshToken('user123');
 
@@ -185,10 +199,10 @@ describe('tokenRefresh', () => {
     });
 
     it('returns stored token on refresh failure', async () => {
-      mockLoadToken.mockResolvedValue({
+      mockLoadToken.mockResolvedValue(storedToken({
         token: 'stored-token',
         deviceId: 'device-123',
-      } as any);
+      }));
       mockGetTokenAge.mockResolvedValue(45);
       mockGetToken.mockRejectedValue(new Error('Network error'));
 

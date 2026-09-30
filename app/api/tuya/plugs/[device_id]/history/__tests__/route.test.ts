@@ -8,14 +8,15 @@ jest.mock('@/lib/auth/session', () => ({
   authSession: { getSession: jest.fn() },
 }));
 
+import type { NextRequest } from 'next/server';
 import { GET } from '../route';
 import { getHistory } from '@/lib/tuya/tuyaProxy';
 import { authSession } from '@/lib/auth/session';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
+import { asNextRequest, mockAppSession } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetHistory = jest.mocked(getHistory);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockHistory = {
   device_id: 'bf123',
@@ -28,11 +29,11 @@ const mockHistory = {
 };
 
 /** Helper to create a mock GET request with optional query params */
-function createGetRequest(queryString?: string): any {
+function createGetRequest(queryString?: string): NextRequest {
   const searchParams = new URLSearchParams(queryString ?? '');
-  return {
+  return asNextRequest({
     nextUrl: { searchParams },
-  };
+  });
 }
 
 describe('GET /api/tuya/plugs/[device_id]/history', () => {
@@ -41,7 +42,7 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockContext = { params: Promise.resolve({ device_id: 'bf123' }) };
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -49,7 +50,7 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await GET(createGetRequest(), mockContext as any);
+    const response = await GET(createGetRequest(), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -59,7 +60,7 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
   it('should return 200 with history response and call getHistory with device_id', async () => {
     mockGetHistory.mockResolvedValue(mockHistory);
 
-    const response = await GET(createGetRequest(), mockContext as any);
+    const response = await GET(createGetRequest(), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -70,7 +71,7 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
   it('should forward query params period, page, page_size and omit missing as undefined', async () => {
     mockGetHistory.mockResolvedValue(mockHistory);
 
-    await GET(createGetRequest('period=7d&page=2&page_size=50'), mockContext as any);
+    await GET(createGetRequest('period=7d&page=2&page_size=50'), mockContext);
 
     expect(mockGetHistory).toHaveBeenCalledWith('bf123', {
       period: '7d',
@@ -84,7 +85,7 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
   it('should pass all params as undefined when no query string provided', async () => {
     mockGetHistory.mockResolvedValue(mockHistory);
 
-    await GET(createGetRequest(), mockContext as any);
+    await GET(createGetRequest(), mockContext);
 
     expect(mockGetHistory).toHaveBeenCalledWith('bf123', {
       period: undefined,
@@ -100,7 +101,7 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
 
     await GET(
       createGetRequest('period=24h&from=1742987790&to=1743074190&page=1&page_size=100'),
-      mockContext as any
+      mockContext
     );
 
     expect(mockGetHistory).toHaveBeenCalledWith('bf123', {
@@ -121,7 +122,7 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
       )
     );
 
-    const response = await GET(createGetRequest(), mockContext as any);
+    const response = await GET(createGetRequest(), mockContext);
 
     expect(response.status).toBe(503);
   });

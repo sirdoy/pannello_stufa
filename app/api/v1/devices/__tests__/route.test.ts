@@ -35,6 +35,8 @@ import { getPlugs } from '@/lib/tuya/tuyaProxy';
 import { raspiClient } from '@/lib/raspi';
 import { getHealth as getThermorossiHealth } from '@/lib/stove/thermorossiProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { Device, DeviceAggregatorError } from '@/types/devices';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockFritzGetDevices = jest.mocked(fritzboxClient.getDevices);
@@ -47,63 +49,139 @@ const mockGetPlugs = jest.mocked(getPlugs);
 const mockRaspiGetHealth = jest.mocked(raspiClient.getHealth);
 const mockGetThermorossiHealth = jest.mocked(getThermorossiHealth);
 
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-
 // --- Seed builders (one minimal happy-path payload per provider) ---
 function seedAllProviders(): void {
   mockFritzGetDevices.mockResolvedValue([
     { id: 'aa:bb', name: 'iPhone', ip: '192.168.1.10', mac: 'AA:BB:CC:DD:EE:FF', active: true },
-  ] as any);
+  ]);
   mockGetLights.mockResolvedValue([
-    { light_id: '1', name: 'Lampada', reachable: true, room_name: 'Sala' },
-  ] as any);
+    {
+      light_id: '1',
+      name: 'Lampada',
+      on: true,
+      brightness: 254,
+      ct_mirek: null,
+      ct_kelvin: null,
+      hue: null,
+      saturation: null,
+      colormode: null,
+      reachable: true,
+      capability_tier: 'white',
+      room_id: 'r1',
+      room_name: 'Sala',
+      model_id: null,
+      light_type: null,
+    },
+  ]);
   mockGetSonosDevices.mockResolvedValue({
     speakers: [
-      { uid: 'RINCON_X', name: 'Cucina', ip: '192.168.1.20', is_visible: true, is_coordinator: true },
+      {
+        uid: 'RINCON_X',
+        name: 'Cucina',
+        ip: '192.168.1.20',
+        model: null,
+        firmware: null,
+        serial: null,
+        role: 'speaker',
+        is_visible: true,
+        is_coordinator: true,
+      },
     ],
     count: 1,
     is_stale: false,
-    fetched_at: 0,
-  } as any);
+    fetched_at: null,
+  });
   mockGetProxyHomesdata.mockResolvedValue({
     body: {
       homes: [{
+        id: 'home-1',
+        name: 'Casa',
         modules: [
-          { id: '09:00:01', type: 'NATherm1', name: 'Termo', room_id: 'r1' },
-          { id: '09:00:02', type: 'NRV', name: 'Valvola', room_id: 'r1' },
+          {
+            id: '09:00:01',
+            type: 'NATherm1',
+            name: 'Termo',
+            room_id: 'r1',
+            setup_date: 0,
+            firmware_revision: 0,
+            battery_level: 'full',
+          },
+          {
+            id: '09:00:02',
+            type: 'NRV',
+            name: 'Valvola',
+            room_id: 'r1',
+            setup_date: 0,
+            firmware_revision: 0,
+            battery_level: 'full',
+          },
         ],
-        rooms: [{ id: 'r1', name: 'Soggiorno' }],
+        rooms: [{ id: 'r1', name: 'Soggiorno', type: 'livingroom', module_ids: ['09:00:01', '09:00:02'] }],
+        schedules: [],
       }],
     },
-  } as any);
+    status: 'ok',
+    time_exec: 0,
+    time_server: 0,
+  });
   mockGetProxyCameraStatus.mockResolvedValue({
     cameras: [
-      { camera_id: '70:ee:50:12', name: 'Cam', device_type: 'NACamera', status: 'on' },
+      {
+        camera_id: '70:ee:50:12',
+        name: 'Cam',
+        device_type: 'NACamera',
+        status: 'on',
+        sd_status: null,
+        alim_status: null,
+        firmware: null,
+        is_local: null,
+      },
     ],
     data_freshness: 'LIVE',
-  } as any);
+  });
   mockGetSensors.mockResolvedValue({
     sensors: [
-      { id: 'sens-1', type: 'openCloseSensor', custom_name: 'Porta', room: 'Ingresso', is_reachable: true },
+      {
+        id: 'sens-1',
+        type: 'openCloseSensor',
+        custom_name: 'Porta',
+        room: 'Ingresso',
+        firmware_version: null,
+        battery_percentage: null,
+        is_reachable: true,
+        last_seen: null,
+      },
     ],
     count: 1,
     is_stale: false,
-  } as any);
+  });
   mockGetPlugs.mockResolvedValue([
-    { device_id: 'plug-1', custom_name: 'Lampada Soggiorno', switch_on: true, data_freshness: 'LIVE' },
-  ] as any);
-  mockRaspiGetHealth.mockResolvedValue({ status: 'ok', data_freshness: 'LIVE' } as any);
+    {
+      device_id: 'plug-1',
+      switch_on: true,
+      power_w: null,
+      voltage_v: null,
+      current_ma: null,
+      energy_kwh: null,
+      countdown_s: null,
+      data_freshness: 'LIVE',
+      last_polled_at: null,
+      custom_name: 'Lampada Soggiorno',
+      device_type: null,
+    },
+  ]);
+  mockRaspiGetHealth.mockResolvedValue({ status: 'ok', data_freshness: 'LIVE' });
   mockGetThermorossiHealth.mockResolvedValue({
     status: 'ok',
     data_freshness: 'LIVE',
     last_poll_at: '2026-04-25T10:00:00Z',
-  } as any);
+  });
 }
 
 describe('GET /api/v1/devices', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -115,7 +193,7 @@ describe('GET /api/v1/devices', () => {
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/devices');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     expect(response.status).toBe(401);
     const data = await response.json();
     expect(data.code).toBe('UNAUTHORIZED');
@@ -128,12 +206,12 @@ describe('GET /api/v1/devices', () => {
   it('aggregates items from all 8 providers with empty errors[]', async () => {
     seedAllProviders();
     const request = new Request('http://localhost:3000/api/v1/devices');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.errors).toEqual([]);
-    const providerTypes = new Set(data.items.map((i: any) => i.provider_type));
+    const providerTypes = new Set(data.items.map((i: Device) => i.provider_type));
     expect(providerTypes).toEqual(
       new Set(['fritzbox', 'hue', 'sonos', 'netatmo', 'dirigera', 'tuya', 'raspi', 'thermorossi']),
     );
@@ -145,8 +223,8 @@ describe('GET /api/v1/devices', () => {
 
   it('maps Fritz!Box device with composite id, ip, mac, status, type=network_device', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
-    const item = data.items.find((i: any) => i.provider_type === 'fritzbox');
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
+    const item = data.items.find((i: Device) => i.provider_type === 'fritzbox');
     expect(item).toMatchObject({
       id: 'fritzbox:AA:BB:CC:DD:EE:FF',
       name: 'iPhone',
@@ -160,8 +238,8 @@ describe('GET /api/v1/devices', () => {
 
   it('maps Hue light with composite id, type=light, room from room_name', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
-    const item = data.items.find((i: any) => i.provider_type === 'hue');
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
+    const item = data.items.find((i: Device) => i.provider_type === 'hue');
     expect(item).toMatchObject({
       id: 'hue:1',
       name: 'Lampada',
@@ -174,8 +252,8 @@ describe('GET /api/v1/devices', () => {
 
   it('maps Sonos speaker with composite id, type=speaker, ip; omits room (Pitfall 2)', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
-    const item = data.items.find((i: any) => i.provider_type === 'sonos');
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
+    const item = data.items.find((i: Device) => i.provider_type === 'sonos');
     expect(item).toMatchObject({
       id: 'sonos:RINCON_X',
       name: 'Cucina',
@@ -188,21 +266,21 @@ describe('GET /api/v1/devices', () => {
 
   it('maps Netatmo thermostat + valve + camera (3 items) with type discriminators', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
-    const netatmoItems = data.items.filter((i: any) => i.provider_type === 'netatmo');
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
+    const netatmoItems = data.items.filter((i: Device) => i.provider_type === 'netatmo');
     expect(netatmoItems.length).toBe(3);
-    const types = new Set(netatmoItems.map((i: any) => i.type));
+    const types = new Set(netatmoItems.map((i: Device) => i.type));
     expect(types).toEqual(new Set(['thermostat', 'valve', 'camera']));
-    const thermo = netatmoItems.find((i: any) => i.type === 'thermostat');
+    const thermo = netatmoItems.find((i: Device) => i.type === 'thermostat');
     expect(thermo).toMatchObject({ id: 'netatmo:09:00:01', name: 'Termo', room: 'Soggiorno' });
-    const camera = netatmoItems.find((i: any) => i.type === 'camera');
+    const camera = netatmoItems.find((i: Device) => i.type === 'camera');
     expect(camera).toMatchObject({ id: 'netatmo:70:ee:50:12', name: 'Cam', status: 1 });
   });
 
   it('maps DIRIGERA sensor with type=contact_sensor for openCloseSensor', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
-    const item = data.items.find((i: any) => i.provider_type === 'dirigera');
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
+    const item = data.items.find((i: Device) => i.provider_type === 'dirigera');
     expect(item).toMatchObject({
       id: 'dirigera:sens-1',
       name: 'Porta',
@@ -215,8 +293,8 @@ describe('GET /api/v1/devices', () => {
 
   it('maps Tuya plug using custom_name fallback (Pitfall 3) and type=plug', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
-    const item = data.items.find((i: any) => i.provider_type === 'tuya');
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
+    const item = data.items.find((i: Device) => i.provider_type === 'tuya');
     expect(item).toMatchObject({
       id: 'tuya:plug-1',
       name: 'Lampada Soggiorno',
@@ -228,8 +306,8 @@ describe('GET /api/v1/devices', () => {
 
   it('emits single Raspi item with composite id raspi:host and status=1 when healthy', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
-    const item = data.items.find((i: any) => i.provider_type === 'raspi');
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
+    const item = data.items.find((i: Device) => i.provider_type === 'raspi');
     expect(item).toMatchObject({
       id: 'raspi:host',
       name: 'Raspberry Pi',
@@ -241,8 +319,8 @@ describe('GET /api/v1/devices', () => {
 
   it('emits single Thermorossi item with composite id thermorossi:stove and status=1 when healthy', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
-    const item = data.items.find((i: any) => i.provider_type === 'thermorossi');
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
+    const item = data.items.find((i: Device) => i.provider_type === 'thermorossi');
     expect(item).toMatchObject({
       id: 'thermorossi:stove',
       name: 'Stufa',
@@ -259,7 +337,7 @@ describe('GET /api/v1/devices', () => {
   it('returns 200 with errors[] entry when a multi-item provider (fritzbox) rejects', async () => {
     seedAllProviders();
     mockFritzGetDevices.mockRejectedValue(new Error('Fritz!Box unreachable'));
-    const response = await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any);
+    const response = await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.errors).toContainEqual({
@@ -267,32 +345,32 @@ describe('GET /api/v1/devices', () => {
       message: expect.stringContaining('Fritz!Box unreachable'),
     });
     // No fritzbox items in result.
-    expect(data.items.every((i: any) => i.provider_type !== 'fritzbox')).toBe(true);
+    expect(data.items.every((i: Device) => i.provider_type !== 'fritzbox')).toBe(true);
     // Other providers still contributed.
-    expect(data.items.some((i: any) => i.provider_type === 'hue')).toBe(true);
+    expect(data.items.some((i: Device) => i.provider_type === 'hue')).toBe(true);
   });
 
   it('emits Raspi item with status=0 (NOT in errors[]) when raspiClient.getHealth rejects (Pitfall 4)', async () => {
     seedAllProviders();
     mockRaspiGetHealth.mockRejectedValue(new Error('Raspi down'));
-    const response = await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any);
+    const response = await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
-    const raspi = data.items.find((i: any) => i.provider_type === 'raspi');
+    const raspi = data.items.find((i: Device) => i.provider_type === 'raspi');
     expect(raspi).toMatchObject({ id: 'raspi:host', status: 0 });
     // Critical: single-item provider failures do NOT appear in errors[].
-    expect(data.errors.find((e: any) => e.provider_type === 'raspi')).toBeUndefined();
+    expect(data.errors.find((e: DeviceAggregatorError) => e.provider_type === 'raspi')).toBeUndefined();
   });
 
   it('emits Thermorossi item with status=0 (NOT in errors[]) when getHealth rejects (Pitfall 4)', async () => {
     seedAllProviders();
     mockGetThermorossiHealth.mockRejectedValue(new Error('Stove offline'));
-    const response = await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any);
+    const response = await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
-    const stove = data.items.find((i: any) => i.provider_type === 'thermorossi');
+    const stove = data.items.find((i: Device) => i.provider_type === 'thermorossi');
     expect(stove).toMatchObject({ id: 'thermorossi:stove', status: 0 });
-    expect(data.errors.find((e: any) => e.provider_type === 'thermorossi')).toBeUndefined();
+    expect(data.errors.find((e: DeviceAggregatorError) => e.provider_type === 'thermorossi')).toBeUndefined();
   });
 
   // -------------------------------------------------------------------------
@@ -301,7 +379,7 @@ describe('GET /api/v1/devices', () => {
 
   it('?provider_type=hue calls only Hue listing function (Pitfall 5 perf win)', async () => {
     seedAllProviders();
-    await GET(new Request('http://localhost:3000/api/v1/devices?provider_type=hue') as any, {} as any);
+    await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices?provider_type=hue')), routeContext());
     expect(mockGetLights).toHaveBeenCalled();
     expect(mockFritzGetDevices).not.toHaveBeenCalled();
     expect(mockGetSonosDevices).not.toHaveBeenCalled();
@@ -315,7 +393,7 @@ describe('GET /api/v1/devices', () => {
 
   it('?provider_type=foo (invalid) returns 200 with items:[], total_count:0, errors:[] and zero fan-out calls', async () => {
     seedAllProviders();
-    const response = await GET(new Request('http://localhost:3000/api/v1/devices?provider_type=foo') as any, {} as any);
+    const response = await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices?provider_type=foo')), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.items).toEqual([]);
@@ -332,32 +410,32 @@ describe('GET /api/v1/devices', () => {
 
   it('clamps limit=0 to 1 (D-18)', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices?limit=0') as any, {} as any)).json();
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices?limit=0')), routeContext())).json();
     expect(data.limit).toBe(1);
     expect(data.items.length).toBe(1);
   });
 
   it('clamps limit=2000 to 1000 (D-18)', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices?limit=2000') as any, {} as any)).json();
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices?limit=2000')), routeContext())).json();
     expect(data.limit).toBe(1000);
   });
 
   it('uses default limit=100 when limit=NaN (D-18 NaN-safe)', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices?limit=abc') as any, {} as any)).json();
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices?limit=abc')), routeContext())).json();
     expect(data.limit).toBe(100);
   });
 
   it('clamps negative offset to 0 (D-19)', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices?offset=-10') as any, {} as any)).json();
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices?offset=-10')), routeContext())).json();
     expect(data.offset).toBe(0);
   });
 
   it('returns items:[] but preserves total_count when offset beyond total (D-19)', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices?offset=9999') as any, {} as any)).json();
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices?offset=9999')), routeContext())).json();
     expect(data.items).toEqual([]);
     expect(data.total_count).toBeGreaterThan(0); // total reflects merged length pre-pagination
   });
@@ -368,11 +446,11 @@ describe('GET /api/v1/devices', () => {
 
   it('sorts items by provider_type ASC then name ASC Italian-locale (D-17)', async () => {
     seedAllProviders();
-    const data = await (await GET(new Request('http://localhost:3000/api/v1/devices') as any, {} as any)).json();
+    const data = await (await GET(asNextRequest(new Request('http://localhost:3000/api/v1/devices')), routeContext())).json();
     // First item must have provider_type 'dirigera' (alphabetically first among the 8).
     expect(data.items[0].provider_type).toBe('dirigera');
     // Verify the full provider sequence is non-decreasing (ASC).
-    const providerSeq: string[] = data.items.map((i: any) => i.provider_type);
+    const providerSeq: string[] = data.items.map((i: Device) => i.provider_type);
     const sortedSeq = [...providerSeq].sort();
     expect(providerSeq).toEqual(sortedSeq);
   });

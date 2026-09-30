@@ -10,15 +10,16 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
 import { authSession } from '@/lib/auth/session';
+import type { CameraStatusResponse } from '@/types/netatmoProxy';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetCameraStatus = jest.mocked(netatmoProxy.getProxyCameraStatus);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('GET /api/v1/netatmo/camera/status', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -27,7 +28,7 @@ describe('GET /api/v1/netatmo/camera/status', () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/status');
 
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -35,12 +36,12 @@ describe('GET /api/v1/netatmo/camera/status', () => {
   });
 
   it('should return 200 with camera status', async () => {
-    const mockData = { cameras: [], freshness: 'LIVE' };
-    mockGetCameraStatus.mockResolvedValue(mockData as any);
+    const mockData: CameraStatusResponse = { cameras: [], data_freshness: 'LIVE' };
+    mockGetCameraStatus.mockResolvedValue(mockData);
 
     const request = new Request('http://localhost:3000/api/v1/netatmo/camera/status');
 
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);

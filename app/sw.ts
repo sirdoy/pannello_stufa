@@ -33,6 +33,12 @@ declare global {
   interface ServiceWorkerRegistration {
     readonly periodicSync?: PeriodicSyncManager;
   }
+  interface PeriodicSyncEvent extends ExtendableEvent {
+    readonly tag: string;
+  }
+  interface ServiceWorkerGlobalScopeEventMap {
+    periodicsync: PeriodicSyncEvent;
+  }
 }
 
 declare const self: ServiceWorkerGlobalScope;
@@ -369,9 +375,23 @@ function openDB(): Promise<IDBDatabase> {
 }
 
 /**
+ * Command queued in IndexedDB by lib/pwa/backgroundSync.ts
+ */
+interface QueuedSwCommand {
+  id: number;
+  endpoint: string;
+  method?: string;
+  data?: Record<string, unknown>;
+  status?: string;
+  timestamp?: string;
+  retries?: number;
+  lastError?: string | null;
+}
+
+/**
  * Get pending commands from IndexedDB
  */
-async function getPendingCommands(): Promise<any[]> {
+async function getPendingCommands(): Promise<QueuedSwCommand[]> {
   const db = await openDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(COMMAND_QUEUE_STORE, 'readonly');
@@ -427,7 +447,7 @@ async function removeCommand(id: number): Promise<void> {
 /**
  * Execute a queued command
  */
-async function executeCommand(command: any): Promise<void> {
+async function executeCommand(command: QueuedSwCommand): Promise<void> {
   const url = `/api/${command.endpoint}`;
   const options: RequestInit = {
     method: command.method || 'POST',
@@ -573,7 +593,7 @@ async function incrementBadge(): Promise<void> {
  */
 async function cacheDeviceState(
   deviceId: string,
-  state: any
+  state: unknown
 ): Promise<void> {
   try {
     const db = await openDB();
@@ -744,7 +764,7 @@ const PERIODIC_SYNC_TAG = 'check-stove-status';
  * Triggered at intervals to check stove status even with app closed
  * Note: Only supported in Chrome/Edge
  */
-self.addEventListener('periodicsync', (event: any) => {
+self.addEventListener('periodicsync', (event: PeriodicSyncEvent) => {
 
   if (event.tag === PERIODIC_SYNC_TAG) {
     event.waitUntil(checkStoveStatusBackground());

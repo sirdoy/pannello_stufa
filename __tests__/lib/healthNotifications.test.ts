@@ -72,8 +72,10 @@ describe('Health Monitoring Notification Types', () => {
 
       expect(payload!.notification.title).toBe('Anomalia Rilevata');
       expect(payload!.notification.body).toBe('Custom mismatch message');
-      expect((payload!.data as any).expected).toBe('ON');
-      expect((payload!.data as any).actual).toBe('STANDBY');
+      // data spreads the caller's extra fields at runtime; the inferred type only lists the fixed ones
+      const data: Record<string, unknown> = { ...payload!.data };
+      expect(data.expected).toBe('ON');
+      expect(data.actual).toBe('STANDBY');
     });
 
     test('builds stove_error payload with error code', () => {

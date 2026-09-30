@@ -20,7 +20,7 @@ jest.mock('@/lib/auth/useUser', () => ({
 
 // Mock child components
 jest.mock('@/app/components/SettingsLayout', () => {
-  return function MockSettingsLayout({ children, title }: any) {
+  return function MockSettingsLayout({ children, title }: { children?: React.ReactNode; title?: React.ReactNode }) {
     return (
       <div data-testid="settings-layout">
         <h1>{title}</h1>

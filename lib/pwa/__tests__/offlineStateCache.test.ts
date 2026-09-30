@@ -9,6 +9,13 @@ import {
   DEVICE_IDS,
 } from '../offlineStateCache';
 
+type CachedDeviceState = NonNullable<Parameters<typeof formatStoveStateForDisplay>[0]>;
+
+/** IndexedDB entries are untyped at runtime: widen the parameter to exercise the missing-state guard */
+const formatStoveStateUnchecked = formatStoveStateForDisplay as (
+  cachedData: Partial<CachedDeviceState> | null
+) => ReturnType<typeof formatStoveStateForDisplay>;
+
 // Mock IndexedDB
 jest.mock('../indexedDB', () => ({
   get: jest.fn().mockResolvedValue(null),
@@ -36,11 +43,12 @@ describe('offlineStateCache', () => {
     });
 
     it('returns null for undefined state', () => {
-      expect(formatStoveStateForDisplay({ timestamp: '2026-01-19T10:00:00Z' } as any)).toBeNull();
+      expect(formatStoveStateUnchecked({ timestamp: '2026-01-19T10:00:00Z' })).toBeNull();
     });
 
     it('formats stove state correctly when on', () => {
-      const cachedData = {
+      const cachedData: CachedDeviceState = {
+        deviceId: DEVICE_IDS.STOVE,
         state: {
           status: 'on',
           temperature: 22.5,
@@ -54,7 +62,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatStoveStateForDisplay(cachedData as any);
+      const result = formatStoveStateForDisplay(cachedData);
 
       expect(result!.isOn).toBe(true);
       expect(result!.status).toBe('on');
@@ -67,7 +75,8 @@ describe('offlineStateCache', () => {
     });
 
     it('formats stove state correctly when off', () => {
-      const cachedData = {
+      const cachedData: CachedDeviceState = {
+        deviceId: DEVICE_IDS.STOVE,
         state: {
           status: 'off',
           temperature: 18,
@@ -75,7 +84,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatStoveStateForDisplay(cachedData as any);
+      const result = formatStoveStateForDisplay(cachedData);
 
       expect(result!.isOn).toBe(false);
       expect(result!.status).toBe('off');
@@ -83,19 +92,21 @@ describe('offlineStateCache', () => {
 
     it('marks data as stale after 30 minutes', () => {
       const thirtyFiveMinutesAgo = new Date(Date.now() - 35 * 60 * 1000);
-      const cachedData = {
+      const cachedData: CachedDeviceState = {
+        deviceId: DEVICE_IDS.STOVE,
         state: { status: 'on' },
         timestamp: thirtyFiveMinutesAgo.toISOString(),
       };
 
-      const result = formatStoveStateForDisplay(cachedData as any);
+      const result = formatStoveStateForDisplay(cachedData);
 
       expect(result!.isStale).toBe(true);
       expect(result!.ageMinutes).toBeGreaterThan(30);
     });
 
     it('handles alternative field names', () => {
-      const cachedData = {
+      const cachedData: CachedDeviceState = {
+        deviceId: DEVICE_IDS.STOVE,
         state: {
           state: 'on',
           temp: 21,
@@ -106,7 +117,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatStoveStateForDisplay(cachedData as any);
+      const result = formatStoveStateForDisplay(cachedData);
 
       expect(result!.isOn).toBe(true);
       expect(result!.temperature).toBe(21);
@@ -116,12 +127,13 @@ describe('offlineStateCache', () => {
     });
 
     it('includes formatted cache timestamp', () => {
-      const cachedData = {
+      const cachedData: CachedDeviceState = {
+        deviceId: DEVICE_IDS.STOVE,
         state: { status: 'on' },
         timestamp: '2026-01-19T14:30:00.000Z',
       };
 
-      const result = formatStoveStateForDisplay(cachedData as any);
+      const result = formatStoveStateForDisplay(cachedData);
 
       expect(result!.cachedAtFormatted).toBeDefined();
       expect(typeof result!.cachedAtFormatted).toBe('string');
@@ -134,7 +146,8 @@ describe('offlineStateCache', () => {
     });
 
     it('formats thermostat state with rooms array', () => {
-      const cachedData = {
+      const cachedData: CachedDeviceState = {
+        deviceId: DEVICE_IDS.THERMOSTAT,
         state: {
           rooms: [
             {
@@ -150,7 +163,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatThermostatStateForDisplay(cachedData as any);
+      const result = formatThermostatStateForDisplay(cachedData);
 
       expect(result!.temperature).toBe(21.5);
       expect(result!.setpoint).toBe(22);
@@ -162,7 +175,8 @@ describe('offlineStateCache', () => {
     });
 
     it('handles flat thermostat state', () => {
-      const cachedData = {
+      const cachedData: CachedDeviceState = {
+        deviceId: DEVICE_IDS.THERMOSTAT,
         state: {
           temperature: 20,
           setpoint: 21,
@@ -172,7 +186,7 @@ describe('offlineStateCache', () => {
         timestamp: new Date().toISOString(),
       };
 
-      const result = formatThermostatStateForDisplay(cachedData as any);
+      const result = formatThermostatStateForDisplay(cachedData);
 
       expect(result!.temperature).toBe(20);
       expect(result!.setpoint).toBe(21);
@@ -182,12 +196,13 @@ describe('offlineStateCache', () => {
 
     it('marks data as stale after 30 minutes', () => {
       const fortyMinutesAgo = new Date(Date.now() - 40 * 60 * 1000);
-      const cachedData = {
+      const cachedData: CachedDeviceState = {
+        deviceId: DEVICE_IDS.THERMOSTAT,
         state: { temperature: 20 },
         timestamp: fortyMinutesAgo.toISOString(),
       };
 
-      const result = formatThermostatStateForDisplay(cachedData as any);
+      const result = formatThermostatStateForDisplay(cachedData);
 
       expect(result!.isStale).toBe(true);
     });

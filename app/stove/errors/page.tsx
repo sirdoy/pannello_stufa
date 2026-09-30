@@ -8,7 +8,7 @@ import ErrorAlert from '@/app/components/ui/ErrorAlert';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
-interface ErrorItem {
+type ErrorItem = {
   id: string;
   errorCode: number;
   errorDescription: string;
@@ -16,7 +16,7 @@ interface ErrorItem {
   status?: string;
   resolved: boolean;
   resolvedAt?: number;
-}
+};
 
 export default function ErrorsPage() {
   const router = useRouter();
@@ -34,8 +34,9 @@ export default function ErrorsPage() {
   const fetchErrors = async (): Promise<void> => {
     setLoading(true);
     try {
-      const allErrors: any = await getRecentErrors(100);
-      setErrors(allErrors);
+      // getRecentErrors returns loosely typed Firebase entries: they carry the ErrorItem fields
+      const allErrors = await getRecentErrors(100);
+      setErrors(allErrors as ErrorItem[]);
     } catch (error) {
       console.error('Failed to fetch errors:', error);
     } finally {

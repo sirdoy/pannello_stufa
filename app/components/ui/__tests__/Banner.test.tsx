@@ -9,7 +9,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import Banner from '../Banner';
+import Banner, { type BannerProps } from '../Banner';
 
 expect.extend(toHaveNoViolations);
 
@@ -115,7 +115,7 @@ describe('Banner', () => {
 
     it('falls back to info variant for invalid variant', () => {
       const { container } = render(
-        <Banner title="Invalid" variant={'invalid' as any} />
+        <Banner title="Invalid" variant={'invalid' as string as BannerProps['variant']} />
       );
       const banner = container.firstChild;
       expect(banner).toHaveClass('bg-ocean-500/[0.15]');

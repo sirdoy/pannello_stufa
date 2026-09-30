@@ -208,7 +208,7 @@ export default function DeviceTypesPage() {
         cancelLabel="Annulla"
         successMessage="Tipo creato!"
       >
-        {({ control }: any) => (
+        {({ control }) => (
           <>
             <Controller
               name="slug"
@@ -252,7 +252,7 @@ export default function DeviceTypesPage() {
         cancelLabel="Annulla"
         successMessage="Tipo aggiornato!"
       >
-        {({ control }: any) => (
+        {({ control }) => (
           <>
             <div className="text-sm text-slate-400 mb-2">
               <p>Slug: <strong className="text-slate-200">{typeToEdit?.slug}</strong></p>

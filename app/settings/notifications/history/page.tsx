@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { it } from 'date-fns/locale';
 import SettingsLayout from '@/app/components/SettingsLayout';
+import type { ColumnDef } from '@tanstack/react-table';
 import { Card, Button, Heading, Text, Skeleton, EmptyState, Badge, DataTable } from '@/app/components/ui';
 
 interface NotificationHistoryItem {
@@ -15,7 +16,7 @@ interface NotificationHistoryItem {
   title: string;
   body: string;
   deviceId?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Type for DataTable row
@@ -69,12 +70,12 @@ export default function NotificationHistoryPage() {
   }, [user]);
 
   // Column definitions
-  const columns = [
+  const columns: ColumnDef<NotificationHistoryRow>[] = [
       {
         accessorKey: 'timestamp',
         header: 'Data',
-        cell: ({ getValue }: { getValue: () => number }) => {
-          const date = new Date(getValue());
+        cell: ({ getValue }) => {
+          const date = new Date(getValue<number>());
           return format(date, 'dd/MM/yyyy HH:mm', { locale: it });
         },
         sortingFn: 'datetime',
@@ -82,8 +83,8 @@ export default function NotificationHistoryPage() {
       {
         accessorKey: 'type',
         header: 'Tipo',
-        cell: ({ getValue }: { getValue: () => string }) => {
-          const type = getValue();
+        cell: ({ getValue }) => {
+          const type = getValue<string>();
           const variants = {
             scheduler: 'ocean',
             error: 'danger',
@@ -102,8 +103,8 @@ export default function NotificationHistoryPage() {
       {
         accessorKey: 'status',
         header: 'Stato',
-        cell: ({ getValue }: { getValue: () => string }) => {
-          const status = getValue();
+        cell: ({ getValue }) => {
+          const status = getValue<string>();
           const variants = {
             sent: 'ocean',
             delivered: 'sage',
@@ -125,8 +126,8 @@ export default function NotificationHistoryPage() {
       {
         accessorKey: 'title',
         header: 'Titolo',
-        cell: ({ getValue }: { getValue: () => string }) => (
-          <Text className="max-w-[200px] truncate">{getValue()}</Text>
+        cell: ({ getValue }) => (
+          <Text className="max-w-[200px] truncate">{getValue<string>()}</Text>
         ),
       },
   ];

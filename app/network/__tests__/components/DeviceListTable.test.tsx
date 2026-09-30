@@ -12,11 +12,28 @@
 
 import { render, screen, fireEvent } from '@testing-library/react';
 import DeviceListTable from '../../components/DeviceListTable';
+import type { ReactNode } from 'react';
 import type { DeviceData } from '@/app/components/devices/network/types';
+
+// Minimal view of the DataTable props/columns used by the mock below
+interface MockColumn {
+  accessorKey?: string;
+  cell?: (ctx: { row: { original: DeviceData } }) => ReactNode;
+}
+
+interface MockDataTableProps {
+  data: DeviceData[];
+  columns: MockColumn[];
+  enableFiltering?: boolean;
+  enablePagination?: boolean;
+  pageSize?: number;
+  density?: string;
+  striped?: boolean;
+}
 
 // Mock UI components to avoid circular dependency
 jest.mock('@/app/components/ui', () => ({
-  DataTable: jest.fn(({ data, columns, enableFiltering, enablePagination, pageSize, density, striped }) => (
+  DataTable: jest.fn(({ data, columns, enableFiltering, enablePagination, pageSize, density, striped }: MockDataTableProps) => (
     <div
       data-testid="data-table"
       data-rows={data.length}
@@ -27,9 +44,9 @@ jest.mock('@/app/components/ui', () => ({
       data-density={density}
       data-striped={striped}
     >
-      {data.map((d: any, i: number) => {
+      {data.map((d, i) => {
         // Render the category column cell for testing
-        const categoryColumn = columns.find((col: any) => col.accessorKey === 'category');
+        const categoryColumn = columns.find((col) => col.accessorKey === 'category');
         return (
           <div
             key={i}
@@ -48,12 +65,12 @@ jest.mock('@/app/components/ui', () => ({
       })}
     </div>
   )),
-  Card: ({ children, className }: any) => <div className={className}>{children}</div>,
-  Heading: ({ children, level }: any) => {
-    const Tag = `h${level}` as any;
+  Card: ({ children, className }: { children?: ReactNode; className?: string }) => <div className={className}>{children}</div>,
+  Heading: ({ children, level }: { children?: ReactNode; level: number }) => {
+    const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
     return <Tag>{children}</Tag>;
   },
-  Badge: ({ children, variant, size }: any) => (
+  Badge: ({ children, variant, size }: { children?: ReactNode; variant?: string; size?: string }) => (
     <span data-variant={variant} data-size={size}>{children}</span>
   ),
 }));

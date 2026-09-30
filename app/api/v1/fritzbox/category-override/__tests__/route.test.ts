@@ -14,18 +14,19 @@ jest.mock('@/lib/auth/session', () => ({
 import { POST } from '../route';
 import { saveCategoryOverride } from '@/lib/network/deviceCategories';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSaveCategoryOverride = jest.mocked(saveCategoryOverride);
 
 describe('POST /api/v1/fritzbox/category-override', () => {
-  const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  const mockSession = mockAppSession({ sub: 'auth0|123', email: 'test@test.com' });
   const testMac = 'AA:BB:CC:DD:EE:FF';
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Default: authenticated user
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockSession);
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -37,7 +38,7 @@ describe('POST /api/v1/fritzbox/category-override', () => {
       json: jest.fn().mockResolvedValue({ mac: testMac, category: 'mobile' }),
     };
 
-    const response = await POST(mockRequest as any, {} as any);
+    const response = await POST(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -50,7 +51,7 @@ describe('POST /api/v1/fritzbox/category-override', () => {
       json: jest.fn().mockResolvedValue({ category: 'mobile' }),
     };
 
-    const response = await POST(mockRequest as any, {} as any);
+    const response = await POST(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -64,7 +65,7 @@ describe('POST /api/v1/fritzbox/category-override', () => {
       json: jest.fn().mockResolvedValue({ mac: testMac, category: 'laptop' }),
     };
 
-    const response = await POST(mockRequest as any, {} as any);
+    const response = await POST(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -80,7 +81,7 @@ describe('POST /api/v1/fritzbox/category-override', () => {
       json: jest.fn().mockResolvedValue({ mac: testMac, category: 'mobile' }),
     };
 
-    const response = await POST(mockRequest as any, {} as any);
+    const response = await POST(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -94,7 +95,7 @@ describe('POST /api/v1/fritzbox/category-override', () => {
       json: jest.fn().mockResolvedValue({ mac: testMac, category: 'pc' }),
     };
 
-    const response = await POST(mockRequest as any, {} as any);
+    const response = await POST(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);

@@ -7,41 +7,42 @@ jest.mock('@/lib/auth/session', () => ({
   authSession: { getSession: jest.fn() },
 }));
 
+import type { NextRequest } from 'next/server';
 import { PUT } from '../route';
 import * as sonosProxy from '@/lib/sonos/sonosProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetSpeakerMute = jest.mocked(sonosProxy.setSpeakerMute);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-const mockContext = { params: Promise.resolve({ uid: 'RINCON_A' }) };
+const mockContext = routeContext({ uid: 'RINCON_A' });
 
 /** Build a jsdom-safe mock request whose body is readable via parseJson. */
-function makePutRequest(body: Record<string, unknown>): any {
-  return {
+function makePutRequest(body: Record<string, unknown>): NextRequest {
+  return asNextRequest({
     headers: { get: (name: string) => (name === 'content-type' ? 'application/json' : null) },
     text: async () => JSON.stringify(body),
     nextUrl: { searchParams: new URLSearchParams() },
-  };
+  });
 }
 
 describe('PUT /api/v1/sonos/speakers/[uid]/mute', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
-    const response = await PUT(makePutRequest({ mute: true }), mockContext as any);
+    const response = await PUT(makePutRequest({ mute: true }), mockContext);
     expect(response.status).toBe(401);
   });
 
   it('should return 202 with suggested_poll_delay_s', async () => {
-    mockSetSpeakerMute.mockResolvedValue({ status: 'ok' } as any);
-    const response = await PUT(makePutRequest({ mute: true }), mockContext as any);
+    mockSetSpeakerMute.mockResolvedValue({ data_confirmed: true });
+    const response = await PUT(makePutRequest({ mute: true }), mockContext);
     const data = await response.json();
     expect(response.status).toBe(202);
     expect(data.suggested_poll_delay_s).toBe(1);

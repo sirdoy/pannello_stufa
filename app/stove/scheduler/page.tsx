@@ -9,6 +9,7 @@ import {
   updateSchedule,
   deleteSchedule,
   setActiveSchedule,
+  type ScheduleMetadata,
 } from '@/lib/scheduler/schedulesApiClient';
 import { logSchedulerAction } from '@/lib/logService';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
@@ -101,7 +102,7 @@ export default function WeeklyScheduler() {
   const [selectedDay, setSelectedDay] = useState<DayOfWeek>('Lunedì');
 
   // Multi-schedule management states
-  const [schedules, setSchedules] = useState<any[]>([]);
+  const [schedules, setSchedules] = useState<ScheduleMetadata[]>([]);
   const [activeScheduleId, setActiveScheduleId] = useState<string>('');
   const [loadingSchedules, setLoadingSchedules] = useState<boolean>(true);
   const [createScheduleModal, setCreateScheduleModal] = useState<boolean>(false);

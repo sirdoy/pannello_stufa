@@ -12,7 +12,17 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import DeviceRegistryPage from '../page';
-import type { RegistryDevice } from '@/types/registry';
+import type { RegistryDevice, DeviceCreate, DeviceUpdate } from '@/types/registry';
+
+// Minimal view of a TanStack column as consumed by the DataTable mock
+interface MockColumn<TData> {
+  id?: string;
+  accessorKey?: string;
+  cell?: (ctx: { row: { original: TData } }) => React.ReactNode;
+}
+
+// Arguments of a mocked fetch call: (url, init)
+type FetchCall = [string, RequestInit?];
 
 // Mock next/navigation
 const mockPush = jest.fn();
@@ -34,11 +44,11 @@ jest.mock('@/app/components/SettingsLayout', () => ({
 // Mock DataTable — renders data items mapping columns including actions
 jest.mock('@/app/components/ui/DataTable', () => ({
   __esModule: true,
-  default: ({ data, columns }: { data: RegistryDevice[]; columns: any[] }) => (
+  default: ({ data, columns }: { data: RegistryDevice[]; columns: MockColumn<RegistryDevice>[] }) => (
     <div data-testid="data-table">
       {data.map((item: RegistryDevice) => (
         <div key={item.id} data-testid={`row-${item.id}`}>
-          {columns.map((col: any) => {
+          {columns.map((col) => {
             if (col.id === 'actions') {
               const cellContent = col.cell?.({ row: { original: item } });
               return <div key="actions">{cellContent}</div>;
@@ -68,8 +78,8 @@ jest.mock('@/app/components/ui/FormModal', () => ({
     title,
   }: {
     isOpen: boolean;
-    onSubmit: (data: any) => Promise<void>;
-    children?: any;
+    onSubmit: (data: DeviceCreate | DeviceUpdate) => Promise<void>;
+    children?: unknown;
     title?: string;
   }) => {
     if (!isOpen) return null;
@@ -182,7 +192,7 @@ jest.mock('@/app/hooks/useToast', () => ({
 // Mock Input
 jest.mock('@/app/components/ui/Input', () => ({
   __esModule: true,
-  default: (props: any) => <input {...props} />,
+  default: (props: React.InputHTMLAttributes<HTMLInputElement>) => <input {...props} />,
 }));
 
 // Mock Select — renders a native select with data-testid for easy interaction
@@ -360,7 +370,7 @@ describe('/registry/devices page', () => {
     fireEvent.change(providerSelect, { target: { value: 'hue' } });
 
     await waitFor(() => {
-      const deviceCalls = fetchSpy.mock.calls.filter((call: any[]) =>
+      const deviceCalls = (fetchSpy.mock.calls as FetchCall[]).filter((call) =>
         (call[0] as string).includes('/api/registry/devices')
       );
       expect(deviceCalls.length).toBeGreaterThan(0);
@@ -483,7 +493,7 @@ describe('/registry/devices page', () => {
     fireEvent.click(nextButton);
 
     await waitFor(() => {
-      const deviceCalls = fetchSpy.mock.calls.filter((call: any[]) =>
+      const deviceCalls = (fetchSpy.mock.calls as FetchCall[]).filter((call) =>
         (call[0] as string).includes('/api/registry/devices')
       );
       expect(deviceCalls.length).toBeGreaterThan(0);
@@ -546,12 +556,12 @@ describe('/registry/devices page', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      const postCall = postSpy.mock.calls.find(
-        (call: any[]) => call[1]?.method === 'POST'
+      const postCall = (postSpy.mock.calls as FetchCall[]).find(
+        (call) => call[1]?.method === 'POST'
       );
       expect(postCall).toBeDefined();
       expect(postCall![0]).toBe('/api/registry/devices');
-      const body = JSON.parse(postCall![1].body as string);
+      const body = JSON.parse(postCall![1]!.body as string);
       expect(body).toMatchObject({
         provider_name: 'hue',
         device_id: '99',
@@ -576,7 +586,7 @@ describe('/registry/devices page', () => {
     });
 
     // Override fetch for POST to return 409 — the page throws, FormModal mock swallows it
-    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+    global.fetch = jest.fn().mockImplementation((url: string, options?: RequestInit) => {
       if (options?.method === 'POST') {
         return Promise.resolve({
           ok: false,
@@ -630,7 +640,7 @@ describe('/registry/devices page', () => {
     });
 
     // Override fetch for PUT
-    const putSpy = jest.fn().mockImplementation((url: string, options?: any) => {
+    const putSpy = jest.fn().mockImplementation((url: string, options?: RequestInit) => {
       if (options?.method === 'PUT') {
         return Promise.resolve({
           ok: true,
@@ -649,8 +659,8 @@ describe('/registry/devices page', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      const putCall = putSpy.mock.calls.find(
-        (call: any[]) => call[1]?.method === 'PUT'
+      const putCall = (putSpy.mock.calls as FetchCall[]).find(
+        (call) => call[1]?.method === 'PUT'
       );
       expect(putCall).toBeDefined();
       // Must use numeric id=1, NOT device_id string '5'
@@ -692,7 +702,7 @@ describe('/registry/devices page', () => {
     });
 
     // Override fetch for DELETE
-    const deleteSpy = jest.fn().mockImplementation((url: string, options?: any) => {
+    const deleteSpy = jest.fn().mockImplementation((url: string, options?: RequestInit) => {
       if (options?.method === 'DELETE') {
         return Promise.resolve({
           ok: true,
@@ -710,8 +720,8 @@ describe('/registry/devices page', () => {
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      const deleteCall = deleteSpy.mock.calls.find(
-        (call: any[]) => call[1]?.method === 'DELETE'
+      const deleteCall = (deleteSpy.mock.calls as FetchCall[]).find(
+        (call) => call[1]?.method === 'DELETE'
       );
       expect(deleteCall).toBeDefined();
       // Must use numeric id=1, NOT device_id string '5'
@@ -734,7 +744,7 @@ describe('/registry/devices page', () => {
     });
 
     // Override fetch for DELETE to return 404
-    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+    global.fetch = jest.fn().mockImplementation((url: string, options?: RequestInit) => {
       if (options?.method === 'DELETE') {
         return Promise.resolve({
           ok: false,

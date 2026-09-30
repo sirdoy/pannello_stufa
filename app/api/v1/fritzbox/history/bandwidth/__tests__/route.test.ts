@@ -14,6 +14,7 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockFritzboxClient = jest.mocked(fritzboxClient);
@@ -22,7 +23,7 @@ const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
 describe('GET /api/v1/fritzbox/history/bandwidth', () => {
   let mockRequest: Request;
-  const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  const mockSession = mockAppSession({ sub: 'auth0|123', email: 'test@test.com' });
   const mockData = {
     items: [
       {
@@ -46,12 +47,12 @@ describe('GET /api/v1/fritzbox/history/bandwidth', () => {
     jest.clearAllMocks();
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history/bandwidth');
     // Default: authenticated user
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockSession);
     // Default: rate limit allows
     mockCheckRateLimit.mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
     // Guard for new method that may not be in the auto-mock yet
     if (!mockFritzboxClient.getBandwidthHistoryRaw) {
-      (mockFritzboxClient as any).getBandwidthHistoryRaw = jest.fn();
+      Object.assign(mockFritzboxClient, { getBandwidthHistoryRaw: jest.fn() });
     }
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -61,7 +62,7 @@ describe('GET /api/v1/fritzbox/history/bandwidth', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -72,7 +73,7 @@ describe('GET /api/v1/fritzbox/history/bandwidth', () => {
   it('should return 200 with bandwidth data', async () => {
     mockGetCachedData.mockResolvedValue(mockData);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -83,7 +84,7 @@ describe('GET /api/v1/fritzbox/history/bandwidth', () => {
   it('should return 429 when rate limited', async () => {
     mockCheckRateLimit.mockResolvedValue({ allowed: false, suppressedCount: 1, nextAllowedIn: 30 });
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(429);
@@ -96,13 +97,13 @@ describe('GET /api/v1/fritzbox/history/bandwidth', () => {
   it('should call getCachedData with correct cache key', async () => {
     mockGetCachedData.mockResolvedValue(mockData);
 
-    await GET(mockRequest as any, {} as any);
+    await GET(asNextRequest(mockRequest), routeContext());
 
     expect(mockGetCachedData).toHaveBeenCalledWith('history-bandwidth-raw', expect.any(Function));
 
     // Verify the fetch function calls the correct client method
     const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
-    mockFritzboxClient.getBandwidthHistoryRaw.mockResolvedValue(mockData as any);
+    mockFritzboxClient.getBandwidthHistoryRaw.mockResolvedValue(mockData);
     await fetchFn?.();
     expect(mockFritzboxClient.getBandwidthHistoryRaw).toHaveBeenCalled();
   });
@@ -111,7 +112,7 @@ describe('GET /api/v1/fritzbox/history/bandwidth', () => {
     const error = new Error('Bandwidth history query failed');
     mockGetCachedData.mockRejectedValue(error);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(500);

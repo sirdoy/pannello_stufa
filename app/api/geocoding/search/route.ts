@@ -22,6 +22,17 @@ interface GeocodingSearchResult {
   timezone: string | null;
 }
 
+/** Raw result item from the Open-Meteo Geocoding API (optional fields may be missing) */
+interface OpenMeteoGeocodingResult {
+  id: number;
+  name: string;
+  country?: string;
+  admin1?: string;
+  latitude: number;
+  longitude: number;
+  timezone?: string;
+}
+
 /**
  * Fetch with retry logic for Open-Meteo API
  */
@@ -100,10 +111,10 @@ export const GET = withAuthAndErrorHandler(async (request) => {
       return success({ results: [] });
     }
 
-    const data = (await response.json()) as { results?: any[] };
+    const data = (await response.json()) as { results?: OpenMeteoGeocodingResult[] };
 
     // Open-Meteo returns { results: [...] } or {} if no results
-    const results: GeocodingSearchResult[] = (data.results || []).map((result: any) => ({
+    const results: GeocodingSearchResult[] = (data.results || []).map((result) => ({
       id: result.id,
       name: result.name,
       country: result.country || null,

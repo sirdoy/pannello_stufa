@@ -7,7 +7,11 @@
  */
 import { render, screen } from '@testing-library/react';
 import { axe, toHaveNoViolations } from 'jest-axe';
+import type { LabelHTMLAttributes } from 'react';
 import Text, { textVariants } from '../Text';
+
+// Text props are HTMLAttributes<HTMLElement> (no htmlFor): pass label attributes via spread for as="label"
+const labelFor = (htmlFor: string): LabelHTMLAttributes<HTMLLabelElement> => ({ htmlFor });
 
 expect.extend(toHaveNoViolations);
 
@@ -63,7 +67,7 @@ describe('Text', () => {
     it('should have no a11y violations with as="label"', async () => {
       const { container } = render(
         <div>
-          <Text as="label" htmlFor="test-input" aria-label="Form Label" {...({} as any)}>Form Label</Text>
+          <Text as="label" aria-label="Form Label" {...labelFor('test-input')}>Form Label</Text>
           <input id="test-input" type="text" />
         </div>
       );
@@ -344,7 +348,7 @@ describe('Text', () => {
     });
 
     it('passes htmlFor to label element', () => {
-      render(<Text as="label" htmlFor="my-input" aria-label="Label" {...({} as any)}>Label</Text>);
+      render(<Text as="label" aria-label="Label" {...labelFor('my-input')}>Label</Text>);
       const text = screen.getByText('Label');
       expect(text).toHaveAttribute('for', 'my-input');
     });

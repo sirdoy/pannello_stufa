@@ -14,6 +14,7 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import { getHealth } from '@/lib/tuya/tuyaProxy';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
+import { asNextRequest, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetHealth = jest.mocked(getHealth);
 
@@ -41,7 +42,7 @@ describe('GET /api/tuya/health', () => {
   it('should return 200 with health data when getHealth succeeds', async () => {
     mockGetHealth.mockResolvedValue(mockHealthData);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -60,7 +61,7 @@ describe('GET /api/tuya/health', () => {
       )
     );
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
 
     expect(response.status).toBe(503);
   });

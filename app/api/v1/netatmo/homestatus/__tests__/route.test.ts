@@ -10,15 +10,15 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetProxyHomestatus = jest.mocked(netatmoProxy.getProxyHomestatus);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('GET /api/v1/netatmo/homestatus', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -26,16 +26,16 @@ describe('GET /api/v1/netatmo/homestatus', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/netatmo/homestatus');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(401);
     expect(data.code).toBe('UNAUTHORIZED');
   });
 
   it('should return 200 with data', async () => {
-    mockGetProxyHomestatus.mockResolvedValue({ body: { home: {} } } as any);
+    mockGetProxyHomestatus.mockResolvedValue({ rooms: [], data_freshness: 'LIVE' });
     const request = new Request('http://localhost:3000/api/v1/netatmo/homestatus');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);

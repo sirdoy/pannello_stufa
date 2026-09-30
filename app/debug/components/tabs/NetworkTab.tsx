@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { EndpointCard, PostEndpointCard } from '@/app/debug/components/ApiTab';
+import { EndpointCard, PostEndpointCard, type DebugApiResponse } from '@/app/debug/components/ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
@@ -13,8 +13,8 @@ interface NetworkTabProps {
 }
 
 export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabProps) {
-  const [getResponses, setGetResponses] = useState<Record<string, any>>({});
-  const [postResponses, setPostResponses] = useState<Record<string, any>>({});
+  const [getResponses, setGetResponses] = useState<Record<string, DebugApiResponse>>({});
+  const [postResponses, setPostResponses] = useState<Record<string, DebugApiResponse>>({});
   const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
   const [loadingPost, setLoadingPost] = useState<Record<string, boolean>>({});
   const [timings, setTimings] = useState<Record<string, number>>({});
@@ -46,7 +46,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
     }
   };
 
-  const callPostEndpoint = async (name: string, url: string, body: any) => {
+  const callPostEndpoint = async (name: string, url: string, body: Record<string, unknown>) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {

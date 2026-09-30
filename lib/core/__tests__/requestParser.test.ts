@@ -18,19 +18,20 @@ import {
   getOptionalPathParam,
 } from '../requestParser';
 import { ApiError, ERROR_CODES } from '../apiErrors';
+import { asNextRequest } from '@/__tests__/__utils__/routeHelpers';
 
 // Helper to create mock request
-function createMockRequest(body: any = null, contentType: string | undefined = 'application/json', url = 'https://example.com/api/test') {
-  return {
+function createMockRequest(body: unknown = null, contentType: string | undefined = 'application/json', url = 'https://example.com/api/test') {
+  return asNextRequest({
     headers: {
-      get: jest.fn((name: any) => {
+      get: jest.fn((name: string) => {
         if (name === 'content-type') return contentType;
         return null;
       }),
     },
     text: jest.fn(() => Promise.resolve(body ? JSON.stringify(body) : '')),
     url,
-  } as any;
+  });
 }
 
 describe('JSON Body Parsing', () => {
@@ -50,10 +51,10 @@ describe('JSON Body Parsing', () => {
     });
 
     it('should return default value for invalid JSON', async () => {
-      const request = {
+      const request = asNextRequest({
         headers: { get: () => 'application/json' },
         text: () => Promise.resolve('not valid json'),
-      } as any;
+      });
       const result = await parseJson(request, { fallback: true });
 
       expect(result).toEqual({ fallback: true });
@@ -69,23 +70,23 @@ describe('JSON Body Parsing', () => {
 
   describe('parseJsonOrThrow', () => {
     it('should parse valid JSON body', async () => {
-      const request = {
+      const request = asNextRequest({
         text: () => Promise.resolve(JSON.stringify({ name: 'test' })),
-      } as any;
+      });
       const result = await parseJsonOrThrow(request);
 
       expect(result).toEqual({ name: 'test' });
     });
 
     it('should throw on empty body', async () => {
-      const request = { text: () => Promise.resolve('') } as any;
+      const request = asNextRequest({ text: () => Promise.resolve('') });
 
       await expect(parseJsonOrThrow(request)).rejects.toThrow(ApiError);
       await expect(parseJsonOrThrow(request)).rejects.toThrow('Body richiesto');
     });
 
     it('should throw on invalid JSON', async () => {
-      const request = { text: () => Promise.resolve('invalid json') } as any;
+      const request = asNextRequest({ text: () => Promise.resolve('invalid json') });
 
       await expect(parseJsonOrThrow(request)).rejects.toThrow(ApiError);
       await expect(parseJsonOrThrow(request)).rejects.toThrow('JSON non valido');
@@ -147,8 +148,9 @@ describe('Validation Utilities', () => {
 
       try {
         validateRequired(data, ['name', 'email', 'age']);
-      } catch (error: any) {
-        expect(error.details.missing).toEqual(['name', 'email', 'age']);
+      } catch (error) {
+        if (!(error instanceof ApiError)) throw error;
+        expect(error.details?.missing).toEqual(['name', 'email', 'age']);
       }
     });
   });

@@ -11,6 +11,10 @@ import {
 } from '@/lib/pwa/offlineStateCache';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
+import type { formatCommandForDisplay } from '@/lib/pwa/backgroundSync';
+
+// useBackgroundSync exposes pendingCommands as unknown[]: they are formatCommandForDisplay() results
+type PendingCommand = ReturnType<typeof formatCommandForDisplay>;
 
 /**
  * Enhanced Offline Page
@@ -140,7 +144,7 @@ export default function OfflinePage() {
 
           {/* Command List */}
           <div className="mt-3 space-y-2">
-            {pendingCommands.slice(0, 3).map((cmd: any) => (
+            {(pendingCommands as PendingCommand[]).slice(0, 3).map((cmd) => (
               <div
                 key={cmd.id}
                 className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02]"

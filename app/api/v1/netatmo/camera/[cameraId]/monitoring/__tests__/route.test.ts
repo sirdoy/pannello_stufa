@@ -10,11 +10,12 @@ jest.mock('@/lib/auth/session', () => ({
 import { POST } from '../route';
 import * as netatmoProxy from '@/lib/netatmo/netatmoProxy';
 import { authSession } from '@/lib/auth/session';
+import type { SetMonitoringResponse } from '@/types/netatmoProxy';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetCameraMonitoring = jest.mocked(netatmoProxy.proxySetCameraMonitoring);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-const mockContext = { params: Promise.resolve({ cameraId: 'cam_001' }) };
+const mockContext = routeContext({ cameraId: 'cam_001' });
 
 /** Build a mock POST request whose body is readable via parseJson (jsdom-safe). */
 function makePostRequest(url: string, body: Record<string, unknown>) {
@@ -22,13 +23,13 @@ function makePostRequest(url: string, body: Record<string, unknown>) {
     headers: { get: (name: string) => name === 'content-type' ? 'application/json' : null },
     text: async () => JSON.stringify(body),
     nextUrl: { searchParams: new URLSearchParams() },
-  } as any;
+  };
 }
 
 describe('POST /api/v1/netatmo/camera/[cameraId]/monitoring', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -40,7 +41,7 @@ describe('POST /api/v1/netatmo/camera/[cameraId]/monitoring', () => {
       { monitoring: 'on' }
     );
 
-    const response = await POST(request, mockContext as any);
+    const response = await POST(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -48,15 +49,15 @@ describe('POST /api/v1/netatmo/camera/[cameraId]/monitoring', () => {
   });
 
   it('should return 202 with suggested_poll_delay_s and call proxy with cameraId from path', async () => {
-    const mockData = { status: 'ok' };
-    mockSetCameraMonitoring.mockResolvedValue(mockData as any);
+    const mockData: SetMonitoringResponse = { camera_id: 'cam_001', monitoring: 'on', status: 'applied' };
+    mockSetCameraMonitoring.mockResolvedValue(mockData);
 
     const request = makePostRequest(
       'http://localhost:3000/api/v1/netatmo/camera/cam_001/monitoring',
       { monitoring: 'on' }
     );
 
-    const response = await POST(request, mockContext as any);
+    const response = await POST(asNextRequest(request), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(202);

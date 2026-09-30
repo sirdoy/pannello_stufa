@@ -43,6 +43,15 @@ type TargetMode = 'all' | 'specific';
 type TemplateKey = 'custom' | 'error_alert' | 'scheduler_success' | 'maintenance_reminder' | 'critical_test' | 'low_priority_test';
 type Priority = 'high' | 'normal' | 'low';
 
+interface TestNotificationRequest {
+  deviceToken?: string;
+  broadcast?: boolean;
+  customTitle?: string;
+  customBody?: string;
+  template?: TemplateKey;
+  priority?: Priority;
+}
+
 export default function TestNotificationPage() {
   const router = useRouter();
   const [devices, setDevices] = useState<Device[]>([]);
@@ -131,7 +140,7 @@ export default function TestNotificationPage() {
     setResult(null);
 
     try {
-      const body: any = {};
+      const body: TestNotificationRequest = {};
 
       // Target selection
       if (targetMode === 'specific' && selectedDevice) {

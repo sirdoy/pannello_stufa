@@ -14,6 +14,7 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockFritzboxClient = jest.mocked(fritzboxClient);
@@ -22,19 +23,18 @@ const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
 describe('GET /api/v1/fritzbox/bandwidth', () => {
   let mockRequest: Request;
-  const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  const mockSession = mockAppSession({ sub: 'auth0|123', email: 'test@test.com' });
   const mockBandwidth = {
-    uploadCurrent: 1024,
-    downloadCurrent: 5120,
-    uploadMax: 10240,
-    downloadMax: 51200,
+    download: 5120,
+    upload: 1024,
+    timestamp: 1711324800000,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/bandwidth');
     // Default: authenticated user
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockSession);
     // Default: rate limit allows
     mockCheckRateLimit.mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
     // Mock console methods to suppress output
@@ -45,7 +45,7 @@ describe('GET /api/v1/fritzbox/bandwidth', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -56,7 +56,7 @@ describe('GET /api/v1/fritzbox/bandwidth', () => {
   it('should return 200 with bandwidth data when rate limit allows and cache provides data', async () => {
     mockGetCachedData.mockResolvedValue(mockBandwidth);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -71,7 +71,7 @@ describe('GET /api/v1/fritzbox/bandwidth', () => {
   it('should return 429 with RATE_LIMITED code and retryAfter when rate limit exceeded', async () => {
     mockCheckRateLimit.mockResolvedValue({ allowed: false, suppressedCount: 1, nextAllowedIn: 30 });
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(429);
@@ -86,7 +86,7 @@ describe('GET /api/v1/fritzbox/bandwidth', () => {
   it('should call getCachedData with correct cache key and fetch function', async () => {
     mockGetCachedData.mockResolvedValue(mockBandwidth);
 
-    await GET(mockRequest as any, {} as any);
+    await GET(asNextRequest(mockRequest), routeContext());
 
     expect(mockGetCachedData).toHaveBeenCalledWith(
       'bandwidth',
@@ -95,7 +95,7 @@ describe('GET /api/v1/fritzbox/bandwidth', () => {
 
     // Verify the fetch function is fritzboxClient.getBandwidth
     const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
-    mockFritzboxClient.getBandwidth.mockResolvedValue(mockBandwidth as any);
+    mockFritzboxClient.getBandwidth.mockResolvedValue(mockBandwidth);
     await fetchFn?.();
     expect(mockFritzboxClient.getBandwidth).toHaveBeenCalled();
   });
@@ -104,7 +104,7 @@ describe('GET /api/v1/fritzbox/bandwidth', () => {
     const error = new Error('Bandwidth query failed');
     mockGetCachedData.mockRejectedValue(error);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(500);

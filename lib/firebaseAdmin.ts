@@ -12,6 +12,7 @@
 
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
 import { getMessaging, Messaging } from 'firebase-admin/messaging';
+import type { SendResponse } from 'firebase-admin/messaging';
 import { getDatabase, Database } from 'firebase-admin/database';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
 import { logNotification } from './notifications/notificationLogger';
@@ -337,6 +338,30 @@ interface NotificationPayload {
   actions?: NotificationActionDef[];
 }
 
+/** Per-token outcome: FCM SendResponse, or the raw error thrown by a single-token send */
+export type PushSendResponse = SendResponse | { success: false; error: unknown };
+
+/** Result of sendPushNotification */
+export interface PushSendResult {
+  success: boolean;
+  successCount: number;
+  failureCount: number;
+  responses: PushSendResponse[];
+  invalidTokensRemoved?: number;
+}
+
+/** sendNotificationToUser outcome when nothing is sent (no tokens, or filtered by preferences) */
+export interface UserNotificationSkipped {
+  success: false;
+  error: 'NO_TOKENS' | 'FILTERED';
+  message: string;
+  reason?: string | null;
+  stats?: Awaited<ReturnType<typeof filterNotificationByPreferences>>['stats'];
+}
+
+/** Result of sendNotificationToUser */
+export type UserNotificationResult = PushSendResult | UserNotificationSkipped;
+
 /**
  * Helper: Get category for notification actions based on notification type
  * Used for iOS aps.category and Android clickAction
@@ -373,7 +398,7 @@ export async function sendPushNotification(
   tokens: string | string[],
   notification: NotificationPayload,
   userId: string | null = null
-): Promise<any> {
+): Promise<PushSendResult> {
   try {
     // Inizializza Admin SDK
     initializeFirebaseAdmin();
@@ -649,7 +674,7 @@ export async function sendPushNotification(
  * @param {string} userId - User ID (session sub)
  * @param {Object} notification - Dati notifica
  */
-export async function sendNotificationToUser(userId: string, notification: NotificationPayload): Promise<any> {
+export async function sendNotificationToUser(userId: string, notification: NotificationPayload): Promise<UserNotificationResult> {
   try {
     // Recupera tutti i token dell'utente usando Admin SDK
     const tokensData = await adminDbGet(`users/${userId}/fcmTokens`);

@@ -1,31 +1,61 @@
 'use client';
 
-import { forwardRef, useEffect, useState, useRef, type ReactNode } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { forwardRef, useEffect, useState, useRef, type ForwardedRef, type ReactElement, type ReactNode, type RefAttributes } from 'react';
+import {
+  useForm,
+  Controller,
+  type Control,
+  type DefaultValues,
+  type FieldErrors,
+  type FieldValues,
+  type FormState,
+  type Path,
+  type UseFormRegister,
+  type UseFormSetValue,
+  type UseFormWatch,
+} from 'react-hook-form';
+import type { ZodTypeAny } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, Check, X } from 'lucide-react';
-import Modal from './Modal';
+import Modal, { type ModalProps } from './Modal';
 import Button from './Button';
 import { useDepsChanged } from '@/lib/hooks/useDepsChanged';
 import { cn } from '@/lib/utils/cn';
 
-export interface FormModalProps {
+/**
+ * Form context passed to the FormModal children render prop
+ */
+export interface FormModalRenderContext<TValues extends FieldValues = FieldValues> {
+  control: Control<TValues>;
+  formState: FormState<TValues>;
+  register: UseFormRegister<TValues>;
+  setValue: UseFormSetValue<TValues>;
+  watch: UseFormWatch<TValues>;
+  isDisabled: boolean;
+  errors: FieldErrors<TValues>;
+}
+
+export interface FormModalProps<TValues extends FieldValues = FieldValues> {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => Promise<void> | void;
+  onSubmit: (data: TValues) => Promise<void> | void;
   title: string;
   description?: string;
-  fields: any[];
-  initialValues?: any;
-  schema?: any;
+  defaultValues?: DefaultValues<NoInfer<TValues>>;
+  validationSchema?: ZodTypeAny;
+  size?: ModalProps['size'];
+  children?: ReactNode | ((form: FormModalRenderContext<TValues>) => ReactNode);
   submitLabel?: string;
   cancelLabel?: string;
   icon?: ReactNode;
   showSuccessOverlay?: boolean;
   successMessage?: string;
   className?: string;
-  [key: string]: any;
 }
+
+type FormModalComponent = (<TValues extends FieldValues = FieldValues>(
+  props: FormModalProps<TValues> & RefAttributes<HTMLDivElement>
+) => ReactElement | null) & { displayName?: string };
 
 /**
  * FormModal Component - Ember Noir Design System
@@ -82,7 +112,7 @@ export interface FormModalProps {
 /**
  * Internal ErrorSummary component - displays all errors at top of form
  */
-function ErrorSummary({ errors }: { errors: Record<string, any> }) {
+function ErrorSummary({ errors }: { errors: object }) {
   const errorList = Object.entries(errors).map(([field, error]) => ({
     field,
     message: error instanceof Error ? error.message : 'Invalid value',
@@ -153,14 +183,14 @@ function SuccessOverlay({ message }: { message?: string }) {
 /**
  * FormModal main component
  */
-const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
+const FormModal = forwardRef(function FormModal<TValues extends FieldValues = FieldValues>(
   {
     isOpen,
     onClose,
     onSubmit,
     title,
     description,
-    defaultValues = {},
+    defaultValues = {} as DefaultValues<TValues>,
     validationSchema,
     submitLabel = 'Save',
     cancelLabel = 'Cancel',
@@ -169,8 +199,8 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
     children,
     className,
     ...props
-  },
-  ref
+  }: FormModalProps<TValues>,
+  ref: ForwardedRef<HTMLDivElement>
 ) {
   // Form state: 'idle' | 'submitting' | 'success' | 'error'
   const [formState, setFormState] = useState('idle');
@@ -185,7 +215,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   const resolver = validationSchema ? zodResolver(validationSchema) : undefined;
 
   // Initialize React Hook Form
-  const form = useForm({
+  const form = useForm<TValues>({
     defaultValues,
     resolver,
     mode: 'onBlur', // Validate on blur for touched fields
@@ -235,7 +265,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   };
 
   // Trigger shake animation on invalid fields
-  const triggerShakeAnimation = (validationErrors: Record<string, any>) => {
+  const triggerShakeAnimation = (validationErrors: FieldErrors<TValues>) => {
     if (!formRef.current) return;
 
     const errorFields = Object.keys(validationErrors || errors);
@@ -259,7 +289,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   };
 
   // Handle form submission
-  const onFormSubmit = async (data: any) => {
+  const onFormSubmit = async (data: TValues) => {
     setHasSubmitted(true);
     setFormState('submitting');
 
@@ -279,7 +309,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
   };
 
   // Handle validation errors on submit
-  const onFormError = (validationErrors: Record<string, any>) => {
+  const onFormError = (validationErrors: FieldErrors<TValues>) => {
     setHasSubmitted(true);
 
     // Trigger shake animation on invalid fields
@@ -288,12 +318,12 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
     // Focus first error field
     const firstErrorField = Object.keys(validationErrors)[0];
     if (firstErrorField) {
-      setFocus(firstErrorField);
+      setFocus(firstErrorField as Path<TValues>);
     }
   };
 
   // Create form context for children render prop
-  const formContext = {
+  const formContext: FormModalRenderContext<TValues> = {
     control,
     formState: rhfFormState,
     register,
@@ -365,7 +395,7 @@ const FormModal = forwardRef<HTMLDivElement, FormModalProps>(function FormModal(
       </div>
     </Modal>
   );
-});
+}) as FormModalComponent;
 
 // Named exports
 export { FormModal, ErrorSummary, SuccessOverlay };

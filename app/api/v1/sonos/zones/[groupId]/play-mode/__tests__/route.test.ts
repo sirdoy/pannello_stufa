@@ -10,38 +10,35 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET, PUT } from '../route';
 import * as sonosProxy from '@/lib/sonos/sonosProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { SonosCommandOkResponse, SonosPlayModeResponse } from '@/types/sonosProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetPlayMode = jest.mocked(sonosProxy.getPlayMode);
 const mockSetPlayMode = jest.mocked(sonosProxy.setPlayMode);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
-const mockContext = { params: Promise.resolve({ groupId: 'RINCON_123' }) };
+const mockContext = routeContext({ groupId: 'RINCON_123' });
 
-const mockPlayModeData = { mode: 'NORMAL' };
-const mockCommandResponse = {
-  command: 'set_play_mode' as const,
-  status: 'accepted' as const,
-  group_id: 'RINCON_123',
-};
+const mockPlayModeData: SonosPlayModeResponse = { group_id: 'RINCON_123', play_mode: 'NORMAL' };
+const mockCommandResponse: SonosCommandOkResponse = { data_confirmed: true };
 
 /** Build a mock GET request. */
 function makeGetRequest(url: string) {
-  return new Request(url) as any;
+  return asNextRequest(new Request(url));
 }
 
 /** Build a mock PUT request whose body is readable via parseJson (jsdom-safe). */
 function makePutRequest(url: string, body: Record<string, unknown>) {
-  return {
+  return asNextRequest({
     headers: { get: (name: string) => name === 'content-type' ? 'application/json' : null },
     text: async () => JSON.stringify(body),
     nextUrl: { searchParams: new URLSearchParams() },
-  } as any;
+  });
 }
 
 describe('GET /api/v1/sonos/zones/[groupId]/play-mode', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -50,15 +47,15 @@ describe('GET /api/v1/sonos/zones/[groupId]/play-mode', () => {
     mockGetSession.mockResolvedValue(null);
     const req = makeGetRequest('http://localhost:3000/api/v1/sonos/zones/RINCON_123/play-mode');
 
-    const response = await GET(req, mockContext as any);
+    const response = await GET(req, mockContext);
     expect(response.status).toBe(401);
   });
 
   it('should return 200 with play mode data', async () => {
-    mockGetPlayMode.mockResolvedValue(mockPlayModeData as any);
+    mockGetPlayMode.mockResolvedValue(mockPlayModeData);
     const req = makeGetRequest('http://localhost:3000/api/v1/sonos/zones/RINCON_123/play-mode');
 
-    const response = await GET(req, mockContext as any);
+    const response = await GET(req, mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -70,7 +67,7 @@ describe('GET /api/v1/sonos/zones/[groupId]/play-mode', () => {
 describe('PUT /api/v1/sonos/zones/[groupId]/play-mode', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -79,15 +76,15 @@ describe('PUT /api/v1/sonos/zones/[groupId]/play-mode', () => {
     mockGetSession.mockResolvedValue(null);
     const req = makePutRequest('http://localhost:3000/api/v1/sonos/zones/RINCON_123/play-mode', { mode: 'SHUFFLE' });
 
-    const response = await PUT(req, mockContext as any);
+    const response = await PUT(req, mockContext);
     expect(response.status).toBe(401);
   });
 
   it('should call setPlayMode with groupId and full body and return 202', async () => {
-    mockSetPlayMode.mockResolvedValue(mockCommandResponse as any);
+    mockSetPlayMode.mockResolvedValue(mockCommandResponse);
     const req = makePutRequest('http://localhost:3000/api/v1/sonos/zones/RINCON_123/play-mode', { mode: 'SHUFFLE' });
 
-    const response = await PUT(req, mockContext as any);
+    const response = await PUT(req, mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(202);

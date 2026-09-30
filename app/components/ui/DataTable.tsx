@@ -1,6 +1,17 @@
 'use client';
 
-import { forwardRef, useMemo, useState, useEffect, useRef, type ReactNode } from 'react';
+import {
+  forwardRef,
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+  type ForwardedRef,
+  type HTMLAttributes,
+  type ReactElement,
+  type ReactNode,
+  type RefAttributes,
+} from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,15 +24,19 @@ import {
   type SortingState,
   type ColumnFiltersState,
   type Row,
+  type RowSelectionState,
   type Table,
+  type TableOptions,
 } from '@tanstack/react-table';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
-export interface DataTableProps<TData> {
-  columns: ColumnDef<TData>[];
-  data: TData[];
+export interface DataTableProps<TData>
+  extends HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof dataTableVariants> {
+  columns: ColumnDef<TData>[] | undefined;
+  data: TData[] | undefined;
   variant?: 'default' | 'compact' | 'striped';
   showPagination?: boolean;
   pageSize?: number;
@@ -36,12 +51,27 @@ export interface DataTableProps<TData> {
   initialSorting?: SortingState;
   initialFilters?: ColumnFiltersState;
   className?: string;
-  [key: string]: any;
+  getRowId?: TableOptions<TData>['getRowId'];
+  selectionMode?: 'none' | 'single' | 'multi';
+  onSelectionChange?: (selection: RowSelectionState) => void;
+  selectedRows?: RowSelectionState;
+  enablePagination?: boolean;
+  pageSizeOptions?: number[];
+  showRowCount?: boolean;
+  onPageChange?: (pageIndex: number) => void;
+  bulkActions?: DataTableBulkAction[];
+  onBulkAction?: (action: string, selectedRows: Row<TData>[]) => void;
+  enableExpansion?: boolean;
+  getRowCanExpand?: (row: Row<TData>) => boolean;
 }
+
+type DataTableComponent = (<TData>(
+  props: DataTableProps<TData> & RefAttributes<HTMLDivElement>
+) => ReactElement | null) & { displayName?: string };
 import Checkbox from './Checkbox';
 import Button from './Button';
 import Text from './Text';
-import DataTableToolbar from './DataTableToolbar';
+import DataTableToolbar, { type DataTableBulkAction } from './DataTableToolbar';
 import DataTableRow from './DataTableRow';
 
 /**
@@ -184,7 +214,7 @@ function SortIndicator({ isSorted, direction }: { isSorted: boolean | string; di
  * columns={columns}
  * />
  */
-const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataTable(
+const DataTable = forwardRef(function DataTable<TData>(
   {
     data: dataProp,
     columns: columnsProp,
@@ -209,8 +239,8 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
     renderExpandedContent,
     getRowCanExpand,
     ...props
-  },
-  ref
+  }: DataTableProps<TData>,
+  ref: ForwardedRef<HTMLDivElement>
 ) {
   // Stable references required by TanStack Table (new objects = state reset)
   const data = useMemo(() => dataProp ?? [], [dataProp]);
@@ -230,7 +260,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   });
 
   // Selection state (internal for uncontrolled mode)
-  const [internalRowSelection, setInternalRowSelection] = useState({});
+  const [internalRowSelection, setInternalRowSelection] = useState<RowSelectionState>({});
 
   // Expansion state
   const [expanded, setExpanded] = useState({});
@@ -266,7 +296,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
     return {
       id: 'expand',
       header: () => null,
-      cell: ({ row }: { row: Row<any> }) =>
+      cell: ({ row }: { row: Row<TData> }) =>
         row.getCanExpand() ? (
           <button
             onClick={(e) => {
@@ -296,7 +326,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
     if (selectionMode === 'none') return null;
     return {
       id: 'select',
-      header: ({ table }: { table: Table<any> }) =>
+      header: ({ table }: { table: Table<TData> }) =>
         selectionMode === 'multi' ? (
           <Checkbox
             checked={table.getIsAllPageRowsSelected()}
@@ -306,7 +336,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
             size="sm"
           />
         ) : null,
-      cell: ({ row }: { row: Row<any> }) => (
+      cell: ({ row }: { row: Row<TData> }) => (
         <div
           onClick={(e) => e.stopPropagation()}
           className="flex items-center justify-center"
@@ -338,7 +368,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
   const extraColumnsCount = (selectionColumn ? 1 : 0) + (expansionColumn ? 1 : 0);
 
   // Row click handler
-  const handleRowClick = (row: Row<any>) => {
+  const handleRowClick = (row: Row<TData>) => {
     if (onRowClick) {
       onRowClick(row);
     }
@@ -699,7 +729,7 @@ const DataTable = forwardRef<HTMLDivElement, DataTableProps<any>>(function DataT
       </div>
     </div>
   );
-});
+}) as DataTableComponent;
 
 DataTable.displayName = 'DataTable';
 

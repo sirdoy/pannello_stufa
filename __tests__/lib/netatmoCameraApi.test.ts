@@ -11,6 +11,10 @@ import NETATMO_CAMERA_API, {
   getSubTypeIcon,
 } from '@/lib/netatmo/netatmoCameraApi';
 
+/** Untyped runtime payloads may carry null/undefined: widen the parameter to exercise the fallbacks. */
+const withNullableInput = (fn: (type: string) => string) =>
+  fn as (type: string | null | undefined) => string;
+
 describe('netatmoCameraApi display helpers', () => {
   describe('getCameraTypeName', () => {
     it('should return correct type names', () => {
@@ -21,8 +25,8 @@ describe('netatmoCameraApi display helpers', () => {
 
     it('should return type as fallback for unknown types', () => {
       expect(getCameraTypeName('UNKNOWN')).toBe('UNKNOWN');
-      expect(getCameraTypeName(null as any)).toBe('Camera');
-      expect(getCameraTypeName(undefined as any)).toBe('Camera');
+      expect(withNullableInput(getCameraTypeName)(null)).toBe('Camera');
+      expect(withNullableInput(getCameraTypeName)(undefined)).toBe('Camera');
     });
   });
 
@@ -38,7 +42,7 @@ describe('netatmoCameraApi display helpers', () => {
 
     it('should return type as fallback for unknown types', () => {
       expect(getEventTypeName('unknown')).toBe('unknown');
-      expect(getEventTypeName(null as any)).toBe('Evento');
+      expect(withNullableInput(getEventTypeName)(null)).toBe('Evento');
     });
   });
 
@@ -54,7 +58,7 @@ describe('netatmoCameraApi display helpers', () => {
 
     it('should return camera icon for unknown types', () => {
       expect(getEventIcon('unknown')).toBe('📷');
-      expect(getEventIcon(null as any)).toBe('📷');
+      expect(withNullableInput(getEventIcon)(null)).toBe('📷');
     });
   });
 
@@ -94,10 +98,11 @@ describe('netatmoCameraApi display helpers', () => {
     });
 
     it('should not export deleted API functions', () => {
-      expect((NETATMO_CAMERA_API as any).getCamerasData).toBeUndefined();
-      expect((NETATMO_CAMERA_API as any).parseCameras).toBeUndefined();
-      expect((NETATMO_CAMERA_API as any).getLiveStreamUrl).toBeUndefined();
-      expect((NETATMO_CAMERA_API as any).getEventSnapshotUrl).toBeUndefined();
+      const api: Record<string, unknown> = { ...NETATMO_CAMERA_API };
+      expect(api.getCamerasData).toBeUndefined();
+      expect(api.parseCameras).toBeUndefined();
+      expect(api.getLiveStreamUrl).toBeUndefined();
+      expect(api.getEventSnapshotUrl).toBeUndefined();
     });
   });
 });

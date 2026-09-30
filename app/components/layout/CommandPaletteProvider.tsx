@@ -2,7 +2,7 @@
 
 import { useState, useEffect, createContext, useContext, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import CommandPalette from '@/app/components/ui/CommandPalette';
+import CommandPalette, { type CommandPaletteProps } from '@/app/components/ui/CommandPalette';
 import { getDeviceCommands } from '@/lib/commands/deviceCommands';
 import {
   Home,
@@ -16,10 +16,14 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
+type CommandPaletteGroup = NonNullable<CommandPaletteProps['commands']>[number];
+
 interface CommandPaletteContextValue {
   open: boolean;
   setOpen: (open: boolean) => void;
-  commands: any[];
+  openPalette: () => void;
+  closePalette: () => void;
+  commands: CommandPaletteGroup[];
 }
 
 /**
@@ -47,7 +51,7 @@ export interface CommandPaletteProviderProps {
   /** App content */
   children: ReactNode;
   /** Custom commands (merged with defaults) */
-  commands?: any[];
+  commands?: CommandPaletteGroup[];
 }
 
 /**

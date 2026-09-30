@@ -13,6 +13,8 @@ import Popover, {
   PopoverContent,
   PopoverClose,
   PopoverArrow,
+  type PopoverProps,
+  type PopoverContentProps,
 } from '../Popover';
 
 expect.extend(toHaveNoViolations);
@@ -26,7 +28,7 @@ const TestPopover = ({
   arrow = false,
   children,
   ...props
-}: any) => (
+}: PopoverProps & Pick<PopoverContentProps, 'size' | 'arrow'>) => (
   <Popover triggerMode={triggerMode} {...props}>
     <Popover.Trigger asChild>
       <button type="button" data-testid="popover-trigger">Open Popover</button>
@@ -229,7 +231,7 @@ describe('Popover Component', () => {
       ['sm', 'max-w-xs'],
       ['md', 'max-w-sm'],
       ['lg', 'max-w-md'],
-    ])('applies %s size variant with %s class', async (size, expectedClass) => {
+    ] as const)('applies %s size variant with %s class', async (size, expectedClass) => {
       const user = userEvent.setup();
 
       render(<TestPopover size={size} />);

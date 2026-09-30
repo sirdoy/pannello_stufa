@@ -259,7 +259,7 @@ export default function ApiKeysPage() {
         submitLabel="Crea"
         cancelLabel="Annulla"
       >
-        {({ control }: any) => (
+        {({ control }) => (
           <Controller
             name="name"
             control={control}

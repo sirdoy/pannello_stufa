@@ -8,11 +8,29 @@ import Text from '@/app/components/ui/Text';
 import Badge from '@/app/components/ui/Badge';
 import { Copy, Check, ChevronDown, ChevronUp, Clock } from 'lucide-react';
 
+/**
+ * Parsed JSON body of a debug API call (or `{ error }` when the fetch failed)
+ */
+export interface DebugApiResponse {
+  error?: unknown;
+  success?: unknown;
+  [key: string]: unknown;
+}
+
+/**
+ * True when the response carries an `error` or an explicit falsy `success`
+ */
+function responseHasError(response: unknown): boolean {
+  if (!response || typeof response !== 'object') return false;
+  const { error, success } = response as DebugApiResponse;
+  return Boolean(error || (!success && success !== undefined));
+}
+
 interface EndpointCardProps {
   name: string;
   url: string;
   externalUrl?: string;
-  response: any;
+  response: unknown;
   loading: boolean;
   timing?: number;
   onRefresh: () => void;
@@ -35,7 +53,7 @@ export function EndpointCard({
   isCopied,
 }: EndpointCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const hasError = response?.error || (response && !response.success && response.success !== undefined);
+  const hasError = responseHasError(response);
 
   return (
     <div
@@ -65,7 +83,7 @@ export function EndpointCard({
                 Error
               </Badge>
             )}
-            {response && !hasError && (
+            {!!response && !hasError && (
               <Badge variant="sage" size="sm">
                 ✓
               </Badge>
@@ -100,7 +118,7 @@ export function EndpointCard({
         </div>
       </div>
 
-      {isExpanded && response && <JsonDisplay data={response} />}
+      {isExpanded && !!response && <JsonDisplay data={response} />}
     </div>
   );
 }
@@ -120,12 +138,12 @@ interface ApiParam {
   max?: number;
 }
 
-interface PostEndpointCardProps {
+export interface PostEndpointCardProps {
   name: string;
   url: string;
   externalUrl?: string;
   params?: ApiParam[];
-  response: any;
+  response: unknown;
   loading: boolean;
   timing?: number;
   onExecute: (formValues: Record<string, string>) => void;
@@ -149,7 +167,7 @@ export function PostEndpointCard({
     params.reduce((acc, param) => ({ ...acc, [param.name]: param.defaultValue }), {} as Record<string, string>)
   );
   const [isExpanded, setIsExpanded] = useState(false);
-  const hasError = response?.error || (response && !response.success && response.success !== undefined);
+  const hasError = responseHasError(response);
 
   const handleExecute = () => {
     onExecute(formValues);
@@ -188,7 +206,7 @@ export function PostEndpointCard({
                 Error
               </Badge>
             )}
-            {response && !hasError && (
+            {!!response && !hasError && (
               <Badge variant="sage" size="sm">
                 ✓
               </Badge>
@@ -254,7 +272,7 @@ export function PostEndpointCard({
           )}
         </div>
         <div className="flex items-center gap-2">
-          {response && (
+          {!!response && (
             <Button onClick={() => setIsExpanded(!isExpanded)} size="sm" variant="ghost">
               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </Button>
@@ -265,7 +283,7 @@ export function PostEndpointCard({
         </div>
       </div>
 
-      {isExpanded && response && <JsonDisplay data={response} />}
+      {isExpanded && !!response && <JsonDisplay data={response} />}
     </div>
   );
 }
@@ -274,7 +292,7 @@ export function PostEndpointCard({
  * JsonDisplay - Formatted JSON with copy button
  */
 interface JsonDisplayProps {
-  data: any;
+  data: unknown;
 }
 
 function JsonDisplay({ data }: JsonDisplayProps) {

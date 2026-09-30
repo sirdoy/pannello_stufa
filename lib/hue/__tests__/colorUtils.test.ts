@@ -10,6 +10,9 @@ import {
 } from '../colorUtils';
 import type { HueLight } from '@/types/hueProxy';
 
+/** Callers may hold a missing light at runtime: widen the parameter to exercise the guard */
+const supportsColorUnchecked = supportsColor as (light: HueLight | null | undefined) => boolean;
+
 describe('colorUtils', () => {
   describe('rgbToXY', () => {
     it('should convert pure red (255, 0, 0) to XY', () => {
@@ -126,11 +129,11 @@ describe('colorUtils', () => {
     });
 
     it('should return false for null light', () => {
-      expect(supportsColor(null as any)).toBe(false);
+      expect(supportsColorUnchecked(null)).toBe(false);
     });
 
     it('should return false for undefined light', () => {
-      expect(supportsColor(undefined as any)).toBe(false);
+      expect(supportsColorUnchecked(undefined)).toBe(false);
     });
   });
 

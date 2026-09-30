@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentProps } from 'react';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Heading from '@/app/components/ui/Heading';
@@ -49,7 +49,7 @@ interface TrendsSummary {
 }
 
 interface Trends {
-  daily: any[];
+  daily: NonNullable<ComponentProps<typeof DeliveryChart>['data']>;
   summary: TrendsSummary;
 }
 

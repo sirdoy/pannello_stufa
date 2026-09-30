@@ -1,19 +1,20 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import HueTab from '../HueTab';
+import type { PostEndpointCardProps } from '@/app/debug/components/ApiTab';
 
 jest.mock('@/app/debug/components/ApiTab', () => ({
   EndpointCard: () => <div data-testid="endpoint-card" />,
-  PostEndpointCard: ({ name, url, params, onExecute }: any) => {
+  PostEndpointCard: ({ name, url, params, onExecute }: Pick<PostEndpointCardProps, 'name' | 'url' | 'params' | 'onExecute'>) => {
     const defaults = (params ?? []).reduce(
-      (acc: Record<string, string>, p: any) => ({ ...acc, [p.name]: p.defaultValue || 'test-id' }),
+      (acc: Record<string, string>, p) => ({ ...acc, [p.name]: p.defaultValue || 'test-id' }),
       {} as Record<string, string>
     );
     return (
       <div data-testid={`post-card-${name.toLowerCase().replace(/\s+/g, '-')}`}>
         <span data-testid={`url-${name.toLowerCase().replace(/\s+/g, '-')}`}>{url}</span>
         <span data-testid={`params-${name.toLowerCase().replace(/\s+/g, '-')}`}>
-          {(params ?? []).map((p: any) => p.name).join(',')}
+          {(params ?? []).map((p) => p.name).join(',')}
         </span>
         <button onClick={() => onExecute(defaults)}>Execute {name}</button>
       </div>
@@ -34,7 +35,7 @@ global.fetch = mockFetch;
 // component's non-memoized useEffect dependencies (pre-existing issue).
 const originalError = console.error.bind(console.error);
 beforeAll(() => {
-  console.error = (...args: any[]) => {
+  console.error = (...args: unknown[]) => {
     if (typeof args[0] === 'string' && args[0].includes('Maximum update depth')) return;
     originalError(...args);
   };

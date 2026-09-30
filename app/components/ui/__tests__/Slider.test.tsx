@@ -5,14 +5,14 @@ import Slider from '../Slider';
 
 // Mock ResizeObserver for Radix Slider (uses it for thumb positioning)
 global.ResizeObserver = class ResizeObserver {
-  callback: any;
-  constructor(callback: any) {
+  callback: ResizeObserverCallback;
+  constructor(callback: ResizeObserverCallback) {
     this.callback = callback;
   }
   observe() {}
   unobserve() {}
   disconnect() {}
-} as any;
+};
 
 // Mock setPointerCapture/releasePointerCapture for JSDOM
 // Radix Slider uses these for drag interactions

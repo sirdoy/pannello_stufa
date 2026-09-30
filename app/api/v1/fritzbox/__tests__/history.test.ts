@@ -17,14 +17,15 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../history/route';
 import { fritzboxClient } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 import type { DeviceEvent } from '@/app/components/devices/network/types';
 
 const mockGetSession = jest.mocked(authSession.getSession);
-const mockClientGetDeviceEvents = jest.fn();
+const mockClientGetDeviceEvents = jest.mocked(fritzboxClient.getDeviceEvents);
 
 describe('GET /api/v1/fritzbox/history', () => {
   let mockRequest: Request;
-  const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
+  const mockSession = mockAppSession({ sub: 'auth0|123', email: 'test@test.com' });
   const now = Date.now();
 
   // Shape produced by fritzboxClient.getDeviceEvents from backend DeviceEventRecord
@@ -36,8 +37,7 @@ describe('GET /api/v1/fritzbox/history', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
-    (fritzboxClient as any).getDeviceEvents = mockClientGetDeviceEvents;
+    mockGetSession.mockResolvedValue(mockSession);
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -45,7 +45,7 @@ describe('GET /api/v1/fritzbox/history', () => {
     mockClientGetDeviceEvents.mockResolvedValue(mockEvents);
 
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history');
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(mockClientGetDeviceEvents).toHaveBeenCalledWith(24, undefined);
@@ -64,7 +64,7 @@ describe('GET /api/v1/fritzbox/history', () => {
     mockClientGetDeviceEvents.mockResolvedValue([]);
 
     mockRequest = new Request(`http://localhost:3000/api/v1/fritzbox/history?range=${range}`);
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(mockClientGetDeviceEvents).toHaveBeenCalledWith(hours, undefined);
@@ -73,10 +73,10 @@ describe('GET /api/v1/fritzbox/history', () => {
   });
 
   test('device filter is forwarded to the backend as mac', async () => {
-    mockClientGetDeviceEvents.mockResolvedValue([mockEvents[1]]);
+    mockClientGetDeviceEvents.mockResolvedValue(mockEvents.slice(1, 2));
 
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history?device=AA:BB:CC:DD:EE:FF');
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(mockClientGetDeviceEvents).toHaveBeenCalledWith(24, 'AA:BB:CC:DD:EE:FF');
@@ -86,7 +86,7 @@ describe('GET /api/v1/fritzbox/history', () => {
 
   test('malformed device filter returns no events without calling the backend', async () => {
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history?device=not-a-mac');
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(mockClientGetDeviceEvents).not.toHaveBeenCalled();
@@ -99,7 +99,7 @@ describe('GET /api/v1/fritzbox/history', () => {
     mockClientGetDeviceEvents.mockResolvedValue([]);
 
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/history');
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);

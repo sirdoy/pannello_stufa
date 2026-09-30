@@ -10,13 +10,14 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
+import type { HueGroup } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetGroup = jest.mocked(hueProxy.getGroup);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('GET /api/v1/hue/groups/[groupId]', () => {
-  const mockGroupData = {
+  const mockGroupData: HueGroup = {
     group_id: '1',
     name: 'Living Room',
     type: 'Room',
@@ -31,7 +32,7 @@ describe('GET /api/v1/hue/groups/[groupId]', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -40,20 +41,16 @@ describe('GET /api/v1/hue/groups/[groupId]', () => {
     mockGetSession.mockResolvedValue(null);
     const req = new Request('http://localhost:3000/api/v1/hue/groups/1');
 
-    const response = await GET(req as any, {
-      params: Promise.resolve({ groupId: '1' }),
-    } as any);
+    const response = await GET(asNextRequest(req), routeContext({ groupId: '1' }));
 
     expect(response.status).toBe(401);
   });
 
   it('should return 200 with single group data', async () => {
-    mockGetGroup.mockResolvedValue(mockGroupData as any);
+    mockGetGroup.mockResolvedValue(mockGroupData);
     const req = new Request('http://localhost:3000/api/v1/hue/groups/1');
 
-    const response = await GET(req as any, {
-      params: Promise.resolve({ groupId: '1' }),
-    } as any);
+    const response = await GET(asNextRequest(req), routeContext({ groupId: '1' }));
     const data = await response.json();
 
     expect(response.status).toBe(200);

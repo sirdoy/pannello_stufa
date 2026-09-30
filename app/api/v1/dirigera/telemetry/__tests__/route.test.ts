@@ -10,10 +10,10 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as dirigeraProxy from '@/lib/dirigera/dirigeraProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetTelemetry = jest.mocked(dirigeraProxy.getTelemetry);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockTelemetryData = {
   telemetry: [
@@ -27,7 +27,7 @@ const mockTelemetryData = {
 describe('GET /api/v1/dirigera/telemetry', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -35,16 +35,16 @@ describe('GET /api/v1/dirigera/telemetry', () => {
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/dirigera/telemetry');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(401);
     expect(data.code).toBe('UNAUTHORIZED');
   });
 
   it('returns 200 with telemetry data when authenticated (no query params)', async () => {
-    mockGetTelemetry.mockResolvedValue(mockTelemetryData as any);
+    mockGetTelemetry.mockResolvedValue(mockTelemetryData);
     const request = new Request('http://localhost:3000/api/v1/dirigera/telemetry');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
@@ -54,11 +54,11 @@ describe('GET /api/v1/dirigera/telemetry', () => {
   });
 
   it('forwards typed query params to proxy', async () => {
-    mockGetTelemetry.mockResolvedValue(mockTelemetryData as any);
+    mockGetTelemetry.mockResolvedValue(mockTelemetryData);
     const request = new Request(
       'http://localhost:3000/api/v1/dirigera/telemetry?sensor_id=xyz&start=1773000000&end=1773200000&limit=50&offset=10'
     );
-    await GET(request as any, {} as any);
+    await GET(asNextRequest(request), routeContext());
     expect(mockGetTelemetry).toHaveBeenCalledWith({
       sensor_id: 'xyz',
       start: 1773000000,
@@ -69,11 +69,11 @@ describe('GET /api/v1/dirigera/telemetry', () => {
   });
 
   it('drops invalid numeric params silently', async () => {
-    mockGetTelemetry.mockResolvedValue(mockTelemetryData as any);
+    mockGetTelemetry.mockResolvedValue(mockTelemetryData);
     const request = new Request(
       'http://localhost:3000/api/v1/dirigera/telemetry?limit=not-a-number'
     );
-    await GET(request as any, {} as any);
+    await GET(asNextRequest(request), routeContext());
     expect(mockGetTelemetry).toHaveBeenCalledWith();
   });
 });

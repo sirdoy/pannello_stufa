@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { EndpointCard, PostEndpointCard } from '@/app/debug/components/ApiTab';
+import { EndpointCard, PostEndpointCard, type DebugApiResponse } from '@/app/debug/components/ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Badge from '@/app/components/ui/Badge';
 
@@ -11,13 +11,13 @@ interface HueTabProps {
 }
 
 export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
-  const [getResponses, setGetResponses] = useState<Record<string, any>>({});
-  const [postResponses, setPostResponses] = useState<Record<string, any>>({});
+  const [getResponses, setGetResponses] = useState<Record<string, DebugApiResponse>>({});
+  const [postResponses, setPostResponses] = useState<Record<string, DebugApiResponse>>({});
   const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
   const [loadingPost, setLoadingPost] = useState<Record<string, boolean>>({});
   const [timings, setTimings] = useState<Record<string, number>>({});
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
-  const [bridgeStatus, setBridgeStatus] = useState<any>(null);
+  const [bridgeStatus, setBridgeStatus] = useState<'connected' | 'disconnected' | null>(null);
 
   const copyUrlToClipboard = async (url: string) => {
     try {
@@ -57,7 +57,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
     fetchGetEndpoint('scenes', '/api/v1/hue/scenes');
   };
 
-  const callPostEndpoint = async (name: string, url: string, body: any) => {
+  const callPostEndpoint = async (name: string, url: string, body: Record<string, unknown>) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -82,7 +82,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
     }
   };
 
-  const callPutEndpoint = async (name: string, url: string, body: any) => {
+  const callPutEndpoint = async (name: string, url: string, body: Record<string, unknown>) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {

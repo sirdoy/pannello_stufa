@@ -8,7 +8,18 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import RoomsPage from '../page';
-import type { Room, RoomsHealthResponse } from '@/types/rooms';
+import type { Room, RoomCreate, RoomUpdate, RoomsHealthResponse } from '@/types/rooms';
+
+// Minimal view of a TanStack column as consumed by the DataTable mock
+interface MockColumn<TData> {
+  id?: string;
+  accessorKey?: string;
+  cell?: (ctx: { row: { original: TData } }) => React.ReactNode;
+}
+
+// Arguments of a mocked fetch call: (url, init) — the page sends headers as a plain object
+type FetchInit = Omit<RequestInit, 'headers'> & { headers?: Record<string, string> };
+type FetchCall = [string, FetchInit?];
 
 // Mock next/navigation
 const mockPush = jest.fn();
@@ -30,11 +41,11 @@ jest.mock('@/app/components/SettingsLayout', () => ({
 // Mock DataTable — renders data items mapping columns including actions cells
 jest.mock('@/app/components/ui/DataTable', () => ({
   __esModule: true,
-  default: ({ data, columns }: { data: Room[]; columns: any[] }) => (
+  default: ({ data, columns }: { data: Room[]; columns: MockColumn<Room>[] }) => (
     <div data-testid="data-table">
       {data.map((item: Room) => (
         <div key={item.id} data-testid={`row-${item.id}`}>
-          {columns.map((col: any) => {
+          {columns.map((col) => {
             if (col.id === 'actions') {
               const cellContent = col.cell?.({ row: { original: item } });
               return <div key="actions">{cellContent}</div>;
@@ -63,8 +74,8 @@ jest.mock('@/app/components/ui/FormModal', () => ({
     title,
   }: {
     isOpen: boolean;
-    onSubmit: (data: any) => Promise<void>;
-    children?: any;
+    onSubmit: (data: RoomCreate | RoomUpdate) => Promise<void>;
+    children?: unknown;
     title?: string;
   }) => {
     if (!isOpen) return null;
@@ -338,7 +349,7 @@ describe('RoomsPage', () => {
     });
 
     // Override fetch for POST
-    const postSpy = jest.fn().mockImplementation((url: string, options?: any) => {
+    const postSpy = jest.fn().mockImplementation((url: string, options?: FetchInit) => {
       if (options?.method === 'POST') {
         return Promise.resolve({
           ok: true,
@@ -357,13 +368,13 @@ describe('RoomsPage', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      const postCall = postSpy.mock.calls.find(
-        (call: any[]) => call[1]?.method === 'POST'
+      const postCall = (postSpy.mock.calls as FetchCall[]).find(
+        (call) => call[1]?.method === 'POST'
       );
       expect(postCall).toBeDefined();
       expect(postCall![0]).toBe('/api/rooms');
-      expect(postCall![1].headers['Content-Type']).toBe('application/json');
-      const body = JSON.parse(postCall![1].body as string);
+      expect(postCall![1]!.headers!['Content-Type']).toBe('application/json');
+      const body = JSON.parse(postCall![1]!.body as string);
       expect(body.name).toBe('Nuova Stanza');
     });
   });
@@ -383,7 +394,7 @@ describe('RoomsPage', () => {
     });
 
     // Override fetch for POST 409
-    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+    global.fetch = jest.fn().mockImplementation((url: string, options?: FetchInit) => {
       if (options?.method === 'POST') {
         return Promise.resolve({ ok: false, status: 409 });
       }
@@ -434,7 +445,7 @@ describe('RoomsPage', () => {
     });
 
     // Override fetch for PUT
-    const putSpy = jest.fn().mockImplementation((url: string, options?: any) => {
+    const putSpy = jest.fn().mockImplementation((url: string, options?: FetchInit) => {
       if (options?.method === 'PUT') {
         return Promise.resolve({
           ok: true,
@@ -453,12 +464,12 @@ describe('RoomsPage', () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      const putCall = putSpy.mock.calls.find(
-        (call: any[]) => call[1]?.method === 'PUT'
+      const putCall = (putSpy.mock.calls as FetchCall[]).find(
+        (call) => call[1]?.method === 'PUT'
       );
       expect(putCall).toBeDefined();
       expect(putCall![0]).toContain('/api/rooms/1');
-      expect(putCall![1].method).toBe('PUT');
+      expect(putCall![1]!.method).toBe('PUT');
     });
   });
 
@@ -475,7 +486,7 @@ describe('RoomsPage', () => {
       expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
     });
 
-    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+    global.fetch = jest.fn().mockImplementation((url: string, options?: FetchInit) => {
       if (options?.method === 'PUT') {
         return Promise.resolve({ ok: false, status: 409 });
       }
@@ -506,7 +517,7 @@ describe('RoomsPage', () => {
       expect(screen.getByTestId('form-modal-edit')).toBeInTheDocument();
     });
 
-    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+    global.fetch = jest.fn().mockImplementation((url: string, options?: FetchInit) => {
       if (options?.method === 'PUT') {
         return Promise.resolve({ ok: false, status: 404 });
       }
@@ -565,7 +576,7 @@ describe('RoomsPage', () => {
     });
 
     // Override fetch for DELETE
-    const deleteSpy = jest.fn().mockImplementation((url: string, options?: any) => {
+    const deleteSpy = jest.fn().mockImplementation((url: string, options?: FetchInit) => {
       if (options?.method === 'DELETE') {
         return Promise.resolve({ ok: true, status: 204 });
       }
@@ -580,12 +591,12 @@ describe('RoomsPage', () => {
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      const deleteCall = deleteSpy.mock.calls.find(
-        (call: any[]) => call[1]?.method === 'DELETE'
+      const deleteCall = (deleteSpy.mock.calls as FetchCall[]).find(
+        (call) => call[1]?.method === 'DELETE'
       );
       expect(deleteCall).toBeDefined();
       expect(deleteCall![0]).toContain('/api/rooms/1');
-      expect(deleteCall![1].method).toBe('DELETE');
+      expect(deleteCall![1]!.method).toBe('DELETE');
     });
   });
 
@@ -602,7 +613,7 @@ describe('RoomsPage', () => {
       expect(screen.getByTestId('confirmation-dialog')).toBeInTheDocument();
     });
 
-    global.fetch = jest.fn().mockImplementation((url: string, options?: any) => {
+    global.fetch = jest.fn().mockImplementation((url: string, options?: FetchInit) => {
       if (options?.method === 'DELETE') {
         return Promise.resolve({ ok: false, status: 404 });
       }

@@ -13,7 +13,7 @@
  * const myFn = mockFunction<(id: string) => Promise<User>>(jest.fn());
  * myFn.mockResolvedValue(mockUser);
  */
-export function mockFunction<T extends (...args: any[]) => any>(
+export function mockFunction<T extends jest.MockableFunction>(
   fn: jest.Mock
 ): jest.MockedFunction<T> {
   return fn as unknown as jest.MockedFunction<T>;
@@ -35,7 +35,7 @@ export function createMockResponse(overrides?: Partial<Response>): Response {
     redirected: false,
     type: 'basic' as ResponseType,
     url: '',
-    clone: jest.fn() as any,
+    clone: jest.fn(),
     body: null,
     bodyUsed: false,
     arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
@@ -74,7 +74,7 @@ export function createMockNextRequest(
     referrer: '',
     referrerPolicy: '' as ReferrerPolicy,
     signal: new AbortController().signal,
-    clone: jest.fn() as any,
+    clone: jest.fn(),
     bodyUsed: false,
     arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
     blob: jest.fn().mockResolvedValue(new Blob()),
@@ -96,7 +96,7 @@ export function createMockNextRequest(
  * typedMockResolvedValue(mockFn, { id: '123', name: 'Test' });
  */
 export function typedMockResolvedValue<T>(
-  mock: jest.MockedFunction<any>,
+  mock: jest.MockedFunction<jest.MockableFunction>,
   value: T
 ): void {
   mock.mockResolvedValue(value);
@@ -110,7 +110,7 @@ export function typedMockResolvedValue<T>(
  * typedMockRejectedValue(mockFn, new Error('Test error'));
  */
 export function typedMockRejectedValue(
-  mock: jest.MockedFunction<any>,
+  mock: jest.MockedFunction<jest.MockableFunction>,
   error: Error
 ): void {
   mock.mockRejectedValue(error);

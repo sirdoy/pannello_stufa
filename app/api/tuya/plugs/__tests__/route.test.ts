@@ -12,10 +12,10 @@ import { GET } from '../route';
 import { getPlugs } from '@/lib/tuya/tuyaProxy';
 import { authSession } from '@/lib/auth/session';
 import { ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core/apiErrors';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetPlugs = jest.mocked(getPlugs);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockPlug = {
   device_id: 'bf123',
@@ -37,7 +37,7 @@ describe('GET /api/tuya/plugs', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockRequest = new Request('http://localhost:3000/api/tuya/plugs');
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -45,7 +45,7 @@ describe('GET /api/tuya/plugs', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -55,7 +55,7 @@ describe('GET /api/tuya/plugs', () => {
   it('should return 200 with array of plugs when authenticated', async () => {
     mockGetPlugs.mockResolvedValue([mockPlug]);
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -72,7 +72,7 @@ describe('GET /api/tuya/plugs', () => {
       )
     );
 
-    const response = await GET(mockRequest as any, {} as any);
+    const response = await GET(asNextRequest(mockRequest), routeContext());
 
     expect(response.status).toBe(503);
   });

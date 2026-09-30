@@ -5,6 +5,19 @@ import { useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, EmptyState, Heading, Text, Banner } from '@/app/components/ui';
 import type { HueScene, HueGroup } from '@/types/hueProxy';
 
+/** JSON bodies of GET /api/v1/hue/scenes and /api/v1/hue/groups (or an error payload) */
+interface HueScenesApiResponse {
+  scenes?: HueScene[];
+  reconnect?: boolean;
+  error?: string;
+}
+
+interface HueGroupsApiResponse {
+  groups?: HueGroup[];
+  reconnect?: boolean;
+  error?: string;
+}
+
 /**
  * Scenes Page - Philips Hue scene management
  * View and activate all available scenes (read-only, CRUD deferred)
@@ -63,7 +76,7 @@ export default function ScenesPage() {
         fetch('/api/v1/hue/scenes'),
         fetch('/api/v1/hue/groups'),
       ]);
-      const [scenesData, roomsData]: any[] = await Promise.all([
+      const [scenesData, roomsData]: [HueScenesApiResponse, HueGroupsApiResponse] = await Promise.all([
         scenesRes.json(),
         roomsRes.json(),
       ]);

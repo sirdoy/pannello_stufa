@@ -7,6 +7,15 @@ import {
   ZONE_COLORS,
   getZoneColor,
 } from '@/lib/utils/scheduleHelpers';
+import type { NetatmoSchedule } from '@/lib/utils/scheduleHelpers';
+
+/** Malformed API payloads: widen the parameter types to exercise the runtime guards */
+const parseIncompleteSchedule = parseTimelineSlots as (
+  schedule: Partial<NetatmoSchedule>
+) => ReturnType<typeof parseTimelineSlots>;
+const getZoneColorUnchecked = getZoneColor as (
+  zoneType: number | undefined
+) => ReturnType<typeof getZoneColor>;
 
 describe('scheduleHelpers', () => {
   describe('DAY_NAMES', () => {
@@ -108,10 +117,10 @@ describe('scheduleHelpers', () => {
     });
 
     it('should return empty array for invalid input', () => {
-      expect(parseTimelineSlots(null as any)).toEqual([]);
-      expect(parseTimelineSlots({} as any)).toEqual([]);
-      expect(parseTimelineSlots({ zones: [] } as any)).toEqual([]);
-      expect(parseTimelineSlots({ timetable: [] } as any)).toEqual([]);
+      expect(parseTimelineSlots(null)).toEqual([]);
+      expect(parseIncompleteSchedule({})).toEqual([]);
+      expect(parseIncompleteSchedule({ zones: [] })).toEqual([]);
+      expect(parseIncompleteSchedule({ timetable: [] })).toEqual([]);
     });
 
     it('should skip slots with missing zones', () => {
@@ -173,7 +182,7 @@ describe('scheduleHelpers', () => {
     it('should return default color for unknown zone types', () => {
       const unknownColor = getZoneColor(99);
       expect(unknownColor).toEqual({ bg: 'hsl(0, 0%, 50%)', text: 'hsl(0, 0%, 100%)', name: 'Altro' });
-      expect(getZoneColor(undefined as any)).toEqual({ bg: 'hsl(0, 0%, 50%)', text: 'hsl(0, 0%, 100%)', name: 'Altro' });
+      expect(getZoneColorUnchecked(undefined)).toEqual({ bg: 'hsl(0, 0%, 50%)', text: 'hsl(0, 0%, 100%)', name: 'Altro' });
     });
 
     it('should have bg and text properties', () => {

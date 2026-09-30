@@ -11,25 +11,35 @@ jest.mock('@/lib/auth/session', () => ({
 import { PUT } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 import type { HueCommandResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetLightState = jest.mocked(hueProxy.setLightState);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
-const mockProxyResponse = {
-  command: 'set_light_state' as const,
-  status: 'accepted' as const,
+const mockProxyResponse: HueCommandResponse = {
   light_id: '1',
-  requested_state: { on: true, bri: 200 },
-  suggested_poll_delay_s: 2,
-  poll_endpoint: '/api/v1/hue/lights/1',
-} as unknown as HueCommandResponse; // legacy 202 contract
+  name: 'Lampada',
+  on: true,
+  brightness: 200,
+  ct_mirek: null,
+  ct_kelvin: null,
+  hue: null,
+  saturation: null,
+  colormode: null,
+  reachable: true,
+  capability_tier: 'white',
+  room_id: null,
+  room_name: null,
+  model_id: null,
+  light_type: null,
+  data_confirmed: true,
+};
 
 describe('PUT /api/v1/hue/lights/[lightId]/state', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -42,7 +52,7 @@ describe('PUT /api/v1/hue/lights/[lightId]/state', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PUT(req as any, { params: Promise.resolve({ lightId: '1' }) } as any);
+    const response = await PUT(asNextRequest(req), routeContext({ lightId: '1' }));
     expect(response.status).toBe(401);
   });
 
@@ -54,11 +64,12 @@ describe('PUT /api/v1/hue/lights/[lightId]/state', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await PUT(req as any, { params: Promise.resolve({ lightId: '1' }) } as any);
+    const response = await PUT(asNextRequest(req), routeContext({ lightId: '1' }));
     const data = await response.json();
 
     expect(response.status).toBe(202);
-    expect(data.command).toBe('set_light_state');
+    expect(data.light_id).toBe('1');
+    expect(data.data_confirmed).toBe(true);
     expect(mockSetLightState).toHaveBeenCalledWith('1', expect.any(Object));
   });
 });

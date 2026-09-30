@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Maximize, Minimize } from 'lucide-react';
+import type HlsInstance from 'hls.js';
 import { Text, Button } from '../../ui';
 
 // Webkit fullscreen API declarations
@@ -46,7 +47,7 @@ export default function HlsPlayer({
   const isMuted = muted !== undefined ? muted : !showControls;
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const hlsRef = useRef<any>(null);
+  const hlsRef = useRef<HlsInstance | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -151,7 +152,7 @@ export default function HlsPlayer({
     const video = videoRef.current;
     if (!video || !src) return;
 
-    let hls: any = null;
+    let hls: HlsInstance | null = null;
 
     const initPlayer = async () => {
       try {
@@ -203,16 +204,16 @@ export default function HlsPlayer({
           }
         });
 
-        hls.on(Hls.Events.ERROR, (event: any, data: any) => {
+        hls.on(Hls.Events.ERROR, (event, data) => {
           if (data.fatal) {
             switch (data.type) {
               case Hls.ErrorTypes.NETWORK_ERROR:
                 console.error('HLS network error', data);
-                hls.startLoad();
+                hls?.startLoad();
                 break;
               case Hls.ErrorTypes.MEDIA_ERROR:
                 console.error('HLS media error', data);
-                hls.recoverMediaError();
+                hls?.recoverMediaError();
                 break;
               default:
                 console.error('HLS fatal error', data);

@@ -14,6 +14,7 @@ import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from 'react-use-websocket';
+import type { UseAdaptivePollingOptions } from '@/lib/hooks/useAdaptivePolling';
 
 // Mock all external dependencies
 jest.mock('@/lib/scheduler/schedulerService');
@@ -24,9 +25,9 @@ jest.mock('@/lib/hooks/useBackgroundSync');
 jest.mock('@/app/context/WebSocketContext');
 
 // Capture polling opts for WS fallback assertions
-let lastPollingOpts: any = null;
+let lastPollingOpts: UseAdaptivePollingOptions | null = null;
 jest.mock('@/lib/hooks/useAdaptivePolling', () => ({
-  useAdaptivePolling: jest.fn((opts: any) => {
+  useAdaptivePolling: jest.fn((opts: UseAdaptivePollingOptions) => {
     lastPollingOpts = opts;
     // Call callback immediately to simulate immediate:true
     if (opts.immediate !== false && opts.interval !== null) {
@@ -586,7 +587,7 @@ describe('useStoveData', () => {
       );
 
       expect(lastPollingOpts).not.toBeNull();
-      expect(lastPollingOpts.interval).toBeNull();
+      expect(lastPollingOpts?.interval).toBeNull();
     });
 
     it('activates polling (interval=60000) when readyState is CLOSED', () => {
@@ -596,7 +597,7 @@ describe('useStoveData', () => {
       );
 
       expect(lastPollingOpts).not.toBeNull();
-      expect(lastPollingOpts.interval).toBe(60000);
+      expect(lastPollingOpts?.interval).toBe(60000);
     });
 
     it('always sets alwaysActive:true regardless of readyState (MIG-03)', () => {
@@ -610,7 +611,7 @@ describe('useStoveData', () => {
       const { unmount } = renderHook(() =>
         useStoveData({ userId: mockUserId })
       );
-      expect(lastPollingOpts.alwaysActive).toBe(true);
+      expect(lastPollingOpts?.alwaysActive).toBe(true);
       unmount();
 
       // Test with CLOSED
@@ -623,7 +624,7 @@ describe('useStoveData', () => {
       renderHook(() =>
         useStoveData({ userId: mockUserId })
       );
-      expect(lastPollingOpts.alwaysActive).toBe(true);
+      expect(lastPollingOpts?.alwaysActive).toBe(true);
     });
 
     it('bootstraps one HTTP fetch when WS is OPEN at mount and no snapshot arrives (M15)', async () => {
@@ -756,7 +757,7 @@ describe('useStoveData', () => {
       });
 
       // Don't auto-invoke callback since polling is suppressed — override mock
-      jest.mocked(useAdaptivePolling).mockImplementation((opts: any) => {
+      jest.mocked(useAdaptivePolling).mockImplementation((opts) => {
         lastPollingOpts = opts;
         // interval=null means polling is suppressed, don't call callback
       });
@@ -796,7 +797,7 @@ describe('useStoveData', () => {
       });
 
       // Suppress polling to isolate WS path
-      jest.mocked(useAdaptivePolling).mockImplementation((opts: any) => {
+      jest.mocked(useAdaptivePolling).mockImplementation((opts) => {
         lastPollingOpts = opts;
       });
 

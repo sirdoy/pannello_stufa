@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { EndpointCard } from '../ApiTab';
+import { EndpointCard, type DebugApiResponse } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
@@ -11,7 +11,7 @@ interface FirebaseTabProps {
 }
 
 export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTabProps) {
-  const [getResponses, setGetResponses] = useState<Record<string, any>>({});
+  const [getResponses, setGetResponses] = useState<Record<string, DebugApiResponse>>({});
   const [loadingGet, setLoadingGet] = useState<Record<string, boolean>>({});
   const [timings, setTimings] = useState<Record<string, number>>({});
   const [copiedUrl, setCopiedUrl] = useState<string | null>(null);

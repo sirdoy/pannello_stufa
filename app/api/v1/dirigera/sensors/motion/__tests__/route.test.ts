@@ -10,12 +10,13 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as dirigeraProxy from '@/lib/dirigera/dirigeraProxy';
 import { authSession } from '@/lib/auth/session';
+import type { MotionSensorsResponse } from '@/types/dirigeraProxy';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetMotionSensors = jest.mocked(dirigeraProxy.getMotionSensors);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
-const mockMotionData = {
+const mockMotionData: MotionSensorsResponse = {
   sensors: [
     {
       id: 'm1',
@@ -26,7 +27,7 @@ const mockMotionData = {
       battery_percentage: null,
       is_reachable: true,
       last_seen: '2026-04-01T10:00:00Z',
-      is_open: null,
+      is_detected: false,
       light_level: 120,
       data_freshness: 'LIVE',
     },
@@ -38,7 +39,7 @@ const mockMotionData = {
 describe('GET /api/v1/dirigera/sensors/motion', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -46,16 +47,16 @@ describe('GET /api/v1/dirigera/sensors/motion', () => {
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/dirigera/sensors/motion');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(401);
     expect(data.code).toBe('UNAUTHORIZED');
   });
 
   it('returns 200 with motion sensors data when authenticated', async () => {
-    mockGetMotionSensors.mockResolvedValue(mockMotionData as any);
+    mockGetMotionSensors.mockResolvedValue(mockMotionData);
     const request = new Request('http://localhost:3000/api/v1/dirigera/sensors/motion');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
@@ -64,9 +65,9 @@ describe('GET /api/v1/dirigera/sensors/motion', () => {
   });
 
   it('returns only sensors, count, is_stale fields in response body', async () => {
-    mockGetMotionSensors.mockResolvedValue(mockMotionData as any);
+    mockGetMotionSensors.mockResolvedValue(mockMotionData);
     const request = new Request('http://localhost:3000/api/v1/dirigera/sensors/motion');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(data.sensors).toEqual(mockMotionData.sensors);
     expect(data.count).toBe(1);

@@ -26,20 +26,33 @@ const mockQuery = jest.mocked(query);
 const mockOrderByChild = jest.mocked(orderByChild);
 const mockLimitToLast = jest.mocked(limitToLast);
 
+/** Notification constructor double with the static members errorMonitor reads */
+type NotificationMock = jest.Mock & {
+  permission: NotificationPermission;
+  requestPermission: jest.Mock;
+};
+
+/** Firebase DataSnapshot child as iterated by errorMonitor (key + val only) */
+type MockChildSnapshot = { key: string; val: () => unknown };
+
 describe('errorMonitor', () => {
+  let mockNotification: NotificationMock;
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, 'error').mockImplementation(() => {});
 
     // Mock window.Notification for browser notification tests
-    global.Notification = jest.fn() as any;
-    (global.Notification as any).permission = 'default';
-    (global.Notification as any).requestPermission = jest.fn();
+    mockNotification = Object.assign(jest.fn(), {
+      permission: 'default' as NotificationPermission,
+      requestPermission: jest.fn(),
+    });
+    global.Notification = mockNotification as unknown as typeof Notification;
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
-    delete (global as any).Notification;
+    Reflect.deleteProperty(global, 'Notification');
   });
 
   describe('ERROR_SEVERITY and ERROR_CODES constants', () => {
@@ -78,9 +91,9 @@ describe('errorMonitor', () => {
 
     test('returns known error code info when code is defined', () => {
       // ARRANGE: Temporarily add a known error
-      (ERROR_CODES as any)[5] = {
+      ERROR_CODES[5] = {
         description: 'Test Error',
-        severity: ERROR_SEVERITY.CRITICAL,
+        severity: ERROR_SEVERITY.CRITICAL!,
       };
 
       // ACT
@@ -114,9 +127,9 @@ describe('errorMonitor', () => {
 
     test('returns true for critical error codes', () => {
       // ARRANGE: Add critical error temporarily
-      (ERROR_CODES as any)[10] = {
+      ERROR_CODES[10] = {
         description: 'Critical Test',
-        severity: ERROR_SEVERITY.CRITICAL,
+        severity: ERROR_SEVERITY.CRITICAL!,
       };
 
       // ACT
@@ -136,7 +149,7 @@ describe('errorMonitor', () => {
     });
 
     afterEach(() => {
-      delete (global as any).fetch;
+      Reflect.deleteProperty(global, 'fetch');
     });
 
     test('logs error to Firebase with correct structure', async () => {
@@ -254,7 +267,7 @@ describe('errorMonitor', () => {
       // ARRANGE
       const mockSnapshot = {
         exists: () => true,
-        forEach: (callback: (snapshot: any) => void) => {
+        forEach: (callback: (snapshot: MockChildSnapshot) => void) => {
           callback({ key: 'error1', val: () => ({ errorCode: 1, timestamp: 1000 }) });
           callback({ key: 'error2', val: () => ({ errorCode: 2, timestamp: 2000 }) });
           callback({ key: 'error3', val: () => ({ errorCode: 3, timestamp: 3000 }) });
@@ -330,7 +343,7 @@ describe('errorMonitor', () => {
       // ARRANGE
       const mockSnapshot = {
         exists: () => true,
-        forEach: (callback: (snapshot: any) => void) => {
+        forEach: (callback: (snapshot: MockChildSnapshot) => void) => {
           callback({ key: 'error1', val: () => ({ errorCode: 1, resolved: false }) });
           callback({ key: 'error2', val: () => ({ errorCode: 2, resolved: true }) });
           callback({ key: 'error3', val: () => ({ errorCode: 3, resolved: false }) });
@@ -353,7 +366,7 @@ describe('errorMonitor', () => {
       // ARRANGE
       const mockSnapshot = {
         exists: () => true,
-        forEach: (callback: (snapshot: any) => void) => {
+        forEach: (callback: (snapshot: MockChildSnapshot) => void) => {
           callback({ key: 'error1', val: () => ({ errorCode: 1, resolved: true }) });
           callback({ key: 'error2', val: () => ({ errorCode: 2, resolved: true }) });
         },
@@ -390,7 +403,7 @@ describe('errorMonitor', () => {
     });
 
     afterEach(() => {
-      delete (global as any).fetch;
+      Reflect.deleteProperty(global, 'fetch');
     });
 
     test('marks error as resolved via API', async () => {
@@ -470,7 +483,9 @@ describe('errorMonitor', () => {
 
     test('returns true when previousErrorCode is undefined', () => {
       // ACT
-      const result = shouldNotify(5, undefined as any);
+      // previousErrorCode comes from stored state and may be missing at runtime
+      const shouldNotifyUnchecked = shouldNotify as (errorCode: number, previousErrorCode: number | undefined) => boolean;
+      const result = shouldNotifyUnchecked(5, undefined);
 
       // ASSERT
       expect(result).toBe(true);
@@ -480,7 +495,7 @@ describe('errorMonitor', () => {
   describe('sendErrorNotification', () => {
     test('returns false when Notification API not supported', async () => {
       // ARRANGE
-      delete (global as any).Notification;
+      Reflect.deleteProperty(global, 'Notification');
 
       // ACT
       const result = await sendErrorNotification(5, 'Test error');
@@ -491,21 +506,21 @@ describe('errorMonitor', () => {
 
     test('requests permission when permission is default', async () => {
       // ARRANGE
-      (global.Notification as any).permission = 'default';
-      ((global.Notification as any).requestPermission as jest.Mock).mockResolvedValue('granted');
-      (global.Notification as unknown as jest.Mock).mockImplementation(() => {});
+      mockNotification.permission = 'default';
+      mockNotification.requestPermission.mockResolvedValue('granted');
+      mockNotification.mockImplementation(() => {});
 
       // ACT
       const result = await sendErrorNotification(5, 'Test error');
 
       // ASSERT
-      expect((global.Notification as any).requestPermission).toHaveBeenCalled();
+      expect(mockNotification.requestPermission).toHaveBeenCalled();
     });
 
     test('sends notification when permission is granted', async () => {
       // ARRANGE
-      (global.Notification as any).permission = 'granted';
-      (global.Notification as unknown as jest.Mock).mockImplementation(() => {});
+      mockNotification.permission = 'granted';
+      mockNotification.mockImplementation(() => {});
 
       // ACT
       const result = await sendErrorNotification(5, 'Test error');
@@ -524,7 +539,7 @@ describe('errorMonitor', () => {
 
     test('returns false when permission is denied', async () => {
       // ARRANGE
-      (global.Notification as any).permission = 'denied';
+      mockNotification.permission = 'denied';
 
       // ACT
       const result = await sendErrorNotification(5, 'Test error');
@@ -536,12 +551,12 @@ describe('errorMonitor', () => {
 
     test('uses critical icon for critical errors', async () => {
       // ARRANGE
-      (ERROR_CODES as any)[99] = {
+      ERROR_CODES[99] = {
         description: 'Critical error',
-        severity: ERROR_SEVERITY.CRITICAL,
+        severity: ERROR_SEVERITY.CRITICAL!,
       };
-      (global.Notification as any).permission = 'granted';
-      (global.Notification as unknown as jest.Mock).mockImplementation(() => {});
+      mockNotification.permission = 'granted';
+      mockNotification.mockImplementation(() => {});
 
       // ACT
       await sendErrorNotification(99, 'Critical error');
@@ -560,11 +575,11 @@ describe('errorMonitor', () => {
 
     test('uses default error message when description not provided', async () => {
       // ARRANGE
-      (global.Notification as any).permission = 'granted';
-      (global.Notification as unknown as jest.Mock).mockImplementation(() => {});
+      mockNotification.permission = 'granted';
+      mockNotification.mockImplementation(() => {});
 
       // ACT
-      await sendErrorNotification(5, '' as any);
+      await sendErrorNotification(5, '');
 
       // ASSERT
       expect(global.Notification).toHaveBeenCalledWith(

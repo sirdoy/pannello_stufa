@@ -10,22 +10,21 @@ jest.mock('@/lib/auth/session', () => ({
 import { POST } from '../route';
 import * as sonosProxy from '@/lib/sonos/sonosProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockPrevious = jest.mocked(sonosProxy.previous);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 describe('POST /api/v1/sonos/zones/[groupId]/previous', () => {
   let mockRequest: Request;
-  let mockContext: { params: Promise<{ groupId: string }> };
+  const mockContext = routeContext({ groupId: 'RINCON_123' });
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockRequest = new Request('http://localhost:3000/api/v1/sonos/zones/RINCON_123/previous', {
       method: 'POST',
     });
-    mockContext = { params: Promise.resolve({ groupId: 'RINCON_123' }) };
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -33,7 +32,7 @@ describe('POST /api/v1/sonos/zones/[groupId]/previous', () => {
   it('should return 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
 
-    const response = await POST(mockRequest as any, mockContext as any);
+    const response = await POST(asNextRequest(mockRequest), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -41,9 +40,9 @@ describe('POST /api/v1/sonos/zones/[groupId]/previous', () => {
   });
 
   it('should return 202 with command response', async () => {
-    mockPrevious.mockResolvedValue({ success: true } as any);
+    mockPrevious.mockResolvedValue({ data_confirmed: true });
 
-    const response = await POST(mockRequest as any, mockContext as any);
+    const response = await POST(asNextRequest(mockRequest), mockContext);
     const data = await response.json();
 
     expect(response.status).toBe(202);

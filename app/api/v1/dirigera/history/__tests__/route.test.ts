@@ -10,10 +10,10 @@ jest.mock('@/lib/auth/session', () => ({
 import { GET } from '../route';
 import * as dirigeraProxy from '@/lib/dirigera/dirigeraProxy';
 import { authSession } from '@/lib/auth/session';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetHistory = jest.mocked(dirigeraProxy.getHistory);
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockHistoryData = {
   events: [
@@ -27,7 +27,7 @@ const mockHistoryData = {
 describe('GET /api/v1/dirigera/history', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -35,16 +35,16 @@ describe('GET /api/v1/dirigera/history', () => {
   it('returns 401 when not authenticated', async () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/dirigera/history');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(401);
     expect(data.code).toBe('UNAUTHORIZED');
   });
 
   it('returns 200 with history data when authenticated (no query params)', async () => {
-    mockGetHistory.mockResolvedValue(mockHistoryData as any);
+    mockGetHistory.mockResolvedValue(mockHistoryData);
     const request = new Request('http://localhost:3000/api/v1/dirigera/history');
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
@@ -54,11 +54,11 @@ describe('GET /api/v1/dirigera/history', () => {
   });
 
   it('forwards typed query params to proxy', async () => {
-    mockGetHistory.mockResolvedValue(mockHistoryData as any);
+    mockGetHistory.mockResolvedValue(mockHistoryData);
     const request = new Request(
       'http://localhost:3000/api/v1/dirigera/history?sensor_id=abc&event_type=open&limit=50&offset=10'
     );
-    await GET(request as any, {} as any);
+    await GET(asNextRequest(request), routeContext());
     expect(mockGetHistory).toHaveBeenCalledWith({
       sensor_id: 'abc',
       event_type: 'open',
@@ -68,11 +68,11 @@ describe('GET /api/v1/dirigera/history', () => {
   });
 
   it('drops invalid numeric params silently', async () => {
-    mockGetHistory.mockResolvedValue(mockHistoryData as any);
+    mockGetHistory.mockResolvedValue(mockHistoryData);
     const request = new Request(
       'http://localhost:3000/api/v1/dirigera/history?limit=not-a-number'
     );
-    await GET(request as any, {} as any);
+    await GET(asNextRequest(request), routeContext());
     expect(mockGetHistory).toHaveBeenCalledWith();
   });
 });

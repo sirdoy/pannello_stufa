@@ -1,26 +1,36 @@
 'use client';
 
-import { forwardRef, useState, useEffect, useRef, type ReactNode } from 'react';
+import { forwardRef, useState, useEffect, useRef, type ForwardedRef, type HTMLAttributes, type ReactElement, type ReactNode, type RefAttributes } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import Input from './Input';
 import Badge from './Badge';
-import Button from './Button';
+import Button, { type ButtonProps } from './Button';
 import Text from './Text';
-import type { Table } from '@tanstack/react-table';
+import type { Row, Table } from '@tanstack/react-table';
 
-export interface DataTableToolbarProps<TData> {
+export interface DataTableBulkAction {
+  id: string;
+  label: string;
+  variant?: ButtonProps['variant'];
+  icon?: ReactNode;
+}
+
+export interface DataTableToolbarProps<TData> extends HTMLAttributes<HTMLDivElement> {
   table: Table<TData>;
   globalFilter?: string;
   onGlobalFilterChange?: (value: string) => void;
   searchPlaceholder?: string;
   showSearch?: boolean;
   showBulkActions?: boolean;
-  onBulkAction?: (action: string, selectedRows: any) => void;
-  bulkActions?: any[];
+  onBulkAction?: (action: string, selectedRows: Row<TData>[]) => void;
+  bulkActions?: DataTableBulkAction[];
   className?: string;
-  [key: string]: any;
 }
+
+type DataTableToolbarComponent = (<TData>(
+  props: DataTableToolbarProps<TData> & RefAttributes<HTMLDivElement>
+) => ReactElement | null) & { displayName?: string };
 
 /**
  * DataTableToolbar Component
@@ -50,7 +60,7 @@ export interface DataTableToolbarProps<TData> {
  * onBulkAction={(action, rows) => handleBulkAction(action, rows)}
  * />
  */
-const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(function DataTableToolbar(
+const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
   {
     table,
     globalFilter = '',
@@ -62,8 +72,8 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
     bulkActions = [],
     className = '',
     ...props
-  },
-  ref
+  }: DataTableToolbarProps<TData>,
+  ref: ForwardedRef<HTMLDivElement>
 ) {
   // Debounced search state
   const [searchValue, setSearchValue] = useState(globalFilter);
@@ -133,7 +143,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
   };
 
   // Format filter value for display
-  const formatFilterValue = (value: any) => {
+  const formatFilterValue = (value: unknown) => {
     if (Array.isArray(value)) {
       return value.join(', ');
     }
@@ -179,7 +189,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
 
           {/* Bulk action buttons */}
           <div className="flex items-center gap-2">
-            {Array.isArray(bulkActions) && bulkActions.map((action: any) => (
+            {Array.isArray(bulkActions) && bulkActions.map((action) => (
               <Button
                 key={action.id}
                 variant={action.variant || 'subtle'}
@@ -258,7 +268,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
           )}
 
           {/* Column filter chips */}
-          {columnFilters.map((filter: { id: string; value: any }) => (
+          {columnFilters.map((filter: { id: string; value: unknown }) => (
             <Badge
               key={filter.id}
               variant="ocean"
@@ -294,7 +304,7 @@ const DataTableToolbar = forwardRef<HTMLDivElement, DataTableToolbarProps<any>>(
       )}
     </div>
   );
-});
+}) as DataTableToolbarComponent;
 
 DataTableToolbar.displayName = 'DataTableToolbar';
 

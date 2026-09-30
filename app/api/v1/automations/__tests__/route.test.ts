@@ -16,12 +16,12 @@ import { GET, POST } from '../route';
 import { automationsProxy } from '@/lib/automations';
 import { authSession } from '@/lib/auth/session';
 import { parseJson } from '@/lib/core/requestParser';
+import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockAutomationsProxy = jest.mocked(automationsProxy);
 const mockParseJson = jest.mocked(parseJson);
 
-const mockSession = { user: { sub: 'auth0|123', email: 'test@test.com' } };
 
 const mockRule = {
   id: 1,
@@ -55,7 +55,7 @@ const mockPaginatedRules = {
 describe('GET /api/v1/automations', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
@@ -64,7 +64,7 @@ describe('GET /api/v1/automations', () => {
     mockGetSession.mockResolvedValue(null);
     const request = new Request('http://localhost:3000/api/v1/automations');
 
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -75,7 +75,7 @@ describe('GET /api/v1/automations', () => {
     mockAutomationsProxy.getAutomations.mockResolvedValue(mockPaginatedRules);
     const request = new Request('http://localhost:3000/api/v1/automations');
 
-    const response = await GET(request as any, {} as any);
+    const response = await GET(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -88,7 +88,7 @@ describe('GET /api/v1/automations', () => {
     mockAutomationsProxy.getAutomations.mockResolvedValue(mockPaginatedRules);
     const request = new Request('http://localhost:3000/api/v1/automations?limit=10&offset=5');
 
-    await GET(request as any, {} as any);
+    await GET(asNextRequest(request), routeContext());
 
     expect(mockAutomationsProxy.getAutomations).toHaveBeenCalledWith({ limit: 10, offset: 5 });
   });
@@ -97,11 +97,11 @@ describe('GET /api/v1/automations', () => {
 describe('POST /api/v1/automations', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetSession.mockResolvedValue(mockSession as any);
+    mockGetSession.mockResolvedValue(mockAppSession());
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     // Default: parseJson returns a valid body for POST tests
-    mockParseJson.mockResolvedValue(validBody as any);
+    mockParseJson.mockResolvedValue(validBody);
   });
 
   it('returns 401 when not authenticated', async () => {
@@ -112,7 +112,7 @@ describe('POST /api/v1/automations', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await POST(request as any, {} as any);
+    const response = await POST(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(401);
@@ -127,7 +127,7 @@ describe('POST /api/v1/automations', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await POST(request as any, {} as any);
+    const response = await POST(asNextRequest(request), routeContext());
     const data = await response.json();
 
     expect(response.status).toBe(201);
@@ -142,20 +142,20 @@ describe('POST /api/v1/automations', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    await POST(request as any, {} as any);
+    await POST(asNextRequest(request), routeContext());
 
     expect(mockAutomationsProxy.createAutomation).toHaveBeenCalledWith(validBody);
   });
 
   it('returns 400 when body is missing required name field', async () => {
-    mockParseJson.mockResolvedValue({ enabled: true } as any);
+    mockParseJson.mockResolvedValue({ enabled: true });
     const request = new Request('http://localhost:3000/api/v1/automations', {
       method: 'POST',
       body: JSON.stringify({ enabled: true }),
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await POST(request as any, {} as any);
+    const response = await POST(asNextRequest(request), routeContext());
 
     expect(response.status).toBe(400);
   });
@@ -178,7 +178,7 @@ describe('POST /api/v1/automations', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    const response = await POST(request as never, {} as never);
+    const response = await POST(asNextRequest(request), routeContext());
 
     expect(response.status).toBe(400);
     expect(mockAutomationsProxy.createAutomation).not.toHaveBeenCalled();
@@ -200,7 +200,7 @@ describe('POST /api/v1/automations', () => {
       active_hours_start: '06:00',
       active_hours_end: '09:00',
     };
-    mockParseJson.mockResolvedValue(fullBody as any);
+    mockParseJson.mockResolvedValue(fullBody);
     mockAutomationsProxy.createAutomation.mockResolvedValue(mockRule);
     const request = new Request('http://localhost:3000/api/v1/automations', {
       method: 'POST',
@@ -208,7 +208,7 @@ describe('POST /api/v1/automations', () => {
       headers: { 'Content-Type': 'application/json' },
     });
 
-    await POST(request as any, {} as any);
+    await POST(asNextRequest(request), routeContext());
 
     expect(mockAutomationsProxy.createAutomation).toHaveBeenCalledWith(fullBody);
   });

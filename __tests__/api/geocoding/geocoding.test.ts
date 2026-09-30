@@ -5,13 +5,16 @@
  * Tests search and reverse geocoding functionality
  */
 
+import { asNextRequest, routeContext } from '@/__tests__/__utils__/routeHelpers';
+
 // Mock fetch for testing
-global.fetch = jest.fn() as jest.Mock;
+const mockFetch = jest.fn() as jest.MockedFunction<typeof fetch>;
+global.fetch = mockFetch;
 
 // Mock auth middleware
 jest.mock('@/lib/core', () => ({
-  withAuthAndErrorHandler: (handler: any, name: string) => handler,
-  success: (data: any) => ({
+  withAuthAndErrorHandler: <H>(handler: H, name: string) => handler,
+  success: (data: Record<string, unknown>) => ({
     status: 200,
     json: async () => ({ success: true, ...data }),
   }),
@@ -52,10 +55,10 @@ describe('Geocoding Search API', () => {
         ],
       };
 
-      (global.fetch as any).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockOpenMeteoResponse,
-      });
+      } as Response);
 
       // Import the route handler
       const { GET } = await import('@/app/api/geocoding/search/route');
@@ -65,7 +68,7 @@ describe('Geocoding Search API', () => {
         url: 'http://localhost:3000/api/geocoding/search?q=Milano',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -84,7 +87,7 @@ describe('Geocoding Search API', () => {
         url: 'http://localhost:3000/api/geocoding/search',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -99,7 +102,7 @@ describe('Geocoding Search API', () => {
         url: 'http://localhost:3000/api/geocoding/search?q=ab',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -109,10 +112,10 @@ describe('Geocoding Search API', () => {
 
     it('should return empty results for no matches', async () => {
       // Mock Open-Meteo empty response
-      (global.fetch as any).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({}),
-      });
+      } as Response);
 
       const { GET } = await import('@/app/api/geocoding/search/route');
 
@@ -120,7 +123,7 @@ describe('Geocoding Search API', () => {
         url: 'http://localhost:3000/api/geocoding/search?q=xyzabc123',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -130,18 +133,18 @@ describe('Geocoding Search API', () => {
 
     it('should return empty results on API failure', async () => {
       // Mock API failure
-      (global.fetch as any).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-      });
-      (global.fetch as any).mockResolvedValueOnce({
+      } as Response);
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-      });
-      (global.fetch as any).mockResolvedValueOnce({
+      } as Response);
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
-      });
+      } as Response);
 
       const { GET } = await import('@/app/api/geocoding/search/route');
 
@@ -149,7 +152,7 @@ describe('Geocoding Search API', () => {
         url: 'http://localhost:3000/api/geocoding/search?q=Roma',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -158,10 +161,10 @@ describe('Geocoding Search API', () => {
     });
 
     it('should call Open-Meteo API with correct parameters', async () => {
-      (global.fetch as any).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ results: [] }),
-      });
+      } as Response);
 
       const { GET } = await import('@/app/api/geocoding/search/route');
 
@@ -169,10 +172,10 @@ describe('Geocoding Search API', () => {
         url: 'http://localhost:3000/api/geocoding/search?q=Firenze',
       };
 
-      await GET(mockRequest as any, {} as any);
+      await GET(asNextRequest(mockRequest), routeContext());
 
       expect(global.fetch).toHaveBeenCalled();
-      const calledUrl = (global.fetch as jest.Mock).mock.calls[0][0];
+      const calledUrl = mockFetch.mock.calls[0]?.[0];
       expect(calledUrl).toContain('geocoding-api.open-meteo.com');
       expect(calledUrl).toContain('name=Firenze');
       expect(calledUrl).toContain('count=5');
@@ -191,16 +194,16 @@ describe('Geocoding Reverse API', () => {
   describe('GET /api/geocoding/reverse', () => {
     it('should return city name for valid coordinates', async () => {
       // Mock forecast API response (first call)
-      (global.fetch as any).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           timezone: 'Europe/Rome',
           current: { temperature_2m: 15 },
         }),
-      });
+      } as Response);
 
       // Mock city search response (second call)
-      (global.fetch as any).mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           results: [
@@ -213,7 +216,7 @@ describe('Geocoding Reverse API', () => {
             },
           ],
         }),
-      });
+      } as Response);
 
       const { GET } = await import('@/app/api/geocoding/reverse/route');
 
@@ -221,7 +224,7 @@ describe('Geocoding Reverse API', () => {
         url: 'http://localhost:3000/api/geocoding/reverse?lat=41.9028&lon=12.4964',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(200);
@@ -238,7 +241,7 @@ describe('Geocoding Reverse API', () => {
         url: 'http://localhost:3000/api/geocoding/reverse',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -253,7 +256,7 @@ describe('Geocoding Reverse API', () => {
         url: 'http://localhost:3000/api/geocoding/reverse?lat=999&lon=999',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -268,7 +271,7 @@ describe('Geocoding Reverse API', () => {
         url: 'http://localhost:3000/api/geocoding/reverse?lat=abc&lon=def',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(400);
@@ -278,7 +281,7 @@ describe('Geocoding Reverse API', () => {
 
     it('should return formatted coordinates as fallback on API failure', async () => {
       // Mock API failure
-      (global.fetch as any).mockRejectedValueOnce(new Error('Network error'));
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       const { GET } = await import('@/app/api/geocoding/reverse/route');
 
@@ -286,7 +289,7 @@ describe('Geocoding Reverse API', () => {
         url: 'http://localhost:3000/api/geocoding/reverse?lat=45.4642&lon=9.19',
       };
 
-      const response = await GET(mockRequest as any, {} as any);
+      const response = await GET(asNextRequest(mockRequest), routeContext());
       const data = await response.json();
 
       expect(response.status).toBe(200);

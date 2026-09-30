@@ -12,19 +12,20 @@ import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLigh
 import { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import type { UseLightsDataReturn } from '@/app/components/devices/lights/hooks/useLightsData';
 import type { HueGroup, HueCommandResponse } from '@/types/hueProxy';
+import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 // Mock dependencies
 jest.mock('@/lib/hooks/useRetryableCommand');
 
 describe('useLightsCommands', () => {
-  const mockRouter = {
+  const mockRouter: AppRouterInstance = {
     push: jest.fn(),
     replace: jest.fn(),
     refresh: jest.fn(),
     back: jest.fn(),
     forward: jest.fn(),
     prefetch: jest.fn(),
-  } as any;
+  };
 
   const mockGroups: HueGroup[] = [
     {
@@ -141,14 +142,15 @@ describe('useLightsCommands', () => {
       })
     );
 
-    expect((result.current as any).handleRemoteAuth).toBeUndefined();
-    expect((result.current as any).handleStartPairing).toBeUndefined();
-    expect((result.current as any).handlePairWithBridge).toBeUndefined();
-    expect((result.current as any).handleCancelPairing).toBeUndefined();
-    expect((result.current as any).handleConfirmButtonPressed).toBeUndefined();
-    expect((result.current as any).handleSelectBridge).toBeUndefined();
-    expect((result.current as any).handleRetryPairing).toBeUndefined();
-    expect((result.current as any).handleDisconnectRemote).toBeUndefined();
+    const current: Record<string, unknown> = { ...result.current };
+    expect(current.handleRemoteAuth).toBeUndefined();
+    expect(current.handleStartPairing).toBeUndefined();
+    expect(current.handlePairWithBridge).toBeUndefined();
+    expect(current.handleCancelPairing).toBeUndefined();
+    expect(current.handleConfirmButtonPressed).toBeUndefined();
+    expect(current.handleSelectBridge).toBeUndefined();
+    expect(current.handleRetryPairing).toBeUndefined();
+    expect(current.handleDisconnectRemote).toBeUndefined();
   });
 
   it('handleRoomToggle sends v1 flat body { on: true } (not { on: { on: true } })', async () => {

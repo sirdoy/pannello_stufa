@@ -99,7 +99,7 @@ describe('TamStatusCard', () => {
 
   it('renders Skeleton on initial load when no status is present', () => {
     const { container } = render(<TamStatusCard status={null} loading={true} stale={false} />);
-    const skeleton = container.querySelector('[class*="h-[160px]"]');
+    const skeleton = container.querySelector('[class*="h-40"]');
     expect(skeleton).not.toBeNull();
   });
 });

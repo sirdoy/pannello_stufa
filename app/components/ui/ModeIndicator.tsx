@@ -75,7 +75,7 @@ export default function ModeIndicator({
         </Button>
       )}
       {enabled && semiManual && returnToAutoAt && (
-        <Text variant="tertiary" size="xs" className={compact ? 'ml-8 mt-2' : 'mt-2'}>
+        <Text variant="tertiary" size="xs" className={compact ? 'mt-2 ml-8' : 'mt-2'}>
           Ritorno automatico: {new Date(returnToAutoAt).toLocaleString('it-IT', {
             day: '2-digit',
             month: '2-digit',

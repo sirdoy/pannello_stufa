@@ -26,15 +26,15 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
           <div
             key={day}
             className={`
-              flex items-center gap-3 p-3 rounded-xl transition-all duration-200
+              flex items-center gap-3 rounded-xl p-3 transition-all duration-200
               ${isSelected
                 ? 'bg-primary-900/20 ring-primary-500'
-                : 'bg-white/[0.03] hover:bg-neutral-100 hover:bg-white/[0.05]'
+                : 'bg-white/3 hover:bg-neutral-100 hover:bg-white/5'
               }
             `}
           >
             {/* Day name */}
-            <div className="w-12 flex-shrink-0">
+            <div className="w-12 shrink-0">
               <span className={`
                 text-sm font-medium
                 ${isSelected
@@ -47,13 +47,13 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
             </div>
 
             {/* Timeline bar (24h) */}
-            <div className="flex-1 relative">
-              <div className="h-8 w-full bg-neutral-700 rounded-lg overflow-hidden relative">
+            <div className="relative flex-1">
+              <div className="relative h-8 w-full overflow-hidden rounded-lg bg-neutral-700">
                 {/* Reference grid lines */}
                 {[0, 6, 12, 18, 24].map(hour => (
                   <div
                     key={hour}
-                    className="absolute top-0 bottom-0 w-px bg-neutral-600"
+                    className="absolute inset-y-0 w-px bg-neutral-600"
                     style={{ left: `${(hour / 24) * 100}%` }}
                   />
                 ))}
@@ -74,7 +74,7 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
                       key={idx}
                       role="img"
                       aria-label={`Intervallo ${interval.start} - ${interval.end}, potenza ${interval.power}, ventola ${interval.fan}`}
-                      className="absolute top-0 bottom-0 transition-all duration-200 hover:opacity-90"
+                      className="absolute inset-y-0 transition-all duration-200 hover:opacity-90"
                       style={{
                         left: `${left}%`,
                         width: `${width}%`,
@@ -96,7 +96,7 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
               </div>
 
               {/* Time labels (optional, show on hover) */}
-              <div className="absolute -bottom-4 left-0 right-0 flex justify-between text-neutral-500 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <div className="pointer-events-none absolute inset-x-0 -bottom-4 flex justify-between text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100">
                 <span>0h</span>
                 <span>6h</span>
                 <span>12h</span>
@@ -106,7 +106,7 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
             </div>
 
             {/* Total hours badge */}
-            <div className="w-16 flex-shrink-0 text-right">
+            <div className="w-16 shrink-0 text-right">
               <span className={`
                 text-sm font-medium
                 ${hasIntervals
@@ -119,7 +119,7 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
             </div>
 
             {/* Select button */}
-            <div className="w-20 flex-shrink-0">
+            <div className="w-20 shrink-0">
               <Button
                 size="sm"
                 variant={isSelected ? 'ember' : 'ghost'}

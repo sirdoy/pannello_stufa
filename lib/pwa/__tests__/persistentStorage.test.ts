@@ -39,7 +39,7 @@ describe('persistentStorage', () => {
     });
 
     it('requests persistence', async () => {
-      const result = await requestPersistentStorage();
+      await requestPersistentStorage();
       expect(navigator.storage.persist).toHaveBeenCalled();
     });
 

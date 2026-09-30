@@ -192,9 +192,9 @@ export default function TestNotificationPage() {
   const isCustom = template === 'custom';
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="mx-auto max-w-3xl space-y-6">
       <Card className="p-6">
-        <div className="flex items-center gap-3 mb-2">
+        <div className="mb-2 flex items-center gap-3">
           <Button
             variant="ghost"
             size="sm"
@@ -216,27 +216,27 @@ export default function TestNotificationPage() {
 
         <div className="space-y-4">
           <div className="space-y-3">
-            <label className="flex items-center gap-3 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-3">
               <input
                 type="radio"
                 name="targetMode"
                 value="all"
                 checked={targetMode === 'all'}
                 onChange={(e) => setTargetMode(e.target.value as TargetMode)}
-                className="w-4 h-4 text-ember-500 focus:ring-ember-500"
+                className="size-4 text-ember-500 focus:ring-ember-500"
                 data-testid="target-all"
               />
               <Text>All Devices ({devices.length})</Text>
             </label>
 
-            <label className="flex items-center gap-3 cursor-pointer">
+            <label className="flex cursor-pointer items-center gap-3">
               <input
                 type="radio"
                 name="targetMode"
                 value="specific"
                 checked={targetMode === 'specific'}
                 onChange={(e) => setTargetMode(e.target.value as TargetMode)}
-                className="w-4 h-4 text-ember-500 focus:ring-ember-500"
+                className="size-4 text-ember-500 focus:ring-ember-500"
                 data-testid="target-specific"
               />
               <Text>Specific Device</Text>
@@ -244,7 +244,7 @@ export default function TestNotificationPage() {
           </div>
 
           {targetMode === 'specific' && (
-            <div className="ml-7 mt-3">
+            <div className="mt-3 ml-7">
               {loadingDevices ? (
                 <Text variant="tertiary" size="sm">Loading devices...</Text>
               ) : devices.length === 0 ? (
@@ -253,7 +253,7 @@ export default function TestNotificationPage() {
                 <select
                   value={selectedDevice || ''}
                   onChange={(e) => setSelectedDevice(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
+                  className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-slate-200 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
                   data-testid="device-selector"
                 >
                   <option value="">Select a device</option>
@@ -278,7 +278,7 @@ export default function TestNotificationPage() {
             <select
               value={template}
               onChange={(e) => handleTemplateChange(e.target.value as TemplateKey)}
-              className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
+              className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-slate-200 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
               data-testid="test-template"
             >
               {Object.entries(templates).map(([key, tpl]) => (
@@ -295,7 +295,7 @@ export default function TestNotificationPage() {
           </div>
 
           {!isCustom && selectedTemplate ? (
-            <div className="p-4 bg-slate-800/50 border border-white/10 rounded-lg">
+            <div className="rounded-lg border border-white/10 bg-slate-800/50 p-4">
               <Text variant="tertiary" size="xs" className="mb-2">Preview:</Text>
               <Text>{selectedTemplate.title}</Text>
               <Text size="sm" className="mt-1">{selectedTemplate.body}</Text>
@@ -309,7 +309,7 @@ export default function TestNotificationPage() {
                   value={customTitle}
                   onChange={(e) => setCustomTitle(e.target.value)}
                   placeholder="Enter notification title"
-                  className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 placeholder-slate-500 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
+                  className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-slate-200 placeholder-slate-500 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
                   data-testid="custom-title"
                 />
               </div>
@@ -321,7 +321,7 @@ export default function TestNotificationPage() {
                   onChange={(e) => setCustomBody(e.target.value)}
                   placeholder="Enter notification body"
                   rows={4}
-                  className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-lg text-slate-200 placeholder-slate-500 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
+                  className="w-full rounded-lg border border-white/10 bg-slate-800 px-4 py-3 text-slate-200 placeholder-slate-500 focus:border-ember-500 focus:ring-1 focus:ring-ember-500"
                   data-testid="custom-body"
                 />
               </div>
@@ -334,14 +334,14 @@ export default function TestNotificationPage() {
         <Heading level={2} size="lg" className="mb-4">Priority Level</Heading>
         <div className="space-y-3">
           {priorities.map(p => (
-            <label key={p.value} className="flex items-start gap-3 cursor-pointer">
+            <label key={p.value} className="flex cursor-pointer items-start gap-3">
               <input
                 type="radio"
                 name="priority"
                 value={p.value}
                 checked={priority === p.value}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-4 h-4 mt-1 text-ember-500 focus:ring-ember-500 bg-slate-800 border-white/20"
+                className="mt-1 size-4 border-white/20 bg-slate-800 text-ember-500 focus:ring-ember-500"
                 data-testid={`priority-${p.value}`}
               />
               <div>
@@ -368,7 +368,7 @@ export default function TestNotificationPage() {
       </Card>
 
       {result && (
-        <Card className={`p-6 border-2 ${result.success ? 'border-sage-500/30' : 'border-danger-500/30'}`} data-testid="delivery-status">
+        <Card className={`border-2 p-6 ${result.success ? 'border-sage-500/30' : 'border-danger-500/30'}`} data-testid="delivery-status">
           <div className="flex items-start gap-3">
             <span className="text-3xl">{result.success ? '✅' : '❌'}</span>
             <div className="flex-1">
@@ -382,7 +382,7 @@ export default function TestNotificationPage() {
                     Notification should arrive within 5 seconds
                   </Text>
 
-                  <div className="space-y-2 p-4 bg-slate-800/50 border border-white/10 rounded-lg">
+                  <div className="space-y-2 rounded-lg border border-white/10 bg-slate-800/50 p-4">
                     <Text variant="tertiary" size="xs" className="mb-2">Delivery Trace:</Text>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -407,14 +407,14 @@ export default function TestNotificationPage() {
                     </div>
 
                     {result.trace.template && (
-                      <div className="mt-3 pt-3 border-t border-white/10">
+                      <div className="mt-3 border-t border-white/10 pt-3">
                         <Text variant="tertiary" size="xs">Template used</Text>
                         <Text size="sm">{result.trace.template}</Text>
                       </div>
                     )}
 
                     {result.success && (
-                      <div className="mt-3 pt-3 border-t border-white/10">
+                      <div className="mt-3 border-t border-white/10 pt-3">
                         <Text variant="tertiary" size="xs" className="flex items-center gap-2">
                           <span>📝</span>
                           Logged to notification history
@@ -423,7 +423,7 @@ export default function TestNotificationPage() {
                     )}
 
                     {(result.trace?.deliveryResults?.errors?.length ?? 0) > 0 && (
-                      <div className="mt-3 pt-3 border-t border-white/10">
+                      <div className="mt-3 border-t border-white/10 pt-3">
                         <Text variant="tertiary" size="xs" className="mb-2">Errors:</Text>
                         {result.trace?.deliveryResults?.errors?.map((err, idx) => (
                           <Text key={idx} size="xs" variant="danger">
@@ -447,7 +447,7 @@ export default function TestNotificationPage() {
       )}
 
       {/* Test History Info */}
-      <Card className="p-6 bg-slate-800/30 border border-white/5">
+      <Card className="border border-white/5 bg-slate-800/30 p-6">
         <div className="flex items-start gap-3">
           <span className="text-xl">💡</span>
           <div>
@@ -457,7 +457,7 @@ export default function TestNotificationPage() {
             <div className="space-y-2">
               <Text size="sm" variant="secondary">
                 Test notifications are logged like production notifications and appear in
-                <a href="/settings/notifications/history" className="text-ember-400 hover:underline ml-1">
+                <a href="/settings/notifications/history" className="ml-1 text-ember-400 hover:underline">
                   Notification History
                 </a>.
               </Text>

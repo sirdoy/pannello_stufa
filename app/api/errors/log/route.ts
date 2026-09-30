@@ -18,7 +18,6 @@
 import {
   withAuthAndErrorHandler,
   success,
-  badRequest,
   parseJsonOrThrow,
   validateRequired,
   validateEnum,

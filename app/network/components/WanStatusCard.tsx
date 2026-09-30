@@ -52,7 +52,7 @@ export default function WanStatusCard({ wan, isStale, lastUpdated }: WanStatusCa
   return (
     <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Status Banner */}
-      <div className={`${statusBgClass} rounded-lg p-3 flex items-center justify-between`}>
+      <div className={`${statusBgClass} flex items-center justify-between rounded-lg p-3`}>
         <Badge variant={wan.connected ? 'sage' : 'danger'}>
           {wan.connected ? 'WAN Online' : 'WAN Offline'}
         </Badge>
@@ -65,7 +65,7 @@ export default function WanStatusCard({ wan, isStale, lastUpdated }: WanStatusCa
 
       {/* External IP Section */}
       <div className="space-y-2">
-        <Text variant="label" size="sm" className="text-slate-400 uppercase tracking-wide">
+        <Text variant="label" size="sm" className="tracking-wide text-slate-400 uppercase">
           IP Esterno
         </Text>
         <CopyableIp ip={wan.externalIp || 'N/A'} />

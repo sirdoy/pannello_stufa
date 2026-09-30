@@ -26,7 +26,7 @@ export default function SonosQueueViewer({ groupId }: SonosQueueViewerProps) {
     <div className="border-t border-slate-700/50 pt-3">
       <button
         onClick={handleToggle}
-        className="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
+        className="flex items-center gap-2 text-sm text-slate-400 transition-colors hover:text-slate-200"
       >
         <ListMusic size={14} />
         <span>{headerLabel}</span>
@@ -36,37 +36,37 @@ export default function SonosQueueViewer({ groupId }: SonosQueueViewerProps) {
       {isExpanded && (
         <div className="mt-2 space-y-0.5">
           {loading && items.length === 0 && (
-            <p className="text-xs text-slate-500 py-2">Caricamento...</p>
+            <p className="py-2 text-xs text-slate-500">Caricamento...</p>
           )}
           {error && (
-            <p className="text-xs text-red-400 py-2">{error}</p>
+            <p className="py-2 text-xs text-red-400">{error}</p>
           )}
           {!loading && !error && items.length === 0 && (
-            <p className="text-xs text-slate-500 py-2">Coda vuota</p>
+            <p className="py-2 text-xs text-slate-500">Coda vuota</p>
           )}
           {items.length > 0 && (
             <>
               {items.map(item => (
                 <div key={item.position} className="flex items-center gap-3 py-1.5">
-                  <span className="w-6 text-right text-xs text-slate-500 flex-shrink-0">
+                  <span className="w-6 shrink-0 text-right text-xs text-slate-500">
                     {/* position is 0-based (backend offset + index) */}
                     {item.position + 1}
                   </span>
                   <span className="flex-1 truncate text-sm text-slate-200">
                     {item.title ?? '—'}
                   </span>
-                  <span className="text-xs text-slate-400 truncate max-w-[120px]">
+                  <span className="max-w-30 truncate text-xs text-slate-400">
                     {item.artist ?? '—'}
                   </span>
                 </div>
               ))}
               {loading && items.length > 0 && (
-                <p className="text-xs text-slate-500 py-2">Caricamento...</p>
+                <p className="py-2 text-xs text-slate-500">Caricamento...</p>
               )}
               {hasMore && !loading && (
                 <button
                   onClick={() => void loadMore()}
-                  className="text-xs text-ember-400 hover:text-ember-300 transition-colors py-1.5"
+                  className="py-1.5 text-xs text-ember-400 transition-colors hover:text-ember-300"
                 >
                   Carica altri
                 </button>

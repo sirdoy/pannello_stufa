@@ -35,6 +35,8 @@ export interface UseDirigeraFullDataReturn {
 }
 
 export function useDirigeraFullData(filter: SensorFilter): UseDirigeraFullDataReturn {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const [data, setData] = useState<DirigeraFullData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -124,7 +126,6 @@ export function useDirigeraFullData(filter: SensorFilter): UseDirigeraFullDataRe
     return () => {
       unsubscribe('dirigera', handleMessage);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWsConnected, subscribe, unsubscribe, filter]);
 
   useAdaptivePolling({

@@ -83,9 +83,9 @@ export default function ErrorsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="mx-auto max-w-7xl space-y-6">
         <Skeleton.Card>
-          <Skeleton className="h-8 w-64 mb-6" />
+          <Skeleton className="mb-6 h-8 w-64" />
           {[...Array(5)].map((_, i) => (
             <div key={i} className="mb-4">
               <Skeleton className="h-24 w-full" />
@@ -97,10 +97,10 @@ export default function ErrorsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6">
       {/* Header */}
       <Card variant="glass" className="p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <Heading level={1} size="3xl" className="flex items-center gap-3">
               <span>🚨</span>
@@ -150,7 +150,7 @@ export default function ErrorsPage() {
       <div className="space-y-4">
         {paginatedErrors.length === 0 ? (
           <Card variant="glass" className="p-12 text-center">
-            <span className="text-6xl mb-4 block">✅</span>
+            <span className="mb-4 block text-6xl">✅</span>
             <Heading level={2} size="xl" className="mb-2">
               Nessun errore trovato
             </Heading>
@@ -171,7 +171,7 @@ export default function ErrorsPage() {
                 />
 
                 {/* Metadata */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-700">
+                <div className="grid grid-cols-1 gap-4 border-t border-slate-700 pt-4 md:grid-cols-3">
                   <div>
                     <Text variant="tertiary" size="xs" className="mb-1">Data e Ora</Text>
                     <Text size="sm">
@@ -211,7 +211,7 @@ export default function ErrorsPage() {
 
                 {/* Actions */}
                 {!error.resolved && (
-                  <div className="pt-4 border-t border-slate-700">
+                  <div className="border-t border-slate-700 pt-4">
                     <Button
                       variant="success"
                       size="sm"

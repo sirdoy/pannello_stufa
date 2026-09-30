@@ -13,7 +13,7 @@ jest.mock('../indexedDB', () => ({
   put: jest.fn().mockResolvedValue(1),
   getAll: jest.fn().mockResolvedValue([]),
   getByIndex: jest.fn().mockResolvedValue([]),
-  remove: jest.fn((storeName: string, key: string | number) => Promise.resolve()),
+  remove: jest.fn((_storeName: string, _key: string | number) => Promise.resolve()),
   STORES: {
     COMMAND_QUEUE: 'commandQueue',
     DEVICE_STATE: 'deviceState',

@@ -67,7 +67,7 @@ export default function WifiNetworksTable({ networks, loading, stale }: WifiNetw
 
   if (loading) {
     return (
-      <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+      <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
         <Skeleton className="h-6 w-40" />
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
@@ -87,7 +87,7 @@ export default function WifiNetworksTable({ networks, loading, stale }: WifiNetw
   }
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <Heading level={3}>Reti WiFi</Heading>

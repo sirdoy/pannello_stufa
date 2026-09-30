@@ -17,6 +17,8 @@ const OnlineStatusContext = createContext<OnlineStatusState | null>(null);
  * One timer for the whole app — no duplicate HEAD /api/health polling.
  */
 export function OnlineStatusProvider({ children }: { children: ReactNode }) {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const [isOnline, setIsOnline] = useState(true);
   const [wasOffline, setWasOffline] = useState(false);
   const [lastOnlineAt, setLastOnlineAt] = useState<Date | null>(null);
@@ -41,6 +43,8 @@ export function OnlineStatusProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof navigator !== 'undefined') {
       const online = navigator.onLine;
+      // navigator is client-only: reading it during render would break SSR hydration
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOnline(online);
       if (online) {
         setLastOnlineAt(new Date());
@@ -101,7 +105,6 @@ export function OnlineStatusProvider({ children }: { children: ReactNode }) {
     }, isOnline ? 30000 : 10000);
 
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOnline, offlineSince]);
 
   return (

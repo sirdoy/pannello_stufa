@@ -187,8 +187,8 @@ export default function LocationSearch({
       {/* Current location display */}
       {currentLocation && (
         <div className={cn(
-          'mb-4 p-3 rounded-lg border',
-          'bg-sage-900/20 border-sage-700/30',
+          'mb-4 rounded-lg border p-3',
+          'border-sage-700/30 bg-sage-900/20',
           ' '
         )}>
           <Text variant="tertiary" size="xs" className="mb-1">
@@ -211,8 +211,8 @@ export default function LocationSearch({
         {/* Suggestions dropdown */}
         {suggestions.length > 0 && (
           <ul className={cn(
-            'absolute z-10 w-full mt-1 rounded-lg border shadow-lg overflow-hidden',
-            'bg-slate-800 border-slate-700',
+            'absolute z-10 mt-1 w-full overflow-hidden rounded-lg border shadow-lg',
+            'border-slate-700 bg-slate-800',
             ' '
           )}>
             {suggestions.map((s) => (
@@ -221,11 +221,11 @@ export default function LocationSearch({
                   type="button"
                   onClick={() => handleSelectSuggestion(s)}
                   className={cn(
-                    'w-full px-4 py-3 text-left transition-colors flex items-center gap-3',
+                    'flex w-full items-center gap-3 px-4 py-3 text-left transition-colors',
                     'hover:bg-slate-700',
                   )}
                 >
-                  <span className="text-ocean-400 flex-shrink-0">📍</span>
+                  <span className="shrink-0 text-ocean-400">📍</span>
                   <div className="min-w-0">
                     <Text className="truncate">{s.name}</Text>
                     <Text variant="tertiary" size="sm" className="truncate">
@@ -265,7 +265,7 @@ export default function LocationSearch({
         type="button"
         onClick={() => setShowAdvanced(!showAdvanced)}
         className={cn(
-          'mt-4 text-sm flex items-center gap-1',
+          'mt-4 flex items-center gap-1 text-sm',
           'text-slate-400 hover:text-slate-300',
           ' '
         )}
@@ -277,7 +277,7 @@ export default function LocationSearch({
       {/* Manual coordinates section */}
       {showAdvanced && (
         <div className={cn(
-          'mt-3 p-4 rounded-lg space-y-3',
+          'mt-3 space-y-3 rounded-lg p-4',
           'bg-slate-800/40',
         )}>
           <Text variant="secondary" size="sm">

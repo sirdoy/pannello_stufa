@@ -17,7 +17,7 @@ import {
   getPathParam,
   getOptionalPathParam,
 } from '../requestParser';
-import { ApiError, ERROR_CODES } from '../apiErrors';
+import { ApiError } from '../apiErrors';
 import { asNextRequest } from '@/__tests__/__utils__/routeHelpers';
 
 // Helper to create mock request

@@ -3,8 +3,8 @@ import { Card, Button, EmptyState } from './components/ui';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card variant="glass" className="max-w-md w-full p-8">
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <Card variant="glass" className="w-full max-w-md p-8">
         <EmptyState
           icon="🔍"
           title="Pagina Non Trovata"

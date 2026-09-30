@@ -176,7 +176,7 @@ export default function RoomStatusPage() {
       <Card variant="glass" className="p-4 sm:p-6">
         {/* Stats row: house summary + health stats (per D-06, D-07, D-08) */}
         {(houseStatus !== null || health !== null) && (
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-slate-400 mb-4">
+          <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-slate-400 sm:gap-6">
             {houseStatus !== null && (
               <>
                 <span>
@@ -209,7 +209,7 @@ export default function RoomStatusPage() {
         )}
 
         {/* Toolbar: Aggiorna button (per D-20) */}
-        <div className="flex items-center justify-end mb-4">
+        <div className="mb-4 flex items-center justify-end">
           <Button variant="ember" size="sm" onClick={handleRefresh}>
             Aggiorna
           </Button>
@@ -223,7 +223,7 @@ export default function RoomStatusPage() {
 
         {/* Empty state (per D-24) */}
         {!loading && !error && houseStatus !== null && houseStatus.rooms.length === 0 && (
-          <div className="text-center py-8 text-slate-400">
+          <div className="py-8 text-center text-slate-400">
             <p>Nessuna stanza configurata</p>
             <Button
               variant="ember"
@@ -238,11 +238,11 @@ export default function RoomStatusPage() {
 
         {/* Room cards grid (per D-09) */}
         {!loading && !error && houseStatus !== null && houseStatus.rooms.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {sortedRooms.map((room) => (
               <Card key={room.room_id} variant="glass">
                 {/* Room header (per D-10) */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
+                <div className="mb-3 flex flex-wrap items-center gap-2">
                   <Heading>{room.room_name}</Heading>
                   <Badge variant="sage" size="sm">
                     {room.available_count} disponibili
@@ -257,7 +257,7 @@ export default function RoomStatusPage() {
 
                 {/* Empty room state (per D-25) */}
                 {room.devices.length === 0 && (
-                  <p className="text-sm text-slate-400 py-2">Nessun dispositivo assegnato</p>
+                  <p className="py-2 text-sm text-slate-400">Nessun dispositivo assegnato</p>
                 )}
 
                 {/* Device rows (per D-12) */}
@@ -275,7 +275,7 @@ export default function RoomStatusPage() {
                               {device.provider_name}
                             </Badge>
                             {/* Device type mono (per D-15) */}
-                            <code className="text-sm font-mono text-slate-400">
+                            <code className="font-mono text-sm text-slate-400">
                               {device.device_type}
                             </code>
                             {/* Status badge (per D-13) */}
@@ -291,7 +291,7 @@ export default function RoomStatusPage() {
                           </div>
                           {/* Provider-specific data (per D-16) */}
                           {deviceData !== null && (
-                            <span className="text-xs text-slate-400 ml-1">{deviceData}</span>
+                            <span className="ml-1 text-xs text-slate-400">{deviceData}</span>
                           )}
                         </div>
                       );

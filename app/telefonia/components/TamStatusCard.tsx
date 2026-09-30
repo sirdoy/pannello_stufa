@@ -47,13 +47,13 @@ export default function TamStatusCard({
 }: TamStatusCardProps) {
   // Loading (first load, no data yet)
   if (loading && !status) {
-    return <Skeleton className="h-[160px] rounded-2xl" />;
+    return <Skeleton className="h-40 rounded-2xl" />;
   }
 
   // Error state — heading stays visible, body replaced by Banner.
   if (error) {
     return (
-      <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+      <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Voicemail size={24} aria-hidden="true" className="text-slate-400" />
@@ -74,7 +74,7 @@ export default function TamStatusCard({
   // If we have no status (edge case — treat as error per UI-SPEC "TAM is never empty")
   if (!status || !status.tam) {
     return (
-      <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+      <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Voicemail size={24} aria-hidden="true" className="text-slate-400" />
@@ -102,7 +102,7 @@ export default function TamStatusCard({
   const fetchedAt = parseFetchedAt(status.fetched_at);
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Row 1: heading + HealthIndicator */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

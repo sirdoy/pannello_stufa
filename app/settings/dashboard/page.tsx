@@ -122,7 +122,7 @@ export default function DashboardSettingsPage() {
           text: data.error || 'Errore durante il salvataggio',
         });
       }
-    } catch (err) {
+    } catch {
       setSaveMessage({ type: 'error', text: 'Errore di connessione' });
     } finally {
       setIsSaving(false);
@@ -214,7 +214,7 @@ export default function DashboardSettingsPage() {
       </div>
 
       {/* Save section */}
-      <div className="flex justify-end mt-6">
+      <div className="mt-6 flex justify-end">
         <Button
           variant="ember"
           onClick={handleSave}

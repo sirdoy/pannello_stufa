@@ -108,19 +108,19 @@ describe('ConnectionStatus', () => {
     it('applies correct dot size for sm', () => {
       const { container } = render(<ConnectionStatus size="sm" />);
       const dot = container.querySelector('[aria-hidden="true"]');
-      expect(dot).toHaveClass('w-1.5', 'h-1.5');
+      expect(dot).toHaveClass('size-1.5');
     });
 
     it('applies correct dot size for md', () => {
       const { container } = render(<ConnectionStatus size="md" />);
       const dot = container.querySelector('[aria-hidden="true"]');
-      expect(dot).toHaveClass('w-2', 'h-2');
+      expect(dot).toHaveClass('size-2');
     });
 
     it('applies correct dot size for lg', () => {
       const { container } = render(<ConnectionStatus size="lg" />);
       const dot = container.querySelector('[aria-hidden="true"]');
-      expect(dot).toHaveClass('w-2.5', 'h-2.5');
+      expect(dot).toHaveClass('size-2.5');
     });
   });
 

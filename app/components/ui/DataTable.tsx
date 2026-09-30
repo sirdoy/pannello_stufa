@@ -92,11 +92,11 @@ export const dataTableVariants = cva(
         relaxed: '[&_td]:py-4 [&_th]:py-4', // 52px rows
       },
       striped: {
-        true: '[&_tbody_tr:nth-child(even)]:bg-white/[0.02]',
+        true: '[&_tbody_tr:nth-child(even)]:bg-white/2',
         false: '',
       },
       stickyHeader: {
-        true: '[&_thead]:sticky [&_thead]:top-0 [&_thead]:bg-slate-900 [&_thead]:z-10',
+        true: '[&_thead]:sticky [&_thead]:top-0 [&_thead]:z-10 [&_thead]:bg-slate-900',
         false: '',
       },
     },
@@ -304,11 +304,11 @@ const DataTable = forwardRef(function DataTable<TData>(
               row.toggleExpanded();
             }}
             aria-label={row.getIsExpanded() ? 'Collapse row' : 'Expand row'}
-            className="p-1 hover:bg-white/[0.05] rounded transition-colors"
+            className="rounded p-1 transition-colors hover:bg-white/5"
           >
             <ChevronRight
               className={cn(
-                'w-4 h-4 transition-transform text-slate-400',
+                'size-4 text-slate-400 transition-transform',
                 row.getIsExpanded() && 'rotate-90 text-ember-400'
               )}
               aria-hidden="true"
@@ -392,6 +392,7 @@ const DataTable = forwardRef(function DataTable<TData>(
   };
 
   // Initialize TanStack Table
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is not memoizable; the compiler skips this component
   const table = useReactTable({
     data,
     columns,
@@ -523,7 +524,7 @@ const DataTable = forwardRef(function DataTable<TData>(
         <div
           ref={scrollContainerRef}
           className={cn(
-            'overflow-x-auto rounded-2xl border border-white/[0.06]',
+            'overflow-x-auto rounded-2xl border border-white/6',
             'scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent',
             '-webkit-overflow-scrolling-touch'
           )}
@@ -534,7 +535,7 @@ const DataTable = forwardRef(function DataTable<TData>(
               'min-w-full'
             )}
           >
-        <thead className="bg-slate-800/50 border-b border-white/[0.06]">
+        <thead className="border-b border-white/6 bg-slate-800/50">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id} role="row">
               {headerGroup.headers.map((header) => {
@@ -549,7 +550,7 @@ const DataTable = forwardRef(function DataTable<TData>(
                     aria-sort={canSort ? getAriaSortValue(isSorted, sortDirection) : undefined}
                     className={cn(
                       'px-4 text-left text-sm font-semibold text-slate-300',
-                      'border-b border-white/[0.06]',
+                      'border-b border-white/6',
                       canSort && 'cursor-pointer select-none',
                       (header.id === 'select' || header.id === 'expand') && 'w-10 px-2 text-center'
                     )}
@@ -562,7 +563,7 @@ const DataTable = forwardRef(function DataTable<TData>(
                     ) : canSort ? (
                       <button
                         type="button"
-                        className="inline-flex items-center w-full hover:text-slate-100 transition-colors"
+                        className="inline-flex w-full items-center transition-colors hover:text-slate-100"
                         onClick={header.column.getToggleSortingHandler()}
                         aria-label={`Sort by ${flexRender(
                           header.column.columnDef.header,
@@ -622,7 +623,7 @@ const DataTable = forwardRef(function DataTable<TData>(
 
         {/* Pagination */}
         {enablePagination && pageCount > 1 && (
-          <div className="flex items-center justify-center gap-4 py-4 border-t border-white/[0.06]">
+          <div className="flex items-center justify-center gap-4 border-t border-white/6 py-4">
           {/* ARIA live region for screen readers */}
           <div role="status" aria-live="polite" className="sr-only">
             Page {pageIndex + 1} of {pageCount}. Showing rows {startRow} to {endRow} of {totalRows}.
@@ -644,15 +645,15 @@ const DataTable = forwardRef(function DataTable<TData>(
               disabled={!table.getCanPreviousPage()}
               aria-label="Go to previous page"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="size-4" />
             </Button>
 
             {/* Page numbers */}
-            {pageNumbers.map((page, idx) =>
+            {pageNumbers.map((page) =>
               typeof page === 'string' ? (
                 <span
                   key={page}
-                  className="flex items-center justify-center w-8 h-8 text-slate-500"
+                  className="flex size-8 items-center justify-center text-slate-500"
                   aria-hidden="true"
                 >
                   ...
@@ -665,7 +666,7 @@ const DataTable = forwardRef(function DataTable<TData>(
                   onClick={() => table.setPageIndex(page)}
                   aria-current={page === pageIndex ? 'page' : undefined}
                   aria-label={`Go to page ${page + 1}`}
-                  className="min-w-[32px]"
+                  className="min-w-8"
                 >
                   {page + 1}
                 </Button>
@@ -679,7 +680,7 @@ const DataTable = forwardRef(function DataTable<TData>(
               disabled={!table.getCanNextPage()}
               aria-label="Go to next page"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="size-4" />
             </Button>
           </nav>
 
@@ -697,7 +698,7 @@ const DataTable = forwardRef(function DataTable<TData>(
                 value={pageSize}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
                 className={cn(
-                  'px-2 py-1 rounded-lg text-sm',
+                  'rounded-lg px-2 py-1 text-sm',
                   'bg-slate-800/60 text-slate-200',
                   'border border-slate-700/50',
                   'focus:outline-none focus-visible:ring-2',
@@ -719,7 +720,7 @@ const DataTable = forwardRef(function DataTable<TData>(
         {/* Right fade gradient scroll indicator */}
         {showScrollIndicator && (
           <div
-            className="absolute top-0 right-0 bottom-0 w-8 pointer-events-none rounded-r-2xl"
+            className="pointer-events-none absolute inset-y-0 right-0 w-8 rounded-r-2xl"
             style={{
               background: 'linear-gradient(to left, rgb(15 23 42), transparent)',
             }}

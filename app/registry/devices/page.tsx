@@ -482,14 +482,14 @@ export default function DeviceRegistryPage() {
       accessorKey: 'device_type_slug',
       header: 'Tipo',
       cell: ({ row }) => (
-        <code className="text-sm font-mono text-slate-400">{row.original.device_type_slug}</code>
+        <code className="font-mono text-sm text-slate-400">{row.original.device_type_slug}</code>
       ),
     },
     {
       accessorKey: 'device_id',
       header: 'ID dispositivo',
       cell: ({ row }) => (
-        <code className="text-sm font-mono text-slate-400">{row.original.device_id}</code>
+        <code className="font-mono text-sm text-slate-400">{row.original.device_id}</code>
       ),
     },
     {
@@ -536,7 +536,7 @@ export default function DeviceRegistryPage() {
         <Card variant="glass" className="p-4 sm:p-6">
           {/* Health stats inline (per D-11) */}
           {health && (
-            <div className="flex items-center gap-6 text-sm text-slate-400 mb-4">
+            <div className="mb-4 flex items-center gap-6 text-sm text-slate-400">
               <span>
                 Tipi dispositivo:{' '}
                 <strong className="text-slate-200">{health.device_types_count}</strong>
@@ -549,7 +549,7 @@ export default function DeviceRegistryPage() {
           )}
 
           {/* Toolbar: provider filter + register button (per D-08, D-14) */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <Select
               label="Provider"
               options={providerOptions}
@@ -565,7 +565,7 @@ export default function DeviceRegistryPage() {
 
           {/* Empty state (per D-35) */}
           {devices.length === 0 ? (
-            <div className="text-center py-8 text-slate-400">
+            <div className="py-8 text-center text-slate-400">
               <p>Nessun dispositivo registrato</p>
               {!allRegistered && (
                 <Button
@@ -584,7 +584,7 @@ export default function DeviceRegistryPage() {
 
           {/* Server-side pagination controls (per D-06, Research Pattern 6) */}
           {totalCount > PAGE_SIZE && (
-            <div className="flex items-center justify-between mt-4 text-sm text-slate-400">
+            <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
               <span>
                 Pagina {page + 1} di {Math.ceil(totalCount / PAGE_SIZE)}
               </span>
@@ -645,14 +645,14 @@ export default function DeviceRegistryPage() {
             {({ control }) => (
               <>
                 {/* Read-only context (per D-22) */}
-                <div className="text-sm text-slate-400 mb-2">
+                <div className="mb-2 text-sm text-slate-400">
                   <p>Provider: <strong className="text-slate-200">{deviceToEdit?.provider_name}</strong></p>
                   <p>ID: <strong className="text-slate-200">{deviceToEdit?.device_id}</strong></p>
                 </div>
                 <Controller name="custom_name" control={control} render={({ field, fieldState }) => (
                   <Input label="Nome" {...field} error={fieldState.error?.message} />
                 )} />
-                <Controller name="device_type_slug" control={control} render={({ field, fieldState }) => (
+                <Controller name="device_type_slug" control={control} render={({ field }) => (
                   <Select label="Tipo" options={deviceTypes.map(t => ({ value: t.slug, label: t.label }))} value={field.value} onChange={(e) => field.onChange(String(e.target.value))} />
                 )} />
               </>

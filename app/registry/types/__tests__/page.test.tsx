@@ -67,11 +67,9 @@ jest.mock('@/app/components/ui/DataTable', () => ({
 }));
 
 // Mock FormModal — captures title and renders submit button
-let lastFormModalProps: MockFormModalProps | null = null;
 jest.mock('@/app/components/ui/FormModal', () => ({
   __esModule: true,
   default: (props: MockFormModalProps) => {
-    lastFormModalProps = props;
     if (!props.isOpen) return null;
     const handleSubmit = () => {
       if (props.title === 'Crea tipo dispositivo') {

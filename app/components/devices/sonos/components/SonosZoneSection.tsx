@@ -62,7 +62,7 @@ export default function SonosZoneSection({
   };
 
   return (
-    <div className="rounded-2xl bg-slate-800/50 p-5 sm:p-6 space-y-4">
+    <div className="space-y-4 rounded-2xl bg-slate-800/50 p-5 sm:p-6">
       {/* Zone header */}
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-slate-100">
@@ -93,7 +93,7 @@ export default function SonosZoneSection({
       />
 
       {/* Play Mode + Sleep Timer — same row per D-16, stacks on mobile */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <SonosPlayModeControls
           playMode={playMode?.play_mode ?? null}
           onSetPlayMode={(mode: SonosPlayMode) => void commands.handleSetPlayMode(zone.group_id, mode)}
@@ -109,16 +109,16 @@ export default function SonosZoneSection({
 
       {/* Zone volume — affects all speakers in zone */}
       <div className="border-t border-slate-700/50 pt-3">
-        <h3 className="text-sm font-medium text-slate-400 mb-2">Volume Zona</h3>
+        <h3 className="mb-2 text-sm font-medium text-slate-400">Volume Zona</h3>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500 w-8 text-right">{localZoneVolume}%</span>
+          <span className="w-8 text-right text-xs text-slate-500">{localZoneVolume}%</span>
           <input
             type="range"
             min={0}
             max={100}
             value={localZoneVolume}
             onChange={handleZoneVolumeChange}
-            className="w-full h-2 rounded-lg bg-slate-700 accent-success-500"
+            className="h-2 w-full rounded-lg bg-slate-700 accent-success-500"
             aria-label="Volume Zona"
           />
         </div>
@@ -126,7 +126,7 @@ export default function SonosZoneSection({
 
       {/* Volume per speaker */}
       <div className="border-t border-slate-700/50 pt-3">
-        <h3 className="text-sm font-medium text-slate-400 mb-2">Volume Speaker</h3>
+        <h3 className="mb-2 text-sm font-medium text-slate-400">Volume Speaker</h3>
         {zone.members.map(member => (
           <SonosSpeakerVolume
             key={member.uid}

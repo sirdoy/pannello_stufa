@@ -78,7 +78,7 @@ describe('ActionsSection — picker overlay', () => {
     );
     fireEvent.click(screen.getByRole('button', { name: /Aggiungi azione/i }));
     // Count tile buttons by aria-pressed (TypeTile renders as button with aria-pressed)
-    const tiles = screen.getAllByRole('button', { name: /Annulla/ });
+    screen.getAllByRole('button', { name: /Annulla/ });
     // There should be 11 type tiles + 1 Annulla = let's count buttons excluding Annulla
     const allButtons = screen.getAllByRole('button');
     // Minus the Annulla button (1)

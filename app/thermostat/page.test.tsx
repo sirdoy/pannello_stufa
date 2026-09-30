@@ -179,7 +179,7 @@ describe('NetatmoPage - setState-in-render fix', () => {
       }),
     });
 
-    const { rerender } = render(<NetatmoPage />);
+    render(<NetatmoPage />);
 
     // Initial render should not call router
     expect(mockRouter.replace).not.toHaveBeenCalled();

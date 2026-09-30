@@ -19,14 +19,12 @@ import {
   getNotificationPermission,
   getFCMToken,
   initializeNotifications,
-  checkStoredToken,
 } from '@/lib/notifications/notificationService';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import { Heading, Text, Banner, Badge } from '@/app/components/ui';
 import NotificationPermissionButton from '@/app/components/NotificationPermissionButton';
-import NotificationPreferencesPanel from '@/app/components/NotificationPreferencesPanel';
 import NotificationSettingsForm from './NotificationSettingsForm';
 import Skeleton from '@/app/components/ui/Skeleton';
 // @ts-expect-error no type definitions for useNotificationPreferences
@@ -64,7 +62,6 @@ export default function NotificationsSettingsPage() {
   const {
     prefs: preferences,
     loading: isLoadingPreferences,
-    error: preferencesError,
     isSaving: isSavingPreferences,
     savePreferences,
   } = useNotificationPreferences(user?.sub);
@@ -163,7 +160,7 @@ export default function NotificationsSettingsPage() {
 
     const tokensRef = ref(db, `users/${user.sub}/fcmTokens`);
 
-    const unsubscribe = onValue(tokensRef, (snapshot) => {
+    onValue(tokensRef, (snapshot) => {
       if (snapshot.exists()) {
         const tokensData = snapshot.val();
         const devicesList = Object.entries(tokensData).map(([key, data]) => ({
@@ -256,7 +253,7 @@ export default function NotificationsSettingsPage() {
     return (
       <SettingsLayout title="Notifiche" icon="🔔">
         <Card variant="glass" className="p-8 text-center">
-          <div className="text-6xl mb-4">🔐</div>
+          <div className="mb-4 text-6xl">🔐</div>
           <Heading level={2} size="xl" className="mb-2">
             Autenticazione Richiesta
           </Heading>
@@ -285,7 +282,7 @@ export default function NotificationsSettingsPage() {
           Stato Notifiche
         </Heading>
         <NotificationPermissionButton
-          onSuccess={(token) => {
+          onSuccess={(_token) => {
           }}
           onError={(error) => {
             console.error('Errore attivazione:', error);
@@ -336,7 +333,7 @@ export default function NotificationsSettingsPage() {
 
           <div className="flex flex-col gap-4">
             {/* Test dispositivo corrente */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
               <Button
                 variant={testResult === 'success' ? 'success' : 'ember'}
                 size="md"
@@ -376,7 +373,7 @@ export default function NotificationsSettingsPage() {
             </div>
 
             {/* Test tutti i dispositivi */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center border-t border-default pt-4">
+            <div className="border-default flex flex-col items-start gap-4 border-t pt-4 sm:flex-row sm:items-center">
               <Button
                 variant="subtle"
                 size="md"
@@ -402,7 +399,7 @@ export default function NotificationsSettingsPage() {
             </div>
 
             {testResult === 'no_tokens' && (
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                 <Text variant="warning" size="sm">
                   Dispositivo non registrato
                 </Text>
@@ -423,7 +420,7 @@ export default function NotificationsSettingsPage() {
       {/* Dispositivi Registrati */}
       {permission === 'granted' && (
         <Card variant="glass" className="p-6 sm:p-8">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Heading level={2} size="lg">
                 Dispositivi Registrati
@@ -488,8 +485,8 @@ export default function NotificationsSettingsPage() {
                 {devices.map((device) => (
                   <Card key={device.id} className="p-4">
                     <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex items-center gap-2">
                           <span className="text-lg">
                             {device.platform === 'ios' ? '📱' : '💻'}
                           </span>
@@ -521,7 +518,7 @@ export default function NotificationsSettingsPage() {
                           <Text
                             size="xs"
                             variant="tertiary"
-                            className="truncate mt-1"
+                            className="mt-1 truncate"
                           >
                             {device.userAgent}
                           </Text>
@@ -533,8 +530,8 @@ export default function NotificationsSettingsPage() {
               </div>
 
               {/* Register current device button - always visible */}
-              <div className="pt-2 border-t border-default">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="border-default border-t pt-2">
+                <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
                   <Button
                     variant={isCurrentDeviceRegistered ? 'ghost' : 'ember'}
                     size="sm"
@@ -566,8 +563,8 @@ export default function NotificationsSettingsPage() {
       {/* Notification History Link */}
       <Card variant="glass" className="p-4 sm:p-6">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="text-xl flex-shrink-0">📬</div>
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="shrink-0 text-xl">📬</div>
             <div className="min-w-0">
               <Text>Cronologia Notifiche</Text>
               <Text variant="tertiary" size="sm">
@@ -588,8 +585,8 @@ export default function NotificationsSettingsPage() {
       {/* Device Management Link */}
       <Card variant="glass" className="p-4 sm:p-6">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="text-xl flex-shrink-0">📱</div>
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <div className="shrink-0 text-xl">📱</div>
             <div className="min-w-0">
               <Text>Gestione Dispositivi</Text>
               <Text variant="tertiary" size="sm">
@@ -610,10 +607,10 @@ export default function NotificationsSettingsPage() {
       {/* Info iOS */}
       <Card
         variant="glass"
-        className="p-6 sm:p-8 bg-ocean-500/10 border-2 border-ocean-500/30"
+        className="border-2 border-ocean-500/30 bg-ocean-500/10 p-6 sm:p-8"
       >
         <div className="flex gap-4">
-          <div className="text-2xl flex-shrink-0">ℹ️</div>
+          <div className="shrink-0 text-2xl">ℹ️</div>
           <div className="flex-1">
             <Heading level={3} size="md" variant="subtle" className="mb-3">
               Note per iOS (iPhone/iPad)
@@ -621,7 +618,7 @@ export default function NotificationsSettingsPage() {
 
             <ul className="space-y-2">
               <li className="flex gap-2">
-                <Text variant="tertiary" size="sm" className="flex-shrink-0">
+                <Text variant="tertiary" size="sm" className="shrink-0">
                   •
                 </Text>
                 <Text variant="tertiary" size="sm">
@@ -630,7 +627,7 @@ export default function NotificationsSettingsPage() {
                 </Text>
               </li>
               <li className="flex gap-2">
-                <Text variant="tertiary" size="sm" className="flex-shrink-0">
+                <Text variant="tertiary" size="sm" className="shrink-0">
                   •
                 </Text>
                 <Text variant="tertiary" size="sm">
@@ -638,7 +635,7 @@ export default function NotificationsSettingsPage() {
                 </Text>
               </li>
               <li className="flex gap-2">
-                <Text variant="tertiary" size="sm" className="flex-shrink-0">
+                <Text variant="tertiary" size="sm" className="shrink-0">
                   •
                 </Text>
                 <Text variant="tertiary" size="sm">
@@ -647,7 +644,7 @@ export default function NotificationsSettingsPage() {
                 </Text>
               </li>
               <li className="flex gap-2">
-                <Text variant="tertiary" size="sm" className="flex-shrink-0">
+                <Text variant="tertiary" size="sm" className="shrink-0">
                   •
                 </Text>
                 <Text variant="tertiary" size="sm">

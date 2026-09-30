@@ -156,25 +156,6 @@ export async function put<T = unknown>(storeName: string, value: T): Promise<IDB
 }
 
 /**
- * Add a value to a store (fails if key exists)
- * @param {string} storeName - Store name
- * @param {any} value - Value to store
- * @returns {Promise<any>} The key of the stored value
- */
-async function add<T = unknown>(storeName: string, value: T): Promise<IDBValidKey> {
-  const db = await openDB();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readwrite');
-    const store = transaction.objectStore(storeName);
-    const request = store.add(value);
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-/**
  * Delete a value from a store
  * @param {string} storeName - Store name
  * @param {string|number} key - Key to delete
@@ -191,49 +172,5 @@ export async function remove(storeName: string, key: string | number): Promise<v
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
   });
-}
-
-/**
- * Clear all values from a store
- * @param {string} storeName - Store name
- * @returns {Promise<void>}
- */
-async function clear(storeName: string): Promise<void> {
-  const db = await openDB();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readwrite');
-    const store = transaction.objectStore(storeName);
-    const request = store.clear();
-
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-}
-
-/**
- * Count items in a store
- * @param {string} storeName - Store name
- * @returns {Promise<number>}
- */
-async function count(storeName: string): Promise<number> {
-  const db = await openDB();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readonly');
-    const store = transaction.objectStore(storeName);
-    const request = store.count();
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-/**
- * Check if IndexedDB is supported
- * @returns {boolean}
- */
-function isSupported(): boolean {
-  return typeof indexedDB !== 'undefined';
 }
 

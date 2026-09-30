@@ -39,7 +39,7 @@ export default function InstallPrompt() {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[54] bg-black/40 backdrop-blur-sm animate-fade-in"
+        className="animate-fade-in fixed inset-0 z-54 bg-black/40 backdrop-blur-sm"
         onClick={dismiss}
         aria-hidden="true"
       />
@@ -47,9 +47,9 @@ export default function InstallPrompt() {
       {/* Bottom Sheet */}
       <div
         className={cn(
-          'fixed bottom-0 left-0 right-0 z-[55]',
-          'max-w-2xl mx-auto',
-          'bg-slate-900 border-t border-slate-700/50',
+          'fixed inset-x-0 bottom-0 z-55',
+          'mx-auto max-w-2xl',
+          'border-t border-slate-700/50 bg-slate-900',
           ' ',
           'rounded-t-3xl',
           'shadow-liquid-xl',
@@ -61,10 +61,10 @@ export default function InstallPrompt() {
         aria-describedby="install-prompt-description"
       >
         {/* Drag handle (decorative) */}
-        <div className="flex justify-center mb-4">
+        <div className="mb-4 flex justify-center">
           <div
             className={cn(
-              'w-12 h-1.5 rounded-full',
+              'h-1.5 w-12 rounded-full',
               'bg-slate-700 '
             )}
             aria-hidden="true"
@@ -72,13 +72,13 @@ export default function InstallPrompt() {
         </div>
 
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
+        <div className="mb-4 flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div
               className={cn(
                 'flex items-center justify-center',
-                'w-12 h-12 rounded-2xl',
-                'bg-ember-500/20 border border-ember-500/30'
+                'size-12 rounded-2xl',
+                'border border-ember-500/30 bg-ember-500/20'
               )}
             >
               <Download
@@ -101,9 +101,9 @@ export default function InstallPrompt() {
           <button
             onClick={dismiss}
             className={cn(
-              'p-2 rounded-lg',
+              'rounded-lg p-2',
               'text-slate-400 hover:text-slate-200',
-              'hover:bg-white/[0.06]',
+              'hover:bg-white/6',
               'transition-all duration-200',
               ']'
             )}
@@ -114,11 +114,11 @@ export default function InstallPrompt() {
         </div>
 
         {/* Benefits */}
-        <div id="install-prompt-description" className="space-y-3 mb-6">
+        <div id="install-prompt-description" className="mb-6 space-y-3">
           <div className="flex items-start gap-3">
             <Wifi
               size={20}
-              className="flex-shrink-0 mt-0.5 text-ocean-400 "
+              className="mt-0.5 shrink-0 text-ocean-400 "
               aria-hidden="true"
             />
             <Text
@@ -132,7 +132,7 @@ export default function InstallPrompt() {
           <div className="flex items-start gap-3">
             <Bell
               size={20}
-              className="flex-shrink-0 mt-0.5 text-sage-400 "
+              className="mt-0.5 shrink-0 text-sage-400 "
               aria-hidden="true"
             />
             <Text
@@ -146,7 +146,7 @@ export default function InstallPrompt() {
           <div className="flex items-start gap-3">
             <Smartphone
               size={20}
-              className="flex-shrink-0 mt-0.5 text-ember-400 "
+              className="mt-0.5 shrink-0 text-ember-400 "
               aria-hidden="true"
             />
             <Text
@@ -165,14 +165,14 @@ export default function InstallPrompt() {
               {/* iOS Manual Instructions */}
               <div
                 className={cn(
-                  'p-4 rounded-xl',
-                  'bg-slate-800 border border-slate-700',
+                  'rounded-xl p-4',
+                  'border border-slate-700 bg-slate-800',
                   ' '
                 )}
               >
                 <Text
                   size="sm"
-                  className="font-semibold mb-2 text-slate-200 "
+                  className="mb-2 font-semibold text-slate-200 "
                 >
                   Come installare:
                 </Text>

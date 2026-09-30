@@ -24,6 +24,8 @@ const MAX_RETRIES = 1;
 const RETRY_DELAY_MS = 1500;
 
 export function useCameraData(): UseCameraDataReturn {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const [cameras, setCameras] = useState<CameraStatus[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -128,7 +130,6 @@ export function useCameraData(): UseCameraDataReturn {
     return () => {
       unsubscribe('netatmo', handleMessage);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWsConnected, subscribe, unsubscribe]);
 
   useAdaptivePolling({

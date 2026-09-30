@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import BandwidthChart from '@/app/network/components/BandwidthChart';
 import type { BandwidthHistoryPoint } from '@/app/components/devices/network/types';
 

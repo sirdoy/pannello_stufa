@@ -19,7 +19,7 @@
  * }
  */
 
-import { get, getAll, put, STORES } from './indexedDB';
+import { get, STORES } from './indexedDB';
 
 /**
  * Device IDs for state caching
@@ -75,13 +75,6 @@ interface FormattedThermostatState {
   ageMinutes: number;
 }
 
-interface SWMessageEvent {
-  data: {
-    success: boolean;
-    data?: CachedDeviceState;
-  };
-}
-
 /**
  * Get cached state for a device
  * @param {string} deviceId - Device ID
@@ -97,79 +90,6 @@ export async function getCachedState(deviceId: string): Promise<CachedDeviceStat
   } catch (error) {
     console.error(`[OfflineStateCache] Failed to get cached state for ${deviceId}:`, error);
     return null;
-  }
-}
-
-/**
- * Get all cached device states
- * @returns {Promise<Array<{deviceId: string, state: Object, timestamp: string}>>}
- */
-async function getAllCachedStates(): Promise<CachedDeviceState[]> {
-  try {
-    const states = await getAll<CachedDeviceState>(STORES.DEVICE_STATE);
-    return states || [];
-  } catch (error) {
-    console.error('[OfflineStateCache] Failed to get all cached states:', error);
-    return [];
-  }
-}
-
-/**
- * Manually cache a device state (usually done by Service Worker)
- * @param {string} deviceId - Device ID
- * @param {Object} state - Device state data
- * @returns {Promise<void>}
- */
-async function cacheState(deviceId: string, state: Record<string, unknown>): Promise<void> {
-  try {
-    await put(STORES.DEVICE_STATE, {
-      deviceId,
-      state,
-      timestamp: new Date().toISOString(),
-    });
-  } catch (error) {
-    console.error(`[OfflineStateCache] Failed to cache state for ${deviceId}:`, error);
-  }
-}
-
-/**
- * Get cached state via Service Worker (for cross-context access)
- * @param {string} deviceId - Device ID
- * @returns {Promise<Object|null>}
- */
-async function getCachedStateFromSW(deviceId: string): Promise<CachedDeviceState | null> {
-  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
-    return getCachedState(deviceId);
-  }
-
-  try {
-    const registration = await navigator.serviceWorker.ready;
-    if (!registration.active) {
-      return getCachedState(deviceId);
-    }
-
-    return new Promise((resolve) => {
-      const messageChannel = new MessageChannel();
-
-      messageChannel.port1.onmessage = (event: SWMessageEvent) => {
-        if (event.data.success) {
-          resolve(event.data.data || null);
-        } else {
-          resolve(null);
-        }
-      };
-
-      registration.active!.postMessage(
-        { type: 'GET_CACHED_STATE', data: { deviceId } },
-        [messageChannel.port2]
-      );
-
-      // Timeout after 2 seconds
-      setTimeout(() => resolve(null), 2000);
-    });
-  } catch (error) {
-    console.error('[OfflineStateCache] Failed to get state from SW:', error);
-    return getCachedState(deviceId);
   }
 }
 

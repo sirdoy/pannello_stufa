@@ -54,12 +54,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="theme-color" content="#0f172a" />
     </head>
-    <body className="min-h-screen bg-slate-900 text-slate-100 flex flex-col" suppressHydrationWarning>
+    <body className="flex min-h-screen flex-col bg-slate-900 text-slate-100" suppressHydrationWarning>
     <AmbientBg />
     {/* Skip to content - Accessibility */}
     <a
       href="#main-content"
-      className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-[10000] px-6 py-3 bg-ember-500 text-white rounded-xl shadow-liquid-lg font-semibold hover:bg-ember-600 transition-colors"
+      className="shadow-liquid-lg sr-only z-10000 rounded-xl bg-ember-500 px-6 py-3 font-semibold text-white transition-colors hover:bg-ember-600 focus:not-sr-only focus:absolute focus:top-4 focus:left-4"
     >
       Salta al contenuto
     </a>
@@ -69,9 +69,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <NavbarConnectionStatusChip />
       <main
         id="main-content"
-        className="flex-1 pt-[calc(env(safe-area-inset-top)+12px)] pb-[calc(env(safe-area-inset-bottom)+88px)] px-4 sm:px-6 lg:px-8"
+        className="flex-1 px-4 pt-[calc(env(safe-area-inset-top)+12px)] pb-[calc(env(safe-area-inset-bottom)+88px)] sm:px-6 lg:px-8"
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto max-w-7xl">
           {children}
         </div>
       </main>

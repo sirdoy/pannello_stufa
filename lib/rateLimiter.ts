@@ -133,58 +133,6 @@ function checkRateLimitInMemory(
 }
 
 /**
- * Clear all rate limit entries for a user (in-memory implementation)
- * Useful for testing and user-requested reset
- *
- * @param userId - User ID to clear
- * @returns Number of entries cleared
- */
-function clearRateLimitForUserInMemory(userId: string): number {
-  let clearedCount = 0;
-
-  for (const key of recentSends.keys()) {
-    if (key.startsWith(`${userId}:`)) {
-      recentSends.delete(key);
-      clearedCount++;
-    }
-  }
-
-  return clearedCount;
-}
-
-/**
- * Get current rate limit status for a user+type (in-memory implementation)
- * Useful for debugging and UI display
- *
- * @param userId - User ID
- * @param notifType - Notification type
- * @returns Status object with counts and timing
- */
-function getRateLimitStatusInMemory(userId: string, notifType: string): RateLimitStatus {
-  const key = `${userId}:${notifType}`;
-  const now = Date.now();
-
-  const limits = DEFAULT_RATE_LIMITS[notifType] ?? DEFAULT_RATE_LIMITS.default!;
-  const windowMs = limits.windowMinutes * 60 * 1000;
-
-  const sends = recentSends.get(key) ?? [];
-  const recentInWindow = sends.filter(ts => now - ts < windowMs);
-
-  let nextResetIn = 0;
-  if (recentInWindow.length > 0) {
-    const oldestInWindow = Math.min(...recentInWindow);
-    nextResetIn = Math.ceil(((oldestInWindow + windowMs) - now) / 1000);
-  }
-
-  return {
-    currentCount: recentInWindow.length,
-    maxAllowed: limits.maxPerWindow,
-    windowMinutes: limits.windowMinutes,
-    nextResetIn,
-  };
-}
-
-/**
  * Periodic cleanup to prevent memory leaks
  * Removes entries older than max retention period (1 hour)
  * Runs every 5 minutes

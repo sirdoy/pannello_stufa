@@ -106,6 +106,8 @@ export interface UseLightsDataReturn {
  * @returns All lights state and actions
  */
 export function useLightsData(): UseLightsDataReturn {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   // Core state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -127,7 +129,6 @@ export function useLightsData(): UseLightsDataReturn {
   // Check connection on mount
   useEffect(() => {
     checkConnection();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function checkConnection() {
@@ -209,7 +210,6 @@ export function useLightsData(): UseLightsDataReturn {
 
     subscribe('hue', handleMessage);
     return () => { unsubscribe('hue', handleMessage); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWsConnected, subscribe, unsubscribe]);
 
   async function fetchData() {

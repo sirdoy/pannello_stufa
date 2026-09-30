@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
 import Slider from '../Slider';
@@ -371,8 +371,7 @@ describe('Slider Component', () => {
 
   describe('Variants', () => {
     test('renders ember variant by default', () => {
-      const { container } = render(<Slider aria-label="Volume" />);
-      const range = container.querySelector('[data-radix-collection-item]');
+      render(<Slider aria-label="Volume" />);
       // Check parent has the thumb with ember styling
       const thumb = screen.getByRole('slider');
       expect(thumb).toHaveClass('border-ember-500');

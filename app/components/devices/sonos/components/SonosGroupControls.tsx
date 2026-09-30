@@ -20,10 +20,10 @@ export default function SonosGroupControls({
   // Show unjoin button for non-coordinator members in a multi-member zone
   if (!isCoordinator && zoneMemberCount > 1) {
     return (
-      <div className="inline-flex items-center gap-2 mt-2">
+      <div className="mt-2 inline-flex items-center gap-2">
         <button
           onClick={() => void onUnjoinGroup(uid)}
-          className="text-xs px-2 py-1 bg-red-500/20 text-red-400 hover:bg-red-500/30 rounded-md transition-colors"
+          className="rounded-md bg-red-500/20 px-2 py-1 text-xs text-red-400 transition-colors hover:bg-red-500/30"
           aria-label="Separa altoparlante dal gruppo"
         >
           Separa
@@ -37,7 +37,7 @@ export default function SonosGroupControls({
     const otherZones = availableZones.filter(z => z.coordinator_uid !== uid);
 
     return (
-      <div className="inline-flex items-center gap-2 mt-2">
+      <div className="mt-2 inline-flex items-center gap-2">
         <select
           onChange={e => {
             const targetUid = e.target.value;
@@ -48,7 +48,7 @@ export default function SonosGroupControls({
             }
           }}
           defaultValue=""
-          className="text-xs bg-slate-700/50 text-slate-300 rounded-md border-0 px-2 py-1"
+          className="rounded-md border-0 bg-slate-700/50 px-2 py-1 text-xs text-slate-300"
           aria-label="Unisci a un gruppo"
         >
           <option value="" disabled>

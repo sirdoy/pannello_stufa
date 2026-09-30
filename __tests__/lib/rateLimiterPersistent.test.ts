@@ -13,9 +13,7 @@ import {
   checkRateLimitPersistent,
   clearRateLimitPersistentForUser,
   getRateLimitPersistentStatus,
-  type RateLimitResult,
   type RateLimitConfig,
-  type RateLimitStatus,
 } from '@/lib/rateLimiterPersistent';
 
 // Mock firebaseAdmin
@@ -195,9 +193,7 @@ describe('rateLimiterPersistent', () => {
       // Simulate transaction with 9 existing timestamps (limit is 10)
       const existingTimestamps = Array.from({ length: 9 }, (_, i) => now - i * 1000);
 
-      let transactionCallCount = 0;
       mockTransaction.mockImplementation(async (path, updateFn) => {
-        transactionCallCount++;
         const currentData = {
           timestamps: existingTimestamps,
           windowStart: now - 60000,

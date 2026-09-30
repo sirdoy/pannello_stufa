@@ -73,12 +73,6 @@ describe('useStoveCommands', () => {
     requested_value: null,
   } as unknown as ThermorossiCommandResponse; // legacy 202 contract
 
-  const mockResponse202 = {
-    ok: true,
-    status: 202,
-    json: jest.fn().mockResolvedValue(mockCommandResponse),
-  } as unknown as Response;
-
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();

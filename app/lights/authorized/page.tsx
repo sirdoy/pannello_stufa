@@ -29,10 +29,10 @@ export default function HueAuthorizedPage() {
   }, [router]);
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-16">
+    <div className="mx-auto max-w-2xl px-4 py-16">
       <Card className="p-12 text-center">
         <div className="mb-6">
-          <div className="w-16 h-16 mx-auto bg-gradient-to-br from-warning-100 to-warning-200 rounded-full flex items-center justify-center animate-pulse">
+          <div className="mx-auto flex size-16 animate-pulse items-center justify-center rounded-full bg-linear-to-br from-warning-100 to-warning-200">
             <span className="text-3xl">💡</span>
           </div>
         </div>

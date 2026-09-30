@@ -83,7 +83,7 @@ export async function getNotificationHistory(userId: string, options: Notificati
       try {
         // Decode cursor: base64 encoded JSON with docPath and timestamp
         const decodedCursor = JSON.parse(Buffer.from(cursor, 'base64').toString('utf-8'));
-        const { docId, timestamp: cursorTimestamp } = decodedCursor;
+        const { docId } = decodedCursor;
 
         // Reconstruct document reference for startAfter
         const cursorDoc = await db.collection('notificationLogs').doc(docId).get();

@@ -83,7 +83,7 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
     try {
       // Test base64 decode
       Buffer.from(cursor, 'base64').toString('utf-8');
-    } catch (err) {
+    } catch {
       return errorResponse('Invalid cursor format', 'VALIDATION_ERROR', 400);
     }
   }

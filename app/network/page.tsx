@@ -52,8 +52,8 @@ const BandwidthChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="bg-slate-800/30 rounded-2xl p-6 h-[380px] flex items-center justify-center">
-        <Skeleton className="w-full h-full rounded-xl" />
+      <div className="flex h-95 items-center justify-center rounded-2xl bg-slate-800/30 p-6">
+        <Skeleton className="size-full rounded-xl" />
       </div>
     ),
   }
@@ -64,8 +64,8 @@ const BandwidthCorrelationChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="bg-slate-800/30 rounded-2xl p-6 h-[360px] flex items-center justify-center">
-        <Skeleton className="w-full h-full rounded-xl" />
+      <div className="flex h-90 items-center justify-center rounded-2xl bg-slate-800/30 p-6">
+        <Skeleton className="size-full rounded-xl" />
       </div>
     ),
   }
@@ -75,8 +75,8 @@ const DeviceCountChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="bg-slate-800/30 rounded-2xl p-6 h-[320px] flex items-center justify-center">
-        <Skeleton className="w-full h-full rounded-xl" />
+      <div className="flex h-80 items-center justify-center rounded-2xl bg-slate-800/30 p-6">
+        <Skeleton className="size-full rounded-xl" />
       </div>
     ),
   }
@@ -183,12 +183,12 @@ export default function NetworkPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-12 w-48 rounded-xl" />
-        <Skeleton className="h-[100px] rounded-2xl" />
-        <Skeleton className="h-[280px] rounded-2xl" />
-        <Skeleton className="h-10 rounded-xl w-full" />
-        <Skeleton className="h-[400px] rounded-2xl" />
-        <Skeleton className="h-[380px] rounded-2xl" />
-        <Skeleton className="h-[300px] rounded-2xl" />
+        <Skeleton className="h-25 rounded-2xl" />
+        <Skeleton className="h-70 rounded-2xl" />
+        <Skeleton className="h-10 w-full rounded-xl" />
+        <Skeleton className="h-100 rounded-2xl" />
+        <Skeleton className="h-95 rounded-2xl" />
+        <Skeleton className="h-75 rounded-2xl" />
       </div>
     );
   }
@@ -225,7 +225,7 @@ export default function NetworkPage() {
         <BudgetStatsCard data={budgetStats.data} loading={budgetStats.loading} error={budgetStats.error} />
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-1 border-b border-white/[0.06] pb-0">
+        <div className="flex flex-wrap gap-1 border-b border-white/6 pb-0">
           {([
             { key: 'dispositivi' as const, label: 'Dispositivi' },
             { key: 'wifi' as const, label: 'WiFi Clients' },
@@ -237,7 +237,7 @@ export default function NetworkPage() {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={cn(
-                'px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+                '-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors',
                 activeTab === tab.key
                   ? 'border-ember-400 text-ember-400'
                   : 'border-transparent text-slate-400 hover:text-slate-200'

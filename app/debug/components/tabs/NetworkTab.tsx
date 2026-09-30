@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { EndpointCard, PostEndpointCard, type DebugApiResponse } from '@/app/debug/components/ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -30,7 +30,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
     }
   };
 
-  const fetchGetEndpoint = async (name: string, url: string) => {
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -44,7 +44,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  };
+  }, []);
 
   const callPostEndpoint = async (name: string, url: string, body: Record<string, unknown>) => {
     setLoadingPost((prev) => ({ ...prev, [name]: true }));
@@ -66,7 +66,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
     }
   };
 
-  const fetchAllGetEndpoints = () => {
+  const fetchAllGetEndpoints = useCallback(() => {
     fetchGetEndpoint('health', '/api/v1/fritzbox/health');
     fetchGetEndpoint('devices', '/api/v1/fritzbox/devices');
     fetchGetEndpoint('bandwidth', '/api/v1/fritzbox/bandwidth');
@@ -74,7 +74,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
     fetchGetEndpoint('deviceHistory', '/api/v1/fritzbox/history?range=24h');
     fetchGetEndpoint('vendorLookup', '/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF');
     fetchGetEndpoint('categoryOverride', '/api/v1/fritzbox/category-override');
-  };
+  }, [fetchGetEndpoint]);
 
   // Initial fetch
   useEffect(() => {
@@ -99,7 +99,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
   return (
     <div className="space-y-6">
       {/* Info box */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
         <Text variant="secondary" size="sm">
           Network API endpoints proxy to the Fritz!Box Home Network API at{''}
           <code className="text-xs">{EXTERNAL_BASE}</code>. All proxy routes require an authenticated session.
@@ -298,7 +298,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
             onCopyUrl={() => copyUrlToClipboard('/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
             isCopied={copiedUrl === '/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF'}
           />
-          <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+          <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
             <Text variant="secondary" size="sm">
               Change the <code className="text-xs">mac</code> parameter to look up different MAC addresses.
             </Text>
@@ -321,7 +321,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
         <Heading level={2} size="lg" className="mb-4">
           🔐 Auth (External Only)
         </Heading>
-        <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4 mb-3">
+        <div className="mb-3 rounded-lg border border-amber-700/50 bg-amber-900/20 p-4">
           <Text variant="secondary" size="sm">
             Auth endpoints hit the external API directly. These may fail due to CORS restrictions — use them as URL references.
           </Text>

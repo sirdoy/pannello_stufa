@@ -61,7 +61,7 @@ describe('Heading', () => {
       const variants = ['default', 'gradient', 'subtle', 'ember', 'ocean', 'sage', 'warning', 'danger', 'info'] as const;
       const { container } = render(
         <div>
-          {variants.map((variant, index) => (
+          {variants.map((variant, _index) => (
             <Heading key={variant} level={2} variant={variant}>
               {variant} heading
             </Heading>
@@ -157,7 +157,7 @@ describe('Heading', () => {
     it('applies gradient variant classes', () => {
       render(<Heading variant="gradient">Gradient</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('bg-gradient-to-r');
+      expect(heading).toHaveClass('bg-linear-to-r');
       expect(heading).toHaveClass('from-ember-500');
       expect(heading).toHaveClass('to-flame-600');
       expect(heading).toHaveClass('bg-clip-text');

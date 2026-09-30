@@ -30,7 +30,7 @@ const textVariants = cva(
         danger: 'text-danger-400 ',
         info: 'text-ocean-400 ', // alias for ocean
         // Special variants
-        label: 'text-slate-400 uppercase tracking-wider',
+        label: 'tracking-wider text-slate-400 uppercase',
       },
       size: {
         xs: 'text-xs',

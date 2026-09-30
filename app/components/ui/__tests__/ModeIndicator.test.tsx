@@ -128,13 +128,13 @@ describe('ModeIndicator Component', () => {
 
   describe('Compact Mode', () => {
     test('applies smaller icon in compact mode', () => {
-      const { container } = render(<ModeIndicator enabled={true} compact={true} />);
+      render(<ModeIndicator enabled={true} compact={true} />);
       const icon = screen.getByText('⏰');
       expect(icon).toHaveClass('text-xl');
     });
 
     test('applies normal icon size in non-compact mode', () => {
-      const { container } = render(<ModeIndicator enabled={true} compact={false} />);
+      render(<ModeIndicator enabled={true} compact={false} />);
       const icon = screen.getByText('⏰');
       expect(icon).toHaveClass('text-2xl');
     });

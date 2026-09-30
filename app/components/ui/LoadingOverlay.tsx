@@ -48,7 +48,7 @@ export default function LoadingOverlay({
 
   const overlay = (
     <div
-      className="animate-fadeIn fixed inset-0 z-[9999] flex items-center justify-center"
+      className="animate-fadeIn fixed inset-0 z-9999 flex items-center justify-center"
       aria-live="assertive"
       aria-busy="true"
     >
@@ -59,12 +59,12 @@ export default function LoadingOverlay({
       <div className="animate-spring-in relative z-10 transform-gpu will-change-transform">
         <div className="
           ,0,0,0.15)] relative
-          flex min-w-[280px]
+          flex min-w-70
           flex-col
           items-center
           gap-5 overflow-hidden rounded-3xl border
           border-slate-700/60 bg-slate-800/90 px-8 py-10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-          backdrop-blur-2xl sm:min-w-[320px]
+          backdrop-blur-2xl sm:min-w-80
           sm:gap-6 sm:px-10
           
           
@@ -73,15 +73,15 @@ export default function LoadingOverlay({
           {/* Animated spinner icon */}
           <div className="relative">
             {/* Pulse ring effect */}
-            <div className="bg-ember-500/20 absolute inset-0 -m-4 animate-ping rounded-full" />
+            <div className="absolute inset-0 -m-4 animate-ping rounded-full bg-ember-500/20" />
 
             {/* Icon container */}
             <div className="
-              from-ember-500
-              to-flame-600 shadow-ember-glow relative
+              relative
               animate-pulse rounded-2xl border
-              border-white/10
-              bg-gradient-to-br p-5
+              border-white/10 bg-linear-to-br from-ember-500
+              to-flame-600
+              p-5 shadow-ember-glow
               sm:p-6
             ">
               <span className="inline-block animate-bounce text-5xl sm:text-6xl">
@@ -102,9 +102,9 @@ export default function LoadingOverlay({
 
           {/* Loading dots */}
           <div className="flex gap-2">
-            <span className="bg-ember-500 h-2.5 w-2.5 animate-bounce rounded-full [animation-delay:0ms]" />
-            <span className="bg-ember-500 h-2.5 w-2.5 animate-bounce rounded-full [animation-delay:150ms]" />
-            <span className="bg-ember-500 h-2.5 w-2.5 animate-bounce rounded-full [animation-delay:300ms]" />
+            <span className="size-2.5 animate-bounce rounded-full bg-ember-500 [animation-delay:0ms]" />
+            <span className="size-2.5 animate-bounce rounded-full bg-ember-500 [animation-delay:150ms]" />
+            <span className="size-2.5 animate-bounce rounded-full bg-ember-500 [animation-delay:300ms]" />
           </div>
         </div>
       </div>

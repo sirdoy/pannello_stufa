@@ -19,7 +19,7 @@
  * await incrementBadge();
  */
 
-import { put, get, STORES } from './indexedDB';
+import { put, STORES } from './indexedDB';
 
 // Badge API declarations (not in all TypeScript DOM libs yet)
 declare global {
@@ -32,36 +32,12 @@ declare global {
 // Badge count key in IndexedDB
 const BADGE_KEY = 'badgeCount';
 
-interface BadgeState {
-  key: string;
-  value: number;
-}
-
-interface AlertData {
-  errors?: number;
-  needsMaintenance?: boolean;
-}
-
 /**
  * Check if Badge API is supported
  * @returns {boolean}
  */
 function isBadgeSupported(): boolean {
   return typeof navigator !== 'undefined' && 'setAppBadge' in navigator;
-}
-
-/**
- * Get current badge count from IndexedDB
- * @returns {Promise<number>}
- */
-async function getBadgeCount(): Promise<number> {
-  try {
-    const result = await get<BadgeState>(STORES.APP_STATE, BADGE_KEY);
-    return result?.value || 0;
-  } catch (error) {
-    console.error('[BadgeService] Failed to get badge count:', error);
-    return 0;
-  }
 }
 
 /**
@@ -74,33 +50,6 @@ async function saveBadgeCount(count: number): Promise<void> {
     await put(STORES.APP_STATE, { key: BADGE_KEY, value: count });
   } catch (error) {
     console.error('[BadgeService] Failed to save badge count:', error);
-  }
-}
-
-/**
- * Set the app badge count
- * @param {number} count - Number to show on badge
- * @returns {Promise<boolean>} Success status
- */
-async function setBadgeCount(count: number): Promise<boolean> {
-  if (!isBadgeSupported()) {
-    return false;
-  }
-
-  try {
-    const safeCount = Math.max(0, Math.floor(count));
-
-    if (safeCount > 0) {
-      await navigator.setAppBadge!(safeCount);
-    } else {
-      await navigator.clearAppBadge!();
-    }
-
-    await saveBadgeCount(safeCount);
-    return true;
-  } catch (error) {
-    console.error('[BadgeService] Failed to set badge:', error);
-    return false;
   }
 }
 

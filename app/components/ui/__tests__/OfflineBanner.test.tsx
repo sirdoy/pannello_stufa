@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import OfflineBanner from '../OfflineBanner';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';

@@ -38,7 +38,7 @@ function ScheduleContent() {
 
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="mx-auto max-w-4xl px-4 py-8">
         <Card variant="elevated" className="p-6">
           <Text variant="danger">{error}</Text>
         </Card>
@@ -53,7 +53,7 @@ function ScheduleContent() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       {/* Header with back button */}
       <div className="mb-6">
         <Button
@@ -89,7 +89,7 @@ function ScheduleContent() {
       </div>
 
       {/* Schedule selector card */}
-      <Card variant="glass" className="p-5 sm:p-6 mb-6">
+      <Card variant="glass" className="mb-6 p-5 sm:p-6">
         <ScheduleSelector
           schedules={schedules as Schedule[]}
           activeSchedule={activeSchedule as Schedule}
@@ -99,8 +99,8 @@ function ScheduleContent() {
       </Card>
 
       {/* Timeline card */}
-      <Card variant="glass" className="p-5 sm:p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
+      <Card variant="glass" className="mb-6 p-5 sm:p-6">
+        <div className="mb-4 flex items-center justify-between">
           <Heading level={2} size="xl">
             Programmazione Settimanale
           </Heading>
@@ -116,8 +116,8 @@ function ScheduleContent() {
 
       {/* Active overrides section */}
       {roomsWithOverride.length > 0 && (
-        <Card variant="elevated" className="p-5 sm:p-6 mb-6">
-          <Heading level={3} size="lg" className="flex items-center gap-2 mb-4">
+        <Card variant="elevated" className="mb-6 p-5 sm:p-6">
+          <Heading level={3} size="lg" className="mb-4 flex items-center gap-2">
             <Flame className="text-ember-400" />
             Override Attivi
           </Heading>

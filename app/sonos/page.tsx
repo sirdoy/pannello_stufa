@@ -35,8 +35,8 @@ export default function SonosPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-12 w-48 rounded-xl" />
-        <Skeleton className="h-[200px] rounded-2xl" />
-        <Skeleton className="h-[200px] rounded-2xl" />
+        <Skeleton className="h-50 rounded-2xl" />
+        <Skeleton className="h-50 rounded-2xl" />
       </div>
     );
   }

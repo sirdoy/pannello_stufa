@@ -191,8 +191,8 @@ export default function CameraDashboard() {
     return (
       <Section title="Videocamere" description="Caricamento..." spacing="lg" level={1}>
         <Grid cols={2} gap="lg">
-          <Skeleton.Card className="min-h-[400px]" />
-          <Skeleton.Card className="min-h-[400px]" />
+          <Skeleton.Card className="min-h-100" />
+          <Skeleton.Card className="min-h-100" />
         </Grid>
       </Section>
     );
@@ -272,36 +272,36 @@ export default function CameraDashboard() {
             {cameras.map(camera => (
               <div
                 key={camera.camera_id}
-                className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${
+                className={`cursor-pointer rounded-xl p-4 transition-all duration-200 ${
                   selectedCameraId === camera.camera_id
-                    ? 'bg-ocean-500/20 border-2 border-ocean-500'
-                    : 'bg-slate-800/50 hover:bg-slate-700/50 border-2 border-transparent'
+                    ? 'border-2 border-ocean-500 bg-ocean-500/20'
+                    : 'border-2 border-transparent bg-slate-800/50 hover:bg-slate-700/50'
                 }`}
                 onClick={() => setSelectedCameraId(camera.camera_id)}
               >
                 <div className="flex items-center gap-4">
                   {/* Snapshot thumbnail */}
-                  <div className="w-24 h-16 rounded-lg overflow-hidden bg-slate-700 flex-shrink-0">
+                  <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-700">
                     {snapshotUrls[camera.camera_id] && !snapshotErrors[camera.camera_id] ? (
                       <img
                         src={snapshotUrls[camera.camera_id]}
                         alt={camera.name ?? camera.camera_id}
-                        className="w-full h-full object-cover"
+                        className="size-full object-cover"
                         onError={() => setSnapshotErrors(prev => ({ ...prev, [camera.camera_id]: true }))}
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
+                      <div className="flex size-full items-center justify-center">
                         <Text variant="tertiary" size="xs">N/D</Text>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <Heading level={3} size="md" className="truncate">{camera.name ?? camera.camera_id}</Heading>
                     <Text variant="tertiary" size="sm">
                       {getCameraTypeName(camera.device_type ?? '')}
                     </Text>
-                    <div className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                    <div className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
                       camera.status === 'on'
                         ? 'bg-sage-500/20 text-sage-400'
                         : 'bg-slate-600/50 text-slate-400'
@@ -324,7 +324,7 @@ export default function CameraDashboard() {
             <CardContent>
               {/* Video/Snapshot toggle */}
               {selectedCamera.status === 'on' && !isStale && (
-                <div className="flex gap-2 mb-4">
+                <div className="mb-4 flex gap-2">
                   <Button
                     variant={!isLiveMode ? 'ember' : 'subtle'}
                     size="sm"
@@ -343,13 +343,13 @@ export default function CameraDashboard() {
               )}
 
               {/* Video preview */}
-              <div className="aspect-video bg-slate-800 rounded-xl overflow-hidden mb-4 relative">
+              <div className="relative mb-4 aspect-video overflow-hidden rounded-xl bg-slate-800">
                 {isLiveMode && selectedCamera.status === 'on' && streamUrl ? (
                   // Live video mode — stream URL obtained
                   <HlsPlayer
                     src={streamUrl}
                     poster={snapshotUrls[selectedCamera.camera_id] ?? ''}
-                    className="w-full h-full"
+                    className="size-full"
                     onError={() => {
                       setIsLiveMode(false);
                       setStreamError(true);
@@ -357,13 +357,13 @@ export default function CameraDashboard() {
                   />
                 ) : isLiveMode && streamLoading ? (
                   // Stream URL is being fetched
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-2">
-                    <div className="w-8 h-8 border-2 border-ocean-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="flex size-full flex-col items-center justify-center gap-2">
+                    <div className="size-8 animate-spin rounded-full border-2 border-ocean-500 border-t-transparent" />
                     <Text variant="secondary">Connessione al live...</Text>
                   </div>
                 ) : isLiveMode && streamError ? (
                   // Stream fetch failed
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                  <div className="flex size-full flex-col items-center justify-center gap-2">
                     <span className="text-4xl opacity-50">📡</span>
                     <Text variant="secondary">Live non disponibile</Text>
                   </div>
@@ -372,11 +372,11 @@ export default function CameraDashboard() {
                   <img
                     src={snapshotUrls[selectedCamera.camera_id]}
                     alt={selectedCamera.name ?? selectedCamera.camera_id}
-                    className="w-full h-full object-cover"
+                    className="size-full object-cover"
                     onError={() => setSnapshotErrors(prev => ({ ...prev, [selectedCamera.camera_id]: true }))}
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center gap-2">
+                  <div className="flex size-full flex-col items-center justify-center gap-2">
                     <span className="text-4xl opacity-50">📹</span>
                     <Text variant="secondary">Snapshot non disponibile</Text>
                   </div>
@@ -384,7 +384,7 @@ export default function CameraDashboard() {
 
                 {/* Status badge overlay */}
                 {!isLiveMode && (
-                  <div className={`absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium backdrop-blur-sm ${
+                  <div className={`absolute top-3 right-3 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm ${
                     selectedCamera.status === 'on'
                       ? 'bg-sage-500/80 text-white'
                       : 'bg-slate-600/80 text-slate-300'
@@ -395,22 +395,22 @@ export default function CameraDashboard() {
               </div>
 
               {/* Camera info */}
-              <div className="grid grid-cols-2 gap-3 mb-6">
-                <div className="p-3 bg-slate-800/50 rounded-lg">
+              <div className="mb-6 grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-slate-800/50 p-3">
                   <Text variant="label" size="xs">Tipo</Text>
                   <Text variant="body" size="sm" className="mt-1">
                     {getCameraTypeName(selectedCamera.device_type ?? '')}
                   </Text>
                 </div>
-                <div className="p-3 bg-slate-800/50 rounded-lg">
+                <div className="rounded-lg bg-slate-800/50 p-3">
                   <Text variant="label" size="xs">Stato</Text>
                   <Text variant={selectedCamera.status === 'on' ? 'sage' : 'secondary'} size="sm" className="mt-1">
                     {selectedCamera.status === 'on' ? 'Attiva' : 'Inattiva'}
                   </Text>
                 </div>
-                <div className="p-3 bg-slate-800/50 rounded-lg">
+                <div className="rounded-lg bg-slate-800/50 p-3">
                   <Text variant="label" size="xs">Monitoraggio</Text>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="mt-1 flex items-center gap-2">
                     <Switch
                       checked={monitoringStates[selectedCamera.camera_id] ?? false}
                       onCheckedChange={(val) => handleMonitoringToggle(selectedCamera.camera_id, val)}
@@ -425,7 +425,7 @@ export default function CameraDashboard() {
                   </div>
                 </div>
                 {selectedCamera.sd_status && (
-                  <div className="p-3 bg-slate-800/50 rounded-lg">
+                  <div className="rounded-lg bg-slate-800/50 p-3">
                     <Text variant="label" size="xs">SD Card</Text>
                     <Text variant="body" size="sm" className="mt-1">
                       {selectedCamera.sd_status === 'on' ? 'Presente' : 'Assente'}
@@ -437,20 +437,20 @@ export default function CameraDashboard() {
               {/* Recent events for this camera */}
               <Heading level={3} size="sm" className="mb-3">Eventi recenti</Heading>
               {cameraEvents.length > 0 ? (
-                <div className="space-y-2 max-h-80 overflow-y-auto">
+                <div className="max-h-80 space-y-2 overflow-y-auto">
                   {cameraEvents.slice(0, 10).map(event => (
                     <button
                       key={event.event_id}
                       onClick={() => setSelectedEvent(event)}
-                      className="w-full flex items-center gap-3 p-2 bg-slate-800/50 rounded-lg hover:bg-slate-700/50 transition-colors cursor-pointer text-left"
+                      className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-slate-800/50 p-2 text-left transition-colors hover:bg-slate-700/50"
                     >
                       {/* Snapshot preview */}
-                      <div className="relative w-20 h-12 rounded-md overflow-hidden bg-slate-700 flex-shrink-0">
+                      <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-md bg-slate-700">
                         {event.snapshot_url ? (
                           <img
                             src={event.snapshot_url}
                             alt={getEventTypeName(event.event_type)}
-                            className="w-full h-full object-cover"
+                            className="size-full object-cover"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
@@ -465,7 +465,7 @@ export default function CameraDashboard() {
                           </span>
                         </div>
                       </div>
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <Text variant="body" size="sm">
                           {getEventTypeName(event.event_type)}
                         </Text>
@@ -483,7 +483,7 @@ export default function CameraDashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-6">
+                <div className="py-6 text-center">
                   <Text variant="secondary" size="sm">Nessun evento recente per questa camera</Text>
                 </div>
               )}

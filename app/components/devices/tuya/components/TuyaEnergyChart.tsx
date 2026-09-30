@@ -7,7 +7,7 @@ import { useTuyaHistory } from '../hooks/useTuyaHistory';
 const TuyaEnergyChartInner = dynamic(() => import('./TuyaEnergyChartInner'), {
   ssr: false,
   loading: () => (
-    <div className="h-[200px] rounded-xl bg-slate-700/30 animate-pulse" />
+    <div className="h-50 animate-pulse rounded-xl bg-slate-700/30" />
   ),
 });
 
@@ -53,7 +53,7 @@ export default function TuyaEnergyChart({ deviceId }: TuyaEnergyChartProps) {
 
       {/* Chart area */}
       {loading && (
-        <div className="h-[200px] rounded-xl bg-slate-700/30 animate-pulse" />
+        <div className="h-50 animate-pulse rounded-xl bg-slate-700/30" />
       )}
 
       {!loading && error && (

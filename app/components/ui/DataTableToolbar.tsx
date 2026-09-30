@@ -3,7 +3,6 @@
 import { forwardRef, useState, useEffect, useRef, type ForwardedRef, type HTMLAttributes, type ReactElement, type ReactNode, type RefAttributes } from 'react';
 import { Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-import Input from './Input';
 import Badge from './Badge';
 import Button, { type ButtonProps } from './Button';
 import Text from './Text';
@@ -65,7 +64,7 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
     table,
     globalFilter = '',
     onGlobalFilterChange,
-    showSearch = true,
+    showSearch: _showSearch = true,
     searchPlaceholder = 'Search...',
     showBulkActions = false,
     onBulkAction,
@@ -175,7 +174,7 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
         <div
           className={cn(
             'flex items-center justify-between gap-4 p-3',
-            'bg-ember-500/10 border border-ember-400/20 rounded-xl'
+            'rounded-xl border border-ember-400/20 bg-ember-500/10'
           )}
           role="toolbar"
           aria-label="Bulk actions"
@@ -211,9 +210,9 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
       {/* Search and Controls Row */}
       <div className="flex items-center gap-4">
         {/* Global Search Input */}
-        <div className="relative flex-1 max-w-sm">
+        <div className="relative max-w-sm flex-1">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500"
+            className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500"
             aria-hidden="true"
           />
           <input
@@ -223,13 +222,13 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
             placeholder="Search..."
             aria-label={searchPlaceholder}
             className={cn(
-              'w-full pl-10 pr-4 py-2 rounded-xl',
+              'w-full rounded-xl py-2 pr-4 pl-10',
               'bg-slate-800/60 backdrop-blur-xl',
               'text-slate-100 placeholder:text-slate-500',
-              'font-medium font-display text-sm',
+              'font-display text-sm font-medium',
               'border border-slate-700/50',
               'focus:outline-none focus-visible:ring-2',
-              'focus-visible:ring-ember-500/50 focus-visible:border-ember-500/60',
+              'focus-visible:border-ember-500/60 focus-visible:ring-ember-500/50',
               'transition-all duration-200',
             )}
           />
@@ -259,10 +258,10 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
                     onGlobalFilterChange('');
                   }
                 }}
-                className="p-0.5 hover:bg-ocean-500/30 rounded transition-colors"
+                className="rounded p-0.5 transition-colors hover:bg-ocean-500/30"
                 aria-label="Remove search filter"
               >
-                <X className="w-3 h-3" />
+                <X className="size-3" />
               </button>
             </Badge>
           )}
@@ -281,10 +280,10 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
               <button
                 type="button"
                 onClick={() => handleRemoveFilter(filter.id)}
-                className="p-0.5 hover:bg-ocean-500/30 rounded transition-colors"
+                className="rounded p-0.5 transition-colors hover:bg-ocean-500/30"
                 aria-label={`Remove ${getColumnHeaderName(filter.id)} filter`}
               >
-                <X className="w-3 h-3" />
+                <X className="size-3" />
               </button>
             </Badge>
           ))}

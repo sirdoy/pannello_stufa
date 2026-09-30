@@ -9,7 +9,6 @@
 
 import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import RoomDetailPage from '../page';
 import type { Room } from '@/types/rooms';
 import type { RegistryDevice } from '@/types/registry';

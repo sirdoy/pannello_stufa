@@ -150,10 +150,10 @@ const PopoverClose = forwardRef<React.ElementRef<typeof PopoverPrimitive.Close>,
       <PopoverPrimitive.Close
         ref={ref}
         className={cn(
-          'p-2 rounded-xl',
+          'rounded-xl p-2',
           'text-slate-400 hover:text-slate-200',
           ' ',
-          'hover:bg-white/[0.06] ]',
+          '] hover:bg-white/6',
           'transition-colors duration-200',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
           className

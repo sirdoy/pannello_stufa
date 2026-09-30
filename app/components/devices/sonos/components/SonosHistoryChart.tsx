@@ -44,12 +44,12 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
 
   return (
     <div className="rounded-2xl bg-slate-800/50 p-5 sm:p-6">
-      <h2 className="text-base font-semibold text-slate-100 mb-4">
+      <h2 className="mb-4 text-base font-semibold text-slate-100">
         Cronologia
       </h2>
 
       {/* Controls row */}
-      <div className="flex flex-wrap gap-3 items-center mb-4">
+      <div className="mb-4 flex flex-wrap items-center gap-3">
         {/* Type selector */}
         <div className="flex gap-1">
           <button
@@ -98,7 +98,7 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
           <select
             value={speakerFilter ?? ''}
             onChange={e => setSpeakerFilter(e.target.value || null)}
-            className="text-xs bg-slate-700/50 text-slate-300 rounded-md border-0 px-2 py-1"
+            className="rounded-md border-0 bg-slate-700/50 px-2 py-1 text-xs text-slate-300"
             aria-label="Filtra per altoparlante"
           >
             <option value="">Tutti</option>
@@ -114,7 +114,7 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
           <select
             value={zoneFilter ?? ''}
             onChange={e => setZoneFilter(e.target.value || null)}
-            className="text-xs bg-slate-700/50 text-slate-300 rounded-md border-0 px-2 py-1"
+            className="rounded-md border-0 bg-slate-700/50 px-2 py-1 text-xs text-slate-300"
             aria-label="Filtra per zona"
           >
             <option value="">Tutte le zone</option>
@@ -129,7 +129,7 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
 
       {/* Chart area */}
       {loading && (
-        <div className="h-[200px] rounded-xl bg-slate-700/30 animate-pulse" />
+        <div className="h-50 animate-pulse rounded-xl bg-slate-700/30" />
       )}
 
       {!loading && error && (
@@ -154,11 +154,11 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-xs text-slate-500 border-b border-slate-700/50">
-                    <th className="text-left pb-2 pr-3">Ora</th>
-                    <th className="text-left pb-2 pr-3">Brano</th>
-                    <th className="text-left pb-2 pr-3">Artista</th>
-                    <th className="text-left pb-2">Sorgente</th>
+                  <tr className="border-b border-slate-700/50 text-xs text-slate-500">
+                    <th className="pr-3 pb-2 text-left">Ora</th>
+                    <th className="pr-3 pb-2 text-left">Brano</th>
+                    <th className="pr-3 pb-2 text-left">Artista</th>
+                    <th className="pb-2 text-left">Sorgente</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -169,11 +169,11 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
                         idx % 2 === 0 ? '' : 'bg-slate-700/20'
                       }`}
                     >
-                      <td className="py-1.5 pr-3 text-xs text-slate-400 whitespace-nowrap">
+                      <td className="py-1.5 pr-3 text-xs whitespace-nowrap text-slate-400">
                         {format(item.timestamp * 1000, 'dd/MM HH:mm')}
                       </td>
-                      <td className="py-1.5 pr-3 max-w-[160px] truncate">{item.title || '—'}</td>
-                      <td className="py-1.5 pr-3 text-slate-400 truncate max-w-[120px]">
+                      <td className="max-w-40 truncate py-1.5 pr-3">{item.title || '—'}</td>
+                      <td className="max-w-30 truncate py-1.5 pr-3 text-slate-400">
                         {item.artist || '—'}
                       </td>
                       <td className="py-1.5 text-xs text-slate-500">{item.source_type || '—'}</td>

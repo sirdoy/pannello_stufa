@@ -42,7 +42,7 @@ export default function StatusBadge({
   className = '',
   // Legacy props
   text,
-  gradient,
+  gradient: _gradient,
 }: StatusBadgeProps) {
   // Auto-detect status color based on status text
   const getAutoColor = (status: string | undefined) => {
@@ -222,7 +222,7 @@ export default function StatusBadge({
             ring-2 ring-slate-900/50
             
           `.trim().replace(/\s+/g, ' ')}>
-            <span className="text-xs font-bold font-display">
+            <span className="font-display text-xs font-bold">
               {resolvedIcon && <span className="mr-1">{resolvedIcon}</span>}
               {text || status}
             </span>

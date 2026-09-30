@@ -21,7 +21,6 @@ import type {
   AutomationRule,
   AutomationRuleCreate,
   AutomationRulePatch,
-  ActionItem,
 } from '@/types/automations';
 import type { UIDraft, UIConditionGroup } from './types';
 import { emptyDraft } from './types';

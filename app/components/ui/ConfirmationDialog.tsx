@@ -2,7 +2,7 @@
 
 import { forwardRef, useRef, useEffect, type ReactNode, type ComponentPropsWithoutRef } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { cva, type VariantProps } from 'class-variance-authority';
+import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 import { AlertTriangle } from 'lucide-react';
 import Button from './Button';
@@ -59,7 +59,7 @@ export interface ConfirmationDialogProps extends ComponentPropsWithoutRef<typeof
 // z-[300]: must sit above EmberGlass Sheet backdrop (z-200) and container (z-201)
 // so confirmation dialogs spawned from inside an open Sheet are interactive.
 const overlayVariants = cva([
-  'fixed inset-0 z-[300]',
+  'fixed inset-0 z-300',
   'bg-slate-950/70 ',
   'backdrop-blur-md',
   'data-[state=open]:animate-fade-in',
@@ -68,7 +68,7 @@ const overlayVariants = cva([
 
 // CVA variants for content
 const contentVariants = cva([
-  'fixed z-[301] p-6',
+  'fixed z-301 p-6',
   'bg-slate-900/95 ',
   'backdrop-blur-3xl',
   'border border-slate-700/50 ',
@@ -76,16 +76,16 @@ const contentVariants = cva([
   'focus:outline-none',
   'overflow-y-auto',
   // Desktop: centered
-  'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
-  'rounded-3xl max-h-[85vh]',
+  'top-1/2 left-1/2 -translate-1/2',
+  'max-h-[85vh] rounded-3xl',
   // Size: sm for compact dialog
   'w-full max-w-sm',
   // Animation
   'data-[state=open]:animate-scale-in-center',
   'data-[state=closed]:animate-fade-out',
   // Mobile bottom sheet override (max-sm = < 640px)
-  'max-sm:left-0 max-sm:right-0 max-sm:bottom-0 max-sm:top-auto',
-  'max-sm:translate-x-0 max-sm:translate-y-0',
+  'max-sm:inset-x-0 max-sm:top-auto max-sm:bottom-0',
+  'max-sm:translate-0',
   'max-sm:rounded-t-3xl max-sm:rounded-b-none',
   'max-sm:max-h-[85vh] max-sm:w-full max-sm:max-w-none',
   'max-sm:data-[state=open]:animate-slide-in-from-bottom',
@@ -186,7 +186,7 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
     icon !== undefined
       ? icon
       : variant === 'danger'
-        ? <AlertTriangle className="h-6 w-6 text-danger-500" />
+        ? <AlertTriangle className="size-6 text-danger-500" />
         : null;
 
   return (
@@ -212,16 +212,16 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
               required a11y label — we used to ALSO render a separate <h2> next to a
               VisuallyHidden Title, which produced duplicate headings and broke
               role-based locators in strict mode. Single Title now serves both. */}
-          <div className="flex items-start gap-4 mb-4">
+          <div className="mb-4 flex items-start gap-4">
             {displayIcon && (
-              <div className="flex-shrink-0 mt-0.5">
+              <div className="mt-0.5 shrink-0">
                 {displayIcon}
               </div>
             )}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               <DialogPrimitive.Title
                 className={cn(
-                  'text-lg font-display font-semibold',
+                  'font-display text-lg font-semibold',
                   'text-slate-100 '
                 )}
               >
@@ -240,7 +240,7 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
           </div>
 
           {/* Footer with buttons - Cancel | Confirm order */}
-          <div className="flex items-center justify-end gap-3 mt-6">
+          <div className="mt-6 flex items-center justify-end gap-3">
             <Button
               ref={cancelButtonRef}
               variant="subtle"

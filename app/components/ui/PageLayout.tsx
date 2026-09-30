@@ -22,9 +22,9 @@ const pageLayoutVariants = cva(
     variants: {
       maxWidth: {
         sm: 'max-w-screen-sm',
-        md: 'max-w-screen-md',
-        lg: 'max-w-screen-lg',
-        xl: 'max-w-screen-xl',
+        md: 'max-w-3xl',
+        lg: 'max-w-5xl',
+        xl: 'max-w-7xl',
         '2xl': 'max-w-screen-2xl',
         '7xl': 'max-w-7xl',
         full: 'max-w-full',
@@ -104,7 +104,7 @@ const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(function PageHeader(
           )}
         </div>
         {actions && (
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex shrink-0 items-center gap-2">
             {actions}
           </div>
         )}
@@ -157,7 +157,7 @@ const PageFooter = forwardRef<HTMLElement, PageFooterProps>(function PageFooter(
     <footer
       ref={ref}
       className={cn(
-        'py-6 border-t border-slate-800 ',
+        'border-t border-slate-800 py-6 ',
         className
       )}
       {...props}

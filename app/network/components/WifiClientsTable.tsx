@@ -3,7 +3,6 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import Card from '@/app/components/ui/Card';
 import Badge from '@/app/components/ui/Badge';
-import Button from '@/app/components/ui/Button';
 import { DataTable } from '@/app/components/ui';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -128,9 +127,9 @@ export default function WifiClientsTable({
   ];
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Heading level={2} size="lg">
           Client WiFi ({total})
         </Heading>
@@ -141,10 +140,10 @@ export default function WifiClientsTable({
             <button
               key={value}
               onClick={() => onBandChange(value)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 band === value
-                  ? 'bg-ember-500/20 border border-ember-400/30 text-ember-300'
-                  : 'text-slate-400 hover:text-slate-200 border border-transparent'
+                  ? 'border border-ember-400/30 bg-ember-500/20 text-ember-300'
+                  : 'border border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
               {label}

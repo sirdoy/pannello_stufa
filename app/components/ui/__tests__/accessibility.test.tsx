@@ -890,19 +890,19 @@ describe('Accessibility Test Suite - All Components', () => {
       test('sm size has 44px minimum height', () => {
         render(<Button size="sm">Small</Button>);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('min-h-[44px]');
+        expect(button).toHaveClass('min-h-11');
       });
 
       test('md size has 48px minimum height', () => {
         render(<Button size="md">Medium</Button>);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('min-h-[48px]');
+        expect(button).toHaveClass('min-h-12');
       });
 
       test('lg size has 56px minimum height', () => {
         render(<Button size="lg">Large</Button>);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('min-h-[56px]');
+        expect(button).toHaveClass('min-h-14');
       });
     });
 
@@ -910,22 +910,22 @@ describe('Accessibility Test Suite - All Components', () => {
       test('sm size meets 44px minimum', () => {
         render(<ControlButton size="sm" onChange={() => {}} />);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('min-h-[44px]');
-        expect(button).toHaveClass('min-w-[44px]');
+        expect(button).toHaveClass('min-h-11');
+        expect(button).toHaveClass('min-w-11');
       });
 
       test('md size meets 48px minimum', () => {
         render(<ControlButton size="md" onChange={() => {}} />);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('min-h-[48px]');
-        expect(button).toHaveClass('min-w-[48px]');
+        expect(button).toHaveClass('min-h-12');
+        expect(button).toHaveClass('min-w-12');
       });
 
       test('lg size meets 56px minimum', () => {
         render(<ControlButton size="lg" onChange={() => {}} />);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('min-h-[56px]');
-        expect(button).toHaveClass('min-w-[56px]');
+        expect(button).toHaveClass('min-h-14');
+        expect(button).toHaveClass('min-w-14');
       });
     });
 
@@ -933,15 +933,15 @@ describe('Accessibility Test Suite - All Components', () => {
       test('sm iconOnly has 44px minimum dimensions', () => {
         render(<Button size="sm" iconOnly icon="X" aria-label="Close" />);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('min-h-[44px]');
-        expect(button).toHaveClass('min-w-[44px]');
+        expect(button).toHaveClass('min-h-11');
+        expect(button).toHaveClass('min-w-11');
       });
 
       test('md iconOnly has 48px minimum dimensions', () => {
         render(<Button size="md" iconOnly icon="X" aria-label="Close" />);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('min-h-[48px]');
-        expect(button).toHaveClass('min-w-[48px]');
+        expect(button).toHaveClass('min-h-12');
+        expect(button).toHaveClass('min-w-12');
       });
     });
   });

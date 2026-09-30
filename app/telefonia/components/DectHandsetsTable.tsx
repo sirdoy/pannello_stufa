@@ -44,7 +44,7 @@ export default function DectHandsetsTable({
   total,
 }: DectHandsetsTableProps) {
   if (loading && handsets.length === 0) {
-    return <Skeleton className="h-[280px] rounded-2xl" />;
+    return <Skeleton className="h-70 rounded-2xl" />;
   }
 
   const columns: ColumnDef<DectHandset>[] = [
@@ -96,7 +96,7 @@ export default function DectHandsetsTable({
   );
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Phone size={20} aria-hidden="true" className="text-ember-400" />

@@ -86,7 +86,7 @@ export default function DeviceTypesPage() {
       accessorKey: 'slug',
       header: 'Slug',
       cell: ({ row }) => (
-        <code className="text-sm font-mono text-slate-400">{row.original.slug}</code>
+        <code className="font-mono text-sm text-slate-400">{row.original.slug}</code>
       ),
     },
     {
@@ -184,7 +184,7 @@ export default function DeviceTypesPage() {
         <Skeleton className="h-64 w-full" />
       ) : (
         <Card variant="glass" className="p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <Heading level={2} size="lg">
               Tipi
             </Heading>
@@ -254,7 +254,7 @@ export default function DeviceTypesPage() {
       >
         {({ control }) => (
           <>
-            <div className="text-sm text-slate-400 mb-2">
+            <div className="mb-2 text-sm text-slate-400">
               <p>Slug: <strong className="text-slate-200">{typeToEdit?.slug}</strong></p>
             </div>
             <Controller

@@ -28,14 +28,14 @@ export default function DirigeraTelemetryPanel({
   loadMore,
 }: DirigeraTelemetryPanelProps) {
   const staleBadge = stale && loading
-    ? <span className="text-xs text-ember-400 ml-2">Aggiornamento…</span>
+    ? <span className="ml-2 text-xs text-ember-400">Aggiornamento…</span>
     : stale && !loading
-      ? <span className="text-xs text-slate-400 ml-2">Dati non aggiornati</span>
+      ? <span className="ml-2 text-xs text-slate-400">Dati non aggiornati</span>
       : null;
 
   return (
     <div className="rounded-2xl bg-slate-800/50 p-4">
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-slate-100">
           Telemetria
           {staleBadge}
@@ -45,20 +45,20 @@ export default function DirigeraTelemetryPanel({
       {/* Loading state — no items yet */}
       {loading && items.length === 0 && (
         <div className="py-8 text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-slate-600 border-t-ember-500" />
+          <div className="inline-block size-8 animate-spin rounded-full border-2 border-slate-600 border-t-ember-500" />
         </div>
       )}
 
       {/* Error state — no items */}
       {error && items.length === 0 && (
-        <p className="text-sm text-slate-400 py-4 text-center">
+        <p className="py-4 text-center text-sm text-slate-400">
           Impossibile caricare la telemetria
         </p>
       )}
 
       {/* Empty state — not loading, no error, no items */}
       {items.length === 0 && !loading && !error && (
-        <p className="text-sm text-slate-400 py-4 text-center">
+        <p className="py-4 text-center text-sm text-slate-400">
           Nessuna telemetria
         </p>
       )}
@@ -69,11 +69,11 @@ export default function DirigeraTelemetryPanel({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-xs uppercase tracking-wide text-slate-400">
-                  <th className="text-left pb-2">Sensore</th>
-                  <th className="text-left pb-2">Batteria</th>
-                  <th className="text-left pb-2">Lux</th>
-                  <th className="text-left pb-2">Data/ora</th>
+                <tr className="text-xs tracking-wide text-slate-400 uppercase">
+                  <th className="pb-2 text-left">Sensore</th>
+                  <th className="pb-2 text-left">Batteria</th>
+                  <th className="pb-2 text-left">Lux</th>
+                  <th className="pb-2 text-left">Data/ora</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,7 +109,7 @@ export default function DirigeraTelemetryPanel({
                 type="button"
                 onClick={loadMore}
                 disabled={isLoadingMore}
-                className="w-full sm:w-auto px-4 py-2 text-sm border border-slate-700 rounded-lg hover:border-ember-500 focus-visible:ring-2 focus-visible:ring-ember-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-ember-500 focus-visible:ring-2 focus-visible:ring-ember-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
               >
                 {isLoadingMore ? 'Caricamento...' : 'Carica altri 50'}
               </button>

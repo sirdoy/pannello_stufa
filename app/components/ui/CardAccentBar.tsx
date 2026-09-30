@@ -86,12 +86,12 @@ export default function CardAccentBar({
   const barHeight = sizes[size] || sizes.md;
 
   return (
-    <div className={`absolute top-0 left-0 right-0 z-10 ${className}`}>
+    <div className={`absolute inset-x-0 top-0 z-10 ${className}`}>
       {/* Main gradient bar - flush with top edge */}
       <div
         className={`
           relative ${barHeight} w-full overflow-hidden
-          bg-gradient-to-r ${theme.gradient}
+          bg-linear-to-r ${theme.gradient}
           rounded-t-2xl
         `}
         style={{
@@ -101,7 +101,7 @@ export default function CardAccentBar({
         {/* Shimmer animation overlay */}
         {animated && (
           <div
-            className="absolute inset-0 w-[200%] bg-gradient-to-r from-transparent via-white/25 to-transparent animate-shimmer"
+            className="animate-shimmer absolute inset-0 w-[200%] bg-linear-to-r from-transparent via-white/25 to-transparent"
           />
         )}
       </div>
@@ -109,8 +109,7 @@ export default function CardAccentBar({
       {/* Glow diffusion below the bar */}
       <div
         className={`
-          absolute top-full left-0 right-0 h-4
-          pointer-events-none
+          pointer-events-none absolute inset-x-0 top-full h-4
           ${pulse ? 'animate-pulse' : ''}
         `}
         style={{
@@ -155,24 +154,23 @@ export function CardAccentCorner({
       <div
         className={`
           absolute top-0 left-0 h-1 w-12
-          bg-gradient-to-r ${gradient}
+          bg-linear-to-r ${gradient}
           ${corner.includes('right') ? 'rounded-tr' : 'rounded-tl'}
         `}
       />
       {/* Vertical segment */}
       <div
         className={`
-          absolute top-0 left-0 w-1 h-12
-          bg-gradient-to-b ${gradient}
+          absolute top-0 left-0 h-12 w-1
+          bg-linear-to-b ${gradient}
           ${corner.includes('bottom') ? 'rounded-bl' : 'rounded-tl'}
         `}
       />
       {/* Corner glow */}
       <div
         className={`
-          absolute -top-1 -left-1 w-8 h-8
-          bg-gradient-to-br ${gradient}
-          blur-xl opacity-40
+          absolute -top-1 -left-1 size-8 bg-linear-to-br ${gradient}
+          opacity-40 blur-xl
           ${animated ? 'animate-pulse' : ''}
         `}
       />

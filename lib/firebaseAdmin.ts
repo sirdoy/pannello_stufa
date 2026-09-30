@@ -11,7 +11,7 @@
  */
 
 import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
-import { getMessaging, Messaging } from 'firebase-admin/messaging';
+import { getMessaging } from 'firebase-admin/messaging';
 import type { SendResponse } from 'firebase-admin/messaging';
 import { getDatabase, Database } from 'firebase-admin/database';
 import { getFirestore, Firestore } from 'firebase-admin/firestore';
@@ -20,7 +20,7 @@ import { filterNotificationByPreferences, getFilterMessage } from './notificatio
 import type { NotificationPreferences as FilterPreferences } from './notifications/notificationFilter';
 import type { NotificationPreferences as FirebaseStoredPreferences } from '@/types/firebase/notifications';
 import { getDefaultPreferences } from './schemas/notificationPreferences';
-import { getActionsForNotificationType, ACTION_CATEGORIES, type NotificationActionDef } from './notifications/notificationActions';
+import { ACTION_CATEGORIES, type NotificationActionDef } from './notifications/notificationActions';
 
 // Error codes that indicate token is permanently invalid
 const INVALID_TOKEN_ERRORS = [
@@ -205,7 +205,7 @@ async function lookupDeviceIdForToken(token: string): Promise<{ userId: string; 
       const userId = userSnap.key;
       const tokens = userSnap.child('fcmTokens').val() || {};
 
-      Object.entries(tokens).forEach(([tokenKey, tokenData]) => {
+      Object.entries(tokens).forEach(([_tokenKey, tokenData]) => {
         const typedTokenData = tokenData as TokenRecord;
         if (typedTokenData.token === token && typedTokenData.deviceId) {
           result = { userId, deviceId: typedTokenData.deviceId };
@@ -246,7 +246,7 @@ interface ErrorData {
  */
 async function trackNotificationError(errorData: ErrorData): Promise<string | undefined> {
   try {
-    const db = getAdminDatabase();
+    getAdminDatabase();
 
     const errorLog = {
       timestamp: new Date().toISOString(),
@@ -757,32 +757,5 @@ export async function sendNotificationToUser(userId: string, notification: Notif
   } catch (error) {
     console.error('❌ Errore invio notifica a utente:', error);
     throw error;
-  }
-}
-
-/**
- * Helper: Verifica se un token è valido
- * (Utile per cleanup token obsoleti/invalidi)
- */
-async function verifyFCMToken(token: string): Promise<boolean> {
-  try {
-    initializeFirebaseAdmin();
-
-    // Prova a inviare messaggio dry-run
-    await getMessaging().send({
-      token,
-      notification: {
-        title: 'Test',
-        body: 'Test',
-      },
-    }, true); // dry_run = true
-
-    return true;
-  } catch (error: unknown) {
-    const errCode = error instanceof Error && 'code' in error
-      ? (error as Error & { code: string }).code
-      : 'unknown';
-    console.error('❌ Token invalido:', errCode);
-    return false;
   }
 }

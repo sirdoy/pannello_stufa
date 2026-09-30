@@ -44,6 +44,8 @@ export function computeRaspiHealth(d: RaspiData): RaspiHealth {
 }
 
 export function useRaspiData(): UseRaspiDataReturn {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const [data, setData] = useState<RaspiData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -135,7 +137,6 @@ export function useRaspiData(): UseRaspiDataReturn {
 
     subscribe('raspi', handleMessage);
     return () => { unsubscribe('raspi', handleMessage); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWsConnected, subscribe, unsubscribe]);
 
   // Polling fallback: suppressed when WS is OPEN (raspi topic delivers live snapshot + events).
@@ -152,7 +153,6 @@ export function useRaspiData(): UseRaspiDataReturn {
   // wait for a WS message that may never come (empty raspi cache → no snapshot).
   useEffect(() => {
     void fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const health: RaspiHealth = data ? computeRaspiHealth(data) : 'ok';

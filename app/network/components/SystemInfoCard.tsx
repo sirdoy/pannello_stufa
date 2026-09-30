@@ -34,9 +34,9 @@ interface SystemInfoCardProps {
 export default function SystemInfoCard({ data, loading, stale }: SystemInfoCardProps) {
   if (loading) {
     return (
-      <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+      <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
         <Skeleton className="h-6 w-48" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Skeleton className="h-24 rounded-xl" />
           <Skeleton className="h-24 rounded-xl" />
           <Skeleton className="h-24 rounded-xl" />
@@ -50,10 +50,10 @@ export default function SystemInfoCard({ data, loading, stale }: SystemInfoCardP
   }
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Text variant="label" size="sm" className="text-slate-400 uppercase tracking-wide">
+        <Text variant="label" size="sm" className="tracking-wide text-slate-400 uppercase">
           Sistema Fritz!Box
         </Text>
         {stale && (
@@ -64,7 +64,7 @@ export default function SystemInfoCard({ data, loading, stale }: SystemInfoCardP
       </div>
 
       {/* Info grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <InfoBox
           icon="📡"
           label="Modello"

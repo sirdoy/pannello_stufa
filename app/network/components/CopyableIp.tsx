@@ -38,9 +38,9 @@ export default function CopyableIp({ ip }: CopyableIpProps) {
         aria-label={copied ? 'IP copiato' : 'Copia IP'}
       >
         {copied ? (
-          <Check className="w-4 h-4 text-sage-400" />
+          <Check className="size-4 text-sage-400" />
         ) : (
-          <Copy className="w-4 h-4" />
+          <Copy className="size-4" />
         )}
       </Button>
     </div>

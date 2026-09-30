@@ -203,7 +203,7 @@ describe('Switch', () => {
       render(<Switch variant="ember" checked label="Ember" />);
       const switchElement = screen.getByRole('switch');
       // Verify gradient classes are present
-      expect(switchElement).toHaveClass('data-[state=checked]:bg-gradient-to-r');
+      expect(switchElement).toHaveClass('data-[state=checked]:bg-linear-to-r');
     });
   });
 
@@ -211,16 +211,16 @@ describe('Switch', () => {
     it('has animation token duration class on track', () => {
       render(<Switch label="Animated" />);
       const switchElement = screen.getByRole('switch');
-      expect(switchElement).toHaveClass('duration-[var(--duration-smooth)]');
-      expect(switchElement).toHaveClass('ease-[var(--ease-move)]');
+      expect(switchElement).toHaveClass('duration-(--duration-smooth)');
+      expect(switchElement).toHaveClass('ease-(--ease-move)');
     });
 
     it('has animation token duration and spring easing on thumb', () => {
       const { container } = render(<Switch label="Animated" />);
       // The thumb is the span inside the switch
       const thumb = container.querySelector('[data-state]')?.querySelector('span');
-      expect(thumb).toHaveClass('duration-[var(--duration-smooth)]');
-      expect(thumb).toHaveClass('ease-[var(--ease-spring)]');
+      expect(thumb).toHaveClass('duration-(--duration-smooth)');
+      expect(thumb).toHaveClass('ease-spring');
     });
   });
 

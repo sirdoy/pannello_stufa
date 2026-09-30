@@ -97,7 +97,7 @@ export default function LoginPage() {
         Inserisci le tue credenziali per gestire le API key.
       </Text>
 
-      <Card variant="glass" className="max-w-sm mx-auto p-6 sm:p-8 mt-6">
+      <Card variant="glass" className="mx-auto mt-6 max-w-sm p-6 sm:p-8">
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
           {error === 'INVALID_CREDENTIALS' && (
             <Banner variant="error" compact>

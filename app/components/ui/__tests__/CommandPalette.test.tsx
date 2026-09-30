@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CommandPalette from '../CommandPalette';
-import CommandPaletteProvider, { useCommandPalette, CommandPaletteContext } from '../../layout/CommandPaletteProvider';
+import CommandPaletteProvider, { useCommandPalette } from '../../layout/CommandPaletteProvider';
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({
@@ -499,9 +499,9 @@ describe('CommandPalette', () => {
         />
       );
 
-      // Items should have py-3 for 48px touch targets
+      // Items should have p-3 (vertical padding 12px) for 48px touch targets
       const item = screen.getByText('Dashboard').closest('[data-selected]');
-      expect(item!.className).toContain('py-3');
+      expect(item!.className.split(' ')).toContain('p-3');
     });
 
     it('placeholder is visible', () => {

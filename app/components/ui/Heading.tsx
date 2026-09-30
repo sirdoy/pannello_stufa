@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils/cn';
  */
 const headingVariants = cva(
   // Base classes
-  'font-bold font-display',
+  'font-display font-bold',
   {
     variants: {
       size: {
@@ -28,7 +28,7 @@ const headingVariants = cva(
       variant: {
         // Neutral hierarchy
         default: 'text-slate-100 ',
-        gradient: 'bg-gradient-to-r from-ember-500 to-flame-600 bg-clip-text text-transparent',
+        gradient: 'bg-linear-to-r from-ember-500 to-flame-600 bg-clip-text text-transparent',
         subtle: 'text-slate-400 ',
         // Accent colors - Ember Noir palette
         ember: 'text-ember-400 ',

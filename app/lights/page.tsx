@@ -73,7 +73,7 @@ export default function LightsPage() {
 
   if (!lightsData.connected) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Card className="p-8">
           <Heading level={1} size="lg" className="mb-4">Bridge Hue Non Connesso</Heading>
           <Text variant="secondary" className="mb-6">
@@ -86,9 +86,9 @@ export default function LightsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <Button variant="ghost" onClick={() => router.push('/')} size="sm">← Indietro</Button>
         </div>
         <Heading level={1} size="2xl" className="mb-2">Controllo Luci Philips Hue</Heading>
@@ -106,7 +106,7 @@ export default function LightsPage() {
         </div>
       )}
 
-      <Card className="p-6 mb-6">
+      <Card className="mb-6 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="grid grid-cols-3 gap-3 sm:gap-6">
             <div><Text variant="label" size="xs" className="mb-1">Stanze</Text><Heading level={3} size="lg">{lightsData.groups.length}</Heading></div>
@@ -118,7 +118,7 @@ export default function LightsPage() {
       </Card>
 
       {lightsData.hasAnyLights && (
-        <Card className="p-6 mb-6 bg-gradient-to-br from-slate-800/40 to-slate-900/60 border-slate-700/50">
+        <Card className="mb-6 border-slate-700/50 bg-linear-to-br from-slate-800/40 to-slate-900/60 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🏠</span>
@@ -144,7 +144,7 @@ export default function LightsPage() {
       )}
 
       {lightsData.groups.length > 0 && (
-        <div className="space-y-6 mb-8">
+        <div className="mb-8 space-y-6">
           <Heading level={2} size="md">🏠 Stanze</Heading>
           {lightsData.groups.map((group: HueGroup) => {
             const groupLights = lightsData.lights.filter((l: HueLight) => group.lights.includes(l.light_id));
@@ -158,8 +158,8 @@ export default function LightsPage() {
             const allOff = groupLights.length > 0 && onCount === 0;
             return (
               <Card key={group.group_id} className="overflow-hidden">
-                <div className={`p-6 ${isOn ? 'bg-gradient-to-br from-warning-900/20 to-warning-800/20' : ''}`}>
-                  <div className="flex items-start justify-between mb-4">
+                <div className={`p-6 ${isOn ? 'bg-linear-to-br from-warning-900/20 to-warning-800/20' : ''}`}>
+                  <div className="mb-4 flex items-start justify-between">
                     <div>
                       <Heading level={3} size="md" className="mb-1">{group.name}</Heading>
                       <Text variant="tertiary" size="xs">
@@ -189,23 +189,23 @@ export default function LightsPage() {
                     </div>
                   )}
                   {(groupLights.length > 0 || groupScenes.length > 0) && (
-                    <Button variant="ghost" onClick={() => setExpandedRoom(isExpanded ? null : group.group_id)} size="sm" className="w-full mt-4">
+                    <Button variant="ghost" onClick={() => setExpandedRoom(isExpanded ? null : group.group_id)} size="sm" className="mt-4 w-full">
                       {isExpanded ? '▲ Nascondi Dettagli' : '▼ Mostra Dettagli'} ({groupLights.length} luci, {groupScenes.length} scene)
                     </Button>
                   )}
                 </div>
                 {isExpanded && (
-                  <div className="p-6 border-t border-slate-700 bg-slate-900/20">
+                  <div className="border-t border-slate-700 bg-slate-900/20 p-6">
                     {groupLights.length > 0 && (
                       <>
                         <Heading level={4} size="sm" className="mb-3">💡 Luci Individuali</Heading>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                        <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2">
                           {groupLights.map((light: HueLight) => {
                             const briPct = Math.round((light.brightness ?? 0) * 100 / 254);
                             const hasColor = supportsColor(light);
                             return (
-                              <div key={light.light_id} className={cn("p-4 rounded-xl border-2 transition-colors", light.on ? "border-warning-500/50 bg-warning-500/10" : "border-slate-700 bg-slate-800")}>
-                                <div className="flex items-center justify-between mb-2">
+                              <div key={light.light_id} className={cn("rounded-xl border-2 p-4 transition-colors", light.on ? "border-warning-500/50 bg-warning-500/10" : "border-slate-700 bg-slate-800")}>
+                                <div className="mb-2 flex items-center justify-between">
                                   <div>
                                     <Text size="sm">{light.name}</Text>
                                     {hasColor && <Text variant="tertiary" size="xs">🎨 Colore disponibile</Text>}
@@ -230,10 +230,10 @@ export default function LightsPage() {
                                     {hasColor && (
                                       <div className="space-y-1.5">
                                         <Text variant="tertiary" size="xs">Colore</Text>
-                                        <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
+                                        <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
                                           {COLOR_PRESETS.map(preset => (
-                                            <button key={preset.name} onClick={() => handleLightColorChange(light.light_id, preset)} disabled={changingColor === light.light_id} className="relative w-full aspect-square rounded-lg border-2 border-slate-600 hover:border-slate-400 transition-all active:scale-95 disabled:opacity-50" style={{ backgroundColor: preset.hex }} title={preset.name}>
-                                              {changingColor === light.light_id && <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg"><div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div></div>}
+                                            <button key={preset.name} onClick={() => handleLightColorChange(light.light_id, preset)} disabled={changingColor === light.light_id} className="relative aspect-square w-full rounded-lg border-2 border-slate-600 transition-all hover:border-slate-400 active:scale-95 disabled:opacity-50" style={{ backgroundColor: preset.hex }} title={preset.name}>
+                                              {changingColor === light.light_id && <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/20"><div className="size-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div></div>}
                                             </button>
                                           ))}
                                         </div>
@@ -250,12 +250,12 @@ export default function LightsPage() {
                     {groupScenes.length > 0 && (
                       <>
                         <Heading level={4} size="sm" className="mb-3">🎨 Scene della Stanza</Heading>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                           {groupScenes.map((scene: HueScene) => (
-                            <button key={scene.scene_id} onClick={() => { setActivatingScene(scene.scene_id); lightsCommands.handleSceneActivate(scene.scene_id, scene.group_id).finally(() => setActivatingScene(null)); }} disabled={activatingScene === scene.scene_id} className={cn("relative p-4 rounded-xl border-2 transition-all active:scale-95", activatingScene === scene.scene_id ? "border-warning-500 bg-warning-500/10" : "border-slate-700 hover:border-warning-500/50")}>
-                              <div className="text-2xl mb-1">🎨</div>
+                            <button key={scene.scene_id} onClick={() => { setActivatingScene(scene.scene_id); lightsCommands.handleSceneActivate(scene.scene_id, scene.group_id).finally(() => setActivatingScene(null)); }} disabled={activatingScene === scene.scene_id} className={cn("relative rounded-xl border-2 p-4 transition-all active:scale-95", activatingScene === scene.scene_id ? "border-warning-500 bg-warning-500/10" : "border-slate-700 hover:border-warning-500/50")}>
+                              <div className="mb-1 text-2xl">🎨</div>
                               <Text size="xs" className="text-center">{scene.name}</Text>
-                              {activatingScene === scene.scene_id && <div className="absolute top-1 right-1"><div className="w-3 h-3 border-2 border-warning-500 border-t-transparent rounded-full animate-spin"></div></div>}
+                              {activatingScene === scene.scene_id && <div className="absolute top-1 right-1"><div className="size-3 animate-spin rounded-full border-2 border-warning-500 border-t-transparent"></div></div>}
                             </button>
                           ))}
                         </div>

@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   queueCommand,
   getQueuedCommands,
-  getPendingCount,
   clearFailedCommands,
   retryCommand,
   cancelCommand,
@@ -64,7 +63,7 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
   /**
    * Refresh command lists from IndexedDB
    */
-  const refreshCommands = async () => {
+  const refreshCommands = useCallback(async () => {
     try {
       const pending = await getQueuedCommands(COMMAND_STATUS.PENDING);
       const failed = await getQueuedCommands(COMMAND_STATUS.FAILED);
@@ -75,7 +74,8 @@ export function useBackgroundSync(): UseBackgroundSyncReturn {
     } catch (error) {
       console.error('[useBackgroundSync] Failed to refresh commands:', error);
     }
-  };
+  }, []);
+
 
   // Initial load and periodic refresh
   useEffect(() => {

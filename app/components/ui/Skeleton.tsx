@@ -29,7 +29,7 @@ export default function Skeleton({ className = '', ...props }: SkeletonProps) {
       {...props}
     >
       {/* Shimmer overlay effect */}
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 }
@@ -44,7 +44,7 @@ interface SkeletonCardProps extends HTMLAttributes<HTMLDivElement> {
 Skeleton.Card = function SkeletonCard({ children, className = '', ...props }: SkeletonCardProps) {
   return (
     <div
-      className={`bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-slate-700/50 shadow-[0_4px_20px_rgba(0,0,0,0.3)] ,0,0,0.1)] ${className}`}
+      className={`,0,0,0.1)] rounded-2xl border border-slate-700/50 bg-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl ${className}`}
       {...props}
     >
       {children}
@@ -57,38 +57,38 @@ Skeleton.Card = function SkeletonCard({ children, className = '', ...props }: Sk
  */
 Skeleton.StovePanel = function SkeletonStovePanel() {
   return (
-    <div className="space-y-4 sm:space-y-6 animate-spring-in">
+    <div className="animate-spring-in space-y-4 sm:space-y-6">
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
           <div className="p-6 sm:p-8">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="mb-6 flex items-center gap-3">
+              <Skeleton className="size-8 rounded-full" />
               <Skeleton className="h-8 w-24" />
             </div>
 
             {/* Status Display */}
             <div className="mb-6">
-              <div className="relative bg-slate-800/60 rounded-2xl p-8 sm:p-10 border border-slate-700/50 overflow-visible ">
-                <div className="text-center mb-8 sm:mb-10">
-                  <Skeleton className="h-8 w-48 mx-auto" />
+              <div className="relative overflow-visible rounded-2xl border border-slate-700/50 bg-slate-800/60 p-8 sm:p-10 ">
+                <div className="mb-8 text-center sm:mb-10">
+                  <Skeleton className="mx-auto h-8 w-48" />
                 </div>
                 <div className="relative flex flex-col items-center">
-                  <div className="relative mb-[-40px] sm:mb-[-50px]">
-                    <Skeleton className="h-[120px] w-[120px] sm:h-[140px] sm:w-[140px] rounded-full" />
+                  <div className="relative -mb-10 sm:mb-[-50px]">
+                    <Skeleton className="size-[120px] rounded-full sm:size-[140px]" />
                   </div>
-                  <div className="relative z-10 w-full grid grid-cols-2 gap-3 sm:gap-4 mt-4">
-                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 ">
-                      <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
-                        <Skeleton className="h-6 w-6 rounded-full mb-2" />
-                        <Skeleton className="h-3 w-16 mb-1" />
+                  <div className="relative z-10 mt-4 grid w-full grid-cols-2 gap-3 sm:gap-4">
+                    <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 ">
+                      <div className="flex min-h-25 flex-col items-center justify-center p-4 sm:min-h-30 sm:p-6">
+                        <Skeleton className="mb-2 size-6 rounded-full" />
+                        <Skeleton className="mb-1 h-3 w-16" />
                         <Skeleton className="h-8 w-12" />
                       </div>
                     </div>
-                    <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 ">
-                      <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[100px] sm:min-h-[120px]">
-                        <Skeleton className="h-6 w-6 rounded-full mb-2" />
-                        <Skeleton className="h-3 w-16 mb-1" />
+                    <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 ">
+                      <div className="flex min-h-25 flex-col items-center justify-center p-4 sm:min-h-30 sm:p-6">
+                        <Skeleton className="mb-2 size-6 rounded-full" />
+                        <Skeleton className="mb-1 h-3 w-16" />
                         <Skeleton className="h-8 w-12" />
                       </div>
                     </div>
@@ -98,15 +98,15 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             </div>
 
             {/* ON/OFF buttons */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              <Skeleton className="h-20 sm:h-24 rounded-xl" />
-              <Skeleton className="h-20 sm:h-24 rounded-xl" />
+            <div className="mb-6 grid grid-cols-2 gap-4">
+              <Skeleton className="h-20 rounded-xl sm:h-24" />
+              <Skeleton className="h-20 rounded-xl sm:h-24" />
             </div>
 
             {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent"></div>
+                <div className="h-px w-full bg-linear-to-r from-transparent via-slate-600/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-28 rounded-full" />
@@ -114,11 +114,11 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             </div>
 
             {/* Mode Indicator */}
-            <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 sm:p-6 mb-6 ">
-              <div className="flex items-center gap-4 mb-4">
-                <Skeleton className="h-12 w-12 rounded-xl" />
-                <div className="flex-1 min-w-0">
-                  <Skeleton className="h-5 w-32 mb-2" />
+            <div className="relative mb-6 overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/50 p-5 sm:p-6 ">
+              <div className="mb-4 flex items-center gap-4">
+                <Skeleton className="size-12 rounded-xl" />
+                <div className="min-w-0 flex-1">
+                  <Skeleton className="mb-2 h-5 w-32" />
                   <Skeleton className="h-4 w-48" />
                 </div>
               </div>
@@ -127,18 +127,18 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
 
             {/* Controls */}
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-5 sm:p-6 ">
-                <div className="flex items-center gap-3 mb-4">
-                  <Skeleton className="h-10 w-10 rounded-xl" />
+              <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/50 p-5 sm:p-6 ">
+                <div className="mb-4 flex items-center gap-3">
+                  <Skeleton className="size-10 rounded-xl" />
                   <Skeleton className="h-5 w-24" />
                 </div>
                 <div className="flex items-center gap-3">
-                  <Skeleton className="flex-1 h-16 sm:h-20 rounded-xl" />
+                  <Skeleton className="h-16 flex-1 rounded-xl sm:h-20" />
                   <div className="flex flex-col items-center justify-center px-4">
-                    <Skeleton className="h-3 w-12 mb-1" />
+                    <Skeleton className="mb-1 h-3 w-12" />
                     <Skeleton className="h-10 w-12" />
                   </div>
-                  <Skeleton className="flex-1 h-16 sm:h-20 rounded-xl" />
+                  <Skeleton className="h-16 flex-1 rounded-xl sm:h-20" />
                 </div>
               </div>
             </div>
@@ -154,49 +154,49 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
  */
 Skeleton.ThermostatCard = function SkeletonThermostatCard() {
   return (
-    <div className="space-y-4 sm:space-y-6 animate-spring-in">
+    <div className="animate-spring-in space-y-4 sm:space-y-6">
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
           <div className="p-6 sm:p-8">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="mb-6 flex items-center gap-3">
+              <Skeleton className="size-8 rounded-full" />
               <Skeleton className="h-8 w-32" />
             </div>
 
             {/* Room Selection */}
             <div className="mb-4 sm:mb-6">
-              <Skeleton className="h-14 sm:h-16 w-full rounded-xl" />
+              <Skeleton className="h-14 w-full rounded-xl sm:h-16" />
             </div>
 
             {/* Temperature Display */}
-            <div className="space-y-4 mb-4 sm:mb-6">
-              <div className="relative rounded-2xl p-6 sm:p-8 bg-slate-800/60 border border-slate-700/50 ">
+            <div className="mb-4 space-y-4 sm:mb-6">
+              <div className="relative rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 sm:p-8 ">
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <div className="relative overflow-hidden rounded-2xl bg-slate-800/60 border border-slate-700/50 ">
-                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                      <Skeleton className="h-3 w-16 mb-2" />
-                      <Skeleton className="h-12 sm:h-14 w-16 sm:w-20" />
+                  <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 ">
+                    <div className="flex min-h-30 flex-col items-center justify-center p-4 sm:p-6">
+                      <Skeleton className="mb-2 h-3 w-16" />
+                      <Skeleton className="h-12 w-16 sm:h-14 sm:w-20" />
                     </div>
                   </div>
-                  <div className="relative overflow-hidden rounded-2xl bg-ocean-900/40 border border-ocean-500/30 ">
-                    <div className="flex flex-col items-center justify-center p-4 sm:p-6 min-h-[120px]">
-                      <Skeleton className="h-3 w-16 mb-2" />
-                      <Skeleton className="h-12 sm:h-14 w-16 sm:w-20" />
+                  <div className="relative overflow-hidden rounded-2xl border border-ocean-500/30 bg-ocean-900/40 ">
+                    <div className="flex min-h-30 flex-col items-center justify-center p-4 sm:p-6">
+                      <Skeleton className="mb-2 h-3 w-16" />
+                      <Skeleton className="h-12 w-16 sm:h-14 sm:w-20" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Temperature controls */}
-              <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-4 sm:p-5 ">
+              <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/50 p-4 sm:p-5 ">
                 <div className="flex items-center gap-3">
-                  <Skeleton className="flex-1 h-16 sm:h-18 rounded-xl" />
+                  <Skeleton className="h-16 flex-1 rounded-xl sm:h-18" />
                   <div className="flex flex-col items-center justify-center px-4">
-                    <Skeleton className="h-3 w-12 mb-1" />
+                    <Skeleton className="mb-1 h-3 w-12" />
                     <Skeleton className="h-8 w-16" />
                   </div>
-                  <Skeleton className="flex-1 h-16 sm:h-18 rounded-xl" />
+                  <Skeleton className="h-16 flex-1 rounded-xl sm:h-18" />
                 </div>
               </div>
             </div>
@@ -204,7 +204,7 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
             {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent"></div>
+                <div className="h-px w-full bg-linear-to-r from-transparent via-slate-600/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-28 rounded-full" />
@@ -212,11 +212,11 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
             </div>
 
             {/* Mode Control */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-6">
-              <Skeleton className="h-20 sm:h-24 rounded-xl" />
-              <Skeleton className="h-20 sm:h-24 rounded-xl" />
-              <Skeleton className="h-20 sm:h-24 rounded-xl" />
-              <Skeleton className="h-20 sm:h-24 rounded-xl" />
+            <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+              <Skeleton className="h-20 rounded-xl sm:h-24" />
+              <Skeleton className="h-20 rounded-xl sm:h-24" />
+              <Skeleton className="h-20 rounded-xl sm:h-24" />
+              <Skeleton className="h-20 rounded-xl sm:h-24" />
             </div>
 
             {/* Actions */}
@@ -236,44 +236,44 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
  */
 Skeleton.LightsCard = function SkeletonLightsCard() {
   return (
-    <div className="space-y-4 sm:space-y-6 animate-spring-in">
+    <div className="animate-spring-in space-y-4 sm:space-y-6">
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
           <div className="p-6 sm:p-8">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="mb-6 flex items-center gap-3">
+              <Skeleton className="size-8 rounded-full" />
               <Skeleton className="h-8 w-20" />
             </div>
 
             {/* Room Selection */}
             <div className="mb-4 sm:mb-6">
-              <Skeleton className="h-14 sm:h-16 w-full rounded-xl" />
+              <Skeleton className="h-14 w-full rounded-xl sm:h-16" />
             </div>
 
             {/* Main Control Area */}
             <div className="mb-6">
-              <div className="relative rounded-2xl p-6 sm:p-8 bg-slate-800/60 border border-slate-700/50 ">
+              <div className="relative rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 sm:p-8 ">
                 {/* ON/OFF buttons */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                  <Skeleton className="h-16 sm:h-20 rounded-xl" />
-                  <Skeleton className="h-16 sm:h-20 rounded-xl" />
+                <div className="mb-6 grid grid-cols-2 gap-4">
+                  <Skeleton className="h-16 rounded-xl sm:h-20" />
+                  <Skeleton className="h-16 rounded-xl sm:h-20" />
                 </div>
 
                 {/* Brightness Control */}
-                <div className="relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700/50 p-4 sm:p-5 ">
+                <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/50 p-4 sm:p-5 ">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Skeleton className="h-6 w-6 rounded-full" />
+                        <Skeleton className="size-6 rounded-full" />
                         <Skeleton className="h-5 w-24" />
                       </div>
                       <Skeleton className="h-8 w-12" />
                     </div>
                     <Skeleton className="h-3 w-full rounded-full" />
                     <div className="flex items-center gap-2">
-                      <Skeleton className="flex-1 h-10 rounded-xl" />
-                      <Skeleton className="flex-1 h-10 rounded-xl" />
+                      <Skeleton className="h-10 flex-1 rounded-xl" />
+                      <Skeleton className="h-10 flex-1 rounded-xl" />
                     </div>
                   </div>
                 </div>
@@ -283,7 +283,7 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
             {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600/50 to-transparent"></div>
+                <div className="h-px w-full bg-linear-to-r from-transparent via-slate-600/50 to-transparent"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-20 rounded-full" />
@@ -292,18 +292,18 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
 
             {/* Scenes */}
             <div className="mb-6">
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start ">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
-                  <Skeleton className="h-3 w-20 mx-auto" />
+              <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
+                <div className="w-32 shrink-0 snap-start rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 sm:w-36 ">
+                  <Skeleton className="mx-auto mb-2 size-8 rounded-full" />
+                  <Skeleton className="mx-auto h-3 w-20" />
                 </div>
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start ">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
-                  <Skeleton className="h-3 w-20 mx-auto" />
+                <div className="w-32 shrink-0 snap-start rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 sm:w-36 ">
+                  <Skeleton className="mx-auto mb-2 size-8 rounded-full" />
+                  <Skeleton className="mx-auto h-3 w-20" />
                 </div>
-                <div className="flex-shrink-0 w-32 sm:w-36 p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 snap-start ">
-                  <Skeleton className="h-8 w-8 rounded-full mb-2 mx-auto" />
-                  <Skeleton className="h-3 w-20 mx-auto" />
+                <div className="w-32 shrink-0 snap-start rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 sm:w-36 ">
+                  <Skeleton className="mx-auto mb-2 size-8 rounded-full" />
+                  <Skeleton className="mx-auto h-3 w-20" />
                 </div>
               </div>
             </div>
@@ -324,13 +324,13 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
  */
 Skeleton.WeatherCard = function SkeletonWeatherCard() {
   return (
-    <div className="space-y-4 sm:space-y-6 animate-spring-in">
+    <div className="animate-spring-in space-y-4 sm:space-y-6">
       <Skeleton.Card className="overflow-visible transition-all duration-500">
         <div className="relative">
           <div className="p-6 sm:p-8">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <Skeleton className="h-8 w-8 rounded-full" />
+            <div className="mb-6 flex items-center gap-3">
+              <Skeleton className="size-8 rounded-full" />
               <Skeleton className="h-8 w-20" />
             </div>
 
@@ -341,23 +341,23 @@ Skeleton.WeatherCard = function SkeletonWeatherCard() {
 
             {/* Current conditions - main display */}
             <div className="mb-6">
-              <div className="flex items-start gap-4 mb-4">
+              <div className="mb-4 flex items-start gap-4">
                 {/* Weather icon */}
-                <Skeleton className="h-16 w-16 rounded-full flex-shrink-0" />
+                <Skeleton className="size-16 shrink-0 rounded-full" />
                 {/* Temperature + condition */}
                 <div className="flex-1">
-                  <Skeleton className="h-12 w-24 mb-2" />
-                  <Skeleton className="h-5 w-40 mb-1" />
+                  <Skeleton className="mb-2 h-12 w-24" />
+                  <Skeleton className="mb-1 h-5 w-40" />
                   <Skeleton className="h-4 w-32" />
                 </div>
               </div>
 
               {/* Weather details grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl ">
-                    <Skeleton className="h-5 w-5 rounded-full mb-2" />
-                    <Skeleton className="h-3 w-12 mb-1" />
+                  <div key={i} className="flex flex-col items-center rounded-xl bg-slate-800/40 p-3 ">
+                    <Skeleton className="mb-2 size-5 rounded-full" />
+                    <Skeleton className="mb-1 h-3 w-12" />
                     <Skeleton className="h-4 w-10" />
                   </div>
                 ))}
@@ -369,12 +369,12 @@ Skeleton.WeatherCard = function SkeletonWeatherCard() {
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="flex-shrink-0 w-20 p-3 rounded-xl bg-slate-800/40 "
+                  className="w-20 shrink-0 rounded-xl bg-slate-800/40 p-3 "
                 >
-                  <Skeleton className="h-3 w-10 mx-auto mb-2" />
-                  <Skeleton className="h-8 w-8 rounded-full mx-auto mb-2" />
-                  <Skeleton className="h-4 w-12 mx-auto mb-1" />
-                  <Skeleton className="h-3 w-8 mx-auto" />
+                  <Skeleton className="mx-auto mb-2 h-3 w-10" />
+                  <Skeleton className="mx-auto mb-2 size-8 rounded-full" />
+                  <Skeleton className="mx-auto mb-1 h-4 w-12" />
+                  <Skeleton className="mx-auto h-3 w-8" />
                 </div>
               ))}
             </div>
@@ -390,29 +390,29 @@ Skeleton.WeatherCard = function SkeletonWeatherCard() {
  */
 Skeleton.Scheduler = function SkeletonScheduler() {
   return (
-    <div className="max-w-5xl mx-auto space-y-8 animate-spring-in">
+    <div className="animate-spring-in mx-auto max-w-5xl space-y-8">
       {/* Header Card */}
       <Skeleton.Card className="p-8">
         {/* Title */}
-        <Skeleton className="h-8 sm:h-9 w-64 sm:w-80 mb-8" />
+        <Skeleton className="mb-8 h-8 w-64 sm:h-9 sm:w-80" />
 
         {/* Status e toggle */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-slate-100/80 bg-slate-800/60 mb-4">
+        <div className="mb-4 flex flex-col gap-4 rounded-xl bg-slate-100/80 bg-slate-800/60 p-4 sm:flex-row sm:items-center sm:justify-between">
           {/* ModeIndicator */}
           <div className="flex items-center gap-2">
-            <Skeleton className="h-6 w-6 rounded-lg" />
+            <Skeleton className="size-6 rounded-lg" />
             <div>
-              <Skeleton className="h-4 w-24 mb-1" />
+              <Skeleton className="mb-1 h-4 w-24" />
               <Skeleton className="h-3 w-32" />
             </div>
           </div>
 
           {/* Toggle button */}
-          <Skeleton className="h-10 sm:h-11 w-full sm:w-40 rounded-xl" />
+          <Skeleton className="h-10 w-full rounded-xl sm:h-11 sm:w-40" />
         </div>
 
         {/* Pulsanti Espandi/Comprimi */}
-        <div className="flex gap-3 justify-end">
+        <div className="flex justify-end gap-3">
           <Skeleton className="h-9 w-32 rounded-xl" />
           <Skeleton className="h-9 w-32 rounded-xl" />
         </div>
@@ -425,23 +425,23 @@ Skeleton.Scheduler = function SkeletonScheduler() {
           <div className="p-6">
             <div className="flex items-center justify-between">
               {/* Day info */}
-              <div className="flex items-center gap-4 flex-1">
-                <Skeleton className="h-8 w-8 rounded-lg" />
+              <div className="flex flex-1 items-center gap-4">
+                <Skeleton className="size-8 rounded-lg" />
                 <div>
-                  <Skeleton className="h-6 w-24 mb-2" />
+                  <Skeleton className="mb-2 h-6 w-24" />
                   <Skeleton className="h-4 w-32" />
                 </div>
               </div>
 
               {/* Expand icon */}
-              <Skeleton className="h-6 w-6 rounded-lg" />
+              <Skeleton className="size-6 rounded-lg" />
             </div>
 
             {/* TimeBar compatta */}
             <div className="mt-4">
-              <div className="relative h-4 w-full bg-slate-200 bg-slate-700/50 rounded-lg overflow-hidden shadow-inner">
-                <div className="absolute top-0 bottom-0 bg-gradient-to-r from-ember-400 to-flame-500" style={{ left: '20%', width: '30%' }} />
-                <div className="absolute top-0 bottom-0 bg-gradient-to-r from-ember-400 to-flame-500" style={{ left: '60%', width: '25%' }} />
+              <div className="relative h-4 w-full overflow-hidden rounded-lg bg-slate-200 bg-slate-700/50 shadow-inner">
+                <div className="absolute inset-y-0 bg-linear-to-r from-ember-400 to-flame-500" style={{ left: '20%', width: '30%' }} />
+                <div className="absolute inset-y-0 bg-linear-to-r from-ember-400 to-flame-500" style={{ left: '60%', width: '25%' }} />
               </div>
             </div>
           </div>
@@ -459,33 +459,33 @@ Skeleton.CameraCard = function SkeletonCameraCard() {
     <Skeleton.Card className="overflow-hidden">
       <div className="p-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Skeleton className="h-8 w-8 rounded-full" />
+            <Skeleton className="size-8 rounded-full" />
             <Skeleton className="h-7 w-28" />
           </div>
           <Skeleton className="h-6 w-16 rounded-full" />
         </div>
 
         {/* Toggle buttons */}
-        <div className="flex gap-2 mb-3">
+        <div className="mb-3 flex gap-2">
           <Skeleton className="h-8 w-20 rounded-lg" />
           <Skeleton className="h-8 w-16 rounded-lg" />
         </div>
 
         {/* Video preview area */}
-        <div className="relative aspect-video bg-slate-800 rounded-xl overflow-hidden mb-4">
+        <div className="relative mb-4 aspect-video overflow-hidden rounded-xl bg-slate-800">
           <div className="absolute inset-0 flex items-center justify-center">
-            <Skeleton className="h-12 w-12 rounded-full" />
+            <Skeleton className="size-12 rounded-full" />
           </div>
           {/* Status badge */}
           <Skeleton className="absolute top-2 right-2 h-6 w-14 rounded-full" />
           {/* Fullscreen/Refresh button */}
-          <Skeleton className="absolute bottom-2 right-2 h-9 w-9 rounded-full" />
+          <Skeleton className="absolute right-2 bottom-2 size-9 rounded-full" />
         </div>
 
         {/* Camera info */}
-        <div className="flex items-center gap-2 mb-4">
+        <div className="mb-4 flex items-center gap-2">
           <Skeleton className="h-4 w-32" />
         </div>
 
@@ -501,20 +501,20 @@ Skeleton.CameraCard = function SkeletonCameraCard() {
  */
 Skeleton.LogEntry = function SkeletonLogEntry() {
   return (
-    <li className="border-b border-slate-200 border-slate-700/50 pb-4 mb-4 last:border-b-0 flex items-start gap-3">
+    <li className="mb-4 flex items-start gap-3 border-b border-slate-200 border-slate-700/50 pb-4 last:border-b-0">
       {/* Icon */}
-      <Skeleton className="h-8 w-8 rounded-full flex-shrink-0 mt-1" />
+      <Skeleton className="mt-1 size-8 shrink-0 rounded-full" />
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         {/* User & Device Badge Row */}
-        <div className="flex items-center gap-2 mb-2 flex-wrap">
-          <Skeleton className="h-6 w-6 rounded-full" />
+        <div className="mb-2 flex flex-wrap items-center gap-2">
+          <Skeleton className="size-6 rounded-full" />
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-5 w-20 rounded-md" />
         </div>
 
         {/* Timestamp */}
-        <Skeleton className="h-3 w-40 mb-2" />
+        <Skeleton className="mb-2 h-3 w-40" />
 
         {/* Action */}
         <Skeleton className="h-5 w-3/4" />
@@ -528,16 +528,16 @@ Skeleton.LogEntry = function SkeletonLogEntry() {
  */
 Skeleton.LogPage = function SkeletonLogPage() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8 animate-spring-in">
+    <div className="animate-spring-in mx-auto max-w-5xl space-y-8 px-4 py-8">
       {/* Header */}
-      <div className="text-center mb-8">
-        <Skeleton className="h-9 w-64 mx-auto mb-2" />
-        <Skeleton className="h-5 w-80 mx-auto" />
+      <div className="mb-8 text-center">
+        <Skeleton className="mx-auto mb-2 h-9 w-64" />
+        <Skeleton className="mx-auto h-5 w-80" />
       </div>
 
       {/* Filters Card */}
       <Skeleton.Card className="p-6 sm:p-8">
-        <Skeleton className="h-4 w-40 mb-4" />
+        <Skeleton className="mb-4 h-4 w-40" />
         <div className="flex flex-wrap gap-3">
           <Skeleton className="h-9 w-24 rounded-xl" />
           <Skeleton className="h-9 w-32 rounded-xl" />
@@ -569,19 +569,19 @@ Skeleton.LogPage = function SkeletonLogPage() {
  */
 Skeleton.Changelog = function SkeletonChangelog() {
   return (
-    <div className="space-y-8 animate-spring-in">
+    <div className="animate-spring-in space-y-8">
       {/* Header Card */}
       <Skeleton.Card className="overflow-hidden">
         {/* Accent bar */}
-        <div className="h-1 bg-gradient-to-r from-ember-500/50 via-flame-500/50 to-ember-600/50" />
+        <div className="h-1 bg-linear-to-r from-ember-500/50 via-flame-500/50 to-ember-600/50" />
 
         <div className="p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <Skeleton className="w-12 h-12 rounded-2xl" />
+              <div className="mb-3 flex items-center gap-3">
+                <Skeleton className="size-12 rounded-2xl" />
                 <div>
-                  <Skeleton className="h-7 w-32 mb-2" />
+                  <Skeleton className="mb-2 h-7 w-32" />
                   <Skeleton className="h-4 w-24" />
                 </div>
               </div>
@@ -589,11 +589,11 @@ Skeleton.Changelog = function SkeletonChangelog() {
             </div>
 
             {/* Version Badge */}
-            <div className="flex flex-col items-start sm:items-end gap-2">
+            <div className="flex flex-col items-start gap-2 sm:items-end">
               <Skeleton className="h-3 w-24" />
               <Skeleton className="h-12 w-28 rounded-xl" />
-              <div className="flex items-center gap-2 mt-1">
-                <Skeleton className="w-2 h-2 rounded-full" />
+              <div className="mt-1 flex items-center gap-2">
+                <Skeleton className="size-2 rounded-full" />
                 <Skeleton className="h-3 w-20" />
               </div>
             </div>
@@ -604,18 +604,18 @@ Skeleton.Changelog = function SkeletonChangelog() {
       {/* Timeline */}
       <div className="relative">
         {/* Vertical line */}
-        <div className="absolute left-[23px] sm:left-[27px] top-8 bottom-8 w-px bg-slate-700/30 " />
+        <div className="absolute inset-y-8 left-[23px] w-px bg-slate-700/30 sm:left-[27px] " />
 
         <div className="space-y-6">
           {[...Array(5)].map((_, index) => (
             <div key={index} className="relative pl-14 sm:pl-16">
               {/* Timeline dot */}
-              <Skeleton className="absolute left-0 top-6 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl" />
+              <Skeleton className="absolute top-6 left-0 size-12 rounded-2xl sm:size-14" />
 
               <Skeleton.Card className="overflow-hidden">
                 {/* Header */}
-                <div className="p-5 sm:p-6 bg-slate-800/30 border-b border-slate-700/30 ">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="border-b border-slate-700/30 bg-slate-800/30 p-5 sm:p-6 ">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                       <Skeleton className="h-6 w-24" />
                       <Skeleton className="h-6 w-20 rounded-full" />
@@ -626,10 +626,10 @@ Skeleton.Changelog = function SkeletonChangelog() {
                 </div>
 
                 {/* Changes List */}
-                <div className="p-5 sm:p-6 space-y-3">
+                <div className="space-y-3 p-5 sm:p-6">
                   {[...Array(3)].map((_, changeIndex) => (
                     <div key={changeIndex} className="flex items-start gap-3">
-                      <Skeleton className="w-5 h-5 rounded-full flex-shrink-0 mt-0.5" />
+                      <Skeleton className="mt-0.5 size-5 shrink-0 rounded-full" />
                       <Skeleton className={`h-4 flex-1 ${changeIndex === 2 ? 'w-3/4' : 'w-full'}`} />
                     </div>
                   ))}
@@ -642,21 +642,21 @@ Skeleton.Changelog = function SkeletonChangelog() {
 
       {/* Footer Legend */}
       <Skeleton.Card className="p-5 sm:p-6">
-        <div className="flex items-center justify-center gap-6 mb-4">
+        <div className="mb-4 flex items-center justify-center gap-6">
           <div className="flex items-center gap-2">
-            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="size-3 rounded-full" />
             <Skeleton className="h-3 w-20" />
           </div>
           <div className="flex items-center gap-2">
-            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="size-3 rounded-full" />
             <Skeleton className="h-3 w-20" />
           </div>
           <div className="flex items-center gap-2">
-            <Skeleton className="w-3 h-3 rounded-full" />
+            <Skeleton className="size-3 rounded-full" />
             <Skeleton className="h-3 w-12" />
           </div>
         </div>
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-600/30 to-transparent mb-4" />
+        <div className="mb-4 h-px w-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent" />
         <div className="flex justify-center">
           <Skeleton className="h-3 w-56" />
         </div>
@@ -670,18 +670,18 @@ Skeleton.Changelog = function SkeletonChangelog() {
  */
 Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-spring-in">
+    <div className="animate-spring-in mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <Skeleton className="h-9 w-64 sm:w-80 mb-2" />
+        <Skeleton className="mb-2 h-9 w-64 sm:w-80" />
         <Skeleton className="h-5 w-80 sm:w-96" />
       </div>
 
       {/* Mode Control Card */}
-      <Skeleton.Card className="p-8 mb-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <Skeleton.Card className="mb-8 p-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <Skeleton className="h-6 w-48 mb-2" />
+            <Skeleton className="mb-2 h-6 w-48" />
             <Skeleton className="h-4 w-36" />
           </div>
           <div className="flex flex-wrap gap-3">
@@ -694,41 +694,41 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
       </Skeleton.Card>
 
       {/* Topology Info Card */}
-      <Skeleton.Card className="p-8 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Skeleton.Card className="mb-8 p-8">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div>
-            <Skeleton className="h-4 w-16 mb-2" />
+            <Skeleton className="mb-2 h-4 w-16" />
             <Skeleton className="h-6 w-32" />
           </div>
           <div>
-            <Skeleton className="h-4 w-16 mb-2" />
+            <Skeleton className="mb-2 h-4 w-16" />
             <Skeleton className="h-6 w-12" />
           </div>
           <div>
-            <Skeleton className="h-4 w-20 mb-2" />
+            <Skeleton className="mb-2 h-4 w-20" />
             <Skeleton className="h-6 w-12" />
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t border-slate-200 border-slate-700/50">
+        <div className="mt-4 border-t border-slate-200 border-slate-700/50 pt-4">
           <Skeleton className="h-9 w-56 rounded-xl" />
         </div>
       </Skeleton.Card>
 
       {/* Rooms Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         {[...Array(6)].map((_, i) => (
           <Skeleton.Card key={i} className="p-8">
             {/* Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1 min-w-0">
-                <Skeleton className="h-6 w-32 mb-2" />
+            <div className="mb-4 flex items-start justify-between">
+              <div className="min-w-0 flex-1">
+                <Skeleton className="mb-2 h-6 w-32" />
                 <Skeleton className="h-3 w-24" />
               </div>
               <Skeleton className="h-6 w-20 rounded-lg" />
             </div>
             {/* Temperature */}
             <div className="mb-4">
-              <Skeleton className="h-12 w-40 mb-2" />
+              <Skeleton className="mb-2 h-12 w-40" />
               <Skeleton className="h-3 w-28" />
             </div>
             {/* Buttons */}
@@ -749,28 +749,28 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
  */
 Skeleton.SchedulePage = function SkeletonSchedulePage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       {/* Header */}
       <div className="mb-6">
-        <div className="h-6 w-24 bg-slate-700/50 rounded mb-4 animate-pulse" />
-        <div className="h-10 w-64 bg-slate-700/50 rounded mb-2 animate-pulse" />
-        <div className="h-5 w-96 bg-slate-700/50 rounded animate-pulse" />
+        <div className="mb-4 h-6 w-24 animate-pulse rounded bg-slate-700/50" />
+        <div className="mb-2 h-10 w-64 animate-pulse rounded bg-slate-700/50" />
+        <div className="h-5 w-96 animate-pulse rounded bg-slate-700/50" />
       </div>
 
       {/* Selector card */}
-      <div className="bg-slate-800/50 rounded-2xl p-6 mb-6">
-        <div className="h-5 w-32 bg-slate-700/50 rounded mb-2 animate-pulse" />
-        <div className="h-12 w-full bg-slate-700/50 rounded-xl animate-pulse" />
+      <div className="mb-6 rounded-2xl bg-slate-800/50 p-6">
+        <div className="mb-2 h-5 w-32 animate-pulse rounded bg-slate-700/50" />
+        <div className="h-12 w-full animate-pulse rounded-xl bg-slate-700/50" />
       </div>
 
       {/* Timeline card */}
-      <div className="bg-slate-800/50 rounded-2xl p-6">
-        <div className="h-6 w-48 bg-slate-700/50 rounded mb-4 animate-pulse" />
+      <div className="rounded-2xl bg-slate-800/50 p-6">
+        <div className="mb-4 h-6 w-48 animate-pulse rounded bg-slate-700/50" />
         <div className="space-y-2">
           {Array(7).fill(null).map((_, i) => (
             <div key={i} className="flex gap-2">
-              <div className="w-12 h-12 bg-slate-700/50 rounded animate-pulse" />
-              <div className="flex-1 h-12 bg-slate-700/50 rounded animate-pulse" />
+              <div className="size-12 animate-pulse rounded bg-slate-700/50" />
+              <div className="h-12 flex-1 animate-pulse rounded bg-slate-700/50" />
             </div>
           ))}
         </div>
@@ -787,7 +787,7 @@ Skeleton.RaspiCard = function SkeletonRaspiCard() {
     <div
       className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -796,12 +796,12 @@ Skeleton.RaspiCard = function SkeletonRaspiCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Success green accent bar */}
-      <div className="h-1 bg-gradient-to-r from-success-500/50 via-success-400/50 to-success-600/50" />
+      <div className="h-1 bg-linear-to-r from-success-500/50 via-success-400/50 to-success-600/50" />
       <div className="p-5 sm:p-6">
         {/* Header skeleton */}
-        <div className="flex items-center gap-3 mb-4">
-          <SkeletonPulse className="w-8 h-8 rounded-lg" />
-          <SkeletonPulse className="w-32 h-6 rounded" />
+        <div className="mb-4 flex items-center gap-3">
+          <SkeletonPulse className="size-8 rounded-lg" />
+          <SkeletonPulse className="h-6 w-32 rounded" />
         </div>
         {/* 4 metric boxes (CPU, RAM, Disk, Temp) in 2x2 grid */}
         <div className="grid grid-cols-2 gap-3">
@@ -824,7 +824,7 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
     <div
       className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -834,27 +834,27 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Sage accent bar */}
-      <div className="h-1 bg-gradient-to-r from-emerald-500/50 via-teal-500/50 to-emerald-600/50" />
+      <div className="h-1 bg-linear-to-r from-emerald-500/50 via-teal-500/50 to-emerald-600/50" />
 
       <div className="p-5 sm:p-6">
         {/* Header skeleton */}
-        <div className="flex items-center gap-3 mb-4">
-          <SkeletonPulse className="w-8 h-8 rounded-lg" />
-          <SkeletonPulse className="w-24 h-6 rounded" />
+        <div className="mb-4 flex items-center gap-3">
+          <SkeletonPulse className="size-8 rounded-lg" />
+          <SkeletonPulse className="h-6 w-24 rounded" />
         </div>
 
         {/* Status bar skeleton */}
-        <SkeletonPulse className="w-full h-10 rounded-lg mb-4" />
+        <SkeletonPulse className="mb-4 h-10 w-full rounded-lg" />
 
         {/* Bandwidth hero skeleton */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="mb-4 grid grid-cols-2 gap-4">
           <div>
-            <SkeletonPulse className="w-20 h-8 rounded mb-2" />
-            <SkeletonPulse className="w-full h-10 rounded" />
+            <SkeletonPulse className="mb-2 h-8 w-20 rounded" />
+            <SkeletonPulse className="h-10 w-full rounded" />
           </div>
           <div>
-            <SkeletonPulse className="w-20 h-8 rounded mb-2" />
-            <SkeletonPulse className="w-full h-10 rounded" />
+            <SkeletonPulse className="mb-2 h-8 w-20 rounded" />
+            <SkeletonPulse className="h-10 w-full rounded" />
           </div>
         </div>
 
@@ -877,7 +877,7 @@ Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
     <div
       className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -886,12 +886,12 @@ Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Ocean accent bar */}
-      <div className="h-1 bg-gradient-to-r from-ocean-500/50 via-ocean-400/50 to-ocean-600/50" />
+      <div className="h-1 bg-linear-to-r from-ocean-500/50 via-ocean-400/50 to-ocean-600/50" />
       <div className="p-5 sm:p-6">
         {/* Header skeleton */}
-        <div className="flex items-center gap-3 mb-4">
-          <SkeletonPulse className="w-8 h-8 rounded-lg" />
-          <SkeletonPulse className="w-28 h-6 rounded" />
+        <div className="mb-4 flex items-center gap-3">
+          <SkeletonPulse className="size-8 rounded-lg" />
+          <SkeletonPulse className="h-6 w-28 rounded" />
         </div>
         {/* 4 sensor stat boxes in 2x2 grid */}
         <div className="grid grid-cols-2 gap-3">
@@ -913,7 +913,7 @@ Skeleton.TuyaCard = function SkeletonTuyaCard() {
     <div
       className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -922,11 +922,11 @@ Skeleton.TuyaCard = function SkeletonTuyaCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Warning/amber accent bar */}
-      <div className="h-1 bg-gradient-to-r from-warning-500/50 via-warning-400/50 to-warning-600/50" />
+      <div className="h-1 bg-linear-to-r from-warning-500/50 via-warning-400/50 to-warning-600/50" />
       <div className="p-5 sm:p-6">
-        <div className="flex items-center gap-3 mb-4">
-          <SkeletonPulse className="w-8 h-8 rounded-lg" />
-          <SkeletonPulse className="w-24 h-6 rounded" />
+        <div className="mb-4 flex items-center gap-3">
+          <SkeletonPulse className="size-8 rounded-lg" />
+          <SkeletonPulse className="h-6 w-24 rounded" />
         </div>
         {/* 3 metric boxes (total plugs, total W, on/off) */}
         <div className="grid grid-cols-3 gap-3">
@@ -947,7 +947,7 @@ Skeleton.SonosCard = function SkeletonSonosCard() {
     <div
       className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
     >
-      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
     </div>
   );
 
@@ -956,22 +956,22 @@ Skeleton.SonosCard = function SkeletonSonosCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Sage accent bar */}
-      <div className="h-1 bg-gradient-to-r from-success-500/50 via-success-400/50 to-success-600/50" />
+      <div className="h-1 bg-linear-to-r from-success-500/50 via-success-400/50 to-success-600/50" />
       <div className="p-5 sm:p-6">
         {/* Header skeleton */}
-        <div className="flex items-center gap-3 mb-4">
-          <SkeletonPulse className="w-8 h-8 rounded-lg" />
-          <SkeletonPulse className="w-20 h-6 rounded" />
+        <div className="mb-4 flex items-center gap-3">
+          <SkeletonPulse className="size-8 rounded-lg" />
+          <SkeletonPulse className="h-6 w-20 rounded" />
         </div>
         {/* Now-playing line */}
         <div className="mb-2">
-          <SkeletonPulse className="h-5 w-3/4 rounded mb-2" />
+          <SkeletonPulse className="mb-2 h-5 w-3/4 rounded" />
           <SkeletonPulse className="h-4 w-1/2 rounded" />
         </div>
         {/* Stats row: zone count + speaker count */}
-        <div className="flex gap-3 mt-4">
-          <SkeletonPulse className="flex-1 h-14 rounded-lg" />
-          <SkeletonPulse className="flex-1 h-14 rounded-lg" />
+        <div className="mt-4 flex gap-3">
+          <SkeletonPulse className="h-14 flex-1 rounded-lg" />
+          <SkeletonPulse className="h-14 flex-1 rounded-lg" />
         </div>
       </div>
     </Card>

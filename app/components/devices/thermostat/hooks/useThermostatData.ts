@@ -80,6 +80,8 @@ export interface UseThermostatDataReturn {
 }
 
 export function useThermostatData(): UseThermostatDataReturn {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const [connected, setConnected] = useState(false);
   const [topology, setTopology] = useState<NetatmoTopology | null>(null);
   const [status, setStatus] = useState<NetatmoStatus | null>(null);
@@ -308,7 +310,6 @@ export function useThermostatData(): UseThermostatDataReturn {
 
     subscribe('netatmo', handleMessage);
     return () => { unsubscribe('netatmo', handleMessage); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWsConnected, subscribe, unsubscribe]);
 
   // Poll status every 60 seconds — gated on topology being loaded, suppressed when WS is live

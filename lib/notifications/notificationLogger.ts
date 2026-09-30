@@ -23,19 +23,8 @@
  */
 
 import { getAdminFirestore } from '@/lib/firebaseAdmin';
-import { Timestamp, Query, DocumentData } from 'firebase-admin/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
 import { subHours } from 'date-fns';
-
-/**
- * Notification log filter options
- */
-interface NotificationLogFilter {
-  startDate?: Date;
-  endDate?: Date;
-  status?: string;
-  type?: string;
-  limit?: number;
-}
 
 /**
  * Log a notification send attempt

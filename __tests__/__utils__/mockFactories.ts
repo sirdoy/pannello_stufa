@@ -24,7 +24,7 @@ export function createMockDbRef(): DatabaseReference {
     root: {} as DatabaseReference,
     toString: jest.fn(() => 'mock-ref'),
     toJSON: jest.fn(() => 'mock-ref'),
-    child: jest.fn((path: string) => createMockDbRef()),
+    child: jest.fn((_path: string) => createMockDbRef()),
   } as unknown as DatabaseReference;
 }
 
@@ -41,7 +41,7 @@ export function createMockDataSnapshot(val: unknown): DataSnapshot {
     ref: createMockDbRef(),
     val: jest.fn(() => val),
     exists: jest.fn(() => val !== null && val !== undefined),
-    child: jest.fn((path: string) => createMockDataSnapshot(null)),
+    child: jest.fn((_path: string) => createMockDataSnapshot(null)),
     forEach: jest.fn(),
     hasChild: jest.fn(() => false),
     hasChildren: jest.fn(() => false),
@@ -100,7 +100,7 @@ export function createMockQuerySnapshot(
     size: docs.length,
     empty: docs.length === 0,
     forEach: jest.fn((callback) => {
-      mockDocs.forEach((doc, index) => callback(doc));
+      mockDocs.forEach((doc, _index) => callback(doc));
     }),
     query: {},
     metadata: { hasPendingWrites: false, fromCache: false, isEqual: jest.fn() },

@@ -154,20 +154,20 @@ function getStoveCommands(): CommandGroup {
       {
         id: 'stove-ignite',
         label: 'Accendi Stufa',
-        icon: <Power className="w-4 h-4" />,
+        icon: <Power className="size-4" />,
         shortcut: '⌘⇧S',
         onSelect: async () => { await executeStoveAction('/api/v1/thermorossi/commands/ignit'); },
       },
       {
         id: 'stove-shutdown',
         label: 'Spegni Stufa',
-        icon: <PowerOff className="w-4 h-4" />,
+        icon: <PowerOff className="size-4" />,
         onSelect: async () => { await executeStoveAction('/api/v1/thermorossi/commands/shutdown'); },
       },
       {
         id: 'stove-power-up',
         label: 'Aumenta Potenza Stufa',
-        icon: <Plus className="w-4 h-4" />,
+        icon: <Plus className="size-4" />,
         onSelect: async () => {
           try {
             const statusRes = await fetch('/api/v1/thermorossi/power');
@@ -189,7 +189,7 @@ function getStoveCommands(): CommandGroup {
       {
         id: 'stove-power-down',
         label: 'Diminuisci Potenza Stufa',
-        icon: <Minus className="w-4 h-4" />,
+        icon: <Minus className="size-4" />,
         onSelect: async () => {
           try {
             const statusRes = await fetch('/api/v1/thermorossi/power');
@@ -211,7 +211,7 @@ function getStoveCommands(): CommandGroup {
       {
         id: 'stove-fan-up',
         label: 'Aumenta Ventola Stufa',
-        icon: <Fan className="w-4 h-4" />,
+        icon: <Fan className="size-4" />,
         onSelect: async () => {
           try {
             const statusRes = await fetch('/api/v1/thermorossi/fan-level');
@@ -233,7 +233,7 @@ function getStoveCommands(): CommandGroup {
       {
         id: 'stove-fan-down',
         label: 'Diminuisci Ventola Stufa',
-        icon: <Fan className="w-4 h-4" />,
+        icon: <Fan className="size-4" />,
         onSelect: async () => {
           try {
             const statusRes = await fetch('/api/v1/thermorossi/fan-level');
@@ -266,25 +266,25 @@ function getThermostatCommands(): CommandGroup {
       {
         id: 'thermo-mode-schedule',
         label: 'Modalita Automatica',
-        icon: <Calendar className="w-4 h-4" />,
+        icon: <Calendar className="size-4" />,
         onSelect: async () => { await setThermostatMode('schedule'); },
       },
       {
         id: 'thermo-mode-away',
         label: 'Modalita Away',
-        icon: <Home className="w-4 h-4" />,
+        icon: <Home className="size-4" />,
         onSelect: async () => { await setThermostatMode('away'); },
       },
       {
         id: 'thermo-mode-hg',
         label: 'Modalita Antigelo',
-        icon: <Snowflake className="w-4 h-4" />,
+        icon: <Snowflake className="size-4" />,
         onSelect: async () => { await setThermostatMode('hg'); },
       },
       {
         id: 'thermo-temp-up',
         label: 'Aumenta Temperatura (+0.5C)',
-        icon: <Plus className="w-4 h-4" />,
+        icon: <Plus className="size-4" />,
         shortcut: '⌘↑',
         // Note: This requires knowing which room is selected - show info toast
         onSelect: () => {
@@ -294,7 +294,7 @@ function getThermostatCommands(): CommandGroup {
       {
         id: 'thermo-temp-down',
         label: 'Diminuisci Temperatura (-0.5C)',
-        icon: <Minus className="w-4 h-4" />,
+        icon: <Minus className="size-4" />,
         shortcut: '⌘↓',
         onSelect: () => {
           window.location.href = '/thermostat';
@@ -314,7 +314,7 @@ function getLightsCommands(): CommandGroup {
       {
         id: 'lights-all-on',
         label: 'Accendi Tutte le Luci',
-        icon: <Lightbulb className="w-4 h-4" />,
+        icon: <Lightbulb className="size-4" />,
         shortcut: '⌘⇧L',
         onSelect: async () => {
           try {
@@ -327,7 +327,7 @@ function getLightsCommands(): CommandGroup {
       {
         id: 'lights-all-off',
         label: 'Spegni Tutte le Luci',
-        icon: <Moon className="w-4 h-4" />,
+        icon: <Moon className="size-4" />,
         onSelect: async () => {
           try {
             await setAllLights(false);
@@ -339,7 +339,7 @@ function getLightsCommands(): CommandGroup {
       {
         id: 'lights-brightness-up',
         label: 'Aumenta Luminosita',
-        icon: <Sun className="w-4 h-4" />,
+        icon: <Sun className="size-4" />,
         onSelect: () => {
           // Room-specific - navigate
           window.location.href = '/lights';

@@ -84,7 +84,6 @@ export function getDevicesForRoom(
     const canonical = ROOM_ALIASES[l.room_name];
     if (canonical !== roomName) {
       if (process.env.NODE_ENV === 'development' && !canonical) {
-        // eslint-disable-next-line no-console
         console.warn('[rooms] unmatched light room_name', l.room_name);
       }
       continue;
@@ -122,7 +121,6 @@ export function getDevicesForRoom(
     const canonical = ROOM_ALIASES[g.name];
     if (canonical !== roomName) {
       if (process.env.NODE_ENV === 'development' && !canonical) {
-        // eslint-disable-next-line no-console
         console.warn('[rooms] unmatched sonos group name', g.name);
       }
       continue;

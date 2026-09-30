@@ -117,9 +117,9 @@ export default function IntervalBottomSheet({
           size="md"
           fullWidth
           onClick={onEdit}
-          className="bg-ocean-500/10 text-ocean-600 hover:bg-ocean-500/20 ring-1 ring-ocean-500/30 "
+          className="bg-ocean-500/10 text-ocean-600 ring-1 ring-ocean-500/30 hover:bg-ocean-500/20 "
         >
-          <Edit2 className="w-4 h-4 mr-2" />
+          <Edit2 className="mr-2 size-4" />
           Modifica
         </Button>
 
@@ -128,9 +128,9 @@ export default function IntervalBottomSheet({
           size="md"
           fullWidth
           onClick={onDelete}
-          className="bg-ember-500/10 text-ember-600 hover:bg-ember-500/20 ring-1 ring-ember-500/30 "
+          className="bg-ember-500/10 text-ember-600 ring-1 ring-ember-500/30 hover:bg-ember-500/20 "
         >
-          <Trash2 className="w-4 h-4 mr-2" />
+          <Trash2 className="mr-2 size-4" />
           Elimina
         </Button>
       </div>

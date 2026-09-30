@@ -27,7 +27,7 @@ export default function PWAInitializer() {
         // 1. Register Firebase Messaging service worker
         if ('serviceWorker' in navigator) {
           try {
-            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+            await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
               scope: '/',
             });
           } catch (swError) {
@@ -82,7 +82,7 @@ export default function PWAInitializer() {
 
   // Setup foreground message listener
   useEffect(() => {
-    const unsubscribe = onForegroundMessage((payload) => {
+    const unsubscribe = onForegroundMessage((_payload) => {
       // The notification will be shown automatically by onForegroundMessage
     });
 

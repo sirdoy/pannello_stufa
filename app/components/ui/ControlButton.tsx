@@ -41,54 +41,54 @@ export const controlButtonVariants = cva(
       variant: {
         // Primary: warm copper/amber
         ember: [
-          'bg-gradient-to-br from-ember-500 to-flame-600',
+          'bg-linear-to-br from-ember-500 to-flame-600',
           'hover:from-ember-400 hover:to-flame-500',
           'shadow-ember-glow-sm hover:shadow-ember-glow',
         ],
         // Secondary: muted ocean blue
         ocean: [
-          'bg-gradient-to-br from-ocean-500 to-ocean-600',
+          'bg-linear-to-br from-ocean-500 to-ocean-600',
           'hover:from-ocean-400 hover:to-ocean-500',
           'shadow-[0_4px_15px_rgba(67,125,174,0.25)]',
           'hover:shadow-[0_6px_20px_rgba(67,125,174,0.35)]',
         ],
         // Sage: muted green
         sage: [
-          'bg-gradient-to-br from-sage-500 to-sage-600',
+          'bg-linear-to-br from-sage-500 to-sage-600',
           'hover:from-sage-400 hover:to-sage-500',
           'shadow-[0_4px_15px_rgba(96,115,96,0.25)]',
           'hover:shadow-[0_6px_20px_rgba(96,115,96,0.35)]',
         ],
         // Warning: amber
         warning: [
-          'bg-gradient-to-br from-warning-500 to-warning-600',
+          'bg-linear-to-br from-warning-500 to-warning-600',
           'hover:from-warning-400 hover:to-warning-500',
           'shadow-[0_4px_15px_rgba(234,179,8,0.25)]',
           'hover:shadow-[0_6px_20px_rgba(234,179,8,0.35)]',
         ],
         // Danger: red
         danger: [
-          'bg-gradient-to-br from-danger-500 to-danger-600',
+          'bg-linear-to-br from-danger-500 to-danger-600',
           'hover:from-danger-400 hover:to-danger-500',
           'shadow-[0_4px_15px_rgba(239,68,68,0.25)]',
           'hover:shadow-[0_6px_20px_rgba(239,68,68,0.35)]',
         ],
         // Subtle: glass effect
         subtle: [
-          'bg-white/[0.06]',
+          'bg-white/6',
           'text-slate-200',
-          'hover:bg-white/[0.1]',
+          'hover:bg-white/10',
           ']',
           ']',
         ],
       },
       size: {
         // 44px minimum touch target
-        sm: 'min-h-[44px] min-w-[44px] h-12 text-2xl',
+        sm: 'h-12 min-h-11 min-w-11 text-2xl',
         // 48px standard
-        md: 'min-h-[48px] min-w-[48px] h-14 text-3xl',
+        md: 'h-14 min-h-12 min-w-12 text-3xl',
         // 56px large
-        lg: 'min-h-[56px] min-w-[56px] h-16 sm:h-20 text-3xl sm:text-4xl',
+        lg: 'h-16 min-h-14 min-w-14 text-3xl sm:h-20 sm:text-4xl',
       },
     },
     defaultVariants: {

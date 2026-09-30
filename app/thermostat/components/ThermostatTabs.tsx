@@ -38,22 +38,22 @@ function ThermostatTabs({
       className={cn('flex flex-col', className)}
     >
       {/* Tab list - at top for both mobile and desktop */}
-      <Tabs.List className="justify-start mb-4">
+      <Tabs.List className="mb-4 justify-start">
         <Tabs.Trigger
           value="schedule"
-          icon={<Calendar className="w-5 h-5" />}
+          icon={<Calendar className="size-5" />}
         >
           Schedule
         </Tabs.Trigger>
         <Tabs.Trigger
           value="manual"
-          icon={<SlidersHorizontal className="w-5 h-5" />}
+          icon={<SlidersHorizontal className="size-5" />}
         >
           Manual
         </Tabs.Trigger>
         <Tabs.Trigger
           value="history"
-          icon={<Clock className="w-5 h-5" />}
+          icon={<Clock className="size-5" />}
         >
           History
         </Tabs.Trigger>

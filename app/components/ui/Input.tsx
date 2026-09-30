@@ -18,13 +18,13 @@ import { cn } from '@/lib/utils/cn';
 const inputVariants = cva(
   // Base styles
   cn(
-    'w-full px-4 py-3 rounded-xl',
+    'w-full rounded-xl px-4 py-3',
     'bg-slate-800/60 backdrop-blur-xl',
     'text-slate-100 placeholder:text-slate-500',
-    'font-medium font-display',
+    'font-display font-medium',
     'focus:outline-none focus-visible:ring-2',
     'transition-all duration-200',
-    'disabled:opacity-50 disabled:cursor-not-allowed',
+    'disabled:cursor-not-allowed disabled:opacity-50',
     // Light mode base
   ),
   {
@@ -32,15 +32,15 @@ const inputVariants = cva(
       variant: {
         default: cn(
           'border border-slate-700/50',
-          'focus-visible:ring-ember-500/50 focus-visible:border-ember-500/60',
+          'focus-visible:border-ember-500/60 focus-visible:ring-ember-500/50',
         ),
         error: cn(
           'border border-danger-500',
-          'focus-visible:ring-danger-500/50 focus-visible:border-danger-500/60'
+          'focus-visible:border-danger-500/60 focus-visible:ring-danger-500/50'
         ),
         success: cn(
           'border border-sage-500',
-          'focus-visible:ring-sage-500/50 focus-visible:border-sage-500/60'
+          'focus-visible:border-sage-500/60 focus-visible:ring-sage-500/50'
         ),
       },
     },
@@ -178,7 +178,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         <Label.Root
           htmlFor={inputId}
           className={cn(
-            'block text-sm font-semibold mb-2 font-display',
+            'mb-2 block font-display text-sm font-semibold',
             'text-slate-300',
           )}
         >
@@ -218,14 +218,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                 onClick={handleClear}
                 aria-label="Clear input"
                 className={cn(
-                  'absolute right-3 top-1/2 -translate-y-1/2',
-                  'p-1 rounded-full',
+                  'absolute top-1/2 right-3 -translate-y-1/2',
+                  'rounded-full p-1',
                   'text-slate-400 hover:text-slate-200',
                   'hover:bg-slate-700/50',
                   'transition-colors duration-150',
                 )}
               >
-                <X className="h-4 w-4" />
+                <X className="size-4" />
               </button>
             )}
           </>
@@ -243,7 +243,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       </div>
 
       {/* Error message and character count row */}
-      <div className="flex justify-between items-start mt-1 min-h-5">
+      <div className="mt-1 flex min-h-5 items-start justify-between">
         {/* Error message */}
         {displayError && (
           <div
@@ -254,7 +254,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
               'text-sm text-danger-500'
             )}
           >
-            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <AlertCircle className="size-4 shrink-0" />
             <span>{displayError}</span>
           </div>
         )}
@@ -263,7 +263,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         {showCount && maxLength && (
           <div
             className={cn(
-              'text-sm text-slate-500 ml-auto',
+              'ml-auto text-sm text-slate-500',
             )}
           >
             {(currentValue as string)?.length || 0}/{maxLength}

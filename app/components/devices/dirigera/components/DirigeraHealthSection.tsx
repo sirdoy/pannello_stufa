@@ -31,7 +31,7 @@ export default function DirigeraHealthSection({ health }: DirigeraHealthSectionP
           <span className="text-xs text-slate-400">Hub raggiungibile</span>
           <span className="flex items-center gap-1.5 text-sm font-medium">
             <span
-              className={`inline-block h-2 w-2 rounded-full ${
+              className={`inline-block size-2 rounded-full ${
                 health.is_reachable ? 'bg-success-500' : 'bg-danger-500'
               }`}
               aria-hidden="true"

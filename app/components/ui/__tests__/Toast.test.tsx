@@ -6,10 +6,10 @@
  * Uses jest-axe for automated a11y violation detection.
  */
 import React from 'react';
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import { ToastProvider, ToastContext, type ToastContextValue } from '../ToastProvider';
+import { ToastProvider, type ToastContextValue } from '../ToastProvider';
 import { useToast } from '@/app/hooks/useToast';
 import Toast, { ToastViewport, toastVariants, type ToastProps } from '../Toast';
 import * as ToastPrimitive from '@radix-ui/react-toast';
@@ -441,7 +441,7 @@ describe('ToastViewport', () => {
     );
 
     const viewport = container.querySelector('[class*="fixed"]');
-    expect(viewport).toHaveClass('bottom-4', 'right-4', 'z-[9999]');
+    expect(viewport).toHaveClass('bottom-4', 'right-4', 'z-9999');
   });
 
   it('supports custom className', () => {

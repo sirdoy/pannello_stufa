@@ -104,7 +104,7 @@ export default function CreateScheduleModal({
         className="animate-scale-in-center p-6 sm:p-8"
       >
           {/* Header */}
-          <div className="flex items-start justify-between mb-6">
+          <div className="mb-6 flex items-start justify-between">
             <div>
               <Heading level={3} size="xl">
                 Crea Nuova Pianificazione
@@ -126,7 +126,7 @@ export default function CreateScheduleModal({
           <div className="space-y-6">
             {/* Name Input */}
             <div>
-              <Text as="label" variant="secondary" size="sm" className="block mb-2">
+              <Text as="label" variant="secondary" size="sm" className="mb-2 block">
                 Nome Pianificazione <Text as="span" variant="ember">*</Text>
               </Text>
               <Input
@@ -154,13 +154,13 @@ export default function CreateScheduleModal({
 
             {/* Mode Selection */}
             <div>
-              <Text as="label" variant="secondary" size="sm" className="block mb-3">
+              <Text as="label" variant="secondary" size="sm" className="mb-3 block">
                 Modalità Creazione
               </Text>
               <RadioGroup
                 value={mode}
                 onValueChange={(value) => setMode(value as 'scratch' | 'copy')}
-                className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+                className="grid grid-cols-1 gap-3 sm:grid-cols-2"
               >
                 <RadioGroupItem
                   value="scratch"
@@ -204,7 +204,7 @@ export default function CreateScheduleModal({
           </div>
 
           {/* Footer */}
-          <div className="flex gap-3 mt-8">
+          <div className="mt-8 flex gap-3">
             <Button
               variant="subtle"
               onClick={onCancel}

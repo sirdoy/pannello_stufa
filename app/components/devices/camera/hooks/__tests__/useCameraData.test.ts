@@ -57,14 +57,6 @@ function makeSuccessResponse(cameras: CameraStatus[] = mockCameras, freshness: D
   });
 }
 
-function makeErrorResponse(status: number = 500, error?: string) {
-  return Promise.resolve({
-    ok: false,
-    status,
-    json: () => Promise.resolve({ error: error ?? `Errore ${status}` }),
-  });
-}
-
 describe('useCameraData', () => {
   beforeEach(() => {
     jest.clearAllMocks();

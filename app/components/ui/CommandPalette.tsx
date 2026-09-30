@@ -123,7 +123,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
           'inset-4',
           // Desktop: centered dialog
           'md:inset-auto',
-          'md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2',
+          'md:top-1/2 md:left-1/2 md:-translate-1/2',
           'md:w-full md:max-w-2xl'
         )}
       >
@@ -145,7 +145,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
             placeholder={placeholder}
             autoFocus
             className={cn(
-              'w-full px-4 py-4',
+              'w-full p-4',
               'text-lg font-medium',
               'bg-transparent',
               'border-b border-slate-700/50 ',
@@ -159,7 +159,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
           <Command.List
             className={cn(
               'flex-1 overflow-y-auto',
-              'max-h-[60vh] md:max-h-[400px]',
+              'max-h-[60vh] md:max-h-100',
               'p-2'
             )}
           >
@@ -180,10 +180,10 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
                 heading={group.heading}
                 className={cn(
                   // Group heading styling
-                  '[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2',
-                  '[&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-semibold',
-                  '[&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider',
-                  '[&_[cmdk-group-heading]]:text-slate-500 ]]:text-slate-400'
+                  '**:[[cmdk-group-heading]]:px-3 **:[[cmdk-group-heading]]:py-2',
+                  '**:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-semibold',
+                  '**:[[cmdk-group-heading]]:tracking-wider **:[[cmdk-group-heading]]:uppercase',
+                  ']]:text-slate-400 **:[[cmdk-group-heading]]:text-slate-500'
                 )}
               >
                 {group.items?.map((item) => (
@@ -193,24 +193,24 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
                     onSelect={() => handleSelect(item.onSelect)}
                     className={cn(
                       'flex items-center justify-between gap-3',
-                      'px-3 py-3 rounded-xl',
+                      'rounded-xl p-3',
                       'text-sm font-medium',
                       'cursor-pointer',
                       'text-slate-300 ',
                       // Selection state (via data attribute from cmdk)
-                      'data-[selected=true]:bg-slate-700/50 ]:bg-slate-100',
+                      ']:bg-slate-100 data-[selected=true]:bg-slate-700/50',
                       // Hover state
                       'hover:bg-slate-700/30 ',
                       // Transition
                       'transition-colors duration-150',
                       // Disabled state
-                      'data-[disabled=true]:opacity-50 data-[disabled=true]:pointer-events-none'
+                      'data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50'
                     )}
                   >
                     <div className="flex items-center gap-3">
                       {/* Icon (user decision: all items have icons) */}
                       {item.icon && (
-                        <span className="flex-shrink-0 text-slate-400 " aria-hidden="true">
+                        <span className="shrink-0 text-slate-400 " aria-hidden="true">
                           {item.icon}
                         </span>
                       )}

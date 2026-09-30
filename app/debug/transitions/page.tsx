@@ -39,42 +39,42 @@ export default function TransitionsDebugPage() {
       type: TRANSITION_TYPES.SLIDE_MORPH,
       name: 'Slide Morph',
       description: 'Slide laterale + scale + blur (iOS-style)',
-      icon: <ArrowLeft className="w-6 h-6" />,
+      icon: <ArrowLeft className="size-6" />,
       color: 'ember',
     },
     {
       type: TRANSITION_TYPES.FADE_SCALE,
       name: 'Fade Scale',
       description: 'Zoom gentile con fade',
-      icon: <Sparkles className="w-6 h-6" />,
+      icon: <Sparkles className="size-6" />,
       color: 'sage',
     },
     {
       type: TRANSITION_TYPES.EMBER_BURST,
       name: 'Ember Burst',
       description: 'Esplosione ember glow (spettacolare!)',
-      icon: <Zap className="w-6 h-6" />,
+      icon: <Zap className="size-6" />,
       color: 'flame',
     },
     {
       type: TRANSITION_TYPES.LIQUID_FLOW,
       name: 'Liquid Flow',
       description: 'Flow liquido verticale',
-      icon: <Waves className="w-6 h-6" />,
+      icon: <Waves className="size-6" />,
       color: 'ocean',
     },
     {
       type: TRANSITION_TYPES.STACK_LIFT,
       name: 'Stack Lift',
       description: 'Card lift con rotazione 3D',
-      icon: <Layers className="w-6 h-6" />,
+      icon: <Layers className="size-6" />,
       color: 'ember',
     },
     {
       type: TRANSITION_TYPES.DIAGONAL_SWEEP,
       name: 'Diagonal Sweep',
       description: 'Wipe diagonale cinematografico',
-      icon: <Slash className="w-6 h-6" />,
+      icon: <Slash className="size-6" />,
       color: 'flame',
     },
   ];
@@ -100,9 +100,9 @@ export default function TransitionsDebugPage() {
       <div className="space-y-4">
         <TransitionLink
           href="/debug"
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-ember-400 transition-colors"
+          className="inline-flex items-center gap-2 text-slate-400 transition-colors hover:text-ember-400"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <ArrowLeft className="size-5" />
           <Text>Torna a Debug</Text>
         </TransitionLink>
 
@@ -117,12 +117,12 @@ export default function TransitionsDebugPage() {
       </div>
 
       {/* Current Status */}
-      <Card glow className="p-6 border-2 border-ember-500/20">
+      <Card glow className="border-2 border-ember-500/20 p-6">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className={`
-              w-3 h-3 rounded-full
-              ${isTransitioning ? 'bg-ember-400 animate-pulse-ember' : 'bg-sage-400'}
+              size-3 rounded-full
+              ${isTransitioning ? 'animate-pulse-ember bg-ember-400' : 'bg-sage-400'}
             `} />
             <Text>
               Status: {isTransitioning ? 'Transitioning...' : 'Ready'}
@@ -159,13 +159,13 @@ export default function TransitionsDebugPage() {
               key={transition.type}
               onClick={() => handleChangeType(transition.type)}
               className={`
-                relative
-                p-6
-                rounded-2xl
-                text-left
-                transition-all duration-300
-                border-2
                 group
+                relative
+                rounded-2xl
+                border-2
+                p-6 text-left
+                transition-all
+                duration-300
                 ${selectedType === transition.type
                   ? `
                     bg-${transition.color}-500/15
@@ -173,10 +173,10 @@ export default function TransitionsDebugPage() {
                     shadow-glow-primary
                   `
                   : `
-                    bg-white/[0.03]
-                    border-white/[0.06]
-                    hover:bg-white/[0.06]
-                    hover:border-white/[0.12]
+                    border-white/6
+                    bg-white/3
+                    hover:border-white/12
+                    hover:bg-white/6
                     
                     
                   `
@@ -185,17 +185,17 @@ export default function TransitionsDebugPage() {
             >
               <div className="flex items-start gap-4">
                 <div className={`
-                  p-3 rounded-xl
+                  rounded-xl p-3
                   ${selectedType === transition.type
                     ? `bg-${transition.color}-400/20 text-${transition.color}-400`
-                    : 'bg-white/[0.06] text-slate-400 group-hover:text-slate-300'
+                    : 'bg-white/6 text-slate-400 group-hover:text-slate-300'
                   }
                   transition-colors
                 `}>
                   {transition.icon}
                 </div>
 
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <Text className="mb-1">
                     {transition.name}
                   </Text>
@@ -208,12 +208,11 @@ export default function TransitionsDebugPage() {
               {selectedType === transition.type && (
                 <div className="
                   absolute -top-2 -right-2
-                  w-6 h-6
-                  bg-ember-500
-                  rounded-full
-                  flex items-center justify-center
-                  text-white text-xs
-                  shadow-ember-glow-sm
+                  flex size-6
+                  items-center
+                  justify-center
+                  rounded-full bg-ember-500 text-xs
+                  text-white shadow-ember-glow-sm
                 ">
                   ✓
                 </div>
@@ -238,21 +237,21 @@ export default function TransitionsDebugPage() {
               transitionType={selectedType}
               className="
                 group
-                relative
                 card-ember
-                p-6
-                hover:shadow-card-hover
-                hover:scale-[1.02]
-                transition-all duration-300
+                relative
                 overflow-hidden
+                p-6
+                transition-all
+                duration-300 hover:scale-102
+                hover:shadow-card-hover
               "
             >
               {/* Background gradient on hover */}
               <div className="
                 absolute inset-0
-                bg-gradient-to-br from-ember-500/5 to-flame-500/5
-                opacity-0 group-hover:opacity-100
-                transition-opacity duration-300
+                bg-linear-to-br from-ember-500/5 to-flame-500/5
+                opacity-0 transition-opacity
+                duration-300 group-hover:opacity-100
               "/>
 
               <div className="relative flex items-center gap-4">
@@ -271,12 +270,12 @@ export default function TransitionsDebugPage() {
 
               {/* Arrow indicator */}
               <div className="
-                absolute bottom-4 right-4
-                opacity-0 group-hover:opacity-100
-                transform translate-x-2 group-hover:translate-x-0
-                transition-all duration-300
+                absolute right-4 bottom-4
+                translate-x-2 transform
+                opacity-0 transition-all duration-300
+                group-hover:translate-x-0 group-hover:opacity-100
               ">
-                <ArrowLeft className="w-5 h-5 text-ember-400 rotate-180" />
+                <ArrowLeft className="size-5 rotate-180 text-ember-400" />
               </div>
             </TransitionLink>
           ))}
@@ -289,7 +288,7 @@ export default function TransitionsDebugPage() {
         icon="ℹ️"
         title="Browser Support"
       >
-        <div className="space-y-2 text-sm mt-2">
+        <div className="mt-2 space-y-2 text-sm">
           <Text className="text-ocean-300">
             <strong className="text-ember-400">View Transitions API nativa:</strong> Chrome 111+, Edge 111+, Safari 18+
           </Text>
@@ -306,12 +305,12 @@ export default function TransitionsDebugPage() {
       <div className="space-y-4">
         <Heading level={2}>Come Usare</Heading>
 
-        <Card variant="subtle" className="p-6 space-y-4">
+        <Card variant="subtle" className="space-y-4 p-6">
           <div>
             <Text className="mb-2 text-ember-400">
               1. Import TransitionLink
             </Text>
-            <pre className="bg-slate-950/50 p-4 rounded-xl overflow-x-auto text-sm">
+            <pre className="overflow-x-auto rounded-xl bg-slate-950/50 p-4 text-sm">
               <code className="text-sage-300">
 {`import TransitionLink from '@/app/components/TransitionLink';`}
               </code>
@@ -322,7 +321,7 @@ export default function TransitionsDebugPage() {
             <Text className="mb-2 text-ember-400">
               2. Usa al posto di Link
             </Text>
-            <pre className="bg-slate-950/50 p-4 rounded-xl overflow-x-auto text-sm">
+            <pre className="overflow-x-auto rounded-xl bg-slate-950/50 p-4 text-sm">
               <code className="text-sage-300">
 {`// Default transition (slide-morph)
 <TransitionLink href="/stove">
@@ -344,7 +343,7 @@ export default function TransitionsDebugPage() {
             <Text className="mb-2 text-ember-400">
               3. Cambia transizione globalmente
             </Text>
-            <pre className="bg-slate-950/50 p-4 rounded-xl overflow-x-auto text-sm">
+            <pre className="overflow-x-auto rounded-xl bg-slate-950/50 p-4 text-sm">
               <code className="text-sage-300">
 {`import { usePageTransition, TRANSITION_TYPES } from '@/app/context/PageTransitionContext';
 

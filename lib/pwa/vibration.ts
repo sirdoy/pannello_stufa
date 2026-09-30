@@ -116,17 +116,3 @@ export function vibrateCritical(): boolean {
   return vibrate(VIBRATION_PATTERNS.CRITICAL);
 }
 
-/**
- * Vibrate for notification
- */
-function vibrateNotification(): boolean {
-  return vibrate(VIBRATION_PATTERNS.NOTIFICATION);
-}
-
-/**
- * Vibrate for heartbeat (connection restored)
- */
-function vibrateHeartbeat(): boolean {
-  return vibrate(VIBRATION_PATTERNS.HEARTBEAT);
-}
-

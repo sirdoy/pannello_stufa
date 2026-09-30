@@ -24,12 +24,12 @@ export default function TimelineSlot({
   return (
     <div
       className="
-        h-12 flex items-center justify-center
-        text-xs font-semibold
-        transition-all duration-200
-        hover:scale-y-110 hover:z-10
-        group relative
-        min-w-[40px]
+        group relative flex h-12
+        min-w-10 items-center
+        justify-center text-xs
+        font-semibold transition-all
+        duration-200 hover:z-10
+        hover:scale-y-110
       "
       style={{
         width: `${widthPercent}%`,
@@ -43,11 +43,11 @@ export default function TimelineSlot({
 
       {/* Time tooltip on hover */}
       <div className="
-        absolute -bottom-8 left-1/2 -translate-x-1/2
-        bg-slate-900 text-white text-xs px-2 py-1 rounded
-        opacity-0 group-hover:opacity-100
-        transition-opacity pointer-events-none
-        whitespace-nowrap z-20
+        pointer-events-none absolute -bottom-8 left-1/2
+        z-20 -translate-x-1/2 rounded bg-slate-900 px-2 py-1
+        text-xs whitespace-nowrap
+        text-white opacity-0
+        transition-opacity group-hover:opacity-100
         
       ">
         {startTime}-{endTime}

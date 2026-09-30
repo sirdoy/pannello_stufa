@@ -34,7 +34,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0 || !label) return null;
 
   return (
-    <div className="bg-slate-900 border border-white/10 rounded-lg p-3 shadow-xl">
+    <div className="rounded-lg border border-white/10 bg-slate-900 p-3 shadow-xl">
       <Text size="xs" className="mb-2">
         {format(label, 'dd/MM/yyyy')}
       </Text>
@@ -65,19 +65,19 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
  */
 export default function DeviceCountChart({ data, loading }: DeviceCountChartProps) {
   return (
-    <div className="bg-slate-800/30 rounded-2xl p-6">
+    <div className="rounded-2xl bg-slate-800/30 p-6">
       <Heading level={2} size="lg" className="mb-6">
         Dispositivi connessi
       </Heading>
 
       {loading && (
-        <div className="h-[280px] flex items-center justify-center">
+        <div className="flex h-70 items-center justify-center">
           <Text variant="secondary">Caricamento...</Text>
         </div>
       )}
 
       {!loading && data.length === 0 && (
-        <div className="h-[280px] flex items-center justify-center">
+        <div className="flex h-70 items-center justify-center">
           <Text variant="secondary">Nessun dato disponibile</Text>
         </div>
       )}

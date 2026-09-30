@@ -102,8 +102,8 @@ export default function Section({
         <div className={headerSpacingMap[spacing ?? 'md'] || headerSpacingMap.md}>
           {/* Category indicator + subtitle */}
           {(subtitle || title) && (
-            <div className="flex items-center gap-3 mb-2">
-              <div className="h-1 w-12 bg-gradient-to-r from-ember-500 to-flame-600 rounded-full" />
+            <div className="mb-2 flex items-center gap-3">
+              <div className="h-1 w-12 rounded-full bg-linear-to-r from-ember-500 to-flame-600" />
               {subtitle && (
                 <Text variant="tertiary" size="sm" uppercase tracking as="span">
                   {subtitle}
@@ -114,13 +114,13 @@ export default function Section({
 
           {/* Title + Actions row */}
           {(title || action) && (
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mb-2">
+            <div className="mb-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
               {title && (
                 <Heading level={level} size={level === 1 ? '3xl' : '2xl'}>
                   {title}
                 </Heading>
               )}
-              {action && <div className="flex-shrink-0">{action}</div>}
+              {action && <div className="shrink-0">{action}</div>}
             </div>
           )}
 

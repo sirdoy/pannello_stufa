@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, EmptyState, Heading, Text, Banner } from '@/app/components/ui';
 import type { HueScene, HueGroup } from '@/types/hueProxy';
@@ -36,19 +36,19 @@ function SceneCard({ scene, activatingScene, onActivate }: SceneCardProps) {
       key={scene.scene_id}
       onClick={() => onActivate(scene.scene_id, scene.group_id, scene.name || 'Scena')}
       disabled={isActivating}
-      className={`w-full relative p-6 rounded-2xl border-2 transition-all duration-200 active:scale-95 ${
+      className={`relative w-full rounded-2xl border-2 p-6 transition-all duration-200 active:scale-95 ${
         isActivating
           ? 'border-warning-500 bg-warning-50 bg-warning-900/20'
-          : 'border-slate-200 border-slate-700 bg-white/60 bg-white/[0.03] hover:bg-warning-50 hover:bg-warning-900/20 hover:border-warning-300 hover:border-warning-600'
+          : 'border-slate-200 border-slate-700 bg-white/3 bg-white/60 hover:border-warning-300 hover:border-warning-600 hover:bg-warning-50 hover:bg-warning-900/20'
       }`}
     >
-      <div className="text-4xl mb-3">🎨</div>
+      <div className="mb-3 text-4xl">🎨</div>
       <Text size="sm" className="text-center">
         {scene.name || 'Scena'}
       </Text>
       {isActivating && (
         <div className="absolute top-2 right-2">
-          <div className="w-4 h-4 border-2 border-warning-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="size-4 animate-spin rounded-full border-2 border-warning-500 border-t-transparent"></div>
         </div>
       )}
     </button>
@@ -69,7 +69,7 @@ export default function ScenesPage() {
 
   const connectionCheckedRef = useRef<boolean>(false);
 
-  const fetchData = async (): Promise<void> => {
+  const fetchData = useCallback(async (): Promise<void> => {
     try {
       setError(null);
       const [scenesRes, roomsRes] = await Promise.all([
@@ -94,9 +94,10 @@ export default function ScenesPage() {
       console.error('Errore fetch scene Hue:', err);
       setError(err instanceof Error ? err.message : 'Errore sconosciuto');
     }
-  };
+  }, []);
 
-  const checkConnection = async (): Promise<void> => {
+
+  const checkConnection = useCallback(async (): Promise<void> => {
     try {
       setLoading(true);
       setError(null);
@@ -113,7 +114,8 @@ export default function ScenesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [fetchData]);
+
 
   useEffect(() => {
     if (connectionCheckedRef.current) return;
@@ -142,7 +144,7 @@ export default function ScenesPage() {
 
   if (!connected) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <Card className="p-8">
           <Heading level={1} size="lg" className="mb-4">Bridge Hue Non Connesso</Heading>
           <Text variant="secondary" className="mb-6">
@@ -164,7 +166,7 @@ export default function ScenesPage() {
   })).filter(group => group.scenes.length > 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-8">
         <Button variant="ghost" onClick={() => router.push('/lights')} size="sm" className="mb-4">
           ← Indietro
@@ -187,7 +189,7 @@ export default function ScenesPage() {
         </div>
       )}
 
-      <Card className="p-6 mb-6">
+      <Card className="mb-6 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <Heading level={2} size="lg" className="mb-1">Scene Disponibili</Heading>
@@ -202,7 +204,7 @@ export default function ScenesPage() {
         </div>
 
         {rooms.length > 1 && (
-          <div className="mt-4 pt-4 border-t border-slate-200 border-slate-700">
+          <div className="mt-4 border-t border-slate-200 border-slate-700 pt-4">
             <Text variant="secondary" size="xs" className="mb-2">Filtra per stanza:</Text>
             <div className="flex flex-wrap gap-2">
               <Button variant={selectedRoom === 'all' ? 'ember' : 'outline'}
@@ -229,7 +231,7 @@ export default function ScenesPage() {
         scenesByRoom.map(({ room, scenes: roomScenes }) => (
           <div key={room.group_id} className="mb-8">
             <Heading level={2} size="md" className="mb-4">{room.name || 'Stanza'}</Heading>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               {roomScenes.map(scene => (
                 <SceneCard key={scene.scene_id} scene={scene}
                   activatingScene={activatingScene} onActivate={handleActivateScene} />
@@ -238,7 +240,7 @@ export default function ScenesPage() {
           </div>
         ))
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {filteredScenes.map(scene => (
             <SceneCard key={scene.scene_id} scene={scene}
               activatingScene={activatingScene} onActivate={handleActivateScene} />

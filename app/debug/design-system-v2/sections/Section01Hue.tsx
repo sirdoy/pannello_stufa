@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useSyncExternalStore } from 'react';
-import { Pressable } from '@/app/components/EmberGlass';
 
 // AUDIT-EXCEPTION (DS-02): the 6 oklch literal strings below are the source-of-truth
 // preset map (D-05). Every other visual value on this page is a token reference.

@@ -184,10 +184,10 @@ export default function NotificationsDashboard() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       {/* Header Section */}
       <Card className="p-6">
-        <div className="flex items-center justify-between mb-2">
+        <div className="mb-2 flex items-center justify-between">
           <div>
             <Heading level={1} className="flex items-center gap-3">
               <span>🔔</span>
@@ -209,7 +209,7 @@ export default function NotificationsDashboard() {
         </div>
 
         {error && (
-          <div className="mt-4 p-4 rounded-lg bg-ember-50 border border-ember-200">
+          <div className="mt-4 rounded-lg border border-ember-200 bg-ember-50 p-4">
             <Text variant="ember" size="sm">
               ⚠️ Error loading dashboard: {error}
             </Text>
@@ -219,9 +219,9 @@ export default function NotificationsDashboard() {
 
       {/* Primary Metrics */}
       {stats && !loading && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* Today's Notifications */}
-          <Card className="p-6 bg-ocean-50 border-2 border-ocean-200">
+          <Card className="border-2 border-ocean-200 bg-ocean-50 p-6">
             <Text variant="tertiary" size="xs" className="mb-2">
               Today&apos;s Notifications
             </Text>
@@ -236,10 +236,10 @@ export default function NotificationsDashboard() {
           {/* Delivery Rate */}
           <Card className={`p-6 ${
             getDeliveryRateColor(stats.notifications.deliveryRate) === 'sage'
-              ? 'bg-sage-50 border-2 border-sage-300'
+              ? 'border-2 border-sage-300 bg-sage-50'
               : getDeliveryRateColor(stats.notifications.deliveryRate) === 'warning'
-              ? 'bg-warning-50 border-2 border-warning-300'
-              : 'bg-ember-50 border-2 border-ember-300'
+              ? 'border-2 border-warning-300 bg-warning-50'
+              : 'border-2 border-ember-300 bg-ember-50'
           }`}>
             <Text variant="tertiary" size="xs" className="mb-2">
               Delivery Rate
@@ -258,7 +258,7 @@ export default function NotificationsDashboard() {
           </Card>
 
           {/* Active Devices */}
-          <Card className="p-6 bg-slate-50 border-2 border-slate-200">
+          <Card className="border-2 border-slate-200 bg-slate-50 p-6">
             <Text variant="tertiary" size="xs" className="mb-2">
               Active Devices
             </Text>
@@ -275,7 +275,7 @@ export default function NotificationsDashboard() {
       {/* 7-Day Delivery Trends */}
       {trends && !loading && (
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <Heading level={2} size="xl">
               📈 7-Day Delivery Trends
             </Heading>
@@ -311,17 +311,17 @@ export default function NotificationsDashboard() {
       {stats && !loading && (
         <Card className={`p-6 ${
           stats.notifications.deliveryRate < 85
-            ? 'bg-warning-50 border-2 border-warning-200'
-            : 'bg-slate-50 border border-slate-200'
+            ? 'border-2 border-warning-200 bg-warning-50'
+            : 'border border-slate-200 bg-slate-50'
         }`}>
-          <div className="flex items-center gap-3 mb-4">
+          <div className="mb-4 flex items-center gap-3">
             <span className="text-2xl">🔔</span>
             <Heading level={2} size="xl">
               Rate Alerting
             </Heading>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <div className="mb-4 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <Text variant="tertiary" size="xs" className="mb-2">
                 Current Delivery Rate
@@ -355,7 +355,7 @@ export default function NotificationsDashboard() {
             </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+          <div className="rounded-lg border border-white/6 bg-white/4 p-4">
             <Text variant="tertiary" size="sm" className="mb-2">
               ℹ️ About Rate Alerting
             </Text>
@@ -386,7 +386,7 @@ export default function NotificationsDashboard() {
 
             {Object.keys(stats.errors.byCode).length > 0 && (
               <>
-                <div className="h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+                <div className="h-px bg-linear-to-r from-transparent via-white/8 to-transparent" />
                 <Text variant="tertiary" size="xs" className="mb-2">
                   Error Breakdown
                 </Text>
@@ -397,7 +397,7 @@ export default function NotificationsDashboard() {
                     .map(([code, count]) => (
                       <div
                         key={code}
-                        className="flex items-center justify-between p-3 rounded-lg bg-slate-800/50"
+                        className="flex items-center justify-between rounded-lg bg-slate-800/50 p-3"
                       >
                         <Text size="sm" className="font-mono">
                           {code}
@@ -430,23 +430,23 @@ export default function NotificationsDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/[0.06]">
-                  <th className="text-left py-3 px-4">
+                <tr className="border-b border-white/6">
+                  <th className="px-4 py-3 text-left">
                     <Text variant="tertiary" size="xs" uppercase>
                       Device
                     </Text>
                   </th>
-                  <th className="text-left py-3 px-4">
+                  <th className="px-4 py-3 text-left">
                     <Text variant="tertiary" size="xs" uppercase>
                       Platform
                     </Text>
                   </th>
-                  <th className="text-left py-3 px-4">
+                  <th className="px-4 py-3 text-left">
                     <Text variant="tertiary" size="xs" uppercase>
                       Last Used
                     </Text>
                   </th>
-                  <th className="text-left py-3 px-4">
+                  <th className="px-4 py-3 text-left">
                     <Text variant="tertiary" size="xs" uppercase>
                       Status
                     </Text>
@@ -459,25 +459,25 @@ export default function NotificationsDashboard() {
                   return (
                     <tr
                       key={device.id}
-                      className="border-b border-white/[0.04] hover:bg-white/[0.02]"
+                      className="border-b border-white/4 hover:bg-white/2"
                     >
-                      <td className="py-3 px-4">
+                      <td className="px-4 py-3">
                         <Text size="sm">
                           {device.displayName}
                         </Text>
-                        <Text variant="tertiary" size="xs" className="font-mono mt-1">
+                        <Text variant="tertiary" size="xs" className="mt-1 font-mono">
                           {device.tokenPrefix}...
                         </Text>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="px-4 py-3">
                         <Text size="sm">{device.platform}</Text>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="px-4 py-3">
                         <Text size="sm">{formatDate(device.lastUsed)}</Text>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="px-4 py-3">
                         <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-full ${statusBadge.bg}`}
+                          className={`inline-flex items-center rounded-full px-2.5 py-1 ${statusBadge.bg}`}
                         >
                           <Text
                             size="xs"
@@ -510,7 +510,7 @@ export default function NotificationsDashboard() {
         <Heading level={2} size="xl" className="mb-4">
           🔗 Quick Actions
         </Heading>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           <Button variant="ember" onClick={() => (window.location.href = '/debug/notifications/test')}>
             📤 Send Test Notification
           </Button>

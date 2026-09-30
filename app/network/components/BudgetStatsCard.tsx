@@ -44,7 +44,7 @@ const BADGE_VARIANTS: Record<BudgetStats['status'], 'sage' | 'ember' | 'danger'>
 export default function BudgetStatsCard({ data, loading, error }: BudgetStatsCardProps) {
   if (loading) {
     return (
-      <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+      <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
         <Skeleton className="h-5 w-32" />
         <Skeleton className="h-2 w-full rounded-full" />
         <div className="grid grid-cols-2 gap-3">
@@ -62,10 +62,10 @@ export default function BudgetStatsCard({ data, loading, error }: BudgetStatsCar
   const windowMinutes = Math.floor(data.window_seconds / 60);
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header row: label + status badge */}
       <div className="flex items-center justify-between">
-        <Text variant="label" size="sm" className="text-slate-400 uppercase tracking-wide">
+        <Text variant="label" size="sm" className="tracking-wide text-slate-400 uppercase">
           Budget API
         </Text>
         <Badge variant={BADGE_VARIANTS[data.status]} size="sm">
@@ -75,7 +75,7 @@ export default function BudgetStatsCard({ data, loading, error }: BudgetStatsCar
 
       {/* Progress bar */}
       <div>
-        <div className="w-full bg-slate-700/50 rounded-full h-2">
+        <div className="h-2 w-full rounded-full bg-slate-700/50">
           <div
             className={`${STATUS_COLORS[data.status]} h-2 rounded-full transition-all`}
             style={{ width: `${Math.min(data.utilization_percent, 100)}%` }}

@@ -201,7 +201,6 @@ describe('scheduleHelpers', () => {
 
     it('should use cyan-yellow-red gradient', () => {
       const cold = tempToColor(15); // Min temp
-      const medium = tempToColor(19); // Mid temp
       const hot = tempToColor(23); // Max temp
 
       // Cold should be cyan-ish (hue 180-210)

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Button, StatusBadge, Heading, Text, Badge } from '@/app/components/ui';
+import { Card, Button, Heading, Text, Badge } from '@/app/components/ui';
 import { BatteryBadge } from '@/app/components/devices/thermostat/BatteryWarning';
 import type { BatteryState } from '@/app/components/devices/thermostat/BatteryWarning';
 import { NETATMO_ROUTES } from '@/lib/routes';
@@ -44,7 +44,6 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
   const [targetTemp, setTargetTemp] = useState(room.setpoint || 20);
 
   const hasSetpoint = room.setpoint !== undefined;
-  const hasTemperature = room.temperature !== undefined;
   const isHeating = room.heating || false;
 
   // Get device type icon and label
@@ -205,7 +204,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
   const stoveSync = room.stoveSync || false;
 
   return (
-    <Card variant="glass" className="p-5 sm:p-6 transition-all duration-300 hover:shadow-liquid-lg relative overflow-visible">
+    <Card variant="glass" className="hover:shadow-liquid-lg relative overflow-visible p-5 transition-all duration-300 sm:p-6">
       {/* Floating badges container */}
       <div className="absolute -top-2 right-2 z-20 flex items-center gap-2">
         {/* Battery warning badge */}
@@ -245,8 +244,8 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
       {/* Header - Clean two-row layout */}
       <div className="mb-4">
         {/* Row 1: Room icon + Name (full width) */}
-        <div className="flex items-center gap-3 mb-2">
-          <span className="text-2xl flex-shrink-0">{roomInfo.icon}</span>
+        <div className="mb-2 flex items-center gap-3">
+          <span className="shrink-0 text-2xl">{roomInfo.icon}</span>
           <div className="min-w-0 flex-1">
             <Heading level={3} size="lg" className="truncate" title={room.name}>
               {room.name}
@@ -261,20 +260,20 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
         <div className="flex flex-wrap items-center gap-2">
           {/* Device type badge */}
           {room.deviceType === 'thermostat' && (
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors.ocean}`}>
+            <span className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold ${badgeColors.ocean}`}>
               <span className="text-base">🌡️</span>
               <span>Termostato</span>
             </span>
           )}
           {room.deviceType === 'valve' && (
-            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors.flame}`}>
+            <span className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold ${badgeColors.flame}`}>
               <span>🔧</span>
               <span>Valvola</span>
             </span>
           )}
 
           {/* Mode badge */}
-          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold border ${badgeColors[badge.color] || badgeColors.ocean}`}>
+          <span className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold ${badgeColors[badge.color] || badgeColors.ocean}`}>
             <span>{badge.icon}</span>
             <span>{badge.text}</span>
           </span>
@@ -283,7 +282,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
       {/* Temperature Display - Glass container */}
       {room.setpoint !== undefined ? (
-        <div className="mb-4 p-4 rounded-2xl bg-white/[0.05] ] backdrop-blur-xl border border-white/5 ">
+        <div className="] mb-4 rounded-2xl border border-white/5 bg-white/5 p-4 backdrop-blur-xl ">
           <div className="flex items-baseline gap-2">
             {room.temperature !== undefined ? (
               <>
@@ -309,7 +308,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
           </Text>
         </div>
       ) : (
-        <div className="mb-4 p-3 bg-warning-900/20 border border-warning-700 rounded-xl backdrop-blur-sm">
+        <div className="mb-4 rounded-xl border border-warning-700 bg-warning-900/20 p-3 backdrop-blur-sm">
           <Text variant="warning" size="sm" className="flex items-center gap-2">
             <span>⚠️</span>
             <span>Stanza non configurata o fuori linea</span>
@@ -319,7 +318,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 p-3 bg-danger-900/30 border border-danger-700 rounded-xl backdrop-blur-sm">
+        <div className="mb-4 rounded-xl border border-danger-700 bg-danger-900/30 p-3 backdrop-blur-sm">
           <Text variant="danger" size="sm">{error}</Text>
         </div>
       )}
@@ -327,12 +326,12 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
       {/* Temperature Editor */}
       {editingTemp ? (
         <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.04] ] backdrop-blur-sm border border-white/10">
+          <div className="] flex items-center gap-3 rounded-xl border border-white/10 bg-white/4 p-3 backdrop-blur-sm">
             <Button
               variant="subtle"
               size="sm"
               onClick={() => setTargetTemp(Math.max(5, targetTemp - 0.5))}
-              className="w-12 h-12"
+              className="size-12"
             >
               −
             </Button>
@@ -345,7 +344,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
               variant="subtle"
               size="sm"
               onClick={() => setTargetTemp(Math.min(30, targetTemp + 0.5))}
-              className="w-12 h-12"
+              className="size-12"
             >
               +
             </Button>
@@ -405,7 +404,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
       {/* Module Details with Battery Status */}
       {room.roomModules && room.roomModules.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-white/5 ">
+        <div className="mt-4 border-t border-white/5 pt-4 ">
           <Text variant="secondary" size="xs" className="mb-2">
             Dispositivi ({room.roomModules.length})
           </Text>
@@ -416,14 +415,14 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
               return (
                 <div
                   key={module.id}
-                  className={`flex items-center gap-2 p-2.5 backdrop-blur-sm rounded-xl border transition-all duration-200 ${
+                  className={`flex items-center gap-2 rounded-xl border p-2.5 backdrop-blur-sm transition-all duration-200 ${
                     isModuleOffline
-                      ? 'bg-slate-800/40 border-slate-600/30 '
-                      : 'bg-white/[0.04] ] border-white/5 hover:bg-white/[0.08] ]'
+                      ? 'border-slate-600/30 bg-slate-800/40 '
+                      : '] ] border-white/5 bg-white/4 hover:bg-white/8'
                   }`}
                 >
-                  <span className={`text-lg flex-shrink-0 ${isModuleOffline ? 'opacity-50' : ''}`}>{deviceInfo.icon}</span>
-                  <div className="flex-1 min-w-0">
+                  <span className={`shrink-0 text-lg ${isModuleOffline ? 'opacity-50' : ''}`}>{deviceInfo.icon}</span>
+                  <div className="min-w-0 flex-1">
                     <Text variant="body" size="xs" className={`truncate ${isModuleOffline ? 'opacity-60' : ''}`}>
                       {module.name}
                     </Text>
@@ -431,7 +430,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
                       {deviceInfo.label}
                     </Text>
                   </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                  <div className="flex shrink-0 items-center gap-1.5">
                     {/* Battery badge */}
                     {module.battery_state && (
                       <BatteryBadge batteryState={module.battery_state as BatteryState} showLabel />
@@ -444,7 +443,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
                     )}
                     {/* Offline badge */}
                     {isModuleOffline && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-xs font-medium bg-slate-700/60 text-slate-300 border border-slate-600/40 ">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-slate-600/40 bg-slate-700/60 px-1.5 py-0.5 text-xs font-medium text-slate-300 ">
                         📵 Offline
                       </span>
                     )}

@@ -81,7 +81,7 @@ export default function ProgressBar({
     <div className={className} {...props}>
       {/* Label & Content Row */}
       {(label || leftContent || rightContent) && (
-        <div className="flex items-center justify-between mb-2">
+        <div className="mb-2 flex items-center justify-between">
           {/* Left side */}
           {leftContent && <div className="flex items-center gap-2">{leftContent}</div>}
           {label && !leftContent && (

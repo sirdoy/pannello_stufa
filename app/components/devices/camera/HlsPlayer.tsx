@@ -246,16 +246,16 @@ export default function HlsPlayer({
 
   if (error) {
     return (
-      <div className={`relative bg-slate-800 flex items-center justify-center ${className}`}>
+      <div className={`relative flex items-center justify-center bg-slate-800 ${className}`}>
         {poster && (
           <img
             src={poster}
             alt="Camera preview"
-            className="absolute inset-0 w-full h-full object-cover opacity-30"
+            className="absolute inset-0 size-full object-cover opacity-30"
           />
         )}
-        <div className="relative z-10 text-center p-4">
-          <span className="text-3xl mb-2 block">📹</span>
+        <div className="relative z-10 p-4 text-center">
+          <span className="mb-2 block text-3xl">📹</span>
           <Text variant="secondary" size="sm">{error}</Text>
         </div>
       </div>
@@ -268,9 +268,9 @@ export default function HlsPlayer({
       className={`relative bg-slate-900 ${className} ${isFullscreen ? 'flex items-center justify-center' : ''}`}
     >
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-slate-900/80 z-10">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80">
           <div className="flex flex-col items-center gap-2">
-            <div className="w-8 h-8 border-2 border-ocean-500 border-t-transparent rounded-full animate-spin" />
+            <div className="size-8 animate-spin rounded-full border-2 border-ocean-500 border-t-transparent" />
             <Text variant="secondary" size="sm">
               {showControls ? 'Caricamento video...' : 'Connessione al live...'}
             </Text>
@@ -279,7 +279,7 @@ export default function HlsPlayer({
       )}
       <video
         ref={videoRef}
-        className={`w-full h-full ${showControls ? 'object-contain' : 'object-cover'} ${isFullscreen ? 'max-h-screen' : ''}`}
+        className={`size-full ${showControls ? 'object-contain' : 'object-cover'} ${isFullscreen ? 'max-h-screen' : ''}`}
         poster={poster}
         playsInline
         muted={isMuted}
@@ -289,12 +289,12 @@ export default function HlsPlayer({
       {/* Fullscreen button - only show when not using native controls */}
       {!loading && !error && !showControls && (
         <Button.Icon
-          icon={isFullscreen ? <Minimize className="w-5 h-5 text-white" /> : <Maximize className="w-5 h-5 text-white" />}
+          icon={isFullscreen ? <Minimize className="size-5 text-white" /> : <Maximize className="size-5 text-white" />}
           onClick={toggleFullscreen}
           variant="ghost"
           size="sm"
           aria-label={isFullscreen ? 'Esci da schermo intero' : 'Schermo intero'}
-          className="absolute bottom-2 right-2 bg-slate-900/70 backdrop-blur-sm hover:bg-slate-800/90 z-20"
+          className="absolute right-2 bottom-2 z-20 bg-slate-900/70 backdrop-blur-sm hover:bg-slate-800/90"
         />
       )}
     </div>

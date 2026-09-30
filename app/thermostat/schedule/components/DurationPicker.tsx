@@ -46,26 +46,24 @@ export default function DurationPicker({ value, onChange }: DurationPickerProps)
         value={toSlider(value)}
         onChange={(e) => onChange(fromSlider(Number(e.target.value)))}
         className="
-          w-full h-2 rounded-lg appearance-none cursor-pointer
+          h-2 w-full cursor-pointer appearance-none rounded-lg
           bg-slate-700 
 
+          [&::-moz-range-thumb]:size-6
+          [&::-moz-range-thumb]:cursor-pointer
+          [&::-moz-range-thumb]:rounded-full
+          [&::-moz-range-thumb]:border-0
+          [&::-moz-range-thumb]:bg-ember-500
+          [&::-webkit-slider-thumb]:size-6
+          [&::-webkit-slider-thumb]:cursor-pointer
           [&::-webkit-slider-thumb]:appearance-none
-          [&::-webkit-slider-thumb]:w-6
-          [&::-webkit-slider-thumb]:h-6
           [&::-webkit-slider-thumb]:rounded-full
           [&::-webkit-slider-thumb]:bg-ember-500
+
           [&::-webkit-slider-thumb]:shadow-lg
-          [&::-webkit-slider-thumb]:cursor-pointer
+          [&::-webkit-slider-thumb]:transition-transform
           [&::-webkit-slider-thumb]:hover:scale-110
           [&::-webkit-slider-thumb]:active:scale-95
-          [&::-webkit-slider-thumb]:transition-transform
-
-          [&::-moz-range-thumb]:w-6
-          [&::-moz-range-thumb]:h-6
-          [&::-moz-range-thumb]:rounded-full
-          [&::-moz-range-thumb]:bg-ember-500
-          [&::-moz-range-thumb]:border-0
-          [&::-moz-range-thumb]:cursor-pointer
         "
         style={{ touchAction: 'none' }}
       />

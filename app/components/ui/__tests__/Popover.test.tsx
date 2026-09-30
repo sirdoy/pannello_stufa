@@ -5,7 +5,7 @@
  * Tests accessibility, click/hover behavior, positioning, size variants, and arrow.
  * Uses jest-axe for automated a11y violation detection.
  */
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
 import Popover, {

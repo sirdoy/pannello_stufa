@@ -18,9 +18,9 @@ export default function ErrorFallback({
     error instanceof Error ? error.message : 'Si è verificato un errore imprevisto';
 
   return (
-    <Card variant="elevated" className="p-6 min-h-[160px]">
-      <div className="flex flex-col items-center justify-center space-y-4 text-center h-full">
-        <div className="text-4xl mb-4">{deviceIcon}</div>
+    <Card variant="elevated" className="min-h-40 p-6">
+      <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
+        <div className="mb-4 text-4xl">{deviceIcon}</div>
         <Heading level={3} variant="ember">
           Errore: {deviceName}
         </Heading>

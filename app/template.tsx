@@ -32,10 +32,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className={`transition-all duration-500 transition-page-smooth ${
+      className={`transition-page-smooth transition-all duration-500 ${
         mounted
-          ? 'opacity-100 translate-y-0 scale-100'
-          : 'opacity-0 translate-y-2 scale-[0.98]'
+          ? 'translate-y-0 scale-100 opacity-100'
+          : 'translate-y-2 scale-98 opacity-0'
       }`}
     >
       {children}

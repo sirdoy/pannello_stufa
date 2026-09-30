@@ -13,7 +13,7 @@ global.fetch = mockFetch;
 
 // Mock auth middleware
 jest.mock('@/lib/core', () => ({
-  withAuthAndErrorHandler: <H>(handler: H, name: string) => handler,
+  withAuthAndErrorHandler: <H>(handler: H, _name: string) => handler,
   success: (data: Record<string, unknown>) => ({
     status: 200,
     json: async () => ({ success: true, ...data }),

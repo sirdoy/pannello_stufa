@@ -32,7 +32,7 @@ export default function InfoBox({
   label,
   value,
   variant = 'neutral',
-  layout = 'horizontal',
+  layout: _layout = 'horizontal',
   className = '',
   ...props
 }: InfoBoxProps) {
@@ -50,19 +50,19 @@ export default function InfoBox({
   return (
     <div className={`
       relative overflow-hidden rounded-xl
-      bg-slate-800/50 backdrop-blur-xl
       border border-slate-700/40
+      bg-slate-800/50 backdrop-blur-xl
       transition-all duration-200
-      hover:bg-slate-800/70 hover:border-slate-600/50
+      hover:border-slate-600/50 hover:bg-slate-800/70
       
       
       
       
       ${className}
     `} {...props}>
-      <div className="relative z-10 flex flex-col items-center justify-center p-3 sm:p-4 min-h-[90px]">
+      <div className="relative z-10 flex min-h-[90px] flex-col items-center justify-center p-3 sm:p-4">
         {/* Icon */}
-        <span className="text-2xl sm:text-3xl mb-1.5">{icon}</span>
+        <span className="mb-1.5 text-2xl sm:text-3xl">{icon}</span>
 
         {/* Label */}
         <Text
@@ -76,7 +76,7 @@ export default function InfoBox({
         </Text>
 
         {/* Value */}
-        <span className={`text-lg sm:text-xl font-bold font-display text-center leading-tight ${variantClasses[variant]}`}>
+        <span className={`text-center font-display text-lg leading-tight font-bold sm:text-xl ${variantClasses[variant]}`}>
           {value}
         </span>
       </div>

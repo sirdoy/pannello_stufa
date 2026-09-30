@@ -209,7 +209,7 @@ export default function RoomDetailPage() {
       accessorKey: 'device_type_slug',
       header: 'Tipo',
       cell: ({ row }) => (
-        <code className="text-sm font-mono text-slate-400">{row.original.device_type_slug}</code>
+        <code className="font-mono text-sm text-slate-400">{row.original.device_type_slug}</code>
       ),
     },
     {
@@ -232,7 +232,7 @@ export default function RoomDetailPage() {
 
       <Card variant="glass" className="p-4 sm:p-6">
         {/* Toolbar */}
-        <div className="flex items-center justify-end mb-4">
+        <div className="mb-4 flex items-center justify-end">
           <Button variant="ember" size="sm" onClick={() => setShowAssign(true)}>
             Assegna dispositivo
           </Button>
@@ -253,7 +253,7 @@ export default function RoomDetailPage() {
 
         {/* Empty state */}
         {!isLoading && !roomData.error && !devicesData.error && devices.length === 0 && (
-          <div className="text-center py-8 text-slate-400">
+          <div className="py-8 text-center text-slate-400">
             <p>Nessun dispositivo assegnato</p>
             <Button variant="ember" size="sm" className="mt-4" onClick={() => setShowAssign(true)}>
               Assegna dispositivo

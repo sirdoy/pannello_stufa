@@ -4,7 +4,6 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useNetworkQuality } from '../useNetworkQuality';
-import type { NetworkQuality } from '../useNetworkQuality';
 
 describe('useNetworkQuality', () => {
   let mockConnection: {

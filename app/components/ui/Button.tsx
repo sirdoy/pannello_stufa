@@ -19,8 +19,8 @@ export const buttonVariants = cva(
     'font-display font-semibold',
     'rounded-xl',
     'transition-all',
-    'duration-[var(--duration-smooth)]',
-    'ease-[var(--ease-move)]',
+    'duration-(--duration-smooth)',
+    'ease-(--ease-move)',
     'flex items-center justify-center gap-2.5',
     'relative overflow-hidden',
     'select-none',
@@ -29,34 +29,34 @@ export const buttonVariants = cva(
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     // Active state - spring physics for responsive feel
-    'active:scale-[0.97]',
-    'active:duration-[var(--duration-fast)]',
-    'active:ease-[var(--ease-spring-subtle)]',
+    'active:scale-97',
+    'active:duration-(--duration-fast)',
+    'active:ease-spring-subtle',
     // Disabled state
-    'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
+    'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
   ],
   {
     variants: {
       variant: {
         // Primary action - Warm ember gradient
         ember: [
-          'bg-gradient-to-br from-ember-500 via-ember-600 to-flame-600',
+          'bg-linear-to-br from-ember-500 via-ember-600 to-flame-600',
           'text-white',
           'shadow-[0_2px_8px_rgba(237,111,16,0.25),0_1px_2px_rgba(0,0,0,0.1)]',
           'hover:from-ember-400 hover:via-ember-500 hover:to-flame-500',
           'hover:shadow-[0_4px_16px_rgba(237,111,16,0.35),0_2px_4px_rgba(0,0,0,0.1)]',
           'hover:-translate-y-0.5',
-          'hover:ease-[var(--ease-spring-subtle)]',
+          'hover:ease-spring-subtle',
         ],
         // Secondary action - Subtle glass
         subtle: [
-          'bg-white/[0.06]',
+          'bg-white/6',
           'text-slate-200',
-          'border border-white/[0.08]',
-          'hover:bg-white/[0.1]',
-          'hover:border-white/[0.12]',
+          'border border-white/8',
+          'hover:bg-white/10',
+          'hover:border-white/12',
           'hover:-translate-y-0.5',
-          'hover:ease-[var(--ease-spring-subtle)]',
+          'hover:ease-spring-subtle',
           ']',
           ']',
           ']',
@@ -66,29 +66,29 @@ export const buttonVariants = cva(
         ghost: [
           'bg-transparent',
           'text-slate-300',
-          'hover:bg-white/[0.06]',
+          'hover:bg-white/6',
           'hover:text-slate-100',
           ']',
         ],
         // Success action - Muted sage green
         success: [
-          'bg-gradient-to-br from-sage-500 via-sage-600 to-sage-700',
+          'bg-linear-to-br from-sage-500 via-sage-600 to-sage-700',
           'text-white',
           'shadow-[0_2px_8px_rgba(96,115,96,0.25),0_1px_2px_rgba(0,0,0,0.1)]',
           'hover:from-sage-400 hover:via-sage-500 hover:to-sage-600',
           'hover:shadow-[0_4px_16px_rgba(96,115,96,0.35)]',
           'hover:-translate-y-0.5',
-          'hover:ease-[var(--ease-spring-subtle)]',
+          'hover:ease-spring-subtle',
         ],
         // Danger action - Red
         danger: [
-          'bg-gradient-to-br from-danger-500 via-danger-600 to-danger-700',
+          'bg-linear-to-br from-danger-500 via-danger-600 to-danger-700',
           'text-white',
           'shadow-[0_2px_8px_rgba(239,68,68,0.25),0_1px_2px_rgba(0,0,0,0.1)]',
           'hover:from-danger-400 hover:via-danger-500 hover:to-danger-600',
           'hover:shadow-[0_4px_16px_rgba(239,68,68,0.35)]',
           'hover:-translate-y-0.5',
-          'hover:ease-[var(--ease-spring-subtle)]',
+          'hover:ease-spring-subtle',
         ],
         // Outline - Border only
         outline: [
@@ -98,13 +98,13 @@ export const buttonVariants = cva(
           'hover:bg-ember-500/10',
           'hover:border-ember-500/60',
           'hover:-translate-y-0.5',
-          'hover:ease-[var(--ease-spring-subtle)]',
+          'hover:ease-spring-subtle',
         ],
       },
       size: {
-        sm: 'px-4 py-2.5 min-h-[44px] text-sm',
-        md: 'px-5 py-3 min-h-[48px] text-base',
-        lg: 'px-6 py-4 min-h-[56px] text-lg',
+        sm: 'min-h-11 px-4 py-2.5 text-sm',
+        md: 'min-h-12 px-5 py-3 text-base',
+        lg: 'min-h-14 px-6 py-4 text-lg',
       },
       fullWidth: {
         true: 'w-full',
@@ -123,9 +123,9 @@ export const buttonVariants = cva(
     },
     compoundVariants: [
       // iconOnly + size interactions for correct padding and min-width
-      { iconOnly: true, size: 'sm', className: 'p-2.5 min-w-[44px] px-0' },
-      { iconOnly: true, size: 'md', className: 'p-3 min-w-[48px] px-0' },
-      { iconOnly: true, size: 'lg', className: 'p-4 min-w-[56px] px-0' },
+      { iconOnly: true, size: 'sm', className: 'p-2.5 min-w-11 px-0' },
+      { iconOnly: true, size: 'md', className: 'p-3 min-w-12 px-0' },
+      { iconOnly: true, size: 'lg', className: 'p-4 min-w-14 px-0' },
       // subtle + colorScheme compound variants
       {
         variant: 'subtle',
@@ -261,9 +261,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     >
       {/* Loading spinner overlay */}
       {loading && (
-        <span className="absolute inset-0 flex items-center justify-center bg-inherit rounded-inherit">
+        <span className="rounded-inherit absolute inset-0 flex items-center justify-center bg-inherit">
           <svg
-            className="animate-spin h-5 w-5"
+            className="size-5 animate-spin"
             viewBox="0 0 24 24"
             fill="none"
             aria-hidden="true"

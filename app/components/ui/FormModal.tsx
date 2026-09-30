@@ -1,9 +1,8 @@
 'use client';
 
-import { forwardRef, useEffect, useState, useRef, type ForwardedRef, type ReactElement, type ReactNode, type RefAttributes } from 'react';
+import { forwardRef, useEffect, useEffectEvent, useState, useRef, type ForwardedRef, type ReactElement, type ReactNode, type RefAttributes } from 'react';
 import {
   useForm,
-  Controller,
   type Control,
   type DefaultValues,
   type FieldErrors,
@@ -16,7 +15,7 @@ import {
 } from 'react-hook-form';
 import type { ZodTypeAny } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, Check, X } from 'lucide-react';
+import { AlertCircle, Check } from 'lucide-react';
 import Modal, { type ModalProps } from './Modal';
 import Button from './Button';
 import { useDepsChanged } from '@/lib/hooks/useDepsChanged';
@@ -125,18 +124,18 @@ function ErrorSummary({ errors }: { errors: object }) {
       role="alert"
       aria-live="polite"
       className={cn(
-        'mb-4 p-4 rounded-xl',
-        'bg-danger-500/10 border border-danger-500/30',
+        'mb-4 rounded-xl p-4',
+        'border border-danger-500/30 bg-danger-500/10',
         'animate-fade-in'
       )}
     >
       <div className="flex items-start gap-3">
-        <AlertCircle className="h-5 w-5 text-danger-500 flex-shrink-0 mt-0.5" />
+        <AlertCircle className="mt-0.5 size-5 shrink-0 text-danger-500" />
         <div>
-          <p className="font-semibold text-danger-400 mb-1">
+          <p className="mb-1 font-semibold text-danger-400">
             Please fix the following errors:
           </p>
-          <ul className="list-disc list-inside space-y-1 text-sm text-danger-300">
+          <ul className="list-inside list-disc space-y-1 text-sm text-danger-300">
             {errorList.map(({ field, message }) => (
               <li key={field}>{message}</li>
             ))}
@@ -164,12 +163,12 @@ function SuccessOverlay({ message }: { message?: string }) {
       aria-live="polite"
     >
       <div className={cn(
-        'w-16 h-16 rounded-full',
-        'bg-sage-500/20 border-2 border-sage-500',
+        'size-16 rounded-full',
+        'border-2 border-sage-500 bg-sage-500/20',
         'flex items-center justify-center',
         'animate-scale-in'
       )}>
-        <Check className="h-8 w-8 text-sage-400" />
+        <Check className="size-8 text-sage-400" />
       </div>
       {message && (
         <p className="mt-4 text-lg font-semibold text-slate-200">
@@ -200,7 +199,7 @@ const FormModal = forwardRef(function FormModal<TValues extends FieldValues = Fi
     className,
     ...props
   }: FormModalProps<TValues>,
-  ref: ForwardedRef<HTMLDivElement>
+  _ref: ForwardedRef<HTMLDivElement>
 ) {
   // Form state: 'idle' | 'submitting' | 'success' | 'error'
   const [formState, setFormState] = useState('idle');
@@ -243,14 +242,18 @@ const FormModal = forwardRef(function FormModal<TValues extends FieldValues = Fi
     setHasSubmitted(false);
   }
 
+  // Reads the latest defaultValues without making them an effect dependency (a new
+  // object each render would reset the form on every render)
+  const resetToDefaults = useEffectEvent(() => reset(defaultValues));
+
   // Reset the react-hook-form store (external to React state) on the same transition
   useEffect(() => {
     // Only reset when transitioning from closed to open
     if (isOpen && !wasOpenRef.current) {
-      reset(defaultValues);
+      resetToDefaults();
     }
     wasOpenRef.current = isOpen;
-  }, [isOpen, reset]); // Note: defaultValues intentionally excluded to prevent infinite loop
+  }, [isOpen]);
 
   // Handle close with loading prevention
   const handleClose = () => {

@@ -142,13 +142,13 @@ if (typeof window !== 'undefined') {
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
-  constructor(callback?: IntersectionObserverCallback, options?: IntersectionObserverInit) {}
+  constructor(_callback?: IntersectionObserverCallback, _options?: IntersectionObserverInit) {}
   disconnect() {}
-  observe(target: Element) {}
+  observe(_target: Element) {}
   takeRecords(): IntersectionObserverEntry[] {
     return [];
   }
-  unobserve(target: Element) {}
+  unobserve(_target: Element) {}
   readonly root: Element | Document | null = null;
   readonly rootMargin: string = '';
   readonly thresholds: ReadonlyArray<number> = [];
@@ -172,8 +172,8 @@ global.ResizeObserver = class ResizeObserver {
   }
   callback: ResizeObserverCallback;
   disconnect() {}
-  observe(target: Element, options?: ResizeObserverOptions) {}
-  unobserve(target: Element) {}
+  observe(_target: Element, _options?: ResizeObserverOptions) {}
+  unobserve(_target: Element) {}
 };
 
 // Mock DOMRect (required for Radix floating UI)

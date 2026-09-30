@@ -83,7 +83,7 @@ export function ForecastDayCard({
   return (
     <div
       className={cn(
-        'flex flex-col items-center p-3 rounded-xl cursor-pointer',
+        'flex cursor-pointer flex-col items-center rounded-xl p-3',
         'bg-slate-800/40 hover:bg-slate-800/60',
         ' ',
         'transition-colors duration-200',
@@ -109,7 +109,7 @@ export function ForecastDayCard({
       <WeatherIcon
         code={day.weatherCode}
         size={32}
-        className="text-ocean-400 mb-2"
+        className="mb-2 text-ocean-400"
       />
 
       {/* High temperature */}
@@ -117,7 +117,7 @@ export function ForecastDayCard({
         variant="body"
         size="lg"
        
-        className="text-ember-400 leading-tight"
+        className="leading-tight text-ember-400"
       >
         {formatTemperature(day.tempMax)}°
       </Text>
@@ -133,8 +133,8 @@ export function ForecastDayCard({
 
       {/* Precipitation chance - only show if > 10% */}
       {(day.precipChance ?? 0) > 10 && (
-        <div className="flex items-center gap-0.5 text-ocean-400 mt-1">
-          <Droplets className="w-3 h-3" />
+        <div className="mt-1 flex items-center gap-0.5 text-ocean-400">
+          <Droplets className="size-3" />
           <Text size="xs" className="text-ocean-400">
             {day.precipChance}%
           </Text>

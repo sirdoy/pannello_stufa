@@ -113,7 +113,7 @@ export function useInstallPrompt(): UseInstallPromptReturn {
       setCanInstall(false);
 
       return outcome === 'accepted';
-    } catch (error) {
+    } catch {
       // Prompt failed (already called, browser doesn't support, etc.)
       return false;
     }

@@ -43,7 +43,7 @@ export default function RawHistoryTab({
 }: RawHistoryTabProps) {
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <Text variant="tertiary" size="sm">
           Dati storici non aggregati forniti dal Fritz!Box (ultime {HOURS_LABEL[hours]}).
         </Text>

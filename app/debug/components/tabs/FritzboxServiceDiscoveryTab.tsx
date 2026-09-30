@@ -32,7 +32,7 @@ function CopyUrl({ url }: { url: string }) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="font-mono text-xs text-slate-300 truncate max-w-[280px]" title={url}>
+      <span className="max-w-70 truncate font-mono text-xs text-slate-300" title={url}>
         {url}
       </span>
       <Button
@@ -83,7 +83,7 @@ export default function FritzboxServiceDiscoveryTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <Network size={20} className="text-ember-400" aria-hidden="true" />
@@ -103,7 +103,7 @@ export default function FritzboxServiceDiscoveryTab() {
           aria-label="Aggiorna elenco servizi"
           aria-busy={loading}
         >
-          <RefreshCw size={16} className={loading ? 'animate-spin mr-2' : 'mr-2'} aria-hidden="true" />
+          <RefreshCw size={16} className={loading ? 'mr-2 animate-spin' : 'mr-2'} aria-hidden="true" />
           Aggiorna
         </Button>
       </div>
@@ -119,7 +119,7 @@ export default function FritzboxServiceDiscoveryTab() {
 
       <Card variant="elevated" className="p-4 sm:p-6">
         {loading && services.length === 0 ? (
-          <Skeleton className="h-[400px] rounded-2xl" />
+          <Skeleton className="h-100 rounded-2xl" />
         ) : services.length === 0 && !error ? (
           <EmptyState
             icon={<Network size={48} className="text-slate-500" />}

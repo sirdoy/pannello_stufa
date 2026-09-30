@@ -225,15 +225,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
 };
 
 /**
- * Unified registry combining hardware devices and display items
- * Used for dashboard cards configuration
- */
-const ALL_DASHBOARD_ITEMS: Record<string, DeviceConfig | DisplayItem> = {
-  ...DEVICE_CONFIG,
-  ...DISPLAY_ITEMS,
-};
-
-/**
  * Default order for dashboard items (new users)
  * Defines initial order and visibility
  */

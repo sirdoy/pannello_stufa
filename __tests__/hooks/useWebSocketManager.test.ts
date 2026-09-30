@@ -153,7 +153,7 @@ describe('WS-02: Unsubscribe sends message only when last callback is removed', 
 
 describe('WS-03: Dispatch routes message to correct topic callback', () => {
   it('calls fritzbox callback and not hue callback when fritzbox message arrives', () => {
-    const { result, rerender } = renderHook(() => useWebSocketManager(TEST_URL));
+    const { result } = renderHook(() => useWebSocketManager(TEST_URL));
 
     const fritzboxCb = jest.fn();
     const hueCb = jest.fn();

@@ -21,7 +21,7 @@ const toastVariants = cva(
     // Animations
     'data-[state=open]:animate-slide-in-from-right',
     'data-[state=closed]:animate-fade-out',
-    'data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)]',
+    'data-[swipe=move]:translate-x-(--radix-toast-swipe-move-x)',
     'data-[swipe=cancel]:translate-x-0 data-[swipe=cancel]:transition-transform',
     'data-[swipe=end]:animate-slide-out-to-right',
   ],
@@ -111,12 +111,12 @@ const Toast = forwardRef<
         {...props}
       >
         {/* Icon */}
-        <div className="flex-shrink-0">
-          <Icon className="h-5 w-5" />
+        <div className="shrink-0">
+          <Icon className="size-5" />
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           {title && (
             <ToastPrimitive.Title className="text-sm font-semibold">
               {title}
@@ -132,8 +132,8 @@ const Toast = forwardRef<
           <ToastPrimitive.Action asChild altText={action.label}>
             <button
               onClick={action.onClick}
-              className="flex-shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium
-                bg-white/10 hover:bg-white/20 transition-colors
+              className="shrink-0 rounded-lg bg-white/10 px-3 py-1.5 text-sm
+                font-medium transition-colors hover:bg-white/20
                  "
             >
               {action.label}
@@ -143,12 +143,12 @@ const Toast = forwardRef<
 
         {/* Close button */}
         <ToastPrimitive.Close
-          className="flex-shrink-0 p-1.5 rounded-lg
-            hover:bg-white/10 transition-colors
+          className="shrink-0 rounded-lg p-1.5
+            transition-colors hover:bg-white/10
             "
           aria-label="Close"
         >
-          <X className="h-4 w-4" />
+          <X className="size-4" />
         </ToastPrimitive.Close>
       </ToastPrimitive.Root>
     );
@@ -168,12 +168,12 @@ function ToastViewport({ className, ...props }: ToastViewportProps) {
   return (
     <ToastPrimitive.Viewport
       className={cn(
-        'fixed bottom-4 right-4 z-[9999]',
+        'fixed right-4 bottom-4 z-9999',
         'flex flex-col-reverse gap-2',
         'w-full max-w-sm',
         'outline-none',
         // Mobile: full width with padding
-        'max-sm:bottom-0 max-sm:right-0 max-sm:left-0 max-sm:p-4',
+        'max-sm:inset-x-0 max-sm:bottom-0 max-sm:p-4',
         className
       )}
       {...props}

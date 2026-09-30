@@ -10,7 +10,7 @@ import {
   withAuthAndErrorHandler,
   success,
 } from '@/lib/core';
-import { adminDbRemove, adminDbGet } from '@/lib/firebaseAdmin';
+import { adminDbRemove } from '@/lib/firebaseAdmin';
 
 export const dynamic = 'force-dynamic';
 

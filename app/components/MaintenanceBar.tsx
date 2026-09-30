@@ -78,12 +78,12 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
   };
 
   return (
-    <div className="bg-slate-800/60 backdrop-blur-xl border border-slate-700/50 rounded-xl hover:bg-slate-800/80 transition-all duration-300 overflow-hidden ">
+    <div className="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-xl transition-all duration-300 hover:bg-slate-800/80 ">
       {/* Mini Bar - Always visible */}
-      <div className="flex items-center justify-between p-4 cursor-pointer relative z-10" onClick={toggleExpanded}>
-        <div className="flex items-center gap-3 flex-1 min-w-0">
-          <span className="text-lg flex-shrink-0">🔧</span>
-          <Text variant="body" className="flex-shrink-0">Manutenzione</Text>
+      <div className="relative z-10 flex cursor-pointer items-center justify-between p-4" onClick={toggleExpanded}>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <span className="shrink-0 text-lg">🔧</span>
+          <Text variant="body" className="shrink-0">Manutenzione</Text>
 
           {/* Badge percentuale - nascosto quando espanso */}
           {!isExpanded && (
@@ -92,13 +92,13 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
               color={getBadgeColor() as 'ember' | 'sage' | 'ocean' | 'warning' | 'danger' | 'neutral'}
               icon={getBadgeIcon()}
               text={`${percentage.toFixed(0)}%`}
-              className="flex-shrink-0"
+              className="shrink-0"
             />
           )}
 
           {/* Info ore compatta - nascosta su mobile e quando espanso */}
           {!isExpanded && (
-            <Text variant="tertiary" className="truncate hidden sm:inline">
+            <Text variant="tertiary" className="hidden truncate sm:inline">
               {formatHoursToHHMM(currentHours)} / {formatHoursToHHMM(targetHours)}
             </Text>
           )}
@@ -106,7 +106,7 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
 
         {/* Toggle button */}
         <button
-          className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-200 transition-colors flex-shrink-0 "
+          className="flex shrink-0 items-center gap-2 text-xs text-slate-500 transition-colors hover:text-slate-200 "
           onClick={toggleExpanded}
         >
           <span className="hidden sm:inline">
@@ -120,16 +120,16 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
 
       {/* Expanded Details - Conditional */}
       <div className={`${styles.collapseContent} ${isExpanded ? styles.expanded : ''}`}>
-        <div className="px-4 pb-4 space-y-3">
+        <div className="space-y-3 px-4 pb-4">
           {/* Progress Bar */}
-          <div className="relative w-full h-3 bg-slate-700 rounded-full overflow-hidden ">
+          <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-700 ">
             <div
               className={`h-full ${getBarColor()} transition-all duration-500 ease-out`}
               style={{ width: `${Math.min(100, percentage)}%` }}
             >
               {/* Animated shimmer effect when near limit */}
               {isNearLimit && (
-                <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent ${styles.shimmer}`} />
+                <div className={`absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent ${styles.shimmer}`} />
               )}
             </div>
           </div>

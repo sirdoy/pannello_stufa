@@ -76,7 +76,7 @@ export default function ScheduleSelector({
       <div className="flex items-end gap-3">
         {/* Schedule dropdown */}
         <div className="flex-1">
-          <label className="block mb-1.5">
+          <label className="mb-1.5 block">
             <Text variant="label" size="sm">Programmazione attiva</Text>
           </label>
           <Select

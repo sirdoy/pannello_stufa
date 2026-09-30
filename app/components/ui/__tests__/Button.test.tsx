@@ -66,14 +66,14 @@ describe('Button Component', () => {
     test('default variant is ember with gradient classes', () => {
       render(<Button>Default</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-ember-500');
     });
 
     test('ember variant renders with gradient', () => {
       render(<Button variant="ember">Ember</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-ember-500');
       expect(button).toHaveClass('via-ember-600');
       expect(button).toHaveClass('to-flame-600');
@@ -82,7 +82,7 @@ describe('Button Component', () => {
     test('subtle variant renders with glass effect', () => {
       render(<Button variant="subtle">Subtle</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-white/[0.06]');
+      expect(button).toHaveClass('bg-white/6');
       expect(button).toHaveClass('border');
     });
 
@@ -96,14 +96,14 @@ describe('Button Component', () => {
     test('success variant renders with sage gradient', () => {
       render(<Button variant="success">Success</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-sage-500');
     });
 
     test('danger variant renders with danger gradient', () => {
       render(<Button variant="danger">Danger</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-danger-500');
     });
 
@@ -118,21 +118,21 @@ describe('Button Component', () => {
     test('size sm applies correct min-h class', () => {
       render(<Button size="sm">Small</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-h-[44px]');
+      expect(button).toHaveClass('min-h-11');
       expect(button).toHaveClass('text-sm');
     });
 
     test('size md applies correct min-h class', () => {
       render(<Button size="md">Medium</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-h-[48px]');
+      expect(button).toHaveClass('min-h-12');
       expect(button).toHaveClass('text-base');
     });
 
     test('size lg applies correct min-h class', () => {
       render(<Button size="lg">Large</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-h-[56px]');
+      expect(button).toHaveClass('min-h-14');
       expect(button).toHaveClass('text-lg');
     });
 
@@ -157,21 +157,21 @@ describe('Button Component', () => {
     test('iconOnly + size sm has min-w-[44px]', () => {
       render(<Button iconOnly size="sm" icon="X" aria-label="Close" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-w-[44px]');
+      expect(button).toHaveClass('min-w-11');
       expect(button).toHaveClass('p-2.5');
     });
 
     test('iconOnly + size md has min-w-[48px]', () => {
       render(<Button iconOnly size="md" icon="X" aria-label="Close" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-w-[48px]');
+      expect(button).toHaveClass('min-w-12');
       expect(button).toHaveClass('p-3');
     });
 
     test('iconOnly + size lg has min-w-[56px]', () => {
       render(<Button iconOnly size="lg" icon="X" aria-label="Close" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-w-[56px]');
+      expect(button).toHaveClass('min-w-14');
       expect(button).toHaveClass('p-4');
     });
   });
@@ -527,7 +527,7 @@ describe('Button Component', () => {
       render(<Button colorScheme="sage">Test</Button>);
       const button = screen.getByRole('button');
       // Should still have ember gradient
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-ember-500');
       // Should NOT have sage colors
       expect(button).not.toHaveClass('bg-sage-500/20');

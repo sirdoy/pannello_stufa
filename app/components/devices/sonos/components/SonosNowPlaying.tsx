@@ -18,10 +18,10 @@ export default function SonosNowPlaying({ playback }: SonosNowPlayingProps) {
 
   return (
     <div>
-      <p className="text-base font-medium text-slate-100 truncate">
+      <p className="truncate text-base font-medium text-slate-100">
         {title ?? 'Nessuna riproduzione'}
       </p>
-      {artist && <p className="text-sm text-slate-400 truncate">{artist}</p>}
+      {artist && <p className="truncate text-sm text-slate-400">{artist}</p>}
     </div>
   );
 }

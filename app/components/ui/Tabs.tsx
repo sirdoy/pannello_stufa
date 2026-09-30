@@ -61,17 +61,17 @@ const TabsContext = createContext<TabsContextValue>({ value: undefined });
 const listVariants = cva(
   [
     'relative flex gap-1',
-    'border-b border-white/[0.06]',
+    'border-b border-white/6',
     ']',
   ],
   {
     variants: {
       orientation: {
         horizontal: 'flex-row',
-        vertical: 'flex-col border-b-0 border-r',
+        vertical: 'flex-col border-r border-b-0',
       },
       overflow: {
-        scroll: 'overflow-x-auto scrollbar-hide',
+        scroll: 'scrollbar-hide overflow-x-auto',
         wrap: 'flex-wrap',
       },
     },
@@ -85,13 +85,13 @@ const listVariants = cva(
 // CVA variants for TabsTrigger
 const triggerVariants = cva(
   [
-    'px-4 py-2.5 min-h-[44px]',
-    'font-display font-medium text-sm',
+    'min-h-11 px-4 py-2.5',
+    'font-display text-sm font-medium',
     'text-slate-400 hover:text-slate-200',
     ' ',
-    'transition-colors duration-[var(--duration-fast)]',
+    'transition-colors duration-(--duration-fast)',
     // Focus ring
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:ring-inset',
+    'focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:outline-none focus-visible:ring-inset',
     // Active state
     'data-[state=active]:text-slate-100',
     ']:text-slate-900',
@@ -101,9 +101,9 @@ const triggerVariants = cva(
   {
     variants: {
       size: {
-        sm: 'px-3 py-2 text-xs min-h-[36px]',
-        md: 'px-4 py-2.5 text-sm min-h-[44px]',
-        lg: 'px-5 py-3 text-base min-h-[48px]',
+        sm: 'min-h-9 px-3 py-2 text-xs',
+        md: 'min-h-11 px-4 py-2.5 text-sm',
+        lg: 'min-h-12 px-5 py-3 text-base',
       },
     },
     defaultVariants: { size: 'md' },
@@ -161,9 +161,9 @@ const TabsList = forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsLis
         <span
           className={cn(
             'absolute bg-ember-500',
-            'transition-all duration-[var(--duration-smooth)]',
+            'transition-all duration-(--duration-smooth)',
             // Use spring easing with subtle overshoot for polished feel
-            'ease-[var(--ease-spring-subtle)]',
+            'ease-spring-subtle',
             'motion-reduce:transition-none',
             orientation === 'horizontal'
               ? 'bottom-0 h-0.5'
@@ -198,7 +198,7 @@ const TabsTrigger = forwardRef<React.ElementRef<typeof TabsPrimitive.Trigger>, T
         {...props}
       >
         <span className="flex items-center gap-2">
-          {icon && <span className="text-lg shrink-0" aria-hidden="true">{icon}</span>}
+          {icon && <span className="shrink-0 text-lg" aria-hidden="true">{icon}</span>}
           {children}
         </span>
       </TabsPrimitive.Trigger>

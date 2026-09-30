@@ -341,8 +341,7 @@ describe('Modal Component', () => {
       // Check for centered positioning classes
       expect(dialog).toHaveClass('left-1/2');
       expect(dialog).toHaveClass('top-1/2');
-      expect(dialog).toHaveClass('-translate-x-1/2');
-      expect(dialog).toHaveClass('-translate-y-1/2');
+      expect(dialog).toHaveClass('-translate-1/2');
     });
 
     test('has rounded corners on all sides', () => {

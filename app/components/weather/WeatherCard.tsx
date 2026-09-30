@@ -11,9 +11,7 @@
 
 import { useState } from 'react';
 import { SmartHomeCard, Badge, Button, Text } from '@/app/components/ui';
-import { CloudSun, CloudOff, RefreshCw } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { it } from 'date-fns/locale';
+import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { CurrentConditions } from './CurrentConditions';
@@ -130,7 +128,7 @@ export function WeatherCard({
         colorTheme="ocean"
       >
         <SmartHomeCard.Controls>
-          <div className="text-center py-8">
+          <div className="py-8 text-center">
             <Text variant="secondary" className="mb-4">
               {error.message || 'Impossibile caricare il meteo'}
             </Text>
@@ -139,7 +137,7 @@ export function WeatherCard({
               size="sm"
               onClick={onRetry}
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="size-4" />
               Riprova
             </Button>
           </div>
@@ -157,7 +155,7 @@ export function WeatherCard({
         colorTheme="ocean"
       >
         <SmartHomeCard.Controls>
-          <div className="text-center py-8">
+          <div className="py-8 text-center">
             <Text variant="secondary">
               Nessun dato meteo disponibile
             </Text>
@@ -168,7 +166,7 @@ export function WeatherCard({
   }
 
   // Data state - render full weather card
-  const { current, forecast, hourly, cachedAt, stale } = weatherData;
+  const { current, forecast, hourly, stale } = weatherData;
 
   // First forecast day is today - used for min/max/UV in current conditions
   const todayForecast = forecast && forecast.length > 0 ? forecast[0] : null;
@@ -184,11 +182,11 @@ export function WeatherCard({
           disabled={isRefreshing}
           aria-label="Aggiorna meteo"
           className={cn(
-            "p-2 rounded-lg hover:bg-slate-800/60 transition-colors",
+            "rounded-lg p-2 transition-colors hover:bg-slate-800/60",
             isRefreshing && "animate-spin"
           )}
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="size-4" />
         </button>
       }
     >
@@ -211,7 +209,7 @@ export function WeatherCard({
 
         {/* Forecast row */}
         {weatherData.forecast && weatherData.forecast.length > 0 && (
-          <div className="mt-6 pt-6 border-t border-slate-700/30 ">
+          <div className="mt-6 border-t border-slate-700/30 pt-6 ">
             <ForecastRow
               forecast={weatherData.forecast}
               onDayClick={setSelectedDay}

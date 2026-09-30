@@ -24,7 +24,7 @@ const dividerVariants = cva(
           'border-dashed border-slate-600 bg-transparent',
         ],
         gradient: [
-          'bg-gradient-to-r from-transparent via-slate-600/50 to-transparent',
+          'bg-linear-to-r from-transparent via-slate-600/50 to-transparent',
         ],
       },
     },
@@ -105,7 +105,7 @@ const Divider = forwardRef<HTMLDivElement, DividerProps>(function Divider(
         className={cn(spacingClass, className)}
         {...props}
       >
-        <div className={cn('w-px h-full', lineClasses)} />
+        <div className={cn('h-full w-px', lineClasses)} />
       </div>
     );
   }
@@ -121,12 +121,12 @@ const Divider = forwardRef<HTMLDivElement, DividerProps>(function Divider(
         {...props}
       >
         <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className={cn('w-full h-px', lineClasses)} />
+          <div className={cn('h-px w-full', lineClasses)} />
         </div>
         <div className="relative flex justify-center">
           <span className={cn(
-            'px-4 py-1.5 backdrop-blur-xl font-semibold font-display text-xs uppercase tracking-[0.15em] rounded-full',
-            'bg-slate-800/80 text-slate-300 border border-slate-700/50',
+            'rounded-full px-4 py-1.5 font-display text-xs font-semibold tracking-[0.15em] uppercase backdrop-blur-xl',
+            'border border-slate-700/50 bg-slate-800/80 text-slate-300',
             ' '
           )}>
             {label}
@@ -145,7 +145,7 @@ const Divider = forwardRef<HTMLDivElement, DividerProps>(function Divider(
       className={cn(spacingClass, className)}
       {...props}
     >
-      <div className={cn('w-full h-px', lineClasses)} />
+      <div className={cn('h-px w-full', lineClasses)} />
     </div>
   );
 });

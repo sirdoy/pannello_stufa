@@ -174,17 +174,17 @@ export default function DevicesSettingsPage() {
             return (
               <div
                 key={device.id}
-                className={`stagger-item p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`stagger-item rounded-xl border-2 p-4 transition-all duration-200 ${
                   isEnabled
                     ? 'border-ember-600 bg-ember-950/30'
-                    : 'border-slate-600 bg-white/[0.02]'
+                    : 'border-slate-600 bg-white/2'
                 }`}
                 style={{ '--stagger-index': index } as React.CSSProperties}
               >
                 <div className="flex items-start justify-between gap-4">
                   {/* Device info */}
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="mb-2 flex items-center gap-3">
                       <Text className="text-2xl">{device.icon}</Text>
                       <Heading level={3} size="md">
                         {device.name}
@@ -215,7 +215,7 @@ export default function DevicesSettingsPage() {
       {/* Action buttons */}
       {hasChanges && (
         <Card variant="glass" className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+          <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
             <div className="flex-1">
               <Text size="sm">
                 Hai modifiche non salvate
@@ -225,7 +225,7 @@ export default function DevicesSettingsPage() {
               </Text>
             </div>
 
-            <div className="flex gap-3 flex-shrink-0">
+            <div className="flex shrink-0 gap-3">
               <Button
                 variant="subtle"
                 onClick={handleReset}
@@ -248,21 +248,21 @@ export default function DevicesSettingsPage() {
       )}
 
       {/* Info card */}
-      <Card variant="glass" className="p-6 bg-ocean-900/10">
+      <Card variant="glass" className="bg-ocean-900/10 p-6">
         <Heading level={3} size="md" variant="subtle" className="mb-3">
           ℹ️ Note
         </Heading>
         <ul className="space-y-2">
           <li className="flex gap-2">
-            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ember" className="shrink-0">•</Text>
             <Text variant="tertiary" size="sm">I dispositivi disabilitati non verranno eliminati, potrai riattivarli quando vuoi</Text>
           </li>
           <li className="flex gap-2">
-            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ember" className="shrink-0">•</Text>
             <Text variant="tertiary" size="sm">Le modifiche saranno visibili immediatamente dopo il salvataggio</Text>
           </li>
           <li className="flex gap-2">
-            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ember" className="shrink-0">•</Text>
             <Text variant="tertiary" size="sm">La configurazione è personale e non influisce sugli altri utenti</Text>
           </li>
         </ul>

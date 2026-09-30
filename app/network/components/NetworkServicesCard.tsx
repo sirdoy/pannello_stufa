@@ -46,18 +46,18 @@ function CollapsibleSection({
   const [isOpen, setIsOpen] = useState(defaultOpen ?? false);
 
   return (
-    <div className="border-b border-white/[0.06] last:border-0">
+    <div className="border-b border-white/6 last:border-0">
       <button
         onClick={() => setIsOpen((v) => !v)}
-        className="w-full flex items-center justify-between py-3 px-1 text-left"
+        className="flex w-full items-center justify-between px-1 py-3 text-left"
       >
-        <span className="font-medium text-sm">
+        <span className="text-sm font-medium">
           {title}{''}
           <span className="text-slate-400">({count})</span>
         </span>
         <ChevronDown
           className={cn(
-            'w-4 h-4 transition-transform text-slate-400',
+            'size-4 text-slate-400 transition-transform',
             isOpen && 'rotate-180',
           )}
         />
@@ -151,7 +151,7 @@ export default function NetworkServicesCard({
 
   if (loading) {
     return (
-      <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+      <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
         <Skeleton className="h-6 w-48" />
         <div className="space-y-3">
           <Skeleton className="h-12 w-full" />
@@ -166,7 +166,7 @@ export default function NetworkServicesCard({
   return (
     <Card variant="elevated" className="p-4 sm:p-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <Heading level={2} size="lg">
           Servizi di rete
         </Heading>
@@ -194,7 +194,7 @@ export default function NetworkServicesCard({
               density="compact"
             />
           ) : (
-            <Text size="sm" className="text-slate-500 px-1">
+            <Text size="sm" className="px-1 text-slate-500">
               Nessuna riserva DHCP configurata
             </Text>
           )}
@@ -215,7 +215,7 @@ export default function NetworkServicesCard({
               density="compact"
             />
           ) : (
-            <Text size="sm" className="text-slate-500 px-1">
+            <Text size="sm" className="px-1 text-slate-500">
               Nessuna regola di port forwarding configurata
             </Text>
           )}
@@ -239,7 +239,7 @@ export default function NetworkServicesCard({
               </div>
               {upnp.upnp_ports.length > 0 && (
                 <div className="space-y-1">
-                  <Text size="sm" className="text-slate-400 font-medium">
+                  <Text size="sm" className="font-medium text-slate-400">
                     Porte UPnP attive:
                   </Text>
                   {upnp.upnp_ports.map((port, idx) => (
@@ -254,7 +254,7 @@ export default function NetworkServicesCard({
               )}
             </div>
           ) : (
-            <Text size="sm" className="text-slate-500 px-1">
+            <Text size="sm" className="px-1 text-slate-500">
               Dati UPnP non disponibili
             </Text>
           )}
@@ -271,15 +271,15 @@ export default function NetworkServicesCard({
               {/* Nodes */}
               {mesh.nodes.length > 0 && (
                 <div className="space-y-2">
-                  <Text size="sm" className="text-slate-400 font-medium">
+                  <Text size="sm" className="font-medium text-slate-400">
                     Nodi ({mesh.node_count}):
                   </Text>
                   {mesh.nodes.map((node) => (
                     <div
                       key={node.uid}
-                      className="flex items-center gap-2 flex-wrap"
+                      className="flex flex-wrap items-center gap-2"
                     >
-                      <span className="font-medium text-sm text-slate-200">
+                      <span className="text-sm font-medium text-slate-200">
                         {node.name}
                       </span>
                       <span className="text-xs text-slate-500">{node.model}</span>
@@ -297,7 +297,7 @@ export default function NetworkServicesCard({
               {/* Links */}
               {mesh.links.length > 0 && (
                 <div className="space-y-2">
-                  <Text size="sm" className="text-slate-400 font-medium">
+                  <Text size="sm" className="font-medium text-slate-400">
                     Connessioni ({mesh.link_count}):
                   </Text>
                   {mesh.links.map((link, idx) => (
@@ -306,7 +306,7 @@ export default function NetworkServicesCard({
                       <span className="text-slate-500"> → </span>
                       <span className="font-medium">{link.target_name}</span>
                       {link.cur_rx_kbps !== null && (
-                        <span className="text-slate-500 ml-2">
+                        <span className="ml-2 text-slate-500">
                           ↓{Math.round(link.cur_rx_kbps / 1000)} Mbps ↑{Math.round((link.cur_tx_kbps ?? 0) / 1000)} Mbps
                         </span>
                       )}
@@ -316,7 +316,7 @@ export default function NetworkServicesCard({
               )}
             </div>
           ) : (
-            <Text size="sm" className="text-slate-500 px-1">
+            <Text size="sm" className="px-1 text-slate-500">
               Dati topologia mesh non disponibili
             </Text>
           )}

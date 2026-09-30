@@ -62,8 +62,8 @@ interface WeatherDetailCellProps {
  */
 function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, sublabel }: WeatherDetailCellProps) {
   return (
-    <div className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl ">
-      <span className={`w-5 h-5 ${iconColor} mb-1.5`}>
+    <div className="flex flex-col items-center rounded-xl bg-slate-800/40 p-3 ">
+      <span className={`size-5 ${iconColor} mb-1.5`}>
         {icon}
       </span>
       <Text variant="tertiary" size="xs" className="mb-0.5">
@@ -155,7 +155,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
   if (humidity !== null && humidity !== undefined) {
     details.push({
       key: 'humidity',
-      icon: <Droplets className="w-5 h-5" />,
+      icon: <Droplets className="size-5" />,
       iconColor: 'text-ocean-400',
       label: 'Umidita',
       value: `${Math.round(humidity)}%`,
@@ -165,7 +165,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
   if (windSpeed !== null && windSpeed !== undefined) {
     details.push({
       key: 'wind',
-      icon: <Wind className="w-5 h-5" />,
+      icon: <Wind className="size-5" />,
       iconColor: 'text-slate-400',
       label: 'Vento',
       value: formatWindSpeed(windSpeed),
@@ -178,7 +178,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
     const uvLabel = getUVIndexLabel(uvIndex);
     details.push({
       key: 'uv',
-      icon: <Sun className="w-5 h-5" />,
+      icon: <Sun className="size-5" />,
       iconColor: 'text-warning-400',
       label: 'UV',
       value: `${Math.round(uvIndex)}`,
@@ -192,7 +192,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
     const aqiLabel = getAirQualityLabel(airQuality);
     details.push({
       key: 'airQuality',
-      icon: <Leaf className="w-5 h-5" />,
+      icon: <Leaf className="size-5" />,
       iconColor: 'text-green-400',
       label: 'Aria',
       value: `${Math.round(airQuality)}`,
@@ -203,7 +203,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
   if (feelsLike !== null && feelsLike !== undefined) {
     details.push({
       key: 'feelsLike',
-      icon: <Thermometer className="w-5 h-5" />,
+      icon: <Thermometer className="size-5" />,
       iconColor: 'text-ember-400',
       label: 'Percepita',
       value: `${formatTemperature(feelsLike)}°`,
@@ -215,7 +215,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
     const pressureLabel = getPressureLabel(current.pressure);
     details.push({
       key: 'pressure',
-      icon: <Gauge className="w-5 h-5" />,
+      icon: <Gauge className="size-5" />,
       iconColor: 'text-slate-400',
       label: 'Pressione',
       value: `${Math.round(current.pressure)} hPa`,
@@ -227,7 +227,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
   if (current.visibility !== null && current.visibility !== undefined) {
     details.push({
       key: 'visibility',
-      icon: <Eye className="w-5 h-5" />,
+      icon: <Eye className="size-5" />,
       iconColor: 'text-slate-400',
       label: 'Visibilita',
       value: `${Math.round(current.visibility / 1000)} km`,
@@ -239,7 +239,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
       {/* Main display: large icon + temperature + condition */}
       <div className="flex items-start gap-4">
         {/* Large weather icon */}
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <WeatherIcon
             code={weatherCode}
             isNight={isNight}
@@ -249,35 +249,35 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
         </div>
 
         {/* Temperature and condition */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-3 mb-1">
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 flex items-baseline gap-3">
             <Text
               size="xl"
              
-              className="leading-none text-4xl"
+              className="text-4xl leading-none"
             >
               {formatTemperature(temperature)}°
             </Text>
             {/* Temperature trend indicator */}
             {trend === 'rising' && (
               <span className="flex items-center" title="In aumento">
-                <TrendingUp className="w-4 h-4 text-ember-400" />
+                <TrendingUp className="size-4 text-ember-400" />
               </span>
             )}
             {trend === 'falling' && (
               <span className="flex items-center" title="In diminuzione">
-                <TrendingDown className="w-4 h-4 text-ocean-400" />
+                <TrendingDown className="size-4 text-ocean-400" />
               </span>
             )}
             {/* Today's min/max */}
             {todayForecast && (
               <div className="flex items-center gap-2 text-sm">
                 <span className="flex items-center gap-0.5 text-ember-400">
-                  <ArrowUp className="w-3.5 h-3.5" />
+                  <ArrowUp className="size-3.5" />
                   <span className="font-medium">{formatTemperature(todayForecast.tempMax)}°</span>
                 </span>
                 <span className="flex items-center gap-0.5 text-ocean-400">
-                  <ArrowDown className="w-3.5 h-3.5" />
+                  <ArrowDown className="size-3.5" />
                   <span className="font-medium">{formatTemperature(todayForecast.tempMin)}°</span>
                 </span>
               </div>
@@ -300,7 +300,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
 
       {/* Details grid - responsive columns */}
       {details.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {details.map((detail) => (
             <WeatherDetailCell
               key={detail.key}
@@ -316,16 +316,16 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
 
       {/* Sunrise/Sunset row - compact horizontal display */}
       {todayForecast && (todayForecast.sunrise || todayForecast.sunset) && (
-        <div className="flex items-center justify-center gap-6 pt-3 mt-3 border-t border-slate-700/20 ">
+        <div className="mt-3 flex items-center justify-center gap-6 border-t border-slate-700/20 pt-3 ">
           {todayForecast.sunrise && (
             <div className="flex items-center gap-2">
-              <Sunrise className="w-4 h-4 text-warning-400" />
+              <Sunrise className="size-4 text-warning-400" />
               <Text variant="secondary" size="sm">{todayForecast.sunrise}</Text>
             </div>
           )}
           {todayForecast.sunset && (
             <div className="flex items-center gap-2">
-              <Sunset className="w-4 h-4 text-ember-400" />
+              <Sunset className="size-4 text-ember-400" />
               <Text variant="secondary" size="sm">{todayForecast.sunset}</Text>
             </div>
           )}

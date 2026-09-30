@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe } from 'jest-axe';
 import Tabs, { TabsList, TabsTrigger, TabsContent } from '../Tabs';
-import type { TabsProps } from '../Tabs';
 import { Calendar, Sliders, History } from 'lucide-react';
 
 interface TestTabsProps {
@@ -277,7 +276,7 @@ describe('Tabs Component', () => {
       expect(trigger).toHaveClass('px-3');
       expect(trigger).toHaveClass('py-2');
       expect(trigger).toHaveClass('text-xs');
-      expect(trigger).toHaveClass('min-h-[36px]');
+      expect(trigger).toHaveClass('min-h-9');
     });
 
     test('applies md size classes by default', () => {
@@ -294,7 +293,7 @@ describe('Tabs Component', () => {
       expect(trigger).toHaveClass('px-4');
       expect(trigger).toHaveClass('py-2.5');
       expect(trigger).toHaveClass('text-sm');
-      expect(trigger).toHaveClass('min-h-[44px]');
+      expect(trigger).toHaveClass('min-h-11');
     });
 
     test('applies lg size classes', () => {
@@ -311,7 +310,7 @@ describe('Tabs Component', () => {
       expect(trigger).toHaveClass('px-5');
       expect(trigger).toHaveClass('py-3');
       expect(trigger).toHaveClass('text-base');
-      expect(trigger).toHaveClass('min-h-[48px]');
+      expect(trigger).toHaveClass('min-h-12');
     });
   });
 
@@ -375,8 +374,6 @@ describe('Tabs Component', () => {
       await waitFor(() => {
         expect(indicator).toHaveStyle({ opacity: '1' });
       });
-
-      const initialLeft = indicator.style.left;
 
       // Click second tab
       await user.click(screen.getByRole('tab', { name: 'Tab 2' }));

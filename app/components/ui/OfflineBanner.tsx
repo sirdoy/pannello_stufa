@@ -110,9 +110,9 @@ export default function OfflineBanner({
   }
 
   const baseClasses = cn(
-    'transition-all duration-300 z-[60]',
+    'z-60 transition-all duration-300',
     'animate-fade-in-up',
-    fixed ? 'fixed top-0 left-0 right-0' : 'relative'
+    fixed ? 'fixed inset-x-0 top-0' : 'relative'
   );
 
   // Reconnected state (success styling)
@@ -130,11 +130,11 @@ export default function OfflineBanner({
         style={{ '--offline-banner-height': '60px' } as React.CSSProperties}
       >
         <div className="flex items-center justify-center gap-2">
-          <Text className="text-white font-medium">
+          <Text className="font-medium text-white">
             Connessione ripristinata
           </Text>
           {typedPendingCommands.length > 0 && (
-            <Text className="text-white/80 text-sm">
+            <Text className="text-sm text-white/80">
               • Sincronizzazione in corso...
             </Text>
           )}
@@ -166,7 +166,7 @@ export default function OfflineBanner({
         style={{ '--offline-banner-height': '60px' } as React.CSSProperties}
       >
         <div className="flex items-center justify-center gap-2">
-          <Text className="text-white font-medium">
+          <Text className="font-medium text-white">
             ✓ {label}
           </Text>
         </div>
@@ -195,16 +195,16 @@ export default function OfflineBanner({
         )}
         style={{ '--offline-banner-height': `${estimatedHeight}px` } as React.CSSProperties}
       >
-        <div className="max-w-6xl mx-auto">
+        <div className="mx-auto max-w-6xl">
           {/* Main offline message */}
           <div className="flex items-start gap-3">
             {/* Icon - subtle informational, NOT alarming */}
-            <div className="flex-shrink-0 text-slate-400">
+            <div className="shrink-0 text-slate-400">
               <WifiOff size={20} strokeWidth={2} aria-hidden="true" />
             </div>
 
             {/* Content */}
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               {/* Title */}
               <Heading
                 level={2}
@@ -218,7 +218,7 @@ export default function OfflineBanner({
               {lastOnlineAt && (
                 <Text
                   size="xs"
-                  className="text-slate-400 mt-0.5"
+                  className="mt-0.5 text-slate-400"
                 >
                   Ultimo aggiornamento:{' '}
                   {formatDistanceToNow(lastOnlineAt, {
@@ -235,7 +235,7 @@ export default function OfflineBanner({
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
                     className={cn(
-                      'flex items-center gap-2 w-full',
+                      'flex w-full items-center gap-2',
                       'text-left',
                       'text-slate-300',
                       'hover:text-slate-200 hover:text-slate-200',
@@ -255,23 +255,23 @@ export default function OfflineBanner({
 
                   {/* Expanded command list */}
                   {isExpanded && (
-                    <div className="mt-2 space-y-2 max-h-[200px] overflow-y-auto">
+                    <div className="mt-2 max-h-50 space-y-2 overflow-y-auto">
                       {typedPendingCommands.map((cmd) => (
                         <div
                           key={cmd.id}
                           className={cn(
                             'flex items-center justify-between gap-3',
-                            'p-2.5 rounded-lg',
+                            'rounded-lg p-2.5',
                             'bg-white/5',
                             'transition-all duration-200'
                           )}
                         >
                           {/* Command info */}
-                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="flex min-w-0 flex-1 items-center gap-2">
                             <span className="text-lg" aria-hidden="true">
                               {cmd.icon}
                             </span>
-                            <div className="flex-1 min-w-0">
+                            <div className="min-w-0 flex-1">
                               <Text
                                 size="sm"
                                 className={cn(
@@ -298,7 +298,7 @@ export default function OfflineBanner({
                             size="sm"
                             onClick={() => cmd.id && cancelCommand(cmd.id)}
                             className={cn(
-                              'flex-shrink-0 h-8 px-3',
+                              'h-8 shrink-0 px-3',
                               'text-slate-300',
                               'border-slate-600/50',
                               'hover:bg-white/10 hover:bg-white/10',

@@ -66,27 +66,27 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
   return (
     <div className="flex items-center justify-between gap-4 rounded-2xl bg-slate-800/50 px-4 py-3">
       {/* Left: icon + name + room */}
-      <div className="flex items-center gap-3 min-w-0">
-        <span className="text-xl flex-shrink-0" aria-hidden="true">
+      <div className="flex min-w-0 items-center gap-3">
+        <span className="shrink-0 text-xl" aria-hidden="true">
           {sensorIcon}
         </span>
         <div className="min-w-0">
-          <p className="text-sm font-medium truncate">{sensor.custom_name ?? sensor.id}</p>
-          <p className="text-xs text-slate-400 truncate">
+          <p className="truncate text-sm font-medium">{sensor.custom_name ?? sensor.id}</p>
+          <p className="truncate text-xs text-slate-400">
             {sensor.room ?? 'Nessuna stanza'}
           </p>
         </div>
       </div>
 
       {/* Right: state + battery + freshness */}
-      <div className="flex items-center gap-3 flex-shrink-0">
+      <div className="flex shrink-0 items-center gap-3">
         {/* Type-specific state */}
         <span className="text-sm">{stateText}</span>
 
         {/* Battery */}
         <span className="flex items-center gap-1 text-xs text-slate-400">
           {showBatteryWarning && (
-            <BatteryLow className="h-4 w-4 text-warning-400" aria-hidden="true" />
+            <BatteryLow className="size-4 text-warning-400" aria-hidden="true" />
           )}
           {batteryText}
         </span>
@@ -94,7 +94,7 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
         {/* Freshness badge */}
         {freshness !== null && (
           <span
-            className={`text-xs px-2 py-0.5 rounded-full ${FRESHNESS_COLORS[freshness]}`}
+            className={`rounded-full px-2 py-0.5 text-xs ${FRESHNESS_COLORS[freshness]}`}
           >
             {freshness}
           </span>

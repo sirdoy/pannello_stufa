@@ -8,7 +8,6 @@ jest.mock('@/lib/pwa/vibration', () => ({
   vibrateShort: jest.fn(),
 }));
 
-import { vibrateShort } from '@/lib/pwa/vibration';
 
 describe('ControlButton Component', () => {
   beforeEach(() => {
@@ -72,60 +71,60 @@ describe('ControlButton Component', () => {
     test('ember variant renders with gradient classes', () => {
       render(<ControlButton variant="ember" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-ember-500');
     });
 
     test('ocean variant renders with ocean gradient', () => {
       render(<ControlButton variant="ocean" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-ocean-500');
     });
 
     test('sage variant renders with sage gradient', () => {
       render(<ControlButton variant="sage" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-sage-500');
     });
 
     test('warning variant renders with warning gradient', () => {
       render(<ControlButton variant="warning" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-warning-500');
     });
 
     test('danger variant renders with danger gradient', () => {
       render(<ControlButton variant="danger" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-gradient-to-br');
+      expect(button).toHaveClass('bg-linear-to-br');
       expect(button).toHaveClass('from-danger-500');
     });
 
     test('subtle variant renders with glass effect', () => {
       render(<ControlButton variant="subtle" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-white/[0.06]');
+      expect(button).toHaveClass('bg-white/6');
     });
 
     test('size sm applies correct min-h class', () => {
       render(<ControlButton size="sm" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-h-[44px]');
+      expect(button).toHaveClass('min-h-11');
     });
 
     test('size md applies correct min-h class', () => {
       render(<ControlButton size="md" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-h-[48px]');
+      expect(button).toHaveClass('min-h-12');
     });
 
     test('size lg applies correct min-h class', () => {
       render(<ControlButton size="lg" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('min-h-[56px]');
+      expect(button).toHaveClass('min-h-14');
     });
 
     test('has touch-manipulation class for mobile optimization', () => {

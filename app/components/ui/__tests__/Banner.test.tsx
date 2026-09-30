@@ -80,35 +80,35 @@ describe('Banner', () => {
     it('applies info variant by default', () => {
       const { container } = render(<Banner title="Info" />);
       const banner = container.firstChild;
-      expect(banner).toHaveClass('bg-ocean-500/[0.15]');
+      expect(banner).toHaveClass('bg-ocean-500/15');
       expect(banner).toHaveClass('border-ocean-500/25');
     });
 
     it('applies warning variant', () => {
       const { container } = render(<Banner title="Warning" variant="warning" />);
       const banner = container.firstChild;
-      expect(banner).toHaveClass('bg-warning-500/[0.15]');
+      expect(banner).toHaveClass('bg-warning-500/15');
       expect(banner).toHaveClass('border-warning-500/25');
     });
 
     it('applies error variant', () => {
       const { container } = render(<Banner title="Error" variant="error" />);
       const banner = container.firstChild;
-      expect(banner).toHaveClass('bg-danger-500/[0.15]');
+      expect(banner).toHaveClass('bg-danger-500/15');
       expect(banner).toHaveClass('border-danger-500/25');
     });
 
     it('applies success variant', () => {
       const { container } = render(<Banner title="Success" variant="success" />);
       const banner = container.firstChild;
-      expect(banner).toHaveClass('bg-sage-500/[0.15]');
+      expect(banner).toHaveClass('bg-sage-500/15');
       expect(banner).toHaveClass('border-sage-500/25');
     });
 
     it('applies ember variant with glow', () => {
       const { container } = render(<Banner title="Ember" variant="ember" />);
       const banner = container.firstChild;
-      expect(banner).toHaveClass('bg-ember-500/[0.15]');
+      expect(banner).toHaveClass('bg-ember-500/15');
       expect(banner).toHaveClass('border-ember-500/25');
       expect(banner).toHaveClass('shadow-ember-glow-sm');
     });
@@ -118,7 +118,7 @@ describe('Banner', () => {
         <Banner title="Invalid" variant={'invalid' as string as BannerProps['variant']} />
       );
       const banner = container.firstChild;
-      expect(banner).toHaveClass('bg-ocean-500/[0.15]');
+      expect(banner).toHaveClass('bg-ocean-500/15');
     });
   });
 
@@ -280,7 +280,7 @@ describe('Banner', () => {
         <Banner title="Merged" variant="warning" className="mt-4" />
       );
       const banner = container.firstChild;
-      expect(banner).toHaveClass('bg-warning-500/[0.15]'); // CVA
+      expect(banner).toHaveClass('bg-warning-500/15'); // CVA
       expect(banner).toHaveClass('mt-4'); // Custom
     });
   });
@@ -351,7 +351,7 @@ describe('Banner', () => {
     });
 
     it('dismiss button icon is aria-hidden for screen readers', () => {
-      const { container } = render(
+      render(
         <Banner title="Test" dismissible />
       );
       const dismissButton = screen.getByLabelText('Dismiss');

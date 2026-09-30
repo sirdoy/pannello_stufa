@@ -29,6 +29,8 @@ export function useFritzTamStatus(options: UseFritzTamStatusOptions = {}): {
   loading: boolean;
   stale: boolean;
 } {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const { paused = false } = options;
 
   const [status, setStatus] = useState<TamStatus | null>(null);
@@ -74,7 +76,6 @@ export function useFritzTamStatus(options: UseFritzTamStatusOptions = {}): {
   // Defensive paused->active re-fetch (Open Question #2 RESOLVED).
   useEffect(() => {
     if (!paused) void fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paused]);
 
   return { status, loading, stale };

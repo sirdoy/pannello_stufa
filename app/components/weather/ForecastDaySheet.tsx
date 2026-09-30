@@ -76,9 +76,9 @@ interface StatCardProps {
  */
 function StatCard({ icon: Icon, iconColor, label, value, subLabel }: StatCardProps) {
   return (
-    <div className="p-4 bg-slate-800/40 rounded-xl ">
-      <div className="flex items-center gap-2 mb-1">
-        <Icon className={`w-4 h-4 ${iconColor}`} />
+    <div className="rounded-xl bg-slate-800/40 p-4 ">
+      <div className="mb-1 flex items-center gap-2">
+        <Icon className={`size-4 ${iconColor}`} />
         <Text variant="tertiary" size="xs">{label}</Text>
       </div>
       <Text size="lg">{value}</Text>
@@ -132,18 +132,18 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
         <Modal.Close />
       </Modal.Header>
       {/* Temperature range - prominent display */}
-      <div className="text-center mb-6">
+      <div className="mb-6 text-center">
         <div className="flex items-center justify-center gap-4">
           <div>
             <Text variant="tertiary" size="xs" className="mb-1">Max</Text>
-            <Text size="xl" className="text-ember-400 text-3xl">
+            <Text size="xl" className="text-3xl text-ember-400">
               {formatTemperature(day.tempMax)}°
             </Text>
           </div>
-          <div className="w-px h-12 bg-slate-700/50 " />
+          <div className="h-12 w-px bg-slate-700/50 " />
           <div>
             <Text variant="tertiary" size="xs" className="mb-1">Min</Text>
-            <Text size="xl" className="text-ocean-400 text-3xl">
+            <Text size="xl" className="text-3xl text-ocean-400">
               {formatTemperature(day.tempMin)}°
             </Text>
           </div>
@@ -151,7 +151,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
       </div>
 
       {/* Condition description with icon */}
-      <div className="text-center mb-6">
+      <div className="mb-6 text-center">
         <WeatherIcon
           code={day.weatherCode}
           size={48}
@@ -190,10 +190,10 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
         />
 
         {/* Precipitation */}
-        <div className="p-4 bg-slate-800/40 rounded-xl ">
-          <div className="flex items-center gap-2 mb-1">
+        <div className="rounded-xl bg-slate-800/40 p-4 ">
+          <div className="mb-1 flex items-center gap-2">
             <Droplets
-              className="w-4 h-4 text-ocean-400"
+              className="size-4 text-ocean-400"
               fill="currentColor"
               strokeWidth={0}
             />
@@ -227,7 +227,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
 
       {/* Sunrise/Sunset - only show if data available */}
       {(day.sunrise || day.sunset) && (
-        <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="mt-4 grid grid-cols-2 gap-4">
           {day.sunrise && (
             <StatCard
               icon={Sunrise}
@@ -249,7 +249,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
 
       {/* Hourly forecast - only for today */}
       {isToday && hourly && (
-        <div className="mt-6 pt-4 border-t border-slate-700/30 ">
+        <div className="mt-6 border-t border-slate-700/30 pt-4 ">
           <Text variant="secondary" size="sm" className="mb-3">
             Previsioni orarie
           </Text>

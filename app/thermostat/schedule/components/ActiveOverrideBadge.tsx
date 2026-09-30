@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Button, Text, ConfirmDialog } from '@/app/components/ui';
+import { Text, ConfirmDialog } from '@/app/components/ui';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { X, Flame, Clock } from 'lucide-react';
 import { format } from 'date-fns';
@@ -30,7 +30,7 @@ export default function ActiveOverrideBadge({
   onCancelled,
 }: ActiveOverrideBadgeProps) {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
-  const [cancelling, setCancelling] = useState<boolean>(false);
+  const [, setCancelling] = useState<boolean>(false);
 
   if (!room || room.mode !== 'manual') {
     return null;
@@ -40,14 +40,6 @@ export default function ActiveOverrideBadge({
   const endDate = room.endtime ? new Date(room.endtime * 1000) : null;
   const now = new Date();
   const remainingMinutes = endDate ? Math.max(0, Math.round((endDate.getTime() - now.getTime()) / 60000)) : null;
-
-  const formatRemaining = (minutes: number | null): string => {
-    if (!minutes) return '';
-    if (minutes < 60) return `${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
-  };
 
   const handleCancel = async (): Promise<void> => {
     try {
@@ -85,12 +77,12 @@ export default function ActiveOverrideBadge({
       <button
         onClick={() => setShowConfirm(true)}
         className="
-          flex items-center gap-3
-          bg-ember-500/20 hover:bg-ember-500/30
+          group flex items-center
+          gap-3 rounded-xl
           border border-ember-500/40
-          rounded-xl px-4 py-3
+          bg-ember-500/20 px-4 py-3
           transition-colors
-          group
+          hover:bg-ember-500/30
         "
       >
         <div className="flex items-center gap-2">
@@ -118,7 +110,7 @@ export default function ActiveOverrideBadge({
 
         <X
           size={16}
-          className="text-slate-400 group-hover:text-ember-400 transition-colors"
+          className="text-slate-400 transition-colors group-hover:text-ember-400"
         />
       </button>
 

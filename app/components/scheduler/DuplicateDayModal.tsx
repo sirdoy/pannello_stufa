@@ -68,10 +68,10 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
     >
       <Card
         variant="glass"
-        className="p-6 animate-scale-in-center"
+        className="animate-scale-in-center p-6"
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <Heading level={2} size="xl">
             Duplica {sourceDay}
           </Heading>
@@ -90,7 +90,7 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
         </Text>
 
         {/* Quick Actions */}
-        <div className="flex gap-2 mb-4">
+        <div className="mb-4 flex gap-2">
           <Button
             variant="subtle"
             size="sm"
@@ -118,11 +118,11 @@ export default function DuplicateDayModal({ isOpen, sourceDay, excludeDays = [],
         </div>
 
         {/* Day Selection */}
-        <div className="space-y-2 mb-6 max-h-[300px] overflow-y-auto">
+        <div className="mb-6 max-h-75 space-y-2 overflow-y-auto">
           {availableDays.map(day => (
             <div
               key={day}
-              className="p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.06] transition-colors"
+              className="rounded-xl bg-white/3 p-3 transition-colors hover:bg-white/6"
             >
               <Checkbox
                 id={`day-${day}`}

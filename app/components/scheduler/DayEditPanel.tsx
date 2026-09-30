@@ -73,14 +73,14 @@ export default function DayEditPanel({
   return (
     <Card variant="glass" className="p-4 md:p-6">
       {/* Header - mobile-first responsive */}
-      <div className="flex flex-col gap-4 mb-6 md:flex-row md:items-center md:justify-between">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         {/* Left: Title + Info */}
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex flex-wrap items-center gap-3">
             <Heading level={3} className="text-2xl">
               {day}
             </Heading>
-            <Text as="span" variant="secondary" size="sm" className="bg-slate-800/60 px-3 py-1 rounded-full">
+            <Text as="span" variant="secondary" size="sm" className="rounded-full bg-slate-800/60 px-3 py-1">
               {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
               {intervals.length > 0 && ` • ${totalHours.toFixed(1)}h`}
             </Text>
@@ -90,11 +90,11 @@ export default function DayEditPanel({
           {saveStatus && (
             <div className="flex items-center">
               {saveStatus.isSaving ? (
-                <Text as="span" size="sm" className="text-blue-400 animate-pulse flex items-center gap-1">
+                <Text as="span" size="sm" className="flex animate-pulse items-center gap-1 text-blue-400">
                   💾 Salvataggio...
                 </Text>
               ) : (
-                <Text as="span" size="sm" className="text-green-400 flex items-center gap-1">
+                <Text as="span" size="sm" className="flex items-center gap-1 text-green-400">
                   ✓ Salvato
                 </Text>
               )}
@@ -103,7 +103,7 @@ export default function DayEditPanel({
         </div>
 
         {/* Right: Action Buttons - icon-only su mobile, con testo su desktop */}
-        <div className="flex gap-2 md:gap-3 self-end md:self-auto">
+        <div className="flex gap-2 self-end md:gap-3 md:self-auto">
           {/* Duplicate button - only if intervals exist */}
           {intervals.length > 0 && onDuplicate && (
             <>
@@ -123,7 +123,7 @@ export default function DayEditPanel({
                 onClick={() => onDuplicate(day)}
                 className="hidden sm:flex"
               >
-                <Copy className="w-4 h-4 mr-2" />
+                <Copy className="mr-2 size-4" />
                 Duplica
               </Button>
             </>
@@ -147,7 +147,7 @@ export default function DayEditPanel({
               onClick={() => onAddInterval(day)}
               className="hidden sm:flex"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="mr-2 size-4" />
               Aggiungi
             </Button>
           </>
@@ -172,8 +172,8 @@ export default function DayEditPanel({
       {/* Intervals list */}
       <div className="space-y-3">
         {intervals.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-5xl mb-4">📭</div>
+          <div className="py-12 text-center">
+            <div className="mb-4 text-5xl">📭</div>
             <Text variant="tertiary" size="lg" className="mb-2">Nessun intervallo configurato per {day}</Text>
             <Text variant="tertiary" size="sm" className="mb-4">Aggiungi il primo intervallo per iniziare</Text>
             <Button

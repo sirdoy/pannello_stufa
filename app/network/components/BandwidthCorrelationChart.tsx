@@ -48,14 +48,14 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const powerLevelValue = payload.find((p) => p.dataKey === 'powerLevel')?.value ?? 0;
 
   return (
-    <div className="bg-slate-900 border border-white/10 rounded-lg p-3 shadow-xl">
+    <div className="rounded-lg border border-white/10 bg-slate-900 p-3 shadow-xl">
       <Text size="xs" className="mb-2">
         {format(label, 'HH:mm:ss')}
       </Text>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" style={{ backgroundColor: '#34d399' }} />
+            <div className="size-2.5 rounded-full bg-emerald-400" style={{ backgroundColor: '#34d399' }} />
             <Text size="xs" variant="secondary">
               Banda:
             </Text>
@@ -66,7 +66,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
         </div>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#ed6f10' }} />
+            <div className="size-2.5 rounded-full" style={{ backgroundColor: '#ed6f10' }} />
             <Text size="xs" variant="secondary">
               Potenza:
             </Text>
@@ -100,7 +100,7 @@ export default function BandwidthCorrelationChart({
   minPoints,
 }: BandwidthCorrelationChartProps) {
   return (
-    <div className="bg-slate-800/30 rounded-2xl p-6">
+    <div className="rounded-2xl bg-slate-800/30 p-6">
       {/* Header */}
       <div className="mb-6">
         <Heading level={2} size="lg">
@@ -110,7 +110,7 @@ export default function BandwidthCorrelationChart({
 
       {/* Empty State: Stove Off */}
       {status === 'stove-off' && (
-        <div className="h-[300px] flex items-center justify-center">
+        <div className="flex h-75 items-center justify-center">
           <Text variant="secondary">
             Stufa spenta — correlazione non disponibile
           </Text>
@@ -119,7 +119,7 @@ export default function BandwidthCorrelationChart({
 
       {/* Collecting State */}
       {status === 'collecting' && (
-        <div className="h-[300px] flex items-center justify-center">
+        <div className="flex h-75 items-center justify-center">
           <Text variant="secondary">
             Raccolta dati: {pointCount}/{minPoints} punti
           </Text>
@@ -128,7 +128,7 @@ export default function BandwidthCorrelationChart({
 
       {/* Insufficient State */}
       {status === 'insufficient' && (
-        <div className="h-[300px] flex items-center justify-center">
+        <div className="flex h-75 items-center justify-center">
           <Text variant="tertiary">
             Dati insufficienti per la correlazione
           </Text>

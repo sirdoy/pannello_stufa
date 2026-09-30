@@ -123,9 +123,9 @@ export default function MaintenancePage() {
 
   return (
     <>
-      <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
+      <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="mb-8 text-center">
           <Heading level={1} size="3xl" className="mb-2">🔧 Manutenzione</Heading>
           <Text variant="tertiary">Configura gli intervalli di pulizia della stufa</Text>
         </div>
@@ -134,23 +134,23 @@ export default function MaintenancePage() {
         <Card variant="glass" className="p-6 sm:p-8">
           <Heading level={2} size="xl" className="mb-4">📊 Stato Attuale</Heading>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/[0.05] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-white/[0.08] ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] before:to-transparent before:pointer-events-none">
-              <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore di Utilizzo</Text>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="shadow-liquid-sm relative overflow-hidden rounded-lg bg-white/5 p-4 ring-1 ring-white/8 backdrop-blur-2xl ring-inset before:pointer-events-none before:absolute before:inset-0 before:bg-linear-to-br before:from-white/8 before:to-transparent">
+              <Text variant="tertiary" size="sm" className="relative z-10 mb-1">Ore di Utilizzo</Text>
               <Heading level={3} size="2xl" className="relative z-10">
                 {formatHoursToHHMM(maintenanceData?.currentHours || 0)}
               </Heading>
             </div>
 
-            <div className="bg-ember-500/[0.15] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-ember-500/30 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-ember-500/[0.20] before:to-transparent before:pointer-events-none">
-              <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore Target</Text>
+            <div className="shadow-liquid-sm relative overflow-hidden rounded-lg bg-ember-500/15 p-4 ring-1 ring-ember-500/30 backdrop-blur-2xl ring-inset before:pointer-events-none before:absolute before:inset-0 before:bg-linear-to-br before:from-ember-500/20 before:to-transparent">
+              <Text variant="tertiary" size="sm" className="relative z-10 mb-1">Ore Target</Text>
               <Heading level={3} size="2xl" variant="ember" className="relative z-10">
                 {formatHoursToHHMM(maintenanceData?.targetHours || 50)}
               </Heading>
             </div>
 
-            <div className="bg-sage-500/[0.15] backdrop-blur-2xl shadow-liquid-sm ring-1 ring-sage-500/30 ring-inset rounded-lg p-4 relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-sage-500/[0.20] before:to-transparent before:pointer-events-none">
-              <Text variant="tertiary" size="sm" className="mb-1 relative z-10">Ore Rimanenti</Text>
+            <div className="shadow-liquid-sm relative overflow-hidden rounded-lg bg-sage-500/15 p-4 ring-1 ring-sage-500/30 backdrop-blur-2xl ring-inset before:pointer-events-none before:absolute before:inset-0 before:bg-linear-to-br before:from-sage-500/20 before:to-transparent">
+              <Text variant="tertiary" size="sm" className="relative z-10 mb-1">Ore Rimanenti</Text>
               <Heading level={3} size="2xl" variant="sage" className="relative z-10">
                 {formatHoursToHHMM(Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)))}
               </Heading>
@@ -158,7 +158,7 @@ export default function MaintenancePage() {
           </div>
 
           {/* Reset Button */}
-          <div className="mt-4 pt-4 border-t border-slate-700">
+          <div className="mt-4 border-t border-slate-700 pt-4">
             <Button
               variant="danger"
               onClick={handleResetRequest}
@@ -170,7 +170,7 @@ export default function MaintenancePage() {
           </div>
 
           {maintenanceData?.lastCleanedAt && (
-            <div className="mt-4 pt-4 border-t border-slate-700">
+            <div className="mt-4 border-t border-slate-700 pt-4">
               <Text variant="tertiary" size="sm">
                 Ultima pulizia: {new Date(maintenanceData.lastCleanedAt).toLocaleDateString('it-IT', {
                   day: '2-digit',
@@ -211,15 +211,15 @@ export default function MaintenancePage() {
             {/* Quick presets */}
             <div>
               <Text variant="secondary" size="sm" className="mb-2">Preselezioni rapide:</Text>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex flex-wrap gap-2">
                 {[25, 50, 75, 100, 150, 200].map((hours) => (
                   <button
                     key={hours}
                     onClick={() => setTargetHours(hours)}
-                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`rounded-lg px-3 py-1 text-sm font-medium transition-all duration-200 ${
                       targetHours === hours
-                        ? 'bg-ember-600 text-white shadow-liquid-sm'
-                        : 'bg-white/[0.08] bg-white/[0.05] backdrop-blur-2xl text-slate-300 hover:bg-white/[0.12] hover:bg-white/[0.08] shadow-liquid-sm ring-1 ring-white/[0.15] ring-white/[0.08] ring-inset'
+                        ? 'shadow-liquid-sm bg-ember-600 text-white'
+                        : 'shadow-liquid-sm bg-white/5 bg-white/8 text-slate-300 ring-1 ring-white/8 ring-white/15 backdrop-blur-2xl ring-inset hover:bg-white/8 hover:bg-white/12'
                     }`}
                     disabled={isSaving}
                   >
@@ -239,7 +239,7 @@ export default function MaintenancePage() {
             </Button>
 
             {saveMessage && (
-              <div className={`p-3 rounded-lg text-sm ${
+              <div className={`rounded-lg p-3 text-sm ${
                 saveMessage.type === 'success'
                   ? 'bg-sage-100 bg-sage-900/30 text-sage-400'
                   : 'bg-ember-100 bg-ember-900/30 text-ember-400'
@@ -251,9 +251,9 @@ export default function MaintenancePage() {
         </Card>
 
         {/* Info Card */}
-        <Card variant="glass" className="p-6 sm:p-8 bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 border-ocean-800">
+        <Card variant="glass" className="border border-ocean-200 border-ocean-800 bg-ocean-50/50 bg-ocean-900/10 p-6 sm:p-8">
           <Heading level={3} variant="subtle" className="mb-2">ℹ️ Come Funziona</Heading>
-          <ul className="space-y-1 list-disc list-inside">
+          <ul className="list-inside list-disc space-y-1">
             <li><Text variant="tertiary" size="sm" as="span">Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</Text></li>
             <li><Text variant="tertiary" size="sm" as="span">Al raggiungimento delle ore impostate, apparirà un banner di richiesta pulizia</Text></li>
             <li><Text variant="tertiary" size="sm" as="span">La stufa non potrà essere accesa (né manualmente né automaticamente) finché non confermi la pulizia</Text></li>

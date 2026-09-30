@@ -15,7 +15,7 @@ import { useUser } from '@/lib/auth/useUser';
 import { Card, Button, Banner, Skeleton, Heading, Text } from '@/app/components/ui';
 import Toggle from '@/app/components/ui/Toggle';
 import { NETATMO_ROUTES } from '@/lib/routes';
-import { getPidConfig, setPidConfig, subscribeToPidConfig } from '@/lib/services/pidAutomationService';
+import { setPidConfig, subscribeToPidConfig } from '@/lib/services/pidAutomationService';
 import { PIDController } from '@/lib/utils/pidController';
 
 interface RoomData {
@@ -47,12 +47,12 @@ function RoomSelector({ rooms, selectedRoomId, onChange, disabled }: RoomSelecto
         onChange={(e) => onChange(e.target.value || null)}
         disabled={disabled}
         aria-label="Stanza da monitorare"
-        className="w-full px-4 py-3 rounded-xl bg-slate-800/60 
-                   border border-white/10 
+        className="w-full rounded-xl border border-white/10 bg-slate-800/60
+                   px-4 py-3
                    text-white 
-                   focus:ring-2 focus:ring-ember-500/50 focus:border-ember-500
-                   disabled:opacity-50 disabled:cursor-not-allowed
-                   transition-all"
+                   transition-all focus:border-ember-500 focus:ring-2
+                   focus:ring-ember-500/50 disabled:cursor-not-allowed
+                   disabled:opacity-50"
       >
         <option value="">Seleziona stanza...</option>
         {rooms.map((room) => (
@@ -117,12 +117,12 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
           onChange={handleSliderChange}
           disabled={disabled}
           aria-label="Setpoint target"
-          className="w-full h-2 rounded-lg appearance-none cursor-pointer
+          className="h-2 w-full cursor-pointer appearance-none rounded-lg
                      bg-slate-700 
                      accent-ember-500
-                     disabled:opacity-50 disabled:cursor-not-allowed"
+                     disabled:cursor-not-allowed disabled:opacity-50"
         />
-        <div className="flex justify-between mt-1">
+        <div className="mt-1 flex justify-between">
           <Text variant="tertiary" size="xs">{MIN_TEMP}°C</Text>
           <Text variant="tertiary" size="xs">{MAX_TEMP}°C</Text>
         </div>
@@ -134,11 +134,11 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
           type="button"
           onClick={handleDecrement}
           disabled={disabled || value <= MIN_TEMP}
-          className="w-10 h-10 rounded-full bg-slate-700/60 
+          className="size-10 rounded-full bg-slate-700/60 text-xl
+                     font-bold
                      text-white 
-                     hover:bg-slate-600 
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors text-xl font-bold"
+                     transition-colors hover:bg-slate-600
+                     disabled:cursor-not-allowed disabled:opacity-50"
         >
           −
         </button>
@@ -152,15 +152,15 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
             onChange={handleInputChange}
             disabled={disabled}
             aria-label="Setpoint target in gradi"
-            className="w-24 px-3 py-2 text-center text-2xl font-bold rounded-xl
-                       bg-slate-800/60 
-                       border border-ember-500/50
-                       text-ember-400 
-                       focus:ring-2 focus:ring-ember-500/50
-                       disabled:opacity-50 disabled:cursor-not-allowed
-                       [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            className="w-24 [appearance:textfield] rounded-xl border border-ember-500/50 bg-slate-800/60 px-3
+                       py-2
+                       text-center text-2xl
+                       font-bold
+                       text-ember-400 focus:ring-2
+                       focus:ring-ember-500/50 disabled:cursor-not-allowed
+                       disabled:opacity-50 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
           />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-ember-400/60 text-sm">
+          <span className="absolute top-1/2 right-3 -translate-y-1/2 text-sm text-ember-400/60">
             °C
           </span>
         </div>
@@ -168,11 +168,11 @@ function ManualSetpointInput({ value, onChange, disabled }: ManualSetpointInputP
           type="button"
           onClick={handleIncrement}
           disabled={disabled || value >= MAX_TEMP}
-          className="w-10 h-10 rounded-full bg-slate-700/60 
+          className="size-10 rounded-full bg-slate-700/60 text-xl
+                     font-bold
                      text-white 
-                     hover:bg-slate-600 
-                     disabled:opacity-50 disabled:cursor-not-allowed
-                     transition-colors text-xl font-bold"
+                     transition-colors hover:bg-slate-600
+                     disabled:cursor-not-allowed disabled:opacity-50"
         >
           +
         </button>
@@ -236,7 +236,7 @@ function PidPowerPreview({ powerLevel }: PidPowerPreviewProps) {
   if (powerLevel == null) return null;
 
   return (
-    <div className={`mt-4 p-4 rounded-xl border ${POWER_BG_COLORS[powerLevel]}`}>
+    <div className={`mt-4 rounded-xl border p-4 ${POWER_BG_COLORS[powerLevel]}`}>
       <Text variant="secondary" size="sm" className="mb-2">
         Potenza boost calcolata dal PID
       </Text>
@@ -284,7 +284,7 @@ interface TemperatureDisplayProps {
 function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }: TemperatureDisplayProps) {
   if (!room) {
     return (
-      <div className="p-4 rounded-xl bg-white/[0.04] ] backdrop-blur-sm border border-white/10">
+      <div className="] rounded-xl border border-white/10 bg-white/4 p-4 backdrop-blur-sm">
         <Text variant="tertiary" size="sm">
           Seleziona una stanza per vedere la temperatura
         </Text>
@@ -299,7 +299,7 @@ function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }: TemperatureDis
   const previewPower = computePidPreview(room.temperature, targetSetpoint, kp, ki, kd);
 
   return (
-    <div className="p-4 rounded-xl bg-white/[0.04] ] backdrop-blur-sm border border-white/10">
+    <div className="] rounded-xl border border-white/10 bg-white/4 p-4 backdrop-blur-sm">
       <div className="flex items-center justify-between">
         <div>
           <Text variant="secondary" size="sm">Temperatura attuale</Text>
@@ -315,7 +315,7 @@ function TemperatureDisplay({ room, manualSetpoint, kp, ki, kd }: TemperatureDis
         </div>
       </div>
       {room.temperature && targetSetpoint && (
-        <div className="mt-3 pt-3 border-t border-white/10">
+        <div className="mt-3 border-t border-white/10 pt-3">
           <Text variant="tertiary" size="xs">
             Differenza: {(targetSetpoint - room.temperature).toFixed(1)}°C
             {room.temperature < targetSetpoint
@@ -354,11 +354,11 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="border border-white/10 rounded-xl overflow-hidden">
+    <div className="overflow-hidden rounded-xl border border-white/10">
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center justify-between bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
+        className="flex w-full items-center justify-between bg-white/2 px-4 py-3 transition-colors hover:bg-white/4"
       >
         <Text size="sm">
           Impostazioni avanzate (PID)
@@ -367,7 +367,7 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
       </button>
 
       {expanded && (
-        <div className="p-4 space-y-4 border-t border-white/10">
+        <div className="space-y-4 border-t border-white/10 p-4">
           <Text variant="tertiary" size="xs">
             Modifica i guadagni PID solo se sai cosa stai facendo.
             Valori errati possono causare oscillazioni o instabilita.
@@ -375,7 +375,7 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
 
           <div className="grid grid-cols-3 gap-4">
             <div>
-              <label className="block mb-1">
+              <label className="mb-1 block">
                 <Text variant="secondary" size="xs">Kp (Proporzionale)</Text>
               </label>
               <input
@@ -386,15 +386,15 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
                 value={kp}
                 onChange={(e) => onChange('kp', parseFloat(e.target.value) || 0)}
                 disabled={disabled}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 
-                           border border-white/10 
-                           text-white text-sm
+                className="w-full rounded-lg border border-white/10 bg-slate-800/60
+                           px-3 py-2
+                           text-sm text-white
                            focus:ring-2 focus:ring-ember-500/50
                            disabled:opacity-50"
               />
             </div>
             <div>
-              <label className="block mb-1">
+              <label className="mb-1 block">
                 <Text variant="secondary" size="xs">Ki (Integrale)</Text>
               </label>
               <input
@@ -405,15 +405,15 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
                 value={ki}
                 onChange={(e) => onChange('ki', parseFloat(e.target.value) || 0)}
                 disabled={disabled}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 
-                           border border-white/10 
-                           text-white text-sm
+                className="w-full rounded-lg border border-white/10 bg-slate-800/60
+                           px-3 py-2
+                           text-sm text-white
                            focus:ring-2 focus:ring-ember-500/50
                            disabled:opacity-50"
               />
             </div>
             <div>
-              <label className="block mb-1">
+              <label className="mb-1 block">
                 <Text variant="secondary" size="xs">Kd (Derivativo)</Text>
               </label>
               <input
@@ -424,9 +424,9 @@ function AdvancedSettings({ kp, ki, kd, onChange, disabled }: AdvancedSettingsPr
                 value={kd}
                 onChange={(e) => onChange('kd', parseFloat(e.target.value) || 0)}
                 disabled={disabled}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800/60 
-                           border border-white/10 
-                           text-white text-sm
+                className="w-full rounded-lg border border-white/10 bg-slate-800/60
+                           px-3 py-2
+                           text-sm text-white
                            focus:ring-2 focus:ring-ember-500/50
                            disabled:opacity-50"
               />
@@ -627,7 +627,7 @@ export default function PidAutomationPanel() {
     <Card variant="glass" className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <Heading level={2} size="xl" className="flex items-center gap-2 mb-2">
+        <Heading level={2} size="xl" className="mb-2 flex items-center gap-2">
           <span>🎯</span>
           <span>Automazione PID Stufa-Termostato</span>
         </Heading>
@@ -653,7 +653,7 @@ export default function PidAutomationPanel() {
       )}
 
       {/* Master Toggle */}
-      <div className="mb-6 p-4 rounded-xl bg-white/[0.05] ] backdrop-blur-xl border border-white/5 ">
+      <div className="] mb-6 rounded-xl border border-white/5 bg-white/5 p-4 backdrop-blur-xl ">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <Text className="mb-1">
@@ -687,7 +687,7 @@ export default function PidAutomationPanel() {
           </div>
 
           {/* Manual Setpoint Input */}
-          <div className="mb-6 p-4 rounded-xl bg-white/[0.04] ] backdrop-blur-sm border border-ember-500/30">
+          <div className="] mb-6 rounded-xl border border-ember-500/30 bg-white/4 p-4 backdrop-blur-sm">
             <ManualSetpointInput
               value={manualSetpoint}
               onChange={handleSetpointChange}
@@ -736,11 +736,11 @@ export default function PidAutomationPanel() {
       )}
 
       {/* Help Info */}
-      <div className="mt-6 p-4 bg-slate-800/40 rounded-xl ">
+      <div className="mt-6 rounded-xl bg-slate-800/40 p-4 ">
         <Text variant="secondary" size="sm" className="mb-2">
           Come funziona
         </Text>
-        <ul className="space-y-1 ml-4">
+        <ul className="ml-4 space-y-1">
           <li>
             <Text variant="tertiary" size="xs">
               Quando abilitato e la stufa e in modalita automatica:

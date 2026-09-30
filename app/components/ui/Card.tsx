@@ -20,8 +20,8 @@ export const cardVariants = cva(
   [
     'rounded-2xl',
     'transition-all',
-    'duration-[var(--duration-smooth)]',
-    'ease-[var(--ease-move)]',
+    'duration-(--duration-smooth)',
+    'ease-(--ease-move)',
     'relative',
     'overflow-hidden',
   ],
@@ -29,33 +29,33 @@ export const cardVariants = cva(
     variants: {
       variant: {
         default: [
-          'bg-slate-900/80 border border-white/[0.06] shadow-card backdrop-blur-xl',
+          'border border-white/6 bg-slate-900/80 shadow-card backdrop-blur-xl',
           ' ]',
           ',0,0,0.08)]',
         ],
         elevated: [
-          'bg-slate-850/90 border border-white/[0.08] shadow-card-elevated backdrop-blur-xl',
+          'border border-white/8 bg-slate-850/90 shadow-card-elevated backdrop-blur-xl',
           ' ]',
           ',0,0,0.12)]',
         ],
         subtle: [
-          'bg-white/[0.03] border border-white/[0.04]',
+          'border border-white/4 bg-white/3',
           '] ]',
         ],
         outlined: [
-          'bg-transparent border border-white/[0.12]',
+          'border border-white/12 bg-transparent',
           ']',
         ],
         glass: [
-          'bg-slate-900/70 border border-white/[0.08] shadow-card backdrop-blur-2xl backdrop-saturate-150',
+          'border border-white/8 bg-slate-900/70 shadow-card backdrop-blur-2xl backdrop-saturate-150',
           ' ]',
         ],
       },
       hover: {
         true: [
-          'hover:shadow-card-hover hover:-translate-y-0.5 cursor-pointer',
-          'hover:border-white/[0.1]',
-          'hover:ease-[var(--ease-spring-subtle)]',
+          'cursor-pointer hover:-translate-y-0.5 hover:shadow-card-hover',
+          'hover:border-white/10',
+          'hover:ease-spring-subtle',
           ',0,0,0.15)]',
           ']',
         ],
@@ -63,7 +63,7 @@ export const cardVariants = cva(
       },
       glow: {
         true: [
-          'shadow-ember-glow border-ember-500/20',
+          'border-ember-500/20 shadow-ember-glow',
           ',111,16,0.12)]',
         ],
         false: [],
@@ -113,7 +113,7 @@ const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
     return (
       <div
         ref={ref}
-        className={cn('flex items-center justify-between mb-4', className)}
+        className={cn('mb-4 flex items-center justify-between', className)}
         {...props}
       >
         {children}
@@ -170,7 +170,7 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
       <div
         ref={ref}
         className={cn(
-          'mt-5 pt-4 border-t border-white/[0.06]',
+          'mt-5 border-t border-white/6 pt-4',
           ']',
           className
         )}
@@ -193,7 +193,7 @@ const CardDivider = forwardRef<HTMLDivElement, CardDividerProps>(
       <div
         ref={ref}
         className={cn(
-          'h-px my-4 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent',
+          'my-4 h-px bg-linear-to-r from-transparent via-white/8 to-transparent',
           ']',
           className
         )}

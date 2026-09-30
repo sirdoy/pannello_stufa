@@ -29,21 +29,21 @@ function HourlyCard({ time, weatherCode, temperature, precipProbability }: Hourl
   const formattedTime = time ? time.split('T')[1]?.substring(0, 5) : '--:--';
 
   return (
-    <div className="flex flex-col items-center p-3 bg-slate-800/40 rounded-xl min-w-[70px] ">
+    <div className="flex min-w-[70px] flex-col items-center rounded-xl bg-slate-800/40 p-3 ">
       <Text variant="tertiary" size="xs" className="mb-2">
         {formattedTime}
       </Text>
       <WeatherIcon
         code={weatherCode ?? 0}
         size={24}
-        className="text-ocean-400 mb-2"
+        className="mb-2 text-ocean-400"
       />
       <Text size="sm">
         {formatTemperature(temperature)}°
       </Text>
       {precipProbability !== null && precipProbability !== undefined && precipProbability > 0 && (
-        <div className="flex items-center gap-1 mt-1">
-          <Droplets className="w-3 h-3 text-ocean-400" />
+        <div className="mt-1 flex items-center gap-1">
+          <Droplets className="size-3 text-ocean-400" />
           <Text variant="tertiary" size="xs">{precipProbability}%</Text>
         </div>
       )}
@@ -115,7 +115,7 @@ export function HourlyForecast({ hourly, maxHours = 12 }: HourlyForecastProps) {
   }
 
   return (
-    <div className="overflow-x-auto -mx-4 px-4">
+    <div className="-mx-4 overflow-x-auto px-4">
       <div className="flex gap-2 pb-2">
         {displayTimes.map((time, index) => (
           <HourlyCard

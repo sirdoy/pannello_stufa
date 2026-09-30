@@ -55,7 +55,7 @@ export default function OfflinePage() {
   const [thermostatState, setThermostatState] = useState<FormattedThermostatState | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const { isOnline, wasOffline } = useOnlineStatus();
+  const { isOnline } = useOnlineStatus();
   const { pendingCommands, hasPendingCommands } = useBackgroundSync();
 
   // Load cached states
@@ -96,9 +96,9 @@ export default function OfflinePage() {
   // If back online, show reconnecting message
   if (isOnline) {
     return (
-      <div className="max-w-2xl mx-auto py-12">
+      <div className="mx-auto max-w-2xl py-12">
         <Card className="p-8 text-center">
-          <Text className="text-6xl mb-4">🌐</Text>
+          <Text className="mb-4 text-6xl">🌐</Text>
           <Heading level={1} size="2xl" className="mb-4">
             Connessione ripristinata
           </Heading>
@@ -106,7 +106,7 @@ export default function OfflinePage() {
             Reindirizzamento alla home...
           </Text>
           <div className="animate-pulse">
-            <div className="h-2 bg-ember-500/30 rounded-full w-48 mx-auto" />
+            <div className="mx-auto h-2 w-48 rounded-full bg-ember-500/30" />
           </div>
         </Card>
       </div>
@@ -116,7 +116,7 @@ export default function OfflinePage() {
   const hasCachedData = stoveState || thermostatState;
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
+    <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
       {/* Offline Banner */}
       <Banner
         variant="warning"
@@ -147,7 +147,7 @@ export default function OfflinePage() {
             {(pendingCommands as PendingCommand[]).slice(0, 3).map((cmd) => (
               <div
                 key={cmd.id}
-                className="flex items-center gap-2 p-2 rounded-lg bg-white/[0.02]"
+                className="flex items-center gap-2 rounded-lg bg-white/2 p-2"
               >
                 <Text>{cmd.icon}</Text>
                 <Text size="sm" className="flex-1">{cmd.label}</Text>
@@ -167,8 +167,8 @@ export default function OfflinePage() {
       {loading && (
         <Card className="p-8 text-center">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-slate-700 rounded w-1/2 mx-auto" />
-            <div className="h-4 bg-slate-700 rounded w-3/4 mx-auto" />
+            <div className="mx-auto h-8 w-1/2 rounded bg-slate-700" />
+            <div className="mx-auto h-4 w-3/4 rounded bg-slate-700" />
           </div>
         </Card>
       )}
@@ -176,7 +176,7 @@ export default function OfflinePage() {
       {/* No Cached Data */}
       {!loading && !hasCachedData && (
         <Card className="p-8 text-center">
-          <Text className="text-6xl mb-4">📦</Text>
+          <Text className="mb-4 text-6xl">📦</Text>
           <Heading level={2} size="xl" className="mb-4">
             Nessun dato memorizzato
           </Heading>
@@ -196,7 +196,7 @@ export default function OfflinePage() {
       {/* Cached Stove State */}
       {!loading && stoveState && (
         <Card className="p-5">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Text className="text-3xl">🔥</Text>
               <div>
@@ -214,9 +214,9 @@ export default function OfflinePage() {
           </div>
 
           {/* Temperature Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Room Temperature */}
-            <div className="text-center p-3 rounded-lg bg-white/[0.02]">
+            <div className="rounded-lg bg-white/2 p-3 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Ambiente
               </Text>
@@ -228,7 +228,7 @@ export default function OfflinePage() {
             </div>
 
             {/* Setpoint */}
-            <div className="text-center p-3 rounded-lg bg-white/[0.02]">
+            <div className="rounded-lg bg-white/2 p-3 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Target
               </Text>
@@ -240,7 +240,7 @@ export default function OfflinePage() {
             </div>
 
             {/* Exhaust Temperature */}
-            <div className="text-center p-3 rounded-lg bg-white/[0.02]">
+            <div className="rounded-lg bg-white/2 p-3 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Fumi
               </Text>
@@ -267,7 +267,7 @@ export default function OfflinePage() {
 
           {/* Stale Data Warning */}
           {stoveState.isStale && (
-            <div className="mt-4 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <div className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-2">
               <Text size="xs" className="text-amber-400">
                 ⚠️ Dati memorizzati {stoveState.ageMinutes} minuti fa.
                 Lo stato attuale potrebbe essere diverso.
@@ -280,7 +280,7 @@ export default function OfflinePage() {
       {/* Cached Thermostat State */}
       {!loading && thermostatState && (
         <Card className="p-5">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Text className="text-3xl">🌡️</Text>
               <div>
@@ -298,7 +298,7 @@ export default function OfflinePage() {
           {/* Temperature Display */}
           <div className="grid grid-cols-2 gap-4">
             {/* Current Temperature */}
-            <div className="text-center p-4 rounded-lg bg-white/[0.02]">
+            <div className="rounded-lg bg-white/2 p-4 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 {thermostatState.roomName || 'Temperatura'}
               </Text>
@@ -315,7 +315,7 @@ export default function OfflinePage() {
             </div>
 
             {/* Setpoint */}
-            <div className="text-center p-4 rounded-lg bg-white/[0.02]">
+            <div className="rounded-lg bg-white/2 p-4 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Target
               </Text>
@@ -334,7 +334,7 @@ export default function OfflinePage() {
 
           {/* Stale Data Warning */}
           {thermostatState.isStale && (
-            <div className="mt-4 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20">
+            <div className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-2">
               <Text size="xs" className="text-amber-400">
                 ⚠️ Dati memorizzati {thermostatState.ageMinutes} minuti fa.
               </Text>

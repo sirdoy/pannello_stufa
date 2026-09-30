@@ -126,7 +126,7 @@ export default function CallHistoryTable({
   onPageChange,
 }: CallHistoryTableProps) {
   if (loading && calls.length === 0 && totalCount === 0 && !error) {
-    return <Skeleton className="h-[520px] rounded-2xl" />;
+    return <Skeleton className="h-130 rounded-2xl" />;
   }
 
   const columns: ColumnDef<CallRecord>[] = [
@@ -184,7 +184,7 @@ export default function CallHistoryTable({
   const isLastPage = (page + 1) * PAGE_SIZE >= totalCount;
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <History size={20} aria-hidden="true" className="text-ember-400" />
@@ -221,7 +221,7 @@ export default function CallHistoryTable({
 
       {/* Pagination footer (only when there are results) */}
       {!error && totalCount > 0 && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 border-t border-white/[0.06] pt-4">
+        <div className="flex flex-col items-start justify-between gap-2 border-t border-white/6 pt-4 sm:flex-row sm:items-center sm:gap-0">
           <Text variant="secondary" size="sm">
             Mostra {offset + 1}–{rangeEnd} di {totalCount}
           </Text>

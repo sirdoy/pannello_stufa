@@ -42,13 +42,13 @@ export const dotVariants = cva(
       status: {
         online: 'bg-sage-500 ',
         offline: 'bg-slate-500 ',
-        connecting: 'bg-warning-500 animate-pulse ',
+        connecting: 'animate-pulse bg-warning-500 ',
         unknown: 'bg-slate-400 ',
       },
       size: {
-        sm: 'w-1.5 h-1.5',
-        md: 'w-2 h-2',
-        lg: 'w-2.5 h-2.5',
+        sm: 'size-1.5',
+        md: 'size-2',
+        lg: 'size-2.5',
       },
     },
     defaultVariants: {

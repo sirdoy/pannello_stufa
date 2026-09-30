@@ -44,7 +44,7 @@ export default function CorrelationInsight({
   }
 
   return (
-    <div className="bg-slate-800/30 rounded-2xl p-4">
+    <div className="rounded-2xl bg-slate-800/30 p-4">
       {/* Insight Description */}
       <div className="mb-2">
         <Text className={textColorClass}>

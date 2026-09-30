@@ -37,8 +37,8 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
 
       {/* Fan Control */}
       <Card variant="glass" className="overflow-hidden">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ocean-900/50 flex items-center justify-center border-2 border-ocean-500/50">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex size-10 items-center justify-center rounded-xl border-2 border-ocean-500/50 bg-ocean-900/50 sm:size-12">
             <span className="text-xl sm:text-2xl">💨</span>
           </div>
           <Heading level={3} size="lg">
@@ -46,7 +46,7 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
           </Heading>
         </div>
 
-        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
           <ControlButton
             type="decrement"
             variant="subtle"
@@ -58,7 +58,7 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
               Livello
             </Text>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl sm:text-6xl font-black text-ocean-400">
+              <span className="text-5xl font-black text-ocean-400 sm:text-6xl">
                 {fanLevel ?? '-'}
               </span>
               <span className="text-xl font-bold text-slate-500">/6</span>
@@ -75,8 +75,8 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
 
       {/* Power Control */}
       <Card variant="glass" className="overflow-hidden">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-ember-900/50 flex items-center justify-center border-2 border-ember-500/50">
+        <div className="mb-5 flex items-center gap-3">
+          <div className="flex size-10 items-center justify-center rounded-xl border-2 border-ember-500/50 bg-ember-900/50 sm:size-12">
             <span className="text-xl sm:text-2xl">⚡</span>
           </div>
           <Heading level={3} size="lg">
@@ -84,7 +84,7 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
           </Heading>
         </div>
 
-        <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-center">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
           <ControlButton
             type="decrement"
             variant="ember"
@@ -96,7 +96,7 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
               Livello
             </Text>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl sm:text-6xl font-black text-ember-400">
+              <span className="text-5xl font-black text-ember-400 sm:text-6xl">
                 {powerLevel ?? '-'}
               </span>
               <span className="text-xl font-bold text-slate-500">/5</span>

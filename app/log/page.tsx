@@ -162,9 +162,9 @@ export default function LogPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+    <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       {/* Header */}
-      <div className="text-center mb-8">
+      <div className="mb-8 text-center">
         <Heading level={1} size="3xl" className="mb-2">📋 Storico Azioni</Heading>
         <Text variant="secondary">Tutte le azioni registrate nel sistema</Text>
       </div>

@@ -13,7 +13,6 @@ import { useUser } from '@/lib/auth/useUser';
 // @ts-expect-error - No type definitions available
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences';
 import {
-  updatePreferenceSection,
   DEFAULT_PREFERENCES,
   NOTIFICATION_CATEGORIES_CONFIG,
 } from '@/lib/notifications/notificationPreferencesService';
@@ -146,7 +145,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
 
   return (
     <Card variant="glass" className="p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <div>
           <Heading level={3} size="md" className="flex items-center gap-2">
             <span>{config.icon}</span>
@@ -158,7 +157,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
         </div>
       </div>
 
-      <div className="border-t border-slate-700/50 mt-4">
+      <div className="mt-4 border-t border-slate-700/50">
         {/* Master Toggle */}
         {masterField && (
           <PreferenceToggle
@@ -172,7 +171,7 @@ function CategorySection({ categoryId, config, preferences, onSave, isSaving }: 
 
         {/* Sub fields (only visible when master is enabled) */}
         {isEnabled && subFields.length > 0 && (
-          <div className="ml-4 pl-4 border-l-2 border-slate-700/50 space-y-1">
+          <div className="ml-4 space-y-1 border-l-2 border-slate-700/50 pl-4">
             {subFields.map((field) => (
               <PreferenceToggle
                 key={field.key}

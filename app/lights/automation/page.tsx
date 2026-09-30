@@ -44,7 +44,7 @@ export default function AutomationPage() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
         <Button
@@ -65,9 +65,9 @@ export default function AutomationPage() {
       </div>
 
       {/* Coming Soon Notice */}
-      <Card className="p-8 mb-8 bg-gradient-to-br from-ocean-50 to-ocean-100 from-ocean-900/20 to-ocean-800/20 border-2 border-ocean-300 border-ocean-700">
+      <Card className="mb-8 border-2 border-ocean-300 border-ocean-700 bg-linear-to-br from-ocean-50 from-ocean-900/20 to-ocean-100 to-ocean-800/20 p-8">
         <div className="flex flex-col items-center text-center">
-          <div className="text-6xl mb-4">🚧</div>
+          <div className="mb-4 text-6xl">🚧</div>
           <Heading level={2} size="lg" className="mb-2">
             Funzionalità in Arrivo - Fase 2
           </Heading>
@@ -96,13 +96,13 @@ export default function AutomationPage() {
         <Heading level={2} size="md" className="mb-4">
           Funzionalità Pianificate
         </Heading>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {futureFeatures.map((feature, index) => (
             <Card
               key={index}
-              className="p-6 opacity-60 hover:opacity-100 transition-opacity"
+              className="p-6 opacity-60 transition-opacity hover:opacity-100"
             >
-              <div className="text-4xl mb-3">{feature.icon}</div>
+              <div className="mb-3 text-4xl">{feature.icon}</div>
               <Heading level={3} size="sm" className="mb-2">
                 {feature.title}
               </Heading>
@@ -127,19 +127,19 @@ export default function AutomationPage() {
             </Text>
             <ul className="space-y-2 text-sm">
               <li className="flex items-start gap-2">
-                <span className="text-sage-500 font-bold">✓</span>
+                <span className="font-bold text-sage-500">✓</span>
                 <Text variant="secondary" size="sm" as="span">Controllo manuale di tutte le luci e stanze</Text>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-sage-500 font-bold">✓</span>
+                <span className="font-bold text-sage-500">✓</span>
                 <Text variant="secondary" size="sm" as="span">Attivazione rapida delle scene create nell&apos;app Philips Hue</Text>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-sage-500 font-bold">✓</span>
+                <span className="font-bold text-sage-500">✓</span>
                 <Text variant="secondary" size="sm" as="span">Regolazione luminosità e colore per ogni stanza</Text>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-warning-500 font-bold">⏳</span>
+                <span className="font-bold text-warning-500">⏳</span>
                 <Text variant="secondary" size="sm" as="span">Usa l&apos;app ufficiale Philips Hue per automazioni avanzate temporanee</Text>
               </li>
             </ul>

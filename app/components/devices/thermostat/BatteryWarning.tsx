@@ -162,10 +162,10 @@ export function BatteryBadge({ batteryState, showLabel = false }: BatteryBadgePr
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
         isCritical
-          ? 'bg-danger-900/40 text-danger-300 border border-danger-500/40'
-          : 'bg-warning-900/40 text-warning-300 border border-warning-500/40'
+          ? 'border border-danger-500/40 bg-danger-900/40 text-danger-300'
+          : 'border border-warning-500/40 bg-warning-900/40 text-warning-300'
       }`}
     >
       <span>{icon}</span>
@@ -201,7 +201,7 @@ export function ModuleBatteryList({ modules = [] }: ModuleBatteryListProps) {
         {batteryModules.map(module => (
           <div
             key={module.id}
-            className="flex items-center justify-between py-1.5 px-2 rounded-lg bg-slate-800/30"
+            className="flex items-center justify-between rounded-lg bg-slate-800/30 px-2 py-1.5"
           >
             <div className="flex items-center gap-2">
               <span className="text-sm">
@@ -217,7 +217,7 @@ export function ModuleBatteryList({ modules = [] }: ModuleBatteryListProps) {
               )}
               {!module.reachable && (
                 <span
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-700/40 text-slate-400 border border-slate-600/40"
+                  className="inline-flex items-center gap-1 rounded-full border border-slate-600/40 bg-slate-700/40 px-2 py-0.5 text-xs font-medium text-slate-400"
                 >
                   Offline
                 </span>

@@ -55,9 +55,9 @@ export default function TimeBar({
   };
 
   return (
-    <div className="relative w-full mb-8">
+    <div className="relative mb-8 w-full">
       {/* Barra base */}
-      <div className="relative h-8 w-full bg-neutral-200/80 backdrop-blur-sm rounded-xl overflow-hidden shadow-liquid-sm ring-1 ring-neutral-300/50 ring-inset">
+      <div className="shadow-liquid-sm relative h-8 w-full overflow-hidden rounded-xl bg-neutral-200/80 ring-1 ring-neutral-300/50 backdrop-blur-sm ring-inset">
         {intervals.map((range, idx) => {
           const [startH, startM] = range.start.split(':').map(Number);
           const [endH, endM] = range.end.split(':').map(Number);
@@ -73,10 +73,10 @@ export default function TimeBar({
               role="button"
               aria-label={`Intervallo ${range.start} - ${range.end}, potenza ${range.power}, ventola ${range.fan}`}
               tabIndex={0}
-              className={`absolute top-0 bottom-0 transition-all duration-200 cursor-pointer ${
+              className={`absolute inset-y-0 cursor-pointer transition-all duration-200 ${
                 isActive
-                  ? 'bg-gradient-to-r from-primary-500 to-accent-600 scale-y-110 z-10 shadow-lg'
-                  : 'bg-gradient-to-r from-primary-400 to-accent-500 hover:from-primary-500 hover:to-accent-600'
+                  ? 'z-10 scale-y-110 bg-linear-to-r from-primary-500 to-accent-600 shadow-lg'
+                  : 'bg-linear-to-r from-primary-400 to-accent-500 hover:from-primary-500 hover:to-accent-600'
               } ${isMobile ? 'active:scale-y-115' : ''}`}
               style={{ left: `${left}%`, width: `${width}%` }}
               onMouseEnter={!isMobile ? (e) => handleMouseEnter(idx, range, e) : undefined}
@@ -106,14 +106,14 @@ export default function TimeBar({
       {/* Tooltip - nascosto su mobile e se intervallo è selezionato */}
       {tooltipData && selectedIndex === null && !isMobile && (
         <div
-          className="fixed z-[9000] bg-neutral-900/95 backdrop-blur-3xl text-white text-xs font-semibold px-3 py-2 rounded-lg shadow-liquid-xl ring-1 ring-white/10 ring-inset pointer-events-none relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-br before:from-white/[0.08] before:to-transparent before:pointer-events-none"
+          className="shadow-liquid-xl pointer-events-none fixed relative z-9000 overflow-hidden rounded-lg bg-neutral-900/95 px-3 py-2 text-xs font-semibold text-white ring-1 ring-white/10 backdrop-blur-3xl ring-inset before:pointer-events-none before:absolute before:inset-0 before:bg-linear-to-br before:from-white/8 before:to-transparent"
           style={{
             left: `${tooltipData.x}px`,
             top: `${tooltipData.y}px`,
             transform: 'translate(-50%, -100%)',
           }}
         >
-          <div className="space-y-1 relative z-10">
+          <div className="relative z-10 space-y-1">
             <div>⏰ {tooltipData.range.start} - {tooltipData.range.end}</div>
             <div className="flex gap-3">
               <span>⚡ Potenza: {tooltipData.range.power}</span>
@@ -121,15 +121,15 @@ export default function TimeBar({
             </div>
           </div>
           {/* Freccia del tooltip */}
-          <div className="absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-full z-10">
-            <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-neutral-900/95"></div>
+          <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-full transform">
+            <div className="size-0 border-x-4 border-t-4 border-transparent border-t-neutral-900/95"></div>
           </div>
         </div>
       )}
 
       {/* Etichette orari sopra/sotto - nascosti su mobile molto piccolo */}
       {intervals.length > 0 && (
-        <div className="relative w-full hidden xs:block">
+        <div className="xs:block relative hidden w-full">
           {intervals.map((range, idx) => {
             const [startH, startM] = range.start.split(':').map(Number);
             const [endH, endM] = range.end.split(':').map(Number);
@@ -140,13 +140,13 @@ export default function TimeBar({
             return (
               <div key={idx}>
                 <span
-                  className="absolute -top-7 text-xs font-semibold text-primary-600 bg-primary-500/[0.08] backdrop-blur-2xl px-2 py-0.5 rounded-lg shadow-liquid-sm ring-1 ring-primary-500/20"
+                  className="shadow-liquid-sm absolute -top-7 rounded-lg bg-primary-500/8 px-2 py-0.5 text-xs font-semibold text-primary-600 ring-1 ring-primary-500/20 backdrop-blur-2xl"
                   style={{ left: `${startLeft}%`, transform: 'translateX(-50%)' }}
                 >
                   {range.start}
                 </span>
                 <span
-                  className="absolute top-10 text-xs font-semibold text-primary-600 bg-primary-500/[0.08] backdrop-blur-2xl px-2 py-0.5 rounded-lg shadow-liquid-sm ring-1 ring-primary-500/20"
+                  className="shadow-liquid-sm absolute top-10 rounded-lg bg-primary-500/8 px-2 py-0.5 text-xs font-semibold text-primary-600 ring-1 ring-primary-500/20 backdrop-blur-2xl"
                   style={{ left: `${endLeft}%`, transform: 'translateX(-50%)' }}
                 >
                   {range.end}
@@ -157,11 +157,11 @@ export default function TimeBar({
         </div>
       )}
       {/* Indicatori ore principali per riferimento */}
-      <div className="relative w-full mt-3">
+      <div className="relative mt-3 w-full">
         {[0, 6, 12, 18, 24].map(hour => (
           <span
             key={hour}
-            className="absolute text-xs text-neutral-400 font-mono"
+            className="absolute font-mono text-xs text-neutral-400"
             style={{ left: `${(hour / 24) * 100}%`, transform: 'translateX(-50%)' }}
           >
             {hour.toString().padStart(2, '0')}:00

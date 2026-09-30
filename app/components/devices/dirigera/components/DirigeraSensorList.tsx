@@ -17,7 +17,7 @@ interface DirigeraSensorListProps {
 export default function DirigeraSensorList({ sensors, filter }: DirigeraSensorListProps) {
   if (sensors.length === 0) {
     return (
-      <p className="text-sm text-slate-400 py-4 text-center">
+      <p className="py-4 text-center text-sm text-slate-400">
         Nessun sensore trovato
       </p>
     );

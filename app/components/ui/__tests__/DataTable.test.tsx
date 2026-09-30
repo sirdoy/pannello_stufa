@@ -199,7 +199,7 @@ describe('DataTable', () => {
         <DataTable data={mockData} columns={mockColumns} striped />
       );
       const table = container.querySelector('table');
-      expect(table).toHaveClass('[&_tbody_tr:nth-child(even)]:bg-white/[0.02]');
+      expect(table).toHaveClass('[&_tbody_tr:nth-child(even)]:bg-white/2');
     });
 
     it('does not apply striped variant by default', () => {
@@ -207,7 +207,7 @@ describe('DataTable', () => {
         <DataTable data={mockData} columns={mockColumns} />
       );
       const table = container.querySelector('table');
-      expect(table).not.toHaveClass('[&_tbody_tr:nth-child(even)]:bg-white/[0.02]');
+      expect(table).not.toHaveClass('[&_tbody_tr:nth-child(even)]:bg-white/2');
     });
   });
 
@@ -337,7 +337,7 @@ describe('DataTable', () => {
       expect(tableContainer).toBeInTheDocument();
       expect(tableContainer).toHaveClass('rounded-2xl');
       expect(tableContainer).toHaveClass('border');
-      expect(tableContainer).toHaveClass('border-white/[0.06]');
+      expect(tableContainer).toHaveClass('border-white/6');
     });
 
     it('table has base classes from CVA', () => {
@@ -367,7 +367,7 @@ describe('DataTable', () => {
       const classes = dataTableVariants({ density: 'compact', striped: true });
       expect(typeof classes).toBe('string');
       expect(classes).toContain('[&_td]:py-2');
-      expect(classes).toContain('[&_tbody_tr:nth-child(even)]:bg-white/[0.02]');
+      expect(classes).toContain('[&_tbody_tr:nth-child(even)]:bg-white/2');
     });
   });
 

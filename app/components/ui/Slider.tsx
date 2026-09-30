@@ -46,9 +46,9 @@ const rangeVariants = cva(
   {
     variants: {
       variant: {
-        ember: 'bg-gradient-to-r from-ember-500 to-flame-500',
-        ocean: 'bg-gradient-to-r from-ocean-500 to-ocean-600',
-        sage: 'bg-gradient-to-r from-sage-500 to-sage-600',
+        ember: 'bg-linear-to-r from-ember-500 to-flame-500',
+        ocean: 'bg-linear-to-r from-ocean-500 to-ocean-600',
+        sage: 'bg-linear-to-r from-sage-500 to-sage-600',
       },
     },
     defaultVariants: {
@@ -60,7 +60,7 @@ const rangeVariants = cva(
 // Thumb variants (border color matches range)
 const thumbVariants = cva(
   cn(
-    'block h-5 w-5 rounded-full bg-white shadow-lg',
+    'block size-5 rounded-full bg-white shadow-lg',
     'border-2',
     'transition-transform duration-150',
     'hover:scale-110',
@@ -178,8 +178,8 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       className={cn(
-        'relative flex w-full touch-none select-none items-center',
-        disabled && 'opacity-50 cursor-not-allowed',
+        'relative flex w-full touch-none items-center select-none',
+        disabled && 'cursor-not-allowed opacity-50',
         className
       )}
       {...props}
@@ -207,9 +207,9 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
           {showTooltip && isDragging && displayValues && (
             <div
               className={cn(
-                'absolute left-1/2 -translate-x-1/2 -top-8',
-                'bg-slate-800 px-2 py-1 rounded text-xs text-white',
-                'whitespace-nowrap pointer-events-none',
+                'absolute -top-8 left-1/2 -translate-x-1/2',
+                'rounded bg-slate-800 px-2 py-1 text-xs text-white',
+                'pointer-events-none whitespace-nowrap',
               )}
             >
               {displayValues[index]}

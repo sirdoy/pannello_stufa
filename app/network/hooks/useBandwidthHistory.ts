@@ -35,6 +35,8 @@ const TIME_RANGE_MS: Record<BandwidthTimeRange, number> = {
  * @returns {UseBandwidthHistoryReturn} Hook interface with chartData, controls, and status
  */
 export function useBandwidthHistory(): UseBandwidthHistoryReturn {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const [history, setHistory] = useState<BandwidthHistoryPoint[]>([]);
   const [timeRange, setTimeRange] = useState<BandwidthTimeRange>('24h');
   const [isLoading, setIsLoading] = useState(true);
@@ -76,7 +78,6 @@ export function useBandwidthHistory(): UseBandwidthHistoryReturn {
   // Load historical data from server on mount
   useEffect(() => {
     void loadHistoryFromServer();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**

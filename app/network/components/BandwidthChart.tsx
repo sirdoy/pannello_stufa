@@ -57,14 +57,14 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const uploadValue = payload.find((p) => p.dataKey === 'upload')?.value ?? 0;
 
   return (
-    <div className="bg-slate-900 border border-white/10 rounded-lg p-3 shadow-xl">
+    <div className="rounded-lg border border-white/10 bg-slate-900 p-3 shadow-xl">
       <Text size="xs" className="mb-2">
         {format(label, 'HH:mm:ss')}
       </Text>
       <div className="space-y-1.5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" style={{ backgroundColor: '#34d399' }} />
+            <div className="size-2.5 rounded-full bg-emerald-400" style={{ backgroundColor: '#34d399' }} />
             <Text size="xs" variant="secondary">
               Download:
             </Text>
@@ -75,7 +75,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
         </div>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-teal-400" style={{ backgroundColor: '#2dd4bf' }} />
+            <div className="size-2.5 rounded-full bg-teal-400" style={{ backgroundColor: '#2dd4bf' }} />
             <Text size="xs" variant="secondary">
               Upload:
             </Text>
@@ -145,9 +145,9 @@ export default function BandwidthChart({
   };
 
   return (
-    <div className="bg-slate-800/30 rounded-2xl p-6">
+    <div className="rounded-2xl bg-slate-800/30 p-6">
       {/* Header: Title + Tier Toggle + Time Range Selector */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <Heading level={2} size="lg">
           Banda
         </Heading>
@@ -168,7 +168,7 @@ export default function BandwidthChart({
 
       {/* Tier Loading State (for historical tiers) */}
       {!isRealtime && tierLoading && (
-        <div className="h-[300px] flex items-center justify-center">
+        <div className="flex h-75 items-center justify-center">
           <div className="text-center">
             <Text variant="secondary">
               Caricamento dati storici...
@@ -179,7 +179,7 @@ export default function BandwidthChart({
 
       {/* Tier Empty State (for historical tiers) */}
       {!isRealtime && !tierLoading && tierData.length === 0 && (
-        <div className="h-[300px] flex items-center justify-center">
+        <div className="flex h-75 items-center justify-center">
           <div className="text-center">
             <Text variant="secondary">
               Nessun dato storico disponibile
@@ -190,7 +190,7 @@ export default function BandwidthChart({
 
       {/* Real-time: Loading State */}
       {isRealtime && isLoading && data.length === 0 && (
-        <div className="h-[300px] flex items-center justify-center">
+        <div className="flex h-75 items-center justify-center">
           <div className="text-center">
             <Text variant="secondary">
               Caricamento storico banda...
@@ -201,7 +201,7 @@ export default function BandwidthChart({
 
       {/* Real-time: Empty State */}
       {isRealtime && isEmpty && (
-        <div className="h-[300px] flex items-center justify-center">
+        <div className="flex h-75 items-center justify-center">
           <div className="text-center">
             <Text variant="secondary">
               Raccolta dati banda in corso...

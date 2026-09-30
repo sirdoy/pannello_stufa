@@ -104,7 +104,7 @@ export const POST = withAuthAndErrorHandler(async (request, context, session) =>
 
   // Parse optional body (empty object if no body)
   const body = await parseJson(request, {}) as TestNotificationBody;
-  const { deviceToken, template, customTitle, customBody, broadcast, priority } = body;
+  const { deviceToken, template, customTitle, customBody, priority } = body;
 
   // Build notification from template or custom values
   let notificationConfig: NotificationTemplate;

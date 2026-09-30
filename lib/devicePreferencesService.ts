@@ -17,39 +17,11 @@
  * - This is because Firebase security rules block client writes (.write: false)
  */
 
-import { ref, get } from 'firebase/database';
-import { db } from './firebase';
 import { adminDbUpdate, adminDbSet, adminDbGet } from './firebaseAdmin';
 import { DEVICE_CONFIG, DEVICE_TYPES } from './devices/deviceTypes';
 
 /** Device preferences object */
 export type DevicePreferences = Record<string, boolean>;
-
-/**
- * Get device preferences for a user (CLIENT-SIDE - uses client SDK)
- */
-async function getDevicePreferences(userId: string): Promise<DevicePreferences> {
-  if (!userId) {
-    console.warn('getDevicePreferences: no userId provided');
-    return getDefaultPreferences();
-  }
-
-  try {
-    const prefsRef = ref(db, `devicePreferences/${userId}`);
-    const snapshot = await get(prefsRef);
-
-    if (snapshot.exists()) {
-      return snapshot.val();
-    }
-
-    // First time: return defaults (don't try to write from client)
-    // The write will happen when user saves preferences via API
-    return getDefaultPreferences();
-  } catch (error) {
-    console.error('Error getting device preferences:', error);
-    return getDefaultPreferences();
-  }
-}
 
 /**
  * Get device preferences for a user (SERVER-SIDE - uses Admin SDK)
@@ -102,25 +74,6 @@ export async function updateDevicePreferences(userId: string, preferences: Parti
 }
 
 /**
- * Toggle a single device preference (SERVER-SIDE - uses Admin SDK)
- * MUST be called from API routes only
- * @param {string} userId - User ID (session sub)
- * @param {string} deviceId - Device ID to toggle
- * @returns {Promise<boolean>} New enabled state
- */
-async function toggleDevicePreference(userId: string, deviceId: string): Promise<boolean> {
-  // Use Admin SDK since this is a write operation
-  const prefs = await getDevicePreferencesAdmin(userId);
-  const newState = !prefs[deviceId];
-
-  await updateDevicePreferences(userId, {
-    [deviceId]: newState
-  });
-
-  return newState;
-}
-
-/**
  * Get default device preferences
  * All devices enabled by default except future ones (lights, sonos)
  */
@@ -133,28 +86,4 @@ function getDefaultPreferences(): DevicePreferences {
   });
 
   return defaults;
-}
-
-/**
- * Get enabled devices for a user (based on preferences)
- * @param {string} userId - User ID (session sub)
- * @returns {Promise<Array>} Array of enabled device configs
- */
-async function getEnabledDevicesForUser(userId: string): Promise<unknown[]> {
-  const preferences = await getDevicePreferences(userId);
-
-  return Object.values(DEVICE_CONFIG).filter(device => {
-    return preferences[device.id] === true;
-  });
-}
-
-/**
- * Check if a specific device is enabled for a user
- * @param {string} userId - User ID (session sub)
- * @param {string} deviceId - Device ID
- * @returns {Promise<boolean>} Whether device is enabled
- */
-async function isDeviceEnabled(userId: string, deviceId: string): Promise<boolean> {
-  const preferences = await getDevicePreferences(userId);
-  return preferences[deviceId] === true;
 }

@@ -17,11 +17,6 @@ interface StorageEstimate {
   error?: string;
 }
 
-interface StorageDetails extends StorageEstimate {
-  persisted: boolean;
-  isSupported: boolean;
-}
-
 /**
  * Check if Storage API is supported
  * @returns {boolean}
@@ -111,20 +106,5 @@ function formatBytes(bytes: number): string {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-/**
- * Get detailed storage breakdown (if available)
- * @returns {Promise<Object>}
- */
-async function getStorageDetails(): Promise<StorageDetails> {
-  const estimate = await getStorageEstimate();
-  const persisted = await isPersisted();
-
-  return {
-    ...estimate,
-    persisted,
-    isSupported: isStorageSupported(),
-  };
 }
 

@@ -52,13 +52,6 @@ type AuthedHandler = (
   session: Session
 ) => Promise<NextResponse<unknown>>;
 
-/** Route handler with optional authentication */
-type OptionalAuthHandler = (
-  request: NextRequest,
-  context: RouteContext,
-  session: Session | null
-) => Promise<NextResponse<unknown>>;
-
 /** Route handler without authentication */
 type UnauthHandler = (
   request: NextRequest,

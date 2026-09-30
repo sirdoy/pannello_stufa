@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { useToast } from '@/app/hooks/useToast';
-import { retryFetch, isTransientError, RetryError } from '@/lib/retry/retryClient';
+import { retryFetch, RetryError } from '@/lib/retry/retryClient';
 import { deduplicationManager, createRequestKey } from '@/lib/retry/deduplicationManager';
 import { idempotencyManager } from '@/lib/retry/idempotencyManager';
 
@@ -120,7 +120,7 @@ export function useRetryableCommand(options: CommandOptions): CommandResult {
         try {
           const body = fetchOptions?.body ? JSON.parse(fetchOptions.body as string) : {};
           idempotencyKey = await idempotencyManager.registerKey(url, body);
-        } catch (parseError) {
+        } catch {
           // If body parsing fails, use empty object
           idempotencyKey = await idempotencyManager.registerKey(url, {});
         }

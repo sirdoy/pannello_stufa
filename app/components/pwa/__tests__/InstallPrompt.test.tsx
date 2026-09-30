@@ -177,7 +177,7 @@ describe('InstallPrompt', () => {
     const { container } = render(<InstallPrompt />);
 
     // Find backdrop (first fixed div before dialog)
-    const backdrop = container.querySelector('.fixed.inset-0.z-\\[54\\]');
+    const backdrop = container.querySelector('.fixed.inset-0.z-54');
     expect(backdrop).toBeInTheDocument();
 
     if (backdrop) {

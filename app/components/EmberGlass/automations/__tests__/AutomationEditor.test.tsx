@@ -8,14 +8,14 @@
  * ConfirmationDialog is NOT mocked — renders via Radix into JSDOM.
  */
 import React from 'react';
-import { render, screen, within, fireEvent, act, waitFor } from '@testing-library/react';
+import { render, screen, within, fireEvent, act } from '@testing-library/react';
 import type { AutomationRule } from '@/types/automations';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 
 jest.mock('../sections/TriggerSection', () => ({
-  TriggerSection: ({ trigger, isNew, onChange }: {
-    trigger: unknown; isNew: boolean; onChange: (t: unknown) => void;
+  TriggerSection: ({ trigger, isNew }: {
+    trigger: unknown; isNew: boolean;
   }) => (
     <div data-testid="trigger-section" data-isnew={String(isNew)}>
       <span data-testid="trigger-type">{(trigger as { type?: string } | null)?.type ?? 'null'}</span>
@@ -24,7 +24,7 @@ jest.mock('../sections/TriggerSection', () => ({
 }));
 
 jest.mock('../sections/ConditionsSection', () => ({
-  ConditionsSection: ({ group, onChange }: { group: unknown; onChange: (g: unknown) => void }) => (
+  ConditionsSection: ({ group }: { group: unknown }) => (
     <div data-testid="conditions-section">
       <span data-testid="conditions-group">{JSON.stringify(group)}</span>
     </div>
@@ -456,7 +456,6 @@ describe('Delete confirm (D-16)', () => {
 
 describe('Save dispatch (D-13)', () => {
   it('create mode: clicking save calls onSaveCreate with body lacking __key', async () => {
-    const onSaveCreate = jest.fn().mockResolvedValue(undefined);
     // Use edit mode rule as base for preloaded state, but render in "new" context
     // We can't easily trigger onSaveCreate via new mode without typing + adding actions.
     // Instead, test via edit flow: render existing rule, change name, save → onSavePatch.

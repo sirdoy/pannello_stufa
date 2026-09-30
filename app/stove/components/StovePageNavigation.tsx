@@ -42,17 +42,17 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           <Link href="/stove/scheduler" className="group block">
             <Card
               variant="glass"
-              className="hover:shadow-sage-glow hover:border-sage-500/40 h-full transition-all duration-300 hover:scale-[1.02]"
+              className="hover:shadow-sage-glow h-full transition-all duration-300 hover:scale-102 hover:border-sage-500/40"
             >
               <div className="flex items-start gap-4">
-                <div className="bg-sage-900/50 border-sage-500/30 group-hover:border-sage-500/60 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-colors">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-sage-500/30 bg-sage-900/50 transition-colors group-hover:border-sage-500/60">
                   <span className="text-3xl">📅</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-sage-400 mb-1 transition-colors"
+                    className="mb-1 transition-colors group-hover:text-sage-400"
                   >
                     Pianificazione
                   </Heading>
@@ -73,17 +73,17 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           <Link href="/stove/maintenance" className="group block">
             <Card
               variant="glass"
-              className="hover:shadow-ocean-glow hover:border-ocean-500/40 h-full transition-all duration-300 hover:scale-[1.02]"
+              className="hover:shadow-ocean-glow h-full transition-all duration-300 hover:scale-102 hover:border-ocean-500/40"
             >
               <div className="flex items-start gap-4">
-                <div className="bg-ocean-900/50 border-ocean-500/30 group-hover:border-ocean-500/60 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-colors">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-ocean-500/30 bg-ocean-900/50 transition-colors group-hover:border-ocean-500/60">
                   <span className="text-3xl">🔧</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-ocean-400 mb-1 transition-colors"
+                    className="mb-1 transition-colors group-hover:text-ocean-400"
                   >
                     Manutenzione
                   </Heading>
@@ -108,17 +108,17 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           <Link href="/stove/errors" className="group block">
             <Card
               variant="glass"
-              className="hover:shadow-ember-glow hover:border-ember-500/40 h-full transition-all duration-300 hover:scale-[1.02]"
+              className="h-full transition-all duration-300 hover:scale-102 hover:border-ember-500/40 hover:shadow-ember-glow"
             >
               <div className="flex items-start gap-4">
-                <div className="bg-ember-900/50 border-ember-500/30 group-hover:border-ember-500/60 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border transition-colors">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-ember-500/30 bg-ember-900/50 transition-colors group-hover:border-ember-500/60">
                   <span className="text-3xl">🚨</span>
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
                     level={3}
                     size="md"
-                    className="group-hover:text-ember-400 mb-1 transition-colors"
+                    className="mb-1 transition-colors group-hover:text-ember-400"
                   >
                     Storico Allarmi
                   </Heading>

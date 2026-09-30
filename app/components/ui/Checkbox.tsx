@@ -20,55 +20,55 @@ const checkboxVariants = cva(
   [
     'rounded-md border-2 transition-all duration-200',
     'flex items-center justify-center',
-    'outline-none cursor-pointer',
+    'cursor-pointer outline-none',
     // Focus ring - ember glow
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     // Disabled state
-    'disabled:opacity-50 disabled:cursor-not-allowed',
+    'disabled:cursor-not-allowed disabled:opacity-50',
     // Base border (unchecked)
     'border-slate-500 ',
   ],
   {
     variants: {
       size: {
-        sm: 'h-4 w-4',
-        md: 'h-5 w-5',
-        lg: 'h-6 w-6',
+        sm: 'size-4',
+        md: 'size-5',
+        lg: 'size-6',
       },
       variant: {
         primary: [
           'hover:border-ember-400 ',
-          'data-[state=checked]:bg-ember-500 data-[state=checked]:border-ember-500',
-          'data-[state=indeterminate]:bg-ember-500 data-[state=indeterminate]:border-ember-500',
+          'data-[state=checked]:border-ember-500 data-[state=checked]:bg-ember-500',
+          'data-[state=indeterminate]:border-ember-500 data-[state=indeterminate]:bg-ember-500',
           ']:bg-ember-600 ]:border-ember-600',
           ']:bg-ember-600 ]:border-ember-600',
         ],
         ember: [
           'hover:border-ember-400 ',
-          'data-[state=checked]:bg-ember-500 data-[state=checked]:border-ember-500',
-          'data-[state=indeterminate]:bg-ember-500 data-[state=indeterminate]:border-ember-500',
+          'data-[state=checked]:border-ember-500 data-[state=checked]:bg-ember-500',
+          'data-[state=indeterminate]:border-ember-500 data-[state=indeterminate]:bg-ember-500',
           ']:bg-ember-600 ]:border-ember-600',
           ']:bg-ember-600 ]:border-ember-600',
         ],
         ocean: [
           'hover:border-ocean-400 ',
-          'data-[state=checked]:bg-ocean-500 data-[state=checked]:border-ocean-500',
-          'data-[state=indeterminate]:bg-ocean-500 data-[state=indeterminate]:border-ocean-500',
+          'data-[state=checked]:border-ocean-500 data-[state=checked]:bg-ocean-500',
+          'data-[state=indeterminate]:border-ocean-500 data-[state=indeterminate]:bg-ocean-500',
           ']:bg-ocean-600 ]:border-ocean-600',
           ']:bg-ocean-600 ]:border-ocean-600',
         ],
         sage: [
           'hover:border-sage-400 ',
-          'data-[state=checked]:bg-sage-500 data-[state=checked]:border-sage-500',
-          'data-[state=indeterminate]:bg-sage-500 data-[state=indeterminate]:border-sage-500',
+          'data-[state=checked]:border-sage-500 data-[state=checked]:bg-sage-500',
+          'data-[state=indeterminate]:border-sage-500 data-[state=indeterminate]:bg-sage-500',
           ']:bg-sage-600 ]:border-sage-600',
           ']:bg-sage-600 ]:border-sage-600',
         ],
         flame: [
           'hover:border-flame-400 ',
-          'data-[state=checked]:bg-flame-500 data-[state=checked]:border-flame-500',
-          'data-[state=indeterminate]:bg-flame-500 data-[state=indeterminate]:border-flame-500',
+          'data-[state=checked]:border-flame-500 data-[state=checked]:bg-flame-500',
+          'data-[state=indeterminate]:border-flame-500 data-[state=indeterminate]:bg-flame-500',
           ']:bg-flame-600 ]:border-flame-600',
           ']:bg-flame-600 ]:border-flame-600',
         ],
@@ -185,7 +185,7 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(
       <div
         className={cn(
           'inline-flex items-center gap-2',
-          disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+          disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
         )}
       >
         {checkboxElement}

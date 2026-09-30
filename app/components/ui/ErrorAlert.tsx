@@ -9,7 +9,6 @@ import type { ReactNode } from 'react';
 import { ERROR_SEVERITY, getErrorInfo } from '@/lib/errorMonitor';
 import Banner from './Banner';
 import Button from './Button';
-import Text from './Text';
 
 /**
  * ErrorAlert Component Props
@@ -59,12 +58,12 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
   // Use <span> with block display to avoid <div> inside <p> hydration error
   const fullDescription: ReactNode = (
     <>
-      <span className="block font-semibold mb-2">
+      <span className="mb-2 block font-semibold">
         {errorDescription || errorInfo.description}
       </span>
       {showSuggestion && suggestion && (
-        <span className="block mt-3 p-3 bg-slate-800/40 backdrop-blur-2xl rounded-lg ring-1 ring-slate-700/50 ring-inset ">
-          <span className="block mb-1 text-sm font-medium text-slate-300 ">
+        <span className="mt-3 block rounded-lg bg-slate-800/40 p-3 ring-1 ring-slate-700/50 backdrop-blur-2xl ring-inset ">
+          <span className="mb-1 block text-sm font-medium text-slate-300 ">
             💡 Suggerimento:
           </span>
           <span className="block text-sm text-slate-400 ">
@@ -130,7 +129,7 @@ export function ErrorBadge({ errorCode, className = '' }: ErrorBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold font-display ${getSeverityClasses()} ${className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-display text-xs font-bold ${getSeverityClasses()} ${className}`}
     >
       <span>⚠️</span>
       <span>Errore {errorCode}</span>

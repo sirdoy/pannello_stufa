@@ -21,6 +21,8 @@ export interface UseTuyaDataReturn {
 }
 
 export function useTuyaData(): UseTuyaDataReturn {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const [plugs, setPlugs] = useState<TuyaPlug[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +93,6 @@ export function useTuyaData(): UseTuyaDataReturn {
 
     subscribe('tuya', handleMessage);
     return () => { unsubscribe('tuya', handleMessage); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isWsConnected, subscribe, unsubscribe]);
 
   useAdaptivePolling({
@@ -108,7 +109,6 @@ export function useTuyaData(): UseTuyaDataReturn {
   // emits a 'tuya' message — which it may never do if the topic is idle.
   useEffect(() => {
     void fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const setPlugOptimistic = (deviceId: string, on: boolean) => {

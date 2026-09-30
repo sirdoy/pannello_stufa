@@ -44,7 +44,7 @@ export default function TemperaturePicker({
           size="lg"
           onClick={decrease}
           disabled={value <= min}
-          className="w-14 h-14 rounded-full p-0"
+          className="size-14 rounded-full p-0"
           aria-label="Diminuisci temperatura"
         >
           <Minus size={24} />
@@ -53,9 +53,9 @@ export default function TemperaturePicker({
         {/* Temperature display */}
         <div
           className="
-            w-28 h-28 rounded-full
-            flex flex-col items-center justify-center
-            shadow-lg transition-colors duration-300
+            flex size-28 flex-col
+            items-center justify-center rounded-full shadow-lg
+            transition-colors duration-300
           "
           style={{ backgroundColor: bgColor }}
         >
@@ -71,7 +71,7 @@ export default function TemperaturePicker({
           size="lg"
           onClick={increase}
           disabled={value >= max}
-          className="w-14 h-14 rounded-full p-0"
+          className="size-14 rounded-full p-0"
           aria-label="Aumenta temperatura"
         >
           <Plus size={24} />
@@ -79,7 +79,7 @@ export default function TemperaturePicker({
       </div>
 
       {/* Min/max labels */}
-      <div className="flex justify-between text-xs text-slate-500 px-4">
+      <div className="flex justify-between px-4 text-xs text-slate-500">
         <span>{min}°C</span>
         <span>{max}°C</span>
       </div>

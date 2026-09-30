@@ -40,8 +40,8 @@ export default function SettingsLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-900 to-slate-800 p-4 sm:p-6 lg:p-8">
+      <div className="mx-auto max-w-4xl space-y-6">
         {/* Header with optional back button */}
         <div className="flex items-center gap-4">
           {showBackButton && (
@@ -49,7 +49,7 @@ export default function SettingsLayout({
               variant="ghost"
               size="sm"
               onClick={handleBack}
-              className="flex-shrink-0"
+              className="shrink-0"
               aria-label="Torna indietro"
             >
               ← Indietro

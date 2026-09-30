@@ -42,8 +42,8 @@ function Kbd({ children, className, ...props }: KbdProps) {
     <kbd
       className={cn(
         'inline-flex items-center justify-center',
-        'px-2 py-1 rounded-md',
-        'text-xs font-mono font-medium',
+        'rounded-md px-2 py-1',
+        'font-mono text-xs font-medium',
         'bg-slate-700/50 ',
         'text-slate-300 ',
         'border border-slate-600/50 ',

@@ -175,7 +175,7 @@ export default function RoomsPage() {
       accessorKey: 'description',
       header: 'Descrizione',
       cell: ({ row }) => (
-        <span className="text-slate-400 truncate max-w-xs block">
+        <span className="block max-w-xs truncate text-slate-400">
           {row.original.description ?? '\u2014'}
         </span>
       ),
@@ -228,7 +228,7 @@ export default function RoomsPage() {
       <Card variant="glass" className="p-4 sm:p-6">
         {/* Health stats inline (per D-27) */}
         {health !== null && (
-          <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm text-slate-400 mb-4">
+          <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-slate-400 sm:gap-6">
             <span>
               Stanze: <strong className="text-slate-200">{health.room_count}</strong>
             </span>
@@ -243,7 +243,7 @@ export default function RoomsPage() {
         )}
 
         {/* Toolbar: stato + create buttons (per D-08, D-05) */}
-        <div className="flex items-center justify-end gap-2 mb-4">
+        <div className="mb-4 flex items-center justify-end gap-2">
           <Button variant="ghost" size="sm" onClick={() => router.push('/rooms/status')}>
             Stato
           </Button>
@@ -260,7 +260,7 @@ export default function RoomsPage() {
 
         {/* Empty state */}
         {!loading && !error && rooms.length === 0 && (
-          <div className="text-center py-8 text-slate-400">
+          <div className="py-8 text-center text-slate-400">
             <p>Nessuna stanza creata</p>
             <Button
               variant="ember"

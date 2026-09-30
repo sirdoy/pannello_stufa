@@ -203,13 +203,13 @@ describe('Checkbox', () => {
       const { rerender } = render(
         <Checkbox size="sm" aria-label="Small" />
       );
-      expect(screen.getByRole('checkbox')).toHaveClass('h-4', 'w-4');
+      expect(screen.getByRole('checkbox')).toHaveClass('size-4');
 
       rerender(<Checkbox size="md" aria-label="Medium" />);
-      expect(screen.getByRole('checkbox')).toHaveClass('h-5', 'w-5');
+      expect(screen.getByRole('checkbox')).toHaveClass('size-5');
 
       rerender(<Checkbox size="lg" aria-label="Large" />);
-      expect(screen.getByRole('checkbox')).toHaveClass('h-6', 'w-6');
+      expect(screen.getByRole('checkbox')).toHaveClass('size-6');
     });
 
     it('renders all color variants without errors', () => {

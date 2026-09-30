@@ -148,7 +148,7 @@ export default function ScheduleManagementModal({
           className="animate-scale-in-center p-6 sm:p-8"
         >
           {/* Header */}
-          <div className="flex items-start justify-between mb-6">
+          <div className="mb-6 flex items-start justify-between">
             <div>
               <Heading level={3} size="xl">
                 Gestisci Pianificazioni
@@ -169,12 +169,12 @@ export default function ScheduleManagementModal({
           {/* Active Schedule Section */}
           {activeSchedule && (
             <div className="mb-6">
-              <Text as="h4" variant="tertiary" size="sm" className="uppercase tracking-wider mb-3">
+              <Text as="h4" variant="tertiary" size="sm" className="mb-3 tracking-wider uppercase">
                 Pianificazione Attiva
               </Text>
-              <div className="p-4 bg-sage-950/30 rounded-2xl border-2 border-sage-700/50 ">
+              <div className="rounded-2xl border-2 border-sage-700/50 bg-sage-950/30 p-4 ">
                 <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-sage-500 shadow-glow-success animate-pulse" />
+                  <div className="shadow-glow-success size-3 animate-pulse rounded-full bg-sage-500" />
                   <div className="flex-1">
                     {editingId === activeSchedule.id ? (
                       <div className="space-y-2">
@@ -227,14 +227,14 @@ export default function ScheduleManagementModal({
           {/* Inactive Schedules Section */}
           {inactiveSchedules.length > 0 && (
             <div>
-              <Text as="h4" variant="tertiary" size="sm" className="uppercase tracking-wider mb-3">
+              <Text as="h4" variant="tertiary" size="sm" className="mb-3 tracking-wider uppercase">
                 Altre Pianificazioni
               </Text>
               <div className="space-y-3">
                 {inactiveSchedules.map((schedule) => (
                   <div
                     key={schedule.id}
-                    className="p-4 bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-slate-600/40 "
+                    className="rounded-2xl border border-slate-600/40 bg-slate-800/60 p-4 backdrop-blur-xl "
                   >
                     {editingId === schedule.id ? (
                       <div className="space-y-2">
@@ -266,8 +266,8 @@ export default function ScheduleManagementModal({
                       </div>
                     ) : (
                       <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="w-3 h-3 rounded-full bg-slate-500 " />
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
+                          <div className="size-3 rounded-full bg-slate-500 " />
                           <Text as="span" className="truncate">
                             {schedule.name}
                           </Text>
@@ -307,7 +307,7 @@ export default function ScheduleManagementModal({
           )}
 
           {schedules.length === 0 && (
-            <div className="text-center py-8">
+            <div className="py-8 text-center">
               <Text variant="tertiary">
                 Nessuna pianificazione disponibile
               </Text>

@@ -12,7 +12,7 @@ jest.mock('@/lib/services/locationService', () => ({
   subscribeToLocation: jest.fn(),
 }));
 
-import { renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { subscribeToLocation } from '@/lib/services/locationService';
 import { useWeatherSummary } from '../useWeatherSummary';
 

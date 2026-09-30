@@ -21,7 +21,7 @@ import {
   buildNotificationPayload,
 } from '@/lib/notifications/notificationTriggers';
 import { getDefaultPreferences } from '@/lib/schemas/notificationPreferences';
-import { getActionsForNotificationType, type NotificationActionDef } from '@/lib/notifications/notificationActions';
+import { getActionsForNotificationType } from '@/lib/notifications/notificationActions';
 
 /**
  * Notification preferences data from Firebase

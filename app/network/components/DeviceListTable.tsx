@@ -31,7 +31,7 @@ type StatusFilter = 'all' | 'online' | 'offline';
  * @example
  * <DeviceListTable devices={devices} isStale={false} />
  */
-function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTableProps) {
+function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: DeviceListTableProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [editingMac, setEditingMac] = useState<string | null>(null);
 
@@ -88,7 +88,7 @@ function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTable
               }}
               onBlur={() => setEditingMac(null)}
               autoFocus
-              className="bg-slate-800 text-slate-200 text-xs rounded px-2 py-1 border border-white/10 focus:border-ember-400 focus:outline-none"
+              className="rounded border border-white/10 bg-slate-800 px-2 py-1 text-xs text-slate-200 focus:border-ember-400 focus:outline-none"
             >
               <option value="iot">IoT</option>
               <option value="mobile">Mobile</option>
@@ -162,7 +162,7 @@ function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTable
   const offlineCount = devices.filter(d => !d.active).length;
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header with device count */}
       <div className="flex items-center gap-3">
         <Heading level={2} size="lg">Dispositivi</Heading>
@@ -170,12 +170,12 @@ function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTable
       </div>
 
       {/* Status filter tabs */}
-      <div className="flex gap-4 border-b border-white/[0.06] pb-2">
+      <div className="flex gap-4 border-b border-white/6 pb-2">
         <button
           onClick={() => setStatusFilter('all')}
-          className={`text-sm font-medium transition-colors pb-2 ${
+          className={`pb-2 text-sm font-medium transition-colors ${
             statusFilter === 'all'
-              ? 'text-ember-400 border-b-2 border-ember-400'
+              ? 'border-b-2 border-ember-400 text-ember-400'
               : 'text-slate-400 hover:text-slate-300'
           }`}
         >
@@ -183,9 +183,9 @@ function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTable
         </button>
         <button
           onClick={() => setStatusFilter('online')}
-          className={`text-sm font-medium transition-colors pb-2 ${
+          className={`pb-2 text-sm font-medium transition-colors ${
             statusFilter === 'online'
-              ? 'text-ember-400 border-b-2 border-ember-400'
+              ? 'border-b-2 border-ember-400 text-ember-400'
               : 'text-slate-400 hover:text-slate-300'
           }`}
         >
@@ -193,9 +193,9 @@ function DeviceListTable({ devices, isStale, onCategoryChange }: DeviceListTable
         </button>
         <button
           onClick={() => setStatusFilter('offline')}
-          className={`text-sm font-medium transition-colors pb-2 ${
+          className={`pb-2 text-sm font-medium transition-colors ${
             statusFilter === 'offline'
-              ? 'text-ember-400 border-b-2 border-ember-400'
+              ? 'border-b-2 border-ember-400 text-ember-400'
               : 'text-slate-400 hover:text-slate-300'
           }`}
         >

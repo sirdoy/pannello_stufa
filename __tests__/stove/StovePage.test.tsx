@@ -8,8 +8,7 @@
  * - Conditional rendering based on status
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import StovePage from '@/app/stove/page';
 
 // Mock dependencies
@@ -57,13 +56,11 @@ import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveC
 import type { useRetryableCommand } from '@/lib/hooks/useRetryableCommand';
 import StovePageBanners from '@/app/stove/components/StovePageBanners';
 import StovePageHero from '@/app/stove/components/StovePageHero';
-import StovePageAdjustments from '@/app/stove/components/StovePageAdjustments';
 
 const mockUseStoveData = jest.mocked(useStoveData);
 const mockUseStoveCommands = jest.mocked(useStoveCommands);
 const MockStovePageBanners = jest.mocked(StovePageBanners);
 const MockStovePageHero = jest.mocked(StovePageHero);
-const MockStovePageAdjustments = jest.mocked(StovePageAdjustments);
 
 const createMockStoveData = (overrides: Record<string, unknown> = {}) => ({
   status: 'off' as import('@/types/thermorossiProxy').StoveState,
@@ -187,7 +184,7 @@ describe('StovePage', () => {
     const { container } = render(<StovePage />);
 
     // Check for ember theme gradient
-    const gradientDiv = container.querySelector('.bg-gradient-to-br');
+    const gradientDiv = container.querySelector('.bg-linear-to-br');
     expect(gradientDiv).toBeInTheDocument();
     expect(gradientDiv?.className).toContain('from-ember-950');
   });

@@ -70,10 +70,10 @@ export default function ApiDebugPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-slate-950 p-6 text-slate-100">
+      <div className="mx-auto max-w-7xl space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-3">
               <Heading level={1} variant="ember">
@@ -87,9 +87,9 @@ export default function ApiDebugPage() {
               Test all system components and monitor live API responses
             </Text>
             <Text size="sm" variant="secondary" className="mt-2">
-              Keyboard: <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">1-6</kbd> = Switch tabs,{''}
-              <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">⌘R</kbd> = Refresh,{''}
-              <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-xs">A</kbd> = Auto-refresh
+              Keyboard: <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">1-6</kbd> = Switch tabs,{''}
+              <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">⌘R</kbd> = Refresh,{''}
+              <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">A</kbd> = Auto-refresh
             </Text>
           </div>
 

@@ -27,7 +27,7 @@ export default function DashboardSkeleton() {
   return (
     <section className="py-8 sm:py-12 lg:py-16">
       <h1 className="sr-only">Dashboard</h1>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-md sm:max-w-2xl lg:max-w-7xl mx-auto px-3">
+      <div className="mx-auto grid max-w-md grid-cols-2 gap-3 px-3 sm:max-w-2xl lg:max-w-7xl lg:grid-cols-4">
         {Array.from({ length: 10 }).map((_, i) => (
           <div
             key={i}

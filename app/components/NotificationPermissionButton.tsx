@@ -129,7 +129,7 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
             <Text variant="warning" size="sm">
               Per ricevere notifiche su iOS, devi prima installare l&apos;app:
             </Text>
-            <ol className="list-decimal list-inside space-y-1">
+            <ol className="list-inside list-decimal space-y-1">
               <Text as="li" variant="warning" size="sm">Tocca il pulsante Condividi in Safari</Text>
               <Text as="li" variant="warning" size="sm">Seleziona &quot;Aggiungi a Home&quot;</Text>
               <Text as="li" variant="warning" size="sm">Apri l&apos;app dalla schermata Home</Text>
@@ -189,7 +189,7 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
         />
       )}
 
-      <div className="flex flex-col sm:flex-row gap-4 items-start">
+      <div className="flex flex-col items-start gap-4 sm:flex-row">
         <Button
           variant="ember"
           size="md"
@@ -204,7 +204,7 @@ export default function NotificationPermissionButton({ onSuccess, onError }: Not
           <Text variant="secondary" size="sm" className="mb-1">
             Riceverai notifiche per:
           </Text>
-          <ul className="list-disc list-inside space-y-0.5">
+          <ul className="list-inside list-disc space-y-0.5">
             <Text as="li" variant="secondary" size="sm">Errori critici della stufa</Text>
             <Text as="li" variant="secondary" size="sm">Azioni automatiche dello scheduler</Text>
             <Text as="li" variant="secondary" size="sm">Promemoria manutenzione</Text>

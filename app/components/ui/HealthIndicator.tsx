@@ -121,7 +121,7 @@ const HealthIndicator = forwardRef<HTMLSpanElement, HealthIndicatorProps>(functi
           size={iconSize}
           strokeWidth={2}
           aria-hidden="true"
-          className="flex-shrink-0"
+          className="shrink-0"
         />
       )}
       {displayLabel}

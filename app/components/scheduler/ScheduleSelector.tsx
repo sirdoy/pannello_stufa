@@ -52,28 +52,28 @@ export default function ScheduleSelector({
           disabled={loading}
           className={cn(
             // Base styles matching design system Select trigger
-            'flex items-center justify-between w-full rounded-xl font-medium font-display cursor-pointer',
-            'bg-slate-800/60 backdrop-blur-xl border border-slate-700/50',
+            'flex w-full cursor-pointer items-center justify-between rounded-xl font-display font-medium',
+            'border border-slate-700/50 bg-slate-800/60 backdrop-blur-xl',
             'text-slate-100',
             'transition-all duration-200',
             // Focus ring - ember glow
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
             'focus-visible:border-ember-500/60',
             // Hover
-            'hover:bg-slate-800/80 hover:border-slate-600/60',
+            'hover:border-slate-600/60 hover:bg-slate-800/80',
             // Disabled
-            'disabled:opacity-50 disabled:cursor-not-allowed',
+            'disabled:cursor-not-allowed disabled:opacity-50',
             // Light mode
             ' ',
             ' ',
             // Size - matching Select md
-            'px-4 py-4 min-h-[56px]'
+            'min-h-14 p-4'
           )}
         >
           {/* Left: Active Schedule Info */}
-          <div className="flex items-center gap-3 flex-1 text-left">
-            <div className="w-2 h-2 rounded-full bg-sage-500 shadow-sage-glow-sm animate-pulse shrink-0" />
-            <div className="flex-1 min-w-0">
+          <div className="flex flex-1 items-center gap-3 text-left">
+            <div className="shadow-sage-glow-sm size-2 shrink-0 animate-pulse rounded-full bg-sage-500" />
+            <div className="min-w-0 flex-1">
               <Text variant="tertiary" size="xs">
                 Pianificazione Attiva
               </Text>
@@ -86,7 +86,7 @@ export default function ScheduleSelector({
           {/* Right: Dropdown Icon */}
           <ChevronDown
             className={cn(
-              'h-5 w-5 text-slate-400 transition-transform duration-200 shrink-0 ml-2',
+              'ml-2 size-5 shrink-0 text-slate-400 transition-transform duration-200',
               isOpen && 'rotate-180'
             )}
           />
@@ -96,33 +96,33 @@ export default function ScheduleSelector({
       <PopoverContent
         align="start"
         sideOffset={8}
-        className="w-[var(--radix-popover-trigger-width)] p-0 overflow-hidden"
+        className="w-(--radix-popover-trigger-width) overflow-hidden p-0"
       >
         {!hasSchedules ? (
           /* No Schedules - Migration Required */
           <div className="p-4">
-            <div className="text-center py-4">
-              <div className="text-3xl mb-3">📅</div>
+            <div className="py-4 text-center">
+              <div className="mb-3 text-3xl">📅</div>
               <Text size="sm" variant="secondary" className="mb-2">
                 Nessuna pianificazione trovata
               </Text>
               <Text variant="tertiary" size="xs" className="mb-4">
                 Esegui la migrazione per creare la struttura v2
               </Text>
-              <div className="bg-slate-700/40 rounded-xl p-3 text-left ">
+              <div className="rounded-xl bg-slate-700/40 p-3 text-left ">
                 <Text as="code" size="xs" className="block font-mono">
                   npm run migrate:schedules
                 </Text>
               </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-slate-700/50 ">
+            <div className="mt-3 border-t border-slate-700/50 pt-3 ">
               <Button
                 variant="ember"
                 size="sm"
                 className="w-full"
                 onClick={handleCreateNew}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="mr-2 size-4" />
                 Crea Prima Pianificazione
               </Button>
             </div>
@@ -130,23 +130,23 @@ export default function ScheduleSelector({
         ) : (
           <>
             {/* Active Schedule Section */}
-            <div className="p-3 border-b border-slate-700/50 ">
-              <Text as="div" variant="tertiary" size="xs" className="uppercase tracking-wider mb-2 px-2">
+            <div className="border-b border-slate-700/50 p-3 ">
+              <Text as="div" variant="tertiary" size="xs" className="mb-2 px-2 tracking-wider uppercase">
                 Attiva
               </Text>
-              <div className="px-3 py-2 bg-sage-950/30 rounded-xl flex items-center gap-3 ">
-                <div className="w-2 h-2 rounded-full bg-sage-500 shadow-sage-glow-sm shrink-0" />
+              <div className="flex items-center gap-3 rounded-xl bg-sage-950/30 px-3 py-2 ">
+                <div className="shadow-sage-glow-sm size-2 shrink-0 rounded-full bg-sage-500" />
                 <Text as="div" size="sm" variant="sage" className="flex-1">
                   {activeSchedule?.name}
                 </Text>
-                <Check className="w-4 h-4 text-sage-400 " />
+                <Check className="size-4 text-sage-400 " />
               </div>
             </div>
 
             {/* Other Schedules Section */}
             {otherSchedules.length > 0 && (
-              <div className="p-3 border-b border-slate-700/50 ">
-                <Text as="div" variant="tertiary" size="xs" className="uppercase tracking-wider mb-2 px-2">
+              <div className="border-b border-slate-700/50 p-3 ">
+                <Text as="div" variant="tertiary" size="xs" className="mb-2 px-2 tracking-wider uppercase">
                   Disponibili
                 </Text>
                 <div className="space-y-1">
@@ -155,13 +155,13 @@ export default function ScheduleSelector({
                       key={schedule.id}
                       onClick={() => handleSelect(schedule.id)}
                       className={cn(
-                        'w-full px-3 py-2 text-left rounded-xl flex items-center gap-3 group',
+                        'group flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left',
                         'transition-colors duration-150',
                         'hover:bg-slate-700/50 '
                       )}
                     >
                       <div className={cn(
-                        'w-2 h-2 rounded-full shrink-0 transition-colors',
+                        'size-2 shrink-0 rounded-full transition-colors',
                         'bg-slate-600 group-hover:bg-ember-500',
                         ' '
                       )} />
@@ -188,7 +188,7 @@ export default function ScheduleSelector({
                 className="w-full"
                 onClick={handleCreateNew}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="mr-2 size-4" />
                 Crea Nuova Pianificazione
               </Button>
             </div>

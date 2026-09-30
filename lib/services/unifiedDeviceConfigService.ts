@@ -24,8 +24,6 @@
  * - Display-only devices (weather): visible controls only homepage (no navbar entry)
  */
 
-import { ref, get } from 'firebase/database';
-import { db } from '@/lib/firebase';
 import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 import { DEVICE_CONFIG, DISPLAY_ITEMS, DEFAULT_DEVICE_ORDER } from '@/lib/devices/deviceTypes';
 import type { DeviceTypeId } from '@/lib/devices/deviceTypes';
@@ -94,32 +92,6 @@ interface DeviceConfigData {
   devices: Array<{ id: string; visible: boolean; order: number }>;
   updatedAt: number;
   version: number;
-}
-
-/**
- * Get unified device config (CLIENT-SIDE - uses client SDK)
- * @param {string} userId - User ID (session sub)
- * @returns {Promise<Object>} Device configuration
- */
-async function getUnifiedDeviceConfig(userId: string): Promise<DeviceConfigData> {
-  if (!userId) {
-    console.warn('getUnifiedDeviceConfig: no userId provided');
-    return getDefaultDeviceConfig();
-  }
-
-  try {
-    const configRef = ref(db, `users/${userId}/deviceConfig`);
-    const snapshot = await get(configRef);
-
-    if (snapshot.exists()) {
-      return snapshot.val();
-    }
-
-    return getDefaultDeviceConfig();
-  } catch (error) {
-    console.error('Error getting unified device config:', error);
-    return getDefaultDeviceConfig();
-  }
 }
 
 /**

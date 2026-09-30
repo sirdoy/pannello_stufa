@@ -58,7 +58,7 @@ const SmartHomeCardHeader = forwardRef<HTMLDivElement, SmartHomeCardHeaderProps>
   return (
     <div
       ref={ref}
-      className={cn('flex items-center gap-3 mb-4', className)}
+      className={cn('mb-4 flex items-center gap-3', className)}
       {...props}
     >
       {children}
@@ -174,7 +174,7 @@ const SmartHomeCard = forwardRef<HTMLDivElement, SmartHomeCardProps>(function Sm
       padding={false}
       className={cn(
         smartHomeCardVariants({ size, colorTheme }),
-        disabled && 'opacity-50 pointer-events-none',
+        disabled && 'pointer-events-none opacity-50',
         className
       )}
       {...props}
@@ -216,7 +216,7 @@ const SmartHomeCard = forwardRef<HTMLDivElement, SmartHomeCardProps>(function Sm
 
         {/* Loading overlay */}
         {isLoading && (
-          <div className="absolute inset-0 bg-slate-900/50 flex items-center justify-center rounded-2xl z-10">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-slate-900/50">
             <Spinner size="lg" />
           </div>
         )}

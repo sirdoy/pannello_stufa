@@ -56,17 +56,17 @@ export default function ChangelogPage() {
   const getConfig = (type?: string) => versionConfig[type as keyof typeof versionConfig] || versionConfig.patch;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+    <div className="animate-fade-in mx-auto max-w-4xl space-y-8">
       {/* Header Card */}
       <Card variant="elevated" className="overflow-hidden">
         {/* Gradient accent bar */}
-        <div className="h-1 bg-gradient-to-r from-ember-500 via-flame-500 to-ember-600" />
+        <div className="h-1 bg-linear-to-r from-ember-500 via-flame-500 to-ember-600" />
 
         <div className="p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex-1">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-ember-500/20 to-flame-500/10 border border-ember-500/30">
+              <div className="mb-3 flex items-center gap-3">
+                <div className="flex size-12 items-center justify-center rounded-2xl border border-ember-500/30 bg-linear-to-br from-ember-500/20 to-flame-500/10">
                   <span className="text-2xl">📋</span>
                 </div>
                 <div>
@@ -81,10 +81,10 @@ export default function ChangelogPage() {
             </div>
 
             {/* Current Build Badge */}
-            <div className="flex flex-col items-start sm:items-end gap-2">
+            <div className="flex flex-col items-start gap-2 sm:items-end">
               <Text variant="label" size="xs">Build Corrente</Text>
-              <div className="px-4 py-2 rounded-xl bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/25">
-                <Text as="span" variant="body" size="xl" className="!text-white font-mono">
+              <div className="rounded-xl bg-linear-to-r from-ember-500 to-flame-600 px-4 py-2 text-white shadow-lg shadow-ember-500/25">
+                <Text as="span" variant="body" size="xl" className="font-mono text-white!">
                   {BUILD_LABEL}
                 </Text>
               </div>
@@ -96,7 +96,7 @@ export default function ChangelogPage() {
       {/* Timeline */}
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute left-[23px] sm:left-[27px] top-8 bottom-8 w-px bg-gradient-to-b from-slate-600/50 via-slate-700/30 to-transparent" />
+        <div className="absolute inset-y-8 left-[23px] w-px bg-linear-to-b from-slate-600/50 via-slate-700/30 to-transparent sm:left-[27px]" />
 
         <div className="space-y-6">
           {paginatedChangelog.map((version, index) => {
@@ -104,17 +104,17 @@ export default function ChangelogPage() {
             const isLatest = currentPage === 1 && index === 0;
 
             return (
-              <div key={version.version} className="relative pl-14 sm:pl-16 animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
+              <div key={version.version} className="animate-fade-in-up relative pl-14 sm:pl-16" style={{ animationDelay: `${index * 50}ms` }}>
                 {/* Timeline dot */}
-                <div className={`absolute left-0 top-6 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center z-10 ${config.dotClass} transition-all duration-300`}>
+                <div className={`absolute top-6 left-0 z-10 flex size-12 items-center justify-center rounded-2xl sm:size-14 ${config.dotClass} transition-all duration-300`}>
                   <span className="text-xl sm:text-2xl">{config.icon}</span>
                 </div>
 
                 <Card variant="default" hover className="overflow-hidden transition-all duration-300">
                   {/* Header with gradient accent */}
                   <div className={'p-5 sm:p-6 bg-gradient-to-r ' + config.accentClass + ' border-b border-slate-700/30'}>
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                      <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="flex flex-wrap items-center gap-3">
                         <Heading level={2} size="xl">v{version.version}</Heading>
 
                         {/* Version type badge */}
@@ -126,7 +126,7 @@ export default function ChangelogPage() {
 
                         {/* Last versioned release */}
                         {isLatest && (
-                          <span className="px-2.5 py-1 text-xs font-bold font-display rounded-full bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/30 animate-pulse-ember">
+                          <span className="animate-pulse-ember rounded-full bg-linear-to-r from-ember-500 to-flame-600 px-2.5 py-1 font-display text-xs font-bold text-white shadow-lg shadow-ember-500/30">
                             LATEST
                           </span>
                         )}
@@ -153,7 +153,7 @@ export default function ChangelogPage() {
                             ? 'bg-sage-500/20 text-sage-400 group-hover:bg-sage-500/30'
                             : 'bg-ocean-500/20 text-ocean-400 group-hover:bg-ocean-500/30';
                         return (
-                        <li key={changeIndex} className="flex items-start gap-3 group">
+                        <li key={changeIndex} className="group flex items-start gap-3">
                           <span className={'mt-1.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors ' + dotClass}>
                             ✓
                           </span>
@@ -179,7 +179,7 @@ export default function ChangelogPage() {
             disabled={currentPage === 1}
             className={'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ' + (currentPage === 1 ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed' : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95')}
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             <span className="hidden sm:inline">Precedente</span>
@@ -229,7 +229,7 @@ export default function ChangelogPage() {
             className={'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ' + (currentPage === totalPages ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed' : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95')}
           >
             <span className="hidden sm:inline">Successiva</span>
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -247,11 +247,11 @@ export default function ChangelogPage() {
 
       {/* Footer Legend */}
       <Card variant="subtle" className="p-5 sm:p-6">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
           <div className="flex items-center gap-6">
             {Object.entries(versionConfig).map(([type, config]) => (
               <div key={type} className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${config.dotClass.split('')[0]} ${config.dotClass.split('')[1]}`} />
+                <div className={`size-3 rounded-full ${config.dotClass.split('')[0]} ${config.dotClass.split('')[1]}`} />
                 <Text variant="tertiary" size="xs">{config.label}</Text>
               </div>
             ))}

@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import TimeRangeSelector from '@/app/network/components/TimeRangeSelector';
-import type { BandwidthTimeRange } from '@/app/components/devices/network/types';
 
 describe('TimeRangeSelector', () => {
   const mockOnChange = jest.fn();
@@ -34,7 +33,7 @@ describe('TimeRangeSelector', () => {
     expect(activeButton.className).toContain('from-ember-500');
 
     // Inactive button should have subtle variant classes
-    expect(inactiveButton.className).toContain('bg-white/[0.06]');
+    expect(inactiveButton.className).toContain('bg-white/6');
   });
 
   it('calls onChange with correct range when clicked', async () => {

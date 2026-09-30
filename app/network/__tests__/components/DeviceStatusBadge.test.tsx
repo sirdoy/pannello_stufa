@@ -14,7 +14,7 @@ import DeviceStatusBadge from '../../components/DeviceStatusBadge';
 
 // Mock date-fns to avoid time-dependent tests
 jest.mock('date-fns', () => ({
-  formatDistanceToNow: jest.fn((date, options) => {
+  formatDistanceToNow: jest.fn((_date, _options) => {
     // Return a predictable format for testing
     return '2 ore fa';
   }),

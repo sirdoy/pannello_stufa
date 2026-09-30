@@ -29,8 +29,8 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const avgVolume = payload.find(p => p.dataKey === 'avg_volume')?.value;
 
   return (
-    <div className="bg-slate-900 border border-white/10 rounded-lg p-2 shadow-xl">
-      <p className="text-xs text-slate-400 mb-1">
+    <div className="rounded-lg border border-white/10 bg-slate-900 p-2 shadow-xl">
+      <p className="mb-1 text-xs text-slate-400">
         {format(label * 1000, 'dd/MM HH:mm')}
       </p>
       {avgVolume !== undefined && (

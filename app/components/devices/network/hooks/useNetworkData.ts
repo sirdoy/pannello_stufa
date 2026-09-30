@@ -149,7 +149,7 @@ export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataR
         );
 
         // Update enrichedData with successful results
-        results.forEach((result, idx) => {
+        results.forEach((result) => {
           if (result.status === 'fulfilled' && result.value) {
             const { mac, category } = result.value;
             const deviceIndex = enrichedData.findIndex(d => d.mac === mac);
@@ -235,7 +235,7 @@ export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataR
 
     subscribe('fritzbox', handleMessage);
     return () => { unsubscribe('fritzbox', handleMessage); };
-  }, [subscribe, unsubscribe, isWsConnected]);
+  }, [subscribe, unsubscribe, isWsConnected, enrichVendors]);
 
   // Health computation — runs on every data update from WS or HTTP (D-11)
   useEffect(() => {
@@ -365,7 +365,7 @@ export function useNetworkData(options?: UseNetworkDataOptions): UseNetworkDataR
       setError(null);
       setStale(false);
       setLastUpdated(Date.now());
-    } catch (err) {
+    } catch {
       // Network error — keep cached data, mark stale
       setStale(true);
       if (!bandwidthRef.current && !wanRef.current) {

@@ -159,7 +159,7 @@ describe('Card', () => {
     it('applies subtle variant classes', () => {
       const { container } = render(<Card variant="subtle">Content</Card>);
       const card = container.firstChild;
-      expect(card).toHaveClass('bg-white/[0.03]');
+      expect(card).toHaveClass('bg-white/3');
       expect(card).not.toHaveClass('shadow-card');
     });
 
@@ -167,7 +167,7 @@ describe('Card', () => {
       const { container } = render(<Card variant="outlined">Content</Card>);
       const card = container.firstChild;
       expect(card).toHaveClass('bg-transparent');
-      expect(card).toHaveClass('border-white/[0.12]');
+      expect(card).toHaveClass('border-white/12');
     });
 
     it('applies glass variant classes', () => {
@@ -283,7 +283,7 @@ describe('Card', () => {
       const divider = container.firstChild;
       expect(divider).toHaveClass('h-px');
       expect(divider).toHaveClass('my-4');
-      expect(divider).toHaveClass('bg-gradient-to-r');
+      expect(divider).toHaveClass('bg-linear-to-r');
       expect(divider).toHaveClass('from-transparent');
       expect(divider).toHaveClass('to-transparent');
     });

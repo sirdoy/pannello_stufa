@@ -32,7 +32,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
       </Heading>
 
       {/* Main stats */}
-      <div className="space-y-3 mb-6">
+      <div className="mb-6 space-y-3">
         <div className="flex items-center justify-between text-sm">
           <Text as="span" variant="secondary">Ore totali</Text>
           <Text as="span" size="lg">
@@ -71,23 +71,23 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
       {/* Power distribution */}
       {stats.totalHours > 0 && (
         <>
-          <div className="border-neutral-700 pt-4 mb-4">
-            <Heading level={3} size="sm" className="text-neutral-300 mb-3">
+          <div className="mb-4 border-neutral-700 pt-4">
+            <Heading level={3} size="sm" className="mb-3 text-neutral-300">
               Distribuzione Potenza
             </Heading>
             <div className="space-y-2">
               {powerPercentages.filter(p => p.hours > 0).map(({ level, hours, percentage }) => (
                 <div key={level} className="flex items-center gap-2">
-                  <span className="font-medium text-neutral-400 w-8">
+                  <span className="w-8 font-medium text-neutral-400">
                     ⚡P{level}
                   </span>
-                  <div className="flex-1 h-2 bg-neutral-700 rounded-full overflow-hidden">
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-700">
                     <div
                       className={`h-full transition-all duration-300 ${getPowerBarClass(level)}`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  <span className="text-neutral-400 w-16">
+                  <span className="w-16 text-neutral-400">
                     {formatHours(hours)} ({Math.round(percentage)}%)
                   </span>
                 </div>
@@ -108,7 +108,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
                   {Math.round((stats.weekdaysTotal / stats.totalHours) * 100)}%)
                 </span>
               </div>
-              <div className="flex items-center justify-between text-sm mt-2">
+              <div className="mt-2 flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
                   <span>🏖️</span>
                   <span className="text-neutral-400">Weekend</span>
@@ -125,7 +125,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
 
       {/* Empty state */}
       {stats.totalHours === 0 && (
-        <div className="text-center py-8">
+        <div className="py-8 text-center">
           <Text variant="tertiary" size="sm">Nessun intervallo configurato</Text>
         </div>
       )}

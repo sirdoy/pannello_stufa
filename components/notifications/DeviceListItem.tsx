@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
-import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import { Text } from '@/app/components/ui';
@@ -157,19 +156,19 @@ export default function DeviceListItem({
   };
 
   return (
-    <div className="p-4 bg-slate-800/50 border border-slate-700/50 rounded-xl" data-testid="device-item">
-      <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+    <div className="rounded-xl border border-slate-700/50 bg-slate-800/50 p-4" data-testid="device-item">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         {/* Device info */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex items-center gap-2">
             {/* Icon */}
-            <span className="text-xl flex-shrink-0">
+            <span className="shrink-0 text-xl">
               {getDeviceIcon(device.platform, device.browser)}
             </span>
 
             {/* Name - editable or display */}
             {isEditing ? (
-              <div className="flex-1 flex items-center gap-2">
+              <div className="flex flex-1 items-center gap-2">
                 <Input
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
@@ -203,12 +202,12 @@ export default function DeviceListItem({
             ) : (
               <button
                 onClick={() => setIsEditing(true)}
-                className="text-left flex-1 min-w-0 group"
+                className="group min-w-0 flex-1 text-left"
               >
-                <Text weight="medium" className="truncate group-hover:text-ember-400 transition-colors">
+                <Text weight="medium" className="truncate transition-colors group-hover:text-ember-400">
                   {device.displayName || 'Dispositivo senza nome'}
                 </Text>
-                <span className="ml-2 opacity-0 group-hover:opacity-100 text-xs text-ember-400 transition-opacity">
+                <span className="ml-2 text-xs text-ember-400 opacity-0 transition-opacity group-hover:opacity-100">
                   ✎
                 </span>
               </button>
@@ -216,13 +215,13 @@ export default function DeviceListItem({
 
             {/* Current device badge */}
             {isCurrentDevice && (
-              <span className="px-2 py-0.5 text-xs font-medium bg-ocean-500/20 text-ocean-400 rounded-full flex-shrink-0">
+              <span className="shrink-0 rounded-full bg-ocean-500/20 px-2 py-0.5 text-xs font-medium text-ocean-400">
                 Questo dispositivo
               </span>
             )}
 
             {/* Status badge */}
-            <span className={`px-2 py-0.5 text-xs font-medium rounded-full flex-shrink-0 ${statusStyle.className}`}>
+            <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${statusStyle.className}`}>
               {statusStyle.text}
             </span>
           </div>
@@ -250,7 +249,7 @@ export default function DeviceListItem({
 
           {/* Error message */}
           {error && (
-            <div className="ml-8 mt-2">
+            <div className="mt-2 ml-8">
               <Text variant="ember" size="sm">
                 {error}
               </Text>

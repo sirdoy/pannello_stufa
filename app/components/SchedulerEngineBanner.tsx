@@ -112,14 +112,14 @@ export default function SchedulerEngineBanner({ variant = 'banner' }: SchedulerE
     return (
       <div
         data-testid="scheduler-engine-banner"
-        className="bg-warning-900/30 border-warning-500/40 flex items-center gap-4 rounded-xl border p-5 backdrop-blur-xl"
+        className="flex items-center gap-4 rounded-xl border border-warning-500/40 bg-warning-900/30 p-5 backdrop-blur-xl"
       >
-        <div className="bg-warning-900/40 border-warning-500/50 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-2">
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-warning-500/50 bg-warning-900/40">
           <span className="text-2xl">⚠️</span>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-display text-warning-300 text-base font-bold">Motore stufa fermo</p>
-          <p className="text-warning-400 mt-0.5 text-sm">
+          <p className="font-display text-base font-bold text-warning-300">Motore stufa fermo</p>
+          <p className="mt-0.5 text-sm text-warning-400">
             {detail} • La pianificazione automatica non sta girando
           </p>
         </div>

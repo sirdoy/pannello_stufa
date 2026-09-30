@@ -89,14 +89,14 @@ export default function DeviceHistoryTimeline({
   return (
     <Card variant="elevated" className="p-4 sm:p-6">
       {/* Header with title and controls */}
-      <div className="flex flex-col gap-4 mb-6">
-        <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="mb-6 flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <Heading level={2} size="xl">
             Cronologia Dispositivi
           </Heading>
 
           {/* Controls row */}
-          <div className="flex items-center gap-3 flex-wrap">
+          <div className="flex flex-wrap items-center gap-3">
             {/* Time range selector */}
             <TimeRangeSelector
               value={timeRange as BandwidthTimeRange}
@@ -119,14 +119,14 @@ export default function DeviceHistoryTimeline({
       <div>
         {/* Loading state */}
         {isLoading && (
-          <div className="text-center py-8">
+          <div className="py-8 text-center">
             <Text variant="secondary">Caricamento cronologia...</Text>
           </div>
         )}
 
         {/* Empty state */}
         {!isLoading && isEmpty && (
-          <div className="text-center py-12">
+          <div className="py-12 text-center">
             <Text variant="secondary" size="lg">
               Nessun evento nel periodo selezionato
             </Text>
@@ -139,14 +139,14 @@ export default function DeviceHistoryTimeline({
             {groupedEvents.map((group) => (
               <div key={group.date}>
                 {/* Sticky date header */}
-                <div className="sticky top-0 bg-slate-900/95 backdrop-blur-sm py-2 mb-2 z-10">
+                <div className="sticky top-0 z-10 mb-2 bg-slate-900/95 py-2 backdrop-blur-sm">
                   <Text size="sm" weight="semibold" className="text-slate-300">
                     {group.dateLabel}
                   </Text>
                 </div>
 
                 {/* Timeline events with vertical line */}
-                <div className="pl-6 border-l-2 border-white/10 space-y-1">
+                <div className="space-y-1 border-l-2 border-white/10 pl-6">
                   {group.events.map((event, index) => (
                     <DeviceEventItem
                       key={`${event.deviceMac}-${event.timestamp}-${index}`}

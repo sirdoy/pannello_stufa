@@ -1,6 +1,5 @@
 'use client';
 
-import { ChevronRight } from 'lucide-react';
 import { flexRender, type Row, type ColumnDef } from '@tanstack/react-table';
 import { cn } from '@/lib/utils/cn';
 import Text from './Text';
@@ -102,11 +101,11 @@ export function DataTableRow<TData>({
         aria-expanded={canExpand ? isExpanded : undefined}
         aria-selected={row.getIsSelected() || undefined}
         className={cn(
-          'border-b border-white/[0.06] last:border-b-0',
+          'border-b border-white/6 last:border-b-0',
           'text-slate-200',
-          'hover:bg-white/[0.02] transition-colors',
+          'transition-colors hover:bg-white/2',
           (canExpand || onRowClick) && 'cursor-pointer',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ember-500/50',
+          'focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:outline-none focus-visible:ring-inset',
           row.getIsSelected() && 'bg-ember-500/10',
           isExpanded && 'border-b-0'
         )}
@@ -129,14 +128,14 @@ export function DataTableRow<TData>({
       {isExpanded && (
         <tr
           data-expansion-row
-          className="bg-slate-800/30 border-b border-white/[0.06] last:border-b-0"
+          className="border-b border-white/6 bg-slate-800/30 last:border-b-0"
           role="row"
         >
           <td colSpan={totalColumns} className="p-4" role="cell">
             {renderExpandedContent ? (
               renderExpandedContent(row)
             ) : (
-              <Text variant="secondary" size="sm" as="pre" className="whitespace-pre-wrap font-mono">
+              <Text variant="secondary" size="sm" as="pre" className="font-mono whitespace-pre-wrap">
                 {JSON.stringify(row.original, null, 2)}
               </Text>
             )}

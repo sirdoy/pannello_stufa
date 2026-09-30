@@ -92,8 +92,8 @@ export default function StovePage() {
   if (stoveData.initialLoading) {
     return (
       <div className="space-y-8">
-        <Skeleton className="h-[500px] rounded-3xl" />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Skeleton className="h-125 rounded-3xl" />
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-32 rounded-2xl" />
           ))}
@@ -109,8 +109,8 @@ export default function StovePage() {
       </Heading>
 
       {/* Full-screen ambient gradient + glow */}
-      <div className={`fixed inset-0 -z-10 bg-gradient-to-br ${theme.bg} transition-all duration-1000`} />
-      <div className={`fixed inset-0 -z-10 pointer-events-none transition-all duration-1000 ${theme.glow}`} />
+      <div className={`fixed inset-0 -z-10 bg-linear-to-br ${theme.bg} transition-all duration-1000`} />
+      <div className={`pointer-events-none fixed inset-0 -z-10 transition-all duration-1000 ${theme.glow}`} />
 
       <LoadingOverlay show={stoveData.loading} message={stoveData.loadingMessage} icon="🔥" />
 

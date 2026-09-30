@@ -92,7 +92,7 @@ describe('Divider', () => {
     it('applies gradient variant classes', () => {
       const { container } = render(<Divider variant="gradient" />);
       const line = container.querySelector('.h-px');
-      expect(line).toHaveClass('bg-gradient-to-r', 'from-transparent');
+      expect(line).toHaveClass('bg-linear-to-r', 'from-transparent');
     });
   });
 

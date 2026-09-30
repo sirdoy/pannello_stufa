@@ -19,11 +19,9 @@
  */
 
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { db } from '@/lib/firebase';
-import { ref, get } from 'firebase/database';
-import { saveToken, loadToken, updateLastUsed, getTokenAge } from '@/lib/tokenStorage';
+import { saveToken, loadToken, getTokenAge } from '@/lib/tokenStorage';
 import { generateDeviceFingerprint } from '@/lib/deviceFingerprint';
-import { initializeTokenManagement, checkAndRefreshToken } from '@/lib/tokenRefresh';
+import { initializeTokenManagement } from '@/lib/tokenRefresh';
 
 /**
  * Ottiene la VAPID key al momento dell'uso (non a livello modulo)

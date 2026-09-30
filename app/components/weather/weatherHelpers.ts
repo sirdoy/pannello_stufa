@@ -101,54 +101,6 @@ export function getUVIndexLabel(uvIndex: number | null | undefined): string {
 }
 
 /**
- * Check if a WMO weather code represents snow precipitation
- * @param weatherCode - WMO weather code (0-99)
- * @returns True if the code represents snow
- *
- * Snow codes: 71-77 (snow), 85-86 (snow showers)
- */
-function isSnowCode(weatherCode: number): boolean {
-  return (weatherCode >= 71 && weatherCode <= 77) || (weatherCode >= 85 && weatherCode <= 86);
-}
-
-/**
- * Get precipitation chance description in Italian
- * Now accepts optional weatherCode to distinguish between rain and snow
- *
- * @param percent - Precipitation probability (0-100)
- * @param weatherCode - Optional WMO weather code to determine precipitation type
- * @returns Italian description or null if too low to mention
- *
- * @example
- * getPrecipitationLabel(5) // null
- * getPrecipitationLabel(30) // "Possibile pioggia"
- * getPrecipitationLabel(60, 71) // "Probabile neve" (snow code)
- * getPrecipitationLabel(85, 63) // "Pioggia prevista" (rain code)
- */
-function getPrecipitationLabel(percent: number | null | undefined, weatherCode: number | null = null): string | null {
-  if (percent === null || percent === undefined || isNaN(percent)) {
-    return null;
-  }
-
-  if (percent <= 10) {
-    return null; // Don't show for very low probability
-  }
-
-  // Determine precipitation type based on weather code
-  const isSnow = weatherCode !== null && isSnowCode(weatherCode);
-  const precipType = isSnow ? 'neve' : 'pioggia';
-  const capitalizedType = isSnow ? 'Neve' : 'Pioggia';
-
-  if (percent <= 40) {
-    return `Possibile ${precipType}`;
-  } else if (percent <= 70) {
-    return `Probabile ${precipType}`;
-  } else {
-    return `${capitalizedType} prevista`;
-  }
-}
-
-/**
  * Get Italian Air Quality Index (AQI) severity label
  * Uses European AQI scale (0-100+)
  * @param aqi - Air Quality Index value

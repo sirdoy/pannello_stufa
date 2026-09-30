@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@/lib/auth/useUser';
 import SettingsLayout from '@/app/components/SettingsLayout';
 import { Card, Button, Heading, Text, Skeleton, EmptyState, Banner } from '@/app/components/ui';
@@ -28,7 +28,7 @@ export default function DeviceManagementPage() {
   const [currentToken, setCurrentToken] = useState<string | null>(null);
 
   // Fetch devices
-  const fetchDevices = async () => {
+  const fetchDevices = useCallback(async () => {
     try {
       setError(null);
       const res = await fetch('/api/notifications/devices');
@@ -45,7 +45,8 @@ export default function DeviceManagementPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
 
   // Get current device token
   useEffect(() => {
@@ -98,7 +99,7 @@ export default function DeviceManagementPage() {
     return (
       <SettingsLayout title="Dispositivi Notifiche" icon="📱">
         <Card variant="glass" className="p-8 text-center">
-          <div className="text-6xl mb-4">🔐</div>
+          <div className="mb-4 text-6xl">🔐</div>
           <Heading level={2} size="xl" className="mb-2">
             Autenticazione Richiesta
           </Heading>
@@ -121,7 +122,7 @@ export default function DeviceManagementPage() {
     return (
       <SettingsLayout title="Dispositivi Notifiche" icon="📱">
         <Card variant="glass" className="p-8 text-center">
-          <div className="text-6xl mb-4">❌</div>
+          <div className="mb-4 text-6xl">❌</div>
           <Heading level={2} size="xl" className="mb-2">
             Errore
           </Heading>
@@ -139,7 +140,7 @@ export default function DeviceManagementPage() {
   return (
     <SettingsLayout title="Dispositivi Notifiche" icon="📱">
       {/* Description */}
-      <div className="space-y-2 mb-6">
+      <div className="mb-6 space-y-2">
         <Text variant="secondary" size="sm">
           Gestisci i dispositivi registrati per le notifiche push.
           Puoi rinominare i dispositivi per identificarli facilmente o rimuovere quelli non più in uso.
@@ -213,7 +214,7 @@ export default function DeviceManagementPage() {
       )}
 
       {/* Back link */}
-      <Card variant="glass" className="p-4 mt-6">
+      <Card variant="glass" className="mt-6 p-4">
         <div className="flex items-center justify-between">
           <Text variant="secondary" size="sm">
             Torna alle impostazioni notifiche

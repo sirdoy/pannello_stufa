@@ -32,12 +32,12 @@ export default function SonosSleepTimer({ remainingSeconds, onSetTimer }: SonosS
       {hasActiveTimer && (
         <div className="flex items-center gap-2">
           <Timer size={14} className="text-ember-400" />
-          <span className="text-sm font-mono text-ember-400">
+          <span className="font-mono text-sm text-ember-400">
             {formatRemainingTime(remainingSeconds!)}
           </span>
           <button
             onClick={() => onSetTimer(0)}
-            className="p-1 rounded text-slate-400 hover:text-slate-200 transition-colors"
+            className="rounded p-1 text-slate-400 transition-colors hover:text-slate-200"
             aria-label="Annulla timer"
           >
             <X size={14} />

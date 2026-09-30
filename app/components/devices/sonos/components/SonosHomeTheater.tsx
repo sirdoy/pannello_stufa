@@ -71,7 +71,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
     <div className="mt-2">
       <button
         onClick={() => setIsExpanded(prev => !prev)}
-        className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
+        className="flex items-center gap-1.5 text-xs text-slate-400 transition-colors hover:text-slate-200"
         aria-label="Home Theater"
       >
         <span>Home Theater</span>
@@ -121,7 +121,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
           {/* Sub gain slider — visible only when sub_enabled */}
           {htData.sub_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 w-24 flex-shrink-0">
+              <span className="w-24 shrink-0 text-xs text-slate-400">
                 Guadagno Sub
               </span>
               <input
@@ -130,10 +130,10 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
                 max={15}
                 value={localSubGain}
                 onChange={handleSubGainChange}
-                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500"
+                className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500"
                 aria-label="Guadagno Sub"
               />
-              <span className="text-xs text-slate-400 min-w-[28px] text-right">
+              <span className="min-w-7 text-right text-xs text-slate-400">
                 {formatValue(localSubGain)}
               </span>
             </div>
@@ -142,7 +142,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
           {/* Surround TV volume slider — visible only when surround_enabled */}
           {htData.surround_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 w-24 flex-shrink-0">
+              <span className="w-24 shrink-0 text-xs text-slate-400">
                 Volume Surround TV
               </span>
               <input
@@ -151,10 +151,10 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
                 max={15}
                 value={localSurroundTv}
                 onChange={handleSurroundTvChange}
-                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500"
+                className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500"
                 aria-label="Volume Surround TV"
               />
-              <span className="text-xs text-slate-400 min-w-[28px] text-right">
+              <span className="min-w-7 text-right text-xs text-slate-400">
                 {formatValue(localSurroundTv)}
               </span>
             </div>
@@ -163,7 +163,7 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
           {/* Surround music volume slider — visible only when surround_enabled */}
           {htData.surround_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="text-xs text-slate-400 w-24 flex-shrink-0">
+              <span className="w-24 shrink-0 text-xs text-slate-400">
                 Volume Surround Musica
               </span>
               <input
@@ -172,10 +172,10 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
                 max={15}
                 value={localSurroundMusic}
                 onChange={handleSurroundMusicChange}
-                className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500"
+                className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500"
                 aria-label="Volume Surround Musica"
               />
-              <span className="text-xs text-slate-400 min-w-[28px] text-right">
+              <span className="min-w-7 text-right text-xs text-slate-400">
                 {formatValue(localSurroundMusic)}
               </span>
             </div>

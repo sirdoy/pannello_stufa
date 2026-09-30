@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange, type ScheduleInterval, type WeeklySchedule } from '@/lib/scheduler/schedulerService';
+import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange, type ScheduleInterval } from '@/lib/scheduler/schedulerService';
 import { saveSchedule as apiSaveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/scheduler/schedulerApiClient';
 import {
   getAllSchedules,
@@ -95,7 +95,7 @@ export default function WeeklyScheduler() {
   });
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [lastLocalSave, setLastLocalSave] = useState<number | null>(null);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>({
+  const [saveStatus] = useState<SaveStatus>({
     isSaving: false,
     day: null,
   });
@@ -244,18 +244,6 @@ export default function WeeklyScheduler() {
     });
   };
 
-  const incrementTime = (time: string, minutesToAdd: number): string => {
-    const [h, m] = time.split(':').map(Number);
-    const total = h! * 60 + m! + minutesToAdd;
-    const newH = String(Math.floor(total / 60) % 24).padStart(2, '0');
-    const newM = String(total % 60).padStart(2, '0');
-    return `${newH}:${newM}`;
-  };
-
-  const isValidRange = (start: string, end: string): boolean => {
-    return start < end;
-  };
-
   // Ordina gli intervalli per orario di inizio
   const sortIntervals = (intervals: ScheduleInterval[]): ScheduleInterval[] => {
     return [...intervals].sort((a, b) => {
@@ -263,132 +251,6 @@ export default function WeeklyScheduler() {
       if (a.start > b.start) return 1;
       return 0;
     });
-  };
-
-  // Applica collegamento tra intervalli adiacenti e rimuove sovrapposizioni
-  const applyAdjacentLinksAndRemoveOverlaps = (intervals: ScheduleInterval[], changedIndex: number, originalStart: string, originalEnd: string, field: 'start' | 'end'): ScheduleInterval[] => {
-    let result = [...intervals];
-    const changedInterval = result[changedIndex];
-    if (!changedInterval) return result;
-
-    // 1. Collegamento bidirezionale con intervalli adiacenti
-    result = result.map((interval, idx) => {
-      // Non modificare l'intervallo che abbiamo cambiato
-      if (idx === changedIndex) return interval;
-
-      // Se questo intervallo terminava esattamente dove iniziava quello modificato
-      // E abbiamo modificato lo start di quello cambiato
-      if (field === 'start' && interval.end === originalStart) {
-        return { ...interval, end: changedInterval.start };
-      }
-
-      // Se questo intervallo iniziava esattamente dove terminava quello modificato
-      // E abbiamo modificato l'end di quello cambiato
-      if (field === 'end' && interval.start === originalEnd) {
-        return { ...interval, start: changedInterval.end };
-      }
-
-      return interval;
-    });
-
-    // 2. Rimuovi intervalli completamente sovrapposti
-    result = result.filter((interval, idx) => {
-      // Non rimuovere l'intervallo che abbiamo modificato
-      if (idx === changedIndex) return true;
-
-      // Rimuovi se l'intervallo è completamente contenuto in quello modificato
-      const isCompletelyOverlapped =
-        interval.start >= changedInterval.start &&
-        interval.end <= changedInterval.end;
-
-      return !isCompletelyOverlapped;
-    });
-
-    return result;
-  };
-
-  const handleChange = async (day: DayOfWeek, index: number, field: string, value: string | number, isBlur = false) => {
-    const originalSchedule = schedule[day];
-    const originalInterval = originalSchedule[index];
-    if (!originalInterval) return;
-    const originalStart = originalInterval.start;
-    const originalEnd = originalInterval.end;
-
-    let updated = [...originalSchedule];
-    const currentInterval = updated[index];
-    if (!currentInterval) return;
-    updated[index] = { ...currentInterval, [field]: value };
-
-    if (isBlur) {
-      // Feature 4: Show saving indicator
-      setSaveStatus({ isSaving: true, day });
-
-      try {
-        // Al blur: applica tutte le validazioni e salva
-        if (field === 'start' || field === 'end') {
-          const intervalToUpdate = updated[index];
-          if (!intervalToUpdate) return;
-          const { start } = intervalToUpdate;
-          let { end } = intervalToUpdate;
-
-          // Validazione: end deve essere > start di almeno 15 minuti
-          if (end <= start) {
-            end = incrementTime(start, 15);
-            intervalToUpdate.end = end;
-          }
-
-          // Applica collegamento con adiacenti e rimuovi sovrapposizioni
-          updated = applyAdjacentLinksAndRemoveOverlaps(
-            updated,
-            index,
-            originalStart,
-            originalEnd,
-            field
-          );
-        }
-
-        // Ordina gli intervalli e salva (per tutti i campi al blur)
-        const sorted = sortIntervals(updated);
-        const updatedSchedule = { ...schedule, [day]: sorted };
-        setSchedule(updatedSchedule);
-
-        await saveSchedule(day, sorted);
-        await logSchedulerAction.updateSchedule(day);
-
-        // Feature 2: Toast notification
-        setToast({
-          message: 'Intervallo aggiornato',
-          icon: '💾',
-          variant: 'success',
-        });
-
-        // Feature 4: Show success briefly
-        setSaveStatus({ isSaving: false, day });
-        setTimeout(() => {
-          setSaveStatus({ isSaving: false, day: null });
-        }, 1000);
-
-        // Se siamo in semi-manuale, aggiorna il returnToAutoAt
-        if (semiManualMode && (field === 'start' || field === 'end')) {
-          const nextChange = await getNextScheduledChange();
-          if (nextChange) {
-            await setSemiManualMode(nextChange);
-            setReturnToAutoAt(nextChange);
-          }
-        }
-      } catch (error) {
-        setSaveStatus({ isSaving: false, day: null });
-        setToast({
-          message: 'Errore durante il salvataggio',
-          icon: '❌',
-          variant: 'error',
-        });
-      }
-    } else {
-      // Durante onChange (non blur), aggiorna solo lo stato locale senza ordinare né validare
-      const updatedSchedule = { ...schedule, [day]: updated };
-      setSchedule(updatedSchedule);
-    }
   };
 
   const toggleSchedulerMode = async () => {
@@ -492,7 +354,7 @@ export default function WeeklyScheduler() {
         icon: '🗑️',
         variant: 'success',
       });
-    } catch (error) {
+    } catch {
       setToast({
         message: 'Errore durante l\'eliminazione',
         icon: '❌',
@@ -547,7 +409,7 @@ export default function WeeklyScheduler() {
         icon: '📋',
         variant: 'success',
       });
-    } catch (error) {
+    } catch {
       setToast({
         message: 'Errore durante la duplicazione',
         icon: '❌',
@@ -562,7 +424,7 @@ export default function WeeklyScheduler() {
     setDuplicateModal({ isOpen: false, sourceDay: null });
   };
 
-  const handleConfirmAddInterval = async ({ start, end, duration, power, fan }: ScheduleInterval & { duration?: number }) => {
+  const handleConfirmAddInterval = async ({ start, end, duration: _duration, power, fan }: ScheduleInterval & { duration?: number }) => {
     const { day, mode, index } = addIntervalModal;
     if (!day) return;
 
@@ -604,7 +466,7 @@ export default function WeeklyScheduler() {
           variant: 'success',
         });
       }
-    } catch (error) {
+    } catch {
       setToast({
         message: 'Errore durante il salvataggio',
         icon: '❌',
@@ -665,7 +527,7 @@ export default function WeeklyScheduler() {
 
   const handleCreateSchedule = async ({ name, copyFromId }: { name: string; copyFromId: string | null }) => {
     try {
-      const newSchedule = await createSchedule(name, copyFromId);
+      await createSchedule(name, copyFromId);
 
       // Reload schedules list
       const allSchedules = await getAllSchedules();
@@ -748,7 +610,7 @@ export default function WeeklyScheduler() {
       }
     >
       {/* Header Row - 2 columns on desktop */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Left: Mode and Schedule Selector */}
         <Card variant="glass" className="p-6 sm:p-8">
           {/* Schedule Selector */}
@@ -764,7 +626,7 @@ export default function WeeklyScheduler() {
             <Button
               variant="subtle"
               onClick={() => setManageSchedulesModal(true)}
-              className="w-full mt-3"
+              className="mt-3 w-full"
               size="sm"
               icon="⚙️"
             >

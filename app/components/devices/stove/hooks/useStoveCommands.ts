@@ -83,7 +83,7 @@ export interface UseStoveCommandsReturn {
  * @returns Command handlers and retryable command objects
  */
 export function useStoveCommands(params: UseStoveCommandsParams): UseStoveCommandsReturn {
-  const { stoveData, router, user } = params;
+  const { stoveData, user } = params;
 
   // Retry infrastructure - one hook per command type (React hooks rules)
   const igniteCmd = useRetryableCommand({ device: 'stove', action: 'ignite' });

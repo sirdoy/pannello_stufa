@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Card, Button, Skeleton, ErrorAlert, Banner, Heading, Text, Grid, InfoBox, PageLayout } from '@/app/components/ui';
+import { Card, Button, Skeleton, Banner, Heading, Text, Grid, InfoBox, PageLayout } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
 import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/thermostat/BatteryWarning';
 import type { Module } from '@/app/components/devices/thermostat/BatteryWarning';
@@ -11,7 +11,7 @@ import ThermostatTabs from './components/ThermostatTabs';
 import { NETATMO_ROUTES } from '@/lib/routes';
 import { Calendar, Clock } from 'lucide-react';
 import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
-import type { NetatmoTopology, NetatmoRoom, NetatmoModule, NetatmoStatus, RoomStatus, ModuleStatus } from '@/app/components/devices/thermostat/hooks/useThermostatData';
+import type { NetatmoRoom, NetatmoModule } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 
 interface RoomWithStatus extends NetatmoRoom {
   name: string;
@@ -34,7 +34,7 @@ function NetatmoContent() {
   const router = useRouter();
   const { connected, topology, status, loading, error, refetch } = useThermostatData();
   const [refreshing, setRefreshing] = useState<boolean>(false);
-  const [oauthError, setOauthError] = useState<string | null>(null);
+  const [, setOauthError] = useState<string | null>(null);
 
   // Derive mode from status
   const mode = status?.mode ?? 'schedule';
@@ -104,7 +104,7 @@ function NetatmoContent() {
 
           {/* Helpful troubleshooting info */}
           <Banner variant="info" icon="💡" title="Suggerimenti:" className="mt-6">
-            <ul className="space-y-1 ml-1 mt-2">
+            <ul className="mt-2 ml-1 space-y-1">
               <Text as="li" size="sm">Verifica di aver completato l&apos;autenticazione Netatmo</Text>
               <Text as="li" size="sm">Controlla che il tuo account Netatmo sia attivo</Text>
               <Text as="li" size="sm">Assicurati di avere almeno un termostato configurato</Text>
@@ -273,8 +273,8 @@ function NetatmoContent() {
         scheduleContent={
           <>
             {/* Mode Control - Liquid Glass Card */}
-            <Card variant="glass" className="p-5 sm:p-6 mb-6">
-              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <Card variant="glass" className="mb-6 p-5 sm:p-6">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
                   <Heading level={2} size="xl" className="mb-1">
                     Modalita Riscaldamento
@@ -310,16 +310,16 @@ function NetatmoContent() {
             </Card>
 
             {/* Schedule Management Link */}
-            <Card variant="glass" className="p-5 sm:p-6 mb-6">
+            <Card variant="glass" className="mb-6 p-5 sm:p-6">
               <Link
                 href="/thermostat/schedule"
-                className="flex items-center justify-between group"
+                className="group flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
                   <div className="
-                    w-10 h-10 rounded-xl
-                    bg-ember-500/20 flex items-center justify-center
-                    group-hover:bg-ember-500/30 transition-colors
+                    flex size-10 items-center
+                    justify-center rounded-xl bg-ember-500/20 transition-colors
+                    group-hover:bg-ember-500/30
                   ">
                     <Calendar className="text-ember-400" size={20} />
                   </div>
@@ -363,12 +363,12 @@ function NetatmoContent() {
 
               {/* Module Battery Status List */}
               {modulesWithBattery && modulesWithBattery.length > 0 && (
-                <div className="mt-4 pt-4 border-t border-slate-700/50">
+                <div className="mt-4 border-t border-slate-700/50 pt-4">
                   <ModuleBatteryList modules={modulesWithBattery as Module[]} />
                 </div>
               )}
 
-              <div className="mt-4 pt-4 border-t border-slate-700/50">
+              <div className="mt-4 border-t border-slate-700/50 pt-4">
                 <Button
                   variant="subtle"
                   onClick={handleRefresh}
@@ -408,7 +408,7 @@ function NetatmoContent() {
         historyContent={
           <Card variant="glass" className="p-8 text-center">
             <div className="flex flex-col items-center gap-4">
-              <Clock className="w-12 h-12 text-slate-400" />
+              <Clock className="size-12 text-slate-400" />
               <Heading level={3} size="lg">
                 Storico Temperature
               </Heading>

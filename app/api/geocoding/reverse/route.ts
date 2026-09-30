@@ -179,7 +179,6 @@ export const GET = withAuthAndErrorHandler(async (request) => {
     // and try a secondary search for nearby cities
 
     // Try searching with coordinates as numbers (some APIs support this)
-    const searchUrl = new URL('https://geocoding-api.open-meteo.com/v1/search');
     // Use a very generic search term that will return something in Italy
     // Then filter by distance
 

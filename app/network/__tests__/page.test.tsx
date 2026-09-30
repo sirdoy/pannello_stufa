@@ -97,7 +97,7 @@ jest.mock('../components/DeviceListTable', () => ({
 
 jest.mock('../components/BandwidthChart', () => ({
   __esModule: true,
-  default: ({ data, timeRange, onTimeRangeChange, isEmpty, isCollecting, pointCount }: ComponentProps<typeof BandwidthChart>) => (
+  default: ({ data, timeRange, isEmpty, isCollecting, pointCount }: ComponentProps<typeof BandwidthChart>) => (
     <div
       data-testid="bandwidth-chart"
       data-point-count={pointCount}

@@ -31,6 +31,8 @@ export function useFritzDectHandsets(options: UseFritzDectHandsetsOptions = {}):
   stale: boolean;
   total: number;
 } {
+  // Opt out of React Compiler: its effects rely on intentionally partial deps (kept as before M44)
+  'use no memo';
   const { paused = false } = options;
 
   const [handsets, setHandsets] = useState<DectHandset[]>([]);
@@ -75,7 +77,6 @@ export function useFritzDectHandsets(options: UseFritzDectHandsetsOptions = {}):
   // Guarantees fresh data whenever paused flips from true to false.
   useEffect(() => {
     if (!paused) void fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paused]);
 
   return { handsets, loading, stale, total };

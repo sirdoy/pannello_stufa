@@ -16,7 +16,7 @@
  * Design System remains at /debug/design-system (documentation)
  */
 
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Tabs from '@/app/components/ui/Tabs';
 import Card from '@/app/components/ui/Card';
@@ -87,7 +87,7 @@ function NotificheContent() {
   };
 
   return (
-    <div className="space-y-6 mt-6">
+    <div className="mt-6 space-y-6">
       <div className="flex items-center justify-between">
         <Text variant="tertiary" size="sm">
           Monitor delivery rate e system health
@@ -102,8 +102,8 @@ function NotificheContent() {
       )}
 
       {stats && !loading && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-6 bg-ocean-50 border-2 border-ocean-200">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <Card className="border-2 border-ocean-200 bg-ocean-50 p-6">
             <Text variant="tertiary" size="xs" className="mb-2">Notifiche Oggi</Text>
             <Text variant="tertiary" className="text-4xl">
               {stats.notifications.total}
@@ -112,10 +112,10 @@ function NotificheContent() {
 
           <Card className={`p-6 ${
             getDeliveryRateColor(stats.notifications.deliveryRate) === 'sage'
-              ? 'bg-sage-50 border-2 border-sage-300'
+              ? 'border-2 border-sage-300 bg-sage-50'
               : getDeliveryRateColor(stats.notifications.deliveryRate) === 'warning'
-              ? 'bg-warning-50 border-2 border-warning-300'
-              : 'bg-ember-50 border-2 border-ember-300'
+              ? 'border-2 border-warning-300 bg-warning-50'
+              : 'border-2 border-ember-300 bg-ember-50'
           }`}>
             <Text variant="tertiary" size="xs" className="mb-2">Delivery Rate</Text>
             <Text
@@ -128,7 +128,7 @@ function NotificheContent() {
             </Text>
           </Card>
 
-          <Card className="p-6 bg-slate-50 border-2 border-slate-200">
+          <Card className="border-2 border-slate-200 bg-slate-50 p-6">
             <Text variant="tertiary" size="xs" className="mb-2">Device Attivi</Text>
             <Text as="p" className="text-4xl">
               {stats.devices.active}
@@ -163,13 +163,13 @@ function DebugPageContent() {
   const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-  const handleTabChange = (value: string): void => {
+  const handleTabChange = useCallback((value: string): void => {
     router.push(`/debug?tab=${value}`, { scroll: false });
-  };
+  }, [router]);
 
-  const handleManualRefresh = (): void => {
+  const handleManualRefresh = useCallback((): void => {
     setRefreshTrigger(prev => prev + 1);
-  };
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -197,13 +197,13 @@ function DebugPageContent() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [handleTabChange, handleManualRefresh]);
 
   return (
     <PageLayout maxWidth="7xl">
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <Heading level={1} className="flex items-center gap-3">
               <span>🐛</span>
@@ -241,9 +241,9 @@ function DebugPageContent() {
 
         {/* Keyboard shortcuts hint */}
         <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-          <span className="px-2 py-1 bg-slate-800 text-slate-200 rounded">1-9: Switch tabs</span>
-          <span className="px-2 py-1 bg-slate-800 text-slate-200 rounded">Cmd+R: Refresh</span>
-          <span className="px-2 py-1 bg-slate-800 text-slate-200 rounded">A: Auto-refresh</span>
+          <span className="rounded bg-slate-800 px-2 py-1 text-slate-200">1-9: Switch tabs</span>
+          <span className="rounded bg-slate-800 px-2 py-1 text-slate-200">Cmd+R: Refresh</span>
+          <span className="rounded bg-slate-800 px-2 py-1 text-slate-200">A: Auto-refresh</span>
         </div>
 
         <Card variant="glass" className="p-6">

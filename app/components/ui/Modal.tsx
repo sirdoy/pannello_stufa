@@ -59,8 +59,8 @@ const contentVariants = cva(
     'focus:outline-none',
     'overflow-y-auto',
     // Centered on all screen sizes (desktop and mobile)
-    'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2',
-    'rounded-3xl max-h-[85vh]',
+    'top-1/2 left-1/2 -translate-1/2',
+    'max-h-[85vh] rounded-3xl',
     // Animation
     'data-[state=open]:animate-scale-in-center',
     'data-[state=closed]:animate-fade-out',
@@ -72,7 +72,7 @@ const contentVariants = cva(
         md: 'w-full max-w-md',
         lg: 'w-full max-w-lg',
         xl: 'w-full max-w-xl',
-        full: 'w-[95vw] h-[85vh] max-w-none',
+        full: 'h-[85vh] w-[95vw] max-w-none',
       },
     },
     defaultVariants: { size: 'md' },
@@ -137,7 +137,7 @@ const ModalHeader = forwardRef<HTMLDivElement, ModalHeaderProps>(
       <div
         ref={ref}
         className={cn(
-          'flex items-center justify-between gap-4 mb-4',
+          'mb-4 flex items-center justify-between gap-4',
           className
         )}
         {...props}
@@ -160,7 +160,7 @@ const ModalTitle = forwardRef<React.ElementRef<typeof DialogPrimitive.Title>, Mo
       <DialogPrimitive.Title
         ref={ref}
         className={cn(
-          'text-xl font-display font-semibold',
+          'font-display text-xl font-semibold',
           'text-slate-100 ',
           className
         )}
@@ -207,7 +207,7 @@ const ModalFooter = forwardRef<HTMLDivElement, ModalFooterProps>(
       <div
         ref={ref}
         className={cn(
-          'flex items-center justify-end gap-3 mt-6',
+          'mt-6 flex items-center justify-end gap-3',
           className
         )}
         {...props}
@@ -230,10 +230,10 @@ const ModalClose = forwardRef<React.ElementRef<typeof DialogPrimitive.Close>, Mo
       <DialogPrimitive.Close
         ref={ref}
         className={cn(
-          'p-2 rounded-xl',
+          'rounded-xl p-2',
           'text-slate-400 hover:text-slate-200',
           ' ',
-          'hover:bg-white/[0.06] ]',
+          '] hover:bg-white/6',
           'transition-colors duration-200',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
           className
@@ -241,7 +241,7 @@ const ModalClose = forwardRef<React.ElementRef<typeof DialogPrimitive.Close>, Mo
         aria-label="Close"
         {...props}
       >
-        {children || <X className="h-5 w-5" />}
+        {children || <X className="size-5" />}
       </DialogPrimitive.Close>
     );
   }

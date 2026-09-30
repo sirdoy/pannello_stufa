@@ -94,7 +94,7 @@ function LocationContent() {
           text: data.error || 'Errore durante il salvataggio',
         });
       }
-    } catch (err) {
+    } catch {
       setSaveMessage({ type: 'error', text: 'Errore di connessione' });
     } finally {
       setIsSaving(false);
@@ -106,7 +106,7 @@ function LocationContent() {
   }
 
   return (
-    <div className="space-y-6 mt-6">
+    <div className="mt-6 space-y-6">
       {/* Description */}
       <Text variant="secondary">
         Configura la posizione per le previsioni meteo
@@ -145,7 +145,7 @@ function LocationContent() {
       {/* Info card */}
       <Card
         variant="glass"
-        className="p-6 sm:p-8 bg-ocean-50/50 bg-ocean-900/10 border border-ocean-200 border-ocean-800"
+        className="border border-ocean-200 border-ocean-800 bg-ocean-50/50 bg-ocean-900/10 p-6 sm:p-8"
       >
         <div className="flex gap-3">
           <div className="text-2xl">ℹ️</div>
@@ -314,7 +314,7 @@ function UnifiedDevicesContent() {
   }
 
   return (
-    <div className="space-y-6 mt-6">
+    <div className="mt-6 space-y-6">
       {/* Description */}
       <Text variant="tertiary" className="text-sm sm:text-base">
         Scegli quali dispositivi mostrare e in che ordine
@@ -336,7 +336,7 @@ function UnifiedDevicesContent() {
             return (
               <div
                 key={device.id}
-                className={`p-3 sm:p-4 rounded-xl border-2 transition-all duration-200 ${
+                className={`rounded-xl border-2 p-3 transition-all duration-200 sm:p-4 ${
                   isVisible
                     ? 'border-ember-600/50 bg-ember-950/10'
                     : 'border-slate-700/30 bg-slate-900/20 opacity-60'
@@ -344,10 +344,10 @@ function UnifiedDevicesContent() {
               >
                 <div className="flex items-center justify-between gap-2 sm:gap-4">
                   {/* Left: Icon + Name + Description + Badges */}
-                  <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <span className="text-2xl flex-shrink-0">{device.icon}</span>
+                  <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <span className="shrink-0 text-2xl">{device.icon}</span>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex flex-wrap items-center gap-2">
                         <Text className="truncate">{device.name}</Text>
                         {device.isDisplayOnly && (
                           <Badge variant="ocean" size="sm">solo home</Badge>
@@ -356,14 +356,14 @@ function UnifiedDevicesContent() {
                           <Badge variant="neutral" size="sm">solo menu</Badge>
                         )}
                       </div>
-                      <Text variant="tertiary" size="xs" className="hidden sm:block truncate">
+                      <Text variant="tertiary" size="xs" className="hidden truncate sm:block">
                         {device.description}
                       </Text>
                     </div>
                   </div>
 
                   {/* Right: Toggle + Order buttons */}
-                  <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                  <div className="flex shrink-0 items-center gap-2 sm:gap-3">
                     {/* Visibility toggle */}
                     <Toggle
                       checked={isVisible}
@@ -406,7 +406,7 @@ function UnifiedDevicesContent() {
       {/* Action buttons */}
       {hasChanges && (
         <Card variant="glass" className="p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+          <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
             <div className="flex-1">
               <Text size="sm">
                 Hai modifiche non salvate
@@ -416,7 +416,7 @@ function UnifiedDevicesContent() {
               </Text>
             </div>
 
-            <div className="flex gap-3 flex-shrink-0">
+            <div className="flex shrink-0 gap-3">
               <Button
                 variant="subtle"
                 onClick={handleReset}
@@ -439,31 +439,31 @@ function UnifiedDevicesContent() {
       )}
 
       {/* Info card */}
-      <Card variant="glass" className="p-4 sm:p-6 bg-ocean-900/10">
+      <Card variant="glass" className="bg-ocean-900/10 p-4 sm:p-6">
         <Heading level={3} size="md" variant="subtle" className="mb-3">
           ℹ️ Come funziona
         </Heading>
         <ul className="space-y-2">
           <li className="flex gap-2">
-            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ember" className="shrink-0">•</Text>
             <Text variant="tertiary" size="sm">
               Il toggle controlla la visibilità del dispositivo (menu e homepage)
             </Text>
           </li>
           <li className="flex gap-2">
-            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ember" className="shrink-0">•</Text>
             <Text variant="tertiary" size="sm">
               Usa le frecce per riordinare i dispositivi nella homepage
             </Text>
           </li>
           <li className="flex gap-2">
-            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ember" className="shrink-0">•</Text>
             <Text variant="tertiary" size="sm">
               <strong>solo home</strong>: il dispositivo appare solo nella homepage (es. Meteo)
             </Text>
           </li>
           <li className="flex gap-2">
-            <Text as="span" variant="ember" className="flex-shrink-0">•</Text>
+            <Text as="span" variant="ember" className="shrink-0">•</Text>
             <Text variant="tertiary" size="sm">
               <strong>solo menu</strong>: il dispositivo appare solo nel menu (es. Sonos)
             </Text>

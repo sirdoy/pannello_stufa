@@ -5,7 +5,6 @@
  */
 
 import { computeNetworkHealth, mapHealthToDeviceCard } from '../networkHealthUtils';
-import type { NetworkHealthStatus } from '../types';
 
 describe('computeNetworkHealth', () => {
   it('returns immediate poor status when WAN disconnected (no hysteresis)', () => {

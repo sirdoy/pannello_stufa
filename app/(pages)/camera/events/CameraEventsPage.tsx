@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import {
@@ -72,9 +72,9 @@ export default function CameraEventsPage() {
   }
 
   // Virtual scrolling - show more events when scrolling
-  const handleLoadMore = (): void => {
+  const handleLoadMore = useCallback((): void => {
     setDisplayCount(prev => prev + 20);
-  };
+  }, []);
 
   // Filter events by selected camera
   const filteredEvents = selectedCameraId === 'all'
@@ -171,7 +171,7 @@ export default function CameraEventsPage() {
           title="Errore"
           description={error}
         />
-        <div className="flex gap-2 mt-4">
+        <div className="mt-4 flex gap-2">
           <Button variant="ember" onClick={handleRefresh}>
             Riprova
           </Button>
@@ -191,7 +191,7 @@ export default function CameraEventsPage() {
           title="Nessun evento registrato"
           description="Non sono stati trovati eventi registrati dalle tue videocamere."
         />
-        <div className="text-center mt-4">
+        <div className="mt-4 text-center">
           <Button variant="subtle" onClick={() => router.push('/camera')}>
             Torna alle camere
           </Button>
@@ -233,7 +233,7 @@ export default function CameraEventsPage() {
     >
       {/* Camera filter */}
       {cameras.length > 1 && (
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
           <Button
             variant={selectedCameraId === 'all' ? 'ember' : 'subtle'}
             size="sm"
@@ -282,15 +282,15 @@ export default function CameraEventsPage() {
                     <button
                       key={event.event_id}
                       onClick={() => setSelectedEvent(event)}
-                      className="w-full flex items-center gap-4 p-3 rounded-xl bg-slate-800/50 hover:bg-slate-700/50 hover:ring-2 hover:ring-ocean-500 transition-all text-left group"
+                      className="group flex w-full items-center gap-4 rounded-xl bg-slate-800/50 p-3 text-left transition-all hover:bg-slate-700/50 hover:ring-2 hover:ring-ocean-500"
                     >
                       {/* Snapshot preview */}
-                      <div className="relative w-32 h-20 sm:w-40 sm:h-24 rounded-lg overflow-hidden bg-slate-900 flex-shrink-0">
+                      <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg bg-slate-900 sm:h-24 sm:w-40">
                         {event.snapshot_url ? (
                           <img
                             src={event.snapshot_url}
                             alt={getEventTypeName(event.event_type)}
-                            className="w-full h-full object-cover"
+                            className="size-full object-cover"
                             onError={(e) => {
                               (e.target as HTMLImageElement).style.display = 'none';
                             }}
@@ -304,8 +304,8 @@ export default function CameraEventsPage() {
                       </div>
 
                       {/* Event info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex items-center gap-2">
                           <span className="text-lg">
                             {getEventIcon(event.event_type)}
                           </span>
@@ -321,7 +321,7 @@ export default function CameraEventsPage() {
                           </Text>
                         )}
 
-                        <div className="flex items-center gap-3 mt-1 flex-wrap">
+                        <div className="mt-1 flex flex-wrap items-center gap-3">
                           <Text variant="tertiary" size="xs">
                             🕐 {new Date(event.timestamp * 1000).toLocaleTimeString('it-IT', {
                               hour: '2-digit',
@@ -346,7 +346,7 @@ export default function CameraEventsPage() {
 
       {/* Infinite scroll sentinel for virtual scrolling */}
       {hasMore && (
-        <div ref={loadMoreRef} className="py-4 flex justify-center">
+        <div ref={loadMoreRef} className="flex justify-center py-4">
           <Text variant="tertiary" size="sm">
             Mostrando {displayedEvents.length} di {filteredEvents.length} eventi
           </Text>

@@ -46,7 +46,7 @@ export default function Pagination({
   `;
 
   return (
-    <div className="flex justify-between items-center pt-4 gap-4">
+    <div className="flex items-center justify-between gap-4 pt-4">
       <button
         onClick={onPrevious}
         disabled={!hasPrev}

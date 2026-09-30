@@ -63,7 +63,7 @@ export function TuyaPlugCard({
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, [remaining]);
+  }, [remaining, setRemaining]);
 
   const isUnreachable = plug.data_freshness === 'UNREACHABLE';
   const displayName = plug.custom_name ?? plug.device_id;
@@ -79,15 +79,15 @@ export function TuyaPlugCard({
   };
 
   return (
-    <div className="rounded-xl bg-slate-800/50 border border-slate-700 p-4 space-y-3">
+    <div className="space-y-3 rounded-xl border border-slate-700 bg-slate-800/50 p-4">
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-100 truncate pr-2">
+        <span className="truncate pr-2 text-sm font-semibold text-slate-100">
           {displayName}
         </span>
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex shrink-0 items-center gap-1.5">
           <span
-            className={`h-2 w-2 rounded-full ${freshnessColors[plug.data_freshness]}`}
+            className={`size-2 rounded-full ${freshnessColors[plug.data_freshness]}`}
           />
           <span className="text-xs text-slate-400">
             {freshnessLabels[plug.data_freshness]}
@@ -112,7 +112,7 @@ export function TuyaPlugCard({
       <button
         onClick={() => onToggle(plug.device_id, plug.switch_on ?? false)}
         disabled={isUnreachable}
-        className={`w-full py-1.5 px-3 rounded-lg text-sm font-medium transition-colors ${
+        className={`w-full rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
           plug.switch_on
             ? 'bg-amber-500/80 text-white hover:bg-amber-500 disabled:opacity-50'
             : 'bg-slate-700/50 text-slate-300 hover:bg-slate-700 disabled:opacity-50'
@@ -126,12 +126,12 @@ export function TuyaPlugCard({
       <div className="border-t border-slate-700/50 pt-3">
         {hasActiveTimer ? (
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-300 font-mono">
+            <span className="font-mono text-sm text-slate-300">
               {formatCountdown(remaining)}
             </span>
             <button
               onClick={() => onCancelTimer(plug.device_id)}
-              className="text-xs px-2 py-1 rounded-md bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+              className="rounded-md bg-red-500/20 px-2 py-1 text-xs text-red-400 transition-colors hover:bg-red-500/30"
             >
               Annulla
             </button>
@@ -145,13 +145,13 @@ export function TuyaPlugCard({
               placeholder="min"
               value={timerMinutes}
               onChange={(e) => setTimerMinutes(e.target.value)}
-              className="w-16 px-2 py-1 rounded-md text-xs bg-slate-700/50 text-slate-200 border border-slate-600"
+              className="w-16 rounded-md border border-slate-600 bg-slate-700/50 px-2 py-1 text-xs text-slate-200"
               aria-label="Minuti timer"
             />
             <button
               onClick={handleSetTimer}
               disabled={!timerMinutes || parseInt(timerMinutes, 10) <= 0}
-              className="text-xs px-2 py-1 rounded-md bg-slate-700/50 text-slate-300 hover:bg-slate-700 transition-colors disabled:opacity-50"
+              className="rounded-md bg-slate-700/50 px-2 py-1 text-xs text-slate-300 transition-colors hover:bg-slate-700 disabled:opacity-50"
             >
               Imposta
             </button>
@@ -162,7 +162,7 @@ export function TuyaPlugCard({
       {/* Expand/collapse energy chart */}
       <button
         onClick={() => setExpanded((prev) => !prev)}
-        className="w-full text-xs text-slate-400 hover:text-slate-300 transition-colors text-left"
+        className="w-full text-left text-xs text-slate-400 transition-colors hover:text-slate-300"
       >
         {expanded ? '▲ Nascondi storico' : '▼ Storico energia'}
       </button>

@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import DeviceRegistryPage from '../page';
 import type { RegistryDevice, DeviceCreate, DeviceUpdate } from '@/types/registry';
 

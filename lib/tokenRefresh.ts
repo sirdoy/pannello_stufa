@@ -38,7 +38,7 @@ function getVapidKey() {
  * Debug logger
  * Note: Debug log API has been removed, using console only
  */
-function debugLog(message: string, data: Record<string, unknown> = {}): void {
+function debugLog(message: string, _data: Record<string, unknown> = {}): void {
 }
 
 /**
@@ -50,7 +50,7 @@ function debugLog(message: string, data: Record<string, unknown> = {}): void {
  * @param {string} userId - User ID for server registration
  * @returns {Promise<{refreshed: boolean, token: string|null, error?: string}>}
  */
-export async function checkAndRefreshToken(userId: string): Promise<{
+export async function checkAndRefreshToken(_userId: string): Promise<{
   refreshed: boolean;
   token: string | null;
   error?: string;

@@ -73,7 +73,6 @@ jest.mock('@/app/hooks/useToast', () => ({
 
 // Import AFTER mocks are set up (top-level import is hoisted above jest.mock,
 // but jest.mock calls are also hoisted, so this ordering is equivalent).
-// eslint-disable-next-line import/first
 import LoginPage from '@/app/login/page';
 
 describe('LoginPage', () => {

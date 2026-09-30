@@ -207,7 +207,7 @@ export default function ApiKeysPage() {
           Sessione scaduta.{' '}
           <a
             href="/login?next=/settings/api-keys"
-            className="underline font-semibold text-warning-100 hover:text-white"
+            className="font-semibold text-warning-100 underline hover:text-white"
           >
             Accedi
           </a>{' '}
@@ -219,7 +219,7 @@ export default function ApiKeysPage() {
         <Skeleton className="h-64 w-full" />
       ) : (
         <Card variant="glass" className="p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <Heading level={2} size="lg">
               Chiavi attive
             </Heading>
@@ -305,7 +305,7 @@ export default function ApiKeysPage() {
             a manual-copy fallback (rule 6).
           */}
           <code
-            className="block p-3 rounded-lg bg-slate-800 text-slate-100 font-mono text-sm break-all"
+            className="block rounded-lg bg-slate-800 p-3 font-mono text-sm break-all text-slate-100"
             style={{ userSelect: 'all' }}
           >
             {revealedKey}
@@ -319,12 +319,12 @@ export default function ApiKeysPage() {
           <Button ref={copyButtonRef} variant="ember" onClick={handleCopy}>
             {copied ? (
               <>
-                <Check className="w-4 h-4" />
+                <Check className="size-4" />
                 Copiato
               </>
             ) : (
               <>
-                <Copy className="w-4 h-4" />
+                <Copy className="size-4" />
                 Copia chiave
               </>
             )}

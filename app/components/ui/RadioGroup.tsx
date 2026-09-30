@@ -49,11 +49,11 @@ const radioItemVariants = cva(
     // Base circle styles
     'aspect-square shrink-0 rounded-full border-2 transition-all duration-200',
     // Focus ring - ember glow
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
+    'focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:outline-none',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     // Disabled state
     'disabled:cursor-not-allowed disabled:opacity-50',
-    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50',
   ],
   {
     variants: {
@@ -72,9 +72,9 @@ const radioItemVariants = cva(
         ],
       },
       size: {
-        sm: 'h-4 w-4',
-        md: 'h-5 w-5',
-        lg: 'h-6 w-6',
+        sm: 'size-4',
+        md: 'size-5',
+        lg: 'size-6',
       },
     },
     defaultVariants: {
@@ -94,9 +94,9 @@ const radioIndicatorVariants = cva(
         sage: 'bg-sage-500 ',
       },
       size: {
-        sm: 'h-2 w-2',
-        md: 'h-2.5 w-2.5',
-        lg: 'h-3 w-3',
+        sm: 'size-2',
+        md: 'size-2.5',
+        lg: 'size-3',
       },
     },
     defaultVariants: {
@@ -173,9 +173,9 @@ const RadioGroupItem = forwardRef<HTMLButtonElement, RadioGroupItemProps>(({
         <label
           htmlFor={id}
           className={cn(
-            'text-base font-medium cursor-pointer select-none',
+            'cursor-pointer text-base font-medium select-none',
             'text-slate-200 ',
-            props.disabled && 'opacity-50 cursor-not-allowed'
+            props.disabled && 'cursor-not-allowed opacity-50'
           )}
         >
           {displayLabel}

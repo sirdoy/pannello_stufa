@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { EndpointCard, type DebugApiResponse } from '../ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -26,7 +26,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
     }
   };
 
-  const fetchGetEndpoint = async (name: string, url: string) => {
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -40,15 +40,15 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  };
+  }, []);
 
-  const fetchAllGetEndpoints = () => {
+  const fetchAllGetEndpoints = useCallback(() => {
     fetchGetEndpoint('health', '/api/health');
     fetchGetEndpoint('schedules', '/api/v1/thermorossi/schedules');
     fetchGetEndpoint('schedulesActive', '/api/v1/thermorossi/scheduler/mode');
     fetchGetEndpoint('locationConfig', '/api/config/location');
     fetchGetEndpoint('dashboardConfig', '/api/config/dashboard');
-  };
+  }, [fetchGetEndpoint]);
 
   // Initial fetch
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
   return (
     <div className="space-y-6">
       {/* Firebase Info */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
         <Text variant="secondary" size="sm">
           Firebase Realtime Database stores all application state including schedules, device preferences, maintenance
           tracking, and cron health data. The /api/health endpoint verifies Firebase connectivity.
@@ -144,7 +144,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
       </div>
 
       {/* Firebase Paths Reference */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
         <Heading level={3} size="sm" className="mb-3">
           📂 Key Firebase Paths
         </Heading>

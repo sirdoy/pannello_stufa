@@ -10,34 +10,6 @@ const API_BASE = '/api';
 // UI ROUTES (Pages)
 // ========================================
 
-// Stove UI pages
-const STOVE_UI_ROUTES = {
-  main: '/stove',
-  scheduler: '/stove/scheduler',
-  maintenance: '/stove/maintenance',
-  errors: '/stove/errors',
-} as const;
-
-// Thermostat UI pages
-const THERMOSTAT_UI_ROUTES = {
-  main: '/thermostat',
-  authorized: '/thermostat/authorized',
-} as const;
-
-// Camera UI pages
-const CAMERA_UI_ROUTES = {
-  main: '/camera',
-} as const;
-
-// Global UI pages
-const GLOBAL_UI_ROUTES = {
-  home: '/',
-  log: '/log',
-  changelog: '/changelog',
-  debug: '/debug',
-  offline: '/offline',
-} as const;
-
 // ========================================
 // API ROUTES
 // ========================================
@@ -89,27 +61,4 @@ export const CAMERA_ROUTES = {
 // Logging endpoints
 export const LOG_ROUTES = {
   add: `${API_BASE}/log/add`,
-} as const;
-
-// User endpoints
-const USER_ROUTES = {
-  me: `${API_BASE}/user`,
-} as const;
-
-// Auth endpoints (first-party login, app/auth/*)
-const AUTH_ROUTES = {
-  login: '/auth/login',
-  logout: '/auth/logout',
-  callback: '/auth/callback',
-  me: '/auth/me',
-} as const;
-
-// All routes combined for easy export
-const API_ROUTES = {
-  stove: STOVE_ROUTES,
-  netatmo: NETATMO_ROUTES,
-  camera: CAMERA_ROUTES,
-  log: LOG_ROUTES,
-  user: USER_ROUTES,
-  auth: AUTH_ROUTES,
 } as const;

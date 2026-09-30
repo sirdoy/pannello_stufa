@@ -104,7 +104,6 @@ describe('useAdaptivePolling - Network Awareness Integration', () => {
     // Start with fast network
     mockUseNetworkQuality.mockReturnValue('fast');
     const callback = jest.fn();
-    const baseInterval = 30000;
 
     const { rerender } = renderHook(
       ({ networkQuality }) => {

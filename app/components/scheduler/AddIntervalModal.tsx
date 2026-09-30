@@ -103,7 +103,6 @@ export default function AddIntervalModal({
     if (!start) return false;
 
     if (inputMode === 'duration') {
-      const minutes = durationPreset === 'custom' ? customMinutes : durationPreset;
       if (durationPreset === 'custom' && (!customMinutes || customMinutes < 15)) return false;
     }
 
@@ -147,10 +146,10 @@ export default function AddIntervalModal({
     >
       <Card
         variant="glass"
-        className="p-6 animate-scale-in-center"
+        className="animate-scale-in-center p-6"
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <Heading
             id="add-interval-title"
             level={2}
@@ -170,7 +169,7 @@ export default function AddIntervalModal({
         </div>
 
         {/* Form */}
-        <div className="space-y-4 mb-6">
+        <div className="mb-6 space-y-4">
           {/* Start Time */}
           <Input
             type="time"
@@ -181,7 +180,7 @@ export default function AddIntervalModal({
 
           {/* Toggle: Duration vs End Time */}
           <div>
-            <Text as="label" variant="secondary" size="sm" className="block mb-2">
+            <Text as="label" variant="secondary" size="sm" className="mb-2 block">
               Modalità Inserimento
             </Text>
             <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'duration' | 'endTime')} className="w-full">
@@ -237,7 +236,7 @@ export default function AddIntervalModal({
           )}
 
           {/* End Time Preview */}
-          <div className="p-4 bg-slate-800/50 rounded-xl">
+          <div className="rounded-xl bg-slate-800/50 p-4">
             <Text variant="secondary" size="sm" className="mb-1">
               {inputMode === 'duration' ? 'Orario fine calcolato:' : 'Orario fine selezionato:'}
             </Text>
@@ -254,8 +253,8 @@ export default function AddIntervalModal({
           {/* Power & Fan */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`px-2 py-1 rounded-md text-xs font-bold ${getPowerBadgeClass(power)}`}>
+              <div className="mb-2 flex items-center gap-2">
+                <span className={`rounded-md px-2 py-1 text-xs font-bold ${getPowerBadgeClass(power)}`}>
                   P{power}
                 </span>
                 <Text as="span" variant="secondary" size="sm">
@@ -276,8 +275,8 @@ export default function AddIntervalModal({
             </div>
 
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`px-2 py-1 rounded-md text-xs font-bold ${getFanBadgeClass(fan)}`}>
+              <div className="mb-2 flex items-center gap-2">
+                <span className={`rounded-md px-2 py-1 text-xs font-bold ${getFanBadgeClass(fan)}`}>
                   V{fan}
                 </span>
                 <Text as="span" variant="secondary" size="sm">

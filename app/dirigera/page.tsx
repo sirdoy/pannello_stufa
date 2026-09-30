@@ -48,9 +48,9 @@ export default function DirigeraPage() {
     return (
       <div className="space-y-6">
         <Skeleton className="h-12 w-48 rounded-xl" />
-        <Skeleton className="h-[80px] rounded-2xl" />
-        <Skeleton className="h-[48px] rounded-lg" />
-        <Skeleton className="h-[180px] rounded-2xl" />
+        <Skeleton className="h-20 rounded-2xl" />
+        <Skeleton className="h-12 rounded-lg" />
+        <Skeleton className="h-45 rounded-2xl" />
       </div>
     );
   }
@@ -87,7 +87,7 @@ export default function DirigeraPage() {
         {data && <DirigeraHealthSection health={data.health} />}
 
         {/* Filter segmented control */}
-        <div className="flex rounded-lg border border-slate-700/50 overflow-hidden">
+        <div className="flex overflow-hidden rounded-lg border border-slate-700/50">
           {FILTERS.map(f => (
             <button
               key={f.key}

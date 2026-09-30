@@ -27,27 +27,27 @@ describe('Spinner', () => {
   describe('Size Variants', () => {
     it('applies xs size variant', () => {
       const { container } = render(<Spinner size="xs" />);
-      expect(container.querySelector('svg')).toHaveClass('h-3', 'w-3');
+      expect(container.querySelector('svg')).toHaveClass('size-3');
     });
 
     it('applies sm size variant', () => {
       const { container } = render(<Spinner size="sm" />);
-      expect(container.querySelector('svg')).toHaveClass('h-4', 'w-4');
+      expect(container.querySelector('svg')).toHaveClass('size-4');
     });
 
     it('applies md size variant (default)', () => {
       const { container } = render(<Spinner />);
-      expect(container.querySelector('svg')).toHaveClass('h-6', 'w-6');
+      expect(container.querySelector('svg')).toHaveClass('size-6');
     });
 
     it('applies lg size variant', () => {
       const { container } = render(<Spinner size="lg" />);
-      expect(container.querySelector('svg')).toHaveClass('h-8', 'w-8');
+      expect(container.querySelector('svg')).toHaveClass('size-8');
     });
 
     it('applies xl size variant', () => {
       const { container } = render(<Spinner size="xl" />);
-      expect(container.querySelector('svg')).toHaveClass('h-12', 'w-12');
+      expect(container.querySelector('svg')).toHaveClass('size-12');
     });
   });
 
@@ -118,7 +118,7 @@ describe('Spinner', () => {
     it('merges className with variants', () => {
       const { container } = render(<Spinner size="lg" className="extra-style" />);
       const svg = container.querySelector('svg');
-      expect(svg).toHaveClass('h-8', 'w-8', 'extra-style');
+      expect(svg).toHaveClass('size-8', 'extra-style');
     });
 
     it('passes additional props to SVG', () => {

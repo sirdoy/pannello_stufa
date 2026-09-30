@@ -47,7 +47,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   if (!data) return null;
 
   return (
-    <div className="bg-slate-900 border border-white/10 rounded-lg p-3 shadow-xl">
+    <div className="rounded-lg border border-white/10 bg-slate-900 p-3 shadow-xl">
       <Text size="xs" className="mb-2">
         {format(parseISO(data.date), 'MMMM dd, yyyy')}
       </Text>
@@ -62,7 +62,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
         </div>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-sage-500" />
+            <div className="size-2.5 rounded-full bg-sage-500" />
             <Text size="xs" variant="secondary">
               Sent:
             </Text>
@@ -73,7 +73,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
         </div>
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-ember-500" />
+            <div className="size-2.5 rounded-full bg-ember-500" />
             <Text size="xs" variant="secondary">
               Failed:
             </Text>
@@ -82,10 +82,10 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
             {data.failed}
           </Text>
         </div>
-        <div className="h-px bg-white/10 my-1" />
+        <div className="my-1 h-px bg-white/10" />
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-ocean-500" />
+            <div className="size-2.5 rounded-full bg-ocean-500" />
             <Text size="xs" variant="secondary">
               Rate:
             </Text>
@@ -118,7 +118,7 @@ const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
 export default function DeliveryChart({ data = [], loading = false }: DeliveryChartProps) {
   if (loading) {
     return (
-      <div className="h-[300px] flex items-center justify-center bg-slate-800/30 rounded-lg">
+      <div className="flex h-75 items-center justify-center rounded-lg bg-slate-800/30">
         <Text variant="secondary">⏳ Loading chart data...</Text>
       </div>
     );
@@ -126,7 +126,7 @@ export default function DeliveryChart({ data = [], loading = false }: DeliveryCh
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-[300px] flex items-center justify-center bg-slate-800/30 rounded-lg">
+      <div className="flex h-75 items-center justify-center rounded-lg bg-slate-800/30">
         <Text variant="tertiary">No data for this period</Text>
       </div>
     );

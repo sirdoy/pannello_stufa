@@ -102,7 +102,7 @@ export default function ConfirmDialog({
   // dialog was off-centre and its buttons off-screen (ROADMAP M11).
   return createPortal(
     <div
-      className="animate-fadeIn fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm "
+      className="animate-fadeIn fixed inset-0 z-9999 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm "
       onClick={onCancel}
       role="dialog"
       aria-modal="true"

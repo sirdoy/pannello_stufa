@@ -25,15 +25,15 @@ export default function DeviceEventItem({ event }: DeviceEventItemProps) {
     <div className="flex items-start gap-3 py-3">
       {/* Timeline dot */}
       <div
-        className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+        className={`mt-1.5 size-2 shrink-0 rounded-full ${
           isConnected ? 'bg-sage-400' : 'bg-slate-500'
         }`}
       />
 
       {/* Event details */}
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         {/* Device name and status badge */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-wrap items-center gap-2">
           <Text size="sm" weight="medium" className="text-slate-100">
             {event.deviceName}
           </Text>
@@ -43,7 +43,7 @@ export default function DeviceEventItem({ event }: DeviceEventItemProps) {
         </div>
 
         {/* Device IP and timestamp */}
-        <div className="flex items-center gap-3 mt-1 flex-wrap text-xs">
+        <div className="mt-1 flex flex-wrap items-center gap-3 text-xs">
           <Text variant="secondary" size="xs" className="font-mono">
             {event.deviceIp}
           </Text>

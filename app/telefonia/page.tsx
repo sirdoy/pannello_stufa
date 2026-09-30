@@ -24,7 +24,7 @@ export default function TelefoniaPage() {
 
   return (
     <PageLayout maxWidth="7xl">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <Button
           variant="ghost"
           size="sm"

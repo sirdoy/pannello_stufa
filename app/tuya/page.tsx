@@ -52,9 +52,9 @@ export default function TuyaPage() {
     return (
       <div className="space-y-6 p-4 sm:p-6">
         <Skeleton className="h-10 w-48 rounded-xl" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[260px] rounded-xl" />
+            <Skeleton key={i} className="h-65 rounded-xl" />
           ))}
         </div>
       </div>
@@ -85,7 +85,7 @@ export default function TuyaPage() {
 
       {/* Plug grid */}
       {plugs && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {plugs.map((plug) => (
             <TuyaPlugCard
               key={plug.device_id}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { EndpointCard, type DebugApiResponse } from '@/app/debug/components/ApiTab';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -26,7 +26,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
     }
   };
 
-  const fetchGetEndpoint = async (name: string, url: string) => {
+  const fetchGetEndpoint = useCallback(async (name: string, url: string) => {
     setLoadingGet((prev) => ({ ...prev, [name]: true }));
     const startTime = Date.now();
     try {
@@ -40,11 +40,11 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
     } finally {
       setLoadingGet((prev) => ({ ...prev, [name]: false }));
     }
-  };
+  }, []);
 
-  const fetchAllGetEndpoints = () => {
+  const fetchAllGetEndpoints = useCallback(() => {
     fetchGetEndpoint('notificationStats', '/api/notifications/stats');
-  };
+  }, [fetchGetEndpoint]);
 
   // Initial fetch
   useEffect(() => {
@@ -89,7 +89,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       </div>
 
       {/* Scheduler Jobs Reference */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
         <Heading level={3} size="sm" className="mb-3">
           ⏰ Automated Jobs
         </Heading>
@@ -113,7 +113,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       </div>
 
       {/* Cron Health */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-4">
+      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
         <Heading level={3} size="sm" className="mb-3">
           💚 Cron Health
         </Heading>

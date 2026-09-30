@@ -46,9 +46,7 @@ import { loadToken, saveToken, getTokenAge, updateLastUsed } from '../tokenStora
 import { getToken, deleteToken } from 'firebase/messaging';
 
 const mockLoadToken = jest.mocked(loadToken);
-const mockSaveToken = jest.mocked(saveToken);
 const mockGetTokenAge = jest.mocked(getTokenAge);
-const mockUpdateLastUsed = jest.mocked(updateLastUsed);
 const mockGetToken = jest.mocked(getToken);
 const mockDeleteToken = jest.mocked(deleteToken);
 

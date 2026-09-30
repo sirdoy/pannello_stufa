@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { CronHint } from '../../primitives/CronHint';
 
 /** Helper: return all divs whose inline fontFamily contains 'ui-monospace' (value divs) */

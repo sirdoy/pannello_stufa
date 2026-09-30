@@ -13,8 +13,6 @@
  * - system: Sistema
  */
 
-import { db } from '@/lib/firebase';
-import { ref, get } from 'firebase/database';
 
 /**
  * Notification Categories Configuration
@@ -160,38 +158,6 @@ export const DEFAULT_PREFERENCES = {
     offlineSync: true,    // Comandi offline sincronizzati
   },
 };
-
-/**
- * Get user notification preferences from Firebase via API
- * @param {string} userId - User ID (session sub)
- * @returns {Promise<Object>} User preferences
- */
-async function getUserPreferences(userId: string) {
-  if (!userId) {
-    throw new Error('User ID required');
-  }
-
-  try {
-    const response = await fetch('/api/notifications/preferences', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch preferences');
-    }
-
-    const data = await response.json();
-    return data.preferences;
-
-  } catch (error) {
-    console.error('Error getting user preferences:', error);
-    // Return defaults in caso di errore
-    return DEFAULT_PREFERENCES;
-  }
-}
 
 /**
  * Update user notification preferences via API

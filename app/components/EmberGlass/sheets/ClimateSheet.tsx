@@ -373,7 +373,7 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
               type="button"
               data-testid={`climate-sheet-zone-chip-${i}`}
               data-sheet-focusable="true"
-              aria-selected={isSelected}
+              aria-pressed={isSelected}
               onClick={() => setSelectedIdx(i)}
               style={{
                 flexShrink: 0,

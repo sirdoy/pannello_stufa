@@ -127,7 +127,7 @@ export default function NotificationHistoryPage() {
         accessorKey: 'title',
         header: 'Titolo',
         cell: ({ getValue }) => (
-          <Text className="max-w-[200px] truncate">{getValue<string>()}</Text>
+          <Text className="max-w-50 truncate">{getValue<string>()}</Text>
         ),
       },
   ];
@@ -149,7 +149,7 @@ export default function NotificationHistoryPage() {
     return (
       <SettingsLayout title="Cronologia Notifiche" icon="📬">
         <Card variant="glass" className="p-8 text-center">
-          <div className="text-6xl mb-4">🔐</div>
+          <div className="mb-4 text-6xl">🔐</div>
           <Heading level={2} size="xl" className="mb-2">
             Autenticazione Richiesta
           </Heading>
@@ -170,7 +170,7 @@ export default function NotificationHistoryPage() {
   return (
     <SettingsLayout title="Cronologia Notifiche" icon="📬">
       {/* Description */}
-      <div className="space-y-2 mb-6">
+      <div className="mb-6 space-y-2">
         <Text variant="secondary" size="sm">
           Visualizza le notifiche inviate negli ultimi 90 giorni.
           Le notifiche più vecchie vengono automaticamente eliminate per conformità GDPR.
@@ -179,7 +179,7 @@ export default function NotificationHistoryPage() {
 
       {/* Error state */}
       {error && (
-        <Card variant="glass" className="p-8 text-center mb-6">
+        <Card variant="glass" className="mb-6 p-8 text-center">
           <Text variant="ember" size="lg" className="mb-2">
             {error}
           </Text>
@@ -238,7 +238,7 @@ export default function NotificationHistoryPage() {
       )}
 
       {/* Back link */}
-      <Card variant="glass" className="p-4 mt-6">
+      <Card variant="glass" className="mt-6 p-4">
         <div className="flex items-center justify-between">
           <Text variant="secondary" size="sm">
             Torna alle impostazioni notifiche

@@ -7,7 +7,7 @@ jest.mock('../../hooks/useSonosHistory');
 // Mock next/dynamic to render the component synchronously
 jest.mock('next/dynamic', () => ({
   __esModule: true,
-  default: (importFn: () => Promise<{ default: React.ComponentType }>) => {
+  default: (_importFn: () => Promise<{ default: React.ComponentType }>) => {
     // Return a simple placeholder for dynamic components in tests
     const MockDynamic = () => <div data-testid="volume-chart-mock" />;
     MockDynamic.displayName = 'MockDynamic';

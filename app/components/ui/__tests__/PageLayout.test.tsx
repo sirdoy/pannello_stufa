@@ -135,19 +135,19 @@ describe('PageLayout', () => {
 
     it('applies md maxWidth', () => {
       const { container } = render(<PageLayout maxWidth="md">Content</PageLayout>);
-      expect(container.firstChild).toHaveClass('max-w-screen-md');
+      expect(container.firstChild).toHaveClass('max-w-3xl');
     });
 
     it('applies lg maxWidth', () => {
       const { container } = render(<PageLayout maxWidth="lg">Content</PageLayout>);
-      expect(container.firstChild).toHaveClass('max-w-screen-lg');
+      expect(container.firstChild).toHaveClass('max-w-5xl');
     });
 
     it('applies no maxWidth by default (layout.js handles it)', () => {
       const { container } = render(<PageLayout>Content</PageLayout>);
       // Default is 'none' - no max-width constraint since layout.js handles max-w-7xl
-      expect(container.firstChild).not.toHaveClass('max-w-screen-xl');
-      expect(container.firstChild).not.toHaveClass('max-w-screen-lg');
+      expect(container.firstChild).not.toHaveClass('max-w-7xl');
+      expect(container.firstChild).not.toHaveClass('max-w-5xl');
     });
 
     it('applies 2xl maxWidth', () => {
@@ -265,7 +265,7 @@ describe('PageLayout', () => {
         <PageLayout maxWidth="lg" className="extra-class">Content</PageLayout>
       );
       const root = container.firstChild;
-      expect(root).toHaveClass('max-w-screen-lg', 'extra-class');
+      expect(root).toHaveClass('max-w-5xl', 'extra-class');
     });
   });
 

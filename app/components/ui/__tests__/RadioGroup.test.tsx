@@ -411,8 +411,7 @@ describe('RadioGroup Component', () => {
       );
 
       const radio = container.querySelector('button[role="radio"]');
-      expect(radio).toHaveClass('h-5');
-      expect(radio).toHaveClass('w-5');
+      expect(radio).toHaveClass('size-5');
     });
 
     test('applies sm size', () => {
@@ -423,8 +422,7 @@ describe('RadioGroup Component', () => {
       );
 
       const radio = container.querySelector('button[role="radio"]');
-      expect(radio).toHaveClass('h-4');
-      expect(radio).toHaveClass('w-4');
+      expect(radio).toHaveClass('size-4');
     });
 
     test('applies lg size', () => {
@@ -435,8 +433,7 @@ describe('RadioGroup Component', () => {
       );
 
       const radio = container.querySelector('button[role="radio"]');
-      expect(radio).toHaveClass('h-6');
-      expect(radio).toHaveClass('w-6');
+      expect(radio).toHaveClass('size-6');
     });
   });
 

@@ -126,8 +126,8 @@ export default function ManualOverrideSheet({
     >
       {/* Success state */}
       {success ? (
-        <div className="text-center py-8">
-          <CheckCircle className="w-16 h-16 text-sage-400 mx-auto mb-4" />
+        <div className="py-8 text-center">
+          <CheckCircle className="mx-auto mb-4 size-16 text-sage-400" />
           <Text variant="sage" size="lg">Override applicato!</Text>
         </div>
       ) : (

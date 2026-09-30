@@ -10,7 +10,7 @@ import {
   shouldNotify,
   sendErrorNotification,
 } from '../errorMonitor';
-import { ref, push, set, get, query, orderByChild, limitToLast } from 'firebase/database';
+import { ref, get, query, orderByChild, limitToLast } from 'firebase/database';
 
 // Mock Firebase
 jest.mock('firebase/database');
@@ -18,13 +18,6 @@ jest.mock('../firebase', () => ({
   database: {},
 }));
 
-const mockRef = jest.mocked(ref);
-const mockPush = jest.mocked(push);
-const mockSet = jest.mocked(set);
-const mockGet = jest.mocked(get);
-const mockQuery = jest.mocked(query);
-const mockOrderByChild = jest.mocked(orderByChild);
-const mockLimitToLast = jest.mocked(limitToLast);
 
 /** Notification constructor double with the static members errorMonitor reads */
 type NotificationMock = jest.Mock & {
@@ -511,7 +504,7 @@ describe('errorMonitor', () => {
       mockNotification.mockImplementation(() => {});
 
       // ACT
-      const result = await sendErrorNotification(5, 'Test error');
+      await sendErrorNotification(5, 'Test error');
 
       // ASSERT
       expect(mockNotification.requestPermission).toHaveBeenCalled();

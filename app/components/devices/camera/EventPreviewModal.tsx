@@ -34,7 +34,7 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
     >
       <Card className="overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-700">
+        <div className="flex items-center justify-between border-b border-slate-700 p-4">
           <div className="flex items-center gap-3">
             <span className="text-2xl">
               {getEventIcon(event.event_type)}
@@ -62,7 +62,7 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
             </div>
           </div>
           <Button.Icon
-            icon={<X className="w-6 h-6" />}
+            icon={<X className="size-6" />}
             onClick={onClose}
             variant="ghost"
             size="md"
@@ -77,10 +77,10 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
             <img
               src={previewUrl}
               alt={`Evento ${getEventTypeName(event.event_type)}`}
-              className="w-full h-full object-contain"
+              className="size-full object-contain"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+            <div className="flex size-full flex-col items-center justify-center gap-3">
               <span className="text-5xl opacity-50">
                 {getEventIcon(event.event_type)}
               </span>
@@ -90,7 +90,7 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-700 flex items-center justify-end">
+        <div className="flex items-center justify-end border-t border-slate-700 p-4">
           <Button
             variant="ember"
             size="sm"

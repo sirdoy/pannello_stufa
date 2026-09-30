@@ -48,18 +48,6 @@ async function requestPersistentStorage(): Promise<boolean> {
 }
 
 /**
- * Check if storage is persisted
- */
-async function checkPersistence(): Promise<boolean> {
-  if (typeof navigator === 'undefined') return false;
-
-  if (navigator.storage && navigator.storage.persisted) {
-    return await navigator.storage.persisted();
-  }
-  return false;
-}
-
-/**
  * Save token to both IndexedDB and localStorage
  * @param token - FCM token
  * @param metadata - Additional metadata (deviceId, deviceInfo, etc.)

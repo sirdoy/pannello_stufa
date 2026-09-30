@@ -103,7 +103,6 @@ export default function NotificationSettingsForm({
     control,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors, isDirty },
     reset,
   } = useForm<NotificationPreferences>({
@@ -120,6 +119,7 @@ export default function NotificationSettingsForm({
   }, [initialValues, reset]);
 
   // Watch DND enabled state
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-hook-form watch() is not memoizable
   const dndWindows = watch('dndWindows') || [];
   const hasDndWindow = dndWindows.length > 0 && dndWindows[0]?.enabled;
 
@@ -144,7 +144,7 @@ export default function NotificationSettingsForm({
       {/* Notification Type Categories */}
       {Object.entries(CATEGORY_CONFIG).map(([categoryId, category]) => (
         <Card key={categoryId} variant="glass" className="p-6">
-          <div className="flex items-center gap-3 mb-4">
+          <div className="mb-4 flex items-center gap-3">
             <span className="text-2xl">{category.icon}</span>
             <div>
               <Heading level={3} size="md">
@@ -186,7 +186,7 @@ export default function NotificationSettingsForm({
 
       {/* DND Hours Section */}
       <Card variant="glass" className="p-6">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="mb-4 flex items-center gap-3">
           <span className="text-2xl">🌙</span>
           <div>
             <Heading level={3} size="md">
@@ -253,8 +253,8 @@ export default function NotificationSettingsForm({
 
           {/* DND Time Inputs - only visible when enabled */}
           {hasDndWindow && (
-            <div className="ml-4 pl-4 border-l-2 border-slate-700/50 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="ml-4 space-y-4 border-l-2 border-slate-700/50 pl-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {/* Start Time */}
                 <div>
                   <Controller
@@ -303,7 +303,7 @@ export default function NotificationSettingsForm({
               </div>
 
               {/* Timezone Display */}
-              <div className="p-3 bg-slate-800/50 rounded-lg">
+              <div className="rounded-lg bg-slate-800/50 p-3">
                 <Text variant="secondary" size="sm">
                   <span className="font-medium">Timezone:</span> {detectedTimezone} (auto-detected)
                 </Text>
@@ -318,7 +318,7 @@ export default function NotificationSettingsForm({
         <button
           type="button"
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full flex items-center justify-between group"
+          className="group flex w-full items-center justify-between"
         >
           <div className="flex items-center gap-3">
             <span className="text-2xl">⚡</span>
@@ -337,7 +337,7 @@ export default function NotificationSettingsForm({
         </button>
 
         {showAdvanced && (
-          <div className="mt-6 pt-6 border-t border-slate-700/50 space-y-6">
+          <div className="mt-6 space-y-6 border-t border-slate-700/50 pt-6">
             <Text variant="secondary" size="sm" className="mb-4">
               Limit the number of notifications per time window to prevent spam.
             </Text>
@@ -350,9 +350,9 @@ export default function NotificationSettingsForm({
                   <span>{category.label} Rate Limits</span>
                 </Text>
 
-                <div className="ml-4 pl-4 border-l-2 border-slate-700/50 space-y-4">
+                <div className="ml-4 space-y-4 border-l-2 border-slate-700/50 pl-4">
                   {category.types.map((type) => (
-                    <div key={type.key} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div key={type.key} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <Controller
                         name={`rateLimits.${type.key}.windowMinutes`}
                         control={control}
@@ -411,7 +411,7 @@ export default function NotificationSettingsForm({
 
       {/* Form-level Errors */}
       {errors.root && (
-        <div className="p-4 bg-ember-500/10 border border-ember-500/30 rounded-xl">
+        <div className="rounded-xl border border-ember-500/30 bg-ember-500/10 p-4">
           <Text variant="ember" size="sm">
             {errors.root.message}
           </Text>

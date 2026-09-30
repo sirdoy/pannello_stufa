@@ -14,13 +14,13 @@ import Text from './Text';
  */
 export const emptyStateVariants = cva(
   // Base classes
-  'text-center flex flex-col items-center',
+  'flex flex-col items-center text-center',
   {
     variants: {
       size: {
-        sm: 'py-4 gap-2',
-        md: 'py-8 gap-3',
-        lg: 'py-12 gap-4',
+        sm: 'gap-2 py-4',
+        md: 'gap-3 py-8',
+        lg: 'gap-4 py-12',
       },
     },
     defaultVariants: {

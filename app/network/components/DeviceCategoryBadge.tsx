@@ -46,7 +46,7 @@ function DeviceCategoryBadge({ category, onClick }: DeviceCategoryBadgeProps) {
     <Badge
       variant={config.variant}
       size="sm"
-      className={onClick ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}
+      className={onClick ? 'cursor-pointer transition-opacity hover:opacity-80' : ''}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}

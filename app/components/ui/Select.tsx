@@ -43,17 +43,17 @@ import { cn } from '@/lib/utils/cn';
 const selectTriggerVariants = cva(
   [
     // Base styles
-    'flex items-center justify-between w-full rounded-xl font-medium font-display cursor-pointer',
-    'bg-slate-800/60 backdrop-blur-xl border border-slate-700/50',
+    'flex w-full cursor-pointer items-center justify-between rounded-xl font-display font-medium',
+    'border border-slate-700/50 bg-slate-800/60 backdrop-blur-xl',
     'text-slate-100 placeholder:text-slate-500',
     'transition-all duration-200',
     // Focus ring - ember glow
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:border-ember-500/60',
     // Hover
-    'hover:bg-slate-800/80 hover:border-slate-600/60',
+    'hover:border-slate-600/60 hover:bg-slate-800/80',
     // Disabled
-    'disabled:opacity-50 disabled:cursor-not-allowed',
+    'disabled:cursor-not-allowed disabled:opacity-50',
     // Light mode
     ' ',
     ' ',
@@ -63,13 +63,13 @@ const selectTriggerVariants = cva(
     variants: {
       variant: {
         default: '',
-        ember: 'data-[state=open]:ring-2 data-[state=open]:ring-ember-500/50 data-[state=open]:border-ember-500/60',
-        ocean: 'data-[state=open]:ring-2 data-[state=open]:ring-ocean-500/50 data-[state=open]:border-ocean-500/60',
+        ember: 'data-[state=open]:border-ember-500/60 data-[state=open]:ring-2 data-[state=open]:ring-ember-500/50',
+        ocean: 'data-[state=open]:border-ocean-500/60 data-[state=open]:ring-2 data-[state=open]:ring-ocean-500/50',
       },
       size: {
         sm: 'px-3 py-2 text-sm',
-        md: 'px-4 py-4 text-base',
-        lg: 'px-5 py-5 text-lg',
+        md: 'p-4 text-base',
+        lg: 'p-5 text-lg',
       },
     },
     defaultVariants: {
@@ -82,14 +82,14 @@ const selectTriggerVariants = cva(
 // CVA variants for items
 const selectItemVariants = cva(
   [
-    'relative flex items-center px-4 py-3 cursor-pointer select-none',
-    'font-medium font-display transition-colors duration-150',
+    'relative flex cursor-pointer items-center px-4 py-3 select-none',
+    'font-display font-medium transition-colors duration-150',
     'outline-none',
     // Hover/highlighted state
-    'data-[highlighted]:bg-slate-700/50',
+    'data-highlighted:bg-slate-700/50',
     ']:bg-slate-100',
     // Disabled state
-    'data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed data-[disabled]:pointer-events-none',
+    'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-40',
   ],
   {
     variants: {
@@ -146,7 +146,7 @@ const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(({
     <SelectPrimitive.Icon asChild>
       <ChevronDown
         className={cn(
-          'h-5 w-5 text-slate-400 transition-transform duration-200 shrink-0 ml-2',
+          'ml-2 size-5 shrink-0 text-slate-400 transition-transform duration-200',
         )}
       />
     </SelectPrimitive.Icon>
@@ -181,7 +181,7 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(({
         // Base styles
         'relative z-50 max-h-64 min-w-32 overflow-hidden rounded-xl',
         // Background and border
-        'bg-slate-800/95 backdrop-blur-2xl border border-slate-700/60',
+        'border border-slate-700/60 bg-slate-800/95 backdrop-blur-2xl',
         'shadow-lg',
         // Light mode
         ' ',
@@ -223,7 +223,7 @@ const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(({
   >
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     <SelectPrimitive.ItemIndicator className="absolute right-3 flex items-center justify-center">
-      <Check className="h-4 w-4 text-ember-400 " />
+      <Check className="size-4 text-ember-400 " />
     </SelectPrimitive.ItemIndicator>
   </SelectPrimitive.Item>
 ));
@@ -309,8 +309,7 @@ function Select({
   placeholder = 'Select...',
   className = '',
   containerClassName = '',
-  // eslint-disable-next-line no-unused-vars
-  liquid = false, // Legacy prop - ignored
+  liquid: _liquid = false, // Legacy prop - ignored
   ...props
 }: SelectProps) {
   const labelId = useId();
@@ -345,7 +344,7 @@ function Select({
         <label
           id={labelId}
           className={cn(
-            'block text-sm font-bold mb-3 font-display',
+            'mb-3 block font-display text-sm font-bold',
             'text-slate-300 '
           )}
           suppressHydrationWarning

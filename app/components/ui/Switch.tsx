@@ -17,14 +17,14 @@ const switchTrackVariants = cva(
   // Base classes
   [
     'relative inline-flex items-center rounded-full',
-    'transition-all duration-[var(--duration-smooth)]',
-    'ease-[var(--ease-move)]',
-    'outline-none cursor-pointer',
+    'transition-all duration-(--duration-smooth)',
+    'ease-(--ease-move)',
+    'cursor-pointer outline-none',
     // Focus ring - ember glow
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     // Disabled state
-    'disabled:opacity-50 disabled:cursor-not-allowed',
+    'disabled:cursor-not-allowed disabled:opacity-50',
     // Unchecked state - dark/light
     'bg-slate-700 ',
   ],
@@ -33,19 +33,19 @@ const switchTrackVariants = cva(
       size: {
         sm: 'h-6 w-11',
         md: 'h-8 w-14',
-        lg: 'h-10 w-[4.5rem]',
+        lg: 'h-10 w-18',
       },
       variant: {
         ember: [
-          'data-[state=checked]:bg-gradient-to-r',
+          'data-[state=checked]:bg-linear-to-r',
           'data-[state=checked]:from-ember-500 data-[state=checked]:to-flame-600',
         ],
         ocean: [
-          'data-[state=checked]:bg-gradient-to-r',
+          'data-[state=checked]:bg-linear-to-r',
           'data-[state=checked]:from-ocean-500 data-[state=checked]:to-ocean-600',
         ],
         sage: [
-          'data-[state=checked]:bg-gradient-to-r',
+          'data-[state=checked]:bg-linear-to-r',
           'data-[state=checked]:from-sage-500 data-[state=checked]:to-sage-600',
         ],
       },
@@ -66,8 +66,8 @@ const switchThumbVariants = cva(
   // Base classes - all sizes share these
   [
     'block rounded-full bg-white shadow-lg',
-    'transition-transform duration-[var(--duration-smooth)]',
-    'ease-[var(--ease-spring)]',
+    'transition-transform duration-(--duration-smooth)',
+    'ease-spring',
     // Start position (unchecked)
     'translate-x-0.5',
   ],
@@ -75,15 +75,15 @@ const switchThumbVariants = cva(
     variants: {
       size: {
         sm: [
-          'h-5 w-5',
+          'size-5',
           'data-[state=checked]:translate-x-5',
         ],
         md: [
-          'h-7 w-7',
+          'size-7',
           'data-[state=checked]:translate-x-6',
         ],
         lg: [
-          'h-9 w-9',
+          'size-9',
           'data-[state=checked]:translate-x-8',
         ],
       },

@@ -45,13 +45,13 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
   };
 
   return (
-    <li className="border-b border-slate-700/30 pb-4 mb-4 last:border-b-0 last:pb-0 last:mb-0 flex items-start gap-3">
+    <li className="mb-4 flex items-start gap-3 border-b border-slate-700/30 pb-4 last:mb-0 last:border-b-0 last:pb-0">
       {/* Icon */}
-      <div className="text-2xl mt-0.5 flex-shrink-0">{getIcon(entry.action, entry.device)}</div>
+      <div className="mt-0.5 shrink-0 text-2xl">{getIcon(entry.action, entry.device)}</div>
 
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         {/* User & Device Badge Row */}
-        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+        <div className="mb-1.5 flex flex-wrap items-center gap-2">
           {/* User Info */}
           {entry.user && (
             <div className="flex items-center gap-2">
@@ -61,7 +61,7 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
                   alt={entry.user.name || entry.user.email || 'User'}
                   width={24}
                   height={24}
-                  className="w-6 h-6 rounded-full ring-1 ring-white/10 "
+                  className="size-6 rounded-full ring-1 ring-white/10 "
                 />
               )}
               <Text variant="body" size="sm">
@@ -87,7 +87,7 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
         </Text>
 
         {/* Action */}
-        <div className="flex items-baseline gap-2 flex-wrap">
+        <div className="flex flex-wrap items-baseline gap-2">
           <Text variant="body">
             {entry.action}
           </Text>

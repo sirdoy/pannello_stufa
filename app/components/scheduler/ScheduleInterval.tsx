@@ -32,9 +32,9 @@ export default function ScheduleInterval({
   return (
     <Card
       variant="glass"
-      className={`cursor-pointer transition-all duration-300 p-4 ${
+      className={`cursor-pointer p-4 transition-all duration-300 ${
         isHighlighted
-          ? 'bg-ember-900/30 ring-2 ring-ember-600 shadow-liquid-lg scale-[1.01]'
+          ? 'shadow-liquid-lg scale-101 bg-ember-900/30 ring-2 ring-ember-600'
           : ''
       }`}
       onMouseEnter={onMouseEnter}

@@ -72,12 +72,12 @@ export default function SonosSpeakerVolume({
     <div className="space-y-1">
       {/* Volume row */}
       <div className="flex items-center gap-3 py-2">
-        <span className="text-sm text-slate-300 min-w-[100px] truncate">
+        <span className="min-w-25 truncate text-sm text-slate-300">
           {speakerName}
         </span>
         <button
           onClick={() => void onSetMute(uid, !isMuted)}
-          className="p-1.5 rounded-md hover:bg-slate-700/50 transition-colors"
+          className="rounded-md p-1.5 transition-colors hover:bg-slate-700/50"
           aria-label={isMuted ? 'Attiva audio' : 'Disattiva audio'}
         >
           {isMuted ? (
@@ -93,10 +93,10 @@ export default function SonosSpeakerVolume({
           value={localVolume}
           onChange={handleVolumeChange}
           disabled={isDisabled}
-          className="flex-1 h-2 rounded-lg appearance-none bg-slate-700/50 accent-emerald-500 disabled:opacity-50"
+          className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500 disabled:opacity-50"
           aria-label={`Volume ${speakerName}`}
         />
-        <span className="text-xs text-slate-400 min-w-[32px] text-right">{localVolume}%</span>
+        <span className="min-w-8 text-right text-xs text-slate-400">{localVolume}%</span>
       </div>
 
       {/* Source switch — inline, soundbar only per D-15 */}

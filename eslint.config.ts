@@ -1,6 +1,5 @@
 import nextConfig from "eslint-config-next";
 import nextTypescript from "eslint-config-next/typescript";
-// @ts-expect-error eslint-plugin-tailwindcss has no type definitions
 import tailwindcss from "eslint-plugin-tailwindcss";
 
 const eslintConfig = [
@@ -16,7 +15,31 @@ const eslintConfig = [
   // TypeScript rules from Next.js
   ...nextTypescript,
 
-  // Tailwind CSS design token enforcement
+  // Camera snapshots/posters are signed, short-lived URLs: next/image would route them through
+  // Vercel Image Optimization (billed, useless cache), so plain <img> is intended here
+  {
+    name: "project/camera-img",
+    files: ["app/(pages)/camera/**", "app/components/devices/camera/**"],
+    rules: {
+      "@next/next/no-img-element": "off",
+    },
+  },
+
+  // Unused vars: a leading underscore marks a deliberately unused binding
+  {
+    name: "project/unused-vars",
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["warn", {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
+        destructuredArrayIgnorePattern: "^_",
+        ignoreRestSiblings: true,
+      }],
+    },
+  },
+
+  // Tailwind CSS v4 class checks (eslint-plugin-tailwindcss 4.x reads the CSS config)
   {
     name: "tailwindcss/design-tokens",
     plugins: {
@@ -24,26 +47,16 @@ const eslintConfig = [
     },
     settings: {
       tailwindcss: {
-        // Tailwind v4 uses CSS @theme directive, not tailwind.config.js
-        // Empty config tells plugin to use built-in defaults
-        config: {},
+        cssConfigPath: "./app/globals.css",
       },
     },
     rules: {
-      // Block arbitrary color values - enforce design tokens
-      // Start with "warn" to establish baseline, promote to "error" after cleanup
-      "tailwindcss/no-arbitrary-value": ["warn", {
-        // Allow arbitrary values for properties that legitimately need flexibility
-        ignoredProperties: [
-          "content",           // CSS content property
-          "grid-template-columns", // Grid layouts
-          "grid-template-rows",    // Grid layouts
-          "animation",         // Custom animations
-          "box-shadow",        // Complex shadows (until all shadows use tokens)
-        ],
-      }],
+      // Arbitrary values are allowed for one-off values with no token (vh, calc(env()), coloured shadows):
+      // plugin v4 has no per-property exceptions. Values that do have a token or a scale class are caught
+      // by no-unnecessary-arbitrary-value / enforces-canonical-classname below.
+      "tailwindcss/no-arbitrary-value": "off",
 
-      // Enforce consistent class ordering for readability
+      // Enforce consistent class ordering (Tailwind compiler order)
       "tailwindcss/classnames-order": "warn",
 
       // Enforce negative values use negative prefix (-mt-4 not mt-[-4px])
@@ -52,8 +65,9 @@ const eslintConfig = [
       // Warn on shorthand conflicts (p-4 and px-2 together)
       "tailwindcss/enforces-shorthand": "warn",
 
-      // Warn on redundant migration patterns
-      "tailwindcss/migration-from-tailwind-2": "warn",
+      // Prefer the canonical v4 spelling (h-75 not h-[300px], z-60 not z-[60])
+      "tailwindcss/enforces-canonical-classname": "warn",
+      "tailwindcss/no-unnecessary-arbitrary-value": "warn",
 
       // Ensure custom classes don't conflict with Tailwind
       "tailwindcss/no-custom-classname": "off", // Allow custom classes from globals.css

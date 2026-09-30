@@ -54,24 +54,3 @@ export function getEnvironmentPath(basePath: string): string {
   const prefix = getEnvironmentPrefix();
   return `${prefix}${basePath}`;
 }
-
-/**
- * Get current environment name
- * @returns {'development' | 'production'}
- */
-function getEnvironmentName(): 'development' | 'production' {
-  return isDevelopment() ? 'development' : 'production';
-}
-
-/**
- * Log environment info (useful for debugging)
- */
-function logEnvironmentInfo(): void {
-  const env = getEnvironmentName();
-  const prefix = getEnvironmentPrefix();
-
-
-  if (typeof window !== 'undefined') {
-  } else {
-  }
-}

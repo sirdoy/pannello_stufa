@@ -53,7 +53,7 @@ describe('cn() utility', () => {
 
     it('resolves complex variant conflicts', () => {
       // Base class + override from className prop (common CVA pattern)
-      expect(cn('px-4 py-2 bg-ember-500', 'bg-slate-900')).toBe('px-4 py-2 bg-slate-900');
+      expect(cn('bg-ember-500 px-4 py-2', 'bg-slate-900')).toBe('px-4 py-2 bg-slate-900');
     });
   });
 

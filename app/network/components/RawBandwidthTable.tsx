@@ -114,7 +114,7 @@ export default function RawBandwidthTable({
   const end = Math.min((page + 1) * PAGE_SIZE, totalCount);
 
   return (
-    <Card variant="elevated" className="p-4 sm:p-6 space-y-4">
+    <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       <div className="flex items-center gap-3">
         <History size={20} aria-hidden="true" className="text-ember-400" />
         <Heading level={3} size="md">
@@ -126,7 +126,7 @@ export default function RawBandwidthTable({
       </div>
 
       {loading ? (
-        <Skeleton className="h-[400px] rounded-2xl" />
+        <Skeleton className="h-100 rounded-2xl" />
       ) : items.length === 0 ? (
         <EmptyState
           icon={<History size={48} className="text-slate-500" />}
@@ -144,7 +144,7 @@ export default function RawBandwidthTable({
             enableFiltering={false}
             enablePagination={false}
           />
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-t border-white/[0.06] pt-4">
+          <div className="flex flex-col items-start justify-between gap-2 border-t border-white/6 pt-4 sm:flex-row sm:items-center">
             <Text variant="secondary" size="sm">
               Mostra {start}–{end} di {totalCount}
             </Text>

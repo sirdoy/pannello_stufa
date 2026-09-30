@@ -97,8 +97,6 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
           <Text variant="secondary" size="sm">
             <strong>Stove Scheduler:</strong> Every minute (checks active schedule)
             <br />
-            <strong>Netatmo Calibration:</strong> Every 12 hours on the Pi (valve maintenance)
-            <br />
             <strong>Netatmo Sync:</strong> Every minute (temperature updates)
             <br />
             <strong>Maintenance Tracking:</strong> Every minute (H24 hours counter)

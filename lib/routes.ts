@@ -67,7 +67,6 @@ export const NETATMO_ROUTES = {
   // Control
   setRoomThermpoint: `${API_BASE}/v1/netatmo/setroomthermpoint`,
   setThermMode: `${API_BASE}/v1/netatmo/setthermmode`,
-  calibrate: `${API_BASE}/v1/netatmo/valves/calibrate`,   // D-04: v1 bulk-calibrate lives under /valves/
 } as const;
 
 // Camera endpoints (Netatmo Security)

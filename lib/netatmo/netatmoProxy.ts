@@ -38,13 +38,10 @@ import type {
   SetMonitoringResponse,
   CameraEventsResponse,
   ValveStatusResponse,
-  CalibrateBatchResponse,
   NetatmoHealthResponse,
   RoomMeasureResponse,
   RenameHomeRequest,
   NetatmoHomedataResponse,
-  CalibrateValveResponse,
-  ValveCalibrationStatus,
 } from '@/types/netatmoProxy';
 
 const DEFAULT_TIMEOUT_MS = 15_000;
@@ -186,20 +183,6 @@ export async function getProxyValves(): Promise<ValveStatusResponse> {
   return haGet<ValveStatusResponse>('/api/v1/netatmo/valves');
 }
 
-/**
- * Trigger calibration on all valves simultaneously.
- * Calls POST /api/v1/netatmo/valves/calibrate on the HA proxy with an empty body.
- * The proxy handles calibration natively — no schedule-switching workaround needed.
- */
-export async function proxyCalibrateValves(): Promise<CalibrateBatchResponse> {
-  return haPost<CalibrateBatchResponse>('/api/v1/netatmo/valves/calibrate', {});
-}
-
-/** Last calibration run and next automatic one (12 h on the Pi, ROADMAP V9). */
-export async function getProxyValveCalibrationStatus(): Promise<ValveCalibrationStatus> {
-  return haGet<ValveCalibrationStatus>('/api/v1/netatmo/valves/calibration-status');
-}
-
 // =============================================================================
 // HEALTH WRAPPERS
 // =============================================================================
@@ -226,16 +209,8 @@ export async function getProxyRoomMeasure(params: URLSearchParams): Promise<Room
 }
 
 // =============================================================================
-// HOME / VALVE SINGLE CALIBRATE WRAPPERS
+// HOME WRAPPERS
 // =============================================================================
-
-/**
- * Calibrate a single valve by module ID.
- * Calls POST /api/v1/netatmo/valves/{moduleId}/calibrate on the HA proxy.
- */
-export async function proxyCalibrateValve(moduleId: string): Promise<CalibrateValveResponse> {
-  return haPost<CalibrateValveResponse>(`/api/v1/netatmo/valves/${moduleId}/calibrate`, {});
-}
 
 /**
  * Rename a home on Netatmo.

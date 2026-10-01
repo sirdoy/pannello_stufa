@@ -21,14 +21,6 @@ export interface OfflineBannerProps {
   className?: string;
 }
 
-interface FormattedCommand {
-  id?: number;
-  label: string;
-  icon: string;
-  formattedTime: string;
-  endpoint: string;
-}
-
 /**
  * OfflineBanner Component - Enhanced for Phase 53
  *
@@ -69,9 +61,6 @@ export default function OfflineBanner({
   const showReconnected = wasOffline && !reconnectedExpired;
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Cast pending commands to typed array
-  const typedPendingCommands = pendingCommands as FormattedCommand[];
-
   // Show reconnected message briefly when coming back online
   useEffect(() => {
     if (wasOffline) {
@@ -88,7 +77,7 @@ export default function OfflineBanner({
 
     if (fixed && shouldShowBanner) {
       // Calculate banner height dynamically
-      const bannerHeight = isExpanded && typedPendingCommands.length > 0
+      const bannerHeight = isExpanded && pendingCommands.length > 0
         ? 'var(--offline-banner-expanded-height, 200px)'
         : 'var(--offline-banner-height, 60px)';
 
@@ -102,7 +91,7 @@ export default function OfflineBanner({
     return () => {
       document.body.style.paddingTop = '';
     };
-  }, [fixed, isOnline, showReconnected, lastSyncedCommand, isExpanded, typedPendingCommands.length]);
+  }, [fixed, isOnline, showReconnected, lastSyncedCommand, isExpanded, pendingCommands.length]);
 
   // Don't render if online and no special messages
   if (isOnline && !showReconnected && !lastSyncedCommand) {
@@ -133,7 +122,7 @@ export default function OfflineBanner({
           <Text className="font-medium text-white">
             Connessione ripristinata
           </Text>
-          {typedPendingCommands.length > 0 && (
+          {pendingCommands.length > 0 && (
             <Text className="text-sm text-white/80">
               • Sincronizzazione in corso...
             </Text>
@@ -145,13 +134,12 @@ export default function OfflineBanner({
 
   // Synced command notification (success styling)
   if (lastSyncedCommand) {
-    const syncedCmd = lastSyncedCommand as { endpoint?: string };
     const actionLabels: Record<string, string> = {
       'stove/ignite': '🔥 Stufa accesa',
       'stove/shutdown': '🌙 Stufa spenta',
       'stove/set-power': '⚡ Potenza impostata',
     };
-    const label = actionLabels[syncedCmd.endpoint || ''] || 'Comando eseguito';
+    const label = actionLabels[lastSyncedCommand.endpoint || ''] || 'Comando eseguito';
 
     return (
       <div
@@ -176,9 +164,9 @@ export default function OfflineBanner({
 
   // Offline state (Ember Noir styling - dark/muted, NOT alarming)
   if (!isOnline) {
-    const hasCommands = typedPendingCommands.length > 0;
+    const hasCommands = pendingCommands.length > 0;
     const estimatedHeight = isExpanded && hasCommands
-      ? Math.min(60 + (typedPendingCommands.length * 56) + 40, 300)
+      ? Math.min(60 + (pendingCommands.length * 56) + 40, 300)
       : 60;
 
     return (
@@ -243,7 +231,7 @@ export default function OfflineBanner({
                     )}
                   >
                     <Text size="sm" className="font-medium">
-                      Comandi in coda ({typedPendingCommands.length})
+                      Comandi in coda ({pendingCommands.length})
                     </Text>
                     <span className={cn(
                       'transition-transform duration-200',
@@ -256,7 +244,7 @@ export default function OfflineBanner({
                   {/* Expanded command list */}
                   {isExpanded && (
                     <div className="mt-2 max-h-50 space-y-2 overflow-y-auto">
-                      {typedPendingCommands.map((cmd) => (
+                      {pendingCommands.map((cmd) => (
                         <div
                           key={cmd.id}
                           className={cn(

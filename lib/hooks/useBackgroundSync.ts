@@ -10,7 +10,15 @@ import {
   formatCommandForDisplay,
   processQueue,
   COMMAND_STATUS,
+  type FormattedCommand,
 } from '@/lib/pwa/backgroundSync';
+
+/** Last command the Service Worker reported as synced (cleared after 5 s). */
+export interface SyncedCommand {
+  commandId: number | undefined;
+  endpoint: string | undefined;
+  timestamp: number;
+}
 
 /**
  * Hook for using Background Sync functionality
@@ -38,11 +46,11 @@ import {
  */
 /** Background Sync hook return type */
 export interface UseBackgroundSyncReturn {
-  pendingCommands: unknown[];
-  failedCommands: unknown[];
+  pendingCommands: FormattedCommand[];
+  failedCommands: FormattedCommand[];
   pendingCount: number;
   isProcessing: boolean;
-  lastSyncedCommand: unknown | null;
+  lastSyncedCommand: SyncedCommand | null;
   hasPendingCommands: boolean;
   hasFailedCommands: boolean;
   queueStoveCommand: (action: string, body?: Record<string, unknown>) => Promise<number>;
@@ -54,11 +62,11 @@ export interface UseBackgroundSyncReturn {
 }
 
 export function useBackgroundSync(): UseBackgroundSyncReturn {
-  const [pendingCommands, setPendingCommands] = useState<unknown[]>([]);
-  const [failedCommands, setFailedCommands] = useState<unknown[]>([]);
+  const [pendingCommands, setPendingCommands] = useState<FormattedCommand[]>([]);
+  const [failedCommands, setFailedCommands] = useState<FormattedCommand[]>([]);
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const [lastSyncedCommand, setLastSyncedCommand] = useState<unknown | null>(null);
+  const [lastSyncedCommand, setLastSyncedCommand] = useState<SyncedCommand | null>(null);
 
   /**
    * Refresh command lists from IndexedDB

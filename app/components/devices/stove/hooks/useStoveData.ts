@@ -30,6 +30,7 @@ import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import type { ThermorossiData } from '@/types/websocket';
 import type { StoveState, ThermorossiStatusResponse } from '@/types/thermorossiProxy';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
+import type { FormattedCommand } from '@/lib/pwa/backgroundSync';
 import { WS_SNAPSHOT_GRACE_MS } from '@/lib/ws/snapshotGrace';
 
 /**
@@ -71,7 +72,7 @@ export interface UseStoveDataReturn {
   // PWA state
   isOnline: boolean;
   hasPendingCommands: boolean;
-  pendingCommands: unknown[];
+  pendingCommands: FormattedCommand[];
   staleness: StalenessInfo | null;
 
   // Timestamp for LastUpdated component

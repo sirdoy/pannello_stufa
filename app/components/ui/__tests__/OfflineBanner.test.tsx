@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import OfflineBanner from '../OfflineBanner';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
+import type { FormattedCommand } from '@/lib/pwa/backgroundSync';
 
 // Mock the hooks
 jest.mock('@/lib/hooks/useOnlineStatus', () => ({
@@ -18,6 +19,17 @@ jest.mock('@/lib/hooks/useBackgroundSync', () => ({
 jest.mock('date-fns', () => ({
   formatDistanceToNow: jest.fn(() => '5 minuti fa'),
 }));
+
+/** Pending command fixture: display fields from the test, queue fields defaulted. */
+const cmd = (c: Pick<FormattedCommand, 'id' | 'label' | 'icon' | 'formattedTime' | 'endpoint'>): FormattedCommand => ({
+  method: 'POST',
+  data: {},
+  status: 'pending',
+  timestamp: '2026-10-01T10:30:00.000Z',
+  retries: 0,
+  lastError: null,
+  ...c,
+});
 
 const mockUseOnlineStatus = useOnlineStatus as jest.MockedFunction<typeof useOnlineStatus>;
 const mockUseBackgroundSync = useBackgroundSync as jest.MockedFunction<typeof useBackgroundSync>;
@@ -131,20 +143,20 @@ describe('OfflineBanner', () => {
 
       mockUseBackgroundSync.mockReturnValue({
         pendingCommands: [
-          {
+          cmd({
             id: 1,
             label: 'Accensione stufa',
             icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
-          },
-          {
+          }),
+          cmd({
             id: 2,
             label: 'Spegnimento stufa',
             icon: '🌙',
             formattedTime: '10:35',
             endpoint: 'stove/shutdown',
-          },
+          }),
         ],
         failedCommands: [],
         pendingCount: 2,
@@ -176,13 +188,13 @@ describe('OfflineBanner', () => {
 
       mockUseBackgroundSync.mockReturnValue({
         pendingCommands: [
-          {
+          cmd({
             id: 1,
             label: 'Accensione stufa',
             icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
-          },
+          }),
         ],
         failedCommands: [],
         pendingCount: 1,
@@ -214,13 +226,13 @@ describe('OfflineBanner', () => {
 
       mockUseBackgroundSync.mockReturnValue({
         pendingCommands: [
-          {
+          cmd({
             id: 1,
             label: 'Accensione stufa',
             icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
-          },
+          }),
         ],
         failedCommands: [],
         pendingCount: 1,
@@ -261,20 +273,20 @@ describe('OfflineBanner', () => {
 
       mockUseBackgroundSync.mockReturnValue({
         pendingCommands: [
-          {
+          cmd({
             id: 1,
             label: 'Accensione stufa',
             icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
-          },
-          {
+          }),
+          cmd({
             id: 2,
             label: 'Imposta potenza',
             icon: '⚡',
             formattedTime: '10:35',
             endpoint: 'stove/set-power',
-          },
+          }),
         ],
         failedCommands: [],
         pendingCount: 2,
@@ -324,13 +336,13 @@ describe('OfflineBanner', () => {
 
       mockUseBackgroundSync.mockReturnValue({
         pendingCommands: [
-          {
+          cmd({
             id: 42,
             label: 'Accensione stufa',
             icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
-          },
+          }),
         ],
         failedCommands: [],
         pendingCount: 1,
@@ -386,13 +398,13 @@ describe('OfflineBanner', () => {
 
       mockUseBackgroundSync.mockReturnValue({
         pendingCommands: [
-          {
+          cmd({
             id: 1,
             label: 'Accensione stufa',
             icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
-          },
+          }),
         ],
         failedCommands: [],
         pendingCount: 1,

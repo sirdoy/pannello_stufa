@@ -2,25 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getRecentErrors, resolveError } from '@/lib/errorMonitor';
+import { getRecentErrors, resolveError, type ErrorEntry } from '@/lib/errorMonitor';
 import { Card, Button, Pagination, Skeleton, Badge } from '@/app/components/ui';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
-type ErrorItem = {
-  id: string;
-  errorCode: number;
-  errorDescription: string;
-  timestamp: number;
-  status?: string;
-  resolved: boolean;
-  resolvedAt?: number;
-};
-
 export default function ErrorsPage() {
   const router = useRouter();
-  const [errors, setErrors] = useState<ErrorItem[]>([]);
+  const [errors, setErrors] = useState<ErrorEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [filter, setFilter] = useState<'all' | 'active' | 'resolved'>('all');
@@ -34,9 +24,8 @@ export default function ErrorsPage() {
   const fetchErrors = async (): Promise<void> => {
     setLoading(true);
     try {
-      // getRecentErrors returns loosely typed Firebase entries: they carry the ErrorItem fields
       const allErrors = await getRecentErrors(100);
-      setErrors(allErrors as ErrorItem[]);
+      setErrors(allErrors);
     } catch (error) {
       console.error('Failed to fetch errors:', error);
     } finally {

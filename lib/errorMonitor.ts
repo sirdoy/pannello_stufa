@@ -122,9 +122,23 @@ export async function logError(
   }
 }
 
-interface ErrorEntry {
+/**
+ * Stove error record in Firebase `errors/{id}` (written by /api/errors/log,
+ * resolved by /api/errors/resolve), plus logError's `additionalData` keys.
+ */
+export interface ErrorEntry extends ErrorRecord {
   id: string;
-  resolved?: boolean;
+}
+
+/** Stored value of `errors/{id}` (the key is not part of it). */
+export interface ErrorRecord {
+  errorCode: number;
+  errorDescription: string;
+  severity: ErrorSeverity;
+  timestamp: number;
+  resolved: boolean;
+  resolvedAt?: number;
+  status?: string;        // stove status at error time (additionalData)
   [key: string]: unknown;
 }
 
@@ -145,7 +159,7 @@ export async function getRecentErrors(limit: number = 50): Promise<ErrorEntry[]>
     snapshot.forEach((child) => {
       errors.push({
         id: child.key as string,
-        ...child.val() as Record<string, unknown>,
+        ...(child.val() as ErrorRecord),
       });
     });
 

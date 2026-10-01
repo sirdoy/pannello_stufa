@@ -52,7 +52,7 @@ const MAX_RETRIES = 3;
 // Retry delay in ms (exponential backoff: 1s, 2s, 4s)
 const BASE_RETRY_DELAY = 1000;
 
-interface QueuedCommand {
+export interface QueuedCommand {
   id?: number;
   endpoint: string;
   method: string;
@@ -68,7 +68,8 @@ interface ProcessQueueResult {
   failed: number;
 }
 
-interface FormattedCommand extends QueuedCommand {
+/** Queued command enriched for display (formatCommandForDisplay). */
+export interface FormattedCommand extends QueuedCommand {
   label: string;
   icon: string;
   formattedTime: string;

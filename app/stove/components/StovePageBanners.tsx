@@ -13,6 +13,7 @@
 import { Banner, Button } from '@/app/components/ui';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
 import type { MaintenanceStatus } from '@/lib/maintenance/maintenanceService';
+import type { FormattedCommand } from '@/lib/pwa/backgroundSync';
 
 export interface StovePageBannersProps {
   errorCode: number;
@@ -21,7 +22,7 @@ export interface StovePageBannersProps {
   maintenanceStatus: MaintenanceStatus | null;
   cleaningInProgress: boolean;
   hasPendingCommands: boolean;
-  pendingCommands: unknown[];
+  pendingCommands: FormattedCommand[];
   onConfirmCleaning: () => void;
   onNavigateToMaintenance: () => void;
 }

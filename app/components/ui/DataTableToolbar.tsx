@@ -19,8 +19,6 @@ export interface DataTableToolbarProps<TData> extends HTMLAttributes<HTMLDivElem
   table: Table<TData>;
   globalFilter?: string;
   onGlobalFilterChange?: (value: string) => void;
-  searchPlaceholder?: string;
-  showSearch?: boolean;
   showBulkActions?: boolean;
   onBulkAction?: (action: string, selectedRows: Row<TData>[]) => void;
   bulkActions?: DataTableBulkAction[];
@@ -64,8 +62,6 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
     table,
     globalFilter = '',
     onGlobalFilterChange,
-    showSearch: _showSearch = true,
-    searchPlaceholder = 'Search...',
     showBulkActions = false,
     onBulkAction,
     bulkActions = [],
@@ -220,7 +216,7 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
             value={searchValue}
             onChange={handleSearchChange}
             placeholder="Search..."
-            aria-label={searchPlaceholder}
+            aria-label="Search..."
             className={cn(
               'w-full rounded-xl py-2 pr-4 pl-10',
               'bg-slate-800/60 backdrop-blur-xl',

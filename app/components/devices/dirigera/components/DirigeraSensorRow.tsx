@@ -1,5 +1,6 @@
 import { BatteryLow } from 'lucide-react';
 import type { DirigeraSensor, DirigeraDataFreshness } from '@/types/dirigeraProxy';
+import { formatCo2, isAirSensor } from '@/lib/dirigera/airQuality';
 
 interface DirigeraSensorRowProps {
   sensor: DirigeraSensor;
@@ -21,6 +22,7 @@ const FRESHNESS_COLORS: Record<DirigeraDataFreshness, string> = {
 export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSensorRowProps) {
   const isContact = sensor.type === 'openCloseSensor';
   const isMotion = sensor.type === 'occupancySensor';
+  const isAir = isAirSensor(sensor);
 
   // Type-specific icon
   let sensorIcon: string;
@@ -28,6 +30,8 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
     sensorIcon = sensor.is_open ? '🚪' : '🔒';
   } else if (isMotion) {
     sensorIcon = '👁️';
+  } else if (isAir) {
+    sensorIcon = '🌬️';
   } else {
     sensorIcon = '📡';
   }
@@ -47,6 +51,8 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
         ? `${(sensor as { light_level: number | null }).light_level} lux`
         : '—';
     stateText = <span className="text-slate-300">{lightLevel}</span>;
+  } else if (isAir) {
+    stateText = <span className="text-slate-300">{formatCo2(sensor.co2)}</span>;
   } else {
     stateText = <span className="text-slate-400">—</span>;
   }

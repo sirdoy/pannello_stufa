@@ -42,7 +42,7 @@ export interface DirigeraHealthResponse {
 export interface DirigeraSensor {
   id: string;
   relation_id?: string | null;  // links occupancySensor <-> lightSensor
-  type: 'openCloseSensor' | 'occupancySensor' | 'motionSensor' | string;
+  type: 'openCloseSensor' | 'occupancySensor' | 'motionSensor' | 'environmentSensor' | string;
   custom_name: string | null;   // registry custom_name, else hub customName (may be null)
   room: string | null;
   firmware_version: string | null;
@@ -53,6 +53,11 @@ export interface DirigeraSensor {
   is_open?: boolean;            // only on openCloseSensor
   is_detected?: boolean;        // only on occupancySensor / motionSensor
   light_level?: number | null;
+  // Only on environmentSensor (IKEA ALPSTUGA air quality monitor, no battery):
+  temperature?: number | null;  // °C
+  humidity?: number | null;     // relative humidity %
+  co2?: number | null;          // ppm
+  pm25?: number | null;         // PM2.5 µg/m³
   device_type?: string | null;  // registry device type slug, null if not set
 }
 
@@ -166,6 +171,11 @@ export interface SensorTelemetryReading {
   sensor_id: string;
   battery_percentage: number | null;
   light_level: number | null;
+  // Air quality columns (environmentSensor only, null elsewhere; absent before backend schema v38)
+  temperature?: number | null;
+  humidity?: number | null;
+  co2?: number | null;
+  pm25?: number | null;
   timestamp: number;   // Unix timestamp (seconds)
 }
 

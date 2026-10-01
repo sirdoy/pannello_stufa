@@ -68,6 +68,17 @@ describe('DirigeraCard', () => {
     expect(getByText('1 attivi di 3 sensori')).toBeInTheDocument();
   });
 
+  test('air quality monitor shows CO2 first and is not counted as active (D10)', () => {
+    mockSensors([
+      ...SENSORS,
+      sensor({ id: 'air', type: 'environmentSensor', custom_name: 'Aria', battery_percentage: null, co2: 430 }),
+    ]);
+    const { getByTestId, getAllByText } = render(<DirigeraCard />);
+    expect(getByTestId('dirigera-card-co2')).toHaveTextContent('430 ppm');
+    expect(getAllByText(/Aria|Porta ingresso|Finestra bagno|Corridoio/)[0]).toHaveTextContent('Aria');
+    expect(getAllByText('1 attivi di 4 sensori')).toHaveLength(1);
+  });
+
   test('detected motion counts as active', () => {
     mockSensors([sensor({ id: 'm', type: 'occupancySensor', custom_name: 'Sala', is_detected: true })]);
     const { getByText } = render(<DirigeraCard />);

@@ -16,6 +16,7 @@ import { useDirigeraHistory } from '@/app/components/devices/dirigera/hooks/useD
 import { useDirigeraTelemetry } from '@/app/components/devices/dirigera/hooks/useDirigeraTelemetry';
 import DirigeraHealthSection from '@/app/components/devices/dirigera/components/DirigeraHealthSection';
 import DirigeraSensorList from '@/app/components/devices/dirigera/components/DirigeraSensorList';
+import DirigeraAirQualityPanel from '@/app/components/devices/dirigera/components/DirigeraAirQualityPanel';
 import DirigeraStatsPanel from '@/app/components/devices/dirigera/components/DirigeraStatsPanel';
 import DirigeraHistoryPanel from '@/app/components/devices/dirigera/components/DirigeraHistoryPanel';
 import DirigeraTelemetryPanel from '@/app/components/devices/dirigera/components/DirigeraTelemetryPanel';
@@ -85,6 +86,9 @@ export default function DirigeraPage() {
 
         {/* Hub health section */}
         {data && <DirigeraHealthSection health={data.health} />}
+
+        {/* Air quality (ALPSTUGA) — only in "Tutti": contact/motion endpoints exclude it */}
+        {data && filter === 'all' && <DirigeraAirQualityPanel sensors={data.sensors} />}
 
         {/* Filter segmented control */}
         <div className="flex overflow-hidden rounded-lg border border-slate-700/50">

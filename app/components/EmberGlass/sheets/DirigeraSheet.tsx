@@ -8,17 +8,28 @@
  *
  * Sections:
  *   - Hero: total / active counts + Apri pagina action
+ *   - Air quality (ALPSTUGA): CO2, PM2.5, temperature, humidity
  *   - Sensor list grouped by type (contact, motion). Each row: dot, name,
  *     room, battery %, last seen relative time, status badge
  *   - Low battery panel (≤25%) — quick visible reference
  */
 
-import { TriangleAlert, BatteryWarning, DoorOpen, Activity } from 'lucide-react';
+import { TriangleAlert, BatteryWarning, DoorOpen, Activity, Wind } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import type { DirigeraSensor } from '@/types/dirigeraProxy';
 import { useDirigeraFullData } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
 import { SheetRow } from './primitives/SheetRow';
+import {
+  AIR_LEVEL_COLORS,
+  co2Level,
+  formatCo2,
+  formatHumidity,
+  formatPm25,
+  formatTemperature,
+  isAirSensor,
+  pm25Level,
+} from '@/lib/dirigera/airQuality';
 
 export interface DirigeraSheetProps {
   sensors: DirigeraSensor[];
@@ -54,6 +65,7 @@ function lastSeenLabel(iso: string | null): string {
 export function DirigeraSheet({ sensors, loading }: DirigeraSheetProps) {
   const contact = sensors.filter((s) => s.type === 'openCloseSensor');
   const motion = sensors.filter((s) => s.type === 'occupancySensor');
+  const air = sensors.filter(isAirSensor);
   const activeCount = sensors.filter(isSensorActive).length;
   const totalCount = sensors.length;
   const offlineCount = sensors.filter((s) => !s.is_reachable).length;
@@ -193,6 +205,30 @@ export function DirigeraSheet({ sensors, loading }: DirigeraSheetProps) {
         </div>
       )}
 
+      {/* Air quality (ALPSTUGA) */}
+      {air.length > 0 && (
+        <>
+          <div
+            style={{
+              fontSize: 11,
+              color: 'var(--text-2)',
+              textTransform: 'uppercase',
+              letterSpacing: 1,
+              marginTop: 22,
+              marginBottom: 6,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+            }}
+          >
+            <Wind size={14} /> Aria
+          </div>
+          {air.map((s) => (
+            <AirRow key={s.id} sensor={s} />
+          ))}
+        </>
+      )}
+
       {/* Contact sensors */}
       {contact.length > 0 && (
         <>
@@ -246,6 +282,40 @@ export function DirigeraSheet({ sensors, loading }: DirigeraSheetProps) {
 
 interface SensorRowProps {
   sensor: DirigeraSensor;
+}
+
+function AirRow({ sensor }: SensorRowProps) {
+  const co2 = co2Level(sensor.co2);
+  const pm25 = pm25Level(sensor.pm25);
+  const room = sensor.room ?? '—';
+  const climate = `${formatTemperature(sensor.temperature)} · ${formatHumidity(sensor.humidity)}`;
+  return (
+    <SheetRow
+      label={sensor.custom_name ?? sensor.id}
+      value={sensor.is_reachable ? `${room} · ${climate}` : `${room} · offline`}
+    >
+      <div
+        data-testid="dirigera-sheet-air"
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: 2,
+          flexShrink: 0,
+          fontSize: 12,
+          fontWeight: 600,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        <span style={{ color: co2 ? AIR_LEVEL_COLORS[co2] : 'var(--text-2)' }}>
+          CO₂ {formatCo2(sensor.co2)}
+        </span>
+        <span style={{ color: pm25 ? AIR_LEVEL_COLORS[pm25] : 'var(--text-2)' }}>
+          PM2.5 {formatPm25(sensor.pm25)}
+        </span>
+      </div>
+    </SheetRow>
+  );
 }
 
 function SensorRow({ sensor }: SensorRowProps) {

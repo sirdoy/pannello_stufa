@@ -22,6 +22,7 @@ import { GlassCardSkeleton } from '../GlassCardSkeleton';
 import { useCardReady } from '../useCardReady';
 import { useDirigeraFullData } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
 import type { DirigeraSensor } from '@/types/dirigeraProxy';
+import { AIR_LEVEL_COLORS, co2Level, formatCo2, isAirSensor } from '@/lib/dirigera/airQuality';
 
 const TONE = '#ffb84a';
 
@@ -40,7 +41,11 @@ export default function DirigeraCard() {
   const [open, setOpen] = useState(false);
   const { data, loading } = useDirigeraFullData('all');
   const sensors = data?.sensors ?? [];
-  const visibleSensors = sensors.slice(0, 4);
+  // Air quality monitors first: their CO2 reading is the most useful at a glance (D10)
+  const visibleSensors = [
+    ...sensors.filter(isAirSensor),
+    ...sensors.filter((s) => !isAirSensor(s)),
+  ].slice(0, 4);
   const activeCount = sensors.filter(isSensorActive).length;
   const totalCount = sensors.length;
 
@@ -107,7 +112,14 @@ export default function DirigeraCard() {
                   flexShrink: 0,
                 }}
               >
-                {s.type === 'openCloseSensor'
+                {isAirSensor(s) ? (
+                  <span
+                    data-testid="dirigera-card-co2"
+                    style={{ color: AIR_LEVEL_COLORS[co2Level(s.co2) ?? 'good'] }}
+                  >
+                    {formatCo2(s.co2)}
+                  </span>
+                ) : s.type === 'openCloseSensor'
                   ? s.is_open
                     ? 'Aperto'
                     : 'Chiuso'

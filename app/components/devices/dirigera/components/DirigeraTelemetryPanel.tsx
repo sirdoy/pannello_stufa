@@ -1,6 +1,18 @@
 'use client';
 
 import type { SensorTelemetryReading } from '@/types/dirigeraProxy';
+import { formatCo2, formatHumidity, formatPm25, formatTemperature } from '@/lib/dirigera/airQuality';
+
+/** Air quality columns as one compact cell ("—" for non-environment sensors). */
+function airText(r: SensorTelemetryReading): string {
+  if (r.co2 == null && r.pm25 == null && r.temperature == null && r.humidity == null) return '—';
+  return [
+    formatCo2(r.co2),
+    `PM2.5 ${formatPm25(r.pm25)}`,
+    formatTemperature(r.temperature),
+    formatHumidity(r.humidity),
+  ].join(' · ');
+}
 
 interface DirigeraTelemetryPanelProps {
   items: SensorTelemetryReading[];
@@ -73,6 +85,7 @@ export default function DirigeraTelemetryPanel({
                   <th className="pb-2 text-left">Sensore</th>
                   <th className="pb-2 text-left">Batteria</th>
                   <th className="pb-2 text-left">Lux</th>
+                  <th className="pb-2 text-left">Aria</th>
                   <th className="pb-2 text-left">Data/ora</th>
                 </tr>
               </thead>
@@ -90,6 +103,7 @@ export default function DirigeraTelemetryPanel({
                         ? `${reading.light_level} lux`
                         : '—'}
                     </td>
+                    <td className="py-2 whitespace-nowrap">{airText(reading)}</td>
                     <td className="py-2 text-slate-400">
                       {new Intl.DateTimeFormat('it-IT', {
                         dateStyle: 'short',

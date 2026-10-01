@@ -164,7 +164,8 @@ describe('ApiKeysPage — create flow', () => {
     );
     // Click Crea inside the FormModal with an empty name field.
     await user.click(screen.getByRole('button', { name: /^crea$/i }));
-    expect(await screen.findByText(/nome obbligatorio/i)).toBeInTheDocument();
+    // Shown inline and in the FormModal error summary (M41)
+    expect(await screen.findAllByText(/nome obbligatorio/i)).toHaveLength(2);
     expect(mockCreate).not.toHaveBeenCalled();
   });
 

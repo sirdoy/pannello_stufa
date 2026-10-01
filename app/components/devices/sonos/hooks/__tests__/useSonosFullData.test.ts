@@ -124,10 +124,10 @@ function makeFetchMock(overrides?: {
   };
 
   return (url: string) => {
-    if (url === '/api/v1/sonos/devices') {
+    if (url === '/api/v1/sonos/speakers') {
       return Promise.resolve({
         ok: opts.devicesOk,
-        json: () => Promise.resolve({ devices: [mockDevice1, mockDevice2] }),
+        json: () => Promise.resolve({ speakers: [mockDevice1, mockDevice2] }),
       });
     }
     if (url === '/api/v1/sonos/zones') {
@@ -371,7 +371,7 @@ describe('useSonosFullData', () => {
     expect(result.current.error).toBeNull();
   });
 
-  it('Test 11: populates devices array from /api/v1/sonos/devices fetch', async () => {
+  it('Test 11: populates devices array from /api/v1/sonos/speakers fetch', async () => {
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
     const { result } = renderHook(() => useSonosFullData());
     await waitFor(() => expect(result.current.loading).toBe(false));

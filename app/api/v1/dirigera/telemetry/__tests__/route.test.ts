@@ -19,7 +19,7 @@ const mockTelemetryData = {
   telemetry: [
     { id: 1, sensor_id: 'xyz', battery_percentage: 90, light_level: 42, timestamp: 1773000000 },
   ],
-  total: 1,
+  total_count: 1,
   limit: 100,
   offset: 0,
 };
@@ -49,7 +49,7 @@ describe('GET /api/v1/dirigera/telemetry', () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.telemetry).toEqual(mockTelemetryData.telemetry);
-    expect(data.total).toBe(1);
+    expect(data.total_count).toBe(1);
     expect(mockGetTelemetry).toHaveBeenCalledWith();
   });
 

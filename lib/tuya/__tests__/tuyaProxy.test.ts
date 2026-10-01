@@ -59,9 +59,9 @@ const mockHistory: TuyaHistoryResponse = {
   device_id: 'bf123',
   granularity: 'raw',
   period: { from: 1742987790, to: 1743074190 },
-  page: 1,
-  page_size: 100,
-  total: 10,
+  total_count: 10,
+  limit: 100,
+  offset: 0,
   items: [],
 };
 

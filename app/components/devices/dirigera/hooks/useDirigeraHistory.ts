@@ -49,7 +49,7 @@ export function useDirigeraHistory(params?: SensorHistoryParams): UseDirigeraHis
       setItems(data.events);
       offsetRef.current = 0;
     }
-    setTotal(data.total);
+    setTotal(data.total_count);
     setStale(false);
     setError(null);
     hasDataRef.current = true;

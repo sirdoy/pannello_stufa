@@ -33,7 +33,7 @@ export function useTuyaHistory(
 
       try {
         const res = await fetch(
-          `/api/tuya/plugs/${deviceId}/history?period=${period}&page_size=500`
+          `/api/tuya/plugs/${deviceId}/history?period=${period}&limit=500`
         );
 
         if (!res.ok) {

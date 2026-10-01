@@ -147,14 +147,12 @@ export function netatmoSchedulesForHome(homes: NetatmoProxyHome[], homeId: strin
 // ─── Sonos ───────────────────────────────────────────────────────────────────
 
 export function useSonosSpeakerOptions(enabled = true): DeviceOptionsResult {
-  return useFetchedOptions<{ devices: SonosDeviceResponse[] }>({
-    url: '/api/v1/sonos/devices',
+  return useFetchedOptions<{ speakers: SonosDeviceResponse[] }>({
+    url: '/api/v1/sonos/speakers',
     enabled,
     extract: (j) => {
-      // Sonos route renames upstream `speakers` → `devices` for client clarity
-      // (see app/api/v1/sonos/devices/route.ts).
-      const devices = (j as { devices?: SonosDeviceResponse[] }).devices ?? [];
-      return devices.map((d) => ({ value: d.uid, label: d.name }));
+      const speakers = (j as { speakers?: SonosDeviceResponse[] }).speakers ?? [];
+      return speakers.map((d) => ({ value: d.uid, label: d.name }));
     },
   });
 }

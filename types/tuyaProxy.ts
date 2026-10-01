@@ -92,8 +92,8 @@ export interface TuyaHistoryResponse {
   device_id: string;
   granularity: 'raw' | 'hourly' | 'daily';
   period: { from: number; to: number };  // resolved epoch range
-  page: number;
-  page_size: number;
-  total: number;
+  total_count: number;
+  limit: number;
+  offset: number;
   items: TuyaHistoryItem[];
 }

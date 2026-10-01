@@ -215,10 +215,10 @@ export function useSonosFullData(): UseSonosFullDataReturn {
       setError(null);
 
       // 0. Fetch devices list
-      const devicesRes = await fetch('/api/v1/sonos/devices');
+      const devicesRes = await fetch('/api/v1/sonos/speakers');
       if (!devicesRes.ok) throw new Error('Devices endpoint failed');
-      const devicesBody = (await devicesRes.json()) as { devices: SonosDeviceResponse[] };
-      const devices = devicesBody.devices;
+      const devicesBody = (await devicesRes.json()) as { speakers: SonosDeviceResponse[] };
+      const devices = devicesBody.speakers;
 
       // 1. Fetch zones (wrapped in { zones: [...] })
       const zonesRes = await fetch('/api/v1/sonos/zones');

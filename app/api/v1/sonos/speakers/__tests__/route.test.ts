@@ -1,5 +1,5 @@
 /**
- * Tests for GET /api/v1/sonos/devices (deprecated alias of /speakers, T6)
+ * Tests for GET /api/v1/sonos/speakers
  */
 
 jest.mock('@/lib/sonos/sonosProxy');
@@ -14,9 +14,9 @@ import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils
 import type { SonosDeviceResponse } from '@/types/sonosProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
-const mockGetDevices = jest.mocked(sonosProxy.getSpeakers);
+const mockGetSpeakers = jest.mocked(sonosProxy.getSpeakers);
 
-describe('GET /api/v1/sonos/devices', () => {
+describe('GET /api/v1/sonos/speakers', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetSession.mockResolvedValue(mockAppSession());
@@ -30,10 +30,7 @@ describe('GET /api/v1/sonos/devices', () => {
     expect(response.status).toBe(401);
   });
 
-  it('should return 200 with { devices: [...] } envelope', async () => {
-    // HA proxy returns `{ speakers, count, is_stale, fetched_at }`; route
-    // renames `speakers` → `devices` for the client envelope and forwards
-    // the rest of the wrapper fields.
+  it('should return 200 with the backend shape { speakers: [...] }', async () => {
     const livingRoom: SonosDeviceResponse = {
       uid: 'RINCON_A',
       name: 'Living Room',
@@ -49,7 +46,7 @@ describe('GET /api/v1/sonos/devices', () => {
       livingRoom,
       { ...livingRoom, uid: 'RINCON_B', name: 'Kitchen', ip: '192.168.1.21', role: 'speaker' },
     ];
-    mockGetDevices.mockResolvedValue({
+    mockGetSpeakers.mockResolvedValue({
       speakers: mockSpeakers,
       count: mockSpeakers.length,
       is_stale: false,
@@ -58,8 +55,9 @@ describe('GET /api/v1/sonos/devices', () => {
     const response = await GET(asNextRequest({}), routeContext());
     const data = await response.json();
     expect(response.status).toBe(200);
-    expect(data.devices).toEqual(mockSpeakers);
+    expect(data.speakers).toEqual(mockSpeakers);
+    expect(data.devices).toBeUndefined();
     expect(data.count).toBe(2);
-    expect(mockGetDevices).toHaveBeenCalledWith();
+    expect(mockGetSpeakers).toHaveBeenCalledWith();
   });
 });

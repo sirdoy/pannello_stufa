@@ -8,8 +8,8 @@ jest.mock('@/lib/haClient');
 import { haGet, haPost, haPut } from '@/lib/haClient';
 import {
   getHealth,
-  getDevices,
-  getDevice,
+  getSpeakers,
+  getSpeaker,
   getZones,
   getEq,
   setEq,
@@ -108,7 +108,7 @@ const mockPlayMode: SonosPlayModeResponse = {
 const mockQueue: SonosQueueResponse = {
   group_id: 'RINCON_B8E9378A123401400',
   items: [],
-  total: 0,
+  total_count: 0,
   limit: 50,
   offset: 0,
 };
@@ -131,7 +131,7 @@ const mockSleepTimer: SonosSleepTimerResponse = {
 
 const mockHistory: SonosHistoryResponse = {
   items: [],
-  total: 0,
+  total_count: 0,
   granularity: 'hourly',
   limit: 100,
   offset: 0,
@@ -157,33 +157,33 @@ describe('getHealth', () => {
   });
 });
 
-describe('getDevices', () => {
+describe('getSpeakers', () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
-  it('calls haGet with /api/v1/sonos/devices', async () => {
+  it('calls haGet with /api/v1/sonos/speakers', async () => {
     mockHaGet.mockResolvedValue([mockDevice]);
 
-    const result = await getDevices();
+    const result = await getSpeakers();
 
-    expect(mockHaGet).toHaveBeenCalledWith('/api/v1/sonos/devices');
+    expect(mockHaGet).toHaveBeenCalledWith('/api/v1/sonos/speakers');
     expect(result).toEqual([mockDevice]);
   });
 });
 
-describe('getDevice', () => {
+describe('getSpeaker', () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });
 
-  it('calls haGet with /api/v1/sonos/devices/{uid}', async () => {
+  it('calls haGet with /api/v1/sonos/speakers/{uid}', async () => {
     mockHaGet.mockResolvedValue(mockDeviceDetail);
 
-    const result = await getDevice('RINCON_B8E9378A123401400');
+    const result = await getSpeaker('RINCON_B8E9378A123401400');
 
     expect(mockHaGet).toHaveBeenCalledWith(
-      '/api/v1/sonos/devices/RINCON_B8E9378A123401400'
+      '/api/v1/sonos/speakers/RINCON_B8E9378A123401400'
     );
     expect(result).toEqual(mockDeviceDetail);
   });

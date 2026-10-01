@@ -134,7 +134,7 @@ export interface SensorHistoryParams {
 // Source: docs/api/dirigera.md — SensorHistoryResponse
 export interface SensorHistoryResponse {
   events: SensorEvent[];
-  total: number;
+  total_count: number;
   limit: number;
   offset: number;
 }
@@ -192,7 +192,7 @@ export interface SensorTelemetryParams {
 // Source: docs/api/dirigera.md — SensorTelemetryResponse
 export interface SensorTelemetryResponse {
   telemetry: SensorTelemetryReading[];
-  total: number;
+  total_count: number;
   limit: number;
   offset: number;
 }

@@ -18,7 +18,7 @@ const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetHistory = jest.mocked(sonosProxy.getHistory);
 const emptyHistory: SonosHistoryResponse = {
   items: [],
-  total: 0,
+  total_count: 0,
   granularity: 'raw',
   limit: 100,
   offset: 0,

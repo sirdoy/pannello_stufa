@@ -9,7 +9,7 @@ import { useSonosHistory } from '../useSonosHistory';
 
 const mockHistoryResponse = {
   items: [],
-  total: 0,
+  total_count: 0,
   granularity: 'hourly' as const,
   limit: 200,
   offset: 0,
@@ -98,7 +98,7 @@ describe('useSonosHistory', () => {
   });
 
   it('Test 4: fetchHistory sets data on success', async () => {
-    const mockData = { ...mockHistoryResponse, total: 5 };
+    const mockData = { ...mockHistoryResponse, total_count: 5 };
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(mockData),

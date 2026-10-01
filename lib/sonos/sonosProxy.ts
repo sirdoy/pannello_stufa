@@ -63,19 +63,19 @@ export interface SonosDevicesPayload {
  * Get the list of all discovered Sonos devices. The HA proxy returns a wrapper
  * `{ speakers, count, is_stale, fetched_at }`, NOT a bare array — the previous
  * `Promise<SonosDeviceResponse[]>` signature was a type lie.
- * Calls GET /api/v1/sonos/devices on the HA proxy.
+ * Calls GET /api/v1/sonos/speakers on the HA proxy.
  */
-export async function getDevices(): Promise<SonosDevicesPayload> {
-  return haGet<SonosDevicesPayload>('/api/v1/sonos/devices');
+export async function getSpeakers(): Promise<SonosDevicesPayload> {
+  return haGet<SonosDevicesPayload>('/api/v1/sonos/speakers');
 }
 
 /**
  * Get detailed information for a specific Sonos device including volume/EQ state.
- * Calls GET /api/v1/sonos/devices/{uid} on the HA proxy.
+ * Calls GET /api/v1/sonos/speakers/{uid} on the HA proxy.
  * @param uid - RINCON_... device UID
  */
-export async function getDevice(uid: string): Promise<SonosDeviceDetailResponse> {
-  return haGet<SonosDeviceDetailResponse>(`/api/v1/sonos/devices/${uid}`);
+export async function getSpeaker(uid: string): Promise<SonosDeviceDetailResponse> {
+  return haGet<SonosDeviceDetailResponse>(`/api/v1/sonos/speakers/${uid}`);
 }
 
 export interface SonosZonesPayload {

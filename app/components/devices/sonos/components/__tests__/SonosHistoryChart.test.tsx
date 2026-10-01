@@ -108,7 +108,7 @@ describe('SonosHistoryChart', () => {
 
   it('renders empty playback message when historyType is playback and no data', () => {
     mockUseSonosHistory.mockReturnValue(
-      makeMockHistory({ historyType: 'playback', data: { items: [], total: 0, granularity: 'raw', limit: 200, offset: 0 } })
+      makeMockHistory({ historyType: 'playback', data: { items: [], total_count: 0, granularity: 'raw', limit: 200, offset: 0 } })
     );
     render(<SonosHistoryChart zones={mockZones} speakers={mockSpeakers} />);
     expect(screen.getByText('Nessun evento di riproduzione')).toBeInTheDocument();

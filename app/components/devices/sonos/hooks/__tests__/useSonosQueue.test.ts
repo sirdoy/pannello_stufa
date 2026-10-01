@@ -43,7 +43,7 @@ describe('useSonosQueue', () => {
       json: () => Promise.resolve({
         group_id: 'RINCON_TEST',
         items: mockItems,
-        total: 25,
+        total_count: 25,
         limit: 20,
         offset: 0,
       }),
@@ -79,7 +79,7 @@ describe('useSonosQueue', () => {
         json: () => Promise.resolve({
           group_id: 'RINCON_TEST',
           items: page1Items,
-          total: 5,
+          total_count: 5,
           limit: 20,
           offset: 0,
         }),
@@ -89,7 +89,7 @@ describe('useSonosQueue', () => {
         json: () => Promise.resolve({
           group_id: 'RINCON_TEST',
           items: page2Items,
-          total: 5,
+          total_count: 5,
           limit: 20,
           offset: 2,
         }),
@@ -120,7 +120,7 @@ describe('useSonosQueue', () => {
       json: () => Promise.resolve({
         group_id: 'RINCON_TEST',
         items: mockItems,
-        total: 2,
+        total_count: 2,
         limit: 20,
         offset: 0,
       }),
@@ -169,7 +169,7 @@ describe('useSonosQueue', () => {
         json: () => Promise.resolve({
           group_id: 'RINCON_TEST',
           items: firstItems,
-          total: 1,
+          total_count: 1,
           limit: 20,
           offset: 0,
         }),
@@ -179,7 +179,7 @@ describe('useSonosQueue', () => {
         json: () => Promise.resolve({
           group_id: 'RINCON_TEST',
           items: secondItems,
-          total: 1,
+          total_count: 1,
           limit: 20,
           offset: 0,
         }),
@@ -215,7 +215,7 @@ describe('useSonosQueue', () => {
         json: () => Promise.resolve({
           group_id: 'RINCON_TEST',
           items: page1Items,
-          total: 40,
+          total_count: 40,
           limit: 20,
           offset: 0,
         }),
@@ -225,7 +225,7 @@ describe('useSonosQueue', () => {
         json: () => Promise.resolve({
           group_id: 'RINCON_TEST',
           items: [],
-          total: 40,
+          total_count: 40,
           limit: 20,
           offset: 20,
         }),

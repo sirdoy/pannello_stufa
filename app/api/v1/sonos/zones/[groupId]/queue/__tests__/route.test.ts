@@ -17,7 +17,7 @@ const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetQueue = jest.mocked(sonosProxy.getQueue);
 const mockContext = routeContext({ groupId: 'RINCON_123' });
 
-const mockQueueData: SonosQueueResponse = { group_id: 'RINCON_123', items: [], total: 0, limit: 100, offset: 0 };
+const mockQueueData: SonosQueueResponse = { group_id: 'RINCON_123', items: [], total_count: 0, limit: 100, offset: 0 };
 
 describe('GET /api/v1/sonos/zones/[groupId]/queue', () => {
   beforeEach(() => {

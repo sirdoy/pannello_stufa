@@ -48,7 +48,7 @@ export function useDirigeraTelemetry(params?: SensorTelemetryParams): UseDiriger
       setItems(data.telemetry);
       offsetRef.current = 0;
     }
-    setTotal(data.total);
+    setTotal(data.total_count);
     setStale(false);
     setError(null);
     hasDataRef.current = true;

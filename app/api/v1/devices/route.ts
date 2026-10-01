@@ -23,7 +23,7 @@
 import { withAuthAndErrorHandler, success, parseQuery } from '@/lib/core';
 import { fritzboxClient } from '@/lib/fritzbox';
 import { getLights } from '@/lib/hue/hueProxy';
-import { getDevices as getSonosDevices } from '@/lib/sonos/sonosProxy';
+import { getSpeakers as getSonosDevices } from '@/lib/sonos/sonosProxy';
 import { getProxyHomesdata, getProxyCameraStatus } from '@/lib/netatmo/netatmoProxy';
 import { getSensors } from '@/lib/dirigera/dirigeraProxy';
 import { getPlugs } from '@/lib/tuya/tuyaProxy';

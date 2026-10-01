@@ -32,7 +32,7 @@ export function useSonosQueue(groupId: string): UseSonosQueueReturn {
       if (!res.ok) throw new Error('Queue non disponibile');
       const data = (await res.json()) as SonosQueueResponse;
       setItems(prev => append ? [...prev, ...data.items] : data.items);
-      setTotal(data.total);
+      setTotal(data.total_count);
       setOffset(pageOffset + data.items.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore coda');

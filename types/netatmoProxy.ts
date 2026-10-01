@@ -215,7 +215,7 @@ export type NetatmoMeasurement = NetatmoRawMeasurement | NetatmoHourlyMeasuremen
 /** Paginated response from GET /getroommeasure */
 export interface RoomMeasureResponse {
   items: NetatmoMeasurement[];
-  total: number;
+  total_count: number;
   limit: number;
   offset: number;
 }

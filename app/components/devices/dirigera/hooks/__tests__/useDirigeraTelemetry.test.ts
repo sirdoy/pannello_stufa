@@ -36,7 +36,7 @@ describe('useDirigeraTelemetry', () => {
     mockUseAdaptivePolling.mockImplementation(() => undefined);
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ telemetry: [mockReading1], total: 10, limit: 50, offset: 0 }),
+      json: () => Promise.resolve({ telemetry: [mockReading1], total_count: 10, limit: 50, offset: 0 }),
     }) as jest.Mock;
   });
 
@@ -77,11 +77,11 @@ describe('useDirigeraTelemetry', () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ telemetry: [mockReading1], total: 10, limit: 50, offset: 0 }),
+        json: () => Promise.resolve({ telemetry: [mockReading1], total_count: 10, limit: 50, offset: 0 }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ telemetry: [mockReading2], total: 10, limit: 50, offset: 50 }),
+        json: () => Promise.resolve({ telemetry: [mockReading2], total_count: 10, limit: 50, offset: 50 }),
       });
 
     const { result } = renderHook(() => useDirigeraTelemetry());
@@ -117,15 +117,15 @@ describe('useDirigeraTelemetry', () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ telemetry: [mockReading1], total: 10, limit: 50, offset: 0 }),
+        json: () => Promise.resolve({ telemetry: [mockReading1], total_count: 10, limit: 50, offset: 0 }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ telemetry: [mockReading2], total: 10, limit: 50, offset: 50 }),
+        json: () => Promise.resolve({ telemetry: [mockReading2], total_count: 10, limit: 50, offset: 50 }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ telemetry: [mockReading1], total: 10, limit: 50, offset: 0 }),
+        json: () => Promise.resolve({ telemetry: [mockReading1], total_count: 10, limit: 50, offset: 0 }),
       });
 
     const { result } = renderHook(() => useDirigeraTelemetry());

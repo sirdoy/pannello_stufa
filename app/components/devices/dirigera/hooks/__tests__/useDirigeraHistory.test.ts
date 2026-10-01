@@ -34,7 +34,7 @@ describe('useDirigeraHistory', () => {
     mockUseAdaptivePolling.mockImplementation(() => undefined);
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () => Promise.resolve({ events: [mockEvent1], total: 10, limit: 50, offset: 0 }),
+      json: () => Promise.resolve({ events: [mockEvent1], total_count: 10, limit: 50, offset: 0 }),
     }) as jest.Mock;
   });
 
@@ -76,11 +76,11 @@ describe('useDirigeraHistory', () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ events: [mockEvent1], total: 10, limit: 50, offset: 0 }),
+        json: () => Promise.resolve({ events: [mockEvent1], total_count: 10, limit: 50, offset: 0 }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ events: [mockEvent2], total: 10, limit: 50, offset: 50 }),
+        json: () => Promise.resolve({ events: [mockEvent2], total_count: 10, limit: 50, offset: 50 }),
       });
 
     const { result } = renderHook(() => useDirigeraHistory());
@@ -116,15 +116,15 @@ describe('useDirigeraHistory', () => {
     (global.fetch as jest.Mock)
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ events: [mockEvent1], total: 10, limit: 50, offset: 0 }),
+        json: () => Promise.resolve({ events: [mockEvent1], total_count: 10, limit: 50, offset: 0 }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ events: [mockEvent2], total: 10, limit: 50, offset: 50 }),
+        json: () => Promise.resolve({ events: [mockEvent2], total_count: 10, limit: 50, offset: 50 }),
       })
       .mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ events: [mockEvent1], total: 10, limit: 50, offset: 0 }),
+        json: () => Promise.resolve({ events: [mockEvent1], total_count: 10, limit: 50, offset: 0 }),
       });
 
     const { result } = renderHook(() => useDirigeraHistory());

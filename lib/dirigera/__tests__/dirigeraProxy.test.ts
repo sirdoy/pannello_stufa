@@ -115,7 +115,7 @@ const mockHistoryResponse: SensorHistoryResponse = {
       timestamp: 1773000000,
     },
   ],
-  total: 1,
+  total_count: 1,
   limit: 100,
   offset: 0,
 };
@@ -155,7 +155,7 @@ const mockTelemetryResponse: SensorTelemetryResponse = {
       timestamp: 1773000000,
     },
   ],
-  total: 1,
+  total_count: 1,
   limit: 100,
   offset: 0,
 };
@@ -210,7 +210,7 @@ describe('dirigeraProxy', () => {
     mockHaGet.mockResolvedValueOnce(mockHistoryResponse);
     const result = await getHistory();
     expect(mockHaGet).toHaveBeenCalledWith('/api/v1/dirigera/history');
-    expect(result.total).toBe(1);
+    expect(result.total_count).toBe(1);
     expect(result.events[0]?.event_type).toBe('open');
   });
 

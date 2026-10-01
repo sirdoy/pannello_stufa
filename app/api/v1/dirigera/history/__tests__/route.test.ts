@@ -19,7 +19,7 @@ const mockHistoryData = {
   events: [
     { id: 1, sensor_id: 'abc', event_type: 'open', timestamp: 1 },
   ],
-  total: 1,
+  total_count: 1,
   limit: 100,
   offset: 0,
 };
@@ -49,7 +49,7 @@ describe('GET /api/v1/dirigera/history', () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.events).toEqual(mockHistoryData.events);
-    expect(data.total).toBe(1);
+    expect(data.total_count).toBe(1);
     expect(mockGetHistory).toHaveBeenCalledWith();
   });
 

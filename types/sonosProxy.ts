@@ -134,7 +134,7 @@ export interface SonosQueueItemResponse {
 export interface SonosQueueResponse {
   group_id: string;
   items: SonosQueueItemResponse[];
-  total: number;
+  total_count: number;
   limit: number;
   offset: number;
 }
@@ -186,7 +186,7 @@ export interface SonosPlaybackHistoryItem {
 // Source: docs/api/sonos.md — SonosHistoryResponse
 export interface SonosHistoryResponse {
   items: SonosVolumeHistoryItem[] | SonosPlaybackHistoryItem[];
-  total: number;
+  total_count: number;
   granularity: 'raw' | 'hourly' | 'daily';
   limit: number;
   offset: number;

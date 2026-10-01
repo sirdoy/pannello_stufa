@@ -39,7 +39,7 @@ describe('GET /api/v1/netatmo/getroommeasure', () => {
         avg_temperature: 20.5, min_temperature: 20.1, max_temperature: 20.9, avg_heating_power: null,
         sample_count: 12, hour_timestamp: 1000,
       }],
-      total: 1,
+      total_count: 1,
       limit: 100,
       offset: 0,
     });

@@ -38,8 +38,8 @@ export interface StoveEventBody {
 interface Slot {
   start_minutes: number;
   end_minutes: number;
-  power: number;
-  fan: number;
+  power_level: number;
+  fan_level: number;
 }
 
 const hhmm = (minutes: number): string =>
@@ -69,7 +69,7 @@ export function stoveEventMessage({ event, data, ts }: StoveEventBody): string {
   switch (event) {
     case 'scheduler_ignition':
       return slot
-        ? `Stufa accesa automaticamente alle ${romeTime(ts)} (P${slot.power}, V${slot.fan})`
+        ? `Stufa accesa automaticamente alle ${romeTime(ts)} (P${slot.power_level}, V${slot.fan_level})`
         : `Stufa accesa automaticamente alle ${romeTime(ts)}`;
     case 'scheduler_shutdown':
       return `Stufa spenta automaticamente alle ${romeTime(ts)}`;

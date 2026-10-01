@@ -52,8 +52,8 @@ export function toSlot(interval: UiInterval): ScheduleSlot {
   return {
     start_minutes: hhmmToMinutes(interval.start),
     end_minutes: hhmmToMinutes(interval.end),
-    power: interval.power,
-    fan: interval.fan,
+    power_level: interval.power,
+    fan_level: interval.fan,
   };
 }
 
@@ -61,8 +61,8 @@ export function toInterval(slot: ScheduleSlot): UiInterval {
   return {
     start: minutesToHHMM(slot.start_minutes),
     end: minutesToHHMM(slot.end_minutes),
-    power: slot.power,
-    fan: slot.fan,
+    power: slot.power_level,
+    fan: slot.fan_level,
   };
 }
 

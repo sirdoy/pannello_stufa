@@ -24,7 +24,7 @@ import * as maintenance from '../maintenance/route';
 import * as confirmCleaning from '../../../maintenance/confirm-cleaning/route';
 
 const mocked = jest.mocked(proxy);
-const SLOT = { start_minutes: 360, end_minutes: 390, power: 2, fan: 3 };
+const SLOT = { start_minutes: 360, end_minutes: 390, power_level: 2, fan_level: 3 };
 
 function req(body?: unknown, search = '') {
   const headers = new Map([['content-type', 'application/json']]);
@@ -95,10 +95,17 @@ describe('slots', () => {
     ['day out of range', { slots: [SLOT] }, { id: '2', day: '7' }],
     ['not 15-min aligned', { slots: [{ ...SLOT, start_minutes: 361 }] }, { id: '2', day: '0' }],
     ['start after end', { slots: [{ ...SLOT, start_minutes: 400 }] }, { id: '2', day: '0' }],
-    ['power out of range', { slots: [{ ...SLOT, power: 6 }] }, { id: '2', day: '0' }],
+    ['power out of range', { slots: [{ ...SLOT, power_level: 6 }] }, { id: '2', day: '0' }],
+    ['legacy power out of range', { slots: [{ start_minutes: 360, end_minutes: 390, power: 6, fan: 3 }] }, { id: '2', day: '0' }],
   ])('400 on %s', async (_label, body, params) => {
     expect((await daySlots.PUT(req(body), ctx(params))).status).toBe(400);
     expect(mocked.replaceDaySlots).not.toHaveBeenCalled();
+  });
+
+  it('maps legacy power/fan from older bundles to power_level/fan_level (T6)', async () => {
+    const legacy = { start_minutes: 360, end_minutes: 390, power: 2, fan: 3 };
+    expect((await daySlots.PUT(req({ slots: [legacy] }), ctx({ id: '2', day: '6' }))).status).toBe(200);
+    expect(mocked.replaceDaySlots).toHaveBeenCalledWith(2, 6, [SLOT]);
   });
 
   it('week: forwards days, rejects bad day keys', async () => {
@@ -125,8 +132,8 @@ describe('mode, override, log', () => {
   });
 
   it('log forwards only numeric known params', async () => {
-    await log.GET(req(undefined, '?page=2&page_size=20&from=abc&evil=1'), ctx());
-    expect(mocked.getExecutionLog).toHaveBeenCalledWith('page=2&page_size=20');
+    await log.GET(req(undefined, '?limit=20&offset=40&page=2&from=abc&evil=1'), ctx());
+    expect(mocked.getExecutionLog).toHaveBeenCalledWith('limit=20&offset=40');
   });
 });
 

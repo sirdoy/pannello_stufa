@@ -48,8 +48,8 @@ export interface NextScheduledAction {
   fan?: number;
 }
 
-async function nextAction(): Promise<NextActionResponse['nextAction']> {
-  const { nextAction: action } = await apiFetch<NextActionResponse>(`${API}/scheduler/next-action`);
+async function nextAction(): Promise<NextActionResponse['next_action']> {
+  const { next_action: action } = await apiFetch<NextActionResponse>(`${API}/scheduler/next-action`);
   return action;
 }
 
@@ -72,8 +72,8 @@ export const getNextScheduledAction = async (): Promise<NextScheduledAction | nu
     return {
       timestamp: new Date(action.at * 1000).toISOString(),
       action: action.action,
-      power: action.power,
-      fan: action.fan,
+      power: action.power_level,
+      fan: action.fan_level,
     };
   } catch (error) {
     console.error('Errore calcolo prossima azione scheduler:', error);

@@ -36,10 +36,10 @@ const DETAIL = {
   is_active: true,
   slots_by_day: {
     '0': [
-      { id: 2, day: 0, start_minutes: 390, end_minutes: 525, power: 1, fan: 1 },
-      { id: 1, day: 0, start_minutes: 360, end_minutes: 390, power: 2, fan: 3 },
+      { id: 2, day: 0, start_minutes: 390, end_minutes: 525, power_level: 1, fan_level: 1 },
+      { id: 1, day: 0, start_minutes: 360, end_minutes: 390, power_level: 2, fan_level: 3 },
     ],
-    '6': [{ id: 3, day: 6, start_minutes: 480, end_minutes: 1380, power: 1, fan: 1 }],
+    '6': [{ id: 3, day: 6, start_minutes: 480, end_minutes: 1380, power_level: 1, fan_level: 1 }],
   },
 };
 
@@ -134,7 +134,7 @@ describe('read side', () => {
 
   it('next action and next change come from the backend', async () => {
     routes['GET /api/v1/thermorossi/scheduler/next-action'] = {
-      body: { success: true, nextAction: { action: 'adjust', at: 1_790_001_800, power: 1, fan: 1 } },
+      body: { success: true, next_action: { action: 'adjust', at: 1_790_001_800, power_level: 1, fan_level: 1 } },
     };
     expect(await getNextScheduledAction()).toEqual({
       timestamp: new Date(1_790_001_800_000).toISOString(), action: 'adjust', power: 1, fan: 1,
@@ -144,7 +144,7 @@ describe('read side', () => {
 
   it('null next action (manual / semi-manual) and errors give null', async () => {
     routes['GET /api/v1/thermorossi/scheduler/next-action'] = {
-      body: { success: true, nextAction: null, reason: 'scheduler_disabled' },
+      body: { success: true, next_action: null, reason: 'scheduler_disabled' },
     };
     expect(await getNextScheduledAction()).toBeNull();
     routes['GET /api/v1/thermorossi/scheduler/next-action'] = { status: 503, body: { error: 'down' } };
@@ -158,7 +158,7 @@ describe('write side', () => {
     await saveSchedule('Giovedì', [{ start: '17:45', end: '18:15', power: 2, fan: 3 }]);
     expect(calls()[calls().length - 1]).toEqual({
       key: 'PUT /api/v1/thermorossi/schedules/2/days/3/slots',
-      body: { slots: [{ start_minutes: 1065, end_minutes: 1095, power: 2, fan: 3 }] },
+      body: { slots: [{ start_minutes: 1065, end_minutes: 1095, power_level: 2, fan_level: 3 }] },
     });
   });
 

@@ -7,8 +7,8 @@
 export interface ScheduleSlot {
   start_minutes: number; // 0..1439
   end_minutes: number; // 1..1440, > start
-  power: number; // 1-5
-  fan: number; // 1-6
+  power_level: number; // 1-5
+  fan_level: number; // 1-6
 }
 
 export interface ScheduleSlotWithId extends ScheduleSlot {
@@ -46,12 +46,12 @@ export interface SchedulerMode {
 export interface NextAction {
   action: 'ignite' | 'shutdown' | 'adjust';
   at: number; // Unix seconds
-  power: number;
-  fan: number;
+  power_level: number;
+  fan_level: number;
 }
 
 export interface NextActionResponse {
-  nextAction: NextAction | null;
+  next_action: NextAction | null;
   reason?: 'scheduler_disabled' | 'semi_manual_override_active' | 'no_active_schedule' | 'no_upcoming_slots';
 }
 
@@ -80,17 +80,17 @@ export interface ExecutionLogItem {
     | 'stale_cache'
     | 'ignite_failed'
     | 'adjust_failed';
-  stoveState: string | null;
-  matchedSlot: ScheduleSlot | null;
-  executionDurationMs: number | null;
+  stove_state: string | null;
+  matched_slot: ScheduleSlot | null;
+  execution_duration_ms: number | null;
   details: Record<string, unknown> | null;
 }
 
 export interface ExecutionLogResponse {
   items: ExecutionLogItem[];
-  total: number;
-  page: number;
-  pageSize: number;
+  total_count: number;
+  limit: number;
+  offset: number;
 }
 
 /** GET /scheduler/engine and WS `scheduler` snapshot `data.engine` (ROADMAP V8). */

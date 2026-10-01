@@ -17,7 +17,7 @@ import { dispatchStoveEvent, stoveEventMessage } from '../stoveEvents';
 
 // 2026-03-30 06:00 Europe/Rome (CEST, UTC+2) = 04:00 UTC
 const TS = Date.UTC(2026, 2, 30, 4, 0) / 1000;
-const SLOT = { start_minutes: 360, end_minutes: 390, power: 2, fan: 3 };
+const SLOT = { start_minutes: 360, end_minutes: 390, power_level: 2, fan_level: 3 };
 
 describe('stoveEventMessage', () => {
   it.each([

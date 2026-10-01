@@ -105,6 +105,26 @@ describe('useFritzNetworkServices', () => {
     expect(result.current.mesh).toEqual(mockMesh.mesh);
   });
 
+  it('sets stale when a section is served from stale cache (is_stale)', async () => {
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockDhcp) })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockPortForwarding) })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockUpnp) })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ mesh: { ...mockMesh.mesh, is_stale: true } }),
+      }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzNetworkServices());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.mesh).not.toBeNull();
+    expect(result.current.stale).toBe(true);
+  });
+
   it('tolerates partial failures — still sets successful results', async () => {
     global.fetch = jest.fn()
       .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(mockDhcp) })

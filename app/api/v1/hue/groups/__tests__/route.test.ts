@@ -11,18 +11,10 @@ import { GET } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
 import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
-import type { HueGroup } from '@/types/hueProxy';
+import type { HueGroup, HueGroupsListResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetGroups = jest.mocked(hueProxy.getGroups);
-
-/** GET /groups wrapper as documented in docs/api/hue.md. */
-interface HueGroupsPayload {
-  groups: HueGroup[];
-  count: number;
-  is_stale: boolean;
-  fetched_at: string | null;
-}
 
 describe('GET /api/v1/hue/groups', () => {
   const mockGroupsData: HueGroup[] = [
@@ -71,14 +63,14 @@ describe('GET /api/v1/hue/groups', () => {
   it('should return 200 with groups array', async () => {
     // HA proxy wraps the array as `{ groups, count, is_stale, fetched_at }`;
     // route spreads the wrapper so the response is `{ success, groups, count, … }`.
-    const payload: HueGroupsPayload = {
+    const payload: HueGroupsListResponse = {
       groups: mockGroupsData,
       count: mockGroupsData.length,
       is_stale: false,
       fetched_at: '2026-03-19T08:51:32.123456Z',
+      data_freshness: 'LIVE',
     };
-    // getGroups() is typed HueGroup[] but returns this wrapper (docs/api/hue.md GET /groups).
-    mockGetGroups.mockResolvedValue(payload as unknown as HueGroup[]);
+    mockGetGroups.mockResolvedValue(payload);
     const req = new Request('http://localhost:3000/api/v1/hue/groups');
 
     const response = await GET(asNextRequest(req), routeContext());

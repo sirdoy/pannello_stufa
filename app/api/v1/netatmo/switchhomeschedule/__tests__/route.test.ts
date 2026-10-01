@@ -33,7 +33,7 @@ describe('POST /api/v1/netatmo/switchhomeschedule', () => {
   });
 
   it('should return 202 with suggested_poll_delay_s', async () => {
-    mockProxySwitchHomeSchedule.mockResolvedValue({ status: 'ok', time_exec: 0.01, time_server: 1773000000 });
+    mockProxySwitchHomeSchedule.mockResolvedValue({ data_confirmed: true, homestatus: {} });
     const request = new Request('http://localhost:3000/api/v1/netatmo/switchhomeschedule', { method: 'POST', body: JSON.stringify({ home_id: 'abc', schedule_id: 'sched1' }), headers: { 'Content-Type': 'application/json' } });
     const response = await POST(asNextRequest(request), routeContext());
     const data = await response.json();

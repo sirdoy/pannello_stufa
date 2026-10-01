@@ -27,7 +27,10 @@ import type {
   HueBridgeHealth,
   HueHistoryResponse,
   HueLightStateRequest,
-  HueCommandResponse,
+  HueLightsListResponse,
+  HueGroupsListResponse,
+  HueLightStateMutationResponse,
+  HueGroupMutationResponse,
 } from '@/types/hueProxy';
 
 // =============================================================================
@@ -38,8 +41,8 @@ import type {
  * Get all Hue lights with state, capability tier, and room enrichment.
  * Calls GET /api/v1/hue/lights on the HA proxy.
  */
-export async function getLights(): Promise<HueLight[]> {
-  return haGet<HueLight[]>('/api/v1/hue/lights');
+export async function getLights(): Promise<HueLightsListResponse> {
+  return haGet<HueLightsListResponse>('/api/v1/hue/lights');
 }
 
 /**
@@ -55,8 +58,8 @@ export async function getLight(lightId: string): Promise<HueLight> {
  * Get all Hue groups (rooms, zones) with member light IDs and current action state.
  * Calls GET /api/v1/hue/groups on the HA proxy.
  */
-export async function getGroups(): Promise<HueGroup[]> {
-  return haGet<HueGroup[]>('/api/v1/hue/groups');
+export async function getGroups(): Promise<HueGroupsListResponse> {
+  return haGet<HueGroupsListResponse>('/api/v1/hue/groups');
 }
 
 /**
@@ -115,15 +118,15 @@ export async function getHistory(params?: URLSearchParams): Promise<HueHistoryRe
 /**
  * Set a single light's state (on/off, brightness, color temperature, etc.).
  * Calls PUT /api/v1/hue/lights/{lightId}/state on the HA proxy.
- * Returns 202 Accepted with suggested_poll_delay_s.
+ * Returns 200 with the re-polled state and `data_confirmed`.
  * @param lightId - Bridge-assigned string key (e.g. "1", "5")
  * @param body - v1 flat state: { on, bri, ct, hue, sat, effect, alert }
  */
 export async function setLightState(
   lightId: string,
   body: HueLightStateRequest
-): Promise<HueCommandResponse> {
-  return haPut<HueCommandResponse>(
+): Promise<HueLightStateMutationResponse> {
+  return haPut<HueLightStateMutationResponse>(
     `/api/v1/hue/lights/${lightId}/state`,
     body as Record<string, unknown>
   );
@@ -132,15 +135,15 @@ export async function setLightState(
 /**
  * Set all lights in a group to the given state.
  * Calls PUT /api/v1/hue/groups/{groupId}/action on the HA proxy.
- * Returns 202 Accepted with suggested_poll_delay_s.
+ * Returns 200 with the re-polled state and `data_confirmed`.
  * @param groupId - Bridge-assigned group ID (e.g. "1", "3")
  * @param body - v1 flat state: { on, bri, ct, hue, sat, effect, alert }
  */
 export async function setGroupAction(
   groupId: string,
   body: HueLightStateRequest
-): Promise<HueCommandResponse> {
-  return haPut<HueCommandResponse>(
+): Promise<HueGroupMutationResponse> {
+  return haPut<HueGroupMutationResponse>(
     `/api/v1/hue/groups/${groupId}/action`,
     body as Record<string, unknown>
   );
@@ -149,15 +152,15 @@ export async function setGroupAction(
 /**
  * Activate a scene on a group.
  * Calls POST /api/v1/hue/groups/{groupId}/scenes/{sceneId} on the HA proxy.
- * Returns 202 Accepted with suggested_poll_delay_s.
+ * Returns 200 with the re-polled state and `data_confirmed`.
  * @param groupId - Bridge-assigned group ID
  * @param sceneId - Scene ID (e.g. "Ab1Cd2Ef3G")
  */
 export async function activateScene(
   groupId: string,
   sceneId: string
-): Promise<HueCommandResponse> {
-  return haPost<HueCommandResponse>(
+): Promise<HueGroupMutationResponse> {
+  return haPost<HueGroupMutationResponse>(
     `/api/v1/hue/groups/${groupId}/scenes/${sceneId}`,
     {}
   );

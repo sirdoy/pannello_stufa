@@ -33,7 +33,7 @@ describe('POST /api/v1/netatmo/createnewhomeschedule', () => {
   });
 
   it('should return 202 with suggested_poll_delay_s', async () => {
-    mockProxyCreateNewHomeSchedule.mockResolvedValue({ status: 'ok', time_exec: 0.01, time_server: 1773000000 });
+    mockProxyCreateNewHomeSchedule.mockResolvedValue({ data_confirmed: true, homestatus: {} });
     const request = new Request('http://localhost:3000/api/v1/netatmo/createnewhomeschedule', { method: 'POST', body: JSON.stringify({ home_id: 'abc', name: 'New Schedule' }), headers: { 'Content-Type': 'application/json' } });
     const response = await POST(asNextRequest(request), routeContext());
     const data = await response.json();

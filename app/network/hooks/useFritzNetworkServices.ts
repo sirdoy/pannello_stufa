@@ -111,14 +111,20 @@ export function useFritzNetworkServices(options: UseFritzNetworkServicesOptions 
 
       if (dhcpResult.status === 'fulfilled' && dhcpResult.value.ok) {
         // Backend PaginatedResponse uses total_count (not total)
-        const json = await dhcpResult.value.json() as { reservations: { items: DhcpReservation[]; total_count: number } };
+        const json = await dhcpResult.value.json() as {
+          reservations: { items: DhcpReservation[]; total_count: number; is_stale?: boolean | null };
+        };
+        if (json.reservations.is_stale === true) hasError = true;
         setDhcp({ items: json.reservations.items, total: json.reservations.total_count ?? json.reservations.items.length });
       } else {
         hasError = true;
       }
 
       if (portFwdResult.status === 'fulfilled' && portFwdResult.value.ok) {
-        const json = await portFwdResult.value.json() as { portForwarding: { items: PortForwardingRule[]; total_count: number } };
+        const json = await portFwdResult.value.json() as {
+          portForwarding: { items: PortForwardingRule[]; total_count: number; is_stale?: boolean | null };
+        };
+        if (json.portForwarding.is_stale === true) hasError = true;
         setPortForwarding({
           items: json.portForwarding.items,
           total: json.portForwarding.total_count ?? json.portForwarding.items.length,
@@ -129,6 +135,7 @@ export function useFritzNetworkServices(options: UseFritzNetworkServicesOptions 
 
       if (upnpResult.status === 'fulfilled' && upnpResult.value.ok) {
         const json = await upnpResult.value.json() as { upnp: UpnpStatus };
+        if (json.upnp.is_stale === true) hasError = true;
         setUpnp(json.upnp);
       } else {
         hasError = true;
@@ -136,11 +143,13 @@ export function useFritzNetworkServices(options: UseFritzNetworkServicesOptions 
 
       if (meshResult.status === 'fulfilled' && meshResult.value.ok) {
         const json = await meshResult.value.json() as { mesh: MeshTopology };
+        if (json.mesh.is_stale === true) hasError = true;
         setMesh(json.mesh);
       } else {
         hasError = true;
       }
 
+      // Stale = a section failed or the backend served stale cache (is_stale)
       setStale(hasError);
     } catch {
       setStale(true);

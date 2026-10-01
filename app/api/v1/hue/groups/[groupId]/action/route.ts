@@ -2,7 +2,7 @@
  * Hue Group Action Route
  * PUT: Set group-wide light state via HA proxy
  *
- * Returns 202 Accepted with suggested_poll_delay_s.
+ * Returns 202 with the backend mutation response (re-polled state + data_confirmed).
  */
 
 import {

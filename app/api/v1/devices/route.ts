@@ -62,8 +62,8 @@ function mapFritzbox(devices: Awaited<ReturnType<typeof fritzboxClient.getDevice
   });
 }
 
-function mapHue(lights: Awaited<ReturnType<typeof getLights>>): Device[] {
-  return lights.map((l): Device => {
+function mapHue(payload: Awaited<ReturnType<typeof getLights>>): Device[] {
+  return payload.lights.map((l): Device => {
     const item: Device = {
       id: `hue:${l.light_id}`,
       name: l.custom_name ?? l.name,

@@ -49,7 +49,7 @@ describe('POST /api/v1/netatmo/camera/[cameraId]/monitoring', () => {
   });
 
   it('should return 202 with suggested_poll_delay_s and call proxy with cameraId from path', async () => {
-    const mockData: SetMonitoringResponse = { camera_id: 'cam_001', monitoring: 'on', status: 'applied' };
+    const mockData: SetMonitoringResponse = { data_confirmed: true, camera_id: 'cam_001', monitoring: 'on', homedata: {} };
     mockSetCameraMonitoring.mockResolvedValue(mockData);
 
     const request = makePostRequest(

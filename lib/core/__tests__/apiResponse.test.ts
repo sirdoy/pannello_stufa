@@ -158,6 +158,24 @@ describe('handleError', () => {
     expect(data.code).toBe(ERROR_CODES.NOT_FOUND);
   });
 
+  it('spreads ApiError details without overriding the envelope keys', async () => {
+    const apiError = new ApiError(ERROR_CODES.MAINTENANCE_REQUIRED, 'Manutenzione richiesta', 409, {
+      reason: 'maintenance_required',
+      command: 'ignite',
+      error: 'should not win',
+      code: 'NOR_THIS',
+    });
+    const response = handleError(apiError);
+    const { data, status } = await getResponseData(response);
+
+    expect(status).toBe(409);
+    expect(data.error).toBe('Manutenzione richiesta');
+    expect(data.code).toBe(ERROR_CODES.MAINTENANCE_REQUIRED);
+    expect(data.success).toBe(false);
+    expect(data.reason).toBe('maintenance_required');
+    expect(data.command).toBe('ignite');
+  });
+
   it('should map STOVE_TIMEOUT error', async () => {
     const err = new Error('STOVE_TIMEOUT');
     const response = handleError(err);

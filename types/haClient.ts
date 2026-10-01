@@ -19,6 +19,21 @@ export interface RFC9457ProblemDetail {
   status: number;
   detail: string;
   instance?: string;
+  /** Only on 422 request validation errors: one entry per invalid field. */
+  errors?: ProblemValidationError[];
+  /** Machine-readable reason extension (e.g. "maintenance_required", "state_conflict"). */
+  error?: string;
+  /** Other extension members (e.g. "command", "current_state"). */
+  [extension: string]: unknown;
+}
+
+/** Pydantic validation error entry in a 422 Problem Details `errors[]`. */
+export interface ProblemValidationError {
+  type: string;
+  loc: (string | number)[];
+  msg: string;
+  input?: unknown;
+  ctx?: Record<string, unknown>;
 }
 
 /**

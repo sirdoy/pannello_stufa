@@ -55,6 +55,8 @@ const mockSensorsResponse: DirigeraSensorsResponse = {
   ],
   count: 1,
   is_stale: false,
+  fetched_at: '2026-03-12T15:30:05.123456Z',
+  data_freshness: 'LIVE',
 };
 
 const mockContactSensorsResponse: ContactSensorsResponse = {
@@ -87,6 +89,7 @@ const mockMotionSensorsResponse: MotionSensorsResponse = {
       battery_percentage: 75,
       is_reachable: true,
       last_seen: '2026-03-12T15:28:00.000Z',
+      is_detected: false,
       light_level: 42,
       data_freshness: 'LIVE',
     },

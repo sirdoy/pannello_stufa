@@ -73,6 +73,18 @@ export interface HueLight {
   device_type?: string | null;         // registry device type slug
 }
 
+/**
+ * Response from proxy GET /api/v1/hue/lights.
+ * Source: api/providers/hue/routes.py — get_hue_lights
+ */
+export interface HueLightsListResponse {
+  lights: HueLight[];
+  count: number;
+  is_stale: boolean;                   // true when data_freshness === "STALE"
+  fetched_at: string | null;           // ISO 8601 UTC ending in "Z" (last successful poll)
+  data_freshness: HueDataFreshness;
+}
+
 // =============================================================================
 // GROUP TYPES
 // =============================================================================
@@ -92,6 +104,18 @@ export interface HueGroup {
   brightness: number | null;           // 0-254 (group action state)
   color_temp: number | null;           // mirek (group action state)
   colormode: string | null;
+}
+
+/**
+ * Response from proxy GET /api/v1/hue/groups.
+ * Source: api/providers/hue/routes.py — get_hue_groups
+ */
+export interface HueGroupsListResponse {
+  groups: HueGroup[];
+  count: number;
+  is_stale: boolean;
+  fetched_at: string | null;           // ISO 8601 UTC ending in "Z"
+  data_freshness: HueDataFreshness;
 }
 
 // =============================================================================
@@ -210,10 +234,5 @@ export interface HueLightStateRequest {
 export interface HueLightStateMutationResponse extends HueLight { data_confirmed: boolean; }
 export interface HueGroupMutationResponse extends HueGroup { data_confirmed: boolean; }
 
-/**
- * Command response as consumed by the UI: the mutation response, plus the
- * optional `suggested_poll_delay_s` of the legacy 202 contract.
- */
-export type HueCommandResponse = (HueLightStateMutationResponse | HueGroupMutationResponse) & {
-  suggested_poll_delay_s?: number;
-};
+/** Command response as consumed by the UI (light, group or scene mutation). */
+export type HueCommandResponse = HueLightStateMutationResponse | HueGroupMutationResponse;

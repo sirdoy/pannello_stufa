@@ -28,9 +28,9 @@ import type {
   NetatmoProxyHomesdataResponse,
   SetRoomThermpointRequest,
   SetThermmodeRequest,
-  SetThermmodeResponse,
   SwitchHomeScheduleRequest,
-  ProxyControlResponse,
+  NetatmoEnergyMutationResponse,
+  NetatmoTopologyMutationResponse,
   CameraStatusResponse,
   CameraStreamResponse,
   CameraSnapshotUrlResponse,
@@ -72,8 +72,8 @@ export async function getProxyHomesdata(): Promise<NetatmoProxyHomesdataResponse
  */
 export async function proxySetRoomThermpoint(
   body: SetRoomThermpointRequest
-): Promise<ProxyControlResponse> {
-  return haPost<ProxyControlResponse>('/api/v1/netatmo/setroomthermpoint', body as unknown as Record<string, unknown>);
+): Promise<NetatmoEnergyMutationResponse> {
+  return haPost<NetatmoEnergyMutationResponse>('/api/v1/netatmo/setroomthermpoint', body as unknown as Record<string, unknown>);
 }
 
 /**
@@ -82,8 +82,8 @@ export async function proxySetRoomThermpoint(
  */
 export async function proxySetThermMode(
   body: SetThermmodeRequest
-): Promise<SetThermmodeResponse> {
-  return haPost<SetThermmodeResponse>('/api/v1/netatmo/setthermmode', body as unknown as Record<string, unknown>);
+): Promise<NetatmoEnergyMutationResponse> {
+  return haPost<NetatmoEnergyMutationResponse>('/api/v1/netatmo/setthermmode', body as unknown as Record<string, unknown>);
 }
 
 /**
@@ -92,8 +92,8 @@ export async function proxySetThermMode(
  */
 export async function proxySwitchHomeSchedule(
   body: SwitchHomeScheduleRequest
-): Promise<ProxyControlResponse> {
-  return haPost<ProxyControlResponse>('/api/v1/netatmo/switchhomeschedule', body as unknown as Record<string, unknown>);
+): Promise<NetatmoEnergyMutationResponse> {
+  return haPost<NetatmoEnergyMutationResponse>('/api/v1/netatmo/switchhomeschedule', body as unknown as Record<string, unknown>);
 }
 
 /**
@@ -103,8 +103,8 @@ export async function proxySwitchHomeSchedule(
  */
 export async function proxySyncHomeSchedule(
   body: Record<string, unknown>
-): Promise<ProxyControlResponse> {
-  return haPost<ProxyControlResponse>('/api/v1/netatmo/synchomeschedule', body);
+): Promise<NetatmoEnergyMutationResponse> {
+  return haPost<NetatmoEnergyMutationResponse>('/api/v1/netatmo/synchomeschedule', body);
 }
 
 /**
@@ -114,8 +114,8 @@ export async function proxySyncHomeSchedule(
  */
 export async function proxyCreateNewHomeSchedule(
   body: Record<string, unknown>
-): Promise<ProxyControlResponse> {
-  return haPost<ProxyControlResponse>('/api/v1/netatmo/createnewhomeschedule', body);
+): Promise<NetatmoEnergyMutationResponse> {
+  return haPost<NetatmoEnergyMutationResponse>('/api/v1/netatmo/createnewhomeschedule', body);
 }
 
 // =============================================================================
@@ -216,8 +216,8 @@ export async function getProxyRoomMeasure(params: URLSearchParams): Promise<Room
  * Rename a home on Netatmo.
  * Calls POST /api/v1/netatmo/renamehome on the HA proxy.
  */
-export async function proxyRenameHome(body: RenameHomeRequest): Promise<ProxyControlResponse> {
-  return haPost<ProxyControlResponse>('/api/v1/netatmo/renamehome', body as unknown as Record<string, unknown>);
+export async function proxyRenameHome(body: RenameHomeRequest): Promise<NetatmoTopologyMutationResponse> {
+  return haPost<NetatmoTopologyMutationResponse>('/api/v1/netatmo/renamehome', body as unknown as Record<string, unknown>);
 }
 
 /**

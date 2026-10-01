@@ -54,7 +54,7 @@ export function useFritzWifiNetworks(options: UseFritzWifiNetworksOptions = {}):
       // So array is at json.networks.networks (double nesting)
       const json = await res.json() as { networks: { networks: WiFiNetworkModel[]; is_stale: boolean; fetched_at: string | null } };
       setNetworks(json.networks.networks);
-      setStale(false);
+      setStale(json.networks.is_stale === true);
     } catch {
       setStale(true);
     } finally {

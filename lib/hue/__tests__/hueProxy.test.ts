@@ -25,7 +25,10 @@ import type {
   HueBridgeHealth,
   HueHistoryResponse,
   HueLightStateRequest,
-  HueCommandResponse,
+  HueLightsListResponse,
+  HueGroupsListResponse,
+  HueLightStateMutationResponse,
+  HueGroupMutationResponse,
 } from '@/types/hueProxy';
 
 const mockHaGet = jest.mocked(haGet);
@@ -116,14 +119,7 @@ const mockHistoryResponse: HueHistoryResponse = {
   to: 1773780000,
 };
 
-const mockCommandResponse = {
-  command: 'set_light_state',
-  status: 'accepted',
-  light_id: '1',
-  requested_state: { on: true, bri: 200 },
-  suggested_poll_delay_s: 2,
-  poll_endpoint: '/api/v1/hue/lights/1',
-} as unknown as HueCommandResponse; // legacy 202 contract
+const mockCommandResponse: HueLightStateMutationResponse = { ...mockLight, data_confirmed: true };
 
 // ---------------------------------------------------------------------------
 
@@ -131,12 +127,15 @@ describe('getLights', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('calls haGet with /api/v1/hue/lights', async () => {
-    mockHaGet.mockResolvedValue([mockLight]);
+    const payload: HueLightsListResponse = {
+      lights: [mockLight], count: 1, is_stale: false, fetched_at: null, data_freshness: 'LIVE',
+    };
+    mockHaGet.mockResolvedValue(payload);
 
     const result = await getLights();
 
     expect(mockHaGet).toHaveBeenCalledWith('/api/v1/hue/lights');
-    expect(result).toEqual([mockLight]);
+    expect(result).toEqual(payload);
   });
 });
 
@@ -157,12 +156,15 @@ describe('getGroups', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('calls haGet with /api/v1/hue/groups', async () => {
-    mockHaGet.mockResolvedValue([mockGroup]);
+    const payload: HueGroupsListResponse = {
+      groups: [mockGroup], count: 1, is_stale: true, fetched_at: null, data_freshness: 'STALE',
+    };
+    mockHaGet.mockResolvedValue(payload);
 
     const result = await getGroups();
 
     expect(mockHaGet).toHaveBeenCalledWith('/api/v1/hue/groups');
-    expect(result).toEqual([mockGroup]);
+    expect(result).toEqual(payload);
   });
 });
 
@@ -258,14 +260,7 @@ describe('setGroupAction', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('calls haPut with /api/v1/hue/groups/{groupId}/action and body', async () => {
-    const groupResponse = {
-      ...mockCommandResponse,
-      command: 'set_group_action',
-      light_id: undefined,
-      group_id: '3',
-      requested_state: { on: false },
-      poll_endpoint: '/api/v1/hue/groups/3',
-    } as unknown as HueCommandResponse; // legacy 202 contract
+    const groupResponse: HueGroupMutationResponse = { ...mockGroup, group_id: '3', data_confirmed: true };
     mockHaPut.mockResolvedValue(groupResponse);
 
     const body: HueLightStateRequest = { on: false };
@@ -283,14 +278,7 @@ describe('activateScene', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('calls haPost with /api/v1/hue/groups/{groupId}/scenes/{sceneId} and empty body', async () => {
-    const sceneResponse = {
-      command: 'activate_scene',
-      status: 'accepted',
-      group_id: '1',
-      scene_id: 'Ab1Cd2Ef3G',
-      suggested_poll_delay_s: 2,
-      poll_endpoint: '/api/v1/hue/groups/1',
-    } as unknown as HueCommandResponse; // legacy 202 contract
+    const sceneResponse: HueGroupMutationResponse = { ...mockGroup, data_confirmed: false };
     mockHaPost.mockResolvedValue(sceneResponse);
 
     const result = await activateScene('1', 'Ab1Cd2Ef3G');

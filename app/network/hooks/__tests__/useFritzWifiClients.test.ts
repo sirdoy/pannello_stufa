@@ -119,6 +119,24 @@ describe('useFritzWifiClients', () => {
     expect(result.current.total).toBe(2);
   });
 
+  it('sets stale from backend is_stale on success', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({
+        clients: { items: mockClients, total_count: 2, limit: 1000, offset: 0, is_stale: true },
+      }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzWifiClients());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.clients).toHaveLength(2);
+    expect(result.current.stale).toBe(true);
+  });
+
   it('reads total from backend total_count (not a non-existent total field)', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

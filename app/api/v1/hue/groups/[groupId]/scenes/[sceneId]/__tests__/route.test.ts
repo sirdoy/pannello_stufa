@@ -12,13 +12,13 @@ import { POST } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
 import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
-import type { HueCommandResponse } from '@/types/hueProxy';
+import type { HueGroupMutationResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockActivateScene = jest.mocked(hueProxy.activateScene);
 
 describe('POST /api/v1/hue/groups/[groupId]/scenes/[sceneId]', () => {
-  const mockProxyResponse: HueCommandResponse = {
+  const mockProxyResponse: HueGroupMutationResponse = {
     group_id: '1',
     name: 'Living Room',
     type: 'Room',
@@ -30,7 +30,6 @@ describe('POST /api/v1/hue/groups/[groupId]/scenes/[sceneId]', () => {
     color_temp: null,
     colormode: null,
     data_confirmed: true,
-    suggested_poll_delay_s: 2,
   };
 
   beforeEach(() => {
@@ -63,7 +62,6 @@ describe('POST /api/v1/hue/groups/[groupId]/scenes/[sceneId]', () => {
     expect(response.status).toBe(202);
     expect(data.group_id).toBe('1');
     expect(data.data_confirmed).toBe(true);
-    expect(data.suggested_poll_delay_s).toBe(2);
     expect(mockActivateScene).toHaveBeenCalledWith('1', 'Ab1Cd2Ef3G');
   });
 });

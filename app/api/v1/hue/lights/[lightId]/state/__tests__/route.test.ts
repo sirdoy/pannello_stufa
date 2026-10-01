@@ -12,12 +12,12 @@ import { PUT } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
 import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
-import type { HueCommandResponse } from '@/types/hueProxy';
+import type { HueLightStateMutationResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetLightState = jest.mocked(hueProxy.setLightState);
 
-const mockProxyResponse: HueCommandResponse = {
+const mockProxyResponse: HueLightStateMutationResponse = {
   light_id: '1',
   name: 'Lampada',
   on: true,

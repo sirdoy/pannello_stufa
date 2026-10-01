@@ -31,6 +31,8 @@ const mockSensorsData = {
   ],
   count: 1,
   is_stale: false,
+  fetched_at: '2026-03-12T15:30:05.123456Z',
+  data_freshness: 'LIVE' as const,
 };
 
 describe('GET /api/v1/dirigera/sensors', () => {
@@ -62,7 +64,7 @@ describe('GET /api/v1/dirigera/sensors', () => {
     expect(data.is_stale).toBe(false);
   });
 
-  it('returns only sensors, count, is_stale fields in response body', async () => {
+  it('forwards sensors, count and freshness fields in response body', async () => {
     mockGetSensors.mockResolvedValue(mockSensorsData);
     const request = new Request('http://localhost:3000/api/v1/dirigera/sensors');
     const response = await GET(asNextRequest(request), routeContext());
@@ -70,6 +72,8 @@ describe('GET /api/v1/dirigera/sensors', () => {
     expect(data.sensors).toEqual(mockSensorsData.sensors);
     expect(data.count).toBe(1);
     expect(data.is_stale).toBe(false);
+    expect(data.fetched_at).toBe('2026-03-12T15:30:05.123456Z');
+    expect(data.data_freshness).toBe('LIVE');
     expect(mockGetSensors).toHaveBeenCalledWith();
   });
 });

@@ -54,25 +54,31 @@ function seedAllProviders(): void {
   mockFritzGetDevices.mockResolvedValue([
     { id: 'aa:bb', name: 'iPhone', ip: '192.168.1.10', mac: 'AA:BB:CC:DD:EE:FF', active: true },
   ]);
-  mockGetLights.mockResolvedValue([
-    {
-      light_id: '1',
-      name: 'Lampada',
-      on: true,
-      brightness: 254,
-      ct_mirek: null,
-      ct_kelvin: null,
-      hue: null,
-      saturation: null,
-      colormode: null,
-      reachable: true,
-      capability_tier: 'white',
-      room_id: 'r1',
-      room_name: 'Sala',
-      model_id: null,
-      light_type: null,
-    },
-  ]);
+  mockGetLights.mockResolvedValue({
+    lights: [
+      {
+        light_id: '1',
+        name: 'Lampada',
+        on: true,
+        brightness: 254,
+        ct_mirek: null,
+        ct_kelvin: null,
+        hue: null,
+        saturation: null,
+        colormode: null,
+        reachable: true,
+        capability_tier: 'white',
+        room_id: 'r1',
+        room_name: 'Sala',
+        model_id: null,
+        light_type: null,
+      },
+    ],
+    count: 1,
+    is_stale: false,
+    fetched_at: null,
+    data_freshness: 'LIVE',
+  });
   mockGetSonosDevices.mockResolvedValue({
     speakers: [
       {
@@ -154,6 +160,8 @@ function seedAllProviders(): void {
     ],
     count: 1,
     is_stale: false,
+    fetched_at: null,
+    data_freshness: 'LIVE',
   });
   mockGetPlugs.mockResolvedValue([
     {

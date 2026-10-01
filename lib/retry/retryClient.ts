@@ -107,19 +107,20 @@ function calculateDelay(attempt: number, options: Required<RetryOptions>): numbe
 }
 
 /**
- * Attempts to parse error code from response body
+ * Attempts to parse error code (and its user-facing message) from response body
  *
  * @param response - Fetch response
- * @returns Error code if found, null otherwise
+ * @returns Error code and optional message if found, null otherwise
  */
-async function extractErrorCode(response: Response): Promise<string | null> {
+async function extractErrorCode(response: Response): Promise<{ code: string; message: string | null } | null> {
   try {
     // Clone response so caller can still read the body
     const clone = response.clone();
     const data = await clone.json();
 
     if (data && typeof data === 'object' && 'code' in data && typeof data.code === 'string') {
-      return data.code;
+      const message = 'error' in data && typeof data.error === 'string' ? data.error : null;
+      return { code: data.code, message };
     }
   } catch {
     // Response is not JSON or cannot be parsed
@@ -182,13 +183,15 @@ export async function retryFetch(
       const response = await fetch(url, options);
 
       // Check if response contains a retryable error code
-      const errorCode = await extractErrorCode(response);
+      const errorInfo = await extractErrorCode(response);
 
-      if (errorCode) {
+      if (errorInfo) {
+        const errorCode = errorInfo.code;
         // Check if error is transient (retryable)
         if (!isTransientError(errorCode)) {
-          // Non-retryable error - throw immediately without retry
-          const error = new Error(`Non-retryable error: ${errorCode}`);
+          // Non-retryable error - throw immediately without retry, keeping the
+          // route's message (e.g. "Manutenzione richiesta") for the UI toast
+          const error = new Error(errorInfo.message ?? `Non-retryable error: ${errorCode}`);
           (error as { code?: string }).code = errorCode;
           throw error;
         }

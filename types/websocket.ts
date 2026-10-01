@@ -1,5 +1,5 @@
 /**
- * WebSocket type definitions for all 8 provider payloads.
+ * WebSocket type definitions for every topic payload.
  *
  * Source of truth: docs/api/websocket.md
  *
@@ -10,9 +10,17 @@
 
 import type { HueLight, HueGroup } from '@/types/hueProxy';
 import type { ThermorossiStatusResponse } from '@/types/thermorossiProxy';
-import type { SonosDeviceResponse, SonosZoneResponse, SonosDataFreshness } from '@/types/sonosProxy';
+import type {
+  SonosDeviceResponse,
+  SonosZoneResponse,
+  SonosDataFreshness,
+  SonosPlaybackResponse,
+  SonosVolumeResponse,
+} from '@/types/sonosProxy';
 import type { DirigeraSensor } from '@/types/dirigeraProxy';
 import type { TuyaPlug } from '@/types/tuyaProxy';
+import type { SchedulerWsPayload } from '@/types/thermorossiScheduler';
+import type { AutomationsEvent } from '@/types/automations';
 
 // Re-export proxy types for convenience
 export type { HueLight, HueGroup } from '@/types/hueProxy';
@@ -73,6 +81,7 @@ export interface FritzBoxWan {
   uptime: number;
   max_upstream_bps: number;
   max_downstream_bps: number;
+  connection_type?: string | null;  // WS-only extra: NewWANAccessType (e.g. "DSL"); null if the call fails
 }
 
 export interface FritzBoxData {
@@ -90,7 +99,10 @@ export interface FritzBoxData {
 
 export interface DirigeraData {
   sensors: DirigeraSensor[] | null;
+  count: number;                      // len(sensors), added by enrichment
   data_freshness: 'LIVE' | 'STALE';  // based on cache staleness
+  is_stale: boolean;
+  fetched_at: string | null;          // ISO 8601 with trailing "Z"
 }
 
 // ---------------------------------------------------------------------------
@@ -140,7 +152,10 @@ export interface HueData {
 export interface SonosData {
   speakers: SonosDeviceResponse[] | null;
   groups: SonosZoneResponse[] | null;
-  data_freshness: SonosDataFreshness;  // import from sonosProxy — 3-state, matches WS doc exactly
+  data_freshness: SonosDataFreshness;  // import from sonosProxy
+  is_stale: boolean;
+  last_poll_at: string | null;         // ISO 8601 with trailing "Z"
+  fetched_at: string | null;           // ISO 8601 with trailing "Z"
 }
 
 // ---------------------------------------------------------------------------
@@ -166,6 +181,27 @@ export interface TuyaData {
 }
 
 // ---------------------------------------------------------------------------
+// Push-only topics (no freshness enrichment unless noted)
+// ---------------------------------------------------------------------------
+
+/** `sonos_transport`: same shape as REST GET /sonos/zones/{group_id}/playback. */
+export type SonosTransportData = SonosPlaybackResponse;
+
+/** `sonos_volume`: single speaker change, or zone-wide change after a group volume mutation. */
+export type SonosVolumeData =
+  | SonosVolumeResponse
+  | { group_id: string; volumes: SonosVolumeResponse[] };
+
+/** `sonos_topology`: full speakers/groups repoll after group/ungroup, same shape as `sonos`. */
+export type SonosTopologyData = SonosData;
+
+/** `scheduler`: snapshot on subscribe, then one event per scheduler change. */
+export type SchedulerData = SchedulerWsPayload;
+
+/** `automations`: one event per execution-log row (no snapshot); always `data_freshness: 'LIVE'`. */
+export type AutomationsData = AutomationsEvent & { data_freshness: 'LIVE' };
+
+// ---------------------------------------------------------------------------
 // TopicDataMap — maps Topic literal to its payload type
 // ---------------------------------------------------------------------------
 
@@ -178,4 +214,9 @@ export type TopicDataMap = {
   sonos: SonosData;
   raspi: RaspiData;
   tuya: TuyaData;
+  scheduler: SchedulerData;
+  sonos_transport: SonosTransportData;
+  sonos_volume: SonosVolumeData;
+  sonos_topology: SonosTopologyData;
+  automations: AutomationsData;
 };

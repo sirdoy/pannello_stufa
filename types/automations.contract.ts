@@ -348,9 +348,18 @@ export interface CapabilityDescriptor {
   parameters: CapabilityParameter[];
 }
 
+// api/capabilities/routes.py — device resolvers (`_resolve_<provider>_device`) return shape
+export interface CapabilityDevice {
+  id: string;
+  name: string;
+  type: string; // Hue bridge light/group type, "plug", sensor type, "speaker", "room", "stove"
+}
+
 // api/capabilities/registry.py — build_provider_block() return shape (line 94-105)
 export interface ProviderBlock {
   name: string;
+  /** Only on GET /capabilities/{provider}/{device_id} (device-scoped, narrowed block). */
+  device?: CapabilityDevice;
   conditions: CapabilityDescriptor[];
   actions: CapabilityDescriptor[];
 }

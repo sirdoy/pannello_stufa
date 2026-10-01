@@ -175,9 +175,10 @@ describe('Camera convenience wrappers', () => {
 
     it('calls POST /api/v1/netatmo/camera/{cameraId}/monitoring with correct path', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({
+        data_confirmed: true,
         camera_id: cameraId,
         monitoring: 'on',
-        status: 'applied',
+        homedata: {},
       }));
 
       await proxySetCameraMonitoring(cameraId, { monitoring: 'on' });
@@ -189,9 +190,10 @@ describe('Camera convenience wrappers', () => {
 
     it('sends monitoring field in request body', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({
+        data_confirmed: true,
         camera_id: cameraId,
         monitoring: 'off',
-        status: 'applied',
+        homedata: {},
       }));
 
       await proxySetCameraMonitoring(cameraId, { monitoring: 'off' });
@@ -203,16 +205,17 @@ describe('Camera convenience wrappers', () => {
 
     it('returns SetMonitoringResponse', async () => {
       mockFetch.mockResolvedValueOnce(mockJsonResponse({
+        data_confirmed: true,
         camera_id: cameraId,
         monitoring: 'off',
-        status: 'applied',
+        homedata: {},
       }));
 
       const result = await proxySetCameraMonitoring(cameraId, { monitoring: 'off' });
 
       expect(result.camera_id).toBe(cameraId);
       expect(result.monitoring).toBe('off');
-      expect(result.status).toBe('applied');
+      expect(result.data_confirmed).toBe(true);
     });
   });
 

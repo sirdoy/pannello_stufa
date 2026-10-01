@@ -69,6 +69,22 @@ describe('useFritzSystemInfo', () => {
     expect(result.current.stale).toBe(false);
   });
 
+  it('sets stale: true when the backend serves stale cache (is_stale)', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ system: { ...mockSystemData, is_stale: true } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzSystemInfo());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.data).not.toBeNull();
+    expect(result.current.stale).toBe(true);
+  });
+
   it('sets stale: true on fetch error', async () => {
     global.fetch = jest.fn().mockRejectedValue(new Error('Network error')) as jest.Mock;
 

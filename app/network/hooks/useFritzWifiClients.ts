@@ -64,10 +64,12 @@ export function useFritzWifiClients(options: UseFritzWifiClientsOptions = {}): {
         return;
       }
       // Backend PaginatedResponse: { items, total_count, limit, offset }
-      const json = await res.json() as { clients: { items: WiFiClient[]; total_count: number } };
+      const json = await res.json() as {
+        clients: { items: WiFiClient[]; total_count: number; is_stale?: boolean | null };
+      };
       setClients(json.clients.items);
       setTotal(json.clients.total_count ?? json.clients.items.length);
-      setStale(false);
+      setStale(json.clients.is_stale === true);
     } catch {
       setStale(true);
     } finally {

@@ -57,28 +57,51 @@ function getEnvConfig(): { baseUrl: string; apiKey: string } {
   return { baseUrl, apiKey };
 }
 
+const PROBLEM_STANDARD_MEMBERS = new Set(['type', 'title', 'status', 'detail', 'instance']);
+
+/** Backend reason extensions (`error` member, kept as `reason`) that map to a dedicated ApiError code. */
+const PROBLEM_REASON_CODES: Partial<Record<string, ApiError['code']>> = {
+  maintenance_required: ERROR_CODES.MAINTENANCE_REQUIRED,
+};
+
 /**
  * Maps a non-ok HTTP response to an ApiError.
- * Attempts to parse RFC 9457 problem detail from the response body.
+ * Attempts to parse RFC 9457 problem detail from the response body. Extension
+ * members (`errors[]`, `command`, ...) are kept in `ApiError.details`; the backend
+ * `error` reason is stored as `reason`, since `error` is the message key of the
+ * Next.js error envelope that spreads these details.
  */
 async function mapResponseError(response: Response): Promise<never> {
   let detail: string | undefined;
   let parsedStatus = response.status;
+  let details: Record<string, unknown> | null = null;
 
   try {
     const body = (await response.json()) as RFC9457ProblemDetail;
     if (body.detail) detail = body.detail;
     if (body.status) parsedStatus = body.status;
+    const extensions = Object.fromEntries(
+      Object.entries(body)
+        .filter(([key]) => !PROBLEM_STANDARD_MEMBERS.has(key))
+        .map(([key, value]) => [key === 'error' ? 'reason' : key, value])
+    );
+    if (Object.keys(extensions).length > 0) details = extensions;
   } catch {
     // Not a JSON body — use statusText as fallback
     detail = response.statusText;
+  }
+
+  const reasonCode = typeof details?.['reason'] === 'string' ? PROBLEM_REASON_CODES[details['reason']] : undefined;
+  if (reasonCode) {
+    throw new ApiError(reasonCode, undefined, parsedStatus as ApiError['status'], details);
   }
 
   if (parsedStatus === HTTP_STATUS.UNAUTHORIZED) {
     throw new ApiError(
       ERROR_CODES.UNAUTHORIZED,
       detail ?? 'Unauthorized',
-      HTTP_STATUS.UNAUTHORIZED
+      HTTP_STATUS.UNAUTHORIZED,
+      details
     );
   }
 
@@ -86,7 +109,8 @@ async function mapResponseError(response: Response): Promise<never> {
     throw new ApiError(
       ERROR_CODES.RATE_LIMITED,
       detail ?? 'Rate limit exceeded',
-      HTTP_STATUS.TOO_MANY_REQUESTS
+      HTTP_STATUS.TOO_MANY_REQUESTS,
+      details
     );
   }
 
@@ -94,7 +118,8 @@ async function mapResponseError(response: Response): Promise<never> {
     throw new ApiError(
       ERROR_CODES.SERVICE_UNAVAILABLE,
       detail ?? 'HA proxy unavailable',
-      HTTP_STATUS.SERVICE_UNAVAILABLE
+      HTTP_STATUS.SERVICE_UNAVAILABLE,
+      details
     );
   }
 
@@ -102,32 +127,35 @@ async function mapResponseError(response: Response): Promise<never> {
     throw new ApiError(
       ERROR_CODES.CONFLICT,
       detail ?? 'Conflict',
-      HTTP_STATUS.CONFLICT
+      HTTP_STATUS.CONFLICT,
+      details
     );
   }
 
   // Client errors keep their status so route/UI branches (e.g. 404 room not found,
   // 422 invalid rule) can react; they are not upstream failures (502).
   if (parsedStatus === HTTP_STATUS.NOT_FOUND) {
-    throw new ApiError(ERROR_CODES.NOT_FOUND, detail ?? 'Not found', HTTP_STATUS.NOT_FOUND);
+    throw new ApiError(ERROR_CODES.NOT_FOUND, detail ?? 'Not found', HTTP_STATUS.NOT_FOUND, details);
   }
 
   if (parsedStatus === HTTP_STATUS.FORBIDDEN) {
-    throw new ApiError(ERROR_CODES.FORBIDDEN, detail ?? 'Forbidden', HTTP_STATUS.FORBIDDEN);
+    throw new ApiError(ERROR_CODES.FORBIDDEN, detail ?? 'Forbidden', HTTP_STATUS.FORBIDDEN, details);
   }
 
   if (parsedStatus === HTTP_STATUS.BAD_REQUEST || parsedStatus === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
     throw new ApiError(
       ERROR_CODES.VALIDATION_ERROR,
       detail ?? 'Invalid request',
-      parsedStatus
+      parsedStatus,
+      details
     );
   }
 
   throw new ApiError(
     ERROR_CODES.EXTERNAL_API_ERROR,
     detail ?? `HA proxy error: ${response.statusText}`,
-    HTTP_STATUS.BAD_GATEWAY
+    HTTP_STATUS.BAD_GATEWAY,
+    details
   );
 }
 

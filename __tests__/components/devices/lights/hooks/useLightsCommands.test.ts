@@ -54,13 +54,19 @@ describe('useLightsCommands', () => {
     },
   ];
 
-  const mockCommandResponse = {
-    command: 'set_group_action',
-    status: 'accepted',
+  const mockCommandResponse: HueCommandResponse = {
     group_id: '1',
-    suggested_poll_delay_s: 2,
-    poll_endpoint: '/api/hue/rooms/1',
-  } as unknown as HueCommandResponse; // legacy 202 contract
+    name: 'Soggiorno',
+    type: 'Room',
+    group_class: 'Living room',
+    lights: ['1'],
+    any_on: true,
+    all_on: true,
+    brightness: 254,
+    color_temp: null,
+    colormode: null,
+    data_confirmed: true,
+  };
 
   const mockLightsData: Pick<
     UseLightsDataReturn,
@@ -181,8 +187,8 @@ describe('useLightsCommands', () => {
     expect(mockLightsData.setRefreshing).toHaveBeenCalledWith(false);
   });
 
-  it('handleRoomToggle calls setTimeout with suggested_poll_delay_s milliseconds', async () => {
-    const responseWithDelay: HueCommandResponse = { ...mockCommandResponse, suggested_poll_delay_s: 3 };
+  it('handleRoomToggle waits 2 s before refetching when data_confirmed is false', async () => {
+    const responseWithDelay: HueCommandResponse = { ...mockCommandResponse, data_confirmed: false };
     mockExecute.mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue(responseWithDelay),
@@ -199,8 +205,7 @@ describe('useLightsCommands', () => {
       await result.current.handleRoomToggle('1', true);
     });
 
-    // setTimeout should have been called with 3000ms (3s * 1000)
-    expect(global.setTimeout).toHaveBeenCalledWith(expect.any(Function), 3000);
+    expect(global.setTimeout).toHaveBeenCalledWith(expect.any(Function), 2000);
     expect(mockLightsData.fetchData).toHaveBeenCalled();
   });
 

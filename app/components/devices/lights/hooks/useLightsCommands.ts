@@ -11,7 +11,7 @@
  * - Persistent error toasts
  *
  * Uses v1 body format (flat keys) to match the HA proxy CLIP v1 API.
- * Commands implement 202 Accepted + suggested_poll_delay_s pattern.
+ * Commands answer with the re-polled state + data_confirmed (2 s refetch delay when unconfirmed).
  *
  * Pairing handlers removed — proxy handles Bridge connectivity.
  */
@@ -63,7 +63,7 @@ export interface UseLightsCommandsReturn {
  *
  * Integrates with useRetryableCommand for room/scene commands.
  * Handlers update UI state for immediate feedback.
- * All commands follow 202 Accepted + suggested_poll_delay_s pattern.
+ * All commands wait 2 s before refetching only when data_confirmed is false.
  *
  * @param params - Configuration parameters
  * @returns Command handlers and retryable command objects
@@ -97,7 +97,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
         }
         const data = await response.json() as HueCommandResponse;
         // Backend re-polled before answering: no wait when the new state is confirmed.
-        const delayMs = data.data_confirmed ? 0 : (data.suggested_poll_delay_s ?? 2) * 1000;
+        const delayMs = data.data_confirmed ? 0 : 2000;
         await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await lightsData.fetchData();
       }
@@ -131,7 +131,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
         }
         const data = await response.json() as HueCommandResponse;
         // Backend re-polled before answering: no wait when the new state is confirmed.
-        const delayMs = data.data_confirmed ? 0 : (data.suggested_poll_delay_s ?? 2) * 1000;
+        const delayMs = data.data_confirmed ? 0 : 2000;
         await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await lightsData.fetchData();
       }
@@ -168,7 +168,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
         }
         const data = await response.json() as HueCommandResponse;
         // Backend re-polled before answering: no wait when the new state is confirmed.
-        const delayMs = data.data_confirmed ? 0 : (data.suggested_poll_delay_s ?? 2) * 1000;
+        const delayMs = data.data_confirmed ? 0 : 2000;
         await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await lightsData.fetchData();
       }
@@ -200,7 +200,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
         }
         const data = await response.json() as HueCommandResponse;
         // Backend re-polled before answering: no wait when the new state is confirmed.
-        const delayMs = data.data_confirmed ? 0 : (data.suggested_poll_delay_s ?? 2) * 1000;
+        const delayMs = data.data_confirmed ? 0 : 2000;
         await new Promise<void>(resolve => setTimeout(resolve, delayMs));
         await lightsData.fetchData();
       }

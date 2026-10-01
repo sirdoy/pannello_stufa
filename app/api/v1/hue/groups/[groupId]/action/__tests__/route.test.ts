@@ -12,13 +12,13 @@ import { PUT } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
 import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
-import type { HueCommandResponse } from '@/types/hueProxy';
+import type { HueGroupMutationResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetGroupAction = jest.mocked(hueProxy.setGroupAction);
 
 describe('PUT /api/v1/hue/groups/[groupId]/action', () => {
-  const mockProxyResponse: HueCommandResponse = {
+  const mockProxyResponse: HueGroupMutationResponse = {
     group_id: '1',
     name: 'Living Room',
     type: 'Room',

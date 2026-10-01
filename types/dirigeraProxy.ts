@@ -52,7 +52,7 @@ export interface DirigeraSensor {
   // Type-specific keys — ABSENT (not null) on other sensor types:
   is_open?: boolean;            // only on openCloseSensor
   is_detected?: boolean;        // only on occupancySensor / motionSensor
-  light_level?: number | null;
+  light_level?: number | null;  // motionSensor always; occupancySensor only with a companion lightSensor
   // Only on environmentSensor (IKEA ALPSTUGA air quality monitor, no battery):
   temperature?: number | null;  // °C
   humidity?: number | null;     // relative humidity %
@@ -66,8 +66,8 @@ export interface DirigeraSensorsResponse {
   sensors: DirigeraSensor[];
   count: number;
   is_stale: boolean;
-  fetched_at?: string | null;
-  data_freshness?: 'LIVE' | 'STALE';
+  fetched_at: string | null;    // ISO 8601 UTC ending in "Z" (last successful poll)
+  data_freshness: 'LIVE' | 'STALE';
 }
 
 // Source: docs/api/dirigera.md — ContactSensor
@@ -85,7 +85,8 @@ export interface ContactSensorsResponse {
 
 // Source: docs/api/dirigera.md — MotionSensor
 export interface MotionSensor extends DirigeraSensor {
-  light_level: number | null;   // companion lightSensor illuminance, merged by room
+  is_detected: boolean;         // always present on motion sensors
+  light_level?: number | null;  // absent when no companion lightSensor (same relation_id) exists
   data_freshness: DirigeraDataFreshness;
 }
 

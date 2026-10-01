@@ -43,7 +43,8 @@ export function useFritzSystemInfo(): {
       }
       const json = await res.json() as { system: SystemInfoData };
       setData(json.system);
-      setStale(false);
+      // Hourly slow-tier data: stale only after a missed hourly poll (backend is_stale)
+      setStale(json.system.is_stale === true);
     } catch {
       setStale(true);
     } finally {

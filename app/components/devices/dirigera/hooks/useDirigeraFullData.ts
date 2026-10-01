@@ -81,7 +81,8 @@ export function useDirigeraFullData(filter: SensorFilter): UseDirigeraFullDataRe
       const newData: DirigeraFullData = { health, sensors };
       dataRef.current = newData;
       setData(newData);
-      setStale(false);
+      // Backend cache freshness: a successful fetch can still serve stale data
+      setStale(sensorsBody.is_stale === true);
     } catch {
       setStale(true);
       if (!dataRef.current) {
@@ -118,7 +119,7 @@ export function useDirigeraFullData(filter: SensorFilter): UseDirigeraFullDataRe
       };
       dataRef.current = newData;
       setData(newData);
-      setStale(false);
+      setStale(wsData.data_freshness === 'STALE');
       setLoading(false);
       setError(null);
     };

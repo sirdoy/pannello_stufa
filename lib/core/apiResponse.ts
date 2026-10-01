@@ -114,9 +114,14 @@ function fromApiError(apiError: ApiError): NextResponse {
   };
 
   // Spread details at top level for backward compatibility
-  // (e.g., reconnect: true should be at top level, not nested in details)
+  // (e.g., reconnect: true should be at top level, not nested in details).
+  // The envelope keys (success/error/code) always win over details.
   if (apiError.details) {
-    Object.assign(response, apiError.details);
+    Object.assign(response, apiError.details, {
+      success: false,
+      error: apiError.message,
+      code: apiError.code,
+    });
   }
 
   return NextResponse.json(response, { status: apiError.status });

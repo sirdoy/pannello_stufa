@@ -4,7 +4,8 @@
  * Tests cover:
  * - X-API-Key header sent on every request (GET and POST)
  * - Successful JSON parsing on 200
- * - RFC 9457 error detail extraction on 4xx/5xx
+ * - RFC 9457 error detail extraction on 4xx/5xx (extension members kept in details)
+ * - 409 maintenance_required → ApiError MAINTENANCE_REQUIRED
  * - ApiError UNAUTHORIZED on 401
  * - ApiError SERVICE_UNAVAILABLE on 503
  * - ApiError RATE_LIMITED on 429
@@ -332,6 +333,78 @@ describe('haPost', () => {
   afterEach(() => {
     delete process.env.HA_API_URL;
     delete process.env.HA_API_KEY;
+  });
+
+  it('maps 409 maintenance_required to MAINTENANCE_REQUIRED, keeping extensions in details', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 409,
+      statusText: 'Conflict',
+      json: async () => ({
+        type: 'about:blank',
+        title: 'Conflict',
+        status: 409,
+        detail: 'Cleaning is due: confirm the cleaning before igniting the stove.',
+        error: 'maintenance_required',
+        command: 'ignite',
+      }),
+    });
+
+    const err = await haPost('/api/v1/thermorossi/commands/ignit', {}).catch((e: unknown) => e);
+
+    expect(err).toBeInstanceOf(ApiError);
+    expect((err as ApiError).code).toBe(ERROR_CODES.MAINTENANCE_REQUIRED);
+    expect((err as ApiError).status).toBe(409);
+    expect((err as ApiError).details).toEqual({ reason: 'maintenance_required', command: 'ignite' });
+  });
+
+  it('keeps 409 state_conflict as CONFLICT with the error extension as details.reason', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 409,
+      statusText: 'Conflict',
+      json: async () => ({
+        type: 'about:blank', title: 'Conflict', status: 409, detail: 'Stove is not off', error: 'state_conflict',
+      }),
+    });
+
+    const err = await haPost('/api/v1/thermorossi/commands/ignit', {}).catch((e: unknown) => e);
+
+    expect((err as ApiError).code).toBe(ERROR_CODES.CONFLICT);
+    expect((err as ApiError).message).toBe('Stove is not off');
+    expect((err as ApiError).details).toEqual({ reason: 'state_conflict' });
+  });
+
+  it('keeps 422 errors[] in details', async () => {
+    const errors = [{ type: 'missing', loc: ['body', 'name'], msg: 'Field required', input: {} }];
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 422,
+      statusText: 'Unprocessable Content',
+      json: async () => ({
+        type: 'about:blank', title: 'Unprocessable Content', status: 422, detail: 'Request validation failed', errors,
+      }),
+    });
+
+    const err = await haPost('/api/v1/rooms/', {}).catch((e: unknown) => e);
+
+    expect((err as ApiError).code).toBe(ERROR_CODES.VALIDATION_ERROR);
+    expect((err as ApiError).status).toBe(422);
+    expect((err as ApiError).details).toEqual({ errors });
+  });
+
+  it('leaves details null when the problem has no extension members', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+      json: async () => ({ type: 'about:blank', title: 'Not Found', status: 404, detail: 'Room not found' }),
+    });
+
+    const err = await haPost('/api/v1/rooms/x', {}).catch((e: unknown) => e);
+
+    expect((err as ApiError).code).toBe(ERROR_CODES.NOT_FOUND);
+    expect((err as ApiError).details).toBeNull();
   });
 
   it('sends X-API-Key header and Content-Type: application/json', async () => {

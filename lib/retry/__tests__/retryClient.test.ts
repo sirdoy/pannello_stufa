@@ -141,8 +141,18 @@ describe('retryClient', () => {
         })
       );
 
-      await expect(retryFetch('https://api.example.com/test', {})).rejects.toThrow();
+      await expect(retryFetch('https://api.example.com/test', {})).rejects.toThrow('Needs cleaning');
       expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back to the error code when the body has no message', async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(JSON.stringify({ code: ERROR_CODES.CONFLICT }), { status: 409 })
+      );
+
+      await expect(retryFetch('https://api.example.com/test', {})).rejects.toThrow(
+        `Non-retryable error: ${ERROR_CODES.CONFLICT}`
+      );
     });
 
     it('throws immediately on NETATMO_NOT_CONNECTED', async () => {

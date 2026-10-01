@@ -33,7 +33,7 @@ describe('POST /api/v1/netatmo/setthermmode', () => {
   });
 
   it('should return 202 with suggested_poll_delay_s', async () => {
-    mockProxySetThermMode.mockResolvedValue({ status: 'ok', confirmed_mode: 'schedule', netatmo_response: {} });
+    mockProxySetThermMode.mockResolvedValue({ data_confirmed: true, homestatus: {} });
     const request = new Request('http://localhost:3000/api/v1/netatmo/setthermmode', { method: 'POST', body: JSON.stringify({ home_id: 'abc', mode: 'schedule' }), headers: { 'Content-Type': 'application/json' } });
     const response = await POST(asNextRequest(request), routeContext());
     const data = await response.json();

@@ -159,12 +159,6 @@ export interface SetThermmodeRequest {
   endtime?: number;
 }
 
-/** POST /setthermmode response */
-export interface SetThermmodeResponse {
-  status: string;
-  confirmed_mode: string | null;  // null if read-back confirmation failed
-  netatmo_response: Record<string, unknown>;
-}
 
 /** POST /switchhomeschedule request body */
 export interface SwitchHomeScheduleRequest {
@@ -173,13 +167,20 @@ export interface SwitchHomeScheduleRequest {
 }
 
 /**
- * Generic proxy control response.
- * Returned by setroomthermpoint, switchhomeschedule, synchomeschedule, createnewhomeschedule.
+ * Energy mutation response (setroomthermpoint, setthermmode, switchhomeschedule,
+ * synchomeschedule, createnewhomeschedule). `homestatus` is the RAW Netatmo homestatus
+ * re-polled after the command, not the {rooms, data_freshness} shape of GET /homestatus.
+ * `data_confirmed: false` = command accepted but re-poll failed (previous cache, `{}` if none).
  */
-export interface ProxyControlResponse {
-  status: string;
-  time_exec: number;
-  time_server: number;
+export interface NetatmoEnergyMutationResponse {
+  data_confirmed: boolean;
+  homestatus: Record<string, unknown>;
+}
+
+/** POST /renamehome response: cached homesdata topology after a forced refresh (`{}` if unavailable). */
+export interface NetatmoTopologyMutationResponse {
+  data_confirmed: boolean;
+  topology: Record<string, unknown>;
 }
 
 // =============================================================================
@@ -291,9 +292,10 @@ export interface SetMonitoringRequest {
  * Response from proxy POST /camera/{camera_id}/monitoring
  */
 export interface SetMonitoringResponse {
+  data_confirmed: boolean;   // false => gethomedata re-poll failed, homedata is the previous cache
   camera_id: string;
-  monitoring: 'on' | 'off';
-  status: 'applied';
+  monitoring: 'on' | 'off';  // echo of the requested value (not read back)
+  homedata: Record<string, unknown>;  // raw gethomedata response; cameras[].status has the applied state
 }
 
 /**

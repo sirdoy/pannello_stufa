@@ -79,6 +79,22 @@ describe('useFritzWifiNetworks', () => {
     expect(result.current.stale).toBe(false);
   });
 
+  it('sets stale=true when the backend serves stale cache (is_stale)', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ networks: { ...mockWifiStatusResponse, is_stale: true } }),
+    }) as jest.Mock;
+
+    const { result } = renderHook(() => useFritzWifiNetworks());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.networks).toHaveLength(2);
+    expect(result.current.stale).toBe(true);
+  });
+
   it('reads from json.networks.networks (double nesting)', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

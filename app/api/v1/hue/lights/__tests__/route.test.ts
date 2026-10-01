@@ -11,18 +11,10 @@ import { GET } from '../route';
 import * as hueProxy from '@/lib/hue/hueProxy';
 import { authSession } from '@/lib/auth/session';
 import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
-import type { HueLight } from '@/types/hueProxy';
+import type { HueLight, HueLightsListResponse } from '@/types/hueProxy';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockGetLights = jest.mocked(hueProxy.getLights);
-
-/** GET /lights wrapper as documented in docs/api/hue.md. */
-interface HueLightsPayload {
-  lights: HueLight[];
-  count: number;
-  is_stale: boolean;
-  fetched_at: string | null;
-}
 
 describe('GET /api/v1/hue/lights', () => {
   const baseLight: HueLight = {
@@ -74,14 +66,14 @@ describe('GET /api/v1/hue/lights', () => {
   it('should return 200 with lights array', async () => {
     // HA proxy wraps the array as `{ lights, count, is_stale, fetched_at }`;
     // route spreads the wrapper so the response is `{ success, lights, count, … }`.
-    const payload: HueLightsPayload = {
+    const payload: HueLightsListResponse = {
       lights: mockLightsData,
       count: mockLightsData.length,
       is_stale: false,
       fetched_at: '2026-03-19T08:51:32.123456Z',
+      data_freshness: 'LIVE',
     };
-    // getLights() is typed HueLight[] but returns this wrapper (docs/api/hue.md GET /lights).
-    mockGetLights.mockResolvedValue(payload as unknown as HueLight[]);
+    mockGetLights.mockResolvedValue(payload);
     const req = new Request('http://localhost:3000/api/v1/hue/lights');
 
     const response = await GET(asNextRequest(req), routeContext());

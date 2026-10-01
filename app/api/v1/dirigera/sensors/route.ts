@@ -10,5 +10,11 @@ export const dynamic = 'force-dynamic';
  */
 export const GET = withAuthAndErrorHandler(async () => {
   const data = await getSensors();
-  return success({ sensors: data.sensors, count: data.count, is_stale: data.is_stale });
+  return success({
+    sensors: data.sensors,
+    count: data.count,
+    is_stale: data.is_stale,
+    fetched_at: data.fetched_at,
+    data_freshness: data.data_freshness,
+  });
 }, 'Dirigera/Sensors');

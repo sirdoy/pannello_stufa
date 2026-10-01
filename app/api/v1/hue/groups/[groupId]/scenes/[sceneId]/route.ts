@@ -2,7 +2,7 @@
  * Hue Scene Activation Route (v1)
  * POST: Activate a scene on a group via HA proxy
  *
- * Returns 202 Accepted with suggested_poll_delay_s.
+ * Returns 202 with the backend mutation response (re-polled state + data_confirmed).
  */
 
 import {

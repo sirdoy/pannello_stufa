@@ -41,7 +41,7 @@ export default function LightsPage() {
       lightsData.setError(null);
       const res = await fetch(`/api/v1/hue/lights/${lightId}/state`, {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bri: Math.round(pct * 254 / 100) }),
+        body: JSON.stringify({ brightness: Math.round(pct * 254 / 100) }),
       });
       if (!res.ok) throw new Error(res.status === 409 ? 'Luce non raggiungibile' : `Comando fallito: ${res.status}`);
       const data = await res.json() as { data_confirmed?: boolean };

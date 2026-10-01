@@ -58,8 +58,8 @@ export interface HueLight {
   name: string;
   on: boolean;
   brightness: number | null;           // 0-254
-  ct_mirek: number | null;             // 153-500
-  ct_kelvin: number | null;            // derived: round(1_000_000 / ct_mirek)
+  color_temp: number | null;           // mirek 153-500
+  ct_kelvin: number | null;            // derived: round(1_000_000 / color_temp)
   hue: number | null;                  // 0-65535
   saturation: number | null;           // 0-254
   colormode: HueColorMode | null;
@@ -199,9 +199,9 @@ export interface HueHistoryItem {
  */
 export interface HueHistoryResponse {
   items: HueHistoryItem[];
-  total: number;
-  page: number;
-  page_size: number;
+  total_count: number;
+  limit: number;
+  offset: number;
   granularity: HueHistoryGranularity;
   from: number | null;                 // Unix epoch (serialization_alias on from_ts field)
   to: number | null;                   // Unix epoch (serialization_alias on to_ts field)
@@ -218,10 +218,10 @@ export interface HueHistoryResponse {
  */
 export interface HueLightStateRequest {
   on?: boolean;
-  bri?: number;                       // 0-254
-  ct?: number;                        // 153-500 mirek
+  brightness?: number;                // 0-254
+  color_temp?: number;                // 153-500 mirek
   hue?: number;                       // 0-65535
-  sat?: number;                       // 0-254
+  saturation?: number;                // 0-254
   xy?: [number, number];              // CIE xy chromaticity, each value in [0, 1]
   effect?: 'none' | 'colorloop';
   alert?: 'none' | 'select' | 'lselect';

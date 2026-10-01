@@ -61,7 +61,7 @@ function seedAllProviders(): void {
         name: 'Lampada',
         on: true,
         brightness: 254,
-        ct_mirek: null,
+        color_temp: null,
         ct_kelvin: null,
         hue: null,
         saturation: null,

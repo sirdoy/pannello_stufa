@@ -146,20 +146,20 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
 
   /**
    * Change brightness of a room/group
-   * Converts percent (0-100) to bri (0-254)
-   * Sends v1 flat body: { bri: 200 } (NOT { dimming: { brightness: 78 } })
+   * Converts percent (0-100) to brightness (0-254, Bridge native range)
+   * Sends flat body: { brightness: 200 } (NOT { dimming: { brightness: 78 } })
    */
   const handleBrightnessChange = async (groupId: string | null | undefined, brightness: string) => {
     try {
       lightsData.setLoadingMessage('Modifica luminosita...');
       lightsData.setRefreshing(true);
       lightsData.setError(null);
-      // Convert percent (0-100) to bri (0-254)
+      // Convert percent (0-100) to brightness (0-254)
       const bri254 = Math.round(parseFloat(brightness) * 254 / 100);
       const response = await hueRoomCmd.execute(`/api/v1/hue/groups/${groupId}/action`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bri: bri254 }),  // v1 flat: { bri: 200 }, NOT { dimming: { brightness: 78 } }
+        body: JSON.stringify({ brightness: bri254 }),  // flat: { brightness: 200 }, NOT { dimming: { brightness: 78 } }
       });
       if (response) {
         if (!response.ok) {

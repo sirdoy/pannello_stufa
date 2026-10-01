@@ -209,7 +209,7 @@ describe('useLightsCommands', () => {
     expect(mockLightsData.fetchData).toHaveBeenCalled();
   });
 
-  it('handleBrightnessChange sends bri=191 for brightness "75" (Math.round(75*254/100))', async () => {
+  it('handleBrightnessChange sends brightness=191 for "75" (Math.round(75*254/100))', async () => {
     mockExecute.mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue(mockCommandResponse),
@@ -230,7 +230,7 @@ describe('useLightsCommands', () => {
       '/api/v1/hue/groups/1/action',
       expect.objectContaining({
         method: 'PUT',
-        body: JSON.stringify({ bri: 191 }),  // Math.round(75 * 254 / 100) = 191; v1 flat, NOT { dimming: { brightness: 75 } }
+        body: JSON.stringify({ brightness: 191 }),  // Math.round(75 * 254 / 100) = 191; flat, NOT { dimming: { brightness: 75 } }
       })
     );
     expect(mockLightsData.fetchData).toHaveBeenCalled();

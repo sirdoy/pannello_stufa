@@ -17,12 +17,20 @@ import type { HueLightStateMutationResponse } from '@/types/hueProxy';
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockSetLightState = jest.mocked(hueProxy.setLightState);
 
+/** Minimal JSON request: jsdom's Request does not expose the body to request.text(). */
+const jsonRequest = (body: unknown) =>
+  asNextRequest({
+    headers: new Headers({ 'content-type': 'application/json' }),
+    text: async () => JSON.stringify(body),
+    json: async () => body,
+  });
+
 const mockProxyResponse: HueLightStateMutationResponse = {
   light_id: '1',
   name: 'Lampada',
   on: true,
   brightness: 200,
-  ct_mirek: null,
+  color_temp: null,
   ct_kelvin: null,
   hue: null,
   saturation: null,
@@ -58,18 +66,22 @@ describe('PUT /api/v1/hue/lights/[lightId]/state', () => {
 
   it('should call setLightState and return 202', async () => {
     mockSetLightState.mockResolvedValue(mockProxyResponse);
-    const req = new Request('http://localhost:3000/api/v1/hue/lights/1/state', {
-      method: 'PUT',
-      body: JSON.stringify({ on: true, bri: 200 }),
-      headers: { 'Content-Type': 'application/json' },
-    });
 
-    const response = await PUT(asNextRequest(req), routeContext({ lightId: '1' }));
+    const response = await PUT(jsonRequest({ on: true, brightness: 200 }), routeContext({ lightId: '1' }));
     const data = await response.json();
 
     expect(response.status).toBe(202);
     expect(data.light_id).toBe('1');
     expect(data.data_confirmed).toBe(true);
-    expect(mockSetLightState).toHaveBeenCalledWith('1', expect.any(Object));
+    expect(mockSetLightState).toHaveBeenCalledWith('1', { on: true, brightness: 200 });
+  });
+
+  it('maps bri/ct/sat from older bundles to the backend names (T6)', async () => {
+    mockSetLightState.mockResolvedValue(mockProxyResponse);
+
+    const response = await PUT(jsonRequest({ bri: 120, ct: 300, sat: 90 }), routeContext({ lightId: '1' }));
+
+    expect(response.status).toBe(202);
+    expect(mockSetLightState).toHaveBeenCalledWith('1', { brightness: 120, color_temp: 300, saturation: 90 });
   });
 });

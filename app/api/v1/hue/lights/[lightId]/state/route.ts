@@ -4,7 +4,7 @@
  * PUT /api/v1/hue/lights/{lightId}/state
  *
  * Sends a state command to a single Hue light via the HA proxy.
- * Accepts CLIP v1 flat body (on, bri, ct, xy).
+ * Accepts the flat body (on, brightness, color_temp, hue, saturation, xy, effect, alert).
  * Logs action to Firebase and returns 202 Accepted with suggested poll delay.
  *
  * Protected: Requires an authenticated session
@@ -12,6 +12,7 @@
 
 import { withAuthAndErrorHandler, getPathParam, parseJson } from '@/lib/core';
 import { setLightState } from '@/lib/hue/hueProxy';
+import { normalizeLightStateBody } from '@/lib/hue/lightStateBody';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 import { NextResponse } from 'next/server';
@@ -24,13 +25,13 @@ export const dynamic = 'force-dynamic';
  */
 export const PUT = withAuthAndErrorHandler(async (request, context) => {
   const lightId = await getPathParam(context, 'lightId');
-  const body = await parseJson(request) as Record<string, unknown>;
+  const body = normalizeLightStateBody(await parseJson(request) as Record<string, unknown>);
 
   const proxyResponse = await setLightState(lightId, body);
 
   // Log action — v1 flat body format
   const on = body.on as boolean | undefined;
-  const bri = body.bri as number | undefined;
+  const bri = body.brightness as number | undefined;
 
   const actionDescription = on !== undefined
     ? (on ? 'Luce accesa' : 'Luce spenta')

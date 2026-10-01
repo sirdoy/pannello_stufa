@@ -36,7 +36,7 @@ describe('useLightsData', () => {
     name: 'Lampada Soggiorno',
     on: true,
     brightness: 200,
-    ct_mirek: 300,
+    color_temp: 300,
     ct_kelvin: 3333,
     hue: null,
     saturation: null,
@@ -54,7 +54,7 @@ describe('useLightsData', () => {
     name: 'Lampada Camera',
     on: false,
     brightness: 100,
-    ct_mirek: 370,
+    color_temp: 370,
     ct_kelvin: 2702,
     hue: null,
     saturation: null,
@@ -787,7 +787,7 @@ describe('useLightsData', () => {
       expect(result.current.lights[0]?.brightness).toBe(200);
     });
 
-    it('WS handleMessage preserves ct_mirek and ct_kelvin from proxy-shaped payload', async () => {
+    it('WS handleMessage preserves color_temp and ct_kelvin from proxy-shaped payload', async () => {
       let capturedCallback: ((data: unknown) => void) | null = null;
       mockSubscribe.mockImplementation((_topic: string, cb: (data: unknown) => void) => {
         capturedCallback = cb;
@@ -805,7 +805,7 @@ describe('useLightsData', () => {
         capturedCallback?.(mockWsLightsPayload);
       });
 
-      expect(result.current.lights[0]?.ct_mirek).toBe(300);
+      expect(result.current.lights[0]?.color_temp).toBe(300);
       expect(result.current.lights[0]?.ct_kelvin).toBe(3333);
     });
 

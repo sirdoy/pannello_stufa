@@ -100,7 +100,7 @@ describe('colorUtils', () => {
   describe('supportsColor', () => {
     const baseLight: HueLight = {
       light_id: '1', name: 'Test', on: true,
-      brightness: 200, ct_mirek: null, ct_kelvin: null,
+      brightness: 200, color_temp: null, ct_kelvin: null,
       hue: null, saturation: null, colormode: null,
       reachable: true, capability_tier: 'white',
       room_id: null, room_name: null, model_id: null, light_type: null,

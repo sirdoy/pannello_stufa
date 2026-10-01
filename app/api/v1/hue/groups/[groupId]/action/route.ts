@@ -11,6 +11,7 @@ import {
   parseJson,
 } from '@/lib/core';
 import { setGroupAction } from '@/lib/hue/hueProxy';
+import { normalizeLightStateBody } from '@/lib/hue/lightStateBody';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 import { NextResponse } from 'next/server';
@@ -19,13 +20,13 @@ export const dynamic = 'force-dynamic';
 
 export const PUT = withAuthAndErrorHandler(async (request, context) => {
   const groupId = await getPathParam(context, 'groupId');
-  const body = await parseJson(request) as Record<string, unknown>;
+  const body = normalizeLightStateBody(await parseJson(request) as Record<string, unknown>);
 
   const proxyResponse = await setGroupAction(groupId, body);
 
   // Log action — v1 flat body format
   const on = body.on as boolean | undefined;
-  const bri = body.bri as number | undefined;
+  const bri = body.brightness as number | undefined;
 
   const action = on !== undefined
     ? (on ? 'Gruppo acceso' : 'Gruppo spento')

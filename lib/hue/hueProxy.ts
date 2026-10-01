@@ -102,7 +102,7 @@ export async function getHealth(): Promise<HueBridgeHealth> {
 /**
  * Get paginated Hue light state history with automatic granularity selection.
  * Calls GET /api/v1/hue/history on the HA proxy.
- * @param params - Optional URLSearchParams for filtering (from, to, light_id, page, page_size)
+ * @param params - Optional URLSearchParams for filtering (from, to, light_id, limit, offset)
  */
 export async function getHistory(params?: URLSearchParams): Promise<HueHistoryResponse> {
   const endpoint = params
@@ -120,7 +120,7 @@ export async function getHistory(params?: URLSearchParams): Promise<HueHistoryRe
  * Calls PUT /api/v1/hue/lights/{lightId}/state on the HA proxy.
  * Returns 200 with the re-polled state and `data_confirmed`.
  * @param lightId - Bridge-assigned string key (e.g. "1", "5")
- * @param body - v1 flat state: { on, bri, ct, hue, sat, effect, alert }
+ * @param body - flat state: { on, brightness, color_temp, hue, saturation, xy, effect, alert }
  */
 export async function setLightState(
   lightId: string,
@@ -137,7 +137,7 @@ export async function setLightState(
  * Calls PUT /api/v1/hue/groups/{groupId}/action on the HA proxy.
  * Returns 200 with the re-polled state and `data_confirmed`.
  * @param groupId - Bridge-assigned group ID (e.g. "1", "3")
- * @param body - v1 flat state: { on, bri, ct, hue, sat, effect, alert }
+ * @param body - flat state: { on, brightness, color_temp, hue, saturation, xy, effect, alert }
  */
 export async function setGroupAction(
   groupId: string,

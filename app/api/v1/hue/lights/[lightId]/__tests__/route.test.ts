@@ -44,7 +44,7 @@ describe('GET /api/v1/hue/lights/[lightId]', () => {
       name: 'Bedroom Light',
       on: false,
       brightness: null,
-      ct_mirek: null,
+      color_temp: null,
       ct_kelvin: null,
       hue: null,
       saturation: null,

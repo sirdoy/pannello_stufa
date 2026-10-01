@@ -22,7 +22,7 @@ describe('GET /api/v1/hue/lights', () => {
     name: 'Desk Lamp',
     on: true,
     brightness: 254,
-    ct_mirek: null,
+    color_temp: null,
     ct_kelvin: null,
     hue: null,
     saturation: null,

@@ -55,7 +55,7 @@ const lightTpl = (
   name,
   on,
   brightness: on ? 200 : 0,
-  ct_mirek: null,
+  color_temp: null,
   ct_kelvin: null,
   hue: null,
   saturation: null,

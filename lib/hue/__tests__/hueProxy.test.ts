@@ -44,7 +44,7 @@ const mockLight: HueLight = {
   name: 'Bedside Lamp',
   on: true,
   brightness: 200,
-  ct_mirek: 370,
+  color_temp: 370,
   ct_kelvin: 2703,
   hue: null,
   saturation: null,
@@ -111,9 +111,9 @@ const mockHistoryResponse: HueHistoryResponse = {
       sample_count: null,
     },
   ],
-  total: 2880,
-  page: 1,
-  page_size: 100,
+  total_count: 2880,
+  limit: 100,
+  offset: 0,
   granularity: 'raw',
   from: 1773693600,
   to: 1773780000,
@@ -245,7 +245,7 @@ describe('setLightState', () => {
   it('calls haPut with /api/v1/hue/lights/{lightId}/state and body', async () => {
     mockHaPut.mockResolvedValue(mockCommandResponse);
 
-    const body: HueLightStateRequest = { on: true, bri: 200 };
+    const body: HueLightStateRequest = { on: true, brightness: 200 };
     const result = await setLightState('1', body);
 
     expect(mockHaPut).toHaveBeenCalledWith(

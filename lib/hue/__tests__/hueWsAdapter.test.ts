@@ -20,7 +20,7 @@ describe('hueWsAdapter', () => {
         name: 'Luce Soggiorno',
         on: true,
         brightness: 200,
-        ct_mirek: 370,
+        color_temp: 370,
         ct_kelvin: 2703,
         hue: 5000,
         saturation: 150,
@@ -48,7 +48,7 @@ describe('hueWsAdapter', () => {
       expect(result[2]?.capability_tier).toBe('white');
     });
 
-    it('computes ct_kelvin from ct_mirek', () => {
+    it('computes ct_kelvin from color_temp', () => {
       const result = adaptWsLights({
         '1': { state: { ct: 250 }, name: 'A', type: 'Color temperature light' },
       });
@@ -136,7 +136,7 @@ describe('hueWsAdapter', () => {
       name: 'Lampada Divano',
       on: true,
       brightness: 180,
-      ct_mirek: 366,
+      color_temp: 366,
       ct_kelvin: 2732,
       hue: 8402,
       saturation: 140,

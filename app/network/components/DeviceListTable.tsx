@@ -212,7 +212,6 @@ function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: Devic
         pageSize={25}
         density="default"
         striped={true}
-        variant="default"
       />
     </Card>
   );

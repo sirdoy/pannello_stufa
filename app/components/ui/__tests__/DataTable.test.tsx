@@ -74,6 +74,37 @@ describe('DataTable', () => {
   });
 
   describe('Sorting', () => {
+    it('applies initialSorting on first render', () => {
+      render(
+        <DataTable
+          data={mockData}
+          columns={mockColumns}
+          initialSorting={[{ id: 'name', desc: true }]}
+        />
+      );
+
+      const nameHeader = screen.getByRole('columnheader', { name: /name/i });
+      expect(nameHeader).toHaveAttribute('aria-sort', 'descending');
+
+      const rows = screen.getAllByRole('row').slice(1);
+      expect(within(rows[0]!).getByText('Gamma')).toBeInTheDocument();
+      expect(within(rows[2]!).getByText('Alpha')).toBeInTheDocument();
+    });
+
+    it('does not forward table options to the root DOM element', () => {
+      const { container } = render(
+        <DataTable
+          data={mockData}
+          columns={mockColumns}
+          initialSorting={[{ id: 'name', desc: false }]}
+        />
+      );
+
+      const root = container.firstChild as HTMLElement;
+      expect(root).not.toHaveAttribute('initialsorting');
+      expect(root).not.toHaveAttribute('initialSorting');
+    });
+
     it('click column header toggles sort (asc -> desc -> none)', async () => {
       const user = userEvent.setup();
       render(<DataTable data={mockData} columns={mockColumns} />);

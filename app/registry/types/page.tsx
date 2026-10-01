@@ -192,7 +192,7 @@ export default function DeviceTypesPage() {
               Crea tipo
             </Button>
           </div>
-          <DataTable columns={columns} data={types} variant="compact" />
+          <DataTable columns={columns} data={types} density="compact" />
         </Card>
       )}
 

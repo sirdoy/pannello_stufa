@@ -243,7 +243,7 @@ export default function ApiKeysPage() {
               </Text>
             </div>
           ) : (
-            <DataTable columns={columns} data={keys} variant="compact" />
+            <DataTable columns={columns} data={keys} density="compact" />
           )}
         </Card>
       )}

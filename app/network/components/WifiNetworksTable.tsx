@@ -101,7 +101,6 @@ export default function WifiNetworksTable({ networks, loading, stale }: WifiNetw
       <DataTable
         columns={columns}
         data={networks}
-        enableSorting={true}
         enableFiltering={false}
         density="compact"
       />

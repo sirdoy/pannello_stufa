@@ -579,7 +579,7 @@ export default function DeviceRegistryPage() {
               )}
             </div>
           ) : (
-            <DataTable columns={columns} data={devices} variant="compact" />
+            <DataTable columns={columns} data={devices} density="compact" />
           )}
 
           {/* Server-side pagination controls (per D-06, Research Pattern 6) */}

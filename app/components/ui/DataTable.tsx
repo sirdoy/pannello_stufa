@@ -37,19 +37,11 @@ export interface DataTableProps<TData>
     VariantProps<typeof dataTableVariants> {
   columns: ColumnDef<TData>[] | undefined;
   data: TData[] | undefined;
-  variant?: 'default' | 'compact' | 'striped';
-  showPagination?: boolean;
   pageSize?: number;
-  showSearch?: boolean;
-  searchPlaceholder?: string;
   renderExpandedContent?: (row: Row<TData>) => ReactNode;
   onRowClick?: (row: Row<TData>) => void;
-  enableSorting?: boolean;
   enableFiltering?: boolean;
-  enableSelection?: boolean;
-  enableExpanding?: boolean;
   initialSorting?: SortingState;
-  initialFilters?: ColumnFiltersState;
   className?: string;
   getRowId?: TableOptions<TData>['getRowId'];
   selectionMode?: 'none' | 'single' | 'multi';
@@ -170,6 +162,7 @@ function SortIndicator({ isSorted, direction }: { isSorted: boolean | string; di
  * @param {string} [props.className] - Additional CSS classes for the table
  * @param {Function} [props.onRowClick] - Callback when a row is clicked
  * @param {Function} [props.getRowId] - Custom function to get row ID
+ * @param {SortingState} [props.initialSorting] - Initial sorting state (e.g. [{ id: 'name', desc: true }])
  * @param {'none'|'single'|'multi'} [props.selectionMode='none'] - Row selection mode
  * @param {Function} [props.onSelectionChange] - Callback when selection changes (selectedRowIds: Record<string, boolean>) => void
  * @param {Object} [props.selectedRows] - Controlled selection state (Record<string, boolean>)
@@ -224,6 +217,7 @@ const DataTable = forwardRef(function DataTable<TData>(
     className,
     onRowClick,
     getRowId,
+    initialSorting,
     selectionMode = 'none',
     onSelectionChange,
     selectedRows: controlledSelectedRows,
@@ -247,7 +241,7 @@ const DataTable = forwardRef(function DataTable<TData>(
   const baseColumns = useMemo(() => columnsProp ?? [], [columnsProp]);
 
   // Sorting state
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting, setSorting] = useState<SortingState>(() => initialSorting ?? []);
 
   // Filtering state
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);

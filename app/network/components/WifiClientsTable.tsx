@@ -163,7 +163,6 @@ export default function WifiClientsTable({
         <DataTable
           columns={columns}
           data={clients}
-          enableSorting={true}
           enableFiltering={false}
           initialSorting={[{ id: 'signal_strength', desc: true }]}
           density="compact"

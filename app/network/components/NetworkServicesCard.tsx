@@ -189,7 +189,6 @@ export default function NetworkServicesCard({
             <DataTable
               columns={dhcpColumns}
               data={dhcp.items}
-              enableSorting={true}
               enableFiltering={false}
               density="compact"
             />
@@ -210,7 +209,6 @@ export default function NetworkServicesCard({
             <DataTable
               columns={portFwdColumns}
               data={portForwarding.items}
-              enableSorting={true}
               enableFiltering={false}
               density="compact"
             />

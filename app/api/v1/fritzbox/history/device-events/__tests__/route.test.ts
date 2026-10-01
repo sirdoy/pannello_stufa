@@ -46,10 +46,6 @@ describe('GET /api/v1/fritzbox/history/device-events', () => {
     mockGetSession.mockResolvedValue(mockSession);
     // Default: rate limit allows
     mockCheckRateLimit.mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
-    // Guard for new method that may not be in the auto-mock yet
-    if (!mockFritzboxClient.getDeviceEventsRaw) {
-      Object.assign(mockFritzboxClient, { getDeviceEventsRaw: jest.fn() });
-    }
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});

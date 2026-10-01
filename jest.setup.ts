@@ -9,7 +9,6 @@ declare global {
   var __CLIENT_SIDE_MOUNTED__: boolean;
   var IS_REACT_ACT_ENVIRONMENT: boolean;
   var axe: ReturnType<typeof configureAxe>;
-  var runAxeWithRealTimers: (container: Element) => ReturnType<ReturnType<typeof configureAxe>>;
 }
 
 // Mock aria-hidden (used by Radix Dialog) to prevent hideOthers from aria-hiding
@@ -392,23 +391,3 @@ Object.defineProperty(global, 'axe', {
     return configuredAxe;
   },
 });
-
-// Helper for jest-axe with fake timers (axe-core uses setTimeout internally)
-// Usage: await runAxeWithRealTimers(container)
-global.runAxeWithRealTimers = async (container: Element) => {
-  // If fake timers are active, temporarily switch to real timers
-  const isUsingFakeTimers = false; // jest.isFakeTimers doesn't exist in current version
-
-  if (isUsingFakeTimers) {
-    jest.useRealTimers();
-  }
-
-  const { axe } = jest.requireActual<typeof import('jest-axe')>('jest-axe');
-  const results = await axe(container);
-
-  if (isUsingFakeTimers) {
-    jest.useFakeTimers();
-  }
-
-  return results;
-};

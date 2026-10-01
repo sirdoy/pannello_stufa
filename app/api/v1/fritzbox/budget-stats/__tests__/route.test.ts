@@ -43,10 +43,6 @@ describe('GET /api/v1/fritzbox/budget-stats', () => {
     mockGetSession.mockResolvedValue(mockSession);
     // Default: rate limit allows
     mockCheckRateLimit.mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
-    // Ensure new Phase 133 methods exist on the auto-mock (may not be present in main repo yet)
-    if (!mockFritzboxClient.getBudgetStats) {
-      Object.assign(mockFritzboxClient, { getBudgetStats: jest.fn() });
-    }
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});

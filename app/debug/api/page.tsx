@@ -6,12 +6,12 @@ import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
 import Tabs from '@/app/components/ui/Tabs';
 import Badge from '@/app/components/ui/Badge';
-import StoveTab from './components/tabs/StoveTab';
-import NetatmoTab from './components/tabs/NetatmoTab';
-import HueTab from './components/tabs/HueTab';
-import WeatherTab from './components/tabs/WeatherTab';
-import FirebaseTab from './components/tabs/FirebaseTab';
-import SchedulerTab from './components/tabs/SchedulerTab';
+import StoveTab from '@/app/debug/components/tabs/StoveTab';
+import NetatmoTab from '@/app/debug/components/tabs/NetatmoTab';
+import HueTab from '@/app/debug/components/tabs/HueTab';
+import WeatherTab from '@/app/debug/components/tabs/WeatherTab';
+import FirebaseTab from '@/app/debug/components/tabs/FirebaseTab';
+import SchedulerTab from '@/app/debug/components/tabs/SchedulerTab';
 
 type TabValue = 'stove' | 'netatmo' | 'hue' | 'weather' | 'firebase' | 'scheduler';
 

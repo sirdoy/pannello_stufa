@@ -6,20 +6,6 @@
  */
 
 /**
- * Type-safe wrapper for manual jest.fn() mocks
- * Preserves function signature while enabling mock methods
- *
- * @example
- * const myFn = mockFunction<(id: string) => Promise<User>>(jest.fn());
- * myFn.mockResolvedValue(mockUser);
- */
-export function mockFunction<T extends jest.MockableFunction>(
-  fn: jest.Mock
-): jest.MockedFunction<T> {
-  return fn as unknown as jest.MockedFunction<T>;
-}
-
-/**
  * Creates a typed mock Response for fetch tests
  *
  * @example
@@ -85,33 +71,4 @@ export function createMockNextRequest(
   };
 
   return { ...defaults, ...options } as unknown as Request;
-}
-
-/**
- * Type-safe mockResolvedValue wrapper
- * Provides IDE autocomplete for return value
- *
- * @example
- * const mockFn = jest.fn();
- * typedMockResolvedValue(mockFn, { id: '123', name: 'Test' });
- */
-export function typedMockResolvedValue<T>(
-  mock: jest.MockedFunction<jest.MockableFunction>,
-  value: T
-): void {
-  mock.mockResolvedValue(value);
-}
-
-/**
- * Type-safe mockRejectedValue wrapper
- *
- * @example
- * const mockFn = jest.fn();
- * typedMockRejectedValue(mockFn, new Error('Test error'));
- */
-export function typedMockRejectedValue(
-  mock: jest.MockedFunction<jest.MockableFunction>,
-  error: Error
-): void {
-  mock.mockRejectedValue(error);
 }

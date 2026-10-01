@@ -53,10 +53,6 @@ describe('GET /api/v1/fritzbox/telephony/calls', () => {
     mockGetSession.mockResolvedValue(mockSession);
     // Default: rate limit allows
     mockCheckRateLimit.mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
-    // Ensure Phase 162 methods exist on the auto-mock (may not be present in main repo yet)
-    if (!mockFritzboxClient.getCallHistory) {
-      Object.assign(mockFritzboxClient, { getCallHistory: jest.fn() });
-    }
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});

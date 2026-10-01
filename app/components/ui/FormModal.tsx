@@ -210,6 +210,8 @@ const FormModal = forwardRef(function FormModal<TValues extends FieldValues = Fi
   const formRef = useRef<HTMLFormElement>(null);
   // Ref to track previous isOpen state for reset logic
   const wasOpenRef = useRef(false);
+  // Pending success auto-close timer, cleared on unmount so onClose never fires after it
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Resolver for React Hook Form validation
   const resolver = validationSchema ? zodResolver(validationSchema) : undefined;
@@ -255,6 +257,10 @@ const FormModal = forwardRef(function FormModal<TValues extends FieldValues = Fi
     }
     wasOpenRef.current = isOpen;
   }, [isOpen]);
+
+  useEffect(() => () => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
+  }, []);
 
   // Handle close with loading prevention
   const handleClose = () => {
@@ -302,7 +308,8 @@ const FormModal = forwardRef(function FormModal<TValues extends FieldValues = Fi
       setFormState('success');
 
       // Brief success display before close (800ms)
-      setTimeout(() => {
+      closeTimerRef.current = setTimeout(() => {
+        closeTimerRef.current = null;
         setFormState('idle');
         onClose?.();
       }, 800);

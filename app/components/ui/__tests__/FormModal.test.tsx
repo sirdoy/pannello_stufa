@@ -431,6 +431,41 @@ describe('FormModal', () => {
 
       jest.useRealTimers();
     });
+    test('does not call onClose after unmount during success delay', async () => {
+      jest.useFakeTimers();
+      const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+      mockOnSubmit.mockResolvedValue(undefined);
+
+      const { unmount } = render(
+        <FormModal
+          isOpen={true}
+          onClose={mockOnClose}
+          onSubmit={mockOnSubmit}
+          title="Test Modal"
+          successMessage="Saved!"
+          defaultValues={{ name: 'Test', email: 'test@test.com' }}
+          validationSchema={testSchema}
+        >
+          {({ control, isDisabled }: { control: Control<TestFormData>; isDisabled: boolean }) => (
+            <TestFormFields control={control} isDisabled={isDisabled} />
+          )}
+        </FormModal>
+      );
+
+      await user.click(screen.getByText('Save'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Saved!')).toBeInTheDocument();
+      });
+
+      unmount();
+
+      act(() => {
+        jest.advanceTimersByTime(800);
+      });
+
+      expect(mockOnClose).not.toHaveBeenCalled();
+    });
   });
 
   describe('Cancel Behavior', () => {

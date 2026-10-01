@@ -6,7 +6,7 @@
  * Auth is handled by haGet/haPost/haPut/haDelete via X-API-Key header.
  *
  * Endpoints:
- *   /api/v1/rooms/                              - GET list, POST create
+ *   /api/v1/rooms                               - GET list, POST create
  *   /api/v1/rooms/{room_id}                     - GET single, PUT update, DELETE
  *   /api/v1/rooms/{room_id}/devices             - GET list, POST assign
  *   /api/v1/rooms/{room_id}/devices/{device_id} - DELETE remove
@@ -29,12 +29,12 @@ import type { RegistryDevice } from '@/types/registry';
 
 /** Get all rooms */
 async function getRooms(): Promise<Room[]> {
-  return haGet<Room[]>('/api/v1/rooms/');
+  return haGet<Room[]>('/api/v1/rooms');
 }
 
 /** Create a new room */
 async function createRoom(body: RoomCreate): Promise<Room> {
-  return haPost<Room>('/api/v1/rooms/', body as unknown as Record<string, unknown>);
+  return haPost<Room>('/api/v1/rooms', body as unknown as Record<string, unknown>);
 }
 
 /** Get a single room by ID */

@@ -5,24 +5,24 @@ import type { DeviceUpdate } from '@/types/registry';
 export const dynamic = 'force-dynamic';
 
 /**
- * PUT /api/registry/devices/[device_id]
+ * PUT /api/registry/devices/[device_registry_id]
  * Updates a registered device's name and type. Requires authentication.
  */
 export const PUT = withAuthAndErrorHandler(async (request, context) => {
   const params = await context.params;
-  const device_id = params['device_id'] ?? '';
+  const device_registry_id = params['device_registry_id'] ?? '';
   const body = (await request.json()) as DeviceUpdate;
-  const data = await registryProxy.updateDevice(Number(device_id), body);
+  const data = await registryProxy.updateDevice(Number(device_registry_id), body);
   return success(data as unknown as Record<string, unknown>);
 }, 'Registry/Devices/Update');
 
 /**
- * DELETE /api/registry/devices/[device_id]
+ * DELETE /api/registry/devices/[device_registry_id]
  * Unregisters a device. Requires authentication.
  */
 export const DELETE = withAuthAndErrorHandler(async (_request, context) => {
   const params = await context.params;
-  const device_id = params['device_id'] ?? '';
-  await registryProxy.unregisterDevice(Number(device_id));
+  const device_registry_id = params['device_registry_id'] ?? '';
+  await registryProxy.unregisterDevice(Number(device_registry_id));
   return noContent();
 }, 'Registry/Devices/Delete');

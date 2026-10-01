@@ -46,7 +46,7 @@ describe('PUT /api/registry/types/[slug]', () => {
     mockUpdateType.mockResolvedValue({
       slug: 'custom_sensor',
       label: 'Nuova etichetta',
-      is_builtin: 0,
+      is_builtin: false,
       created_at: 1773000000,
     } as never);
 

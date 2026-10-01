@@ -156,7 +156,7 @@ function getStoveCommands(): CommandGroup {
         label: 'Accendi Stufa',
         icon: <Power className="size-4" />,
         shortcut: '⌘⇧S',
-        onSelect: async () => { await executeStoveAction('/api/v1/thermorossi/commands/ignit'); },
+        onSelect: async () => { await executeStoveAction('/api/v1/thermorossi/commands/ignite'); },
       },
       {
         id: 'stove-shutdown',

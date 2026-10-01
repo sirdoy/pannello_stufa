@@ -9,7 +9,7 @@
  *   /api/v1/registry/types          - GET list, POST create
  *   /api/v1/registry/types/{slug}   - DELETE
  *   /api/v1/registry/devices        - GET list (paginated), POST register
- *   /api/v1/registry/devices/{id}   - PUT update, DELETE unregister
+ *   /api/v1/registry/devices/{device_registry_id} - PUT update, DELETE unregister
  *   /api/v1/registry/health         - GET health stats
  */
 
@@ -66,16 +66,16 @@ async function registerDevice(body: DeviceCreate): Promise<RegistryDevice> {
 }
 
 /** Update a registered device's name and type */
-async function updateDevice(deviceId: number, body: DeviceUpdate): Promise<RegistryDevice> {
+async function updateDevice(deviceRegistryId: number, body: DeviceUpdate): Promise<RegistryDevice> {
   return haPut<RegistryDevice>(
-    `/api/v1/registry/devices/${deviceId}`,
+    `/api/v1/registry/devices/${deviceRegistryId}`,
     body as unknown as Record<string, unknown>
   );
 }
 
 /** Unregister a device by ID */
-async function unregisterDevice(deviceId: number): Promise<void> {
-  return haDelete(`/api/v1/registry/devices/${deviceId}`);
+async function unregisterDevice(deviceRegistryId: number): Promise<void> {
+  return haDelete(`/api/v1/registry/devices/${deviceRegistryId}`);
 }
 
 /** Get registry health stats (type count, device count) */

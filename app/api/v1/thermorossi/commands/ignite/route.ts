@@ -1,0 +1,22 @@
+import { withAuthAndErrorHandler, withIdempotency, success, parseJson, HTTP_STATUS } from '@/lib/core';
+import { sendIgnite } from '@/lib/stove/thermorossiProxy';
+
+export const dynamic = 'force-dynamic';
+
+/**
+ * POST /api/v1/thermorossi/commands/ignite
+ * Ignites the stove via HA proxy.
+ * Protected: Requires an authenticated session
+ * Idempotent: Returns cached response for duplicate Idempotency-Key
+ */
+export const POST = withAuthAndErrorHandler(
+  withIdempotency(async (request) => {
+    const body = await parseJson(request);
+    void (body?.['source'] as string | undefined); // source param reserved for future use
+
+    const data = await sendIgnite();
+
+    return success(data as unknown as Record<string, unknown>, null, HTTP_STATUS.ACCEPTED);
+  }),
+  'Stove/Ignite'
+);

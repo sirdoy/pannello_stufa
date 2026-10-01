@@ -10,7 +10,7 @@
  * - ApiError TIMEOUT on AbortError
  */
 
-import { getStatus, getPower, getFan, getHealth, getHistory, sendIgnit, sendShutdown, setPower, setFan, setWaterTemp } from '@/lib/stove/thermorossiProxy';
+import { getStatus, getPower, getFan, getHealth, getHistory, sendIgnite, sendShutdown, setPower, setFan, setWaterTemp } from '@/lib/stove/thermorossiProxy';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
 
 // Mock global fetch
@@ -246,11 +246,11 @@ describe('command wrappers', () => {
     delete process.env.HA_API_KEY;
   });
 
-  it('sendIgnit() POSTs to /api/v1/thermorossi/commands/ignit with empty body', async () => {
+  it('sendIgnite() POSTs to /api/v1/thermorossi/commands/ignite with empty body', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => MOCK_COMMAND_RESPONSE });
-    await sendIgnit();
+    await sendIgnite();
     const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/thermorossi/commands/ignit`);
+    expect(url).toBe(`${TEST_PROXY_URL}/api/v1/thermorossi/commands/ignite`);
     expect(options.method).toBe('POST');
     expect(JSON.parse(options.body as string)).toEqual({});
     expect((options.headers as Record<string, string>)['X-API-Key']).toBe(TEST_API_KEY);

@@ -350,7 +350,7 @@ describe('haPost', () => {
       }),
     });
 
-    const err = await haPost('/api/v1/thermorossi/commands/ignit', {}).catch((e: unknown) => e);
+    const err = await haPost('/api/v1/thermorossi/commands/ignite', {}).catch((e: unknown) => e);
 
     expect(err).toBeInstanceOf(ApiError);
     expect((err as ApiError).code).toBe(ERROR_CODES.MAINTENANCE_REQUIRED);
@@ -368,7 +368,7 @@ describe('haPost', () => {
       }),
     });
 
-    const err = await haPost('/api/v1/thermorossi/commands/ignit', {}).catch((e: unknown) => e);
+    const err = await haPost('/api/v1/thermorossi/commands/ignite', {}).catch((e: unknown) => e);
 
     expect((err as ApiError).code).toBe(ERROR_CODES.CONFLICT);
     expect((err as ApiError).message).toBe('Stove is not off');
@@ -386,7 +386,7 @@ describe('haPost', () => {
       }),
     });
 
-    const err = await haPost('/api/v1/rooms/', {}).catch((e: unknown) => e);
+    const err = await haPost('/api/v1/rooms', {}).catch((e: unknown) => e);
 
     expect((err as ApiError).code).toBe(ERROR_CODES.VALIDATION_ERROR);
     expect((err as ApiError).status).toBe(422);

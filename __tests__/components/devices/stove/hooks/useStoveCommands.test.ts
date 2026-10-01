@@ -180,7 +180,7 @@ describe('useStoveCommands', () => {
     });
 
     expect(mockExecute).toHaveBeenCalledWith(
-      expect.stringContaining('/api/v1/thermorossi/commands/ignit'),
+      expect.stringContaining('/api/v1/thermorossi/commands/ignite'),
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({ source: 'manual' }),

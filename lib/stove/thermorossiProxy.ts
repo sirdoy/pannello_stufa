@@ -82,12 +82,12 @@ export async function getHistory(params?: URLSearchParams): Promise<ThermorossiH
 
 /**
  * Ignite the stove.
- * Calls POST /api/v1/thermorossi/commands/ignit on the HA proxy.
+ * Calls POST /api/v1/thermorossi/commands/ignite on the HA proxy.
  * Returns 202 Accepted with suggested_poll_delay_s.
  */
-export async function sendIgnit(): Promise<ThermorossiCommandResponse> {
+export async function sendIgnite(): Promise<ThermorossiCommandResponse> {
   return haPost<ThermorossiCommandResponse>(
-    '/api/v1/thermorossi/commands/ignit',
+    '/api/v1/thermorossi/commands/ignite',
     {}
   );
 }

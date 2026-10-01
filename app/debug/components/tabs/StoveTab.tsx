@@ -190,13 +190,13 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
         <div className="space-y-3">
           <PostEndpointCard
             name="Ignite Stove"
-            url="/api/v1/thermorossi/commands/ignit"
+            url="/api/v1/thermorossi/commands/ignite"
             response={postResponses.ignite}
             loading={loadingPost.ignite ?? false}
             timing={timings.ignite}
-            onExecute={() => callPostEndpoint('ignite', '/api/v1/thermorossi/commands/ignit', {})}
-            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/commands/ignit')}
-            isCopied={copiedUrl === '/api/v1/thermorossi/commands/ignit'}
+            onExecute={() => callPostEndpoint('ignite', '/api/v1/thermorossi/commands/ignite', {})}
+            onCopyUrl={() => copyUrlToClipboard('/api/v1/thermorossi/commands/ignite')}
+            isCopied={copiedUrl === '/api/v1/thermorossi/commands/ignite'}
           />
 
           <PostEndpointCard

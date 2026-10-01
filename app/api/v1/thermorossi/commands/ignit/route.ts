@@ -1,22 +1,7 @@
-import { withAuthAndErrorHandler, withIdempotency, success, parseJson, HTTP_STATUS } from '@/lib/core';
-import { sendIgnit } from '@/lib/stove/thermorossiProxy';
-
+/**
+ * POST /api/v1/thermorossi/commands/ignit — deprecated alias of /commands/ignite (ROADMAP T6),
+ * kept for clients still running an older bundle. Remove together with the backend alias.
+ */
 export const dynamic = 'force-dynamic';
 
-/**
- * POST /api/v1/thermorossi/commands/ignit
- * Ignites the stove via HA proxy.
- * Protected: Requires an authenticated session
- * Idempotent: Returns cached response for duplicate Idempotency-Key
- */
-export const POST = withAuthAndErrorHandler(
-  withIdempotency(async (request) => {
-    const body = await parseJson(request);
-    void (body?.['source'] as string | undefined); // source param reserved for future use
-
-    const data = await sendIgnit();
-
-    return success(data as unknown as Record<string, unknown>, null, HTTP_STATUS.ACCEPTED);
-  }),
-  'Stove/Ignite'
-);
+export { POST } from '../ignite/route';

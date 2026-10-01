@@ -17,7 +17,7 @@ const API_BASE = '/api';
 // Stove control endpoints
 export const STOVE_ROUTES = {
   status: `${API_BASE}/v1/thermorossi/status`,
-  ignite: `${API_BASE}/v1/thermorossi/commands/ignit`,
+  ignite: `${API_BASE}/v1/thermorossi/commands/ignite`,
   shutdown: `${API_BASE}/v1/thermorossi/commands/shutdown`,
   getFan: `${API_BASE}/v1/thermorossi/fan-level`,
   getPower: `${API_BASE}/v1/thermorossi/power`,

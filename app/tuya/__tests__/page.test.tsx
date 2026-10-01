@@ -34,7 +34,7 @@ const mockPlug = (id: string): TuyaPlug => ({
   energy_kwh: 1.5,
   countdown_s: 0,
   data_freshness: 'LIVE',
-  last_polled_at: Date.now() / 1000,
+  last_poll_at: new Date().toISOString(),
   custom_name: `Plug ${id}`,
   device_type: 'smart_plug',
 });

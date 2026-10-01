@@ -53,7 +53,7 @@ export const CAMERA_ROUTES = {
   stream: (cameraId: string): string =>
     `${API_BASE}/v1/netatmo/camera/${encodeURIComponent(cameraId)}/stream`,
   snapshot: (cameraId: string): string =>
-    `${API_BASE}/v1/netatmo/camera/${encodeURIComponent(cameraId)}/snapshot`,
+    `${API_BASE}/v1/netatmo/camera/${encodeURIComponent(cameraId)}/live/snapshot.jpg`,
   eventSnapshot: (eventId: string): string =>
     `${API_BASE}/v1/netatmo/camera/events/${encodeURIComponent(eventId)}/snapshot`,
 } as const;

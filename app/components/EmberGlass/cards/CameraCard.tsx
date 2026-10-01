@@ -8,7 +8,7 @@
  *
  * Header right slot is a LIVE pill (red 6×6 dot pulsing 1.6s + 10px caps text)
  * and the body fills the remaining space with a 14px-radius preview area
- * showing a snapshot from `/api/v1/netatmo/camera/{id}/snapshot?t={lastUpdatedAt}`
+ * showing a snapshot from `/api/v1/netatmo/camera/{id}/live/snapshot.jpg?t={lastUpdatedAt}`
  * with a mono `{name} · {meta}` label overlay.
  *
  * The snapshot endpoint now proxies the JPEG bytes through (no longer 302) so a
@@ -31,6 +31,7 @@ import { CameraSheet } from '../sheets/CameraSheet';
 import { GlassCardSkeleton } from '../GlassCardSkeleton';
 import { useCardReady } from '../useCardReady';
 import { useCameraData } from '@/app/components/devices/camera/hooks/useCameraData';
+import { CAMERA_ROUTES } from '@/lib/routes';
 
 const TONE = '#6aa86a';
 
@@ -49,7 +50,7 @@ export default function CameraCard() {
   // so an offline camera gets the fallback without hitting the proxy.
   const online = cam?.status === 'on';
   const src = cam && online
-    ? `/api/v1/netatmo/camera/${cam.camera_id}/snapshot?t=${lastUpdatedAt ?? 0}`
+    ? `${CAMERA_ROUTES.snapshot(cam.camera_id)}?t=${lastUpdatedAt ?? 0}`
     : null;
   const snapshotError = src !== null && failedSrc === src;
   // CameraStatus does not expose a resolution field; use device_type as the

@@ -44,7 +44,7 @@ describe('GET /api/v1/netatmo/health', () => {
       token_source: 'sqlite',
       requests_this_hour: 10,
       rate_limit_ceiling: 500,
-      last_poll_at: 1773000000,
+      last_poll_at: '2026-03-08T19:20:00Z',
     });
     const request = new Request('http://localhost:3000/api/v1/netatmo/health');
     const response = await GET(asNextRequest(request), routeContext());

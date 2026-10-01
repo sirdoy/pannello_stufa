@@ -53,7 +53,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     window.scrollTo = originalScrollTo;
   });
 
-  test('(a) renders <img> with /api/v1/netatmo/camera/{id}/snapshot?t={lastUpdatedAt}', () => {
+  test('(a) renders <img> with /api/v1/netatmo/camera/{id}/live/snapshot.jpg?t={lastUpdatedAt}', () => {
     mockedUseCameraData.mockReturnValue(
       buildReturn({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -66,7 +66,7 @@ describe('CameraCard (Phase 177 — DASH-07)', () => {
     const img = container.querySelector('img');
 
     expect(img).not.toBeNull();
-    expect(img?.getAttribute('src')).toBe('/api/v1/netatmo/camera/cam1/snapshot?t=1700000000');
+    expect(img?.getAttribute('src')).toBe('/api/v1/netatmo/camera/cam1/live/snapshot.jpg?t=1700000000');
   });
 
   test('(a2) falls back to the placeholder when the snapshot fails to load', () => {

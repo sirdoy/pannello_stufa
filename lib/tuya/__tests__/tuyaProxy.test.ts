@@ -33,7 +33,7 @@ const mockHealth: TuyaHealth = {
   devices: [
     {
       device_id: 'bf123',
-      last_polled_at: 1743074190.456,
+      last_poll_at: '2025-03-27T11:16:30.456000Z',
       data_freshness: 'LIVE',
     },
   ],
@@ -48,7 +48,7 @@ const mockPlug: TuyaPlug = {
   energy_kwh: 1.234,
   countdown_s: 0,
   data_freshness: 'LIVE',
-  last_polled_at: 1743074190.456,
+  last_poll_at: '2025-03-27T11:16:30.456000Z',
   custom_name: 'Test Plug',
   device_type: 'smart_plug',
 };

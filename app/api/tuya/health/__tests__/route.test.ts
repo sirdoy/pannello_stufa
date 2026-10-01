@@ -23,7 +23,7 @@ const mockHealthData = {
   devices: [
     {
       device_id: 'bf123',
-      last_polled_at: 1743074190.456,
+      last_poll_at: '2025-03-27T11:16:30.456000Z',
       data_freshness: 'LIVE' as const,
     },
   ],

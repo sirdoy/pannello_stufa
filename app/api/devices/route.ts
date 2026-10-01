@@ -1,7 +1,10 @@
 /**
  * API Route: Cross-Provider Device Aggregator
  *
- * GET /api/v1/devices
+ * GET /api/devices
+ *
+ * Next-only aggregator (not a mirror of the backend's Fritz!Box-only /api/v1/devices, hence
+ * outside /api/v1 like /api/rooms and /api/registry; moved by ROADMAP T6).
  *
  * Fans out to all 8 providers via `Promise.allSettled`, normalizes per-provider
  * items into a unified `Device` shape (`types/devices.ts`), sorts by
@@ -197,7 +200,7 @@ function mapThermorossi(
 // =============================================================================
 
 /**
- * GET /api/v1/devices
+ * GET /api/devices
  *
  * Cross-provider device aggregator. Fans out to all 8 providers via
  * `Promise.allSettled`, normalizes per-provider items into a unified Device

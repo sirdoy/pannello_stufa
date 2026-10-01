@@ -369,7 +369,7 @@ export interface NetatmoHealthResponse {
   rate_limit_ceiling: number;
   /** OAuth scopes missing from the last token refresh; null until the first refresh (e.g. ["access_camera"]) */
   missing_scopes?: string[] | null;
-  last_poll_at: number | null;
+  last_poll_at: string | null;  // ISO 8601 UTC "Z"
 }
 
 // =============================================================================

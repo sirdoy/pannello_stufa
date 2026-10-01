@@ -17,7 +17,7 @@ const plug: TuyaPlug = {
   energy_kwh: 1.2,
   countdown_s: 0,
   data_freshness: 'LIVE',
-  last_polled_at: 1773000000,
+  last_poll_at: '2026-03-08T19:20:00Z',
   custom_name: 'Presa',
   device_type: null,
 };

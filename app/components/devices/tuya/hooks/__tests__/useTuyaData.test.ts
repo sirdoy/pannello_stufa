@@ -49,7 +49,7 @@ const mockPlug: TuyaPlug = {
   energy_kwh: 1.23,
   countdown_s: 0,
   data_freshness: 'LIVE',
-  last_polled_at: 1711800000,
+  last_poll_at: '2024-03-30T12:00:00Z',
   custom_name: 'Presa Soggiorno',
   device_type: 'smart_plug',
 };

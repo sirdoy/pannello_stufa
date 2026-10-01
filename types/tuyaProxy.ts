@@ -15,7 +15,7 @@
 // Source: docs/api/tuya.md — TuyaDeviceHealth
 export interface TuyaDeviceHealth {
   device_id: string;
-  last_polled_at: number | null;  // Unix epoch float, null if never polled
+  last_poll_at: string | null;    // ISO 8601 UTC "Z", null if never polled
   data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';
 }
 
@@ -39,7 +39,7 @@ export interface TuyaPlug {
   energy_kwh: number | null;      // cumulative energy consumed (kWh)
   countdown_s: number | null;     // remaining countdown in seconds (0 = no timer)
   data_freshness: 'LIVE' | 'STALE' | 'UNREACHABLE';
-  last_polled_at: number | null;  // Unix epoch float, null if never polled
+  last_poll_at: string | null;    // ISO 8601 UTC "Z", null if never polled
   custom_name: string | null;     // from device registry, null if not registered
   device_type: string | null;     // device type slug from registry, null if not registered
 }

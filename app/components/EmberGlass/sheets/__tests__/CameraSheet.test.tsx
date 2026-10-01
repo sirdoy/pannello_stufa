@@ -79,7 +79,7 @@ describe('CameraSheet', () => {
   test('online camera renders the snapshot when active', () => {
     const { container } = renderSheet();
     expect(container.querySelector('img')?.getAttribute('src')).toBe(
-      '/api/v1/netatmo/camera/cam1/snapshot?t=1700000000',
+      '/api/v1/netatmo/camera/cam1/live/snapshot.jpg?t=1700000000',
     );
     expect(screen.getByTestId('camera-sheet-status')).toHaveTextContent('Attiva');
   });

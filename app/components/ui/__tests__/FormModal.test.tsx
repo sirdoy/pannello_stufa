@@ -1,4 +1,4 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor, act, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { z } from 'zod';
 import FormModal from '../FormModal';
@@ -243,6 +243,12 @@ describe('FormModal', () => {
       await waitFor(() => {
         expect(screen.getByText('Please fix the following errors:')).toBeInTheDocument();
       });
+
+      // Summary lists each field's schema message, not a generic placeholder (M41)
+      const summary = screen.getByText('Please fix the following errors:').closest('[role="alert"]') as HTMLElement;
+      expect(within(summary).getByText('Name is required')).toBeInTheDocument();
+      expect(within(summary).getByText('Invalid email address')).toBeInTheDocument();
+      expect(within(summary).queryByText('Invalid value')).not.toBeInTheDocument();
     });
   });
 

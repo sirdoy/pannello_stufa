@@ -111,10 +111,11 @@ type FormModalComponent = (<TValues extends FieldValues = FieldValues>(
 /**
  * Internal ErrorSummary component - displays all errors at top of form
  */
-function ErrorSummary({ errors }: { errors: object }) {
+function ErrorSummary({ errors }: { errors: FieldErrors }) {
+  // react-hook-form errors are plain FieldError objects (never Error instances)
   const errorList = Object.entries(errors).map(([field, error]) => ({
     field,
-    message: error instanceof Error ? error.message : 'Invalid value',
+    message: typeof error?.message === 'string' && error.message ? error.message : 'Invalid value',
   }));
 
   if (errorList.length === 0) return null;

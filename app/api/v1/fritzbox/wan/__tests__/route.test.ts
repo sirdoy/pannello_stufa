@@ -12,14 +12,12 @@ jest.mock('@/lib/auth/session', () => ({
 }));
 
 import { GET } from '../route';
-import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
+import { fritzboxClient } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
 import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockFritzboxClient = jest.mocked(fritzboxClient);
-const mockGetCachedData = jest.mocked(getCachedData);
-const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
 describe('GET /api/v1/fritzbox/wan', () => {
   let mockRequest: Request;
@@ -36,8 +34,6 @@ describe('GET /api/v1/fritzbox/wan', () => {
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/wan');
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession);
-    // Default: rate limit allows
-    mockCheckRateLimit.mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -54,8 +50,8 @@ describe('GET /api/v1/fritzbox/wan', () => {
     expect(data.code).toBe('UNAUTHORIZED');
   });
 
-  it('should return 200 with WAN data when rate limit allows and cache provides data', async () => {
-    mockGetCachedData.mockResolvedValue(mockWan);
+  it('should return 200 with WAN data', async () => {
+    mockFritzboxClient.getWanStatus.mockResolvedValue(mockWan);
 
     const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
@@ -65,45 +61,20 @@ describe('GET /api/v1/fritzbox/wan', () => {
       success: true,
       wan: mockWan,
     });
-    expect(mockCheckRateLimit).toHaveBeenCalledWith('auth0|123', 'wan');
-    expect(mockGetCachedData).toHaveBeenCalled();
+    expect(mockFritzboxClient.getWanStatus).toHaveBeenCalled();
   });
 
-  it('should return 429 with RATE_LIMITED code and retryAfter when rate limit exceeded', async () => {
-    mockCheckRateLimit.mockResolvedValue({ allowed: false, suppressedCount: 1, nextAllowedIn: 15 });
-
-    const response = await GET(asNextRequest(mockRequest), routeContext());
-    const data = await response.json();
-
-    expect(response.status).toBe(429);
-    expect(data.success).toBe(false);
-    expect(data.code).toBe('RATE_LIMITED');
-    expect(data.error).toContain('Troppe richieste');
-    expect(data.error).toContain('15s');
-    expect(data.retryAfter).toBe(15);
-    expect(mockGetCachedData).not.toHaveBeenCalled();
-  });
-
-  it('should call getCachedData with correct cache key and fetch function', async () => {
-    mockGetCachedData.mockResolvedValue(mockWan);
+  it('should call fritzboxClient.getWanStatus', async () => {
+    mockFritzboxClient.getWanStatus.mockResolvedValue(mockWan);
 
     await GET(asNextRequest(mockRequest), routeContext());
 
-    expect(mockGetCachedData).toHaveBeenCalledWith(
-      'wan',
-      expect.any(Function)
-    );
-
-    // Verify the fetch function is fritzboxClient.getWanStatus
-    const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
-    mockFritzboxClient.getWanStatus.mockResolvedValue(mockWan);
-    await fetchFn?.();
     expect(mockFritzboxClient.getWanStatus).toHaveBeenCalled();
   });
 
   it('should propagate errors from fritzboxClient', async () => {
     const error = new Error('WAN query failed');
-    mockGetCachedData.mockRejectedValue(error);
+    mockFritzboxClient.getWanStatus.mockRejectedValue(error);
 
     const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();

@@ -12,14 +12,12 @@ jest.mock('@/lib/auth/session', () => ({
 }));
 
 import { GET } from '../route';
-import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
+import { fritzboxClient } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
 import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
 const mockFritzboxClient = jest.mocked(fritzboxClient);
-const mockGetCachedData = jest.mocked(getCachedData);
-const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
 
 describe('GET /api/v1/fritzbox/budget-stats', () => {
   let mockRequest: Request;
@@ -41,8 +39,6 @@ describe('GET /api/v1/fritzbox/budget-stats', () => {
     mockRequest = new Request('http://localhost:3000/api/v1/fritzbox/budget-stats');
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession);
-    // Default: rate limit allows
-    mockCheckRateLimit.mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
     // Mock console methods to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
@@ -60,7 +56,7 @@ describe('GET /api/v1/fritzbox/budget-stats', () => {
   });
 
   it('should return 200 with budget stats', async () => {
-    mockGetCachedData.mockResolvedValue(mockStats);
+    mockFritzboxClient.getBudgetStats.mockResolvedValue(mockStats);
 
     const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
@@ -70,45 +66,20 @@ describe('GET /api/v1/fritzbox/budget-stats', () => {
       success: true,
       stats: mockStats,
     });
-    expect(mockCheckRateLimit).toHaveBeenCalledWith('auth0|123', 'budget-stats');
-    expect(mockGetCachedData).toHaveBeenCalled();
+    expect(mockFritzboxClient.getBudgetStats).toHaveBeenCalled();
   });
 
-  it('should return 429 when rate limited', async () => {
-    mockCheckRateLimit.mockResolvedValue({ allowed: false, suppressedCount: 1, nextAllowedIn: 30 });
-
-    const response = await GET(asNextRequest(mockRequest), routeContext());
-    const data = await response.json();
-
-    expect(response.status).toBe(429);
-    expect(data.success).toBe(false);
-    expect(data.code).toBe('RATE_LIMITED');
-    expect(data.error).toContain('Troppe richieste');
-    expect(data.error).toContain('30s');
-    expect(data.retryAfter).toBe(30);
-    expect(mockGetCachedData).not.toHaveBeenCalled();
-  });
-
-  it('should call getCachedData with correct cache key and fetch function', async () => {
-    mockGetCachedData.mockResolvedValue(mockStats);
+  it('should call fritzboxClient.getBudgetStats', async () => {
+    mockFritzboxClient.getBudgetStats.mockResolvedValue(mockStats);
 
     await GET(asNextRequest(mockRequest), routeContext());
 
-    expect(mockGetCachedData).toHaveBeenCalledWith(
-      'budget-stats',
-      expect.any(Function)
-    );
-
-    // Verify the fetch function calls fritzboxClient.getBudgetStats
-    const fetchFn = mockGetCachedData.mock.calls[0]?.[1];
-    mockFritzboxClient.getBudgetStats.mockResolvedValue(mockStats);
-    await fetchFn?.();
     expect(mockFritzboxClient.getBudgetStats).toHaveBeenCalled();
   });
 
   it('should propagate errors from fritzboxClient', async () => {
     const error = new Error('Budget stats query failed');
-    mockGetCachedData.mockRejectedValue(error);
+    mockFritzboxClient.getBudgetStats.mockRejectedValue(error);
 
     const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();

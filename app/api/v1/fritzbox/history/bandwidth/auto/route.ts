@@ -1,6 +1,6 @@
-import { withAuthAndErrorHandler, success, ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
-import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
-import { buildCacheKey, pickQueryParams, NUMERIC_PARAM } from '@/lib/fritzbox/fritzboxQuery';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
+import { fritzboxClient } from '@/lib/fritzbox';
+import { pickQueryParams, NUMERIC_PARAM } from '@/lib/fritzbox/fritzboxQuery';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,8 +10,6 @@ export const dynamic = 'force-dynamic';
  * Server-side switch: days<=7 returns hourly records, days>7 returns daily records.
  * Forwards optional days, limit and offset query params to the HA proxy.
  * Protected: Requires an authenticated session
- * Rate limited: 10 requests per minute per user
- * Cached: 60-second TTL
  *
  * Query params:
  *   days   - Number of days to retrieve (1-3650, default 7)
@@ -20,24 +18,13 @@ export const dynamic = 'force-dynamic';
  *
  * Success: { auto: { items, total_count, limit, offset } }
  * Errors:
- *   - 429 RATE_LIMITED: Too many requests
- *   - Plus all health endpoint errors (403, 504, 500)
+ *   - All health endpoint errors (403, 504, 500)
  */
-export const GET = withAuthAndErrorHandler(async (request, _context, session) => {
-  const rateLimitResult = await checkRateLimitFritzBox(session.user.sub, 'history-bandwidth-auto');
-  if (!rateLimitResult.allowed) {
-    throw new ApiError(
-      ERROR_CODES.RATE_LIMITED,
-      `Troppe richieste. Riprova tra ${rateLimitResult.nextAllowedIn}s`,
-      HTTP_STATUS.TOO_MANY_REQUESTS,
-      { retryAfter: rateLimitResult.nextAllowedIn }
-    );
-  }
-
+export const GET = withAuthAndErrorHandler(async (request) => {
   const { searchParams } = new URL(request.url);
-  // Whitelisted + validated params; they are also part of the cache key.
+  // Whitelisted + validated params.
   const params = pickQueryParams(searchParams, { days: NUMERIC_PARAM, limit: NUMERIC_PARAM, offset: NUMERIC_PARAM });
 
-  const auto = await getCachedData(buildCacheKey('history-bandwidth-auto', params), () => fritzboxClient.getBandwidthAuto(params));
+  const auto = await fritzboxClient.getBandwidthAuto(params);
   return success({ auto });
 }, 'FritzBox/HistoryBandwidthAuto');

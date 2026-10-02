@@ -1,7 +1,7 @@
 /**
  * Tests for /api/v1/fritzbox/devices route behavior
  *
- * Verifies rate limiting, cached device retrieval, and response shape.
+ * Verifies device retrieval and response shape.
  * Event detection logic was moved to HA proxy (no longer in this route).
  * Phase 93: Test Fix TFIX-08
  */
@@ -15,17 +15,12 @@ jest.mock('@/lib/auth/session', () => ({
 }));
 
 import { GET } from '../devices/route';
-import {
-  getCachedData,
-  checkRateLimitFritzBox,
-  fritzboxClient,
-} from '@/lib/fritzbox';
+import { fritzboxClient } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
 import { asNextRequest, mockAppSession, routeContext } from '@/__tests__/__utils__/routeHelpers';
 
 const mockGetSession = jest.mocked(authSession.getSession);
-const mockGetCachedData = jest.mocked(getCachedData);
-const mockCheckRateLimit = jest.mocked(checkRateLimitFritzBox);
+const mockGetDevices = jest.mocked(fritzboxClient.getDevices);
 
 describe('GET /api/v1/fritzbox/devices', () => {
   let mockRequest: Request;
@@ -43,19 +38,12 @@ describe('GET /api/v1/fritzbox/devices', () => {
     // Default: authenticated user
     mockGetSession.mockResolvedValue(mockSession);
 
-    // Default: rate limit allows
-    mockCheckRateLimit.mockResolvedValue({
-      allowed: true,
-      suppressedCount: 0,
-      nextAllowedIn: 0,
-    });
-
     // Mock console to suppress output
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   test('returns devices list on success', async () => {
-    mockGetCachedData.mockResolvedValue(mockDevices);
+    mockGetDevices.mockResolvedValue(mockDevices);
 
     const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
@@ -63,11 +51,11 @@ describe('GET /api/v1/fritzbox/devices', () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.devices).toEqual(mockDevices);
-    expect(mockGetCachedData).toHaveBeenCalledWith('devices', expect.any(Function));
+    expect(mockGetDevices).toHaveBeenCalledTimes(1);
   });
 
   test('returns empty array when no devices', async () => {
-    mockGetCachedData.mockResolvedValue([]);
+    mockGetDevices.mockResolvedValue([]);
 
     const response = await GET(asNextRequest(mockRequest), routeContext());
     const data = await response.json();
@@ -76,39 +64,4 @@ describe('GET /api/v1/fritzbox/devices', () => {
     expect(data.success).toBe(true);
     expect(data.devices).toEqual([]);
   });
-
-  test('rate limit exceeded returns 429', async () => {
-    mockCheckRateLimit.mockResolvedValue({
-      allowed: false,
-      suppressedCount: 5,
-      nextAllowedIn: 30,
-    });
-
-    const response = await GET(asNextRequest(mockRequest), routeContext());
-
-    expect(response.status).toBe(429);
-  });
-
-  test('passes session user sub to rate limit check', async () => {
-    mockGetCachedData.mockResolvedValue(mockDevices);
-
-    await GET(asNextRequest(mockRequest), routeContext());
-
-    expect(mockCheckRateLimit).toHaveBeenCalledWith('auth0|123', 'devices');
-  });
-
-  test('getCachedData uses fritzboxClient.getDevices as fetcher', async () => {
-    mockGetCachedData.mockResolvedValue(mockDevices);
-    jest.mocked(fritzboxClient).getDevices = jest.fn().mockResolvedValue(mockDevices);
-
-    await GET(asNextRequest(mockRequest), routeContext());
-
-    const fetcher = mockGetCachedData.mock.calls[0]?.[1];
-    expect(fetcher).toBeDefined();
-    if (fetcher) {
-      await fetcher();
-      expect(jest.mocked(fritzboxClient).getDevices).toHaveBeenCalled();
-    }
-  });
-
 });

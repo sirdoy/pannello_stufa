@@ -1,5 +1,5 @@
-import { withAuthAndErrorHandler, success, ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
-import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
+import { fritzboxClient } from '@/lib/fritzbox';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,24 +8,12 @@ export const dynamic = 'force-dynamic';
  * Returns TR-064 service discovery data from Fritz!Box, parsed as JSON.
  * The HA proxy may return XML or JSON; the client function handles both.
  * Protected: Requires an authenticated session
- * Rate limited: 10 requests per minute per user
- * Cached: 60-second TTL
  *
  * Success: { discovery: { services: [{ name, type, url }] } }
  * Errors:
- *   - 429 RATE_LIMITED: Too many requests
- *   - Plus all health endpoint errors (403, 504, 500)
+ *   - All health endpoint errors (403, 504, 500)
  */
-export const GET = withAuthAndErrorHandler(async (_request, _context, session) => {
-  const rateLimitResult = await checkRateLimitFritzBox(session.user.sub, 'service-discovery');
-  if (!rateLimitResult.allowed) {
-    throw new ApiError(
-      ERROR_CODES.RATE_LIMITED,
-      `Troppe richieste. Riprova tra ${rateLimitResult.nextAllowedIn}s`,
-      HTTP_STATUS.TOO_MANY_REQUESTS,
-      { retryAfter: rateLimitResult.nextAllowedIn }
-    );
-  }
-  const discovery = await getCachedData('service-discovery', () => fritzboxClient.getServiceDiscovery());
+export const GET = withAuthAndErrorHandler(async () => {
+  const discovery = await fritzboxClient.getServiceDiscovery();
   return success({ discovery });
 }, 'FritzBox/ServiceDiscovery');

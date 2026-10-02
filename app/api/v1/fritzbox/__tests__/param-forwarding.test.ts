@@ -1,8 +1,6 @@
 /**
- * Parameterized Fritz!Box proxy routes must:
- *  - forward only whitelisted, well-formed query params to the backend
- *  - include those params in the Firebase cache key (otherwise every page/filter
- *    gets the first cached response for 60s)
+ * Parameterized Fritz!Box proxy routes must forward only whitelisted,
+ * well-formed query params to the backend.
  */
 
 jest.mock('@/lib/fritzbox');
@@ -10,7 +8,7 @@ jest.mock('@/lib/auth/session', () => ({
   authSession: { getSession: jest.fn() },
 }));
 
-import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
+import { fritzboxClient } from '@/lib/fritzbox';
 import { authSession } from '@/lib/auth/session';
 import { GET as wifiClients } from '../wifi/clients/route';
 import { GET as dhcp } from '../network/dhcp/reservations/route';
@@ -23,7 +21,6 @@ import { GET as historyDaily } from '../history/bandwidth/daily/route';
 import { GET as historyAuto } from '../history/bandwidth/auto/route';
 import { GET as historyDevicesDaily } from '../history/devices/daily/route';
 
-const mockGetCachedData = jest.mocked(getCachedData);
 const client = fritzboxClient as unknown as Record<string, jest.Mock>;
 
 type Handler = typeof wifiClients;
@@ -78,12 +75,10 @@ const call = (c: Case, query: string) =>
     {} as Parameters<Handler>[1]
   );
 
-describe('Fritz!Box parameterized routes: cache key + param forwarding', () => {
+describe('Fritz!Box parameterized routes: param forwarding', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.mocked(authSession.getSession).mockResolvedValue({ user: { sub: 'auth0|123' } } as never);
-    jest.mocked(checkRateLimitFritzBox).mockResolvedValue({ allowed: true, suppressedCount: 0, nextAllowedIn: 0 });
-    mockGetCachedData.mockImplementation(async (_key, fn) => fn());
     for (const c of cases) {
       client[c.method] = jest.fn().mockResolvedValue({ items: [], total_count: 0, limit: 100, offset: 0 });
     }
@@ -91,25 +86,6 @@ describe('Fritz!Box parameterized routes: cache key + param forwarding', () => {
   });
 
   describe.each(cases)('$name', (c) => {
-    it('uses a different cache key for different query params', async () => {
-      await call(c, c.queryA);
-      await call(c, c.queryB);
-
-      const [keyA, keyB] = mockGetCachedData.mock.calls.map((args) => args[0]);
-      expect(keyA).not.toEqual(keyB);
-      // Firebase keys cannot contain . $ # [ ] /
-      expect(keyA).not.toMatch(/[.$#[\]/]/);
-      expect(keyB).not.toMatch(/[.$#[\]/]/);
-    });
-
-    it('uses the same cache key for the same query params', async () => {
-      await call(c, c.queryA);
-      await call(c, c.queryA);
-
-      const [keyA, keyA2] = mockGetCachedData.mock.calls.map((args) => args[0]);
-      expect(keyA).toEqual(keyA2);
-    });
-
     it('forwards the validated params to the backend client', async () => {
       await call(c, c.queryA);
 
@@ -117,12 +93,11 @@ describe('Fritz!Box parameterized routes: cache key + param forwarding', () => {
       expect(Object.fromEntries(params.entries())).toEqual(c.forwardedA);
     });
 
-    it('drops malformed params (not forwarded, not in the cache key)', async () => {
+    it('drops malformed params', async () => {
       await call(c, 'limit=abc&offset=-1&days=1e9&hours=../x&band=a/b&mac=zz');
 
       const params = client[c.method]!.mock.calls[0]![0] as URLSearchParams;
       expect(params.toString()).toBe('');
-      expect(mockGetCachedData.mock.calls[0]![0]).not.toMatch(/--/);
     });
   });
 });

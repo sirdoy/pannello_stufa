@@ -1,5 +1,5 @@
-import { withAuthAndErrorHandler, success, ApiError, ERROR_CODES, HTTP_STATUS } from '@/lib/core';
-import { fritzboxClient, getCachedData, checkRateLimitFritzBox } from '@/lib/fritzbox';
+import { withAuthAndErrorHandler, success } from '@/lib/core';
+import { fritzboxClient } from '@/lib/fritzbox';
 
 export const dynamic = 'force-dynamic';
 
@@ -7,32 +7,15 @@ export const dynamic = 'force-dynamic';
  * GET /api/v1/fritzbox/devices
  * Retrieves network device list from Fritz!Box
  * Protected: Requires an authenticated session
- * Rate limited: 10 requests per minute
- * Cached: 60-second TTL
  *
  * Device event tracking (connected/disconnected) is now handled by the HA proxy,
  * not by Firebase-based state comparison. See /api/v1/fritzbox/history for events.
  *
  * Success: { devices: [...] }
  * Errors:
- *   - 429 RATE_LIMITED: Too many requests
- *   - Plus all health endpoint errors (403, 504, 500)
+ *   - All health endpoint errors (403, 504, 500)
  */
-export const GET = withAuthAndErrorHandler(async (request, context, session) => {
-  // 1. Rate limit check
-  const rateLimitResult = await checkRateLimitFritzBox(session.user.sub, 'devices');
-  if (!rateLimitResult.allowed) {
-    throw new ApiError(
-      ERROR_CODES.RATE_LIMITED,
-      `Troppe richieste. Riprova tra ${rateLimitResult.nextAllowedIn}s`,
-      HTTP_STATUS.TOO_MANY_REQUESTS,
-      { retryAfter: rateLimitResult.nextAllowedIn }
-    );
-  }
-
-  // 2. Fetch with cache (60s TTL)
-  const devices = await getCachedData('devices', () => fritzboxClient.getDevices());
-
-  // 3. Return data
+export const GET = withAuthAndErrorHandler(async () => {
+  const devices = await fritzboxClient.getDevices();
   return success({ devices });
 }, 'FritzBox/Devices');

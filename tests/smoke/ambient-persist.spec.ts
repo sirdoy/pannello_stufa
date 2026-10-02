@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 
 /**
  * DS-05 — ambient persistence across hard reload (Phase 174).

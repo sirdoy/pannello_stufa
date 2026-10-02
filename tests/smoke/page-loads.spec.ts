@@ -1,4 +1,5 @@
-import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { type ConsoleMessage, type Page } from '@playwright/test';
 
 /**
  * Collects console errors during a page interaction.
@@ -142,6 +143,13 @@ test.describe('Page Loads', () => {
     });
 
     test('/settings/api-keys loads', async ({ page }) => {
+      // API key management is admin-only and the e2e `test` account is not an admin:
+      // stub the list so the 403 does not reach the console (M39).
+      await page.route('**/api/auth/api-keys', (route) =>
+        route.request().method() === 'GET'
+          ? route.fulfill({ status: 200, json: { keys: [], count: 0 } })
+          : route.continue()
+      );
       const { errors, cleanup } = collectConsoleErrors(page);
       await page.goto('/settings/api-keys');
       await page.waitForLoadState('domcontentloaded');

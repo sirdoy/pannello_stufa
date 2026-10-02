@@ -7,7 +7,7 @@ Testing completo: Unit test (Jest) + E2E (Playwright).
 ```bash
 npm test                  # Unit tests
 npm run test:coverage     # Con coverage report
-npm run test:e2e          # E2E tests (con cleanup)
+npm run test:e2e          # E2E (build prod + Playwright)
 npm run test:e2e:ui       # E2E con UI interattiva
 ```
 
@@ -80,53 +80,49 @@ const { result } = renderHook(() => useContext(), { wrapper });
 
 ## E2E Testing (Playwright)
 
-### Test Suite
+### Suite
 
-| Suite | File | Verifica |
-|-------|------|----------|
-| Contrasto WCAG | `contrast.spec.js` | 4.5:1 min, accessibilità |
-| Uniformità | `component-uniformity.spec.js` | Stili consistenti |
-| Responsive | `responsive.spec.js` | Mobile/Tablet/Desktop |
-| Dark Mode | `dark-mode.spec.js` | Temi + Liquid Glass |
-| Accessibilità | `accessibility.spec.js` | ARIA, keyboard nav |
+| Cartella | Contenuto |
+|----------|-----------|
+| `tests/smoke/` | caricamento pagine, dashboard EmberGlass, sheet, tab bar, stanze, automazioni, splash, design system |
+| `tests/features/` | login e API key (route stubbate), pagine `/stove` e `/thermostat` in sola lettura |
+| `tests/fixtures.ts` | `test` / `expect` da importare negli spec (mai da `@playwright/test`) |
+
+I test girano contro il **Pi reale** (`HA_API_URL` di `.env.local`): nessun click che comanda device veri
+(accendi/spegni, modalità), le azioni si verificano con `page.route()`.
 
 ### Comandi
 
 ```bash
-npm run test:e2e          # Run + cleanup automatico
-npm run test:e2e:headed   # Con browser visibile
-npm run test:e2e:debug    # Step-by-step
-npm run test:e2e:report   # Report HTML
-npm run test:e2e:clean    # Pulizia manuale
+npm run test:e2e                         # build prod + next start + suite (~1-2 min di test, 8 worker)
+PW_SKIP_BUILD=1 npm run test:e2e         # riusa la build `.next` corrente (dopo un `npm run build`)
+npx playwright test tests/smoke/x.spec.ts --repeat-each=3   # un file, ripetuto
+npx playwright show-report               # report HTML (non si apre da solo)
 ```
 
-### TEST_MODE / BYPASS_AUTH
+### Configurazione (`playwright.config.ts`, da **M39**)
 
-Bypassa il login (middleware + `lib/auth/session.ts`) per test automatici:
+- **Server = build di produzione** (`npm run build && npm run start`), non `next dev`: con Turbopack + React
+  Compiler il dev server impiega 60-90 s per compilare `/` e 10-20 s per ogni route, e i worker vanno in timeout.
+  Se sulla porta 3000 gira già un server viene riusato: assicurarsi che sia una build aggiornata.
+- **Login reale, un login per worker** (`tests/fixtures.ts`): il backend ruota il refresh token a ogni refresh e
+  revoca la sessione se ne vede riusato uno vecchio (access token 15 min). Uno `storageState` unico condiviso da
+  tutti i test si rompe appena la suite supera i 15 min (401 a cascata); per worker la sessione viene risalvata
+  dopo ogni test con il token ruotato.
+- `BYPASS_AUTH` / `TEST_MODE` sono forzati a `false` per runner e server, anche se `.env.local` li abilita per lo
+  sviluppo locale: altrimenti niente login reale e `/api/ws-token` risponde 401 sulla build prod.
+- `E2E_ALLOW_DEBUG_PAGES=true` (solo nel webServer Playwright, mai su Vercel) serve le pagine `/debug/*`, che il
+  middleware blocca in produzione.
+- `serviceWorkers: 'block'`: il service worker della PWA fa crashare il renderer di `chromium-headless-shell`.
+- Worker di default (metà dei core): 4 worker sono risultati più lenti, non più stabili. Il collo di bottiglia è
+  il Pi: run ravvicinati in serie lo rallentano (login dei worker in timeout), lasciare qualche minuto tra un run
+  completo e l'altro.
 
-```env
-# .env.local (solo testing!)
-TEST_MODE=true
-BYPASS_AUTH=true
-```
+### Account di test
 
-**IMPORTANTE**: Riportare a `false` dopo i test!
-
-Con `BYPASS_AUTH=false`, `tests/auth.setup.ts` esegue un login reale via form `/auth/login`
-(`tests/helpers/auth.helpers.ts` → `signIn()`), usando l'account di test sul Pi
-(`E2E_TEST_USER_EMAIL` / `E2E_TEST_USER_PASSWORD` in `.env.local`).
-
-### Theme Testing
-
-```javascript
-await page.addInitScript((theme) => {
-  localStorage.setItem('user-theme', theme);
-}, 'dark');
-```
-
-### Performance Target
-
-- DOM Interactive: < 2000ms
+Login dal form `/auth/login` con l'account `test` sul Pi (`E2E_TEST_USER_EMAIL` / `E2E_TEST_USER_PASSWORD` in
+`.env.local`), non admin: le pagine admin-only (es. `/settings/api-keys`) vanno stubbate con `page.route()`.
+Regole sui segreti: `../.claude/rules/playwright-secrets.md`.
 
 ---
 

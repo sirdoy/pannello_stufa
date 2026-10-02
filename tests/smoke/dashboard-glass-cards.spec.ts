@@ -1,4 +1,5 @@
-import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { type ConsoleMessage, type Page } from '@playwright/test';
 import { waitForHydration } from '../helpers/hydration';
 
 /**
@@ -79,6 +80,10 @@ test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
 
     const grid = page.locator('.grid.grid-cols-2').first();
     await expect(grid).toBeVisible();
+    // app/loading.tsx renders the same grid filled with `glass-card-skeleton`
+    // placeholders, and each card streams in behind its own Suspense boundary:
+    // measure only once every placeholder has been replaced by a real card.
+    await expect(grid.getByTestId('glass-card-skeleton')).toHaveCount(0, { timeout: 15000 });
 
     const sizes = await grid.locator('[data-testid$="-card"]').evaluateAll((els) =>
       els.map((el) => {
@@ -156,8 +161,8 @@ test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
 //   - collectConsoleErrors (lines 30-42)
 //
 // Each describe owns its own beforeEach because Playwright route-mocks are
-// per-context and do not inherit across describe blocks. The login storageState is reused via the global
-// playwright.config.ts setup; no per-describe login flow needed.
+// per-context and do not inherit across describe blocks. The per-worker login session comes from
+// tests/fixtures.ts; no per-describe login flow needed.
 //
 // Endpoint URLs verified against the live command hooks at runtime:
 //   STOVE_ROUTES.setPower            → /api/v1/thermorossi/settings/power

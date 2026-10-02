@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 
 /**
  * Phase 182 — Design System Reference Page v2 primitives smoke (DSREF-01..03).
@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  *   --accent to oklch(0.65 0.17 290); downstream primitive surfaces (CircBtn
  *   primary + BigSlider gradient fill) reflect the change without a reload.
  *
- * Auth: storageState from playwright.config.ts applies the test login session.
+ * Auth: the per-worker login session from tests/fixtures.ts applies.
  * No explicit auth setup needed in this spec.
  */
 

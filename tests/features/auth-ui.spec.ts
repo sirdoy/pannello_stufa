@@ -1,4 +1,5 @@
-import { test, expect, type Route } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { type Route } from '@playwright/test';
 
 /**
  * Phase 170 Plan 03 — Auth UI feature spec.
@@ -16,8 +17,8 @@ import { test, expect, type Route } from '@playwright/test';
  *
  * All /api/auth/* routes are stubbed via page.route() — Playwright fulfils
  * inside the browser process so the HA proxy is never hit.
- * The login session ships with the Playwright storageState (see
- * tests/auth.setup.ts) so /login and /settings/api-keys are reachable as
+ * The login session ships with the per-worker storageState (see
+ * tests/fixtures.ts) so /login and /settings/api-keys are reachable as
  * client-rendered pages.
  */
 test.describe('Auth UI Flow', () => {
@@ -127,7 +128,7 @@ test.describe('Auth UI Flow', () => {
     await page
       .getByRole('button', { name: /crea nuova api key/i })
       .click();
-    await page.getByLabel(/nome/i).fill('NewKey');
+    await page.getByRole('textbox', { name: /nome/i }).fill('NewKey');
     await page.getByRole('button', { name: /^crea$/i }).click();
 
     // Reveal — plaintext visible (fixture-string, NOT a real credential).
@@ -164,9 +165,10 @@ test.describe('Auth UI Flow', () => {
     // data-testid="confirmation-confirm".
     await page.getByTestId('confirmation-confirm').click();
 
-    // Row removed.
-    await expect(page.getByText('Existing')).not.toBeVisible({
+    // Dialog closed and row removed.
+    await expect(page.getByRole('cell', { name: 'Existing', exact: true })).toHaveCount(0, {
       timeout: 10000,
     });
+    await expect(page.getByText(/revocare "Existing"/i)).toHaveCount(0);
   });
 });

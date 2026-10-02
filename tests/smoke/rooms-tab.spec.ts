@@ -1,4 +1,5 @@
-import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { type ConsoleMessage, type Page } from '@playwright/test';
 import { waitForHydration } from '../helpers/hydration';
 
 /**
@@ -14,8 +15,8 @@ import { waitForHydration } from '../helpers/hydration';
  * Route mocks: all 5 device endpoints are mocked so 6 RoomCards render with
  * non-zero fixture data independent of real HA proxy state.
  *
- * Auth: reuses storageState from tests/.auth/user.json (created by tests/auth.setup.ts,
- * Phase 51 pattern — same as dashboard-glass-cards.spec.ts).
+ * Auth: reuses the per-worker login session from tests/fixtures.ts
+ * (same as dashboard-glass-cards.spec.ts).
  *
  * Helper functions copied verbatim from tests/smoke/dashboard-glass-cards.spec.ts
  * (Phase 177/178 precedent — CONTEXT D-65).

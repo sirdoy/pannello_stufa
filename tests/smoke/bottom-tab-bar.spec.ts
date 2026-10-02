@@ -1,4 +1,5 @@
-import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { type ConsoleMessage, type Page } from '@playwright/test';
 import { waitForHydration } from '../helpers/hydration';
 
 /**

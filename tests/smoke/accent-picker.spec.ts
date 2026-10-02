@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 
 /**
  * DS-03 — accent picker live update + localStorage persistence (Phase 174).

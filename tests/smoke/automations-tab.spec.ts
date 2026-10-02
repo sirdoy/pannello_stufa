@@ -1,4 +1,5 @@
-import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { type ConsoleMessage, type Page } from '@playwright/test';
 import { waitForHydration } from '../helpers/hydration';
 import type { AutomationRule } from '@/types/automations';
 
@@ -16,7 +17,7 @@ import type { AutomationRule } from '@/types/automations';
  * editor exercises the real automationsProxy + hook + orchestrator wiring
  * without touching the live HA backend.
  *
- * Auth: reuses storageState from tests/.auth/user.json (Phase 51 pattern,
+ * Auth: reuses the per-worker login session from tests/fixtures.ts (Phase 51 pattern,
  * same as rooms-tab.spec.ts and dashboard-glass-cards.spec.ts).
  *
  * Helper functions copied verbatim from tests/smoke/rooms-tab.spec.ts.

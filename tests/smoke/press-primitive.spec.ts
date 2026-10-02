@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 
 /**
  * DS-07 — press primitive on /debug/design-system-v2 (Phase 175).

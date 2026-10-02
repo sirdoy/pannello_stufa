@@ -42,8 +42,13 @@ function deny(req: NextRequest): NextResponse {
 }
 
 export async function middleware(req: NextRequest) {
-  // Block /debug pages in production
-  if (process.env.NODE_ENV === 'production' && req.nextUrl.pathname.startsWith('/debug')) {
+  // Block /debug pages in production. E2E_ALLOW_DEBUG_PAGES is set only by the local
+  // Playwright webServer (`next start`, M39): never set it on Vercel.
+  if (
+    process.env.NODE_ENV === 'production' &&
+    process.env.E2E_ALLOW_DEBUG_PAGES !== 'true' &&
+    req.nextUrl.pathname.startsWith('/debug')
+  ) {
     return NextResponse.rewrite(new URL('/not-found', req.url));
   }
 

@@ -133,4 +133,27 @@ describe('middleware session gate', () => {
     process.env.TEST_MODE = 'true';
     expect((await middleware(await request('/stove'))).status).toBe(200);
   });
+
+  describe('/debug pages in production', () => {
+    const mutableEnv = process.env as Record<string, string | undefined>;
+    beforeEach(() => {
+      mutableEnv.NODE_ENV = 'production';
+      delete process.env.E2E_ALLOW_DEBUG_PAGES;
+    });
+    afterEach(() => {
+      mutableEnv.NODE_ENV = 'test';
+    });
+
+    it('rewrites to /not-found', async () => {
+      const res = await middleware(await request('/debug/design-system-v2', session()));
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://app.example/not-found');
+    });
+
+    it('are served to the local Playwright server (E2E_ALLOW_DEBUG_PAGES)', async () => {
+      process.env.E2E_ALLOW_DEBUG_PAGES = 'true';
+      const res = await middleware(await request('/debug/design-system-v2', session()));
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull();
+      expect(res.status).toBe(200);
+    });
+  });
 });

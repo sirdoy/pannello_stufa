@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 import { signIn, signOut } from '../helpers/auth.helpers';
 import { TEST_USER } from '../helpers/test-context';
 

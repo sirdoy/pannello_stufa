@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '../fixtures';
+import { type Page } from '@playwright/test';
 
 /**
  * SHEET-01 — sheet primitive on /debug/design-system-v2 (Phase 175).

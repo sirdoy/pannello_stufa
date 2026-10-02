@@ -11,7 +11,6 @@ import {
   parseJson,
 } from '@/lib/core';
 import { setGroupAction } from '@/lib/hue/hueProxy';
-import { normalizeLightStateBody } from '@/lib/hue/lightStateBody';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 import { NextResponse } from 'next/server';
@@ -20,7 +19,7 @@ export const dynamic = 'force-dynamic';
 
 export const PUT = withAuthAndErrorHandler(async (request, context) => {
   const groupId = await getPathParam(context, 'groupId');
-  const body = normalizeLightStateBody(await parseJson(request) as Record<string, unknown>);
+  const body = await parseJson(request) as Record<string, unknown>;
 
   const proxyResponse = await setGroupAction(groupId, body);
 

@@ -12,7 +12,6 @@
 
 import { withAuthAndErrorHandler, getPathParam, parseJson } from '@/lib/core';
 import { setLightState } from '@/lib/hue/hueProxy';
-import { normalizeLightStateBody } from '@/lib/hue/lightStateBody';
 import { adminDbPush } from '@/lib/firebaseAdmin';
 import { DEVICE_TYPES } from '@/lib/devices/deviceTypes';
 import { NextResponse } from 'next/server';
@@ -25,7 +24,7 @@ export const dynamic = 'force-dynamic';
  */
 export const PUT = withAuthAndErrorHandler(async (request, context) => {
   const lightId = await getPathParam(context, 'lightId');
-  const body = normalizeLightStateBody(await parseJson(request) as Record<string, unknown>);
+  const body = await parseJson(request) as Record<string, unknown>;
 
   const proxyResponse = await setLightState(lightId, body);
 

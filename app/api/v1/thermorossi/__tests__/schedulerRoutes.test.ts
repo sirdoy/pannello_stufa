@@ -96,16 +96,10 @@ describe('slots', () => {
     ['not 15-min aligned', { slots: [{ ...SLOT, start_minutes: 361 }] }, { id: '2', day: '0' }],
     ['start after end', { slots: [{ ...SLOT, start_minutes: 400 }] }, { id: '2', day: '0' }],
     ['power out of range', { slots: [{ ...SLOT, power_level: 6 }] }, { id: '2', day: '0' }],
-    ['legacy power out of range', { slots: [{ start_minutes: 360, end_minutes: 390, power: 6, fan: 3 }] }, { id: '2', day: '0' }],
+    ['pre-T6 power/fan names', { slots: [{ start_minutes: 360, end_minutes: 390, power: 2, fan: 3 }] }, { id: '2', day: '0' }],
   ])('400 on %s', async (_label, body, params) => {
     expect((await daySlots.PUT(req(body), ctx(params))).status).toBe(400);
     expect(mocked.replaceDaySlots).not.toHaveBeenCalled();
-  });
-
-  it('maps legacy power/fan from older bundles to power_level/fan_level (T6)', async () => {
-    const legacy = { start_minutes: 360, end_minutes: 390, power: 2, fan: 3 };
-    expect((await daySlots.PUT(req({ slots: [legacy] }), ctx({ id: '2', day: '6' }))).status).toBe(200);
-    expect(mocked.replaceDaySlots).toHaveBeenCalledWith(2, 6, [SLOT]);
   });
 
   it('week: forwards days, rejects bad day keys', async () => {

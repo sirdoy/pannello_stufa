@@ -105,7 +105,7 @@ export async function setTimer(
  * Undefined params are omitted from the query string.
  *
  * @param deviceId - Tuya local device ID
- * @param params   - Optional filters: period, from, to, limit, offset (page/page_size: deprecated)
+ * @param params   - Optional filters: period, from, to, limit, offset
  */
 export async function getHistory(
   deviceId: string,
@@ -115,10 +115,6 @@ export async function getHistory(
     to?: string;
     limit?: string;
     offset?: string;
-    /** @deprecated T6: use limit/offset */
-    page?: string;
-    /** @deprecated T6: use limit/offset */
-    page_size?: string;
   }
 ): Promise<TuyaHistoryResponse> {
   const defined = Object.entries(params).filter(

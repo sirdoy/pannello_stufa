@@ -68,17 +68,17 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
     expect(mockGetHistory).toHaveBeenCalledWith('bf123', expect.any(Object));
   });
 
-  it('should forward query params period, page, page_size and omit missing as undefined', async () => {
+  it('should forward query params period, limit, offset and omit missing as undefined', async () => {
     mockGetHistory.mockResolvedValue(mockHistory);
 
-    await GET(createGetRequest('period=7d&page=2&page_size=50'), mockContext);
+    await GET(createGetRequest('period=7d&limit=50&offset=50'), mockContext);
 
     expect(mockGetHistory).toHaveBeenCalledWith('bf123', {
       period: '7d',
       from: undefined,
       to: undefined,
-      page: '2',
-      page_size: '50',
+      limit: '50',
+      offset: '50',
     });
   });
 
@@ -91,8 +91,8 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
       period: undefined,
       from: undefined,
       to: undefined,
-      page: undefined,
-      page_size: undefined,
+      limit: undefined,
+      offset: undefined,
     });
   });
 
@@ -100,7 +100,7 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
     mockGetHistory.mockResolvedValue(mockHistory);
 
     await GET(
-      createGetRequest('period=24h&from=1742987790&to=1743074190&page=1&page_size=100'),
+      createGetRequest('period=24h&from=1742987790&to=1743074190&limit=100&offset=0'),
       mockContext
     );
 
@@ -108,8 +108,8 @@ describe('GET /api/tuya/plugs/[device_id]/history', () => {
       period: '24h',
       from: '1742987790',
       to: '1743074190',
-      page: '1',
-      page_size: '100',
+      limit: '100',
+      offset: '0',
     });
   });
 

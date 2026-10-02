@@ -121,11 +121,11 @@ describe('tuyaProxy', () => {
     expect(result.device_id).toBe('bf123');
   });
 
-  it('getHistory(deviceId, { period, page }) appends query string', async () => {
+  it('getHistory(deviceId, { period, limit }) appends query string', async () => {
     mockHaGet.mockResolvedValueOnce(mockHistory);
-    await getHistory('bf123', { period: '7d', page: '2' });
+    await getHistory('bf123', { period: '7d', limit: '50' });
     expect(mockHaGet).toHaveBeenCalledWith(
-      '/api/v1/tuya/plugs/bf123/history?period=7d&page=2'
+      '/api/v1/tuya/plugs/bf123/history?period=7d&limit=50'
     );
   });
 

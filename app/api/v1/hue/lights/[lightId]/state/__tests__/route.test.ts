@@ -75,13 +75,4 @@ describe('PUT /api/v1/hue/lights/[lightId]/state', () => {
     expect(data.data_confirmed).toBe(true);
     expect(mockSetLightState).toHaveBeenCalledWith('1', { on: true, brightness: 200 });
   });
-
-  it('maps bri/ct/sat from older bundles to the backend names (T6)', async () => {
-    mockSetLightState.mockResolvedValue(mockProxyResponse);
-
-    const response = await PUT(jsonRequest({ bri: 120, ct: 300, sat: 90 }), routeContext({ lightId: '1' }));
-
-    expect(response.status).toBe(202);
-    expect(mockSetLightState).toHaveBeenCalledWith('1', { brightness: 120, color_temp: 300, saturation: 90 });
-  });
 });

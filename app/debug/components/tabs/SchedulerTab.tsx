@@ -43,7 +43,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
   }, []);
 
   const fetchAllGetEndpoints = useCallback(() => {
-    fetchGetEndpoint('notificationStats', '/api/notifications/stats');
+    fetchGetEndpoint('pushHistory', '/api/v1/notifications/history?limit=20');
   }, [fetchGetEndpoint]);
 
   // Initial fetch
@@ -75,14 +75,14 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
         </Heading>
         <div className="space-y-3">
           <EndpointCard
-            name="Notification Stats"
-            url="/api/notifications/stats"
-            response={getResponses.notificationStats}
-            loading={loadingGet.notificationStats ?? false}
-            timing={timings.notificationStats}
-            onRefresh={() => fetchGetEndpoint('notificationStats', '/api/notifications/stats')}
-            onCopyUrl={() => copyUrlToClipboard('/api/notifications/stats')}
-            isCopied={copiedUrl === '/api/notifications/stats'}
+            name="Push History"
+            url="/api/v1/notifications/history?limit=20"
+            response={getResponses.pushHistory}
+            loading={loadingGet.pushHistory ?? false}
+            timing={timings.pushHistory}
+            onRefresh={() => fetchGetEndpoint('pushHistory', '/api/v1/notifications/history?limit=20')}
+            onCopyUrl={() => copyUrlToClipboard('/api/v1/notifications/history?limit=20')}
+            isCopied={copiedUrl === '/api/v1/notifications/history?limit=20'}
           />
 
         </div>

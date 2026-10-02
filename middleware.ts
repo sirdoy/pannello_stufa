@@ -9,8 +9,17 @@ import {
 } from '@/lib/auth/sessionCookie';
 import { SessionApiError, refreshSession } from '@/lib/auth/backendSession';
 
-/** Reachable without a session: the login page, its API, logout and the profile probe. */
-const PUBLIC_PATHS = ['/auth/login', '/auth/logout', '/auth/profile', '/api/auth/session'];
+/**
+ * Reachable without a session: the login page, its API, logout, the profile probe and the
+ * push subscription renewal the service worker sends while logged out (ROADMAP M48).
+ */
+const PUBLIC_PATHS = [
+  '/auth/login',
+  '/auth/logout',
+  '/auth/profile',
+  '/api/auth/session',
+  '/api/v1/notifications/subscriptions/rotate',
+];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -81,6 +90,6 @@ export const config = {
     // Exclude: public API routes (api/internal: Pi webhooks, Bearer secret) and static files (incl. Serwist PWA assets in public/:
     // swe-worker-*/workbox-*/fallback-* scripts, splash images). Not a blanket
     // "has an extension" rule: authenticated API routes like camera HLS end in .m3u8/.ts.
-    "/((?!api/internal|api/stove|api/admin|offline|_next|favicon.ico|icons|splash|manifest.json|sw.js|firebase-messaging-sw.js|swe-worker-|workbox-|fallback-).*)",
+    "/((?!api/internal|api/stove|api/admin|offline|_next|favicon.ico|icons|splash|manifest.json|sw.js|swe-worker-|workbox-|fallback-).*)",
   ],
 };

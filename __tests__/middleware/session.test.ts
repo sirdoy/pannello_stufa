@@ -64,10 +64,24 @@ describe('middleware session gate', () => {
   });
 
   it('lets public auth paths through without a session', async () => {
-    for (const path of ['/auth/login', '/auth/logout', '/auth/profile', '/api/auth/session']) {
+    const paths = [
+      '/auth/login',
+      '/auth/logout',
+      '/auth/profile',
+      '/api/auth/session',
+      // service worker renewing a push subscription while logged out (ROADMAP M48)
+      '/api/v1/notifications/subscriptions/rotate',
+    ];
+    for (const path of paths) {
       const res = await middleware(await request(path));
       expect(res.headers.get('location')).toBeNull();
       expect(res.status).toBe(200);
+    }
+  });
+
+  it('keeps the other notification routes behind the session', async () => {
+    for (const path of ['/api/v1/notifications/subscriptions', '/api/v1/notifications/test']) {
+      expect((await middleware(await request(path))).status).toBe(401);
     }
   });
 

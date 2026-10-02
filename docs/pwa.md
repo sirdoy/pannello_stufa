@@ -4,7 +4,8 @@ Documentazione per le funzionalita PWA dell'applicazione Pannello Stufa.
 
 ## Overview
 
-L'applicazione utilizza **Serwist v9** per il supporto PWA, sostituendo la precedente implementazione con `@ducanh2912/next-pwa`. Questa migrazione offre:
+L'applicazione utilizza **Serwist v9** per il supporto PWA, sostituendo la precedente implementazione con
+`@ducanh2912/next-pwa`. Questa migrazione offre:
 
 - Migliore supporto iOS Safari
 - Service Worker in TypeScript
@@ -15,7 +16,7 @@ L'applicazione utilizza **Serwist v9** per il supporto PWA, sostituendo la prece
 
 ### File Principali
 
-```
+```text
 /
 ├── app/
 │   ├── sw.ts                        # Service Worker (TypeScript)
@@ -26,7 +27,6 @@ L'applicazione utilizza **Serwist v9** per il supporto PWA, sostituendo la prece
 │       └── usePWAInstall.js         # Hook per installazione PWA
 ├── public/
 │   ├── manifest.json                # Web App Manifest
-│   ├── firebase-messaging-sw.js     # FCM Service Worker (separato)
 │   ├── icons/                       # Icone app
 │   └── splash/                      # Splash screens iOS (da generare)
 ├── next.config.mjs                  # Configurazione Serwist
@@ -38,6 +38,7 @@ L'applicazione utilizza **Serwist v9** per il supporto PWA, sostituendo la prece
 Il service worker gestisce:
 
 ### 1. Precaching
+
 Assets statici vengono pre-cachati durante l'installazione.
 
 ### 2. Runtime Caching
@@ -50,29 +51,39 @@ Assets statici vengono pre-cachati durante l'installazione.
 | JS/CSS | StaleWhileRevalidate | static-resources | 1 giorno |
 
 ### 3. Push Notifications
-Gestione notifiche Firebase Cloud Messaging in background:
+
+Web Push inviate dal Pi (M48), anche ad app chiusa:
+
 - Ricezione push (`push` event)
 - Click su notifica (`notificationclick` event)
 - Navigazione all'URL specifico
+- Rinnovo iscrizione (`pushsubscriptionchange` event)
 
 ### 4. Offline Fallback
+
 Pagina `/offline` mostrata quando non c'e connessione.
 
 ### 5. Background Sync (v1.61.0+)
+
 Sincronizzazione automatica comandi offline:
+
 - Accoda comandi stufa quando offline (accensione, spegnimento, potenza)
 - Esegue automaticamente al ritorno della connessione
 - Retry con backoff esponenziale (max 3 tentativi)
 - Notifica client quando comando completato
 
 ### 6. App Badges (v1.61.0+)
+
 Contatore notifiche su icona app:
+
 - Incrementa su ogni push notification
 - Mostra count errori + alert manutenzione
 - Clear automatico quando app viene aperta
 
 ### 7. Device State Cache (v1.61.0+)
+
 Cache automatica stato dispositivi in IndexedDB:
+
 - Intercetta risposte API `/api/stove/status` e `/api/netatmo/status`
 - Salva stato con timestamp per visualizzazione offline
 - Indicatore "dati non recenti" dopo 30 minuti
@@ -117,6 +128,7 @@ Configurazione con purpose separati per compatibilita cross-platform:
 Genera tutti i `<link rel="apple-touch-startup-image">` necessari per iOS.
 
 Dispositivi supportati:
+
 - iPhone 15 Pro Max / 14 Pro Max
 - iPhone 15 Pro / 14 Pro
 - iPhone 15 / 14 / 13 / 12
@@ -141,7 +153,7 @@ Oppure manualmente creare immagini con le dimensioni specificate in `AppleSplash
 
 ### Formato File
 
-```
+```text
 /public/splash/
 ├── splash-1290x2796.png    # iPhone 15 Pro Max
 ├── splash-1179x2556.png    # iPhone 15 Pro
@@ -200,26 +212,9 @@ function InstallBanner() {
 
 ## Push Notifications
 
-### Setup
-
-Le notifiche push usano Firebase Cloud Messaging (FCM).
-
-1. **Service Worker**: `app/sw.ts` gestisce push in background
-2. **FCM SW**: `public/firebase-messaging-sw.js` per compatibilita legacy
-
-### Flusso
-
-1. Client richiede permesso notifiche
-2. Client ottiene FCM token
-3. Token salvato su Firebase Database
-4. Server invia push tramite Firebase Admin SDK
-5. Service Worker riceve e mostra notifica
-
-### Configurazione iOS
-
-Per iOS Safari, le notifiche funzionano SOLO se:
-- App installata come PWA
-- iOS 16.4+ (supporto Web Push)
+Web Push standard (VAPID) inviate dal Pi (ROADMAP M48), dettagli in
+[systems/notifications.md](systems/notifications.md). Un solo service worker: `app/sw.ts` (Serwist, `/sw.js`)
+gestisce `push`, `notificationclick` e `pushsubscriptionchange`.
 
 ## Configurazione Next.js
 
@@ -268,6 +263,7 @@ Configurazione necessaria per TypeScript service worker:
 ### Lighthouse
 
 Esegui audit Lighthouse per verificare score PWA:
+
 - Chrome DevTools > Lighthouse > Progressive Web App
 
 ### iOS Testing
@@ -313,7 +309,7 @@ Permette di accodare comandi stufa quando offline ed eseguirli automaticamente a
 - `lib/hooks/useBackgroundSync.js` - React hook per UI
 - `app/sw.ts` - Handlers nel Service Worker
 
-### Utilizzo
+### Utilizzo — Background Sync
 
 ```javascript
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
@@ -360,7 +356,7 @@ function StoveControls() {
 
 Monitora lo stato della connessione con eventi real-time.
 
-### Utilizzo
+### Utilizzo — useOnlineStatus Hook
 
 ```javascript
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
@@ -380,7 +376,7 @@ function ConnectionStatus() {
 }
 ```
 
-### Valori Restituiti
+### Valori Restituiti — useOnlineStatus Hook
 
 | Campo | Tipo | Descrizione |
 |-------|------|-------------|
@@ -394,7 +390,7 @@ function ConnectionStatus() {
 
 Banner persistente per mostrare stato connessione.
 
-### Utilizzo
+### Utilizzo — OfflineBanner Component
 
 ```javascript
 import { OfflineBanner } from '@/app/components/ui';
@@ -429,6 +425,7 @@ La pagina `/offline` mostra stato cached dei dispositivi invece di un messaggio 
 ### Cache Automatica
 
 Il Service Worker intercetta le risposte API e salva automaticamente:
+
 - `/api/stove/status` → IndexedDB `deviceState.stove`
 - `/api/netatmo/status` → IndexedDB `deviceState.thermostat`
 
@@ -460,7 +457,7 @@ const commands = await getAll(STORES.COMMAND_QUEUE);
 
 Mantiene lo schermo acceso durante il monitoraggio attivo della stufa.
 
-### Utilizzo
+### Utilizzo — Screen Wake Lock
 
 ```javascript
 import { useWakeLock } from '@/lib/hooks/useWakeLock';
@@ -476,7 +473,7 @@ function StoveMonitor() {
 }
 ```
 
-### Browser Support
+### Browser Support — Screen Wake Lock
 
 Chrome, Edge, Safari (iOS 16.4+). Non supportato su Firefox.
 
@@ -484,7 +481,7 @@ Chrome, Edge, Safari (iOS 16.4+). Non supportato su Firefox.
 
 Feedback aptico per notifiche e alert critici.
 
-### Utilizzo
+### Utilizzo — Vibration API
 
 ```javascript
 import { vibrateError, vibrateCritical, vibrateSuccess } from '@/lib/pwa/vibration';
@@ -514,7 +511,7 @@ vibrateSuccess();
 
 Automazione basata sulla posizione per controllo stufa.
 
-### Utilizzo
+### Utilizzo — Geofencing
 
 ```javascript
 import { useGeofencing } from '@/lib/hooks/useGeofencing';
@@ -556,7 +553,7 @@ function GeofenceSettings() {
 
 Richiede storage persistente per evitare che il browser cancelli i dati IndexedDB.
 
-### Utilizzo
+### Utilizzo — Persistent Storage
 
 ```javascript
 import { requestPersistentStorage, getStorageDetails } from '@/lib/pwa/persistentStorage';
@@ -574,7 +571,7 @@ console.log(details);
 
 Controlla lo stato della stufa periodicamente anche con app chiusa (solo Chrome/Edge).
 
-### Utilizzo
+### Utilizzo — Periodic Background Sync
 
 ```javascript
 import { usePeriodicSync } from '@/lib/hooks/usePeriodicSync';
@@ -607,7 +604,7 @@ function PeriodicSyncSettings() {
 
 Condividi stato dispositivi con altri.
 
-### Utilizzo
+### Utilizzo — Web Share API
 
 ```javascript
 import {

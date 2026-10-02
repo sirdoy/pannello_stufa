@@ -6,6 +6,7 @@ import { PageTransitionProvider } from '@/app/context/PageTransitionContext';
 import { ToastProvider } from '@/app/components/ui';
 import { OfflineBanner } from '@/app/components/ui';
 import PWAInitializer from './PWAInitializer';
+import NotificationOptInPrompt from './NotificationOptInPrompt';
 import AxeDevtools from './AxeDevtools';
 import CommandPaletteProvider from './layout/CommandPaletteProvider';
 import InstallPrompt from '@/app/components/pwa/InstallPrompt';
@@ -66,6 +67,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
                 {!onAuthPage && <NewVersionBanner />}
                 <SplashGate>{children}</SplashGate>
                 <InstallPrompt />
+                <NotificationOptInPrompt />
               </CommandPaletteProvider>
             </ToastProvider>
           </PageTransitionProvider>

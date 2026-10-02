@@ -110,45 +110,33 @@ serwist.addEventListeners();
 // ============================================
 
 /**
- * Push event handler for Firebase Cloud Messaging
- * Triggered when a push notification arrives while app is in background
+ * Push event handler (standard Web Push sent by the Pi, ROADMAP M48).
+ * Payload: { title, body, url, tag, priority, event, ts } (../docs/api/notifications.md).
+ * Works whatever the login state: the subscription belongs to the browser, not to the session.
  */
 self.addEventListener('push', (event) => {
   if (!event.data) {
     return;
   }
 
-  let payload;
+  let payload: PushPayloadIn;
   try {
-    payload = event.data.json();
+    payload = event.data.json() as PushPayloadIn;
   } catch {
-    return;
+    payload = { body: event.data.text() };
   }
 
-
-  const notificationTitle = payload.notification?.title || 'Pannello Stufa';
-  const notificationOptions = {
-    body: payload.notification?.body || '',
-    icon: payload.notification?.icon || '/icons/icon-192.png',
-    badge: '/icons/icon-72.png',
-    tag: payload.data?.type || 'default',
-    requireInteraction: payload.data?.priority === 'high',
-    data: {
-      url: payload.data?.url || '/',
-      ...payload.data,
-    },
-    vibrate: payload.data?.priority === 'high' ? [200, 100, 200] : [100],
-    // Include action buttons from FCM payload (Chrome/Edge/Opera only)
-    // iOS Safari ignores this array (no support for notification actions)
-    ...(payload.notification?.actions && {
-      actions: payload.notification.actions,
-    }),
-  } as NotificationOptions & { vibrate?: number[]; actions?: Array<{ action: string; title: string; icon?: string }> };
-
+  const notification = buildNotification(payload);
   event.waitUntil(Promise.all([
-    self.registration.showNotification(notificationTitle, notificationOptions),
+    self.registration.showNotification(notification.title, notification.options),
     incrementBadge(),
   ]));
+});
+
+/** Subscription renewed or expired by the browser: register the new one (no session needed). */
+self.addEventListener('pushsubscriptionchange', (event) => {
+  const change = event as PushSubscriptionChangeEventLike;
+  change.waitUntil(renewSubscription(change.oldSubscription ?? null, change.newSubscription ?? null));
 });
 
 /**
@@ -325,6 +313,83 @@ self.addEventListener('notificationclick', (event) => {
  */
 self.addEventListener('notificationclose', (_event) => {
 });
+
+// ============================================
+// Web Push helpers (ROADMAP M48)
+// ============================================
+
+/** Pi payload, plus the legacy FCM shape ({ notification, data }) still queued on push services. */
+interface PushPayloadIn {
+  title?: string;
+  body?: string;
+  url?: string;
+  tag?: string;
+  priority?: string;
+  event?: string;
+  notification?: { title?: string; body?: string; icon?: string };
+  data?: Record<string, string>;
+}
+
+interface PushSubscriptionChangeEventLike extends ExtendableEvent {
+  readonly oldSubscription?: PushSubscription | null;
+  readonly newSubscription?: PushSubscription | null;
+}
+
+function buildNotification(payload: PushPayloadIn): {
+  title: string;
+  options: NotificationOptions & { vibrate?: number[] };
+} {
+  const priority = payload.priority ?? payload.data?.priority;
+  const url = payload.url ?? payload.data?.url ?? '/';
+  return {
+    title: payload.title ?? payload.notification?.title ?? 'Pannello Stufa',
+    options: {
+      body: payload.body ?? payload.notification?.body ?? '',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-72.png',
+      tag: payload.tag ?? payload.data?.type ?? 'default',
+      requireInteraction: priority === 'high',
+      data: { url, event: payload.event ?? payload.data?.type ?? 'unknown' },
+      vibrate: priority === 'high' ? [200, 100, 200] : [100],
+    },
+  };
+}
+
+// Written by lib/push/pushClient.ts after each registration
+const PUSH_META_CACHE = 'push-meta';
+const PUSH_META_URL = '/__push-meta/endpoint';
+
+async function storedEndpoint(): Promise<string | null> {
+  try {
+    const res = await (await caches.open(PUSH_META_CACHE)).match(PUSH_META_URL);
+    return res ? await res.text() : null;
+  } catch {
+    return null;
+  }
+}
+
+async function renewSubscription(
+  oldSub: PushSubscription | null,
+  newSub: PushSubscription | null
+): Promise<void> {
+  const oldEndpoint = oldSub?.endpoint ?? (await storedEndpoint());
+  if (!oldEndpoint) return; // the page re-registers at the next app start (syncPush)
+  let sub = newSub;
+  if (!sub) {
+    const key = oldSub?.options.applicationServerKey;
+    if (!key) return;
+    sub = await self.registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
+  }
+  const json = sub.toJSON();
+  const res = await fetch('/api/v1/notifications/subscriptions/rotate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ old_endpoint: oldEndpoint, subscription: { endpoint: json.endpoint, keys: json.keys } }),
+  });
+  if (res.ok && json.endpoint) {
+    await (await caches.open(PUSH_META_CACHE)).put(PUSH_META_URL, new Response(json.endpoint));
+  }
+}
 
 // ============================================
 // Notification Action Constants

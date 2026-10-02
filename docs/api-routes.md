@@ -62,8 +62,8 @@ Multi-schedule CRUD con selezione attiva singola.
 
 Scheduler, manutenzione e notifiche della stufa girano sul Pi (ROADMAP D2); il vecchio cron esterno
 `/api/scheduler/check` è stato rimosso (ROADMAP V12). I suoi compiti residui: calibrazione valvole sul Pi (V9),
-meteo aggiornato alla lettura in `/api/weather/forecast` (V10), pulizia token FCM dopo eventi stufa e
-registrazione token (V11).
+meteo aggiornato alla lettura in `/api/weather/forecast` (V10). Le push le manda il Pi (Web Push, M48):
+route proxy `app/api/v1/notifications/**`, vedi [systems/notifications.md](systems/notifications.md).
 
 ---
 

@@ -38,7 +38,7 @@ Indice documentazione Pannello Stufa. **Ottimizzato per token efficiency**.
 | [systems/maintenance.md](systems/maintenance.md) | Tracking ore H24 |
 | [systems/monitoring.md](systems/monitoring.md) | Battito del motore stufa sul Pi |
 | [systems/errors.md](systems/errors.md) | Error detection |
-| [systems/notifications.md](systems/notifications.md) | FCM push |
+| [systems/notifications.md](systems/notifications.md) | Web Push dal Pi (M48) |
 
 ## External Integrations
 

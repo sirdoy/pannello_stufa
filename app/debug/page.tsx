@@ -39,24 +39,16 @@ import NetworkTab from '@/app/debug/components/tabs/NetworkTab';
 import FritzboxServiceDiscoveryTab from '@/app/debug/components/tabs/FritzboxServiceDiscoveryTab';
 
 // ============================================================================
-// NOTIFICHE CONTENT - Notifications Dashboard
+// NOTIFICHE CONTENT - Web Push sent by the Pi (ROADMAP M48)
 // ============================================================================
-interface NotificationStats {
-  notifications: {
-    total: number;
-    deliveryRate: number;
-    sent: number;
-    failed: number;
-  };
-  devices: {
-    active: number;
-    total: number;
-    stale: number;
-  };
+interface PushStats {
+  devices: number;
+  failingDevices: number;
+  sent90d: number;
 }
 
 function NotificheContent() {
-  const [stats, setStats] = useState<NotificationStats | null>(null);
+  const [stats, setStats] = useState<PushStats | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,10 +56,18 @@ function NotificheContent() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/notifications/stats');
-      if (!res.ok) throw new Error('Failed to fetch stats');
-      const data = await res.json();
-      if (data.success) setStats(data.stats);
+      const [subsRes, historyRes] = await Promise.all([
+        fetch('/api/v1/notifications/subscriptions'),
+        fetch('/api/v1/notifications/history?limit=1'),
+      ]);
+      if (!subsRes.ok || !historyRes.ok) throw new Error('Failed to fetch push stats');
+      const subs = (await subsRes.json()) as { items: Array<{ failure_count: number }> };
+      const history = (await historyRes.json()) as { total_count: number };
+      setStats({
+        devices: subs.items.length,
+        failingDevices: subs.items.filter((d) => d.failure_count > 0).length,
+        sent90d: history.total_count,
+      });
     } catch (err) {
       console.error('Error fetching stats:', err);
       setError(err instanceof Error ? err.message : 'Unknown error');
@@ -80,17 +80,11 @@ function NotificheContent() {
     fetchStats();
   }, []);
 
-  const getDeliveryRateColor = (rate: number): 'sage' | 'warning' | 'ember' => {
-    if (rate >= 85) return 'sage';
-    if (rate >= 70) return 'warning';
-    return 'ember';
-  };
-
   return (
     <div className="mt-6 space-y-6">
       <div className="flex items-center justify-between">
         <Text variant="tertiary" size="sm">
-          Monitor delivery rate e system health
+          Web Push inviate dal Pi
         </Text>
         <Button variant="outline" onClick={fetchStats} disabled={loading}>
           {loading ? '⏳' : '🔄'} Refresh
@@ -104,48 +98,31 @@ function NotificheContent() {
       {stats && !loading && (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <Card className="border-2 border-ocean-200 bg-ocean-50 p-6">
-            <Text variant="tertiary" size="xs" className="mb-2">Notifiche Oggi</Text>
+            <Text variant="tertiary" size="xs" className="mb-2">Notifiche (90 giorni)</Text>
             <Text variant="tertiary" className="text-4xl">
-              {stats.notifications.total}
-            </Text>
-          </Card>
-
-          <Card className={`p-6 ${
-            getDeliveryRateColor(stats.notifications.deliveryRate) === 'sage'
-              ? 'border-2 border-sage-300 bg-sage-50'
-              : getDeliveryRateColor(stats.notifications.deliveryRate) === 'warning'
-              ? 'border-2 border-warning-300 bg-warning-50'
-              : 'border-2 border-ember-300 bg-ember-50'
-          }`}>
-            <Text variant="tertiary" size="xs" className="mb-2">Delivery Rate</Text>
-            <Text
-              as="p"
-              variant={getDeliveryRateColor(stats.notifications.deliveryRate)}
-             
-              className="text-4xl"
-            >
-              {stats.notifications.deliveryRate.toFixed(1)}%
+              {stats.sent90d}
             </Text>
           </Card>
 
           <Card className="border-2 border-slate-200 bg-slate-50 p-6">
-            <Text variant="tertiary" size="xs" className="mb-2">Device Attivi</Text>
+            <Text variant="tertiary" size="xs" className="mb-2">Dispositivi registrati</Text>
             <Text as="p" className="text-4xl">
-              {stats.devices.active}
+              {stats.devices}
             </Text>
-            <Text variant="secondary" size="xs" className="mt-2">
-              {stats.devices.total} totali
+          </Card>
+
+          <Card className="border-2 border-slate-200 bg-slate-50 p-6">
+            <Text variant="tertiary" size="xs" className="mb-2">Dispositivi con errori</Text>
+            <Text as="p" variant={stats.failingDevices > 0 ? 'ember' : 'sage'} className="text-4xl">
+              {stats.failingDevices}
             </Text>
           </Card>
         </div>
       )}
 
       <div className="flex gap-3">
-        <Button variant="ember" onClick={() => window.location.href = '/debug/notifications'}>
-          📊 Dashboard Completa
-        </Button>
-        <Button variant="outline" onClick={() => window.location.href = '/debug/notifications/test'}>
-          📤 Invia Test
+        <Button variant="ember" onClick={() => window.location.href = '/settings/notifications'}>
+          🔔 Impostazioni notifiche
         </Button>
       </div>
     </div>

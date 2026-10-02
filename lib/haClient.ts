@@ -308,6 +308,22 @@ export async function haPost<T>(
 }
 
 /**
+ * POST to an endpoint that answers 204 No Content.
+ *
+ * @param endpoint - Path relative to HA_API_URL
+ * @param body     - Request body; serialized as JSON
+ * @param options  - Optional { timeout } in milliseconds (default 15000)
+ * @throws ApiError on any failure
+ */
+export async function haPostNoContent(
+  endpoint: string,
+  body: Record<string, unknown> | object,
+  options: HaRequestOptions = {}
+): Promise<void> {
+  await haRequest('POST', endpoint, body, options);
+}
+
+/**
  * Generic PUT request to the HA proxy.
  *
  * @param endpoint - Path relative to HA_API_URL (e.g. '/api/v1/hue/lights/1/state')

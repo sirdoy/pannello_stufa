@@ -60,13 +60,18 @@ Nuovo topic WS: aggiornare `Topic` + `TopicDataMap` in `types/websocket.ts` (fon
 
 **Scheduler stufa e manutenzione** stanno sul Pi (ROADMAP D2): `lib/scheduler/*` e `lib/maintenance/maintenanceService.ts`
 chiamano le route `app/api/v1/thermorossi/{schedules,scheduler,maintenance}` (proxy `lib/stove/schedulerProxy.ts`,
-tipi `types/thermorossiScheduler.ts`); il Pi manda le notifiche a `/api/internal/stove-events` (`STOVE_EVENTS_SECRET`).
-Il cron esterno `/api/scheduler/check` non c'è più (ROADMAP V12: calibrazione valvole sul Pi, meteo alla lettura,
-token FCM dopo eventi e registrazioni); il banner della pagina stufa guarda il battito del motore sul Pi
+tipi `types/thermorossiScheduler.ts`). Il cron esterno `/api/scheduler/check` non c'è più (ROADMAP V12: calibrazione
+valvole sul Pi, meteo alla lettura); il banner della pagina stufa guarda il battito del motore sul Pi
 (`SchedulerEngineBanner`).
 
-**Firebase** (RTDB + FCM) resta per: log/errori, preferenze e token FCM utenti, rate limiter, cache. I dati
-live dei device vengono dal backend.
+**Notifiche push** (ROADMAP M48): Web Push standard (VAPID) inviate **dal Pi** a ogni dispositivo iscritto, niente
+FCM. Browser: `lib/push/pushClient.ts` (iscrizione via `/sw.js`, scelta sì/no per dispositivo in `localStorage`),
+domanda al primo avvio `app/components/NotificationOptInPrompt.tsx`, impostazioni `/settings/notifications`, proxy
+`app/api/v1/notifications/**`. Un solo service worker sullo scope `/` (`app/sw.ts`): mai registrarne un secondo, era
+la causa delle push mai arrivate. L'iscrizione non dipende dalla sessione. Dettagli:
+[docs/systems/notifications.md](docs/systems/notifications.md).
+
+**Firebase** (RTDB) resta per: log/errori, rate limiter, cache. I dati live dei device vengono dal backend.
 
 ## Docs
 

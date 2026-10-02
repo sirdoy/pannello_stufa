@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useUser } from '@/lib/auth/useUser';
 import { clearBadge } from '@/lib/pwa/badgeService';
 import { requestPersistentStorage } from '@/lib/pwa/persistentStorage';
-import { onForegroundMessage, initializeNotifications } from '@/lib/notifications/notificationService';
+import { syncPush } from '@/lib/push/pushClient';
 
 /**
  * PWA Initializer Component
@@ -13,84 +13,43 @@ import { onForegroundMessage, initializeNotifications } from '@/lib/notification
  * - Clears app badge when app is opened (user has seen notifications)
  * - Requests persistent storage to prevent data loss
  * - Sets up visibility change listeners
- * - Registers Firebase Messaging service worker
- * - Initializes notification listeners
+ * - Re-registers this device for Web Push when notifications are on (ROADMAP M48)
  *
- * This component renders nothing, it's just for side effects.
+ * The service worker itself is registered by Serwist (`/sw.js`). This component renders nothing.
  */
 export default function PWAInitializer() {
   const { user } = useUser();
 
   useEffect(() => {
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        await clearBadge();
+      }
+    };
+
     const initializePWA = async () => {
       try {
-        // 1. Register Firebase Messaging service worker
-        if ('serviceWorker' in navigator) {
-          try {
-            await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-              scope: '/',
-            });
-          } catch (swError) {
-            console.error('[PWAInitializer] Service Worker registration failed:', swError);
-          }
-        }
-
-        // 2. Clear badge - user is viewing the app
+        // Clear badge - user is viewing the app
         await clearBadge();
-
-        // 3. Request persistent storage (won't prompt user, just requests)
-        const persisted = await requestPersistentStorage();
-        if (persisted) {
-        }
-
-        // 4. Listen for visibility changes to clear badge when app becomes visible
-        const handleVisibilityChange = async () => {
-          if (document.visibilityState === 'visible') {
-            await clearBadge();
-          }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
-        // Cleanup
-        return () => {
-          document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
+        // Request persistent storage (won't prompt user, just requests)
+        await requestPersistentStorage();
       } catch (error) {
         console.error('[PWAInitializer] Error:', error);
       }
     };
 
     initializePWA();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
-  // Initialize notifications for authenticated users
+  // Heal the push subscription (renewed by the browser, or lost on the Pi): needs a session
   useEffect(() => {
     if (!user?.sub) return;
-
-    const initNotifications = async () => {
-      try {
-        // Initialize token management (loads existing token, refreshes if needed)
-        await initializeNotifications(user.sub);
-      } catch (error) {
-        console.error('[PWAInitializer] Error initializing notifications:', error);
-      }
-    };
-
-    initNotifications();
+    void syncPush();
   }, [user?.sub]);
 
-  // Setup foreground message listener
-  useEffect(() => {
-    const unsubscribe = onForegroundMessage((_payload) => {
-      // The notification will be shown automatically by onForegroundMessage
-    });
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, []);
-
-  // Render nothing
   return null;
 }

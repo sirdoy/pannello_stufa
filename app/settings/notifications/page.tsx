@@ -59,15 +59,15 @@ function readDeviceState(): DeviceState {
 const subscribeNoop = () => () => {};
 
 function ThisDeviceSection({ onChanged }: { onChanged: () => void }) {
-  // Browser-only state (permission, localStorage): null on the server and during hydration
+  // Browser-only state (permission, localStorage): nothing on the server and during hydration
   const mounted = useSyncExternalStore(subscribeNoop, () => true, () => false);
-  const [, setVersion] = useState(0);
+  return mounted ? <ThisDeviceCard initial={readDeviceState()} onChanged={onChanged} /> : null;
+}
+
+function ThisDeviceCard({ initial, onChanged }: { initial: DeviceState; onChanged: () => void }) {
+  const [state, setState] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState<Status>(null);
-
-  if (!mounted) return null;
-  const state = readDeviceState();
-  const rerender = () => setVersion((n) => n + 1);
 
   const toggle = async () => {
     setBusy(true);
@@ -79,7 +79,7 @@ function ThisDeviceSection({ onChanged }: { onChanged: () => void }) {
       const result = await enablePush();
       setStatus(result.ok ? { ok: true, text: 'Notifiche attivate' } : { ok: false, text: result.message });
     }
-    rerender();
+    setState(readDeviceState());
     setBusy(false);
     onChanged();
   };

@@ -63,12 +63,17 @@ it('shows this device on, the registered devices and the history', async () => {
   expect(screen.getByTestId('push-history-card')).toHaveTextContent('Notifica di prova');
 });
 
-it('toggle off disables push on this device', async () => {
+it('toggle off disables push on this device and updates the state', async () => {
   await renderPage();
+  mocked.disablePush.mockImplementation(async () => {
+    mocked.getChoice.mockReturnValue('disabled');
+  });
   await act(async () => {
     fireEvent.click(screen.getByRole('switch', { name: 'Disattiva notifiche' }));
   });
   expect(mocked.disablePush).toHaveBeenCalled();
+  expect(screen.getByTestId('push-device-state')).toHaveTextContent('Notifiche disattivate');
+  expect(screen.getByRole('switch', { name: 'Attiva notifiche' })).toBeInTheDocument();
 });
 
 it('toggle on enables push', async () => {

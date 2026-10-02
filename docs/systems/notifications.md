@@ -41,3 +41,15 @@ Browser ──/api/v1/notifications/** (route Next, sessione)──> Pi /api/v1/
 - **iOS**: push solo dalla PWA installata nella schermata Home (iOS 16.4+); da Safari la pagina spiega come
   installarla.
 - In sviluppo (`npm run dev`) Serwist è disattivato: niente `/sw.js`, niente push in locale.
+
+## Verifica end-to-end (Playwright)
+
+- Chromium e Google Chrome lanciati da Playwright (headless o no) non hanno un push service:
+  `pushManager.subscribe()` fallisce con `Registration failed - permission denied` anche con il permesso concesso.
+- Firefox funziona con il push service Mozilla riattivato:
+  `firefox.launch({ firefoxUserPrefs: { 'dom.push.enabled': true, 'dom.push.serverURL':
+  'wss://push.services.mozilla.com/', 'dom.push.connection.enabled': true,
+  'permissions.default.desktop-notification': 1 } })` (browser: `npx playwright install firefox`).
+- La consegna si verifica dal service worker: dopo "Invia notifica di prova",
+  `(await navigator.serviceWorker.getRegistration('/')).getNotifications()` restituisce la notifica mostrata.
+- A fine verifica disattivare le notifiche sul browser di test, così sul Pi non restano iscrizioni orfane.

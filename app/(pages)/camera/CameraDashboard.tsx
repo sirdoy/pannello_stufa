@@ -89,9 +89,12 @@ export default function CameraDashboard() {
 
       // Build snapshot URLs — the API route redirects to the Netatmo CDN snapshot URL.
       // Append a timestamp when bustCache=true (explicit refresh) to bypass browser cache.
+      // Only cameras with status "on": the backend answers 503 for any other status
+      // (e.g. "disconnected"), so skip the request like CameraCard does (ROADMAP M56).
       const cacheParam = bustCache ? `?t=${Date.now()}` : '';
       const urls: Record<string, string> = {};
       for (const camera of statusData.cameras ?? []) {
+        if (camera.status !== 'on') continue;
         urls[camera.camera_id] = CAMERA_ROUTES.snapshot(camera.camera_id) + cacheParam;
       }
       setSnapshotUrls(urls);

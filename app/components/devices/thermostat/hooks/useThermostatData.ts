@@ -8,6 +8,7 @@ import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import { adaptNetatmoWsPayload } from '@/lib/netatmo/netatmoWsAdapter';
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 import { NETATMO_ROUTES } from '@/lib/routes';
+import { isFetchInterrupted } from '@/lib/utils/fetchInterruption';
 
 export interface NetatmoTopology {
   home_id: string;
@@ -156,6 +157,8 @@ export function useThermostatData(): UseThermostatDataReturn {
         setConnected(false);
       }
     } catch (err: unknown) {
+      // ROADMAP M55: a navigation cancels in-flight fetches ("Failed to fetch")
+      if (isFetchInterrupted(err)) return;
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore connessione termostato:', err);
       // Retry on network errors
@@ -255,6 +258,7 @@ export function useThermostatData(): UseThermostatDataReturn {
       } as unknown as NetatmoStatus);
       setLastUpdatedAt(Date.now());
     } catch (err: unknown) {
+      if (isFetchInterrupted(err)) return;
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore fetch status termostato:', err);
       // Retry on network errors (but not rate limit)

@@ -30,6 +30,9 @@ export function trackPageUnload(): void {
   window.addEventListener('pageshow', clearUnloading);
 }
 
+// Listen from module load: the cancel happens right at navigation time
+trackPageUnload();
+
 export function isPageUnloading(): boolean {
   return unloadingSince !== null && Date.now() - unloadingSince < UNLOAD_WINDOW_MS;
 }

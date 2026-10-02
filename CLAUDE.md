@@ -98,6 +98,10 @@ export const dynamic = 'force-dynamic';
 
 // UI: Variants only
 <Heading variant="ember">Title</Heading>
+
+// Client fetch catch: a navigation cancels in-flight requests with
+// "TypeError: Failed to fetch" (not AbortError) → skip logging (ROADMAP M55)
+} catch (err) { if (isFetchInterrupted(err)) return; console.error(...); }  // lib/utils/fetchInterruption.ts
 ```
 
 ## Concepts

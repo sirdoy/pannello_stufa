@@ -32,7 +32,7 @@ import type { StoveState, ThermorossiStatusResponse } from '@/types/thermorossiP
 import type { StalenessInfo } from '@/lib/pwa/stalenessDetector';
 import type { FormattedCommand } from '@/lib/pwa/backgroundSync';
 import { WS_SNAPSHOT_GRACE_MS } from '@/lib/ws/snapshotGrace';
-import { isFetchInterrupted, trackPageUnload } from '@/lib/utils/fetchInterruption';
+import { isFetchInterrupted } from '@/lib/utils/fetchInterruption';
 
 /**
  * Parameters required by useStoveData
@@ -187,8 +187,6 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
       console.error('Errore stato manutenzione:', err);
     }
   };
-
-  useEffect(() => { trackPageUnload(); }, []);
 
   // Refs to avoid stale closures in WS useEffect (per Research pitfall 2)
   const fetchSchedulerModeRef = useRef(fetchSchedulerMode);

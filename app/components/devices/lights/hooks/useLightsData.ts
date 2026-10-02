@@ -24,6 +24,7 @@ import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
 import { adaptWsLights, adaptWsGroups } from '@/lib/hue/hueWsAdapter';
 import { WS_SNAPSHOT_GRACE_MS } from '@/lib/ws/snapshotGrace';
+import { isFetchInterrupted } from '@/lib/utils/fetchInterruption';
 
 /**
  * Adaptive classes for UI based on background contrast
@@ -148,6 +149,8 @@ export function useLightsData(): UseLightsDataReturn {
       setConnected(health.data_freshness !== 'UNREACHABLE');
       setStale(health.data_freshness === 'STALE');
     } catch (err: unknown) {
+      // ROADMAP M55: a navigation cancels in-flight fetches ("Failed to fetch")
+      if (isFetchInterrupted(err)) return;
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore connessione Hue:', err);
       setConnected(false);
@@ -243,6 +246,7 @@ export function useLightsData(): UseLightsDataReturn {
       setScenes(scenesData.scenes ?? []);
       setLastUpdatedAt(Date.now());
     } catch (err: unknown) {
+      if (isFetchInterrupted(err)) return;
       const message = err instanceof Error ? err.message : String(err);
       console.error('Errore fetch dati Hue:', err);
       setError(message);

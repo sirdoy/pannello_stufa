@@ -42,7 +42,6 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
 NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
 NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://your-project.firebaseio.com
-NEXT_PUBLIC_FIREBASE_VAPID_KEY=your-vapid-key
 
 # Firebase Admin (Server SDK)
 FIREBASE_ADMIN_PROJECT_ID=your-project-id
@@ -56,9 +55,6 @@ SESSION_SECRET=use-openssl-rand-hex-32-to-generate
 THERMOROSSI_API_URL=https://api.thermorossi.com
 THERMOROSSI_USERNAME=your-username
 THERMOROSSI_PASSWORD=your-password
-
-# Admin
-ADMIN_USER_ID=user:your-user-id
 ```
 
 ### 4. Firebase Setup

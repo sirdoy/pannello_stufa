@@ -29,15 +29,6 @@ SESSION_SECRET=... # >= 32 caratteri, openssl rand -hex 32
 # HA Proxy (Fritz!Box + Netatmo via HomeAssistant)
 HA_API_URL=http://your-homeassistant-host:port
 HA_API_KEY=your-ha-api-key
-
-# Secrets
-ADMIN_SECRET=your-admin-secret  # /api/notifications/send|trigger
-```
-
-**Genera ADMIN_SECRET:**
-
-```bash
-openssl rand -hex 32
 ```
 
 ### 2. Deploy App

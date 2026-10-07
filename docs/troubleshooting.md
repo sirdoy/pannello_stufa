@@ -109,7 +109,7 @@ useEffect(() => {
 | iOS Version | 16.4+ |
 | PWA | Deve essere installata (Safari → Add to Home Screen) |
 | Permissions | Settings → App → Notifications → Allow |
-| FCM Token | `users/{userId}/fcmTokens` con `platform: 'ios'` |
+| Iscrizione | Dispositivo elencato in Impostazioni → Notifiche (iscrizioni sul Pi, M48) |
 
 ### Android/Desktop Non Riceve
 

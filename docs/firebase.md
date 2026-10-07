@@ -42,8 +42,8 @@ firebase-root/
 ├── errors/{errorId}/          # errorCode, severity, resolved, timestamp
 ├── changelog/{version}/       # legacy, non più usato (M36)
 ├── users/{userId}/
-│   ├── fcmTokens/             # FCM tokens per device
-│   └── notificationPreferences/
+│   ├── deviceConfig/          # dispositivi visibili e ordine
+│   └── dashboardPreferences/  # push: iscrizioni sul Pi, non qui (M48)
 ├── devicePreferences/{userId}/ # stove, thermostat, lights, sonos
 ├── netatmo/                   # refresh_token, home_id, topology, etc.
 └── hue/                       # refresh_token, username, bridge_ip
@@ -148,8 +148,6 @@ await runTransaction(ref(db, 'maintenance'), (current) => {
 |------|-------------|
 | `netatmo/refresh_token` | CRITICA |
 | `hue/refresh_token, username, clientkey` | CRITICA |
-| `users/{userId}/fcmTokens` | ALTA |
-| `users/{userId}/notificationPreferences` | MEDIA |
 | `devicePreferences/{userId}` | MEDIA |
 
 **Note**: `dev/*` namespace mirrors production structure with same read/write rules

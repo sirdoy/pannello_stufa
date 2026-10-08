@@ -113,6 +113,22 @@ export function NetatmoSetRoomTempForm({ action, onChange }: FormProps<NetatmoSe
         onChange={(v) => onChange({ ...action, temp: v })}
         aria-label="Temperatura"
       />
+      {action.mode === 'manual' && (
+        <>
+          <div style={{ height: 8 }} />
+          <FieldLabel htmlFor="action-duration">Durata (vuoto = predefinita Netatmo)</FieldLabel>
+          <NumInput
+            id="action-duration"
+            value={action.duration_minutes ?? null}
+            allowNull
+            min={1}
+            max={1440}
+            unit="min"
+            onChange={(v) => onChange({ ...action, duration_minutes: v })}
+            aria-label="Durata"
+          />
+        </>
+      )}
     </>
   );
 }

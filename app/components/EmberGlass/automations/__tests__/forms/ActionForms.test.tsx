@@ -59,6 +59,14 @@ describe('NetatmoSetRoomTempForm', () => {
     expect(screen.getByRole('radiogroup', { name: /Modalità/i })).toBeInTheDocument();
     expect(screen.getByLabelText('Temperatura')).toBeInTheDocument();
   });
+
+  it('shows the duration field only in manual mode', () => {
+    const manual = { type: 'netatmo_set_room_temp' as const, home_id: 'h', room_id: 'r', mode: 'manual' as const, temp: 7, duration_minutes: 720 };
+    const { rerender } = render(<NetatmoSetRoomTempForm action={manual} onChange={jest.fn()} />);
+    expect(screen.getByLabelText('Durata')).toHaveValue(720);
+    rerender(<NetatmoSetRoomTempForm action={{ ...manual, mode: 'home' }} onChange={jest.fn()} />);
+    expect(screen.queryByLabelText('Durata')).not.toBeInTheDocument();
+  });
 });
 
 // ─── 2. NetatmoSetHomeModeForm ───────────────────────────────────────────────

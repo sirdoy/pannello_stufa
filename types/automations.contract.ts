@@ -114,7 +114,8 @@ export interface NetatmoSetRoomTempAction {
   home_id: string;
   room_id: string;
   mode: 'manual' | 'home';
-  temp?: number | null; // 5.0..30.0
+  temp?: number | null; // 5.0..30.0, required when mode is 'manual'
+  duration_minutes?: number | null; // 1..1440, manual only; null = Netatmo default duration
 }
 
 // api/automations/models.py — NetatmoSetHomeModeAction (line 146-149)

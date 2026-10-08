@@ -390,8 +390,9 @@ export type AutomationsTriggerSnapshotCause =
   | null;
 
 export interface AutomationsTriggerSnapshotAuto {
-  changed: string[];
+  changed: string[]; // empty on a retry that ran without a sensor delta
   result: boolean;
+  retry?: number; // 1..3, only on a re-run after an edge whose actions all failed
   cause?: Exclude<AutomationsTriggerSnapshotCause, null>;
 }
 

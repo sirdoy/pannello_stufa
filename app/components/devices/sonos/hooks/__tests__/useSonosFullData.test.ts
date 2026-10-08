@@ -448,6 +448,22 @@ describe('useSonosFullData', () => {
     expect(htUrls).toEqual(['/api/v1/sonos/speakers/RINCON_A/home-theater']);
   });
 
+  it('skips EQ for bonded members (sub, surround): the EQ belongs to the soundbar (M62)', async () => {
+    setWsConnected(false);
+    (global.fetch as jest.Mock).mockImplementation(makeFetchMock());
+
+    const { result } = renderHook(() => useSonosFullData());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    const eqUrls = (global.fetch as jest.Mock).mock.calls
+      .map((c) => c[0] as string)
+      .filter((u) => u.endsWith('/eq'));
+    expect(eqUrls.sort()).toEqual([
+      '/api/v1/sonos/speakers/RINCON_A/eq',
+      '/api/v1/sonos/speakers/RINCON_C/eq',
+    ]);
+  });
+
   it('runs an initial REST fetch on mount even when WS is OPEN (populates supplementary fields)', async () => {
     setWsConnected(true);
     (global.fetch as jest.Mock).mockImplementation(makeFetchMock());

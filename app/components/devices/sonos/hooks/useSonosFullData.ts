@@ -257,14 +257,18 @@ export function useSonosFullData(): UseSonosFullDataReturn {
         if (r.status === 'fulfilled') volumes[allUids[i]!] = r.value;
       });
 
-      // 4b. Fetch EQ for ALL speakers and home-theater for soundbars only
+      // 4b. Fetch EQ for speakers with their own EQ (surrounds and Sub are bonded to the
+      // soundbar: backend returns nulls, ROADMAP M62) and home-theater for soundbars only
       // (backend answers 404 "Not a soundbar speaker" for every other role)
+      const eqUids = [...new Set(
+        zones.flatMap(z => z.members.filter(m => m.role !== 'sub' && m.role !== 'surround').map(m => m.uid))
+      )];
       const soundbarUids = [...new Set(
         zones.flatMap(z => z.members.filter(m => m.role === 'soundbar').map(m => m.uid))
       )];
       const [eqResults, htResults] = await Promise.all([
         Promise.allSettled(
-          allUids.map(uid =>
+          eqUids.map(uid =>
             fetch(`/api/v1/sonos/speakers/${uid}/eq`).then(r => {
               if (!r.ok) throw new Error('eq failed');
               return r.json() as Promise<SonosEqResponse>;
@@ -282,7 +286,7 @@ export function useSonosFullData(): UseSonosFullDataReturn {
       ]);
       const eqData: Record<string, SonosEqResponse> = {};
       eqResults.forEach((r, i) => {
-        if (r.status === 'fulfilled') eqData[allUids[i]!] = r.value;
+        if (r.status === 'fulfilled') eqData[eqUids[i]!] = r.value;
       });
       const homeTheaterData: Record<string, SonosHomeTheaterResponse> = {};
       htResults.forEach((r, i) => {

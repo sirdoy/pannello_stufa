@@ -69,8 +69,8 @@ test.describe('SHEET-01 — sheet primitive', () => {
   // scroll restored to 0 instead of 300. The behaviour is verified manually
   // in the live browser (300 → 0 lock → 300 restore round-trip works) and via
   // the unit test for the Sheet useEffect; only this end-to-end runtime path
-  // is environment-flaky. Skip until production-build smokes (no Strict Mode)
-  // are wired in CI.
+  // is environment-flaky. Still flaky on the production build (no Strict Mode):
+  // 1 run out of 10 locks at 0px instead of -300px (2026-10-08, ROADMAP T10).
   test.skip('scroll-lock applied + restored at y=300', async ({ page }) => {
     await page.goto('/debug/design-system-v2');
     await expect(page.getByRole('heading', { level: 1, name: /Ember Glass/i })).toBeVisible({ timeout: 10000 });

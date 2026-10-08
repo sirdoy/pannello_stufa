@@ -118,6 +118,25 @@ npx playwright show-report               # report HTML (non si apre da solo)
   il Pi: run ravvicinati in serie lo rallentano (login dei worker in timeout), lasciare qualche minuto tra un run
   completo e l'altro.
 
+### Diagnosi di un errore di rete in console
+
+Molte smoke falliscono su qualunque `console.error`, e Chromium scrive solo
+`Failed to load resource: the server responded with a status of 429` senza URL. Per sapere quale richiesta è,
+aggiungere temporaneamente un listener nella fixture `context` di `tests/fixtures.ts` e leggere l'output del run
+(solo status e pathname, mai header o corpo):
+
+```ts
+context.on('response', (r) => {
+  if (r.status() >= 400) console.log(`DIAG ${r.status()} ${new URL(r.url()).pathname}`);
+});
+```
+
+Il backend limita solo le route `/auth/*` (slowapi, bucket = digest del Bearer): un `429` nelle smoke viene da lì,
+di solito `/api/ws-token` (60/min per sessione, una chiamata a ogni caricamento di pagina). Da **M63**: i worker
+fanno login nello stesso secondo con lo stesso utente e ricevevano lo stesso JWT, quindi un solo bucket per tutti;
+ora ogni access token ha un `jti` casuale. Conferma sul Pi:
+`journalctl -u homeassistant.service --since '10 min ago' | grep -c '" 429'`.
+
 ### Account di test
 
 Login dal form `/auth/login` con l'account `test` sul Pi (`E2E_TEST_USER_EMAIL` / `E2E_TEST_USER_PASSWORD` in

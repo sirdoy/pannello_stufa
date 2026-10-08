@@ -1,6 +1,7 @@
 import { BatteryLow } from 'lucide-react';
 import type { DirigeraSensor, DirigeraDataFreshness } from '@/types/dirigeraProxy';
 import { formatCo2, isAirSensor } from '@/lib/dirigera/airQuality';
+import { formatLux, motionLabel } from '@/lib/dirigera/motion';
 
 interface DirigeraSensorRowProps {
   sensor: DirigeraSensor;
@@ -16,7 +17,8 @@ const FRESHNESS_COLORS: Record<DirigeraDataFreshness, string> = {
 /**
  * DirigeraSensorRow — Individual sensor row for the /dirigera sensor list.
  *
- * Shows sensor icon, name, room, type-specific state (open/closed or light level),
+ * Shows sensor icon, name, room, type-specific state (open/closed, or motion plus
+ * light level in lux for motion sensors),
  * battery percentage with low-battery warning icon, and optional freshness badge.
  */
 export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSensorRowProps) {
@@ -45,12 +47,15 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
       <span className="text-success-400">Chiuso</span>
     );
   } else if (isMotion) {
-    const lightLevel =
-      'light_level' in sensor &&
-      (sensor as { light_level: number | null }).light_level !== null
-        ? `${(sensor as { light_level: number | null }).light_level} lux`
-        : '—';
-    stateText = <span className="text-slate-300">{lightLevel}</span>;
+    const lux = formatLux(sensor.light_level);
+    stateText = (
+      <>
+        <span className={sensor.is_detected ? 'text-warning-400' : 'text-success-400'}>
+          {motionLabel(sensor)}
+        </span>
+        {lux !== null && <span className="text-slate-300"> · {lux}</span>}
+      </>
+    );
   } else if (isAir) {
     stateText = <span className="text-slate-300">{formatCo2(sensor.co2)}</span>;
   } else {

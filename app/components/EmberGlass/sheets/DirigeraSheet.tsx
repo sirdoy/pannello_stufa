@@ -10,11 +10,12 @@
  *   - Hero: total / active counts + Apri pagina action
  *   - Air quality (ALPSTUGA): CO2, PM2.5, temperature, humidity
  *   - Sensor list grouped by type (contact, motion). Each row: dot, name,
- *     room, battery %, last seen relative time, status badge
+ *     room, battery %, last seen relative time, status badge; motion rows
+ *     also show the light level in lux (same device, M60)
  *   - Low battery panel (≤25%) — quick visible reference
  */
 
-import { TriangleAlert, BatteryWarning, DoorOpen, Activity, Wind } from 'lucide-react';
+import { TriangleAlert, BatteryWarning, DoorOpen, Activity, Sun, Wind } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 import type { DirigeraSensor } from '@/types/dirigeraProxy';
@@ -30,6 +31,7 @@ import {
   isAirSensor,
   pm25Level,
 } from '@/lib/dirigera/airQuality';
+import { formatLux, isMotionSensor, motionLabel } from '@/lib/dirigera/motion';
 
 export interface DirigeraSheetProps {
   sensors: DirigeraSensor[];
@@ -42,13 +44,12 @@ const TONE = '#ffb84a';
 
 function isSensorActive(s: DirigeraSensor): boolean {
   if (s.type === 'openCloseSensor') return s.is_open === true;
-  const detected = (s as { is_detected?: boolean }).is_detected;
-  return detected === true;
+  return s.is_detected === true;
 }
 
 function statusLabel(s: DirigeraSensor): string {
   if (s.type === 'openCloseSensor') return s.is_open ? 'Aperto' : 'Chiuso';
-  return isSensorActive(s) ? 'Movimento' : 'Fermo';
+  return motionLabel(s);
 }
 
 function lastSeenLabel(iso: string | null): string {
@@ -325,6 +326,7 @@ function SensorRow({ sensor }: SensorRowProps) {
   const room = sensor.room ?? '—';
   const seen = lastSeenLabel(sensor.last_seen);
   const isLow = typeof pct === 'number' && pct <= 25;
+  const lux = isMotionSensor(sensor) ? formatLux(sensor.light_level) : null;
   return (
     <SheetRow
       label={sensor.custom_name ?? sensor.id}
@@ -338,6 +340,24 @@ function SensorRow({ sensor }: SensorRowProps) {
           flexShrink: 0,
         }}
       >
+        {lux !== null && (
+          <span
+            data-testid="dirigera-sheet-lux"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              fontSize: 11,
+              color: 'var(--text-1)',
+              fontWeight: 600,
+              fontVariantNumeric: 'tabular-nums',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            <Sun size={12} aria-hidden="true" />
+            {lux}
+          </span>
+        )}
         {typeof pct === 'number' && (
           <span
             style={{

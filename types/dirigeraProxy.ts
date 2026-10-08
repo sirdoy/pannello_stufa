@@ -52,7 +52,7 @@ export interface DirigeraSensor {
   // Type-specific keys — ABSENT (not null) on other sensor types:
   is_open?: boolean;            // only on openCloseSensor
   is_detected?: boolean;        // only on occupancySensor / motionSensor
-  light_level?: number | null;  // motionSensor always; occupancySensor only with a companion lightSensor
+  light_level?: number | null;  // lux (0 = below 1 lux); occupancySensor only with a companion lightSensor
   // Only on environmentSensor (IKEA ALPSTUGA air quality monitor, no battery):
   temperature?: number | null;  // °C
   humidity?: number | null;     // relative humidity %
@@ -86,7 +86,7 @@ export interface ContactSensorsResponse {
 // Source: docs/api/dirigera.md — MotionSensor
 export interface MotionSensor extends DirigeraSensor {
   is_detected: boolean;         // always present on motion sensors
-  light_level?: number | null;  // absent when no companion lightSensor (same relation_id) exists
+  light_level?: number | null;  // lux; absent when no companion lightSensor (same relation_id) exists
   data_freshness: DirigeraDataFreshness;
 }
 
@@ -171,7 +171,7 @@ export interface SensorTelemetryReading {
   id: number;
   sensor_id: string;
   battery_percentage: number | null;
-  light_level: number | null;
+  light_level: number | null;   // lux
   // Air quality columns (environmentSensor only, null elsewhere; absent before backend schema v38)
   temperature?: number | null;
   humidity?: number | null;

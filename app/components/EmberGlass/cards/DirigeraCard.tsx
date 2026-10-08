@@ -23,18 +23,14 @@ import { useCardReady } from '../useCardReady';
 import { useDirigeraFullData } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
 import type { DirigeraSensor } from '@/types/dirigeraProxy';
 import { AIR_LEVEL_COLORS, co2Level, formatCo2, isAirSensor } from '@/lib/dirigera/airQuality';
+import { motionSummary } from '@/lib/dirigera/motion';
 
 const TONE = '#ffb84a';
 
-/**
- * Active = open contact sensor OR detected motion. The proxy types `is_open`
- * for contact + we read `is_detected` defensively (motion sensors include it
- * in payload but it's not on the DirigeraSensor interface).
- */
+/** Active = open contact sensor OR detected motion. */
 function isSensorActive(s: DirigeraSensor): boolean {
   if (s.type === 'openCloseSensor') return s.is_open === true;
-  const detected = (s as { is_detected?: boolean }).is_detected;
-  return detected === true;
+  return s.is_detected === true;
 }
 
 export default function DirigeraCard() {
@@ -123,9 +119,7 @@ export default function DirigeraCard() {
                   ? s.is_open
                     ? 'Aperto'
                     : 'Chiuso'
-                  : isSensorActive(s)
-                    ? 'Movimento'
-                    : 'Fermo'}
+                  : motionSummary(s)}
               </div>
             </div>
           ))}

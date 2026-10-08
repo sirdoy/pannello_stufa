@@ -39,3 +39,28 @@ describe('DirigeraSheet air quality', () => {
     expect(screen.queryByTestId('dirigera-sheet-air')).not.toBeInTheDocument();
   });
 });
+
+describe('DirigeraSheet motion sensors (M60)', () => {
+  const motion = (extra: Partial<DirigeraSensor>): DirigeraSensor => ({
+    ...base, id: 'm', type: 'occupancySensor', custom_name: 'Movimento sala', room: 'Soggiorno',
+    battery_percentage: 86, is_detected: true, ...extra,
+  });
+
+  it('shows motion state and light level on the same row', () => {
+    render(<DirigeraSheet sensors={[motion({ light_level: 22 })]} loading={false} />);
+    expect(screen.getByText('Movimento', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByTestId('dirigera-sheet-lux')).toHaveTextContent('22 lux');
+  });
+
+  it('keeps 0 lux (dark) and hides the reading without a light sensor', () => {
+    const { rerender } = render(<DirigeraSheet sensors={[motion({ light_level: 0 })]} loading={false} />);
+    expect(screen.getByTestId('dirigera-sheet-lux')).toHaveTextContent('0 lux');
+    rerender(<DirigeraSheet sensors={[motion({})]} loading={false} />);
+    expect(screen.queryByTestId('dirigera-sheet-lux')).not.toBeInTheDocument();
+  });
+
+  it('contact sensors never show lux', () => {
+    render(<DirigeraSheet sensors={[SENSORS[0]!]} loading={false} />);
+    expect(screen.queryByTestId('dirigera-sheet-lux')).not.toBeInTheDocument();
+  });
+});

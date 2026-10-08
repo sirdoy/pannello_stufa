@@ -86,6 +86,16 @@ describe('DirigeraCard', () => {
     expect(getByText('1 attivi di 1 sensori')).toBeInTheDocument();
   });
 
+  test('motion sensor shows motion and light level together (M60)', () => {
+    mockSensors([
+      sensor({ id: 'm', type: 'occupancySensor', custom_name: 'Sala', is_detected: false, light_level: 3 }),
+      sensor({ id: 'd', type: 'occupancySensor', custom_name: 'Buio', is_detected: true, light_level: 0 }),
+    ]);
+    const { getByText } = render(<DirigeraCard />);
+    expect(getByText('Fermo · 3 lux')).toBeInTheDocument();
+    expect(getByText('Movimento · 0 lux')).toBeInTheDocument();
+  });
+
   test('all closed shows OK', () => {
     mockSensors([sensor({ is_open: false })]);
     const { getByText } = render(<DirigeraCard />);

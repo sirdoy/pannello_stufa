@@ -23,8 +23,8 @@
  * RC-clean (D-28): no useMemo / useCallback. React Compiler 1.0 auto-memoizes.
  */
 
-import { useState } from 'react';
-import { Flame, Wrench } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { Flame, Fuel, Wrench } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/auth/useUser';
 import { GlassCard } from '../GlassCard';
@@ -39,6 +39,31 @@ import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData'
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
 
 const WARN = '#ffb84a';
+
+// Icon-only: a text badge truncates the "Stufa" label on narrow cards.
+function HeadBadge({ testId, label, children }: { testId: string; label: string; children: ReactNode }) {
+  return (
+    <span
+      data-testid={testId}
+      role="img"
+      aria-label={label}
+      title={label}
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: 20,
+        height: 20,
+        borderRadius: 999,
+        color: WARN,
+        background: 'rgba(255, 184, 74, 0.14)',
+        border: '1px solid rgba(255, 184, 74, 0.35)',
+      }}
+    >
+      {children}
+    </span>
+  );
+}
 
 export default function StoveCard() {
   const [open, setOpen] = useState(false);
@@ -93,27 +118,16 @@ export default function StoveCard() {
           tone={tone}
           right={
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              {/* ROADMAP D11: reserve sensor of the stove, read on the Pi */}
+              {stove.pelletLow && (
+                <HeadBadge testId="stove-pellet-low-badge" label="Pellet in riserva">
+                  <Fuel size={11} strokeWidth={2.4} aria-hidden />
+                </HeadBadge>
+              )}
               {needsCleaning && (
-                // Icon-only: a text badge truncates the "Stufa" label on narrow cards.
-                <span
-                  data-testid="stove-cleaning-badge"
-                  role="img"
-                  aria-label="Pulizia richiesta"
-                  title="Pulizia richiesta"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 20,
-                    height: 20,
-                    borderRadius: 999,
-                    color: WARN,
-                    background: 'rgba(255, 184, 74, 0.14)',
-                    border: '1px solid rgba(255, 184, 74, 0.35)',
-                  }}
-                >
+                <HeadBadge testId="stove-cleaning-badge" label="Pulizia richiesta">
                   <Wrench size={11} strokeWidth={2.4} aria-hidden />
-                </span>
+                </HeadBadge>
               )}
               <StatusDot on={stove.isAccesa} color={dotColor} />
             </span>

@@ -118,6 +118,7 @@ export default function StovePage() {
         <StovePageBanners
           errorCode={stoveData.errorCode}
           errorDescription={stoveData.errorDescription}
+          pelletLow={stoveData.pelletLow}
           needsMaintenance={stoveData.needsMaintenance}
           maintenanceStatus={stoveData.maintenanceStatus}
           cleaningInProgress={stoveData.cleaningInProgress}

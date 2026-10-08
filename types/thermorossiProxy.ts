@@ -42,6 +42,7 @@ export interface ThermorossiStatusResponse {
   last_poll_at: string | null;      // ISO 8601
   error_code: number | null;        // only when stove_state === 'alarm'
   error_description: string | null; // only when stove_state === 'alarm'
+  pellet_low?: boolean | null;      // reserve sensor of the local WiNet module (D11); null when not read
   custom_name?: string | null;      // registry override for device display name
   device_type?: string | null;      // registry device type slug
 }

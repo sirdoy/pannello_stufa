@@ -63,6 +63,8 @@ export interface UseStoveDataReturn {
   // Error state
   errorCode: number;
   errorDescription: string;
+  /** Reserve sensor of the stove reports low pellets (ROADMAP D11). */
+  pelletLow: boolean;
 
   // Maintenance state
   maintenanceStatus: MaintenanceStatus | null;
@@ -130,6 +132,7 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
   const [errorCode, setErrorCode] = useState(0);
   const [errorDescription, setErrorDescription] = useState('');
   const previousErrorCode = useRef(0);
+  const [pelletLow, setPelletLow] = useState(false);
 
   // Maintenance states
   const [maintenanceStatus, setMaintenanceStatus] = useState<MaintenanceStatus | null>(null);
@@ -210,6 +213,7 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
       // Use data_freshness and last_poll_at from WS payload (proxy-shaped)
       setIsStale(data.data_freshness === 'STALE');
       setLastPollAt(data.last_poll_at ? new Date(data.last_poll_at) : new Date());
+      setPelletLow(data.pellet_low === true);
 
       // Error handling — identical logic to HTTP path (per D-02)
       if (data.stove_state === 'alarm') {
@@ -255,6 +259,7 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
       setPowerLevel(power_level);
       setIsStale(data_freshness === 'STALE');
       setLastPollAt(last_poll_at ? new Date(last_poll_at) : null);
+      setPelletLow(json.pellet_low === true);
 
       if (stove_state === 'alarm') {
         const code = error_code ?? 0;
@@ -343,6 +348,7 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
     // Error state
     errorCode,
     errorDescription,
+    pelletLow,
 
     // Maintenance state
     maintenanceStatus,

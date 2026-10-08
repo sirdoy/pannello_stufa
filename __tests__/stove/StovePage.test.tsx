@@ -75,6 +75,7 @@ const createMockStoveData = (overrides: Record<string, unknown> = {}) => ({
   nextScheduledAction: null,
   errorCode: 0,
   errorDescription: '',
+  pelletLow: false,
   maintenanceStatus: null,
   cleaningInProgress: false,
   loadingMessage: '',
@@ -210,6 +211,7 @@ describe('StovePage', () => {
     const mockData = createMockStoveData({
       errorCode: 5,
       errorDescription: 'Test error',
+      pelletLow: true,
       needsMaintenance: true,
       maintenanceStatus: { needsCleaning: true, currentHours: 50 },
       cleaningInProgress: false,
@@ -225,6 +227,7 @@ describe('StovePage', () => {
     expect(bannersProps).toBeDefined();
     expect(bannersProps!.errorCode).toBe(5);
     expect(bannersProps!.errorDescription).toBe('Test error');
+    expect(bannersProps!.pelletLow).toBe(true);
     expect(bannersProps!.needsMaintenance).toBe(true);
     expect(bannersProps!.maintenanceStatus).toEqual({ needsCleaning: true, currentHours: 50 });
     expect(bannersProps!.cleaningInProgress).toBe(false);

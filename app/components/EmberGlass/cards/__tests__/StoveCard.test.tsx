@@ -151,6 +151,22 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     expect(queryByText('Spenta')).toBeNull();
   });
 
+  // ROADMAP D11: reserve sensor of the stove, read by the Pi from the local WiNet module.
+  test('(f2) low pellet reserve shows the badge', () => {
+    useStoveDataMock.mockReturnValue({
+      isAccesa: true,
+      powerLevel: 1,
+      fanLevel: 1,
+      staleness: null,
+      needsMaintenance: false,
+      pelletLow: true,
+    });
+    const { getByTestId, queryByTestId } = render(<StoveCard />);
+
+    expect(getByTestId('stove-pellet-low-badge')).toHaveAttribute('aria-label', 'Pellet in riserva');
+    expect(queryByTestId('stove-cleaning-badge')).toBeNull();
+  });
+
   test('(g) no cleaning alert when maintenance is not due', () => {
     useStoveDataMock.mockReturnValue({
       isAccesa: false,
@@ -163,6 +179,7 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     const { queryByTestId, getByText } = render(<StoveCard />);
 
     expect(queryByTestId('stove-cleaning-badge')).toBeNull();
+    expect(queryByTestId('stove-pellet-low-badge')).toBeNull();
     expect(queryByTestId('stove-maintenance-alert')).toBeNull();
     expect(getByText('Spenta')).toBeInTheDocument();
   });

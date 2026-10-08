@@ -179,6 +179,34 @@ describe('useStoveData', () => {
     });
   });
 
+  it.each([
+    [true, true],
+    [false, false],
+    [null, false],
+    [undefined, false],
+  ])('maps pellet_low %p to pelletLow %p (ROADMAP D11)', async (pelletLow, expected) => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'working',
+        power_level: 1,
+        fan_level: 1,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-10-08T06:00:00Z',
+        error_code: null,
+        error_description: null,
+        pellet_low: pelletLow,
+      }),
+    });
+
+    const { result } = renderHook(() => useStoveData({ userId: mockUserId }));
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('working');
+    });
+    expect(result.current.pelletLow).toBe(expected);
+  });
+
   it('sets power_level and fan_level from single status response', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

@@ -3,6 +3,7 @@
  *
  * Presentational component rendering page-level banners:
  * - Error alert (outside card layout)
+ * - Low pellet reserve warning
  * - Maintenance warning
  * - Staleness status
  * - Pending commands queue
@@ -18,6 +19,7 @@ import type { FormattedCommand } from '@/lib/pwa/backgroundSync';
 export interface StovePageBannersProps {
   errorCode: number;
   errorDescription: string;
+  pelletLow: boolean;
   needsMaintenance: boolean;
   maintenanceStatus: MaintenanceStatus | null;
   cleaningInProgress: boolean;
@@ -31,6 +33,7 @@ export default function StovePageBanners(props: StovePageBannersProps) {
   const {
     errorCode,
     errorDescription,
+    pelletLow,
     needsMaintenance,
     maintenanceStatus,
     cleaningInProgress,
@@ -50,6 +53,18 @@ export default function StovePageBanners(props: StovePageBannersProps) {
             errorDescription={errorDescription}
             showDetailsButton={true}
             showSuggestion={true}
+          />
+        </div>
+      )}
+
+      {/* Low pellet reserve (stove sensor read on the Pi, ROADMAP D11) */}
+      {pelletLow && (
+        <div className="mb-6" data-testid="stove-pellet-low-banner">
+          <Banner
+            variant="warning"
+            icon="🪵"
+            title="Pellet in riserva"
+            description="Il pellet sta per finire: ricarica il serbatoio della stufa."
           />
         </div>
       )}

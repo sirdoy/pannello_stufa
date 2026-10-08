@@ -3,8 +3,8 @@
  *
  * GET /api/devices
  *
- * Next-only aggregator (not a mirror of the backend's Fritz!Box-only /api/v1/devices, hence
- * outside /api/v1 like /api/rooms and /api/registry; moved by ROADMAP T6).
+ * Next-only aggregator (no backend route with this path, hence outside /api/v1 like
+ * /api/rooms and /api/registry; moved by ROADMAP T6).
  *
  * Fans out to all 8 providers via `Promise.allSettled`, normalizes per-provider
  * items into a unified `Device` shape (`types/devices.ts`), sorts by

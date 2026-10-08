@@ -137,6 +137,18 @@ fanno login nello stesso secondo con lo stesso utente e ricevevano lo stesso JWT
 ora ogni access token ha un `jti` casuale. Conferma sul Pi:
 `journalctl -u homeassistant.service --since '10 min ago' | grep -c '" 429'`.
 
+### Ripetere un test (`--repeat-each`)
+
+Playwright crea un worker nuovo per ogni indice di ripetizione, quindi un login per ripetizione e per test, non
+uno per worker. Il login del backend è limitato a 30/min in un bucket unico (la richiesta non ha Bearer, la
+chiave è l'API key): oltre quella soglia la fixture `workerStorageState` va in timeout su `waitForURL` e i test
+falliscono senza colpa (da **T10**). Restare sotto 25 esecuzioni al minuto (es. un test con `--repeat-each=20`) e
+lasciare un minuto tra una serie e l'altra.
+
+Prima di leggere o cambiare lo scroll in un test, attendere `.transition-page-smooth.opacity-100`:
+`app/template.tsx` riporta la pagina in cima nel suo effect di mount, che su un'idratazione lenta arriva dopo le
+prime azioni del test (da **T10**).
+
 ### Account di test
 
 Login dal form `/auth/login` con l'account `test` sul Pi (`E2E_TEST_USER_EMAIL` / `E2E_TEST_USER_PASSWORD` in

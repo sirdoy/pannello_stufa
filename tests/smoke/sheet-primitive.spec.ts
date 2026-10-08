@@ -61,19 +61,14 @@ test.describe('SHEET-01 — sheet primitive', () => {
     await expect(page.getByRole('dialog')).toBeHidden({ timeout: 1500 });
   });
 
-  // Headless dev runs through React Strict Mode + Next 16 RouterScroll which
-  // together race the [open] useEffect: the first invoke captures scrollY=300
-  // and pins body to -300px; before the cleanup's scrollTo(300) commits, Next's
-  // layout effect snaps scrollY back to 0; the strict-mode re-invoke then
-  // captures 0 and the locked offset persists as -0px through close, leaving
-  // scroll restored to 0 instead of 300. The behaviour is verified manually
-  // in the live browser (300 → 0 lock → 300 restore round-trip works) and via
-  // the unit test for the Sheet useEffect; only this end-to-end runtime path
-  // is environment-flaky. Still flaky on the production build (no Strict Mode):
-  // 1 run out of 10 locks at 0px instead of -300px (2026-10-08, ROADMAP T10).
-  test.skip('scroll-lock applied + restored at y=300', async ({ page }) => {
+  // app/template.tsx scrolls to the top in its mount effect. On a slow hydration that
+  // effect runs after this test has scrolled to 300, so the sheet locks at 0px instead
+  // of -300px (1 run out of 10, ROADMAP T10). The wrapper gets `opacity-100` one frame
+  // after that effect: wait for it before touching the scroll position.
+  test('scroll-lock applied + restored at y=300', async ({ page }) => {
     await page.goto('/debug/design-system-v2');
     await expect(page.getByRole('heading', { level: 1, name: /Ember Glass/i })).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.transition-page-smooth.opacity-100')).toBeAttached({ timeout: 15000 });
     // Force a scrollable page in the smoke environment.
     // Force a scrollable page in the smoke environment AND override Next 16's
     // html[data-scroll-behavior="smooth"] so scrollTop assignment lands on the

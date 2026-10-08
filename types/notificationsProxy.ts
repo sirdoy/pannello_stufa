@@ -10,6 +10,7 @@ export type PushEvent =
   | 'stove_unexpected_off'
   | 'stove_alarm'
   | 'stove_status_work'
+  | 'stove_pellet_low'
   | 'maintenance_80'
   | 'maintenance_90'
   | 'maintenance_100'
@@ -55,6 +56,8 @@ export interface PushSendResult {
   sent: number;
   failed: number;
   removed: number;
+  /** Devices skipped because their user switched the event off (M61). */
+  muted?: number;
 }
 
 export interface PushHistoryItem {
@@ -73,6 +76,22 @@ export interface PushHistory {
   total_count: number;
   limit: number;
   offset: number;
+}
+
+/** One event the user can switch on/off (M61); `enabled` is the choice of that user only. */
+export interface EventPreference {
+  event: PushEvent | string;
+  title: string;
+  description: string;
+  group: string;
+  group_title: string;
+  priority: 'normal' | 'high';
+  enabled: boolean;
+}
+
+export interface PushPreferences {
+  user_id: string;
+  items: EventPreference[];
 }
 
 /** JSON decrypted by the service worker (`app/sw.ts`). */

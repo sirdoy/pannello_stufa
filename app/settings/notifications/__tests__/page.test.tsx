@@ -1,5 +1,6 @@
 /**
- * /settings/notifications — Web Push sent by the Pi (workspace ROADMAP M48).
+ * /settings/notifications — Web Push sent by the Pi (workspace ROADMAP M48),
+ * per-user event preferences (M61).
  */
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 
@@ -21,6 +22,17 @@ const device = {
   created_at: 1790000000, updated_at: 1790000000, last_success_at: 1790600000, last_error: null, failure_count: 0,
 };
 const other = { ...device, id: 2, device_name: 'iPad', last_error: '500: boom', failure_count: 2 };
+const pref = (event: string, title: string, group: string, group_title: string, enabled = true) => ({
+  event, title, description: `Quando: ${title}`, group, group_title, priority: 'normal', enabled,
+});
+const preferences = {
+  user_id: 'user:1',
+  items: [
+    pref('scheduler_ignition', 'Accensione automatica', 'scheduler', 'Programmazione stufa'),
+    pref('scheduler_shutdown', 'Spegnimento automatico', 'scheduler', 'Programmazione stufa', false),
+    pref('stove_alarm', 'Allarme stufa', 'stove', 'Stufa'),
+  ],
+};
 
 function mockFetch(overrides: Record<string, { status: number; body?: unknown }> = {}) {
   global.fetch = jest.fn(async (url: string) => {
@@ -28,6 +40,9 @@ function mockFetch(overrides: Record<string, { status: number; body?: unknown }>
     if (key) {
       const { status, body } = overrides[key]!;
       return { ok: status < 300, status, json: async () => body } as Response;
+    }
+    if (url.includes('/preferences')) {
+      return { ok: true, status: 200, json: async () => preferences } as Response;
     }
     if (url.includes('/history')) {
       return {
@@ -101,7 +116,52 @@ it('explains a blocked permission and hides the toggle', async () => {
   mocked.getPermission.mockReturnValue('denied');
   await renderPage();
   expect(screen.getByTestId('push-help')).toHaveTextContent('bloccate');
-  expect(screen.queryByRole('switch')).toBeNull();
+  expect(within(screen.getByTestId('push-device-card')).queryByRole('switch')).toBeNull();
+});
+
+describe('what to receive (M61)', () => {
+  it('lists the events by group with the choice of this user', async () => {
+    await renderPage();
+    const card = screen.getByTestId('push-preferences-card');
+    const scheduler = within(card).getByRole('region', { name: 'Programmazione stufa' });
+    expect(within(scheduler).getAllByRole('switch')).toHaveLength(2);
+    expect(within(card).getByRole('region', { name: 'Stufa' })).toHaveTextContent('Quando: Allarme stufa');
+    expect(within(card).getByRole('switch', { name: 'Disattiva notifica: Accensione automatica' })).toBeChecked();
+    expect(within(card).getByRole('switch', { name: 'Attiva notifica: Spegnimento automatico' })).not.toBeChecked();
+  });
+
+  it('a switch saves only that event and shows the answer of the Pi', async () => {
+    await renderPage();
+    const saved = {
+      ...preferences,
+      items: preferences.items.map((i) => (i.event === 'stove_alarm' ? { ...i, enabled: false } : i)),
+    };
+    (global.fetch as jest.Mock).mockImplementationOnce(async () => ({ ok: true, status: 200, json: async () => saved }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('switch', { name: 'Disattiva notifica: Allarme stufa' }));
+    });
+    const [url, init] = (global.fetch as jest.Mock).mock.calls.at(-1);
+    expect(url).toBe('/api/v1/notifications/preferences');
+    expect(init.method).toBe('PUT');
+    expect(JSON.parse(init.body)).toEqual({ events: { stove_alarm: false } });
+    expect(screen.getByRole('switch', { name: 'Attiva notifica: Allarme stufa' })).not.toBeChecked();
+  });
+
+  it('a failed save keeps the old choice and says so', async () => {
+    await renderPage();
+    (global.fetch as jest.Mock).mockImplementationOnce(async () => ({ ok: false, status: 502, json: async () => ({}) }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('switch', { name: 'Disattiva notifica: Allarme stufa' }));
+    });
+    expect(within(screen.getByTestId('push-preferences-card')).getByRole('alert')).toHaveTextContent('Salvataggio non riuscito');
+    expect(screen.getByRole('switch', { name: 'Disattiva notifica: Allarme stufa' })).toBeChecked();
+  });
+
+  it('says when the preferences cannot be loaded', async () => {
+    mockFetch({ '/preferences': { status: 503 } });
+    await renderPage();
+    expect(within(screen.getByTestId('push-preferences-card')).getByRole('alert')).toHaveTextContent('Impossibile caricare le preferenze');
+  });
 });
 
 it('explains the iPhone install step', async () => {

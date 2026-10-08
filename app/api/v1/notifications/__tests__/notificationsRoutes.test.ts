@@ -17,6 +17,7 @@ import * as rotate from '../subscriptions/rotate/route';
 import * as one from '../subscriptions/[id]/route';
 import * as test from '../test/route';
 import * as history from '../history/route';
+import * as preferences from '../preferences/route';
 
 const mocked = jest.mocked(proxy);
 const SUB = {
@@ -94,6 +95,33 @@ describe('subscriptions', () => {
     mocked.rotateSubscription.mockRejectedValue(new ApiError('NOT_FOUND', 'Subscription not found', 404));
     const res = await rotate.POST(req({ old_endpoint: 'https://fcm.googleapis.com/old', subscription: SUB }), ctx());
     expect(res.status).toBe(404);
+  });
+});
+
+describe('preferences (M61)', () => {
+  it('reads the choices of the session user', async () => {
+    const res = await preferences.GET(req(undefined, '?user_id=user:2'), ctx());
+    expect(res.status).toBe(200);
+    expect(mocked.getPreferences).toHaveBeenCalledWith('user:1');
+  });
+
+  it('saves for the session user only, whatever the body says', async () => {
+    const res = await preferences.PUT(req({ user_id: 'user:2', events: { stove_alarm: false } }), ctx());
+    expect(res.status).toBe(200);
+    expect(mocked.setPreferences).toHaveBeenCalledWith('user:1', { stove_alarm: false });
+  });
+
+  it('rejects a missing, empty or non-boolean choice', async () => {
+    expect((await preferences.PUT(req({}), ctx())).status).toBe(400);
+    expect((await preferences.PUT(req({ events: {} }), ctx())).status).toBe(400);
+    expect((await preferences.PUT(req({ events: { stove_alarm: 'no' } }), ctx())).status).toBe(400);
+    expect(mocked.setPreferences).not.toHaveBeenCalled();
+  });
+
+  it('401 without a session', async () => {
+    jest.mocked(authSession.getSession).mockResolvedValue(null as never);
+    expect((await preferences.GET(req(), ctx())).status).toBe(401);
+    expect((await preferences.PUT(req({ events: { stove_alarm: false } }), ctx())).status).toBe(401);
   });
 });
 

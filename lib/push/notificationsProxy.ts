@@ -5,9 +5,10 @@
  * the browser subscriptions and sends every push itself.
  */
 
-import { haDelete, haGet, haPost, haPostNoContent } from '@/lib/haClient';
+import { haDelete, haGet, haPost, haPostNoContent, haPut } from '@/lib/haClient';
 import type {
   PushHistory,
+  PushPreferences,
   PushSendResult,
   PushSubscriptionInfo,
   PushSubscriptionList,
@@ -40,3 +41,10 @@ export const sendTestPush = (subscriptionId?: number) =>
 
 export const getPushHistory = (limit: number, offset: number) =>
   haGet<PushHistory>(`${BASE}/history?limit=${limit}&offset=${offset}`);
+
+/** `userId` = session `sub`: always taken from the session by the route, never from the browser (M61). */
+export const getPreferences = (userId: string) =>
+  haGet<PushPreferences>(`${BASE}/preferences?user_id=${encodeURIComponent(userId)}`);
+
+export const setPreferences = (userId: string, events: Record<string, boolean>) =>
+  haPut<PushPreferences>(`${BASE}/preferences`, { user_id: userId, events });

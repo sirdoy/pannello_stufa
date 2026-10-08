@@ -35,3 +35,10 @@ export const historyQuery = z.object({
   limit: z.coerce.number().int().min(1).max(200).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
+
+/** Partial choice of the logged-in user: `{ events: { <event>: on/off } }` (M61). */
+export const preferencesBody = z.object({
+  events: z
+    .record(z.string().min(1).max(100), z.boolean())
+    .refine((v) => Object.keys(v).length > 0, { message: 'events must not be empty' }),
+});

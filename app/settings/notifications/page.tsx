@@ -5,6 +5,8 @@
  *
  * - This device: on/off (stored per device, same choice as the first-launch
  *   question), test push, help when the browser blocks or cannot receive pushes.
+ * - What to receive: one switch per event, saved on the Pi for the logged-in
+ *   user only (workspace ROADMAP M61); other users keep their own choices.
  * - Registered devices: every subscription on the Pi, removable.
  * - Last notifications sent (history kept 90 days on the Pi).
  */
@@ -22,7 +24,13 @@ import {
   getSubscriptionId,
   type PushSupport,
 } from '@/lib/push/pushClient';
-import type { PushHistoryItem, PushSendResult, PushSubscriptionInfo } from '@/types/notificationsProxy';
+import type {
+  EventPreference,
+  PushHistoryItem,
+  PushPreferences,
+  PushSendResult,
+  PushSubscriptionInfo,
+} from '@/types/notificationsProxy';
 
 const API = '/api/v1/notifications';
 const HISTORY_LIMIT = 20;
@@ -157,6 +165,101 @@ function ThisDeviceCard({ initial, onChanged }: { initial: DeviceState; onChange
           Invia notifica di prova
         </button>
       )}
+    </GlassCard>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// What to receive (per user, per event)
+// ---------------------------------------------------------------------------
+
+function PreferencesSection() {
+  const [items, setItems] = useState<EventPreference[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState<string | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch(`${API}/preferences`)
+      .then(async (res) => {
+        if (!res.ok) throw new Error();
+        const data = (await res.json()) as PushPreferences;
+        if (alive) setItems(data.items);
+      })
+      .catch(() => {
+        if (alive) setError('Impossibile caricare le preferenze');
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const toggle = async (item: EventPreference) => {
+    setSaving(item.event);
+    setError(null);
+    const res = await fetch(`${API}/preferences`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ events: { [item.event]: !item.enabled } }),
+    }).catch(() => null);
+    if (res?.ok) {
+      const data = (await res.json()) as PushPreferences;
+      setItems(data.items);
+    } else {
+      setError('Salvataggio non riuscito, riprova');
+    }
+    setSaving(null);
+  };
+
+  const groups: { key: string; title: string; items: EventPreference[] }[] = [];
+  for (const item of items ?? []) {
+    const group = groups.find((g) => g.key === item.group);
+    if (group) group.items.push(item);
+    else groups.push({ key: item.group, title: item.group_title, items: [item] });
+  }
+
+  return (
+    <GlassCard style={cardStyle} data-testid="push-preferences-card">
+      <h2 style={titleStyle}>Cosa ricevere</h2>
+      <p style={mutedStyle}>
+        La scelta vale per te, su tutti i tuoi dispositivi. Gli altri utenti scelgono per conto loro.
+      </p>
+      {error && <p role="alert" style={errorTextStyle}>{error}</p>}
+      {groups.map((group) => (
+        <section key={group.key} aria-label={group.title} style={{ marginTop: 14 }}>
+          <h3 style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-2)', margin: '0 0 2px', textTransform: 'uppercase', letterSpacing: 0.4 }}>
+            {group.title}
+          </h3>
+          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            {group.items.map((item) => (
+              <li
+                key={item.event}
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '10px 0',
+                  borderTop: '0.5px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600 }}>{item.title}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-2)' }}>{item.description}</div>
+                </div>
+                <div style={{ flexShrink: 0 }}>
+                  <InlineToggle
+                    on={item.enabled}
+                    onChange={() => toggle(item)}
+                    disabled={saving !== null}
+                    aria-label={`${item.enabled ? 'Disattiva' : 'Attiva'} notifica: ${item.title}`}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
     </GlassCard>
   );
 }
@@ -301,6 +404,7 @@ export default function NotificationsSettingsPage() {
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
       <h1 style={{ fontSize: 26, fontWeight: 700, margin: '4px 0 18px' }}>Notifiche</h1>
       <ThisDeviceSection key={deviceKey} onChanged={refresh} />
+      <PreferencesSection />
       <DevicesSection devices={devices} error={devicesError} onRemove={removeDevice} />
       <HistorySection items={history} />
     </div>

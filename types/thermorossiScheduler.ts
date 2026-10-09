@@ -121,6 +121,7 @@ export interface ClimateState {
     power_level: number | null; // null while the controller is not driving the stove
     fan_level: number | null;
     integral: number;
+    paused?: boolean; // a manual power / fan command keeps the controller aside (D19)
   };
 }
 
@@ -147,9 +148,9 @@ export interface ClimateLogResponse {
 
 /** WS `scheduler` event `engine.tick`: levels the engine wants and their source (D13, D16). */
 export interface EngineTargetLevels {
-  power_level: number;
-  fan_level: number;
-  source: 'slot' | 'climate' | 'hold';
+  power_level: number | null; // null outside automatic mode when nobody decides that level
+  fan_level: number | null;
+  source: 'slot' | 'climate' | 'hold' | 'manual';
 }
 
 /** WS topic `scheduler` snapshot `data`. */

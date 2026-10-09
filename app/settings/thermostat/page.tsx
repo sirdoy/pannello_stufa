@@ -202,8 +202,9 @@ export default function ThermostatSettingsPage() {
         </div>
         <p style={{ ...mutedStyle, marginTop: 12 }}>
           Con la stufa accesa in una fascia, potenza e ventola seguono la temperatura della stanza rispetto al
-          setpoint del programma Netatmo. I livelli della fascia valgono solo per l&apos;accensione. Funziona con lo
-          scheduler in automatico.
+          setpoint del programma Netatmo. Vale con la stufa accesa dallo scheduler o a mano; i livelli della fascia
+          valgono solo per l&apos;accensione. Se imposti potenza o ventola a mano, il controllo si ferma finché la
+          stufa si spegne o lo scheduler riprende.
         </p>
 
         <label htmlFor="climate-room" style={labelStyle}>
@@ -235,6 +236,12 @@ export default function ThermostatSettingsPage() {
         {state.room_id && (live.setpoint === null || live.temperature === null) && (
           <p style={{ ...mutedStyle, margin: '12px 0 0' }}>
             Dati mancanti (casa non in programma, o temperatura più vecchia di 20 minuti): la stufa segue la fascia.
+          </p>
+        )}
+        {state.enabled && live.paused && (
+          <p style={{ ...mutedStyle, margin: '12px 0 0' }} data-testid="climate-paused">
+            In pausa: potenza o ventola impostate a mano. Riprende quando la stufa si spegne o lo scheduler torna in
+            automatico.
           </p>
         )}
         {status && (

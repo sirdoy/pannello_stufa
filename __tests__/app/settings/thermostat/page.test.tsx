@@ -138,6 +138,12 @@ describe('ThermostatSettingsPage — climate control', () => {
     expect(screen.getByTestId('climate-state')).toHaveTextContent('Attivo');
   });
 
+  it('says when a manual power / fan command paused the control (ROADMAP D19)', async () => {
+    mockApi(climate({ live: { ...climate().live, paused: true } }));
+    render(<ThermostatSettingsPage />);
+    expect(await screen.findByTestId('climate-paused')).toHaveTextContent('In pausa');
+  });
+
   it('shows an error when the state cannot be loaded', async () => {
     mockApi(climate(), { failGet: true });
     render(<ThermostatSettingsPage />);

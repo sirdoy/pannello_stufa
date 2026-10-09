@@ -76,9 +76,11 @@ export default function StovePageHero(props: StovePageHeroProps) {
         <div className="mb-8 text-center">
           {/* Large Status Icon */}
           <div className={`relative mb-4 inline-block ${statusConfig.pulse ? 'animate-pulse' : ''}`}>
-            <span className="relative text-8xl drop-shadow-2xl sm:text-9xl" style={{ lineHeight: 1 }}>
-              {statusConfig.icon}
-            </span>
+            <statusConfig.Icon
+              className={`size-24 drop-shadow-2xl sm:size-32 ${theme.accent}`}
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
           </div>
 
           {/* Status Label - Using div instead of h1 for visual display (page-level h1 is visually hidden) */}

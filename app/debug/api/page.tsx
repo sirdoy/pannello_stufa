@@ -70,7 +70,7 @@ export default function ApiDebugPage() {
   };
 
   return (
-    <div className="text-slate-100">
+    <div className="text-(--text-1)">
       <div className="mx-auto max-w-7xl space-y-6">
         <PageHeader
           title="API Debug Console"
@@ -87,9 +87,9 @@ export default function ApiDebugPage() {
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <Text size="sm" variant="secondary">
-              Keyboard: <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">1-6</kbd> = Switch tabs,{''}
-              <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">⌘R</kbd> = Refresh,{''}
-              <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">A</kbd> = Auto-refresh
+              Keyboard: <kbd className="rounded bg-white/8 px-1.5 py-0.5 text-xs">1-6</kbd> = Switch tabs,{''}
+              <kbd className="rounded bg-white/8 px-1.5 py-0.5 text-xs">⌘R</kbd> = Refresh,{''}
+              <kbd className="rounded bg-white/8 px-1.5 py-0.5 text-xs">A</kbd> = Auto-refresh
             </Text>
           </div>
 

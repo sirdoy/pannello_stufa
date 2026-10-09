@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { VolumeX, Volume2 } from 'lucide-react';
 import type { SonosVolumeResponse, SonosEqResponse, SonosHomeTheaterResponse, SetEqRequest, SetHomeTheaterRequest } from '@/types/sonosProxy';
 import Button from '@/app/components/ui/Button';
+import RangeSlider from '@/app/components/ui/RangeSlider';
 import Text from '@/app/components/ui/Text';
 import SonosEqControls from './SonosEqControls';
 import SonosHomeTheater from './SonosHomeTheater';
@@ -84,14 +85,13 @@ export default function SonosSpeakerVolume({
           aria-label={isMuted ? 'Attiva audio' : 'Disattiva audio'}
           icon={isMuted ? <VolumeX size={16} className="text-danger-400" /> : <Volume2 size={16} />}
         />
-        <input
-          type="range"
+        <RangeSlider
           min={0}
           max={100}
           value={localVolume}
           onChange={handleVolumeChange}
           disabled={isDisabled}
-          className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500 disabled:opacity-50"
+          className="flex-1"
           aria-label={`Volume ${speakerName}`}
         />
         <Text as="span" variant="secondary" size="xs" className="min-w-8 text-right">{localVolume}%</Text>

@@ -1,6 +1,7 @@
 'use client';
 import { formatDuration } from '@/lib/utils/scheduleHelpers';
 import { Text } from '@/app/components/ui';
+import RangeSlider from '@/app/components/ui/RangeSlider';
 
 interface DurationPickerProps {
   value: number;
@@ -38,33 +39,13 @@ export default function DurationPicker({ value, onChange }: DurationPickerProps)
         </Text>
       </div>
 
-      <input
-        type="range"
+      <RangeSlider
         min={0}
         max={100}
         step={1}
         value={toSlider(value)}
         onChange={(e) => onChange(fromSlider(Number(e.target.value)))}
-        className="
-          h-2 w-full cursor-pointer appearance-none rounded-lg
-          bg-white/10
-
-          [&::-moz-range-thumb]:size-6
-          [&::-moz-range-thumb]:cursor-pointer
-          [&::-moz-range-thumb]:rounded-full
-          [&::-moz-range-thumb]:border-0
-          [&::-moz-range-thumb]:bg-ember-500
-          [&::-webkit-slider-thumb]:size-6
-          [&::-webkit-slider-thumb]:cursor-pointer
-          [&::-webkit-slider-thumb]:appearance-none
-          [&::-webkit-slider-thumb]:rounded-full
-          [&::-webkit-slider-thumb]:bg-ember-500
-
-          [&::-webkit-slider-thumb]:shadow-lg
-          [&::-webkit-slider-thumb]:transition-transform
-          [&::-webkit-slider-thumb]:hover:scale-110
-          [&::-webkit-slider-thumb]:active:scale-95
-        "
+        className="[&::-moz-range-thumb]:size-6 [&::-webkit-slider-thumb]:size-6"
         style={{ touchAction: 'none' }}
       />
 

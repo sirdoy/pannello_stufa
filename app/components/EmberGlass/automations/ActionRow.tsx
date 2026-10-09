@@ -13,6 +13,7 @@
  */
 
 import { ChevronUp, ChevronDown, X } from 'lucide-react';
+import InlineSelect from '@/app/components/ui/InlineSelect';
 import type { ActionItem } from '@/types/automations';
 import { ACTION_TYPES, defaultAction } from './lib/automations-config';
 import { IconBtn } from './primitives/IconBtn';
@@ -112,35 +113,25 @@ export function ActionRow({
         )}
 
         {/* Type select */}
-        <select
+        <InlineSelect
+          size="xs"
+          className="min-w-0 flex-1"
           value={action.type}
           onChange={(e) => handleTypeChange(e.target.value)}
           aria-label="Tipo azione"
-          style={{
-            flex: 1,
-            height: 28,
-            borderRadius: 7,
-            background: 'rgba(255,255,255,0.05)',
-            border: '0.5px solid rgba(255,255,255,0.08)',
-            color: '#fff',
-            padding: '0 8px',
-            fontSize: 12,
-            fontFamily: 'inherit',
-            cursor: 'pointer',
-          }}
         >
           {ACTION_TYPES.map((a) => (
-            <option key={a.id} value={a.id} style={{ color: '#000' }}>
+            <option key={a.id} value={a.id}>
               {a.label}
             </option>
           ))}
           {/* D-09b: legacy type rendered as 12th read-only option */}
           {isLegacy && (
-            <option value={action.type} style={{ color: '#000' }}>
+            <option value={action.type}>
               {action.type} (legacy)
             </option>
           )}
-        </select>
+        </InlineSelect>
 
         {/* Reorder + remove */}
         <IconBtn

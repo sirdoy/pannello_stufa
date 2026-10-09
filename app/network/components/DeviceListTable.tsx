@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
 import { DataTable } from '@/app/components/ui';
+import InlineSelect from '@/app/components/ui/InlineSelect';
 import DeviceStatusBadge from './DeviceStatusBadge';
 import DeviceCategoryBadge from './DeviceCategoryBadge';
 import type { DeviceData } from '@/app/components/devices/network/types';
@@ -79,7 +80,9 @@ function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: Devic
 
         if (editingMac === mac) {
           return (
-            <select
+            <InlineSelect
+              size="xs"
+              aria-label="Categoria"
               value={category}
               onChange={(e) => {
                 const newCategory = e.target.value as DeviceCategory;
@@ -88,14 +91,13 @@ function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: Devic
               }}
               onBlur={() => setEditingMac(null)}
               autoFocus
-              className="rounded-lg border border-white/8 bg-(--color-slate-900) px-2 py-1 text-xs text-(--text-1) focus:border-ember-400 focus:outline-none"
             >
               <option value="iot">IoT</option>
               <option value="mobile">Mobile</option>
               <option value="pc">PC</option>
               <option value="smart-home">Smart Home</option>
               <option value="unknown">Sconosciuto</option>
-            </select>
+            </InlineSelect>
           );
         }
 

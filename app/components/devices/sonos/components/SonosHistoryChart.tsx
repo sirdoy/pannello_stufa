@@ -3,9 +3,12 @@
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { format } from 'date-fns';
+import type { ColumnDef } from '@tanstack/react-table';
 import Button from '@/app/components/ui/Button';
 import Card from '@/app/components/ui/Card';
+import DataTable from '@/app/components/ui/DataTable';
 import Heading from '@/app/components/ui/Heading';
+import InlineSelect from '@/app/components/ui/InlineSelect';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Text from '@/app/components/ui/Text';
 import { useSonosHistory } from '../hooks/useSonosHistory';
@@ -13,6 +16,43 @@ import type { SonosZoneResponse } from '@/types/sonosProxy';
 import type { SonosPlaybackHistoryItem, SonosVolumeHistoryItem } from '@/types/sonosProxy';
 
 const SonosVolumeChart = dynamic(() => import('./SonosVolumeChart'), { ssr: false });
+
+const PLAYBACK_COLUMNS: ColumnDef<SonosPlaybackHistoryItem>[] = [
+  {
+    id: 'timestamp',
+    header: 'Ora',
+    enableSorting: false,
+    cell: ({ row }) => (
+      <Text as="span" variant="secondary" size="xs" className="whitespace-nowrap">
+        {format(row.original.timestamp * 1000, 'dd/MM HH:mm')}
+      </Text>
+    ),
+  },
+  {
+    id: 'title',
+    header: 'Brano',
+    enableSorting: false,
+    cell: ({ row }) => <span className="block max-w-40 truncate">{row.original.title || '—'}</span>,
+  },
+  {
+    id: 'artist',
+    header: 'Artista',
+    enableSorting: false,
+    cell: ({ row }) => (
+      <Text as="span" variant="secondary" size="sm" className="block max-w-30 truncate">
+        {row.original.artist || '—'}
+      </Text>
+    ),
+  },
+  {
+    id: 'source',
+    header: 'Sorgente',
+    enableSorting: false,
+    cell: ({ row }) => (
+      <Text as="span" variant="secondary" size="xs">{row.original.source_type || '—'}</Text>
+    ),
+  },
+];
 
 interface SonosHistoryChartProps {
   zones: SonosZoneResponse[];
@@ -100,12 +140,12 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
           </Button>
         </div>
 
-        {/* Filter dropdowns: native selects (ui/Select has no aria-label and no empty value) */}
+        {/* Filter dropdowns */}
         {historyType === 'volume' && speakers.length > 0 && (
-          <select
+          <InlineSelect
+            size="md"
             value={speakerFilter ?? ''}
             onChange={e => setSpeakerFilter(e.target.value || null)}
-            className="h-11 rounded-xl border-[0.5px] border-white/14 bg-white/6 px-3 text-[13px] text-(--text-1)"
             aria-label="Filtra per altoparlante"
           >
             <option value="">Tutti</option>
@@ -114,14 +154,14 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
                 {s.name}
               </option>
             ))}
-          </select>
+          </InlineSelect>
         )}
 
         {historyType === 'playback' && zones.length > 0 && (
-          <select
+          <InlineSelect
+            size="md"
             value={zoneFilter ?? ''}
             onChange={e => setZoneFilter(e.target.value || null)}
-            className="h-11 rounded-xl border-[0.5px] border-white/14 bg-white/6 px-3 text-[13px] text-(--text-1)"
             aria-label="Filtra per zona"
           >
             <option value="">Tutte le zone</option>
@@ -130,7 +170,7 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
                 {z.label}
               </option>
             ))}
-          </select>
+          </InlineSelect>
         )}
       </div>
 
@@ -158,37 +198,7 @@ export default function SonosHistoryChart({ zones, speakers }: SonosHistoryChart
       {!loading && !error && historyType === 'playback' && (
         <>
           {playbackItems.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-white/8 text-xs text-(--text-2)">
-                    <th className="pr-3 pb-2 text-left">Ora</th>
-                    <th className="pr-3 pb-2 text-left">Brano</th>
-                    <th className="pr-3 pb-2 text-left">Artista</th>
-                    <th className="pb-2 text-left">Sorgente</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {playbackItems.map((item, idx) => (
-                    <tr
-                      key={`${item.timestamp}-${idx}`}
-                      className={`text-(--text-1) ${
-                        idx % 2 === 0 ? '' : 'bg-white/4'
-                      }`}
-                    >
-                      <td className="py-1.5 pr-3 text-xs whitespace-nowrap text-(--text-2)">
-                        {format(item.timestamp * 1000, 'dd/MM HH:mm')}
-                      </td>
-                      <td className="max-w-40 truncate py-1.5 pr-3">{item.title || '—'}</td>
-                      <td className="max-w-30 truncate py-1.5 pr-3 text-(--text-2)">
-                        {item.artist || '—'}
-                      </td>
-                      <td className="py-1.5 text-xs text-(--text-2)">{item.source_type || '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataTable data={playbackItems} columns={PLAYBACK_COLUMNS} density="compact" striped />
           ) : (
             <Text variant="secondary" size="sm">
               Nessun evento di riproduzione

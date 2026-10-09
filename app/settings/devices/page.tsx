@@ -17,6 +17,7 @@ import Banner from '@/app/components/ui/Banner';
 import Badge from '@/app/components/ui/Badge';
 import Toggle from '@/app/components/ui/Toggle';
 import Skeleton from '@/app/components/ui/Skeleton';
+import DeviceIcon from '@/app/components/ui/DeviceIcon';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 
@@ -183,7 +184,7 @@ export default function DevicesSettingsPage() {
                   {/* Device info */}
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-3">
-                      <Text className="text-2xl">{device.icon}</Text>
+                      <DeviceIcon device={device.id} className="shrink-0 text-(--text-2)" />
                       <Heading level={3} size="md">
                         {device.name}
                       </Heading>

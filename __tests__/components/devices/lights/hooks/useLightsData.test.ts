@@ -601,11 +601,10 @@ describe('useLightsData', () => {
     await waitFor(() => {
       // With bright yellow light at ~90% brightness, contrastMode should be 'light'
       expect(result.current.contrastMode).toBe('light');
-      expect(result.current.adaptive.heading).toBe('text-slate-900');
     });
   });
 
-  it('returns default adaptive classes when no lights are on', async () => {
+  it('returns the default contrast mode when no lights are on', async () => {
     // Use a group where all lights are off
     const groupAllOff: HueGroup = {
       group_id: '99',
@@ -653,7 +652,6 @@ describe('useLightsData', () => {
     await waitFor(() => {
       // groupAllOff has light_id '2' (on=false) — isRoomOn=false → no dynamic style → default
       expect(result.current.contrastMode).toBe('default');
-      expect(result.current.adaptive.heading).toBe('');
     });
   });
 

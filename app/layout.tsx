@@ -54,7 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="theme-color" content="#0f172a" />
     </head>
-    <body className="flex min-h-screen flex-col bg-slate-900 text-slate-100" suppressHydrationWarning>
+    <body className="flex min-h-screen flex-col bg-(--color-slate-900) text-(--text-1)" suppressHydrationWarning>
     <AmbientBg />
     {/* Skip to content - Accessibility */}
     <a

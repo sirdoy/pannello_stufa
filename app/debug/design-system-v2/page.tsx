@@ -27,6 +27,7 @@ import { Section07Splash } from './sections/Section07Splash';
 import { Section08CardPrimitives } from './sections/Section08CardPrimitives';
 import { Section09SheetPrimitives } from './sections/Section09SheetPrimitives';
 import { Section10SheetGallery } from './sections/Section10SheetGallery';
+import { Section11CompactControls } from './sections/Section11CompactControls';
 
 export default function DesignSystemV2Page(): React.ReactElement {
   return (
@@ -61,6 +62,7 @@ export default function DesignSystemV2Page(): React.ReactElement {
       <Section08CardPrimitives />
       <Section09SheetPrimitives />
       <Section10SheetGallery />
+      <Section11CompactControls />
     </div>
   );
 }

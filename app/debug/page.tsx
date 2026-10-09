@@ -103,14 +103,14 @@ function NotificheContent() {
             </Text>
           </Card>
 
-          <Card className="border-2 border-slate-200 bg-slate-50 p-6">
+          <Card className="border-2 border-white/8 bg-white/4 p-6">
             <Text variant="tertiary" size="xs" className="mb-2">Dispositivi registrati</Text>
             <Text as="p" className="text-4xl">
               {stats.devices}
             </Text>
           </Card>
 
-          <Card className="border-2 border-slate-200 bg-slate-50 p-6">
+          <Card className="border-2 border-white/8 bg-white/4 p-6">
             <Text variant="tertiary" size="xs" className="mb-2">Dispositivi con errori</Text>
             <Text as="p" variant={stats.failingDevices > 0 ? 'ember' : 'sage'} className="text-4xl">
               {stats.failingDevices}
@@ -217,10 +217,10 @@ function DebugPageContent() {
         </div>
 
         {/* Keyboard shortcuts hint */}
-        <div className="flex flex-wrap gap-2 text-xs text-slate-500">
-          <span className="rounded bg-slate-800 px-2 py-1 text-slate-200">1-9: Switch tabs</span>
-          <span className="rounded bg-slate-800 px-2 py-1 text-slate-200">Cmd+R: Refresh</span>
-          <span className="rounded bg-slate-800 px-2 py-1 text-slate-200">A: Auto-refresh</span>
+        <div className="flex flex-wrap gap-2 text-xs text-(--text-2)">
+          <span className="rounded bg-white/8 px-2 py-1 text-(--text-1)">1-9: Switch tabs</span>
+          <span className="rounded bg-white/8 px-2 py-1 text-(--text-1)">Cmd+R: Refresh</span>
+          <span className="rounded bg-white/8 px-2 py-1 text-(--text-1)">A: Auto-refresh</span>
         </div>
 
         <Card variant="glass" className="p-6">

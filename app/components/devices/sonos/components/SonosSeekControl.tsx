@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSyncedState } from '@/lib/hooks/useSyncedState';
+import RangeSlider from '@/app/components/ui/RangeSlider';
 import Text from '@/app/components/ui/Text';
 import type { SonosPlaybackResponse } from '@/types/sonosProxy';
 
@@ -63,8 +64,7 @@ export default function SonosSeekControl({ playback, groupId, onSeek }: SonosSee
 
   return (
     <div className="space-y-1">
-      <input
-        type="range"
+      <RangeSlider
         min={0}
         max={durationSeconds || 1}
         value={localPosition}
@@ -72,7 +72,6 @@ export default function SonosSeekControl({ playback, groupId, onSeek }: SonosSee
         onChange={handleChange}
         onMouseUp={handleRelease}
         onTouchEnd={handleRelease}
-        className="h-2 w-full rounded-lg bg-white/10 accent-ember-500 disabled:opacity-50"
         aria-label="Seek"
       />
       <div className="flex justify-between">

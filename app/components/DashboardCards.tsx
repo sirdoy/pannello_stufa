@@ -34,17 +34,17 @@ const CARD_COMPONENTS: Record<string, React.ComponentType> = {
 };
 
 // Device metadata for error boundaries
-const DEVICE_META: Record<string, { name: string; icon: string }> = {
-  stove: { name: 'Stufa', icon: '🔥' },
-  thermostat: { name: 'Termostato', icon: '🌡️' },
-  weather: { name: 'Meteo', icon: '☀️' },
-  lights: { name: 'Luci', icon: '💡' },
-  camera: { name: 'Camera', icon: '📷' },
-  network: { name: 'Rete', icon: '📡' },
-  raspi: { name: 'Raspberry Pi', icon: '🖥️' },
-  sonos: { name: 'Sonos', icon: '🎵' },
-  dirigera: { name: 'DIRIGERA', icon: '🔌' },
-  tuya: { name: 'Tuya', icon: '⚡' },
+const DEVICE_NAMES: Record<string, string> = {
+  stove: 'Stufa',
+  thermostat: 'Termostato',
+  weather: 'Meteo',
+  lights: 'Luci',
+  camera: 'Camera',
+  network: 'Rete',
+  raspi: 'Raspberry Pi',
+  sonos: 'Sonos',
+  dirigera: 'DIRIGERA',
+  tuya: 'Tuya',
 };
 
 /**
@@ -97,14 +97,13 @@ export default async function DashboardCards() {
       {visibleCards.map((card, flatIndex) => {
         const CardComponent = CARD_COMPONENTS[card.id];
         if (!CardComponent) return null;
-        const meta = DEVICE_META[card.id] ?? { name: card.id, icon: '⚠️' };
         return (
           <div
             key={card.id}
             className="animate-spring-in transition-all duration-300 ease-out"
             style={{ animationDelay: `${flatIndex * 100}ms` }}
           >
-            <DeviceCardErrorBoundary deviceName={meta.name} deviceIcon={meta.icon}>
+            <DeviceCardErrorBoundary deviceName={DEVICE_NAMES[card.id] ?? card.id} deviceId={card.id}>
               <Suspense fallback={<GlassCardSkeleton />}>
                 <CardComponent />
               </Suspense>

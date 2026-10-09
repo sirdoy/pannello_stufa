@@ -27,24 +27,6 @@ import { WS_SNAPSHOT_GRACE_MS } from '@/lib/ws/snapshotGrace';
 import { isFetchInterrupted } from '@/lib/utils/fetchInterruption';
 
 /**
- * Adaptive classes for UI based on background contrast
- */
-export interface AdaptiveClasses {
-  heading: string;
-  text: string;
-  textSecondary: string;
-  badge: string;
-  badgeGlow: string;
-  statusOn: string;
-  statusOff: string;
-  buttonVariant: 'outline' | null;
-  buttonClass: string;
-  slider: string;
-  brightnessPanel: string;
-  brightnessValue: string;
-}
-
-/**
  * All state and functions exposed by useLightsData
  */
 export interface UseLightsDataReturn {
@@ -88,7 +70,6 @@ export interface UseLightsDataReturn {
   roomOnBrightness: number;
   dynamicRoomStyle: Record<string, string> | null;
   contrastMode: 'light' | 'dark' | 'default';
-  adaptive: AdaptiveClasses;
 
   // Actions
   setSelectedGroupId: (id: string | null) => void;
@@ -426,57 +407,6 @@ export function useLightsData(): UseLightsDataReturn {
   // Determine contrast mode for adaptive UI
   const contrastMode = dynamicRoomStyle ? getContrastMode(roomColors, roomOnBrightness) : 'default';
 
-  // Adaptive UI classes based on background contrast
-  const adaptiveClasses: Record<'light' | 'dark' | 'default', AdaptiveClasses> = {
-    // For bright backgrounds (yellow, white, etc.) - use dark UI elements
-    light: {
-      heading: 'text-slate-900',
-      text: 'text-slate-700',
-      textSecondary: 'text-slate-600',
-      badge: 'bg-slate-900/90 text-white',
-      badgeGlow: 'bg-slate-900/40',
-      statusOn: 'bg-slate-900/70 text-white border border-slate-700',
-      statusOff: 'bg-white/60 text-slate-800 border border-slate-300',
-      buttonVariant: 'outline',
-      buttonClass: '!bg-slate-900/90 !text-white !border-slate-700 hover:!bg-slate-800',
-      slider: 'bg-slate-300 accent-slate-800',
-      brightnessPanel: 'bg-white/60 border border-slate-200/80',
-      brightnessValue: 'text-slate-900',
-    },
-    // For dark backgrounds (blue, purple, etc.) - use light UI elements
-    dark: {
-      heading: 'text-white',
-      text: 'text-slate-100',
-      textSecondary: 'text-slate-200',
-      badge: 'bg-white/95 text-slate-900',
-      badgeGlow: 'bg-white/50',
-      statusOn: 'bg-white/80 text-slate-900 border border-white/60',
-      statusOff: 'bg-slate-900/70 text-white border border-slate-500',
-      buttonVariant: 'outline',
-      buttonClass: '!bg-white/90 !text-slate-900 !border-white/60 hover:!bg-white',
-      slider: 'bg-slate-600 accent-white',
-      brightnessPanel: 'bg-slate-900/60 border border-slate-500/80',
-      brightnessValue: 'text-white',
-    },
-    // Default (no dynamic style) - use existing ember noir styling
-    default: {
-      heading: '',
-      text: '',
-      textSecondary: '',
-      badge: '',
-      badgeGlow: '',
-      statusOn: '',
-      statusOff: '',
-      buttonVariant: null,
-      buttonClass: '',
-      slider: '',
-      brightnessPanel: '',
-      brightnessValue: '',
-    },
-  };
-
-  const adaptive = adaptiveClasses[contrastMode];
-
   return {
     // Core state
     loading,
@@ -518,7 +448,6 @@ export function useLightsData(): UseLightsDataReturn {
     roomOnBrightness,
     dynamicRoomStyle,
     contrastMode,
-    adaptive,
 
     // Actions
     setSelectedGroupId,

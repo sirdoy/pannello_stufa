@@ -12,6 +12,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { GlassCard } from '@/app/components/EmberGlass/GlassCard';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
+import InlineSelect from '@/app/components/ui/InlineSelect';
 import {
   errorTextStyle,
   inputStyle,
@@ -185,11 +186,11 @@ function CreateUserForm({ onCreated }: { onCreated: (user: UserAdmin) => void })
         </div>
         <div>
           <label htmlFor="new-role" style={labelStyle}>Ruolo</label>
-          <select id="new-role" value={role} onChange={(e) => setRole(e.target.value as UserRole)} style={inputStyle}>
+          <InlineSelect id="new-role" size="md" className="w-full" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
             {(Object.keys(ROLE_LABEL) as UserRole[]).map((r) => (
               <option key={r} value={r}>{ROLE_LABEL[r]}</option>
             ))}
-          </select>
+          </InlineSelect>
         </div>
         <div>
           <label htmlFor="new-password" style={labelStyle}>Password (vuota = generata)</label>
@@ -300,11 +301,11 @@ function UserRow({ user, onSaved }: { user: UserAdmin; onSaved: (user: UserAdmin
           </div>
           <div>
             <label htmlFor={`role-${user.id}`} style={labelStyle}>Ruolo</label>
-            <select id={`role-${user.id}`} value={role} onChange={(e) => setRole(e.target.value as UserRole)} style={inputStyle}>
+            <InlineSelect id={`role-${user.id}`} size="md" className="w-full" value={role} onChange={(e) => setRole(e.target.value as UserRole)}>
               {(Object.keys(ROLE_LABEL) as UserRole[]).map((r) => (
                 <option key={r} value={r}>{ROLE_LABEL[r]}</option>
               ))}
-            </select>
+            </InlineSelect>
           </div>
           <div>
             <label htmlFor={`pw-${user.id}`} style={labelStyle}>Nuova password (opzionale)</label>

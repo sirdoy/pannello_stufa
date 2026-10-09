@@ -20,6 +20,7 @@ import Button from '@/app/components/ui/Button';
 import Switch from '@/app/components/ui/Switch';
 import { Text, Badge, Banner } from '@/app/components/ui';
 import Skeleton from '@/app/components/ui/Skeleton';
+import DeviceIcon from '@/app/components/ui/DeviceIcon';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 
 interface DashboardCard {
@@ -165,7 +166,7 @@ export default function DashboardSettingsPage() {
             <div className="flex items-center justify-between">
               {/* Left: Icon + Label + Badge */}
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{card.icon}</span>
+                <DeviceIcon device={card.id} className="shrink-0 text-(--text-2)" />
                 <div className="flex items-center gap-2">
                   <Text className="font-medium">{card.label}</Text>
                   {!card.visible && (

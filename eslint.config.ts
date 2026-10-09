@@ -2,6 +2,41 @@ import nextConfig from "eslint-config-next";
 import nextTypescript from "eslint-config-next/typescript";
 import tailwindcss from "eslint-plugin-tailwindcss";
 
+const SLATE_OR_GRADIENT = "/(^|[\\s:])((bg|text|border)-slate-|bg-linear-to-)/";
+
+const designSystemColours = [
+  {
+    selector: `Literal[value=${SLATE_OR_GRADIENT}], TemplateElement[value.raw=${SLATE_OR_GRADIENT}]`,
+    message: "No hand-picked slate colours or gradients: use the design-system components or tokens (.claude/rules/design-system.md).",
+  },
+];
+
+const designSystemTitle = [
+  {
+    selector: "JSXOpeningElement[name.name='h1']",
+    message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title.",
+  },
+  {
+    selector: "JSXOpeningElement[name.name='Heading'] > JSXAttribute[name.name='level'][value.expression.value=1]",
+    message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title; section titles start at level 2.",
+  },
+];
+
+const designSystemNativeControls = [
+  {
+    selector: "JSXOpeningElement[name.name='select']",
+    message: "Use Select or InlineSelect (app/components/ui) instead of a native <select>.",
+  },
+  {
+    selector: "JSXOpeningElement[name.name='table']",
+    message: "Use DataTable (app/components/ui/DataTable.tsx) instead of a native <table>.",
+  },
+  {
+    selector: "JSXOpeningElement[name.name='input'] > JSXAttribute[name.name='type'][value.value='range']",
+    message: "Use RangeSlider or Slider (app/components/ui) instead of a native range input.",
+  },
+];
+
 const eslintConfig = [
   // Generated output, reports and agent worktrees are not source
   {
@@ -25,65 +60,46 @@ const eslintConfig = [
     },
   },
 
-  // Design system (workspace ROADMAP M72, ../.claude/rules/design-system.md): the page title is always the shared
-  // PageHeader, never a hand-made <h1>. Home (dashboard grid) and login (no app chrome) keep a plain <h1>.
+  // Design system (workspace ROADMAP M72, M73, M75; ../.claude/rules/design-system.md).
+  // `no-restricted-syntax` is one rule: a later block replaces the selectors of an earlier one for the files it
+  // matches, so every block below spreads the selectors it keeps.
+  //  - colours: no hand-picked slate colours or gradients in class names, in every file of app/ (.ts maps too)
+  //  - title: the page title is always the shared PageHeader, never a hand-made <h1>
+  //  - native controls: <select>, <table> and <input type="range"> live only inside the design system
+  {
+    name: "project/design-system-colours",
+    files: ["app/**/*.{ts,tsx}"],
+    ignores: ["**/__tests__/**", "**/*.test.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": ["error", ...designSystemColours],
+    },
+  },
   {
     name: "project/design-system",
     files: ["app/**/*.tsx"],
+    // Home (dashboard grid), root loading and login (no app chrome) keep a plain <h1>
     ignores: [
       "app/components/EmberGlass/PageHeader.tsx",
       "app/page.tsx",
       "app/loading.tsx",
       "app/auth/login/page.tsx",
+      "app/layout.tsx",
+      "app/components/ui/**",
+      "app/components/EmberGlass/**/primitives/**",
       "**/__tests__/**",
       "**/*.test.tsx",
     ],
     rules: {
-      "no-restricted-syntax": ["error",
-        {
-          selector: "JSXOpeningElement[name.name='h1']",
-          message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title.",
-        },
-        {
-          selector: "JSXOpeningElement[name.name='Heading'] > JSXAttribute[name.name='level'][value.expression.value=1]",
-          message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title; section titles start at level 2.",
-        },
-      ],
+      "no-restricted-syntax": ["error", ...designSystemColours, ...designSystemTitle, ...designSystemNativeControls],
     },
   },
-
-  // Design system (M73): no hand-picked surface/text colours or gradients in class names. Use Card, Text,
-  // Heading, Button, Badge or the tokens (text-(--text-1), text-(--text-2), bg-white/4, border-white/8).
-  // The dev-only debug pages are not migrated yet (workspace ROADMAP M75).
+  // The design system itself writes the native controls, but still never an <h1>
   {
-    name: "project/design-system-colours",
-    files: ["app/**/*.tsx"],
-    // Later blocks replace the rule of earlier ones: the files exempt from the <h1> check above are listed again
-    ignores: [
-      "app/debug/**",
-      "app/layout.tsx",
-      "app/components/EmberGlass/PageHeader.tsx",
-      "app/page.tsx",
-      "app/loading.tsx",
-      "app/auth/login/page.tsx",
-      "**/__tests__/**",
-      "**/*.test.tsx",
-    ],
+    name: "project/design-system-primitives",
+    files: ["app/components/ui/**/*.tsx", "app/components/EmberGlass/**/primitives/**/*.tsx"],
+    ignores: ["**/__tests__/**", "**/*.test.tsx"],
     rules: {
-      "no-restricted-syntax": ["error",
-        {
-          selector: "JSXOpeningElement[name.name='h1']",
-          message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title.",
-        },
-        {
-          selector: "JSXOpeningElement[name.name='Heading'] > JSXAttribute[name.name='level'][value.expression.value=1]",
-          message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title; section titles start at level 2.",
-        },
-        {
-          selector: "Literal[value=/(^|[\\s:])((bg|text|border)-slate-|bg-linear-to-)/], TemplateElement[value.raw=/(^|[\\s:])((bg|text|border)-slate-|bg-linear-to-)/]",
-          message: "No hand-picked slate colours or gradients: use the design-system components or tokens (.claude/rules/design-system.md).",
-        },
-      ],
+      "no-restricted-syntax": ["error", ...designSystemColours, ...designSystemTitle],
     },
   },
 

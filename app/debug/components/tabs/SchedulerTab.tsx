@@ -89,7 +89,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       </div>
 
       {/* Scheduler Jobs Reference */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+      <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Heading level={3} size="sm" className="mb-3">
           ⏰ Automated Jobs
         </Heading>
@@ -113,7 +113,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       </div>
 
       {/* Cron Health */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+      <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Heading level={3} size="sm" className="mb-3">
           💚 Cron Health
         </Heading>

@@ -99,7 +99,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
   return (
     <div className="space-y-6">
       {/* Info box */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+      <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Text variant="secondary" size="sm">
           Network API endpoints proxy to the Fritz!Box Home Network API at{''}
           <code className="text-xs">{EXTERNAL_BASE}</code>. All proxy routes require an authenticated session.
@@ -265,7 +265,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
             onCopyUrl={() => copyUrlToClipboard('/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF')}
             isCopied={copiedUrl === '/api/v1/fritzbox/vendor-lookup?mac=AA:BB:CC:DD:EE:FF'}
           />
-          <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+          <div className="rounded-lg border border-white/8 bg-white/4 p-4">
             <Text variant="secondary" size="sm">
               Change the <code className="text-xs">mac</code> parameter to look up different MAC addresses.
             </Text>

@@ -22,6 +22,7 @@ import Toggle from '@/app/components/ui/Toggle';
 import Banner from '@/app/components/ui/Banner';
 import Badge from '@/app/components/ui/Badge';
 import Skeleton from '@/app/components/ui/Skeleton';
+import DeviceIcon from '@/app/components/ui/DeviceIcon';
 import { Heading, Text } from '@/app/components/ui';
 import LocationSearch from '@/app/components/LocationSearch';
 import { MapPin, Smartphone, ChevronUp, ChevronDown } from 'lucide-react';
@@ -344,7 +345,7 @@ function UnifiedDevicesContent() {
                 <div className="flex items-center justify-between gap-2 sm:gap-4">
                   {/* Left: Icon + Name + Description + Badges */}
                   <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <span className="shrink-0 text-2xl">{device.icon}</span>
+                    <DeviceIcon device={device.id} className="shrink-0 text-(--text-2)" />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <Text className="truncate">{device.name}</Text>

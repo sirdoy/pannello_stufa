@@ -32,7 +32,7 @@ function CopyUrl({ url }: { url: string }) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="max-w-70 truncate font-mono text-xs text-slate-300" title={url}>
+      <span className="max-w-70 truncate font-mono text-xs text-(--text-1)" title={url}>
         {url}
       </span>
       <Button
@@ -65,13 +65,13 @@ export default function FritzboxServiceDiscoveryTab() {
       accessorKey: 'name',
       header: 'Servizio',
       enableSorting: true,
-      cell: ({ row }) => <span className="font-medium text-slate-200">{row.original.name}</span>,
+      cell: ({ row }) => <span className="font-medium text-(--text-1)">{row.original.name}</span>,
     },
     {
       accessorKey: 'type',
       header: 'Tipo (URN)',
       enableSorting: true,
-      cell: ({ row }) => <span className="font-mono text-xs text-slate-400">{row.original.type}</span>,
+      cell: ({ row }) => <span className="font-mono text-xs text-(--text-2)">{row.original.type}</span>,
     },
     {
       accessorKey: 'url',
@@ -122,7 +122,7 @@ export default function FritzboxServiceDiscoveryTab() {
           <Skeleton className="h-100 rounded-2xl" />
         ) : services.length === 0 && !error ? (
           <EmptyState
-            icon={<Network size={48} className="text-slate-500" />}
+            icon={<Network size={48} className="text-(--text-2)" />}
             title="Nessun servizio rilevato"
             description="Il Fritz!Box non ha restituito servizi TR-064. Verifica che TR-064 sia abilitato nelle impostazioni del router."
             size="md"

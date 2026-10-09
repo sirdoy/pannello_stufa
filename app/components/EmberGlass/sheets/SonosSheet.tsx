@@ -13,6 +13,7 @@ import {
 import { useDebounce } from '@/app/hooks/useDebounce';
 import { sortZonesPlayingFirst } from '@/lib/sonos/sortZones';
 import { PlayingBars } from '../PlayingBars';
+import RangeSlider from '@/app/components/ui/RangeSlider';
 
 interface SonosGroup {
   id: string;
@@ -283,8 +284,7 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <Volume2 size={16} stroke="rgba(255,255,255,0.5)" strokeWidth={2} />
-            <input
-              type="range"
+            <RangeSlider
               data-testid="sonos-sheet-volume-slider"
               data-sheet-focusable="true"
               aria-label="Volume"
@@ -292,7 +292,8 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
               max={100}
               value={pendingVolume}
               onChange={(e) => setPendingVolume(Number(e.target.value))}
-              style={{ flex: 1, accentColor: '#b080ff' }} // AUDIT-EXCEPTION
+              color="#b080ff" // AUDIT-EXCEPTION
+              className="flex-1"
             />
             <div
               data-testid="sonos-sheet-volume-readout"

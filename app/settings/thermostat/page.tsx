@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react';
 import { GlassCard } from '@/app/components/EmberGlass/GlassCard';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
+import InlineSelect from '@/app/components/ui/InlineSelect';
 import { InlineToggle } from '@/app/components/EmberGlass/InlineToggle';
 import {
   errorTextStyle,
@@ -81,13 +82,13 @@ function LevelSelect({
       <label htmlFor={id} style={labelStyle}>
         {label}
       </label>
-      <select id={id} value={value} onChange={(e) => onChange(Number(e.target.value))} style={inputStyle}>
+      <InlineSelect id={id} size="md" className="w-full" value={value} onChange={(e) => onChange(Number(e.target.value))}>
         {options.map((o) => (
           <option key={o} value={o}>
             {o}
           </option>
         ))}
-      </select>
+      </InlineSelect>
     </div>
   );
 }
@@ -211,12 +212,13 @@ export default function ThermostatSettingsPage() {
         <label htmlFor="climate-room" style={labelStyle}>
           Stanza
         </label>
-        <select
+        <InlineSelect
           id="climate-room"
+          size="md"
+          className="mb-4 w-full"
           value={state.room_id ?? ''}
           disabled={busy}
           onChange={(e) => e.target.value && void save({ room_id: e.target.value }, 'Stanza salvata')}
-          style={{ ...inputStyle, marginBottom: 16 }}
         >
           {!state.room_id && <option value="">Scegli una stanza…</option>}
           {roomOptions.map((r) => (
@@ -224,7 +226,7 @@ export default function ThermostatSettingsPage() {
               {r.name}
             </option>
           ))}
-        </select>
+        </InlineSelect>
 
         <div style={gridStyle} data-testid="climate-live">
           <Reading label="Setpoint del programma" value={degrees(live.setpoint)} />

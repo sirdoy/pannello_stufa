@@ -13,6 +13,7 @@ import type {
 } from '@/types/sonosProxy';
 import Card from '@/app/components/ui/Card';
 import Heading from '@/app/components/ui/Heading';
+import RangeSlider from '@/app/components/ui/RangeSlider';
 import Text from '@/app/components/ui/Text';
 import type { UseSonosCommandsReturn } from '../hooks/useSonosCommands';
 import SonosNowPlaying from './SonosNowPlaying';
@@ -115,13 +116,11 @@ export default function SonosZoneSection({
         <Heading level={3} size="sm" variant="subtle" className="mb-2">Volume Zona</Heading>
         <div className="flex items-center gap-3">
           <Text as="span" variant="secondary" size="xs" className="w-8 text-right">{localZoneVolume}%</Text>
-          <input
-            type="range"
+          <RangeSlider
             min={0}
             max={100}
             value={localZoneVolume}
             onChange={handleZoneVolumeChange}
-            className="h-2 w-full rounded-lg bg-white/10 accent-ember-500"
             aria-label="Volume Zona"
           />
         </div>

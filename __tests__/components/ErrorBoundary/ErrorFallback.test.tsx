@@ -47,7 +47,7 @@ describe('ErrorFallback', () => {
         error={error}
         resetErrorBoundary={mockResetErrorBoundary}
         deviceName="Stufa"
-        deviceIcon="🔥"
+        deviceId="stove"
       />
     );
 
@@ -62,11 +62,11 @@ describe('ErrorFallback', () => {
         error={error}
         resetErrorBoundary={mockResetErrorBoundary}
         deviceName="Stufa"
-        deviceIcon="🔥"
+        deviceId="stove"
       />
     );
 
-    expect(screen.getByText('🔥')).toBeInTheDocument();
+    expect(document.querySelector('svg.lucide-flame')).toBeInTheDocument();
   });
 
   it('renders error message from error prop', () => {
@@ -77,7 +77,7 @@ describe('ErrorFallback', () => {
         error={error}
         resetErrorBoundary={mockResetErrorBoundary}
         deviceName="Stufa"
-        deviceIcon="🔥"
+        deviceId="stove"
       />
     );
 
@@ -92,7 +92,7 @@ describe('ErrorFallback', () => {
         error={error}
         resetErrorBoundary={mockResetErrorBoundary}
         deviceName="Stufa"
-        deviceIcon="🔥"
+        deviceId="stove"
       />
     );
 
@@ -107,7 +107,7 @@ describe('ErrorFallback', () => {
         error={error}
         resetErrorBoundary={mockResetErrorBoundary}
         deviceName="Stufa"
-        deviceIcon="🔥"
+        deviceId="stove"
       />
     );
 
@@ -124,7 +124,7 @@ describe('ErrorFallback', () => {
         error={error}
         resetErrorBoundary={mockResetErrorBoundary}
         deviceName="Stufa"
-        deviceIcon="🔥"
+        deviceId="stove"
       />
     );
 

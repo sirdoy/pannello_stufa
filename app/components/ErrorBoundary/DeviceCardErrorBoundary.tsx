@@ -7,13 +7,13 @@ import ErrorFallback from './ErrorFallback';
 interface DeviceCardErrorBoundaryProps {
   children: React.ReactNode;
   deviceName: string;
-  deviceIcon: string;
+  deviceId: string;
 }
 
 export default function DeviceCardErrorBoundary({
   children,
   deviceName,
-  deviceIcon,
+  deviceId,
 }: DeviceCardErrorBoundaryProps) {
   const handleError = (error: unknown) => {
     // Re-throw ValidationError to bypass boundary (let it bubble up for safety alerts)
@@ -29,7 +29,7 @@ export default function DeviceCardErrorBoundary({
   return (
     <ErrorBoundary
       FallbackComponent={(props) => (
-        <ErrorFallback {...props} deviceName={deviceName} deviceIcon={deviceIcon} />
+        <ErrorFallback {...props} deviceName={deviceName} deviceId={deviceId} />
       )}
       onError={handleError}
     >

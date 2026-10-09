@@ -10,6 +10,7 @@
  * D-02: inline-style + var(--token) only.
  */
 import { X } from 'lucide-react';
+import InlineSelect from '@/app/components/ui/InlineSelect';
 import type { ConditionNode } from '@/types/automations';
 import { CONDITION_TYPES, defaultCondition } from './lib/automations-config';
 import { IconBtn } from './primitives/IconBtn';
@@ -63,28 +64,19 @@ export function ConditionItem({ cond, onChange, onRemove }: ConditionItemProps) 
     >
       {/* Header: type-select + remove button */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-        <select
+        <InlineSelect
+          size="xs"
+          className="min-w-0 flex-1"
           value={pickerType}
           onChange={(e) => handleTypeChange(e.target.value)}
           aria-label="Tipo condizione"
-          style={{
-            flex: 1,
-            height: 28,
-            borderRadius: 7,
-            background: 'rgba(255,255,255,0.05)',
-            border: '0.5px solid rgba(255,255,255,0.08)',
-            color: '#fff',
-            padding: '0 8px',
-            fontSize: 12,
-            fontFamily: 'inherit',
-          }}
         >
           {options.map((opt) => (
-            <option key={opt.id} value={opt.id} style={{ color: '#000' }}>
+            <option key={opt.id} value={opt.id}>
               {opt.label}
             </option>
           ))}
-        </select>
+        </InlineSelect>
         <IconBtn onClick={onRemove} aria-label="Rimuovi condizione">
           <X size={12} />
         </IconBtn>

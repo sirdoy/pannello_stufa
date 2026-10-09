@@ -112,7 +112,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       )}
 
       {/* Weather Info */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+      <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Text variant="secondary" size="sm">
           Weather data is fetched from Open-Meteo API by <code className="text-xs">/api/weather/forecast</code> and
           cached in memory for 15 minutes (stale-while-revalidate: stale data is served while a refresh runs). No cron
@@ -148,7 +148,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       </div>
 
       {/* Additional Info */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+      <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Heading level={3} size="sm" className="mb-2">
           📍 Cache Configuration
         </Heading>

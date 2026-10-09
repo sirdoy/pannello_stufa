@@ -1,6 +1,7 @@
 'use client';
 
 import Button from '@/app/components/ui/Button';
+import InlineSelect from '@/app/components/ui/InlineSelect';
 
 interface SonosGroupControlsProps {
   uid: string;
@@ -41,8 +42,9 @@ export default function SonosGroupControls({
 
     return (
       <div className="mt-2 inline-flex items-center gap-2">
-        {/* Native select: ui/Select has no aria-label and no empty value (action menu that resets itself) */}
-        <select
+        {/* InlineSelect: an action menu that resets itself to the empty value */}
+        <InlineSelect
+          size="md"
           onChange={e => {
             const targetUid = e.target.value;
             if (targetUid) {
@@ -52,7 +54,6 @@ export default function SonosGroupControls({
             }
           }}
           defaultValue=""
-          className="h-11 rounded-xl border-[0.5px] border-white/14 bg-white/6 px-3 text-[13px] text-(--text-1)"
           aria-label="Unisci a un gruppo"
         >
           <option value="" disabled>
@@ -63,7 +64,7 @@ export default function SonosGroupControls({
               {zone.label}
             </option>
           ))}
-        </select>
+        </InlineSelect>
       </div>
     );
   }

@@ -73,7 +73,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
   return (
     <div className="space-y-6">
       {/* Firebase Info */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+      <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Text variant="secondary" size="sm">
           Firebase Realtime Database stores all application state including schedules, device preferences, maintenance
           tracking, and cron health data. The /api/health endpoint verifies Firebase connectivity.
@@ -144,7 +144,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
       </div>
 
       {/* Firebase Paths Reference */}
-      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-4">
+      <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Heading level={3} size="sm" className="mb-3">
           📂 Key Firebase Paths
         </Heading>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Button from '@/app/components/ui/Button';
 import Heading from '@/app/components/ui/Heading';
+import InlineSelect from '@/app/components/ui/InlineSelect';
 import Text from '@/app/components/ui/Text';
 import Badge from '@/app/components/ui/Badge';
 import { Copy, Check, ChevronDown, ChevronUp, Clock } from 'lucide-react';
@@ -59,7 +60,7 @@ export function EndpointCard({
       className={`rounded-lg border p-4 transition-colors ${
         hasError
           ? 'border-danger-500/50 bg-danger-500/5'
-          : 'border-slate-700 bg-slate-800/50'
+          : 'border-white/8 bg-white/4'
       }`}
     >
       <div className="mb-3 flex items-start justify-between">
@@ -72,7 +73,7 @@ export function EndpointCard({
               GET
             </Badge>
             {timing && (
-              <span className="flex items-center gap-1 text-xs text-slate-400">
+              <span className="flex items-center gap-1 text-xs text-(--text-2)">
                 <Clock className="size-3" />
                 {timing}ms
               </span>
@@ -90,18 +91,18 @@ export function EndpointCard({
           </div>
           {externalUrl && (
             <div className="mt-1 flex items-center gap-2">
-              <code className="block truncate text-xs text-slate-400">
+              <code className="block truncate text-xs text-(--text-2)">
                 {externalUrl}
               </code>
               <button
                 onClick={onCopyUrl}
-                className="shrink-0 rounded p-1 transition-colors hover:bg-slate-700"
+                className="shrink-0 rounded p-1 transition-colors hover:bg-white/14"
                 title="Copy external URL"
               >
                 {isCopied ? (
                   <Check className="size-3 text-green-500" />
                 ) : (
-                  <Copy className="size-3 text-slate-400" />
+                  <Copy className="size-3 text-(--text-2)" />
                 )}
               </button>
             </div>
@@ -182,7 +183,7 @@ export function PostEndpointCard({
       className={`rounded-lg border p-4 transition-colors ${
         hasError
           ? 'border-danger-500/50 bg-danger-500/5'
-          : 'border-slate-700 bg-slate-800/50'
+          : 'border-white/8 bg-white/4'
       }`}
     >
       <div className="mb-3 flex items-start justify-between">
@@ -195,7 +196,7 @@ export function PostEndpointCard({
               POST
             </Badge>
             {timing && (
-              <span className="flex items-center gap-1 text-xs text-slate-400">
+              <span className="flex items-center gap-1 text-xs text-(--text-2)">
                 <Clock className="size-3" />
                 {timing}ms
               </span>
@@ -213,18 +214,18 @@ export function PostEndpointCard({
           </div>
           {externalUrl && (
             <div className="mt-1 flex items-center gap-2">
-              <code className="block truncate text-xs text-slate-400">
+              <code className="block truncate text-xs text-(--text-2)">
                 {externalUrl}
               </code>
               <button
                 onClick={onCopyUrl}
-                className="shrink-0 rounded p-1 transition-colors hover:bg-slate-700"
+                className="shrink-0 rounded p-1 transition-colors hover:bg-white/14"
                 title="Copy external URL"
               >
                 {isCopied ? (
                   <Check className="size-3 text-green-500" />
                 ) : (
-                  <Copy className="size-3 text-slate-400" />
+                  <Copy className="size-3 text-(--text-2)" />
                 )}
               </button>
             </div>
@@ -239,17 +240,17 @@ export function PostEndpointCard({
                     {param.label}:
                   </Text>
                   {param.type === 'select' ? (
-                    <select
+                    <InlineSelect
+                      className="flex-1"
                       value={formValues[param.name]}
                       onChange={(e) => handleInputChange(param.name, e.target.value)}
-                      className="flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-slate-100"
                     >
                       {param.options?.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
                         </option>
                       ))}
-                    </select>
+                    </InlineSelect>
                   ) : (
                     <input
                       type={param.type || 'text'}
@@ -262,7 +263,7 @@ export function PostEndpointCard({
                           param.type === 'number' ? e.target.value : e.target.value
                         )
                       }
-                      className="flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-slate-100"
+                      className="flex-1 rounded-lg border border-white/8 bg-white/8 px-3 py-1.5 text-(--text-1)"
                     />
                   )}
                 </div>
@@ -311,16 +312,16 @@ function JsonDisplay({ data }: JsonDisplayProps) {
     <div className="relative">
       <button
         onClick={handleCopy}
-        className="absolute top-2 right-2 z-10 rounded bg-slate-800 p-1.5 transition-colors hover:bg-slate-700"
+        className="absolute top-2 right-2 z-10 rounded bg-white/8 p-1.5 transition-colors hover:bg-white/14"
         title="Copy JSON"
       >
         {copied ? (
           <Check className="size-3.5 text-green-500" />
         ) : (
-          <Copy className="size-3.5 text-slate-400" />
+          <Copy className="size-3.5 text-(--text-2)" />
         )}
       </button>
-      <pre className="mt-2 overflow-x-auto rounded-lg bg-slate-900 p-3 font-mono text-xs text-green-400">
+      <pre className="mt-2 overflow-x-auto rounded-lg bg-black/30 p-3 font-mono text-xs text-green-400">
         {JSON.stringify(data, null, 2)}
       </pre>
     </div>

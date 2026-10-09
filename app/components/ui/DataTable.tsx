@@ -61,6 +61,7 @@ type DataTableComponent = (<TData>(
   props: DataTableProps<TData> & RefAttributes<HTMLDivElement>
 ) => ReactElement | null) & { displayName?: string };
 import Checkbox from './Checkbox';
+import InlineSelect from './InlineSelect';
 import Button from './Button';
 import Text from './Text';
 import DataTableToolbar, { type DataTableBulkAction } from './DataTableToolbar';
@@ -687,24 +688,18 @@ const DataTable = forwardRef(function DataTable<TData>(
               >
                 Rows:
               </label>
-              <select
+              <InlineSelect
                 id="page-size"
+                size="xs"
                 value={pageSize}
                 onChange={(e) => table.setPageSize(Number(e.target.value))}
-                className={cn(
-                  'rounded-lg px-2 py-1 text-sm',
-                  'bg-white/6 text-(--text-1)',
-                  'border-[0.5px] border-white/8',
-                  'focus:outline-none focus-visible:ring-2',
-                  'focus-visible:ring-ember-500/50',
-                )}
               >
                 {pageSizeOptions.map((size: number) => (
                   <option key={size} value={size}>
                     {size}
                   </option>
                 ))}
-              </select>
+              </InlineSelect>
             </div>
           )}
           </div>

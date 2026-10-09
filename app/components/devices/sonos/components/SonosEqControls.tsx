@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import { ChevronDown } from 'lucide-react';
 import Button from '@/app/components/ui/Button';
+import RangeSlider from '@/app/components/ui/RangeSlider';
 import Text from '@/app/components/ui/Text';
 import type { SonosEqResponse, SetEqRequest } from '@/types/sonosProxy';
 
@@ -68,13 +69,12 @@ export default function SonosEqControls({ uid, eqData, onSetEq }: SonosEqControl
           {/* Bass slider */}
           <div className="flex items-center gap-3">
             <Text as="span" variant="secondary" size="xs" className="w-14">Bass</Text>
-            <input
-              type="range"
+            <RangeSlider
               min={-10}
               max={10}
               value={localBass}
               onChange={handleBassChange}
-              className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
+              className="flex-1"
               aria-label="Bass"
             />
             <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">
@@ -85,13 +85,12 @@ export default function SonosEqControls({ uid, eqData, onSetEq }: SonosEqControl
           {/* Treble slider */}
           <div className="flex items-center gap-3">
             <Text as="span" variant="secondary" size="xs" className="w-14">Treble</Text>
-            <input
-              type="range"
+            <RangeSlider
               min={-10}
               max={10}
               value={localTreble}
               onChange={handleTrebleChange}
-              className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
+              className="flex-1"
               aria-label="Treble"
             />
             <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">

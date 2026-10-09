@@ -64,7 +64,7 @@ describe('DeviceCardErrorBoundary', () => {
 
   it('renders children when no error occurs', () => {
     render(
-      <DeviceCardErrorBoundary deviceName="Stufa" deviceIcon="🔥">
+      <DeviceCardErrorBoundary deviceName="Stufa" deviceId="stove">
         <BrokenComponent shouldThrow={false} />
       </DeviceCardErrorBoundary>
     );
@@ -74,14 +74,14 @@ describe('DeviceCardErrorBoundary', () => {
 
   it('shows ErrorFallback when child throws Error (crash isolation)', () => {
     render(
-      <DeviceCardErrorBoundary deviceName="Stufa" deviceIcon="🔥">
+      <DeviceCardErrorBoundary deviceName="Stufa" deviceId="stove">
         <BrokenComponent />
       </DeviceCardErrorBoundary>
     );
 
     // Should show error fallback UI
     expect(screen.getByTestId('heading')).toHaveTextContent('Errore: Stufa');
-    expect(screen.getByText('🔥')).toBeInTheDocument();
+    expect(document.querySelector('svg.lucide-flame')).toBeInTheDocument();
     expect(screen.getByTestId('text')).toHaveTextContent('Component crashed');
     expect(screen.getByTestId('button')).toHaveTextContent('Riprova');
   });
@@ -109,7 +109,7 @@ describe('DeviceCardErrorBoundary', () => {
 
     render(
       <ParentBoundary>
-        <DeviceCardErrorBoundary deviceName="Stufa" deviceIcon="🔥">
+        <DeviceCardErrorBoundary deviceName="Stufa" deviceId="stove">
           <ValidationBrokenComponent />
         </DeviceCardErrorBoundary>
       </ParentBoundary>
@@ -123,7 +123,7 @@ describe('DeviceCardErrorBoundary', () => {
 
   it('logs error to console when error is caught', async () => {
     render(
-      <DeviceCardErrorBoundary deviceName="Stufa" deviceIcon="🔥">
+      <DeviceCardErrorBoundary deviceName="Stufa" deviceId="stove">
         <BrokenComponent />
       </DeviceCardErrorBoundary>
     );
@@ -148,7 +148,7 @@ describe('DeviceCardErrorBoundary', () => {
     };
 
     render(
-      <DeviceCardErrorBoundary deviceName="Stufa" deviceIcon="🔥">
+      <DeviceCardErrorBoundary deviceName="Stufa" deviceId="stove">
         <ToggleableComponent />
       </DeviceCardErrorBoundary>
     );

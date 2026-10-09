@@ -178,7 +178,7 @@ export default function TransitionsDebugPage() {
                   rounded-xl p-3
                   ${selectedType === transition.type
                     ? `bg-${transition.color}-400/20 text-${transition.color}-400`
-                    : 'bg-white/6 text-slate-400 group-hover:text-slate-300'
+                    : 'bg-white/6 text-(--text-2) group-hover:text-(--text-1)'
                   }
                   transition-colors
                 `}>
@@ -239,7 +239,7 @@ export default function TransitionsDebugPage() {
               {/* Background gradient on hover */}
               <div className="
                 absolute inset-0
-                bg-linear-to-br from-ember-500/5 to-flame-500/5
+                bg-ember-500/5
                 opacity-0 transition-opacity
                 duration-300 group-hover:opacity-100
               "/>
@@ -300,7 +300,7 @@ export default function TransitionsDebugPage() {
             <Text className="mb-2 text-ember-400">
               1. Import TransitionLink
             </Text>
-            <pre className="overflow-x-auto rounded-xl bg-slate-950/50 p-4 text-sm">
+            <pre className="overflow-x-auto rounded-xl bg-black/30 p-4 text-sm">
               <code className="text-sage-300">
 {`import TransitionLink from '@/app/components/TransitionLink';`}
               </code>
@@ -311,7 +311,7 @@ export default function TransitionsDebugPage() {
             <Text className="mb-2 text-ember-400">
               2. Usa al posto di Link
             </Text>
-            <pre className="overflow-x-auto rounded-xl bg-slate-950/50 p-4 text-sm">
+            <pre className="overflow-x-auto rounded-xl bg-black/30 p-4 text-sm">
               <code className="text-sage-300">
 {`// Default transition (slide-morph)
 <TransitionLink href="/stove">
@@ -333,7 +333,7 @@ export default function TransitionsDebugPage() {
             <Text className="mb-2 text-ember-400">
               3. Cambia transizione globalmente
             </Text>
-            <pre className="overflow-x-auto rounded-xl bg-slate-950/50 p-4 text-sm">
+            <pre className="overflow-x-auto rounded-xl bg-black/30 p-4 text-sm">
               <code className="text-sage-300">
 {`import { usePageTransition, TRANSITION_TYPES } from '@/app/context/PageTransitionContext';
 

@@ -12,8 +12,7 @@
  * Inline fetch of /api/devices/config (RESEARCH OQ-1: extract a hook only if
  * Phase 182 needs it). Mirrors legacy Navbar.tsx:140-167 idiom.
  *
- * device.icon is a STRING key from the registry, not a lucide component;
- * mapped via local ICON_MAP (mirrors rooms/lib/rooms-config.ts:ICON_FOR).
+ * The row icon comes from the device id (ui/DeviceIcon), never from the emoji in the registry.
  *
  * NOTE on CardHead API: Phase 177 CardHead requires { Icon, label, tone }
  * (not the `title` prop the original 181-03 plan/PATTERNS doc referenced).
@@ -32,31 +31,20 @@
 
 import { useEffect, useState } from 'react';
 import {
-  Flame, Thermometer, Lightbulb, Music, Package, Plug, Wifi, Cpu, Phone,
+  Thermometer, Cpu,
   ScrollText, Boxes, History,
   Settings, Bell, KeyRound, LayoutDashboard, MapPin, Users,
-  LogOut, MoreHorizontal,
+  LogOut,
   User,
   SlidersHorizontal,
-  type LucideIcon,
 } from 'lucide-react';
 import { GlassCard } from '../GlassCard';
+import { getDeviceIcon } from '@/app/components/ui/DeviceIcon';
 import { CardHead } from '../CardHead';
 import { PageHeader } from '../PageHeader';
 import { AltroRow } from './AltroRow';
 import { getNavigationStructureWithPreferences } from '@/lib/devices/deviceRegistry';
 
-const ICON_MAP: Record<string, LucideIcon> = {
-  flame: Flame,
-  thermometer: Thermometer,
-  lightbulb: Lightbulb,
-  music: Music,
-  package: Package,
-  plug: Plug,
-  wifi: Wifi,
-  cpu: Cpu,
-  phone: Phone,
-};
 
 const groupCardStyle = { aspectRatio: 'auto' as const };
 
@@ -104,7 +92,7 @@ export function AltroPage(): React.ReactElement {
               return (
                 <AltroRow
                   key={d.id}
-                  icon={ICON_MAP[d.icon] ?? MoreHorizontal}
+                  icon={getDeviceIcon(d.id)}
                   label={d.name}
                   href={href}
                 />

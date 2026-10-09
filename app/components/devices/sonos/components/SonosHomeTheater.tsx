@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import { ChevronDown } from 'lucide-react';
 import Button from '@/app/components/ui/Button';
+import RangeSlider from '@/app/components/ui/RangeSlider';
 import Text from '@/app/components/ui/Text';
 import type { SonosHomeTheaterResponse, SetHomeTheaterRequest } from '@/types/sonosProxy';
 
@@ -124,13 +125,12 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
               <Text as="span" variant="secondary" size="xs" className="w-24 shrink-0">
                 Guadagno Sub
               </Text>
-              <input
-                type="range"
+              <RangeSlider
                 min={-15}
                 max={15}
                 value={localSubGain}
                 onChange={handleSubGainChange}
-                className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
+                className="flex-1"
                 aria-label="Guadagno Sub"
               />
               <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">
@@ -145,13 +145,12 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
               <Text as="span" variant="secondary" size="xs" className="w-24 shrink-0">
                 Volume Surround TV
               </Text>
-              <input
-                type="range"
+              <RangeSlider
                 min={-15}
                 max={15}
                 value={localSurroundTv}
                 onChange={handleSurroundTvChange}
-                className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
+                className="flex-1"
                 aria-label="Volume Surround TV"
               />
               <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">
@@ -166,13 +165,12 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
               <Text as="span" variant="secondary" size="xs" className="w-24 shrink-0">
                 Volume Surround Musica
               </Text>
-              <input
-                type="range"
+              <RangeSlider
                 min={-15}
                 max={15}
                 value={localSurroundMusic}
                 onChange={handleSurroundMusicChange}
-                className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
+                className="flex-1"
                 aria-label="Volume Surround Musica"
               />
               <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">

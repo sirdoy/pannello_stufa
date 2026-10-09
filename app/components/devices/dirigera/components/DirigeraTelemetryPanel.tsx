@@ -1,7 +1,9 @@
 'use client';
 
+import type { ColumnDef } from '@tanstack/react-table';
 import Button from '@/app/components/ui/Button';
 import Card from '@/app/components/ui/Card';
+import DataTable from '@/app/components/ui/DataTable';
 import Heading from '@/app/components/ui/Heading';
 import Spinner from '@/app/components/ui/Spinner';
 import Text from '@/app/components/ui/Text';
@@ -18,6 +20,38 @@ function airText(r: SensorTelemetryReading): string {
     formatHumidity(r.humidity),
   ].join(' · ');
 }
+
+const dateTime = new Intl.DateTimeFormat('it-IT', { dateStyle: 'short', timeStyle: 'medium' });
+
+const COLUMNS: ColumnDef<SensorTelemetryReading>[] = [
+  { accessorKey: 'sensor_id', header: 'Sensore', enableSorting: false },
+  {
+    id: 'battery',
+    header: 'Batteria',
+    enableSorting: false,
+    cell: ({ row }) => (row.original.battery_percentage !== null ? `${row.original.battery_percentage}%` : '—'),
+  },
+  {
+    id: 'lux',
+    header: 'Lux',
+    enableSorting: false,
+    cell: ({ row }) => (row.original.light_level !== null ? `${row.original.light_level} lux` : '—'),
+  },
+  {
+    id: 'air',
+    header: 'Aria',
+    enableSorting: false,
+    cell: ({ row }) => <span className="whitespace-nowrap">{airText(row.original)}</span>,
+  },
+  {
+    id: 'timestamp',
+    header: 'Data/ora',
+    enableSorting: false,
+    cell: ({ row }) => (
+      <Text as="span" variant="secondary" size="sm">{dateTime.format(new Date(row.original.timestamp * 1000))}</Text>
+    ),
+  },
+];
 
 interface DirigeraTelemetryPanelProps {
   items: SensorTelemetryReading[];
@@ -83,43 +117,7 @@ export default function DirigeraTelemetryPanel({
       {/* Data state */}
       {items.length > 0 && (
         <>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs tracking-wide text-(--text-2) uppercase">
-                  <th className="pb-2 text-left">Sensore</th>
-                  <th className="pb-2 text-left">Batteria</th>
-                  <th className="pb-2 text-left">Lux</th>
-                  <th className="pb-2 text-left">Aria</th>
-                  <th className="pb-2 text-left">Data/ora</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map(reading => (
-                  <tr key={reading.id} className="border-t border-white/8">
-                    <td className="py-2">{reading.sensor_id}</td>
-                    <td className="py-2">
-                      {reading.battery_percentage !== null
-                        ? `${reading.battery_percentage}%`
-                        : '—'}
-                    </td>
-                    <td className="py-2">
-                      {reading.light_level !== null
-                        ? `${reading.light_level} lux`
-                        : '—'}
-                    </td>
-                    <td className="py-2 whitespace-nowrap">{airText(reading)}</td>
-                    <td className="py-2 text-(--text-2)">
-                      {new Intl.DateTimeFormat('it-IT', {
-                        dateStyle: 'short',
-                        timeStyle: 'medium',
-                      }).format(new Date(reading.timestamp * 1000))}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable data={items} columns={COLUMNS} density="compact" getRowId={(r) => String(r.id)} />
 
           {/* Load more button — hidden when all items loaded */}
           {items.length < total && (

@@ -416,7 +416,8 @@ export type AutomationsEventStatus =
   | 'condition_not_met';
 
 export type AutomationsTriggerSnapshotCause =
-  | { kind: 'leaf_false'; failed_sensor_ids: string[] }
+  | { kind: 'leaf_false'; failed_sensor_ids: string[]; stale_sensor_ids?: string[] }
+  | { kind: 'sensor_unavailable'; stale_sensor_ids: string[] } // hold rule left as it was
   | { kind: 'guard'; reason: string }
   | { kind: 'action'; action_index: number; action_type: string; error: string }
   | { kind: 'all_actions_failed'; actions: Array<{ index: number; type: string; error: string }> }

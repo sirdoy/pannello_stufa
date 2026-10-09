@@ -3,6 +3,7 @@
 import type React from 'react';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { Hourglass } from 'lucide-react';
 import Text from './Text';
 
 /**
@@ -11,8 +12,8 @@ import Text from './Text';
 export interface LoadingOverlayProps {
   show?: boolean;
   message?: string;
-  /** Emoji or React element icon */
-  icon?: string | React.ReactNode;
+  /** Icon element */
+  icon?: React.ReactNode;
 }
 
 /**
@@ -25,12 +26,12 @@ export interface LoadingOverlayProps {
  * @param {Object} props
  * @param {boolean} props.show - Show overlay
  * @param {string} props.message - Loading message
- * @param {string | React.ReactNode} props.icon - Emoji or React element icon
+ * @param {string | React.ReactNode} props.icon - Icon element
  */
 export default function LoadingOverlay({
   show = false,
   message = 'Caricamento...',
-  icon = '⏳',
+  icon = <Hourglass size={40} />,
 }: LoadingOverlayProps) {
   // Block body scroll when overlay is shown
   useEffect(() => {

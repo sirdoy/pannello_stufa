@@ -249,7 +249,7 @@ export default function DevicesSettingsPage() {
       {/* Info card */}
       <Card variant="glass" className="bg-ocean-900/10 p-6">
         <Heading level={3} size="md" variant="subtle" className="mb-3">
-          ℹ️ Note
+          Note
         </Heading>
         <ul className="space-y-2">
           <li className="flex gap-2">

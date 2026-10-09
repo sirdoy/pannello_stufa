@@ -14,6 +14,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/auth/useUser';
+import { Flame } from 'lucide-react';
 import { Skeleton, LoadingOverlay, Toast } from '@/app/components/ui';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
@@ -52,7 +53,6 @@ export default function StovePage() {
   const { queueStoveCommand } = useBackgroundSync();
   const [toast, setToast] = useState<{
     message: string;
-    icon?: string;
     variant?: 'success' | 'error' | 'warning' | 'info';
   } | null>(null);
 
@@ -108,7 +108,7 @@ export default function StovePage() {
     <div className="relative">
       <PageHeader title="Stufa" backHref="/altro" />
 
-      <LoadingOverlay show={stoveData.loading} message={stoveData.loadingMessage} icon="🔥" />
+      <LoadingOverlay show={stoveData.loading} message={stoveData.loadingMessage} icon={<Flame size={40} />} />
 
       <div className="relative space-y-6 sm:space-y-8">
         <StovePageBanners
@@ -167,7 +167,6 @@ export default function StovePage() {
 
       {toast && (
         <Toast variant={toast.variant} open={!!toast} onOpenChange={(open) => !open && setToast(null)} duration={3000}>
-          {toast.icon && <span>{toast.icon}</span>}
           {toast.message}
         </Toast>
       )}

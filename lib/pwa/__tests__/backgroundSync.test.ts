@@ -54,7 +54,6 @@ describe('backgroundSync', () => {
       const result = formatCommandForDisplay(command);
 
       expect(result.label).toBe('Accensione stufa');
-      expect(result.icon).toBe('🔥');
       expect(result.id).toBe(1);
       expect(result.status).toBe('pending');
     });
@@ -74,7 +73,6 @@ describe('backgroundSync', () => {
       const result = formatCommandForDisplay(command);
 
       expect(result.label).toBe('Spegnimento stufa');
-      expect(result.icon).toBe('🌙');
     });
 
     it('formats stove/set-power command correctly', () => {
@@ -92,7 +90,6 @@ describe('backgroundSync', () => {
       const result = formatCommandForDisplay(command);
 
       expect(result.label).toBe('Imposta potenza');
-      expect(result.icon).toBe('⚡');
     });
 
     it('handles unknown endpoint with fallback', () => {
@@ -110,7 +107,6 @@ describe('backgroundSync', () => {
       const result = formatCommandForDisplay(command);
 
       expect(result.label).toBe('unknown/action');
-      expect(result.icon).toBe('📤');
     });
 
     it('includes formatted time', () => {

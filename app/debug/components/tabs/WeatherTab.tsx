@@ -106,7 +106,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
             Data Status:
           </Heading>
           <Badge variant={cacheStatus === 'cached' ? 'ocean' : 'sage'}>
-            {cacheStatus === 'cached' ? '📦 Cached' : '✨ Fresh'}
+            {cacheStatus === 'cached' ? 'Cached' : 'Fresh'}
           </Badge>
         </div>
       )}
@@ -123,7 +123,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       {/* GET Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📥 GET Endpoints
+          GET Endpoints
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -150,7 +150,7 @@ export default function WeatherTab({ autoRefresh, refreshTrigger }: WeatherTabPr
       {/* Additional Info */}
       <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Heading level={3} size="sm" className="mb-2">
-          📍 Cache Configuration
+          Cache Configuration
         </Heading>
         <Text variant="secondary" size="sm">
           <strong>Cache:</strong> in memory per server instance, key = coordinates (4 decimals)

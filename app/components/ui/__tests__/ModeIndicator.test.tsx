@@ -7,7 +7,7 @@ describe('ModeIndicator Component', () => {
     test('displays manual mode when enabled is false', () => {
       render(<ModeIndicator enabled={false} />);
       expect(screen.getByText('Manuale')).toBeInTheDocument();
-      expect(screen.getByText('🔧')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-wrench')).toBeInTheDocument();
       // Design system uses ember variant for manual mode
       expect(screen.getByText('Manuale').className).toMatch(/text-ember/);
     });
@@ -15,7 +15,7 @@ describe('ModeIndicator Component', () => {
     test('displays automatic mode when enabled is true', () => {
       render(<ModeIndicator enabled={true} />);
       expect(screen.getByText('Automatica')).toBeInTheDocument();
-      expect(screen.getByText('⏰')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-clock')).toBeInTheDocument();
       // Design system uses sage variant for automatic mode
       expect(screen.getByText('Automatica').className).toMatch(/text-sage/);
     });
@@ -23,7 +23,7 @@ describe('ModeIndicator Component', () => {
     test('displays semi-manual mode when enabled and semiManual are true', () => {
       render(<ModeIndicator enabled={true} semiManual={true} />);
       expect(screen.getByText('Semi-manuale')).toBeInTheDocument();
-      expect(screen.getByText('⚙️')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-settings')).toBeInTheDocument();
       // Design system uses warning variant for semi-manual mode
       expect(screen.getByText('Semi-manuale').className).toMatch(/text-warning/);
     });
@@ -129,14 +129,12 @@ describe('ModeIndicator Component', () => {
   describe('Compact Mode', () => {
     test('applies smaller icon in compact mode', () => {
       render(<ModeIndicator enabled={true} compact={true} />);
-      const icon = screen.getByText('⏰');
-      expect(icon).toHaveClass('text-xl');
+      expect(document.querySelector('svg.lucide-clock')).toHaveAttribute('width', '20');
     });
 
     test('applies normal icon size in non-compact mode', () => {
       render(<ModeIndicator enabled={true} compact={false} />);
-      const icon = screen.getByText('⏰');
-      expect(icon).toHaveClass('text-2xl');
+      expect(document.querySelector('svg.lucide-clock')).toHaveAttribute('width', '24');
     });
   });
 
@@ -161,21 +159,21 @@ describe('ModeIndicator Component', () => {
       {
         name: 'Manual mode',
         props: { enabled: false },
-        expectedIcon: '🔧',
+        expectedIcon: 'wrench',
         expectedColorPattern: /text-ember/,
         expectedLabel: 'Manuale'
       },
       {
         name: 'Automatic mode',
         props: { enabled: true, semiManual: false },
-        expectedIcon: '⏰',
+        expectedIcon: 'clock',
         expectedColorPattern: /text-sage/,
         expectedLabel: 'Automatica'
       },
       {
         name: 'Semi-manual mode',
         props: { enabled: true, semiManual: true },
-        expectedIcon: '⚙️',
+        expectedIcon: 'settings',
         expectedColorPattern: /text-warning/,
         expectedLabel: 'Semi-manuale'
       }
@@ -185,7 +183,7 @@ describe('ModeIndicator Component', () => {
       test(`displays correct icon, color, and label for ${name}`, () => {
         render(<ModeIndicator {...props} />);
 
-        expect(screen.getByText(expectedIcon)).toBeInTheDocument();
+        expect(document.querySelector(`svg.lucide-${expectedIcon}`)).toBeInTheDocument();
         expect(screen.getByText(expectedLabel)).toBeInTheDocument();
         expect(screen.getByText(expectedLabel).className).toMatch(expectedColorPattern);
       });

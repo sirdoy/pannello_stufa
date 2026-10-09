@@ -12,7 +12,7 @@ describe('StatusBadge Component', () => {
       render(<StatusBadge status="WORK" icon="🚀" />);
       expect(screen.getByText('🚀')).toBeInTheDocument();
       // Should not show default icon when custom icon provided
-      expect(screen.queryByText('🔥')).not.toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-flame')).not.toBeInTheDocument();
     });
   });
 
@@ -57,50 +57,50 @@ describe('StatusBadge Component', () => {
     });
 
     test('renders with default styling when no status provided', () => {
-      render(<StatusBadge />);
-      expect(screen.getByText('❔')).toBeInTheDocument();
+      const { container } = render(<StatusBadge />);
+      expect(container.querySelector('svg')).not.toBeInTheDocument();
     });
   });
 
   describe('Status Icons', () => {
     test('shows fire icon for WORK status', () => {
       render(<StatusBadge status="WORK" />);
-      expect(screen.getByText('🔥')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-flame')).toBeInTheDocument();
     });
 
     test('shows snowflake icon for OFF status', () => {
       render(<StatusBadge status="OFF" />);
-      expect(screen.getByText('❄️')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-snowflake')).toBeInTheDocument();
     });
 
     test('shows warning icon for ERROR status', () => {
       render(<StatusBadge status="ERROR" />);
-      expect(screen.getByText('⚠️')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-triangle-alert')).toBeInTheDocument();
     });
 
     test('shows rocket icon for START status', () => {
       render(<StatusBadge status="START" />);
-      expect(screen.getByText('🚀')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-rocket')).toBeInTheDocument();
     });
 
     test('shows sleep icon for WAIT status', () => {
       render(<StatusBadge status="WAIT" />);
-      expect(screen.getByText('💤')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-hourglass')).toBeInTheDocument();
     });
 
     test('shows cleaning icon for CLEANING status', () => {
       render(<StatusBadge status="CLEANING" />);
-      expect(screen.getByText('🔄')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-refresh-cw')).toBeInTheDocument();
     });
 
     test('shows modulation icon for MODULATION status', () => {
       render(<StatusBadge status="MODULATION" />);
-      expect(screen.getByText('🌡️')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-thermometer')).toBeInTheDocument();
     });
 
-    test('shows question mark for undefined status', () => {
-      render(<StatusBadge />);
-      expect(screen.getByText('❔')).toBeInTheDocument();
+    test('shows no icon for undefined status', () => {
+      const { container } = render(<StatusBadge />);
+      expect(container.querySelector('svg')).not.toBeInTheDocument();
     });
   });
 
@@ -127,21 +127,21 @@ describe('StatusBadge Component', () => {
   describe('Status Text Matching', () => {
     test('matches status containing WORK substring', () => {
       render(<StatusBadge status="WORK_MODULATION" />);
-      expect(screen.getByText('🔥')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-flame')).toBeInTheDocument();
       const statusElement = screen.getByText('WORK_MODULATION');
       expect(statusElement.className).toMatch(/ember/i);
     });
 
     test('matches status containing OFF substring', () => {
       render(<StatusBadge status="POWER_OFF" />);
-      expect(screen.getByText('❄️')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-snowflake')).toBeInTheDocument();
       const statusElement = screen.getByText('POWER_OFF');
       expect(statusElement).toHaveClass('text-(--text-2)');
     });
 
     test('matches status containing ERROR substring', () => {
       render(<StatusBadge status="ERROR_123" />);
-      expect(screen.getByText('⚠️')).toBeInTheDocument();
+      expect(document.querySelector('svg.lucide-triangle-alert')).toBeInTheDocument();
       const statusElement = screen.getByText('ERROR_123');
       expect(statusElement.className).toMatch(/danger/i);
     });

@@ -71,7 +71,6 @@ interface ProcessQueueResult {
 /** Queued command enriched for display (formatCommandForDisplay). */
 export interface FormattedCommand extends QueuedCommand {
   label: string;
-  icon: string;
   formattedTime: string;
 }
 
@@ -345,15 +344,14 @@ export async function cancelCommand(commandId: number): Promise<boolean> {
  * @returns {Object} Formatted command info
  */
 export function formatCommandForDisplay(command: QueuedCommand): FormattedCommand {
-  const actionMap: Record<string, { label: string; icon: string }> = {
-    'stove/ignite': { label: 'Accensione stufa', icon: '🔥' },
-    'stove/shutdown': { label: 'Spegnimento stufa', icon: '🌙' },
-    'stove/set-power': { label: 'Imposta potenza', icon: '⚡' },
+  const actionMap: Record<string, { label: string }> = {
+    'stove/ignite': { label: 'Accensione stufa' },
+    'stove/shutdown': { label: 'Spegnimento stufa' },
+    'stove/set-power': { label: 'Imposta potenza' },
   };
 
   const action = actionMap[command.endpoint] || {
     label: command.endpoint,
-    icon: '📤',
   };
 
   return {

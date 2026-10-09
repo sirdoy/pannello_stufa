@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Video, VideoOff, WifiOff } from 'lucide-react';
+import CameraEventIcon from '@/app/components/devices/camera/CameraEventIcon';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import {
   Section,
@@ -20,7 +21,7 @@ import {
   Skeleton,
   Switch,
 } from '@/app/components/ui';
-import { getCameraTypeName, getEventTypeName, getEventIcon } from '@/lib/netatmo/netatmoCameraApi';
+import { getCameraTypeName, getEventTypeName } from '@/lib/netatmo/netatmoCameraApi';
 import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 import type { CameraStatus, CameraEvent, DataFreshness } from '@/types/netatmoProxy';
@@ -473,9 +474,7 @@ export default function CameraDashboard() {
                             />
                           ) : null}
                           <div className={`absolute inset-0 items-center justify-center ${event.snapshot_url ? 'hidden' : 'flex'}`}>
-                            <span className="text-lg opacity-60">
-                              {getEventIcon(event.event_type)}
-                            </span>
+                            <CameraEventIcon type={event.event_type} size={18} className="opacity-60" />
                           </div>
                         </div>
                         <div className="min-w-0 flex-1">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Droplet, Flame, Globe, Hourglass, Lightbulb, Package, Thermometer } from 'lucide-react';
 import { Card, Heading, Text, Button, Banner, EmptyState, Skeleton, StatusBadge } from '@/app/components/ui';
+import QueuedCommandIcon from '@/app/components/ui/QueuedCommandIcon';
 import {
   getCachedState,
   formatStoveStateForDisplay,
@@ -148,7 +149,7 @@ export default function OfflinePage() {
                 padding={false}
                 className="flex items-center gap-2 p-2"
               >
-                <Text>{cmd.icon}</Text>
+                <QueuedCommandIcon endpoint={cmd.endpoint} className="shrink-0 text-(--text-2)" />
                 <Text size="sm" className="flex-1">{cmd.label}</Text>
                 <Text variant="tertiary" size="xs">{cmd.formattedTime}</Text>
               </Card>

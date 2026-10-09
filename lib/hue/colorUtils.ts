@@ -25,7 +25,6 @@ export interface ColorPreset {
   name: string;
   hex: string;
   xy: XYColor;
-  icon: string;
 }
 
 /**
@@ -93,61 +92,51 @@ export const COLOR_PRESETS: ColorPreset[] = [
     name: 'Bianco Caldo',
     hex: '#FFE4B5',
     xy: { x: 0.4448, y: 0.4066 },
-    icon: '☀️',
   },
   {
     name: 'Bianco Freddo',
     hex: '#F0F8FF',
     xy: { x: 0.3227, y: 0.329 },
-    icon: '❄️',
   },
   {
     name: 'Rosso',
     hex: '#FF0000',
     xy: { x: 0.6915, y: 0.3083 },
-    icon: '🔴',
   },
   {
     name: 'Verde',
     hex: '#00FF00',
     xy: { x: 0.17, y: 0.7 },
-    icon: '🟢',
   },
   {
     name: 'Blu',
     hex: '#0000FF',
     xy: { x: 0.1532, y: 0.0475 },
-    icon: '🔵',
   },
   {
     name: 'Giallo',
     hex: '#FFFF00',
     xy: { x: 0.4432, y: 0.5154 },
-    icon: '🟡',
   },
   {
     name: 'Arancione',
     hex: '#FFA500',
     xy: { x: 0.5614, y: 0.4156 },
-    icon: '🟠',
   },
   {
     name: 'Viola',
     hex: '#9400D3',
     xy: { x: 0.2859, y: 0.1332 },
-    icon: '🟣',
   },
   {
     name: 'Rosa',
     hex: '#FF69B4',
     xy: { x: 0.4338, y: 0.2468 },
-    icon: '🩷',
   },
   {
     name: 'Ciano',
     hex: '#00FFFF',
     xy: { x: 0.1607, y: 0.3423 },
-    icon: '🔵',
   },
 ];
 

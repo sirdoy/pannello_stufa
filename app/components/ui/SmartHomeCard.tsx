@@ -118,7 +118,7 @@ const SmartHomeCardControls = forwardRef<HTMLDivElement, SmartHomeCardControlsPr
  * Uses Card internally with CardAccentBar for theming.
  *
  * @example
- * <SmartHomeCard icon="🔥" title="Thermostat" colorTheme="ember">
+ * <SmartHomeCard icon={<Flame size={20} />} title="Thermostat" colorTheme="ember">
  *   <SmartHomeCard.Status>
  *     <Badge variant="sage">Online</Badge>
  *   </SmartHomeCard.Status>

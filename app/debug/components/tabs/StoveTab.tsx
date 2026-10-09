@@ -114,7 +114,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
             Connection Status:
           </Heading>
           <Badge variant={connectionStatus === 'connected' ? 'sage' : 'danger'}>
-            {connectionStatus === 'connected' ? '✓ Connected' : '✗ Disconnected'}
+            {connectionStatus === 'connected' ? 'Connected' : 'Disconnected'}
           </Badge>
         </div>
       )}
@@ -122,7 +122,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
       {/* GET Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📥 GET Endpoints
+          GET Endpoints
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -185,7 +185,7 @@ export default function StoveTab({ autoRefresh, refreshTrigger }: StoveTabProps)
       {/* POST Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📤 POST Endpoints
+          POST Endpoints
         </Heading>
         <div className="space-y-3">
           <PostEndpointCard

@@ -10,6 +10,7 @@ export { default as Select } from './Select';
 export { default as InlineSelect } from './InlineSelect';
 export { default as RangeSlider } from './RangeSlider';
 export { default as DeviceIcon, getDeviceIcon } from './DeviceIcon';
+export { default as QueuedCommandIcon } from './QueuedCommandIcon';
 export { default as RadioGroup, RadioGroupItem } from './RadioGroup';
 export { default as Checkbox } from './Checkbox';
 export { default as StatusBadge } from './StatusBadge';

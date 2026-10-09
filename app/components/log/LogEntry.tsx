@@ -11,7 +11,7 @@ interface LogUser {
 
 interface DeviceBadge {
   label: string;
-  icon?: string;
+  icon?: ReactNode;
   color: 'primary' | 'info' | 'warning' | 'success' | 'neutral';
 }
 

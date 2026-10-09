@@ -65,7 +65,7 @@ export interface EmptyStateProps extends HTMLAttributes<HTMLDivElement>, Variant
  * Uses CVA for size variants (sm, md, lg).
  *
  * @param {Object} props - Component props
- * @param {string|ReactNode} props.icon - Emoji or icon component
+ * @param {string|ReactNode} props.icon - Icon element
  * @param {string} props.title - Empty state title
  * @param {string} props.description - Explanatory description
  * @param {ReactNode} props.action - Action button(s)
@@ -75,7 +75,7 @@ export interface EmptyStateProps extends HTMLAttributes<HTMLDivElement>, Variant
  *
  * @example
  * <EmptyState
- *   icon="🏠"
+ *   icon={<Home size={48} />}
  *   title="Nessun dispositivo"
  *   description="Aggiungi dispositivi per iniziare"
  *   action={<Button>Aggiungi</Button>}
@@ -85,7 +85,7 @@ export interface EmptyStateProps extends HTMLAttributes<HTMLDivElement>, Variant
  * // Compact size for inline usage
  * <EmptyState
  *   size="sm"
- *   icon="📭"
+ *   icon={<Inbox size={48} />}
  *   title="Nessun messaggio"
  * />
  */

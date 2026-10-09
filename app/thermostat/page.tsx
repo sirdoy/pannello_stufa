@@ -64,7 +64,7 @@ function NetatmoContent() {
 
       await refetch();
     } catch (err) {
-      console.error('❌ Netatmo: handleModeChange error -', err);
+      console.error('Netatmo: handleModeChange error -', err);
     }
   }
 
@@ -436,7 +436,7 @@ function NetatmoContent() {
   );
 }
 
-// ✅ Wrap with Suspense for useSearchParams
+// Wrap with Suspense for useSearchParams
 export default function NetatmoPage() {
   return (
     <Suspense fallback={<Skeleton.NetatmoPage />}>

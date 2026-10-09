@@ -11,7 +11,7 @@ import {
   setActiveSchedule,
   type ScheduleMetadata,
 } from '@/lib/scheduler/schedulesApiClient';
-import { CalendarDays, Settings, Undo2 } from 'lucide-react';
+import { CalendarDays, Settings, Trash2, Undo2 } from 'lucide-react';
 import { logSchedulerAction } from '@/lib/logService';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
@@ -57,7 +57,6 @@ interface AddIntervalModalState {
 
 interface ToastMessage {
   message: string;
-  icon?: string;
   variant?: string;
 }
 
@@ -120,7 +119,6 @@ export default function WeeklyScheduler() {
         console.error('Error loading schedules:', error);
         setToast({
           message: 'Errore caricamento pianificazioni',
-          icon: '❌',
           variant: 'error',
         });
       } finally {
@@ -181,7 +179,6 @@ export default function WeeklyScheduler() {
           setSchedule(remoteSchedule);
           setToast({
             message: 'Pianificazione aggiornata da altro dispositivo',
-            icon: '🔄',
             variant: 'info',
           });
         }).catch((error) => console.error('Errore aggiornamento pianificazione:', error));
@@ -214,8 +211,7 @@ export default function WeeklyScheduler() {
     // Check if day is full
     if (lastEnd >= '23:59') {
       setToast({
-        message: '⏰ Giornata completa - impossibile aggiungere altri intervalli',
-        icon: '⚠️',
+        message: 'Giornata completa - impossibile aggiungere altri intervalli',
         variant: 'warning',
       });
       return;
@@ -263,7 +259,6 @@ export default function WeeklyScheduler() {
     // Feature 2: Toast notification
     setToast({
       message: `Modalità cambiata in ${newMode ? 'Automatico' : 'Manuale'}`,
-      icon: newMode ? '⏰' : '🔧',
       variant: 'success',
     });
 
@@ -285,7 +280,6 @@ export default function WeeklyScheduler() {
     // Feature 2: Toast notification
     setToast({
       message: 'Ritorno in modalità Automatico',
-      icon: '↩️',
       variant: 'success',
     });
   };
@@ -299,7 +293,6 @@ export default function WeeklyScheduler() {
         // No scheduled intervals found
         setToast({
           message: 'Nessun intervallo programmato. Configura la pianificazione prima di attivare la modalità semi-automatica.',
-          icon: '⚠️',
           variant: 'warning',
         });
         return;
@@ -315,14 +308,12 @@ export default function WeeklyScheduler() {
 
       setToast({
         message: 'Modalità Semi-Automatica attivata',
-        icon: '⚙️',
         variant: 'success',
       });
     } catch (error) {
       console.error('Error activating semi-manual mode:', error);
       setToast({
         message: 'Errore nell\'attivazione della modalità semi-automatica',
-        icon: '❌',
         variant: 'error',
       });
     }
@@ -352,13 +343,11 @@ export default function WeeklyScheduler() {
       // Feature 2: Toast notification
       setToast({
         message: 'Intervallo eliminato',
-        icon: '🗑️',
         variant: 'success',
       });
     } catch {
       setToast({
         message: 'Errore durante l\'eliminazione',
-        icon: '❌',
         variant: 'error',
       });
     }
@@ -407,13 +396,11 @@ export default function WeeklyScheduler() {
       // Show success toast
       setToast({
         message: `Pianificazione duplicata su ${targetDays.length} ${targetDays.length === 1 ? 'giorno' : 'giorni'}`,
-        icon: '📋',
         variant: 'success',
       });
     } catch {
       setToast({
         message: 'Errore durante la duplicazione',
-        icon: '❌',
         variant: 'error',
       });
     }
@@ -456,21 +443,18 @@ export default function WeeklyScheduler() {
         await logSchedulerAction.updateSchedule(day);
         setToast({
           message: 'Intervallo modificato',
-          icon: '✅',
           variant: 'success',
         });
       } else {
         await logSchedulerAction.addInterval(day);
         setToast({
           message: 'Intervallo aggiunto',
-          icon: '✅',
           variant: 'success',
         });
       }
     } catch {
       setToast({
         message: 'Errore durante il salvataggio',
-        icon: '❌',
         variant: 'error',
       });
     }
@@ -513,14 +497,12 @@ export default function WeeklyScheduler() {
 
       setToast({
         message: 'Pianificazione attiva cambiata',
-        icon: '✅',
         variant: 'success',
       });
     } catch (error) {
       console.error('Error setting active schedule:', error);
       setToast({
         message: 'Errore cambio pianificazione',
-        icon: '❌',
         variant: 'error',
       });
     }
@@ -537,14 +519,12 @@ export default function WeeklyScheduler() {
       setCreateScheduleModal(false);
       setToast({
         message: `Pianificazione "${name}" creata`,
-        icon: '✨',
         variant: 'success',
       });
     } catch (error) {
       console.error('Error creating schedule:', error);
       setToast({
         message: error instanceof Error ? error.message : 'Errore creazione pianificazione',
-        icon: '❌',
         variant: 'error',
       });
     }
@@ -560,14 +540,12 @@ export default function WeeklyScheduler() {
 
       setToast({
         message: 'Nome aggiornato',
-        icon: '✅',
         variant: 'success',
       });
     } catch (error) {
       console.error('Error renaming schedule:', error);
       setToast({
         message: error instanceof Error ? error.message : 'Errore rinomina pianificazione',
-        icon: '❌',
         variant: 'error',
       });
     }
@@ -583,14 +561,12 @@ export default function WeeklyScheduler() {
 
       setToast({
         message: 'Pianificazione eliminata',
-        icon: '🗑️',
         variant: 'success',
       });
     } catch (error) {
       console.error('Error deleting schedule:', error);
       setToast({
         message: error instanceof Error ? error.message : 'Errore eliminazione pianificazione',
-        icon: '❌',
         variant: 'error',
       });
     }
@@ -721,7 +697,7 @@ export default function WeeklyScheduler() {
         confirmText="Elimina"
         cancelText="Annulla"
         confirmVariant="danger"
-        icon="🗑️"
+        icon={<Trash2 size={40} />}
         onConfirm={handleConfirmRemoveInterval}
         onCancel={handleCancelRemoveInterval}
       />

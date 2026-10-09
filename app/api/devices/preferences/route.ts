@@ -41,7 +41,6 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
   const devices = Object.values(DEVICE_CONFIG).map(device => ({
     id: device.id,
     name: device.name,
-    icon: device.icon,
     color: device.color,
     enabled: preferences[device.id] === true,
     description: getDeviceDescription(device.id),

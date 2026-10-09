@@ -49,28 +49,6 @@ export function getEventTypeName(type: string): string {
 }
 
 /**
- * Get event icon emoji
- */
-export function getEventIcon(type: string): string {
-  switch (type) {
-    case 'person':
-      return '👤';
-    case 'human':
-      return '🚶';
-    case 'animal':
-      return '🐾';
-    case 'vehicle':
-      return '🚗';
-    case 'movement':
-      return '📷';
-    case 'outdoor':
-      return '🌳';
-    default:
-      return '📷';
-  }
-}
-
-/**
  * Get sub-type name for outdoor camera events
  * Sub-types: 1=human, 2=animal, 3=vehicle
  */
@@ -87,22 +65,6 @@ export function getSubTypeName(subType: number): string | null {
   }
 }
 
-/**
- * Get sub-type icon
- */
-export function getSubTypeIcon(subType: number): string | null {
-  switch (subType) {
-    case 1:
-      return '🚶';
-    case 2:
-      return '🐾';
-    case 3:
-      return '🚗';
-    default:
-      return null;
-  }
-}
-
 // ============================================================================
 // EXPORTS
 // ============================================================================
@@ -110,9 +72,7 @@ export function getSubTypeIcon(subType: number): string | null {
 const NETATMO_CAMERA_API = {
   getCameraTypeName,
   getEventTypeName,
-  getEventIcon,
   getSubTypeName,
-  getSubTypeIcon,
 };
 
 export default NETATMO_CAMERA_API;

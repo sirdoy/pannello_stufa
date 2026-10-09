@@ -10,10 +10,10 @@ describe('describeTrigger', () => {
   test('manual_api_call returns "Manuale"', () => {
     expect(describeTrigger({ type: 'manual_api_call' })).toBe('Manuale');
   });
-  test('schedule_cron returns "⏰ {cron}"', () => {
-    expect(describeTrigger({ type: 'schedule_cron', cron_expression: '0 22 * * *' })).toBe('⏰ 0 22 * * *');
+  test('schedule_cron returns "Orario {cron}"', () => {
+    expect(describeTrigger({ type: 'schedule_cron', cron_expression: '0 22 * * *' })).toBe('Orario 0 22 * * *');
   });
   test('schedule_cron preserves cron whitespace verbatim', () => {
-    expect(describeTrigger({ type: 'schedule_cron', cron_expression: '*/5 * * * *' })).toBe('⏰ */5 * * * *');
+    expect(describeTrigger({ type: 'schedule_cron', cron_expression: '*/5 * * * *' })).toBe('Orario */5 * * * *');
   });
 });

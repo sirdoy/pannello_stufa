@@ -83,7 +83,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
       {/* GET Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📥 GET Endpoints
+          GET Endpoints
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -146,7 +146,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
       {/* Firebase Paths Reference */}
       <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Heading level={3} size="sm" className="mb-3">
-          📂 Key Firebase Paths
+          Key Firebase Paths
         </Heading>
         <div className="space-y-2">
           <Text variant="secondary" size="sm">

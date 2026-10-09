@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
-import { WifiOff, X } from 'lucide-react';
+import { Check, WifiOff, X } from 'lucide-react';
+import QueuedCommandIcon from './QueuedCommandIcon';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useDepsChanged } from '@/lib/hooks/useDepsChanged';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
@@ -135,9 +136,9 @@ export default function OfflineBanner({
   // Synced command notification (success styling)
   if (lastSyncedCommand) {
     const actionLabels: Record<string, string> = {
-      'stove/ignite': '🔥 Stufa accesa',
-      'stove/shutdown': '🌙 Stufa spenta',
-      'stove/set-power': '⚡ Potenza impostata',
+      'stove/ignite': 'Stufa accesa',
+      'stove/shutdown': 'Stufa spenta',
+      'stove/set-power': 'Potenza impostata',
     };
     const label = actionLabels[lastSyncedCommand.endpoint || ''] || 'Comando eseguito';
 
@@ -154,9 +155,8 @@ export default function OfflineBanner({
         style={{ '--offline-banner-height': '60px' } as React.CSSProperties}
       >
         <div className="flex items-center justify-center gap-2">
-          <Text className="font-medium text-white">
-            ✓ {label}
-          </Text>
+          <Check size={16} className="text-white" aria-hidden="true" />
+          <Text className="font-medium text-white">{label}</Text>
         </div>
       </div>
     );
@@ -255,9 +255,7 @@ export default function OfflineBanner({
                         >
                           {/* Command info */}
                           <div className="flex min-w-0 flex-1 items-center gap-2">
-                            <span className="text-lg" aria-hidden="true">
-                              {cmd.icon}
-                            </span>
+                            <QueuedCommandIcon endpoint={cmd.endpoint} className="shrink-0 text-(--text-2)" />
                             <div className="min-w-0 flex-1">
                               <Text
                                 size="sm"

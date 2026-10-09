@@ -1,4 +1,5 @@
-import type { HTMLAttributes } from 'react';
+import { createElement, type HTMLAttributes } from 'react';
+import { Clock, Settings, Wrench } from 'lucide-react';
 import Text from './Text';
 import Button from './Button';
 
@@ -38,9 +39,9 @@ export default function ModeIndicator({
   ...props
 }: ModeIndicatorProps) {
   const getIcon = () => {
-    if (enabled && semiManual) return '⚙️';
-    if (enabled) return '⏰';
-    return '🔧';
+    if (enabled && semiManual) return Settings;
+    if (enabled) return Clock;
+    return Wrench;
   };
 
   // Ember Noir variants for Text
@@ -59,7 +60,7 @@ export default function ModeIndicator({
   return (
     <div className={`flex items-center justify-between ${compact ? 'gap-2' : ''}`} {...props}>
       <div className="flex items-center gap-2">
-        <span className={compact ? 'text-xl' : 'text-2xl'}>{getIcon()}</span>
+        {createElement(getIcon(), { size: compact ? 20 : 24, className: 'shrink-0 text-(--text-2)', 'aria-hidden': true })}
         <div>
           <Text variant={getVariant()} size="sm" as="p">
             {getLabel()}

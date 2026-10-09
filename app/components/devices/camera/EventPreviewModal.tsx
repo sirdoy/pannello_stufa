@@ -1,8 +1,9 @@
 'use client';
 
 import { X } from 'lucide-react';
+import CameraEventIcon from './CameraEventIcon';
 import { Modal, Text, Button, Card } from '../../ui';
-import { getEventTypeName, getEventIcon } from '@/lib/netatmo/netatmoCameraApi';
+import { getEventTypeName } from '@/lib/netatmo/netatmoCameraApi';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import type { CameraEvent } from '@/types/netatmoProxy';
 
@@ -36,9 +37,7 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/8 p-4">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">
-              {getEventIcon(event.event_type)}
-            </span>
+            <CameraEventIcon type={event.event_type} size={24} className="shrink-0 text-(--text-2)" />
             <div>
               <Text variant="body">
                 {getEventTypeName(event.event_type)}
@@ -80,9 +79,7 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
             />
           ) : (
             <div className="flex size-full flex-col items-center justify-center gap-3">
-              <span className="text-5xl opacity-50">
-                {getEventIcon(event.event_type)}
-              </span>
+              <CameraEventIcon type={event.event_type} size={48} className="opacity-50" />
               <Text variant="secondary">Anteprima non disponibile</Text>
             </div>
           )}

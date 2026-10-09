@@ -104,7 +104,7 @@ describe('AutomationRow', () => {
           onToggle={jest.fn()}
         />
       );
-      expect(screen.getByText('⏰ 0 8 * * *')).toBeInTheDocument();
+      expect(screen.getByText('Orario 0 8 * * *')).toBeInTheDocument();
     });
 
     it('shows lastRun pill as "mai" when last_triggered_at is null', () => {

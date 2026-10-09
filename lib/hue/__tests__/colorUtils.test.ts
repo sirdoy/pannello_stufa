@@ -147,7 +147,6 @@ describe('colorUtils', () => {
         expect(preset).toHaveProperty('name');
         expect(preset).toHaveProperty('hex');
         expect(preset).toHaveProperty('xy');
-        expect(preset).toHaveProperty('icon');
         expect(preset.xy).toHaveProperty('x');
         expect(preset.xy).toHaveProperty('y');
       });

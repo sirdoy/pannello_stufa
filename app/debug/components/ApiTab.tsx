@@ -6,7 +6,7 @@ import Heading from '@/app/components/ui/Heading';
 import InlineSelect from '@/app/components/ui/InlineSelect';
 import Text from '@/app/components/ui/Text';
 import Badge from '@/app/components/ui/Badge';
-import { Copy, Check, ChevronDown, ChevronUp, Clock } from 'lucide-react';
+import { Copy, Check, ChevronDown, ChevronUp, Clock, RefreshCw } from 'lucide-react';
 
 /**
  * Parsed JSON body of a debug API call (or `{ error }` when the fetch failed)
@@ -84,9 +84,7 @@ export function EndpointCard({
               </Badge>
             )}
             {!!response && !hasError && (
-              <Badge variant="sage" size="sm">
-                ✓
-              </Badge>
+              <Badge variant="sage" size="sm" icon={<Check size={12} />}>OK</Badge>
             )}
           </div>
           {externalUrl && (
@@ -113,7 +111,7 @@ export function EndpointCard({
             {isExpanded ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
           </Button>
           <Button onClick={onRefresh} loading={loading} size="sm">
-            🔄
+            <RefreshCw className="size-4" />
           </Button>
         </div>
       </div>
@@ -207,9 +205,7 @@ export function PostEndpointCard({
               </Badge>
             )}
             {!!response && !hasError && (
-              <Badge variant="sage" size="sm">
-                ✓
-              </Badge>
+              <Badge variant="sage" size="sm" icon={<Check size={12} />}>OK</Badge>
             )}
           </div>
           {externalUrl && (

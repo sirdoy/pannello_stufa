@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { CalendarDays, Clock, Video, VideoOff } from 'lucide-react';
+import CameraEventIcon from '@/app/components/devices/camera/CameraEventIcon';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import {
   Section,
@@ -16,7 +17,7 @@ import {
   EmptyState,
   Skeleton,
 } from '@/app/components/ui';
-import { getEventTypeName, getEventIcon } from '@/lib/netatmo/netatmoCameraApi';
+import { getEventTypeName } from '@/lib/netatmo/netatmoCameraApi';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 import type { CameraStatus, CameraEvent } from '@/types/netatmoProxy';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
@@ -300,18 +301,14 @@ export default function CameraEventsPage() {
                             />
                           ) : null}
                           <div className={`absolute inset-0 flex items-center justify-center ${event.snapshot_url ? 'opacity-0' : ''}`}>
-                            <span className="text-2xl opacity-60">
-                              {getEventIcon(event.event_type)}
-                            </span>
+                            <CameraEventIcon type={event.event_type} size={24} className="opacity-60" />
                           </div>
                         </div>
 
                         {/* Event info */}
                         <div className="min-w-0 flex-1">
                           <div className="mb-1 flex items-center gap-2">
-                            <span className="text-lg">
-                              {getEventIcon(event.event_type)}
-                            </span>
+                            <CameraEventIcon type={event.event_type} size={18} className="shrink-0 text-(--text-2)" />
                             <Text variant="body">
                               {getEventTypeName(event.event_type)}
                             </Text>

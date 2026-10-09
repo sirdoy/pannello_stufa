@@ -25,7 +25,7 @@ import Skeleton from '@/app/components/ui/Skeleton';
 import DeviceIcon from '@/app/components/ui/DeviceIcon';
 import { Heading, Text } from '@/app/components/ui';
 import LocationSearch from '@/app/components/LocationSearch';
-import { MapPin, Smartphone, ChevronUp, ChevronDown } from 'lucide-react';
+import { MapPin, Smartphone, ChevronUp, ChevronDown, Info } from 'lucide-react';
 
 /**
  * LocationContent - Extracted from location/page.js
@@ -149,7 +149,7 @@ function LocationContent() {
         className="border border-ocean-200 border-ocean-800 bg-ocean-50/50 bg-ocean-900/10 p-6 sm:p-8"
       >
         <div className="flex gap-3">
-          <div className="text-2xl">ℹ️</div>
+          <Info size={24} className="shrink-0 text-ocean-400" aria-hidden="true" />
           <div className="flex-1">
             <Heading level={3} size="md" variant="info" className="mb-1">
               Posizione Condivisa
@@ -441,7 +441,7 @@ function UnifiedDevicesContent() {
       {/* Info card */}
       <Card variant="glass" className="bg-ocean-900/10 p-4 sm:p-6">
         <Heading level={3} size="md" variant="subtle" className="mb-3">
-          ℹ️ Come funziona
+          Come funziona
         </Heading>
         <ul className="space-y-2">
           <li className="flex gap-2">

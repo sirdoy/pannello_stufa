@@ -16,6 +16,7 @@ import {
   getUnifiedDeviceConfigAdmin,
   getVisibleDashboardCards,
 } from '@/lib/services/unifiedDeviceConfigService';
+import { Home } from 'lucide-react';
 import { EmptyState } from './ui';
 import { DeviceCardErrorBoundary } from './ErrorBoundary';
 
@@ -83,7 +84,7 @@ export default async function DashboardCards() {
   if (visibleCards.length === 0) {
     return (
       <EmptyState
-        icon="🏠"
+        icon={<Home size={48} />}
         title="Nessun dispositivo configurato"
         description="Aggiungi i tuoi dispositivi per iniziare"
       />

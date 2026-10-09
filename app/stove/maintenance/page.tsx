@@ -281,7 +281,7 @@ export default function MaintenancePage() {
       {/* Reset Confirmation Dialog */}
       <ConfirmDialog
         isOpen={showResetConfirm}
-        icon="🔄"
+        icon={<RotateCcw size={40} />}
         title="Conferma Reset"
         message="Sei sicuro di voler azzerare il contatore di manutenzione? Questa operazione azzererà il contatore a 0.0 ore, registrerà la data e ora della pulizia, sbloccherà l'accensione della stufa se era bloccata e creerà un log dell'operazione."
         confirmText={isResetting ? 'Attendere...' : 'Conferma Reset'}

@@ -10,7 +10,7 @@ describe('StatusBadge Variants', () => {
 
     test('uses auto-detected icon', () => {
       const { container } = render(<StatusBadge status="WORK" />);
-      expect(container.textContent).toContain('🔥');
+      expect(container.querySelector('svg.lucide-flame')).toBeInTheDocument();
     });
 
     test('uses custom icon', () => {
@@ -37,17 +37,17 @@ describe('StatusBadge Variants', () => {
     test('renders large status display', () => {
       const { container } = render(<StatusBadge status="WORK" variant="display" />);
       expect(screen.getByText('WORK')).toBeInTheDocument();
-      expect(container.querySelector('.text-5xl')).toBeInTheDocument(); // md size icon
+      expect(container.querySelector('svg')).toHaveAttribute('width', '48'); // md size icon
     });
 
     test('renders small size display', () => {
       const { container } = render(<StatusBadge status="TEST" variant="display" size="sm" />);
-      expect(container.querySelector('.text-3xl')).toBeInTheDocument();
+      expect(container.querySelector('svg')).toHaveAttribute('width', '32');
     });
 
     test('renders large size display', () => {
       const { container } = render(<StatusBadge status="TEST" variant="display" size="lg" />);
-      expect(container.querySelector('.text-7xl')).toBeInTheDocument();
+      expect(container.querySelector('svg')).toHaveAttribute('width', '64');
     });
   });
 

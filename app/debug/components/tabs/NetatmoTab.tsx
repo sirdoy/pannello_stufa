@@ -118,7 +118,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
             Connection Status:
           </Heading>
           <Badge variant={connectionStatus === 'connected' ? 'sage' : 'danger'}>
-            {connectionStatus === 'connected' ? '✓ Connected' : '✗ Disconnected'}
+            {connectionStatus === 'connected' ? 'Connected' : 'Disconnected'}
           </Badge>
         </div>
       )}
@@ -126,7 +126,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
       {/* GET Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📥 GET Endpoints
+          GET Endpoints
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -189,7 +189,7 @@ export default function NetatmoTab({ autoRefresh, refreshTrigger }: NetatmoTabPr
       {/* POST Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📤 POST Endpoints
+          POST Endpoints
         </Heading>
         <div className="space-y-3">
           <PostEndpointCard

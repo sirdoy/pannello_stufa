@@ -207,7 +207,7 @@ export default function StovePageHero(props: StovePageHeroProps) {
                     month: '2-digit',
                   })}`
                 ) : schedulerEnabled && nextScheduledAction ? (
-                  `${{ ignite: '🔥', shutdown: '❄️', adjust: '🔁' }[nextScheduledAction.action as string] ?? '⏱️'} ${new Date(
+                  `${{ ignite: 'Accensione', shutdown: 'Spegnimento', adjust: 'Regolazione' }[nextScheduledAction.action as string] ?? 'Prossima'} ${new Date(
                     nextScheduledAction.timestamp
                   ).toLocaleString('it-IT', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}`
                 ) : schedulerEnabled ? (

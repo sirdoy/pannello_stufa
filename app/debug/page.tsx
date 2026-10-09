@@ -86,7 +86,7 @@ function NotificheContent() {
           Web Push inviate dal Pi
         </Text>
         <Button variant="outline" onClick={fetchStats} disabled={loading}>
-          {loading ? '⏳' : '🔄'} Refresh
+          Refresh
         </Button>
       </div>
 
@@ -121,7 +121,7 @@ function NotificheContent() {
 
       <div className="flex gap-3">
         <Button variant="ember" onClick={() => window.location.href = '/settings/notifications'}>
-          🔔 Impostazioni notifiche
+          Impostazioni notifiche
         </Button>
       </div>
     </div>
@@ -204,7 +204,7 @@ function DebugPageContent() {
               onClick={() => setAutoRefresh(!autoRefresh)}
               title="Press A"
             >
-              {autoRefresh ? '⏸️ Stop' : '▶️ Auto'} (5s)
+              {autoRefresh ? 'Stop' : 'Auto'} (5s)
             </Button>
             <Button
               variant="outline"

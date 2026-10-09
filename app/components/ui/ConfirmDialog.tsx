@@ -3,6 +3,7 @@
 import type React from 'react';
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { AlertTriangle } from 'lucide-react';
 import Button from './Button';
 import Card from './Card';
 import Heading from './Heading';
@@ -46,7 +47,7 @@ export interface ConfirmDialogProps {
   onConfirm: () => void;
   /** Cancel action handler */
   onCancel: () => void;
-  /** Dialog icon (emoji string or icon element) */
+  /** Dialog icon element */
   icon?: React.ReactNode;
 }
 
@@ -59,7 +60,7 @@ export default function ConfirmDialog({
   confirmVariant = 'danger',
   onConfirm,
   onCancel,
-  icon = '⚠️',
+  icon = <AlertTriangle size={40} />,
 }: ConfirmDialogProps): React.ReactElement | null {
   // Emit deprecation warning once in development
   useEffect(() => {

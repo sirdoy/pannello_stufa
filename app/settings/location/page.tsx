@@ -19,6 +19,7 @@ import SettingsLayout from '@/app/components/SettingsLayout';
 import Card from '@/app/components/ui/Card';
 import { Text, Heading, Banner } from '@/app/components/ui';
 import Skeleton from '@/app/components/ui/Skeleton';
+import { Info } from 'lucide-react';
 import LocationSearch from '@/app/components/LocationSearch';
 
 interface LocationData {
@@ -158,7 +159,7 @@ export default function LocationSettingsPage() {
         className="border border-ocean-200 border-ocean-800 bg-ocean-50/50 bg-ocean-900/10 p-6 sm:p-8"
       >
         <div className="flex gap-3">
-          <div className="text-2xl">ℹ️</div>
+          <Info size={24} className="shrink-0 text-ocean-400" aria-hidden="true" />
           <div className="flex-1">
             <Heading level={3} size="md" variant="info" className="mb-1">
               Posizione Condivisa

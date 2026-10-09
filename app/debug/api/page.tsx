@@ -105,7 +105,7 @@ export default function ApiDebugPage() {
                 Auto-refresh (5s)
               </Text>
             </label>
-            <Button onClick={handleRefreshAll}>🔄 Refresh All</Button>
+            <Button onClick={handleRefreshAll}>Refresh All</Button>
             {lastRefresh && (
               <Text size="sm" variant="secondary">
                 {new Date(lastRefresh).toLocaleTimeString()}
@@ -117,12 +117,12 @@ export default function ApiDebugPage() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TabValue)}>
           <Tabs.List>
-            <Tabs.Trigger value="stove">🔥 Stove</Tabs.Trigger>
-            <Tabs.Trigger value="netatmo">🌡️ Netatmo</Tabs.Trigger>
-            <Tabs.Trigger value="hue">💡 Hue</Tabs.Trigger>
-            <Tabs.Trigger value="weather">🌤️ Weather</Tabs.Trigger>
-            <Tabs.Trigger value="firebase">🔥 Firebase</Tabs.Trigger>
-            <Tabs.Trigger value="scheduler">⏰ Scheduler</Tabs.Trigger>
+            <Tabs.Trigger value="stove">Stove</Tabs.Trigger>
+            <Tabs.Trigger value="netatmo">Netatmo</Tabs.Trigger>
+            <Tabs.Trigger value="hue">Hue</Tabs.Trigger>
+            <Tabs.Trigger value="weather">Weather</Tabs.Trigger>
+            <Tabs.Trigger value="firebase">Firebase</Tabs.Trigger>
+            <Tabs.Trigger value="scheduler">Scheduler</Tabs.Trigger>
           </Tabs.List>
 
           <div className="mt-6">

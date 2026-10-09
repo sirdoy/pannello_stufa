@@ -228,7 +228,7 @@ export function useThermostatData(): UseThermostatDataReturn {
         // Rate limiting error - don't show to user, just skip this poll
         const errMsg = data.error;
         if (errMsg.includes('concurrency limited')) {
-          console.warn('⚠️ Netatmo rate limit - skipping this poll');
+          console.warn('Netatmo rate limit - skipping this poll');
           return;
         }
         throw new Error(errMsg);

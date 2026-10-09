@@ -38,18 +38,17 @@ type DeviceId = DeviceType | string;
 
 interface DeviceMetadata {
   name: string;
-  icon: string;
   color: string;
 }
 
 /**
- * Get device metadata (name, icon, etc.) from registry
+ * Get device metadata (name, colour) from registry
  */
 function getDeviceMetadata(deviceId: DeviceId): DeviceMetadata | null {
   const deviceConfig = DEVICE_CONFIG[deviceId as DeviceTypeId];
   const displayItem = DISPLAY_ITEMS[deviceId];
-  if (deviceConfig) return { name: deviceConfig.name, icon: deviceConfig.icon, color: deviceConfig.color };
-  if (displayItem) return { name: displayItem.name, icon: displayItem.icon, color: displayItem.color };
+  if (deviceConfig) return { name: deviceConfig.name, color: deviceConfig.color };
+  if (displayItem) return { name: displayItem.name, color: displayItem.color };
   return null;
 }
 
@@ -273,12 +272,11 @@ export function getEnabledDevicesFromConfig(config: DeviceConfigData): string[] 
 /**
  * Get visible dashboard cards with full metadata
  * @param {Object} config - Unified device config
- * @returns {Array} Array of { id, label, icon, visible }
+ * @returns {Array} Array of { id, label, visible }
  */
 export function getVisibleDashboardCards(config: DeviceConfigData): Array<{
   id: string;
   label: string;
-  icon: string;
   visible: boolean;
 }> {
   if (!config || !config.devices) return [];
@@ -291,7 +289,6 @@ export function getVisibleDashboardCards(config: DeviceConfigData): Array<{
       return {
         id: d.id,
         label: meta?.name || d.id,
-        icon: meta?.icon || '❓',
         visible: true,
       };
     });
@@ -305,7 +302,6 @@ export function getVisibleDashboardCards(config: DeviceConfigData): Array<{
 export function getAllDevicesForSettings(config: DeviceConfigData): Array<{
   id: string;
   name: string;
-  icon: string;
   color: string;
   visible: boolean;
   order: number;
@@ -324,7 +320,6 @@ export function getAllDevicesForSettings(config: DeviceConfigData): Array<{
       return {
         id: d.id,
         name: meta?.name || d.id,
-        icon: meta?.icon || '❓',
         color: meta?.color || 'neutral',
         visible: d.visible,
         order: d.order,

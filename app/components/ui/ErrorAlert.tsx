@@ -7,6 +7,7 @@
 
 import type { ReactNode } from 'react';
 import { ERROR_SEVERITY, getErrorInfo } from '@/lib/errorMonitor';
+import { AlertTriangle, Info, Siren, Zap } from 'lucide-react';
 import Banner from './Banner';
 import Button from './Button';
 
@@ -39,16 +40,16 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
   const { severity, suggestion } = errorInfo;
 
   // Map severity to Banner variant and icon
-  const getSeverityConfig = (): { variant: 'error' | 'warning' | 'info'; icon: string } => {
+  const getSeverityConfig = (): { variant: 'error' | 'warning' | 'info'; icon: ReactNode } => {
     switch (severity) {
       case ERROR_SEVERITY.CRITICAL:
-        return { variant: 'error', icon: '🚨' };
+        return { variant: 'error', icon: <Siren size={24} /> };
       case ERROR_SEVERITY.ERROR:
-        return { variant: 'error', icon: '⚠️' };
+        return { variant: 'error', icon: <AlertTriangle size={24} /> };
       case ERROR_SEVERITY.WARNING:
-        return { variant: 'warning', icon: '⚡' };
+        return { variant: 'warning', icon: <Zap size={24} /> };
       default:
-        return { variant: 'info', icon: 'ℹ️' };
+        return { variant: 'info', icon: <Info size={24} /> };
     }
   };
 
@@ -64,7 +65,7 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
       {showSuggestion && suggestion && (
         <span className="mt-3 block rounded-xl border-[0.5px] border-white/6 bg-white/4 p-3">
           <span className="mb-1 block text-sm font-medium text-(--text-1)">
-            💡 Suggerimento:
+            Suggerimento:
           </span>
           <span className="block text-sm text-(--text-2)">
             {suggestion}
@@ -81,7 +82,7 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
       size="sm"
       onClick={() => window.location.href = '/errors'}
     >
-      📋 Vedi Storico Errori
+      Vedi Storico Errori
     </Button>
   ) : undefined;
 
@@ -131,7 +132,7 @@ export function ErrorBadge({ errorCode, className = '' }: ErrorBadgeProps) {
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-display text-xs font-bold ${getSeverityClasses()} ${className}`}
     >
-      <span>⚠️</span>
+      <AlertTriangle size={12} aria-hidden="true" />
       <span>Errore {errorCode}</span>
     </span>
   );

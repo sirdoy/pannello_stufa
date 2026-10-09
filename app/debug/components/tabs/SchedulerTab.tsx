@@ -71,7 +71,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       {/* GET Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📥 GET Endpoints (Stats)
+          GET Endpoints (Stats)
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -91,7 +91,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       {/* Scheduler Jobs Reference */}
       <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Heading level={3} size="sm" className="mb-3">
-          ⏰ Automated Jobs
+          Automated Jobs
         </Heading>
         <div className="space-y-2">
           <Text variant="secondary" size="sm">
@@ -115,7 +115,7 @@ export default function SchedulerTab({ autoRefresh, refreshTrigger }: SchedulerT
       {/* Cron Health */}
       <div className="rounded-lg border border-white/8 bg-white/4 p-4">
         <Heading level={3} size="sm" className="mb-3">
-          💚 Cron Health
+          Cron Health
         </Heading>
         <Text variant="secondary" size="sm">
           Each execution saves timestamp to <code className="text-xs">cronHealth/lastCall</code> in Firebase. Health

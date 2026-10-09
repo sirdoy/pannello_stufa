@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import TransitionLink from '@/app/components/TransitionLink';
 import { usePageTransition, TRANSITION_TYPES } from '@/app/context/PageTransitionContext';
-import { ArrowLeft, Sparkles, Zap, Waves, Layers, Slash } from 'lucide-react';
+import { ArrowLeft, Check, Sparkles, Zap, Waves, Layers, Slash } from 'lucide-react';
 import { Heading, Text, Card, Banner } from '@/app/components/ui';
 import PageLayout from '@/app/components/ui/PageLayout';
 import type { ReactNode } from 'react';
@@ -21,7 +21,6 @@ interface TransitionConfig {
 interface DemoPage {
   href: string;
   label: string;
-  emoji: string;
 }
 
 /**
@@ -85,12 +84,12 @@ export default function TransitionsDebugPage() {
   };
 
   const demoPages: DemoPage[] = [
-    { href: '/', label: 'Home', emoji: '🏠' },
-    { href: '/stove', label: 'Stufa', emoji: '🔥' },
-    { href: '/stove/scheduler', label: 'Scheduler', emoji: '⏰' },
-    { href: '/thermostat', label: 'Termostato', emoji: '🌡️' },
-    { href: '/lights', label: 'Luci', emoji: '💡' },
-    { href: '/settings/theme', label: 'Tema', emoji: '🎨' },
+    { href: '/', label: 'Home' },
+    { href: '/stove', label: 'Stufa' },
+    { href: '/stove/scheduler', label: 'Scheduler' },
+    { href: '/thermostat', label: 'Termostato' },
+    { href: '/lights', label: 'Luci' },
+    { href: '/settings/theme', label: 'Tema' },
   ];
 
   return (
@@ -204,7 +203,7 @@ export default function TransitionsDebugPage() {
                   rounded-full bg-ember-500 text-xs
                   text-white shadow-ember-glow-sm
                 ">
-                  ✓
+                  <Check size={14} />
                 </div>
               )}
             </button>
@@ -245,9 +244,6 @@ export default function TransitionsDebugPage() {
               "/>
 
               <div className="relative flex items-center gap-4">
-                <div className="text-4xl">
-                  {page.emoji}
-                </div>
                 <div>
                   <Text className="mb-1">
                     {page.label}
@@ -275,7 +271,6 @@ export default function TransitionsDebugPage() {
       {/* Browser Support Info */}
       <Banner
         variant="info"
-        icon="ℹ️"
         title="Browser Support"
       >
         <div className="mt-2 space-y-2 text-sm">

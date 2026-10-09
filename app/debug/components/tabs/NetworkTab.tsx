@@ -110,7 +110,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       {/* Health Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          💚 Health
+          Health
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -130,7 +130,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       {/* Devices Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📱 Devices
+          Devices
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -150,7 +150,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       {/* Bandwidth Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📊 Bandwidth
+          Bandwidth
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -170,7 +170,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       {/* WAN Status Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          🌐 WAN Status
+          WAN Status
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -190,7 +190,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       {/* Bandwidth History Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📈 Bandwidth History
+          Bandwidth History
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -232,7 +232,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       {/* Device History Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📜 Device History
+          Device History
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -252,7 +252,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       {/* Vendor & Categories Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          🏷️ Vendor &amp; Categories
+          Vendor &amp; Categories
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -286,7 +286,7 @@ export default function NetworkTab({ autoRefresh, refreshTrigger }: NetworkTabPr
       {/* Auth Section */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          🔐 Auth (External Only)
+          Auth (External Only)
         </Heading>
         <div className="mb-3 rounded-lg border border-amber-700/50 bg-amber-900/20 p-4">
           <Text variant="secondary" size="sm">

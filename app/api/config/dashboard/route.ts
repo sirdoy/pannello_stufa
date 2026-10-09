@@ -15,7 +15,8 @@ import { adminDbGet, adminDbSet } from '@/lib/firebaseAdmin';
 interface DashboardCard {
   id: string;
   label: string;
-  icon: string;
+  /** Legacy emoji still stored for old preferences: never rendered (the UI uses DeviceIcon by id) */
+  icon?: string;
   visible: boolean;
 }
 
@@ -32,11 +33,11 @@ interface UpdateDashboardBody {
  * Must match client-side constant
  */
 const DEFAULT_CARD_ORDER: DashboardCard[] = [
-  { id: 'stove', label: 'Stufa', icon: '🔥', visible: true },
-  { id: 'thermostat', label: 'Termostato', icon: '🌡️', visible: true },
-  { id: 'weather', label: 'Meteo', icon: '☀️', visible: true },
-  { id: 'lights', label: 'Luci', icon: '💡', visible: true },
-  { id: 'camera', label: 'Telecamera', icon: '📹', visible: true },
+  { id: 'stove', label: 'Stufa', visible: true },
+  { id: 'thermostat', label: 'Termostato', visible: true },
+  { id: 'weather', label: 'Meteo', visible: true },
+  { id: 'lights', label: 'Luci', visible: true },
+  { id: 'camera', label: 'Telecamera', visible: true },
 ];
 
 /**
@@ -54,7 +55,7 @@ export const dynamic = 'force-dynamic';
  * Response:
  * {
  *   preferences: {
- *     cardOrder: [{ id, label, icon, visible }, ...]
+ *     cardOrder: [{ id, label, visible }, ...]
  *   }
  * }
  */
@@ -78,8 +79,8 @@ export const GET = withAuthAndErrorHandler(async (request, context, session) => 
  * Request body:
  * {
  *   cardOrder: [
- *     { id: 'stove', label: 'Stufa', icon: '🔥', visible: true },
- *     { id: 'weather', label: 'Meteo', icon: '☀️', visible: false },
+ *     { id: 'stove', label: 'Stufa', visible: true },
+ *     { id: 'weather', label: 'Meteo', visible: false },
  *     ...
  *   ]
  * }

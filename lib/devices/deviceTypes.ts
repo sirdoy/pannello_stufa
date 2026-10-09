@@ -28,7 +28,6 @@ export const DEVICE_TYPES = {
 interface DisplayItem {
   id: string;
   name: string;
-  icon: string;
   color: DeviceColor;
   type: 'display';
 }
@@ -41,7 +40,6 @@ export const DISPLAY_ITEMS: Record<string, DisplayItem> = {
   weather: {
     id: 'weather',
     name: 'Meteo',
-    icon: '☀️',
     color: 'info',
     type: 'display',
   },
@@ -69,7 +67,6 @@ interface DeviceFeatures {
 export interface DeviceConfig {
   id: DeviceTypeId;
   name: string;
-  icon: string;
   color: DeviceColor;
   enabled: boolean;
   routes: Record<string, string>;
@@ -78,13 +75,12 @@ export interface DeviceConfig {
 
 /**
  * Device configuration registry
- * Each device has: id, name, icon, color (Tailwind palette), routes, enabled flag
+ * Each device has: id, name, color (Tailwind palette), routes, enabled flag
  */
 export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.STOVE]: {
     id: 'stove',
     name: 'Stufa',
-    icon: '🔥',
     color: 'primary',
     enabled: true,
     routes: {
@@ -102,7 +98,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.THERMOSTAT]: {
     id: 'thermostat',
     name: 'Termostato',
-    icon: '🌡️',
     color: 'info',
     enabled: true,
     routes: {
@@ -118,7 +113,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.CAMERA]: {
     id: 'camera',
     name: 'Videocamera',
-    icon: '📹',
     color: 'ocean',
     enabled: true,
     routes: {
@@ -136,7 +130,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.LIGHTS]: {
     id: 'lights',
     name: 'Luci',
-    icon: '💡',
     color: 'warning',
     enabled: true,
     routes: {
@@ -157,7 +150,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.SONOS]: {
     id: 'sonos',
     name: 'Sonos',
-    icon: '🎵',
     color: 'success',
     enabled: true,
     routes: {
@@ -170,7 +162,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.NETWORK]: {
     id: 'network',
     name: 'Rete',
-    icon: '🌐',
     color: 'info',
     enabled: true,
     routes: {
@@ -185,7 +176,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.RASPI]: {
     id: 'raspi',
     name: 'Raspberry Pi',
-    icon: '\uD83D\uDDA5\uFE0F',
     color: 'success',
     enabled: true,
     routes: { main: '/raspi' },
@@ -198,7 +188,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.DIRIGERA]: {
     id: 'dirigera',
     name: 'DIRIGERA',
-    icon: '\uD83D\uDD0C',
     color: 'ocean',
     enabled: true,
     routes: { main: '/dirigera' },
@@ -212,7 +201,6 @@ export const DEVICE_CONFIG: Record<DeviceTypeId, DeviceConfig> = {
   [DEVICE_TYPES.TUYA]: {
     id: 'tuya',
     name: 'Tuya',
-    icon: '\u26A1',
     color: 'warning',
     enabled: true,
     routes: { main: '/tuya' },
@@ -284,7 +272,6 @@ export const DEVICE_COLORS: Record<DeviceColor, ColorClasses> = {
 interface GlobalSection {
   id: string;
   name: string;
-  icon: string;
   route: string;
   items?: { label: string; route: string }[];
 }
@@ -297,7 +284,6 @@ export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
   REGISTRO: {
     id: 'registry',
     name: 'Registro',
-    icon: '📋',
     route: '/registry/types',
     items: [
       { label: 'Tipi dispositivo', route: '/registry/types' },
@@ -307,7 +293,6 @@ export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
   STANZE: {
     id: 'rooms',
     name: 'Stanze',
-    icon: '🏠',
     route: '/rooms',
     items: [
       { label: 'Gestione stanze', route: '/rooms' },
@@ -317,13 +302,11 @@ export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
   AUTOMAZIONI: {
     id: 'automations',
     name: 'Automazioni',
-    icon: '⚡',
     route: '/automations',
   },
   API_KEYS: {
     id: 'api-keys',
     name: 'API Keys',
-    icon: '🔑',
     route: '/settings/api-keys',
   },
 };
@@ -332,7 +315,6 @@ export const GLOBAL_SECTIONS: Record<string, GlobalSection> = {
 interface SettingsMenuItem {
   id: string;
   name: string;
-  icon: string;
   route: string;
   description: string;
   submenu?: SettingsMenuItem[];
@@ -345,35 +327,30 @@ export const SETTINGS_MENU: Record<string, SettingsMenuItem> = {
   SETTINGS: {
     id: 'settings',
     name: 'Impostazioni',
-    icon: '⚙️',
     route: '/settings',
     description: 'Aspetto, posizione e dispositivi',
   },
   NOTIFICATIONS: {
     id: 'notifications',
     name: 'Notifiche',
-    icon: '🔔',
     route: '/settings/notifications',
     description: 'Preferenze e dispositivi registrati',
   },
   THERMOSTAT: {
     id: 'thermostat',
     name: 'Automazione Stufa',
-    icon: '🔥',
     route: '/settings/thermostat',
     description: 'Potenza della stufa dalla temperatura della stanza',
   },
   LOG: {
     id: 'log',
     name: 'Storico',
-    icon: '📊',
     route: '/log',
     description: 'Visualizza storico azioni',
   },
   CHANGELOG: {
     id: 'changelog',
     name: 'Changelog',
-    icon: 'ℹ️',
     route: '/changelog',
     description: 'Versioni e aggiornamenti',
   },
@@ -381,14 +358,12 @@ export const SETTINGS_MENU: Record<string, SettingsMenuItem> = {
     DEBUG: {
       id: 'debug',
       name: 'Debug',
-      icon: '🐛',
       route: '/debug',
       description: 'Stufa, log, notifiche, transizioni, meteo',
     },
     DESIGN_SYSTEM: {
       id: 'design-system',
       name: 'Design System',
-      icon: '🎨',
       route: '/debug/design-system-v2',
       description: 'Documentazione componenti EmberGlass',
     },

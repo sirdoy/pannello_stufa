@@ -8,6 +8,7 @@ import {
 import { db } from '@/lib/firebase';
 import { onValue, ref } from 'firebase/database';
 import Card from '@/app/components/ui/Card';
+import DeviceIcon from '@/app/components/ui/DeviceIcon';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Text from '@/app/components/ui/Text';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
@@ -128,7 +129,7 @@ export default function LogPage() {
     return <Icon size={20} className="text-(--text-2)" aria-hidden="true" />;
   };
 
-  const getDeviceBadge = (device?: string): { label: string; icon?: string; color: 'primary' | 'info' | 'warning' | 'success' | 'neutral' } => {
+  const getDeviceBadge = (device?: string): { label: string; icon?: ReactNode; color: 'primary' | 'info' | 'warning' | 'success' | 'neutral' } => {
     const config = device ? DEVICE_CONFIG[device as keyof typeof DEVICE_CONFIG] : undefined;
     if (!config) return { label: 'Sistema', color: 'neutral' };
 
@@ -141,7 +142,7 @@ export default function LogPage() {
 
     return {
       label: config.name,
-      icon: config.icon,
+      icon: <DeviceIcon device={config.id} size={12} />,
       color: colorMap[config.color as keyof typeof colorMap] || 'neutral',
     };
   };

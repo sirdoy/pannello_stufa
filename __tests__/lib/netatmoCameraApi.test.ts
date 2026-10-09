@@ -6,9 +6,7 @@
 import NETATMO_CAMERA_API, {
   getCameraTypeName,
   getEventTypeName,
-  getEventIcon,
   getSubTypeName,
-  getSubTypeIcon,
 } from '@/lib/netatmo/netatmoCameraApi';
 
 /** Untyped runtime payloads may carry null/undefined: widen the parameter to exercise the fallbacks. */
@@ -46,22 +44,6 @@ describe('netatmoCameraApi display helpers', () => {
     });
   });
 
-  describe('getEventIcon', () => {
-    it('should return correct emoji icons', () => {
-      expect(getEventIcon('person')).toBe('👤');
-      expect(getEventIcon('human')).toBe('🚶');
-      expect(getEventIcon('animal')).toBe('🐾');
-      expect(getEventIcon('vehicle')).toBe('🚗');
-      expect(getEventIcon('movement')).toBe('📷');
-      expect(getEventIcon('outdoor')).toBe('🌳');
-    });
-
-    it('should return camera icon for unknown types', () => {
-      expect(getEventIcon('unknown')).toBe('📷');
-      expect(withNullableInput(getEventIcon)(null)).toBe('📷');
-    });
-  });
-
   describe('getSubTypeName', () => {
     it('should return correct sub-type names', () => {
       expect(getSubTypeName(1)).toBe('Persona');
@@ -75,26 +57,11 @@ describe('netatmoCameraApi display helpers', () => {
     });
   });
 
-  describe('getSubTypeIcon', () => {
-    it('should return correct sub-type icons', () => {
-      expect(getSubTypeIcon(1)).toBe('🚶');
-      expect(getSubTypeIcon(2)).toBe('🐾');
-      expect(getSubTypeIcon(3)).toBe('🚗');
-    });
-
-    it('should return null for unknown sub-types', () => {
-      expect(getSubTypeIcon(0)).toBeNull();
-      expect(getSubTypeIcon(99)).toBeNull();
-    });
-  });
-
   describe('default export', () => {
-    it('should export all 5 display helper functions', () => {
+    it('should export the display helper functions', () => {
       expect(NETATMO_CAMERA_API.getCameraTypeName).toBe(getCameraTypeName);
       expect(NETATMO_CAMERA_API.getEventTypeName).toBe(getEventTypeName);
-      expect(NETATMO_CAMERA_API.getEventIcon).toBe(getEventIcon);
       expect(NETATMO_CAMERA_API.getSubTypeName).toBe(getSubTypeName);
-      expect(NETATMO_CAMERA_API.getSubTypeIcon).toBe(getSubTypeIcon);
     });
 
     it('should not export deleted API functions', () => {

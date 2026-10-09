@@ -11,6 +11,17 @@ const designSystemColours = [
   },
 ];
 
+// Pictographs used as icons (workspace ROADMAP M76): icons are lucide components, never emoji in the markup or in
+// the data a page prints. Text symbols (⌘, ✓, →, ·) are not pictographs and stay allowed.
+const EMOJI = "/[\\u{1F000}-\\u{1FAFF}\\u{2600}-\\u{27BF}\\u{2B00}-\\u{2BFF}\\u{23E9}-\\u{23FF}\\u{2139}]/u";
+
+const designSystemEmoji = [
+  {
+    selector: `Literal[value=${EMOJI}], TemplateElement[value.raw=${EMOJI}], JSXText[value=${EMOJI}]`,
+    message: "No emoji as icons: use a lucide icon (DeviceIcon for a device) (.claude/rules/design-system.md).",
+  },
+];
+
 const designSystemTitle = [
   {
     selector: "JSXOpeningElement[name.name='h1']",
@@ -64,6 +75,7 @@ const eslintConfig = [
   // `no-restricted-syntax` is one rule: a later block replaces the selectors of an earlier one for the files it
   // matches, so every block below spreads the selectors it keeps.
   //  - colours: no hand-picked slate colours or gradients in class names, in every file of app/ (.ts maps too)
+  //  - emoji: no pictographs as icons, in every file of app/
   //  - title: the page title is always the shared PageHeader, never a hand-made <h1>
   //  - native controls: <select>, <table> and <input type="range"> live only inside the design system
   {
@@ -71,7 +83,7 @@ const eslintConfig = [
     files: ["app/**/*.{ts,tsx}"],
     ignores: ["**/__tests__/**", "**/*.test.{ts,tsx}"],
     rules: {
-      "no-restricted-syntax": ["error", ...designSystemColours],
+      "no-restricted-syntax": ["error", ...designSystemColours, ...designSystemEmoji],
     },
   },
   {
@@ -90,7 +102,7 @@ const eslintConfig = [
       "**/*.test.tsx",
     ],
     rules: {
-      "no-restricted-syntax": ["error", ...designSystemColours, ...designSystemTitle, ...designSystemNativeControls],
+      "no-restricted-syntax": ["error", ...designSystemColours, ...designSystemEmoji, ...designSystemTitle, ...designSystemNativeControls],
     },
   },
   // The design system itself writes the native controls, but still never an <h1>
@@ -99,7 +111,7 @@ const eslintConfig = [
     files: ["app/components/ui/**/*.tsx", "app/components/EmberGlass/**/primitives/**/*.tsx"],
     ignores: ["**/__tests__/**", "**/*.test.tsx"],
     rules: {
-      "no-restricted-syntax": ["error", ...designSystemColours, ...designSystemTitle],
+      "no-restricted-syntax": ["error", ...designSystemColours, ...designSystemEmoji, ...designSystemTitle],
     },
   },
 

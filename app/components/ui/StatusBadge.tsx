@@ -1,9 +1,12 @@
+import { createElement, type ReactNode } from 'react';
+import { AlertTriangle, CircleHelp, Flame, Hourglass, RefreshCw, Rocket, Snowflake, Thermometer, type LucideIcon } from 'lucide-react';
+
 /**
  * StatusBadge Component Props
  */
 export interface StatusBadgeProps {
   status?: string;
-  icon?: string;
+  icon?: ReactNode;
   variant?: 'display' | 'badge' | 'dot' | 'floating';
   size?: 'sm' | 'md' | 'lg';
   color?: 'ember' | 'sage' | 'ocean' | 'warning' | 'danger' | 'neutral';
@@ -23,7 +26,7 @@ export interface StatusBadgeProps {
  *
  * @param {Object} props - Component props
  * @param {string} props.status - Status text to display
- * @param {string} props.icon - Icon emoji (auto-detected if not provided)
+ * @param {string} props.icon - Icon element (auto-detected from the status in the display variant)
  * @param {'display'|'badge'|'dot'|'floating'} props.variant - Badge variant
  * @param {'sm'|'md'|'lg'} props.size - Badge size
  * @param {'ember'|'sage'|'ocean'|'warning'|'danger'|'neutral'} props.color - Color preset
@@ -58,21 +61,25 @@ export default function StatusBadge({
   };
 
   // Auto-detect icon based on status
-  const getAutoIcon = (status: string | undefined) => {
-    if (!status) return '❔';
+  const getAutoIcon = (status: string | undefined): LucideIcon | null => {
+    if (!status) return null;
     const s = status.toUpperCase();
-    if (s.includes('WORK') || s.includes('FUNZIONE')) return '🔥';
-    if (s.includes('OFF') || s.includes('SPENT')) return '❄️';
-    if (s.includes('ERROR') || s.includes('ERRORE')) return '⚠️';
-    if (s.includes('START') || s.includes('AVVIO')) return '🚀';
-    if (s.includes('WAIT') || s.includes('ATTESA') || s.includes('STANDBY')) return '💤';
-    if (s.includes('CLEANING') || s.includes('PULIZIA')) return '🔄';
-    if (s.includes('MODULATION') || s.includes('MODULAZIONE')) return '🌡️';
-    return '❔';
+    if (s.includes('WORK') || s.includes('FUNZIONE')) return Flame;
+    if (s.includes('OFF') || s.includes('SPENT')) return Snowflake;
+    if (s.includes('ERROR') || s.includes('ERRORE')) return AlertTriangle;
+    if (s.includes('START') || s.includes('AVVIO')) return Rocket;
+    if (s.includes('WAIT') || s.includes('ATTESA') || s.includes('STANDBY')) return Hourglass;
+    if (s.includes('CLEANING') || s.includes('PULIZIA')) return RefreshCw;
+    if (s.includes('MODULATION') || s.includes('MODULAZIONE')) return Thermometer;
+    return null;
   };
 
   const resolvedColor = color || getAutoColor(status);
-  const resolvedIcon = icon || getAutoIcon(status);
+  // Icon given by the caller, else the one recognised from the status (none for an unknown status)
+  const autoIcon = getAutoIcon(status);
+  const iconPx = { sm: 32, md: 48, lg: 64 }[size] ?? 48;
+  const renderIcon = (px: number): ReactNode =>
+    icon ?? (autoIcon ? createElement(autoIcon, { size: px, 'aria-hidden': true }) : null);
 
   // Color presets - Ember Noir palette
   const colorStyles = {
@@ -119,17 +126,17 @@ export default function StatusBadge({
   // Size configurations
   const sizeConfig = {
     sm: {
-      display: { icon: 'text-3xl', text: 'text-lg', padding: 'py-3 px-4' },
+      display: { text: 'text-lg', padding: 'py-3 px-4' },
       badge: { text: 'text-xs', padding: 'px-2.5 py-1' },
       dot: 'w-2 h-2',
     },
     md: {
-      display: { icon: 'text-5xl', text: 'text-2xl', padding: 'py-5 px-6' },
+      display: { text: 'text-2xl', padding: 'py-5 px-6' },
       badge: { text: 'text-sm', padding: 'px-3 py-1.5' },
       dot: 'w-2.5 h-2.5',
     },
     lg: {
-      display: { icon: 'text-7xl', text: 'text-3xl', padding: 'py-6 px-8' },
+      display: { text: 'text-3xl', padding: 'py-6 px-8' },
       badge: { text: 'text-base', padding: 'px-4 py-2' },
       dot: 'w-3 h-3',
     },
@@ -159,7 +166,7 @@ export default function StatusBadge({
           ${className}
         `.trim().replace(/\s+/g, ' ')}
       >
-        <span className={sizes.display.icon}>{resolvedIcon}</span>
+        <span className={colors.text}>{renderIcon(iconPx) ?? <CircleHelp size={iconPx} aria-hidden="true" />}</span>
         <span className={`
           font-display font-bold
           ${sizes.display.text}
@@ -204,7 +211,7 @@ export default function StatusBadge({
             ${pulse ? 'animate-pulse' : ''}
           `.trim().replace(/\s+/g, ' ')}>
             <span className="font-display text-xs font-bold">
-              {resolvedIcon && <span className="mr-1">{resolvedIcon}</span>}
+              {renderIcon(12) && <span className="mr-1 inline-flex align-middle">{renderIcon(12)}</span>}
               {text || status}
             </span>
           </div>
@@ -229,7 +236,7 @@ export default function StatusBadge({
         ${className}
       `.trim().replace(/\s+/g, ' ')}
     >
-      {resolvedIcon && <span className="text-sm">{resolvedIcon}</span>}
+      {renderIcon(14) && <span className="inline-flex">{renderIcon(14)}</span>}
       {status}
     </span>
   );

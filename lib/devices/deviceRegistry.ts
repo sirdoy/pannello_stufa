@@ -10,7 +10,6 @@ import { DEVICE_TYPES, DEVICE_CONFIG, GLOBAL_SECTIONS, SETTINGS_MENU } from './d
 interface NavItem {
   label: string;
   route: string;
-  icon?: string;
   items?: { label: string; route: string }[];
 }
 
@@ -18,7 +17,6 @@ interface NavItem {
 interface DeviceNav {
   id: DeviceTypeId;
   name: string;
-  icon: string;
   color: DeviceColor;
   items: NavItem[];
 }
@@ -28,7 +26,6 @@ interface SettingsMenuItemOutput {
   id: string;
   label: string;
   route: string;
-  icon: string;
   description: string;
   submenu?: SettingsMenuItemOutput[];
 }
@@ -106,7 +103,6 @@ function getGlobalNavItems(): NavItem[] {
   return Object.values(GLOBAL_SECTIONS).map(section => ({
     label: section.name,
     route: section.route,
-    icon: section.icon,
     ...(section.items ? { items: section.items } : {}),
   }));
 }
@@ -121,7 +117,6 @@ function getSettingsMenuItems(): SettingsMenuItemOutput[] {
       id: item.id,
       label: item.name,
       route: item.route,
-      icon: item.icon,
       description: item.description,
     };
 
@@ -131,7 +126,6 @@ function getSettingsMenuItems(): SettingsMenuItemOutput[] {
         id: subitem.id,
         label: subitem.name,
         route: subitem.route,
-        icon: subitem.icon,
         description: subitem.description,
       }));
     }
@@ -154,7 +148,6 @@ export function getNavigationStructureWithPreferences(preferences: Record<string
   const devices = enabledDevices.map(device => ({
     id: device.id,
     name: device.name,
-    icon: device.icon,
     color: device.color,
     items: getDeviceNavItems(device.id),
   }));

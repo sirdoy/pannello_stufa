@@ -21,7 +21,7 @@ jest.mock('date-fns', () => ({
 }));
 
 /** Pending command fixture: display fields from the test, queue fields defaulted. */
-const cmd = (c: Pick<FormattedCommand, 'id' | 'label' | 'icon' | 'formattedTime' | 'endpoint'>): FormattedCommand => ({
+const cmd = (c: Pick<FormattedCommand, 'id' | 'label' | 'formattedTime' | 'endpoint'>): FormattedCommand => ({
   method: 'POST',
   data: {},
   status: 'pending',
@@ -146,14 +146,12 @@ describe('OfflineBanner', () => {
           cmd({
             id: 1,
             label: 'Accensione stufa',
-            icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
           }),
           cmd({
             id: 2,
             label: 'Spegnimento stufa',
-            icon: '🌙',
             formattedTime: '10:35',
             endpoint: 'stove/shutdown',
           }),
@@ -191,7 +189,6 @@ describe('OfflineBanner', () => {
           cmd({
             id: 1,
             label: 'Accensione stufa',
-            icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
           }),
@@ -229,7 +226,6 @@ describe('OfflineBanner', () => {
           cmd({
             id: 1,
             label: 'Accensione stufa',
-            icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
           }),
@@ -276,14 +272,12 @@ describe('OfflineBanner', () => {
           cmd({
             id: 1,
             label: 'Accensione stufa',
-            icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
           }),
           cmd({
             id: 2,
             label: 'Imposta potenza',
-            icon: '⚡',
             formattedTime: '10:35',
             endpoint: 'stove/set-power',
           }),
@@ -339,7 +333,6 @@ describe('OfflineBanner', () => {
           cmd({
             id: 42,
             label: 'Accensione stufa',
-            icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
           }),
@@ -401,7 +394,6 @@ describe('OfflineBanner', () => {
           cmd({
             id: 1,
             label: 'Accensione stufa',
-            icon: '🔥',
             formattedTime: '10:30',
             endpoint: 'stove/ignite',
           }),
@@ -459,7 +451,7 @@ describe('OfflineBanner', () => {
 
       render(<OfflineBanner />);
 
-      expect(screen.getByText('✓ 🔥 Stufa accesa')).toBeInTheDocument();
+      expect(screen.getByText('Stufa accesa')).toBeInTheDocument();
     });
 
     it('shows correct action label for stove shutdown', () => {
@@ -493,7 +485,7 @@ describe('OfflineBanner', () => {
 
       render(<OfflineBanner />);
 
-      expect(screen.getByText('✓ 🌙 Stufa spenta')).toBeInTheDocument();
+      expect(screen.getByText('Stufa spenta')).toBeInTheDocument();
     });
 
     it('shows correct action label for set power', () => {
@@ -527,7 +519,7 @@ describe('OfflineBanner', () => {
 
       render(<OfflineBanner />);
 
-      expect(screen.getByText('✓ ⚡ Potenza impostata')).toBeInTheDocument();
+      expect(screen.getByText('Potenza impostata')).toBeInTheDocument();
     });
 
     it('shows generic label for unknown command', () => {
@@ -561,7 +553,7 @@ describe('OfflineBanner', () => {
 
       render(<OfflineBanner />);
 
-      expect(screen.getByText('✓ Comando eseguito')).toBeInTheDocument();
+      expect(screen.getByText('Comando eseguito')).toBeInTheDocument();
     });
   });
 

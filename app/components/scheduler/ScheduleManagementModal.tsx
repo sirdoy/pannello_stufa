@@ -332,7 +332,7 @@ export default function ScheduleManagementModal({
         confirmText="Elimina"
         cancelText="Annulla"
         confirmVariant="danger"
-        icon="🗑️"
+        icon={<Trash2 size={40} />}
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
       />

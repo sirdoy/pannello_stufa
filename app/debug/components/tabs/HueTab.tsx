@@ -140,7 +140,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
             Bridge Status:
           </Heading>
           <Badge variant={bridgeStatus === 'connected' ? 'sage' : 'danger'}>
-            {bridgeStatus === 'connected' ? '✓ Connected' : '✗ Disconnected'}
+            {bridgeStatus === 'connected' ? 'Connected' : 'Disconnected'}
           </Badge>
         </div>
       )}
@@ -148,7 +148,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
       {/* GET Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📥 GET Endpoints
+          GET Endpoints
         </Heading>
         <div className="space-y-3">
           <EndpointCard
@@ -204,7 +204,7 @@ export default function HueTab({ autoRefresh, refreshTrigger }: HueTabProps) {
       {/* Command Endpoints */}
       <div>
         <Heading level={2} size="lg" className="mb-4">
-          📤 Command Endpoints
+          Command Endpoints
         </Heading>
         <div className="space-y-3">
           <PostEndpointCard

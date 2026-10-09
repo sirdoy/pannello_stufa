@@ -239,6 +239,14 @@ describe('SonosForm', () => {
     expect(screen.getByRole('radiogroup', { name: /Sorgente/i })).toBeInTheDocument();
   });
 
+  it('switching to "Sorgente" stores the source the form shows (tv), not null (D17)', () => {
+    const onChange = jest.fn();
+    const action: SonosAction = { type: 'sonos', speaker_uid: 'u', command: 'play', volume: null, source: null };
+    render(<SonosForm action={action} onChange={onChange} />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Sorgente' }));
+    expect(onChange).toHaveBeenCalledWith({ ...action, command: 'switch_source', source: 'tv' });
+  });
+
   it('hides volume and source when command=play', () => {
     const action: SonosAction = { type: 'sonos', speaker_uid: '', command: 'play', volume: null, source: null };
     render(<SonosForm action={action} onChange={jest.fn()} />);
@@ -261,6 +269,14 @@ describe('TuyaForm', () => {
     render(<TuyaForm action={action} onChange={jest.fn()} />);
     expect(screen.getByRole('radiogroup', { name: /Stato/i })).toBeInTheDocument();
     expect(screen.queryByLabelText('Timer')).not.toBeInTheDocument();
+  });
+
+  it('switching back to "Stato" stores the state the form shows (on), not null (D17)', () => {
+    const onChange = jest.fn();
+    const action: TuyaAction = { type: 'tuya', device_id: 'd', command: 'set_timer', on: null, timer_seconds: 60 };
+    render(<TuyaForm action={action} onChange={onChange} />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Stato' }));
+    expect(onChange).toHaveBeenCalledWith({ ...action, command: 'set_status', on: true, timer_seconds: null });
   });
 
   it('shows timer_seconds ONLY when command=set_timer', () => {

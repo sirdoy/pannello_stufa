@@ -8,10 +8,10 @@ describe('automations-config catalogs', () => {
     expect(TRIGGER_TYPES).toHaveLength(2);
     expect(TRIGGER_TYPES.map(t => t.id)).toEqual(['schedule_cron', 'manual_api_call']);
   });
-  test('CONDITION_TYPES has exactly 4 picker entries (D-18)', () => {
-    expect(CONDITION_TYPES).toHaveLength(4);
+  test('CONDITION_TYPES has 3 picker entries, without the always-true temperature_range (D17)', () => {
+    expect(CONDITION_TYPES).toHaveLength(3);
     expect(CONDITION_TYPES.map(c => c.id)).toEqual([
-      'time_window', 'device_state', 'temperature_range', 'always_true',
+      'time_window', 'device_state', 'always_true',
     ]);
   });
   test('ACTION_TYPES has exactly 11 entries in locked order (D-09)', () => {
@@ -49,7 +49,6 @@ describe('defaultCondition factories', () => {
   test.each([
     ['time_window', { type: 'time_window', start_time: '08:00', end_time: '20:00' }],
     ['device_state', { type: 'device_state', sensor_id: '', expected_state: '' }],
-    ['temperature_range', { type: 'temperature_range', min_temp: null, max_temp: null }],
     ['always_true', { type: 'always_true' }],
   ] as const)('defaultCondition(%s) returns expected shape', (id, expected) => {
     expect(defaultCondition(id)).toEqual(expected);
@@ -72,11 +71,11 @@ describe('defaultAction factories', () => {
     const a = defaultAction('hue_group');
     expect(a).not.toHaveProperty('hue');
     expect(a).not.toHaveProperty('sat');
-    expect(a).toMatchObject({ type: 'hue_group', group_id: '', on: null, brightness: null, color_temp: null });
+    expect(a).toMatchObject({ type: 'hue_group', group_id: '', on: true, brightness: null, color_temp: null });
   });
-  test('defaultAction(hue_light) includes all 6 nullable fields', () => {
+  test('defaultAction(hue_light) starts on "Accendi", as the form shows (D17)', () => {
     expect(defaultAction('hue_light')).toEqual({
-      type: 'hue_light', light_id: '', on: null, brightness: null, color_temp: null, hue: null, sat: null,
+      type: 'hue_light', light_id: '', on: true, brightness: null, color_temp: null, hue: null, sat: null,
     });
   });
   test('defaultAction(netatmo_set_room_temp) defaults mode=manual + temp=21', () => {
@@ -111,7 +110,7 @@ describe('defaultAction factories', () => {
   });
   test('defaultAction(tuya) has correct defaults', () => {
     expect(defaultAction('tuya')).toEqual({
-      type: 'tuya', device_id: '', command: 'set_status', on: null, timer_seconds: null,
+      type: 'tuya', device_id: '', command: 'set_status', on: true, timer_seconds: null,
     });
   });
 });

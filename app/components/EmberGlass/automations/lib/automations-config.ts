@@ -54,13 +54,14 @@ export const TRIGGER_TYPES = [
   desc: string;
 }>;
 
-// ─── CONDITION_TYPES (D-18 — 4 picker entries) ─────────────────────────────
-type ConditionPickerType = 'time_window' | 'device_state' | 'temperature_range' | 'always_true';
+// ─── CONDITION_TYPES (3 picker entries) ────────────────────────────────────
+// temperature_range is not offered (ROADMAP D17): the backend has no sensor behind it and
+// always answers true. A rule that already has one still shows it (ConditionItem, legacy).
+type ConditionPickerType = 'time_window' | 'device_state' | 'always_true';
 
 export const CONDITION_TYPES = [
   { id: 'time_window' as const, label: 'Fascia oraria', Icon: Clock, tone: '#5eafff' },
   { id: 'device_state' as const, label: 'Stato dispositivo', Icon: Home, tone: '#ffb84a' },
-  { id: 'temperature_range' as const, label: 'Intervallo temperatura', Icon: Thermometer, tone: '#b080ff' },
   { id: 'always_true' as const, label: 'Sempre vero', Icon: Check, tone: 'var(--text-2)' },
 ] as const satisfies ReadonlyArray<{
   id: ConditionPickerType;
@@ -114,7 +115,7 @@ export function defaultTrigger(type: TriggerType['type']): TriggerType {
 }
 
 /**
- * Returns a default ConditionNode for the 4 picker types.
+ * Returns a default ConditionNode for the picker types.
  * Sensor leaves (sensor_state_change, sensor_threshold, netatmo_temperature_threshold)
  * are NOT supported in the picker per D-08 — they are preserved on round-trip only.
  */
@@ -124,8 +125,6 @@ export function defaultCondition(type: ConditionPickerType): ConditionNode {
       return { type: 'time_window', start_time: '08:00', end_time: '20:00' };
     case 'device_state':
       return { type: 'device_state', sensor_id: '', expected_state: '' };
-    case 'temperature_range':
-      return { type: 'temperature_range', min_temp: null, max_temp: null };
     case 'always_true':
       return { type: 'always_true' };
     default:
@@ -135,6 +134,8 @@ export function defaultCondition(type: ConditionPickerType): ConditionNode {
 
 /**
  * Returns a default ActionItem for the given type literal.
+ * A field the form shows with a preselected choice ("Accendi") starts with that value:
+ * left null it was saved as "do nothing" (ROADMAP D17).
  * All 11 API action types are covered; assertNever guards the default branch.
  */
 export function defaultAction(type: ActionItem['type']): ActionItem {
@@ -153,14 +154,14 @@ export function defaultAction(type: ActionItem['type']): ActionItem {
       return {
         type: 'hue_light',
         light_id: '',
-        on: null,
+        on: true,
         brightness: null,
         color_temp: null,
         hue: null,
         sat: null,
       };
     case 'hue_group':
-      return { type: 'hue_group', group_id: '', on: null, brightness: null, color_temp: null };
+      return { type: 'hue_group', group_id: '', on: true, brightness: null, color_temp: null };
     case 'hue_scene':
       return { type: 'hue_scene', group_id: '', scene_id: '' };
     case 'thermorossi':
@@ -168,7 +169,7 @@ export function defaultAction(type: ActionItem['type']): ActionItem {
     case 'sonos':
       return { type: 'sonos', speaker_uid: '', command: 'play', volume: null, source: null };
     case 'tuya':
-      return { type: 'tuya', device_id: '', command: 'set_status', on: null, timer_seconds: null };
+      return { type: 'tuya', device_id: '', command: 'set_status', on: true, timer_seconds: null };
     default:
       return assertNever(type);
   }

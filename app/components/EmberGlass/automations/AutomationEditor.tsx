@@ -30,6 +30,7 @@ import { apiToDraft, draftToApi, computePatchDelta } from './lib/automations-map
 // Plan 06's ActionsSection imports the same module.
 import { withKey, stripKeys, type KeyedAction } from './lib/with-key';
 import { isHoldable } from './lib/hold';
+import { incompleteActionMessage } from './lib/action-complete';
 import { TextInput } from './primitives/TextInput';
 import { FieldLabel } from './primitives/FieldLabel';
 import { TriggerSection } from './sections/TriggerSection';
@@ -182,11 +183,15 @@ export function AutomationEditor({
     draft.mode === 'hold' && !draft.actions.every(isHoldable)
       ? 'Con "Finché è vero" le azioni possono essere solo: temperatura manuale di una valvola, potenza o ventola della stufa.'
       : null;
+  // An action saved without its value would do nothing: the backend answers 422 (ROADMAP D17)
+  const actionError =
+    draft.actions.map(incompleteActionMessage).find((message) => message !== null) ?? null;
   const saveAllowed =
     draft.name.trim().length >= 1 &&
     draft.actions.length >= 1 &&
     !hasJsonError &&
-    !holdError;
+    !holdError &&
+    !actionError;
 
   const condCount = countDraftConditions(draft.conditions);
   const actionCount = draft.actions.length;
@@ -372,6 +377,12 @@ export function AutomationEditor({
       {holdError && activeTab !== 3 && (
         <div role="alert" style={{ fontSize: 11, fontWeight: 600, color: '#ff6676', marginTop: 12 }}>
           {holdError}
+        </div>
+      )}
+
+      {actionError && (
+        <div role="alert" style={{ fontSize: 11, fontWeight: 600, color: '#ff6676', marginTop: 12 }}>
+          {actionError}
         </div>
       )}
 

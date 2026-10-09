@@ -13,7 +13,7 @@ import { CONDITION_TYPES, defaultCondition } from './lib/automations-config';
 import { IconBtn } from './primitives/IconBtn';
 import { ConditionForm } from './forms/ConditionForms';
 
-const PICKER_IDS = ['time_window', 'device_state', 'temperature_range', 'always_true'] as const;
+const PICKER_IDS = ['time_window', 'device_state', 'always_true'] as const;
 type PickerId = (typeof PICKER_IDS)[number];
 
 export interface ConditionItemProps {
@@ -33,7 +33,7 @@ export function ConditionItem({ cond, onChange, onRemove }: ConditionItemProps) 
   // Determine if current cond is a legacy type not in the picker
   const isLegacy = !PICKER_IDS.includes(cond.type as PickerId);
 
-  // Dropdown options: 4 picker types + (if legacy, show it as a 5th non-creatable option)
+  // Dropdown options: the picker types + (if legacy, show it as an extra non-creatable option)
   const options: Array<{ id: string; label: string }> = [
     ...CONDITION_TYPES.map((c) => ({ id: c.id, label: c.label })),
     ...(isLegacy ? [{ id: cond.type, label: `${cond.type} (legacy)` }] : []),

@@ -69,16 +69,21 @@ export function DeviceStateForm({ cond, onChange }: ConditionFormProps<DeviceSta
         id="cond-sensor"
         value={cond.sensor_id}
         onChange={(v) => onChange({ ...cond, sensor_id: v })}
-        placeholder="es. plug.salotto"
+        placeholder="es. dirigera:<id sensore>:is_open"
         aria-label="ID sensore"
       />
+      <div style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 4 }}>
+        Formato <code style={{ fontFamily: 'ui-monospace, monospace' }}>provider:id:metrica</code>, es.{' '}
+        <code style={{ fontFamily: 'ui-monospace, monospace' }}>thermorossi:default:stove_state</code>,{' '}
+        <code style={{ fontFamily: 'ui-monospace, monospace' }}>hue:5:on</code>.
+      </div>
       <div style={{ height: 8 }} />
       <FieldLabel htmlFor="cond-state" small>Stato atteso</FieldLabel>
       <TextInput
         id="cond-state"
         value={cond.expected_state}
         onChange={(v) => onChange({ ...cond, expected_state: v })}
-        placeholder="on"
+        placeholder="es. on, off, working"
         aria-label="Stato atteso"
       />
     </div>
@@ -92,30 +97,35 @@ export function TemperatureRangeForm({
   onChange,
 }: ConditionFormProps<TemperatureRangeCondition>) {
   return (
-    <TwoCol>
-      <div>
-        <FieldLabel htmlFor="cond-min-temp" small>Min</FieldLabel>
-        <NumInput
-          id="cond-min-temp"
-          value={cond.min_temp ?? null}
-          allowNull
-          unit="°C"
-          onChange={(v) => onChange({ ...cond, min_temp: v })}
-          aria-label="Temperatura minima"
-        />
+    <>
+      <div style={{ fontSize: 11, color: 'var(--text-2)', marginBottom: 6 }}>
+        Questa condizione non legge nessun sensore: è sempre vera. Toglila o usa «Stato dispositivo».
       </div>
-      <div>
-        <FieldLabel htmlFor="cond-max-temp" small>Max</FieldLabel>
-        <NumInput
-          id="cond-max-temp"
-          value={cond.max_temp ?? null}
-          allowNull
-          unit="°C"
-          onChange={(v) => onChange({ ...cond, max_temp: v })}
-          aria-label="Temperatura massima"
-        />
-      </div>
-    </TwoCol>
+      <TwoCol>
+        <div>
+          <FieldLabel htmlFor="cond-min-temp" small>Min</FieldLabel>
+          <NumInput
+            id="cond-min-temp"
+            value={cond.min_temp ?? null}
+            allowNull
+            unit="°C"
+            onChange={(v) => onChange({ ...cond, min_temp: v })}
+            aria-label="Temperatura minima"
+          />
+        </div>
+        <div>
+          <FieldLabel htmlFor="cond-max-temp" small>Max</FieldLabel>
+          <NumInput
+            id="cond-max-temp"
+            value={cond.max_temp ?? null}
+            allowNull
+            unit="°C"
+            onChange={(v) => onChange({ ...cond, max_temp: v })}
+            aria-label="Temperatura massima"
+          />
+        </div>
+      </TwoCol>
+    </>
   );
 }
 

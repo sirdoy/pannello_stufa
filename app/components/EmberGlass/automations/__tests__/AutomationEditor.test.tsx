@@ -68,7 +68,7 @@ jest.mock('../sections/ActionsSection', () => ({
         onClick={() => {
           const rest = actions.slice(0, -1);
           const fresh = mintActionKey({ type: 'log_event' });
-          onChange([...rest, { ...fresh, type: 'log_event' }]);
+          onChange([...rest, { ...fresh, type: 'log_event', message: 'swapped' }]);
         }}
       />
     </div>
@@ -285,6 +285,28 @@ describe('Save guard (D-14)', () => {
     fireEvent.click(screen.getByTestId('hook-set-last-validation-false'));
     const saveBtn = screen.getByRole('button', { name: 'Salva modifiche' });
     expect(saveBtn).toBeDisabled();
+  });
+});
+
+describe('incomplete action (ROADMAP D17)', () => {
+  it('blocks the save and says what is missing', () => {
+    const rule = makeRule({
+      name: 'X',
+      actions: [{ type: 'tuya', device_id: 'plug', command: 'set_status', on: null, timer_seconds: null }],
+    });
+    renderEdit(rule);
+    expect(screen.getByRole('button', { name: 'Salva modifiche' })).toBeDisabled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Presa: scegli Accendi o Spegni.');
+  });
+
+  it('a complete action leaves the save enabled, with no alert', () => {
+    const rule = makeRule({
+      name: 'X',
+      actions: [{ type: 'tuya', device_id: 'plug', command: 'set_status', on: false, timer_seconds: null }],
+    });
+    renderEdit(rule);
+    expect(screen.getByRole('button', { name: 'Salva modifiche' })).not.toBeDisabled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });
 

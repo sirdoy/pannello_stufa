@@ -17,14 +17,14 @@ describe('ConditionItem — picker types', () => {
     end_time: '20:00',
   };
 
-  it('renders type select with 4 picker options for a time_window cond', () => {
+  it('renders type select with the 3 picker options for a time_window cond', () => {
     render(<ConditionItem cond={timeWindowCond} onChange={jest.fn()} onRemove={jest.fn()} />);
     const select = screen.getByRole('combobox', { name: /tipo condizione/i });
     expect(select).toBeInTheDocument();
-    // Check 4 picker types are present
+    // temperature_range is not offered: the backend always answers true (ROADMAP D17)
     expect(screen.getByRole('option', { name: /fascia oraria/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /stato dispositivo/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /intervallo temperatura/i })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: /intervallo temperatura/i })).not.toBeInTheDocument();
     expect(screen.getByRole('option', { name: /sempre vero/i })).toBeInTheDocument();
   });
 
@@ -86,30 +86,35 @@ describe('ConditionItem — type switch', () => {
     expect(arg).not.toHaveProperty('end_time');
   });
 
-  it('switching from device_state to temperature_range does not preserve sensor_id', () => {
+  it('switching from device_state to always_true does not preserve sensor_id', () => {
     const onChange = jest.fn();
-    const cond: ConditionNode = { type: 'device_state', sensor_id: 'plug.x', expected_state: 'on' };
+    const cond: ConditionNode = { type: 'device_state', sensor_id: 'hue:5:on', expected_state: 'on' };
     render(<ConditionItem cond={cond} onChange={onChange} onRemove={jest.fn()} />);
     fireEvent.change(screen.getByRole('combobox', { name: /tipo condizione/i }), {
-      target: { value: 'temperature_range' },
+      target: { value: 'always_true' },
     });
     const arg = onChange.mock.calls[0]?.[0] as Record<string, unknown>;
-    expect(arg).toHaveProperty('type', 'temperature_range');
-    expect(arg).toHaveProperty('min_temp');
-    expect(arg).not.toHaveProperty('sensor_id');
+    expect(arg).toEqual({ type: 'always_true' });
+  });
+
+  it('keeps an existing temperature_range as a legacy option and says it filters nothing', () => {
+    const cond: ConditionNode = { type: 'temperature_range', min_temp: 18, max_temp: 22 };
+    render(<ConditionItem cond={cond} onChange={jest.fn()} onRemove={jest.fn()} />);
+    expect(screen.getByRole('option', { name: /temperature_range \(legacy\)/ })).toBeInTheDocument();
+    expect(screen.getByText(/è sempre vera/)).toBeInTheDocument();
   });
 });
 
 // ─── Legacy types (D-09b) ─────────────────────────────────────────────────────
 
 describe('ConditionItem — legacy type fallback (D-09b)', () => {
-  it('renders 5th dropdown option for legacy sensor_state_change type', () => {
+  it('renders an extra dropdown option for legacy sensor_state_change type', () => {
     const cond = { type: 'sensor_state_change' } as unknown as ConditionNode;
     render(<ConditionItem cond={cond} onChange={jest.fn()} onRemove={jest.fn()} />);
     const select = screen.getByRole('combobox', { name: /tipo condizione/i });
-    // Should have 5 options: 4 picker + 1 legacy
+    // 3 picker types + 1 legacy
     const options = select.querySelectorAll('option');
-    expect(options.length).toBe(5);
+    expect(options.length).toBe(4);
     // The legacy option should have value matching the type
     const legacyOption = Array.from(options).find(o => o.getAttribute('value') === 'sensor_state_change');
     expect(legacyOption).toBeDefined();

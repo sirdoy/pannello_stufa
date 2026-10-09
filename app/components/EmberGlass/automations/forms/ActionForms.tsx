@@ -521,9 +521,9 @@ export function ThermorossiForm({ action, onChange }: FormProps<ThermorossiActio
 
 // ─── 10. SonosForm — conditional fields ──────────────────────────────────────
 export function SonosForm({ action, onChange }: FormProps<SonosAction>) {
-  // When command changes, reset all conditional fields to null
+  // When command changes, reset the conditional fields; "Sorgente" starts on the choice shown (TV)
   const setCommand = (cmd: SonosAction['command']) =>
-    onChange({ ...action, command: cmd, volume: null, source: null });
+    onChange({ ...action, command: cmd, volume: null, source: cmd === 'switch_source' ? 'tv' : null });
 
   const sourceValue = action.source ?? 'tv';
   const speakers = useSonosSpeakerOptions();
@@ -589,9 +589,9 @@ export function SonosForm({ action, onChange }: FormProps<SonosAction>) {
 
 // ─── 11. TuyaForm — conditional fields ───────────────────────────────────────
 export function TuyaForm({ action, onChange }: FormProps<TuyaAction>) {
-  // When command changes, reset all conditional fields to null
+  // When command changes, reset the conditional fields; "Stato" starts on the choice shown (Accendi)
   const setCommand = (cmd: TuyaAction['command']) =>
-    onChange({ ...action, command: cmd, on: null, timer_seconds: null });
+    onChange({ ...action, command: cmd, on: cmd === 'set_status' ? true : null, timer_seconds: null });
 
   const onValue = action.on === null || action.on === undefined ? 'true' : String(action.on);
   const plugs = useTuyaPlugOptions();

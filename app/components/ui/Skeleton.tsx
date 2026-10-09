@@ -4,7 +4,7 @@ import type { ReactNode, HTMLAttributes } from 'react';
  * Skeleton Component - Ember Noir Design System
  *
  * Creates animated skeleton loaders that match the structure of content being loaded.
- * Dark-first design with subtle shimmer animation.
+ * Flat pulsing placeholders on the EmberGlass surfaces.
  *
  * @component
  * @example
@@ -25,12 +25,9 @@ export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
 export default function Skeleton({ className = '', ...props }: SkeletonProps) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
+      className={`animate-pulse rounded-xl bg-white/8 ${className}`}
       {...props}
-    >
-      {/* Shimmer overlay effect */}
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
-    </div>
+    />
   );
 }
 
@@ -69,7 +66,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
 
             {/* Status Display */}
             <div className="mb-6">
-              <div className="relative overflow-visible rounded-2xl border border-slate-700/50 bg-slate-800/60 p-8 sm:p-10 ">
+              <div className="relative overflow-visible rounded-2xl border-[0.5px] border-white/6 bg-white/4 p-8 sm:p-10">
                 <div className="mb-8 text-center sm:mb-10">
                   <Skeleton className="mx-auto h-8 w-48" />
                 </div>
@@ -78,14 +75,14 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
                     <Skeleton className="size-[120px] rounded-full sm:size-[140px]" />
                   </div>
                   <div className="relative z-10 mt-4 grid w-full grid-cols-2 gap-3 sm:gap-4">
-                    <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 ">
+                    <div className="relative overflow-hidden rounded-2xl border-[0.5px] border-white/6 bg-white/4">
                       <div className="flex min-h-25 flex-col items-center justify-center p-4 sm:min-h-30 sm:p-6">
                         <Skeleton className="mb-2 size-6 rounded-full" />
                         <Skeleton className="mb-1 h-3 w-16" />
                         <Skeleton className="h-8 w-12" />
                       </div>
                     </div>
-                    <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 ">
+                    <div className="relative overflow-hidden rounded-2xl border-[0.5px] border-white/6 bg-white/4">
                       <div className="flex min-h-25 flex-col items-center justify-center p-4 sm:min-h-30 sm:p-6">
                         <Skeleton className="mb-2 size-6 rounded-full" />
                         <Skeleton className="mb-1 h-3 w-16" />
@@ -106,7 +103,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="h-px w-full bg-linear-to-r from-transparent via-slate-600/50 to-transparent"></div>
+                <div className="h-px w-full bg-white/8"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-28 rounded-full" />
@@ -114,7 +111,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
             </div>
 
             {/* Mode Indicator */}
-            <div className="relative mb-6 overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/50 p-5 sm:p-6 ">
+            <div className="relative mb-6 overflow-hidden rounded-2xl border-[0.5px] border-white/6 bg-white/4 p-5 sm:p-6">
               <div className="mb-4 flex items-center gap-4">
                 <Skeleton className="size-12 rounded-xl" />
                 <div className="min-w-0 flex-1">
@@ -127,7 +124,7 @@ Skeleton.StovePanel = function SkeletonStovePanel() {
 
             {/* Controls */}
             <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/50 p-5 sm:p-6 ">
+              <div className="relative overflow-hidden rounded-2xl border-[0.5px] border-white/6 bg-white/4 p-5 sm:p-6">
                 <div className="mb-4 flex items-center gap-3">
                   <Skeleton className="size-10 rounded-xl" />
                   <Skeleton className="h-5 w-24" />
@@ -171,15 +168,15 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
 
             {/* Temperature Display */}
             <div className="mb-4 space-y-4 sm:mb-6">
-              <div className="relative rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 sm:p-8 ">
+              <div className="relative rounded-2xl border-[0.5px] border-white/6 bg-white/4 p-6 sm:p-8">
                 <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/60 ">
+                  <div className="relative overflow-hidden rounded-2xl border-[0.5px] border-white/6 bg-white/4">
                     <div className="flex min-h-30 flex-col items-center justify-center p-4 sm:p-6">
                       <Skeleton className="mb-2 h-3 w-16" />
                       <Skeleton className="h-12 w-16 sm:h-14 sm:w-20" />
                     </div>
                   </div>
-                  <div className="relative overflow-hidden rounded-2xl border border-ocean-500/30 bg-ocean-900/40 ">
+                  <div className="relative overflow-hidden rounded-2xl border border-ocean-500/30 bg-ocean-900/40">
                     <div className="flex min-h-30 flex-col items-center justify-center p-4 sm:p-6">
                       <Skeleton className="mb-2 h-3 w-16" />
                       <Skeleton className="h-12 w-16 sm:h-14 sm:w-20" />
@@ -189,7 +186,7 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
               </div>
 
               {/* Temperature controls */}
-              <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/50 p-4 sm:p-5 ">
+              <div className="relative overflow-hidden rounded-2xl border-[0.5px] border-white/6 bg-white/4 p-4 sm:p-5">
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-16 flex-1 rounded-xl sm:h-18" />
                   <div className="flex flex-col items-center justify-center px-4">
@@ -204,7 +201,7 @@ Skeleton.ThermostatCard = function SkeletonThermostatCard() {
             {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="h-px w-full bg-linear-to-r from-transparent via-slate-600/50 to-transparent"></div>
+                <div className="h-px w-full bg-white/8"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-28 rounded-full" />
@@ -253,7 +250,7 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
 
             {/* Main Control Area */}
             <div className="mb-6">
-              <div className="relative rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 sm:p-8 ">
+              <div className="relative rounded-2xl border-[0.5px] border-white/6 bg-white/4 p-6 sm:p-8">
                 {/* ON/OFF buttons */}
                 <div className="mb-6 grid grid-cols-2 gap-4">
                   <Skeleton className="h-16 rounded-xl sm:h-20" />
@@ -261,7 +258,7 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
                 </div>
 
                 {/* Brightness Control */}
-                <div className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-slate-800/50 p-4 sm:p-5 ">
+                <div className="relative overflow-hidden rounded-2xl border-[0.5px] border-white/6 bg-white/4 p-4 sm:p-5">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -283,7 +280,7 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
             {/* Divider */}
             <div className="relative my-6 sm:my-8">
               <div className="absolute inset-0 flex items-center">
-                <div className="h-px w-full bg-linear-to-r from-transparent via-slate-600/50 to-transparent"></div>
+                <div className="h-px w-full bg-white/8"></div>
               </div>
               <div className="relative flex justify-center">
                 <Skeleton className="h-8 w-20 rounded-full" />
@@ -293,15 +290,15 @@ Skeleton.LightsCard = function SkeletonLightsCard() {
             {/* Scenes */}
             <div className="mb-6">
               <div className="scrollbar-hide flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-                <div className="w-32 shrink-0 snap-start rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 sm:w-36 ">
+                <div className="w-32 shrink-0 snap-start rounded-xl border-[0.5px] border-white/6 bg-white/4 p-4 sm:w-36">
                   <Skeleton className="mx-auto mb-2 size-8 rounded-full" />
                   <Skeleton className="mx-auto h-3 w-20" />
                 </div>
-                <div className="w-32 shrink-0 snap-start rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 sm:w-36 ">
+                <div className="w-32 shrink-0 snap-start rounded-xl border-[0.5px] border-white/6 bg-white/4 p-4 sm:w-36">
                   <Skeleton className="mx-auto mb-2 size-8 rounded-full" />
                   <Skeleton className="mx-auto h-3 w-20" />
                 </div>
-                <div className="w-32 shrink-0 snap-start rounded-xl border border-slate-700/50 bg-slate-800/50 p-4 sm:w-36 ">
+                <div className="w-32 shrink-0 snap-start rounded-xl border-[0.5px] border-white/6 bg-white/4 p-4 sm:w-36">
                   <Skeleton className="mx-auto mb-2 size-8 rounded-full" />
                   <Skeleton className="mx-auto h-3 w-20" />
                 </div>
@@ -355,7 +352,7 @@ Skeleton.WeatherCard = function SkeletonWeatherCard() {
               {/* Weather details grid */}
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="flex flex-col items-center rounded-xl bg-slate-800/40 p-3 ">
+                  <div key={i} className="flex flex-col items-center rounded-xl bg-white/4 p-3">
                     <Skeleton className="mb-2 size-5 rounded-full" />
                     <Skeleton className="mb-1 h-3 w-12" />
                     <Skeleton className="h-4 w-10" />
@@ -369,7 +366,7 @@ Skeleton.WeatherCard = function SkeletonWeatherCard() {
               {[...Array(5)].map((_, i) => (
                 <div
                   key={i}
-                  className="w-20 shrink-0 rounded-xl bg-slate-800/40 p-3 "
+                  className="w-20 shrink-0 rounded-xl bg-white/4 p-3"
                 >
                   <Skeleton className="mx-auto mb-2 h-3 w-10" />
                   <Skeleton className="mx-auto mb-2 size-8 rounded-full" />
@@ -394,7 +391,7 @@ Skeleton.Scheduler = function SkeletonScheduler() {
       {/* Header Card */}
       <Skeleton.Card className="p-8">
         {/* Status e toggle */}
-        <div className="mb-4 flex flex-col gap-4 rounded-xl bg-slate-100/80 bg-slate-800/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mb-4 flex flex-col gap-4 rounded-xl border-[0.5px] border-white/6 bg-white/4 p-4 sm:flex-row sm:items-center sm:justify-between">
           {/* ModeIndicator */}
           <div className="flex items-center gap-2">
             <Skeleton className="size-6 rounded-lg" />
@@ -436,9 +433,9 @@ Skeleton.Scheduler = function SkeletonScheduler() {
 
             {/* TimeBar compatta */}
             <div className="mt-4">
-              <div className="relative h-4 w-full overflow-hidden rounded-lg bg-slate-200 bg-slate-700/50 shadow-inner">
-                <div className="absolute inset-y-0 bg-linear-to-r from-ember-400 to-flame-500" style={{ left: '20%', width: '30%' }} />
-                <div className="absolute inset-y-0 bg-linear-to-r from-ember-400 to-flame-500" style={{ left: '60%', width: '25%' }} />
+              <div className="relative h-4 w-full overflow-hidden rounded-lg bg-white/8">
+                <div className="absolute inset-y-0 bg-(--accent)/60" style={{ left: '20%', width: '30%' }} />
+                <div className="absolute inset-y-0 bg-(--accent)/60" style={{ left: '60%', width: '25%' }} />
               </div>
             </div>
           </div>
@@ -471,7 +468,7 @@ Skeleton.CameraCard = function SkeletonCameraCard() {
         </div>
 
         {/* Video preview area */}
-        <div className="relative mb-4 aspect-video overflow-hidden rounded-xl bg-slate-800">
+        <div className="relative mb-4 aspect-video overflow-hidden rounded-xl bg-white/4">
           <div className="absolute inset-0 flex items-center justify-center">
             <Skeleton className="size-12 rounded-full" />
           </div>
@@ -498,7 +495,7 @@ Skeleton.CameraCard = function SkeletonCameraCard() {
  */
 Skeleton.LogEntry = function SkeletonLogEntry() {
   return (
-    <li className="mb-4 flex items-start gap-3 border-b border-slate-200 border-slate-700/50 pb-4 last:border-b-0">
+    <li className="mb-4 flex items-start gap-3 border-b border-white/6 pb-4 last:border-b-0">
       {/* Icon */}
       <Skeleton className="mt-1 size-8 shrink-0 rounded-full" />
 
@@ -565,7 +562,7 @@ Skeleton.Changelog = function SkeletonChangelog() {
       {/* Header Card */}
       <Skeleton.Card className="overflow-hidden">
         {/* Accent bar */}
-        <div className="h-1 bg-linear-to-r from-ember-500/50 via-flame-500/50 to-ember-600/50" />
+        <div className="h-1 bg-(--accent)/50" />
 
         <div className="p-6 sm:p-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
@@ -596,7 +593,7 @@ Skeleton.Changelog = function SkeletonChangelog() {
       {/* Timeline */}
       <div className="relative">
         {/* Vertical line */}
-        <div className="absolute inset-y-8 left-[23px] w-px bg-slate-700/30 sm:left-[27px] " />
+        <div className="absolute inset-y-8 left-[23px] w-px bg-white/8 sm:left-[27px]" />
 
         <div className="space-y-6">
           {[...Array(5)].map((_, index) => (
@@ -606,7 +603,7 @@ Skeleton.Changelog = function SkeletonChangelog() {
 
               <Skeleton.Card className="overflow-hidden">
                 {/* Header */}
-                <div className="border-b border-slate-700/30 bg-slate-800/30 p-5 sm:p-6 ">
+                <div className="border-b border-white/6 bg-white/4 p-5 sm:p-6">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-3">
                       <Skeleton className="h-6 w-24" />
@@ -648,7 +645,7 @@ Skeleton.Changelog = function SkeletonChangelog() {
             <Skeleton className="h-3 w-12" />
           </div>
         </div>
-        <div className="mb-4 h-px w-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent" />
+        <div className="mb-4 h-px w-full bg-white/8" />
         <div className="flex justify-center">
           <Skeleton className="h-3 w-56" />
         </div>
@@ -696,7 +693,7 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
             <Skeleton className="h-6 w-12" />
           </div>
         </div>
-        <div className="mt-4 border-t border-slate-200 border-slate-700/50 pt-4">
+        <div className="mt-4 border-t border-white/6 pt-4">
           <Skeleton className="h-9 w-56 rounded-xl" />
         </div>
       </Skeleton.Card>
@@ -739,19 +736,19 @@ Skeleton.SchedulePage = function SkeletonSchedulePage() {
     <div className="mx-auto max-w-4xl">
 
       {/* Selector card */}
-      <div className="mb-6 rounded-2xl bg-slate-800/50 p-6">
-        <div className="mb-2 h-5 w-32 animate-pulse rounded bg-slate-700/50" />
-        <div className="h-12 w-full animate-pulse rounded-xl bg-slate-700/50" />
+      <div className="mb-6 rounded-2xl bg-white/4 p-6">
+        <div className="mb-2 h-5 w-32 animate-pulse rounded bg-white/8" />
+        <div className="h-12 w-full animate-pulse rounded-xl bg-white/8" />
       </div>
 
       {/* Timeline card */}
-      <div className="rounded-2xl bg-slate-800/50 p-6">
-        <div className="mb-4 h-6 w-48 animate-pulse rounded bg-slate-700/50" />
+      <div className="rounded-2xl bg-white/4 p-6">
+        <div className="mb-4 h-6 w-48 animate-pulse rounded bg-white/8" />
         <div className="space-y-2">
           {Array(7).fill(null).map((_, i) => (
             <div key={i} className="flex gap-2">
-              <div className="size-12 animate-pulse rounded bg-slate-700/50" />
-              <div className="h-12 flex-1 animate-pulse rounded bg-slate-700/50" />
+              <div className="size-12 animate-pulse rounded bg-white/8" />
+              <div className="h-12 flex-1 animate-pulse rounded bg-white/8" />
             </div>
           ))}
         </div>
@@ -766,10 +763,8 @@ Skeleton.SchedulePage = function SkeletonSchedulePage() {
 Skeleton.RaspiCard = function SkeletonRaspiCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
-    >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
-    </div>
+      className={`animate-pulse rounded-xl bg-white/8 ${className}`}
+    />
   );
 
   const Card = Skeleton.Card;
@@ -777,7 +772,7 @@ Skeleton.RaspiCard = function SkeletonRaspiCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Success green accent bar */}
-      <div className="h-1 bg-linear-to-r from-success-500/50 via-success-400/50 to-success-600/50" />
+      <div className="h-1 bg-sage-400/50" />
       <div className="p-5 sm:p-6">
         {/* Header skeleton */}
         <div className="mb-4 flex items-center gap-3">
@@ -803,10 +798,8 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
   // Internal SkeletonPulse component
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
-    >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
-    </div>
+      className={`animate-pulse rounded-xl bg-white/8 ${className}`}
+    />
   );
 
   // Import Card and CardAccentBar from local scope
@@ -815,7 +808,7 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Sage accent bar */}
-      <div className="h-1 bg-linear-to-r from-emerald-500/50 via-teal-500/50 to-emerald-600/50" />
+      <div className="h-1 bg-sage-400/50" />
 
       <div className="p-5 sm:p-6">
         {/* Header skeleton */}
@@ -856,10 +849,8 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
 Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
-    >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
-    </div>
+      className={`animate-pulse rounded-xl bg-white/8 ${className}`}
+    />
   );
 
   const Card = Skeleton.Card;
@@ -867,7 +858,7 @@ Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Ocean accent bar */}
-      <div className="h-1 bg-linear-to-r from-ocean-500/50 via-ocean-400/50 to-ocean-600/50" />
+      <div className="h-1 bg-ocean-400/50" />
       <div className="p-5 sm:p-6">
         {/* Header skeleton */}
         <div className="mb-4 flex items-center gap-3">
@@ -892,10 +883,8 @@ Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
 Skeleton.TuyaCard = function SkeletonTuyaCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
-    >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
-    </div>
+      className={`animate-pulse rounded-xl bg-white/8 ${className}`}
+    />
   );
 
   const Card = Skeleton.Card;
@@ -903,7 +892,7 @@ Skeleton.TuyaCard = function SkeletonTuyaCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Warning/amber accent bar */}
-      <div className="h-1 bg-linear-to-r from-warning-500/50 via-warning-400/50 to-warning-600/50" />
+      <div className="h-1 bg-warning-400/50" />
       <div className="p-5 sm:p-6">
         <div className="mb-4 flex items-center gap-3">
           <SkeletonPulse className="size-8 rounded-lg" />
@@ -926,10 +915,8 @@ Skeleton.TuyaCard = function SkeletonTuyaCard() {
 Skeleton.SonosCard = function SkeletonSonosCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
-    >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
-    </div>
+      className={`animate-pulse rounded-xl bg-white/8 ${className}`}
+    />
   );
 
   const Card = Skeleton.Card;
@@ -937,7 +924,7 @@ Skeleton.SonosCard = function SkeletonSonosCard() {
   return (
     <Card className="overflow-visible transition-all duration-500">
       {/* Sage accent bar */}
-      <div className="h-1 bg-linear-to-r from-success-500/50 via-success-400/50 to-success-600/50" />
+      <div className="h-1 bg-sage-400/50" />
       <div className="p-5 sm:p-6">
         {/* Header skeleton */}
         <div className="mb-4 flex items-center gap-3">

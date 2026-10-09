@@ -14,11 +14,8 @@ import { usePathname } from 'next/navigation';
 import { Bell } from 'lucide-react';
 import { useUser } from '@/lib/auth/useUser';
 import { Sheet } from '@/app/components/EmberGlass/Sheet';
-import {
-  errorTextStyle,
-  primaryButtonStyle,
-  secondaryButtonStyle,
-} from '@/app/components/EmberGlass/formStyles';
+import Button from '@/app/components/ui/Button';
+import Text from '@/app/components/ui/Text';
 import { enablePush, setChoice, shouldAskForPush } from '@/lib/push/pushClient';
 
 /** Let the dashboard settle before asking. */
@@ -59,31 +56,31 @@ export default function NotificationOptInPrompt() {
 
   return (
     <Sheet open={open} onClose={decline} title="Notifiche push">
-      <div data-testid="push-optin" style={{ display: 'flex', gap: 14, alignItems: 'flex-start', marginBottom: 18 }}>
-        <Bell size={28} color="var(--accent)" aria-hidden="true" style={{ flexShrink: 0, marginTop: 2 }} />
-        <div style={{ fontSize: 15, lineHeight: 1.45, color: 'var(--text-2)' }}>
-          <p style={{ margin: '0 0 8px', color: '#fff', fontWeight: 600 }}>
+      <div data-testid="push-optin" className="mb-4.5 flex items-start gap-3.5">
+        <Bell size={28} className="mt-0.5 shrink-0 text-(--accent)" aria-hidden="true" />
+        <div>
+          <Text weight="semibold" className="mb-2">
             Vuoi ricevere le notifiche su questo dispositivo?
-          </p>
-          <p style={{ margin: 0 }}>
+          </Text>
+          <Text variant="secondary" size="sm">
             Accensioni e spegnimenti automatici della stufa, allarmi, manutenzione e sensori offline. Arrivano anche
             con l&apos;app chiusa e anche se la sessione scade. Puoi cambiare idea quando vuoi da Impostazioni →
             Notifiche.
-          </p>
+          </Text>
         </div>
       </div>
       {error && (
-        <p role="alert" style={errorTextStyle}>
+        <Text role="alert" variant="danger" size="sm" className="mb-3">
           {error}
-        </p>
+        </Text>
       )}
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-        <button type="button" onClick={decline} disabled={busy} style={{ ...secondaryButtonStyle, height: 44 }}>
+      <div className="flex justify-end gap-2.5">
+        <Button type="button" variant="subtle" size="sm" onClick={decline} disabled={busy}>
           No, grazie
-        </button>
-        <button type="button" onClick={accept} disabled={busy} style={primaryButtonStyle(busy)}>
+        </Button>
+        <Button type="button" variant="ember" size="sm" onClick={accept} disabled={busy}>
           {busy ? 'Attivazione…' : 'Attiva notifiche'}
-        </button>
+        </Button>
       </div>
     </Sheet>
   );

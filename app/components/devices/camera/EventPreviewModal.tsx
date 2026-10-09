@@ -34,7 +34,7 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
     >
       <Card className="overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-700 p-4">
+        <div className="flex items-center justify-between border-b border-white/8 p-4">
           <div className="flex items-center gap-3">
             <span className="text-2xl">
               {getEventIcon(event.event_type)}
@@ -67,7 +67,6 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
             variant="ghost"
             size="md"
             aria-label="Chiudi"
-            className="text-slate-400 hover:bg-slate-800"
           />
         </div>
 
@@ -90,7 +89,7 @@ export default function EventPreviewModal({ event, onClose }: EventPreviewModalP
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end border-t border-slate-700 p-4">
+        <div className="flex items-center justify-end border-t border-white/8 p-4">
           <Button
             variant="ember"
             size="sm"

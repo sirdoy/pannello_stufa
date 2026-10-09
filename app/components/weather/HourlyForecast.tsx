@@ -9,7 +9,7 @@
  * @see ForecastDaySheet - Parent modal that renders this component
  */
 
-import { Text } from '@/app/components/ui';
+import { Card, Text } from '@/app/components/ui';
 import WeatherIcon from './WeatherIcon';
 import { formatTemperature } from './weatherHelpers';
 import { Droplets } from 'lucide-react';
@@ -29,7 +29,7 @@ function HourlyCard({ time, weatherCode, temperature, precipProbability }: Hourl
   const formattedTime = time ? time.split('T')[1]?.substring(0, 5) : '--:--';
 
   return (
-    <div className="flex min-w-[70px] flex-col items-center rounded-xl bg-slate-800/40 p-3 ">
+    <Card variant="subtle" padding={false} className="flex min-w-[70px] flex-col items-center p-3">
       <Text variant="tertiary" size="xs" className="mb-2">
         {formattedTime}
       </Text>
@@ -47,7 +47,7 @@ function HourlyCard({ time, weatherCode, temperature, precipProbability }: Hourl
           <Text variant="tertiary" size="xs">{precipProbability}%</Text>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 

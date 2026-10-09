@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, Heading, Text, Button, Banner, StatusBadge } from '@/app/components/ui';
+import { Droplet, Flame, Globe, Hourglass, Lightbulb, Package, Thermometer } from 'lucide-react';
+import { Card, Heading, Text, Button, Banner, EmptyState, Skeleton, StatusBadge } from '@/app/components/ui';
 import {
   getCachedState,
   formatStoveStateForDisplay,
@@ -96,7 +97,7 @@ export default function OfflinePage() {
       <div className="mx-auto max-w-2xl">
         <PageHeader title="Connessione ripristinata" />
         <Card className="p-8 text-center">
-          <Text className="mb-4 text-6xl">🌐</Text>
+          <Globe size={48} className="mx-auto mb-4 text-(--text-2)" aria-hidden="true" />
           <Text variant="tertiary" className="mb-6">
             Reindirizzamento alla home...
           </Text>
@@ -117,7 +118,6 @@ export default function OfflinePage() {
       {/* Offline Banner */}
       <Banner
         variant="warning"
-        icon="📡"
         title="Connessione assente"
         description="Stai visualizzando dati memorizzati nella cache. L'app si riconnetterà automaticamente."
         compact
@@ -127,7 +127,7 @@ export default function OfflinePage() {
       {hasPendingCommands && (
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <Text className="text-2xl">⏳</Text>
+            <Hourglass size={20} className="shrink-0 text-(--text-2)" aria-hidden="true" />
             <div className="flex-1">
               <Heading level={3} size="sm" className="mb-1">
                 Comandi in attesa
@@ -142,14 +142,16 @@ export default function OfflinePage() {
           {/* Command List */}
           <div className="mt-3 space-y-2">
             {pendingCommands.slice(0, 3).map((cmd) => (
-              <div
+              <Card
                 key={cmd.id}
-                className="flex items-center gap-2 rounded-lg bg-white/2 p-2"
+                variant="subtle"
+                padding={false}
+                className="flex items-center gap-2 p-2"
               >
                 <Text>{cmd.icon}</Text>
                 <Text size="sm" className="flex-1">{cmd.label}</Text>
                 <Text variant="tertiary" size="xs">{cmd.formattedTime}</Text>
-              </div>
+              </Card>
             ))}
             {pendingCommands.length > 3 && (
               <Text variant="tertiary" size="xs" className="text-center">
@@ -162,31 +164,27 @@ export default function OfflinePage() {
 
       {/* Loading State */}
       {loading && (
-        <Card className="p-8 text-center">
-          <div className="animate-pulse space-y-4">
-            <div className="mx-auto h-8 w-1/2 rounded bg-slate-700" />
-            <div className="mx-auto h-4 w-3/4 rounded bg-slate-700" />
+        <Card className="p-8">
+          <div className="space-y-4">
+            <Skeleton className="mx-auto h-8 w-1/2" />
+            <Skeleton className="mx-auto h-4 w-3/4" />
           </div>
         </Card>
       )}
 
       {/* No Cached Data */}
       {!loading && !hasCachedData && (
-        <Card className="p-8 text-center">
-          <Text className="mb-4 text-6xl">📦</Text>
-          <Heading level={2} size="xl" className="mb-4">
-            Nessun dato memorizzato
-          </Heading>
-          <Text variant="tertiary" className="mb-6">
-            Non sono disponibili dati offline. Connettiti a Internet per visualizzare lo stato dei dispositivi.
-          </Text>
-          <Button
-            variant="ember"
-            size="lg"
-            onClick={() => window.location.reload()}
-          >
-            Riprova
-          </Button>
+        <Card className="p-8">
+          <EmptyState
+            icon={<Package size={48} className="text-(--text-2)" />}
+            title="Nessun dato memorizzato"
+            description="Non sono disponibili dati offline. Connettiti a Internet per visualizzare lo stato dei dispositivi."
+            action={
+              <Button variant="ember" size="lg" onClick={() => window.location.reload()}>
+                Riprova
+              </Button>
+            }
+          />
         </Card>
       )}
 
@@ -195,7 +193,7 @@ export default function OfflinePage() {
         <Card className="p-5">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Text className="text-3xl">🔥</Text>
+              <Flame size={20} className="shrink-0 text-ember-400" aria-hidden="true" />
               <div>
                 <Heading level={2} size="lg">Stufa</Heading>
                 <Text variant="tertiary" size="xs">
@@ -213,19 +211,19 @@ export default function OfflinePage() {
           {/* Temperature Grid */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Room Temperature */}
-            <div className="rounded-lg bg-white/2 p-3 text-center">
+            <Card variant="subtle" padding={false} className="p-3 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Ambiente
               </Text>
-              <Text size="xl" className="text-ember-400">
+              <Text variant="ember" size="xl">
                 {stoveState.temperature != null
                   ? `${stoveState.temperature}°`
                   : '--'}
               </Text>
-            </div>
+            </Card>
 
             {/* Setpoint */}
-            <div className="rounded-lg bg-white/2 p-3 text-center">
+            <Card variant="subtle" padding={false} className="p-3 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Target
               </Text>
@@ -234,10 +232,10 @@ export default function OfflinePage() {
                   ? `${stoveState.setpoint}°`
                   : '--'}
               </Text>
-            </div>
+            </Card>
 
             {/* Exhaust Temperature */}
-            <div className="rounded-lg bg-white/2 p-3 text-center">
+            <Card variant="subtle" padding={false} className="p-3 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Fumi
               </Text>
@@ -246,7 +244,7 @@ export default function OfflinePage() {
                   ? `${stoveState.exhaustTemp}°`
                   : '--'}
               </Text>
-            </div>
+            </Card>
           </div>
 
           {/* Additional Info */}
@@ -264,12 +262,12 @@ export default function OfflinePage() {
 
           {/* Stale Data Warning */}
           {stoveState.isStale && (
-            <div className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-2">
-              <Text size="xs" className="text-amber-400">
-                ⚠️ Dati memorizzati {stoveState.ageMinutes} minuti fa.
-                Lo stato attuale potrebbe essere diverso.
-              </Text>
-            </div>
+            <Banner
+              variant="warning"
+              compact
+              className="mt-4"
+              description={`Dati memorizzati ${stoveState.ageMinutes} minuti fa. Lo stato attuale potrebbe essere diverso.`}
+            />
           )}
         </Card>
       )}
@@ -279,7 +277,7 @@ export default function OfflinePage() {
         <Card className="p-5">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Text className="text-3xl">🌡️</Text>
+              <Thermometer size={20} className="shrink-0 text-ocean-400" aria-hidden="true" />
               <div>
                 <Heading level={2} size="lg">Termostato</Heading>
                 <Text variant="tertiary" size="xs">
@@ -295,24 +293,25 @@ export default function OfflinePage() {
           {/* Temperature Display */}
           <div className="grid grid-cols-2 gap-4">
             {/* Current Temperature */}
-            <div className="rounded-lg bg-white/2 p-4 text-center">
+            <Card variant="subtle" padding={false} className="p-4 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 {thermostatState.roomName || 'Temperatura'}
               </Text>
-              <Text size="xl" className="text-ocean-400">
+              <Text variant="ocean" size="xl">
                 {thermostatState.temperature != null
                   ? `${thermostatState.temperature.toFixed(1)}°`
                   : '--'}
               </Text>
               {thermostatState.humidity != null && (
-                <Text variant="tertiary" size="xs" className="mt-1 block">
-                  💧 {thermostatState.humidity}%
+                <Text variant="tertiary" size="xs" className="mt-1 flex items-center justify-center gap-1">
+                  <Droplet size={12} aria-hidden="true" />
+                  {thermostatState.humidity}%
                 </Text>
               )}
-            </div>
+            </Card>
 
             {/* Setpoint */}
-            <div className="rounded-lg bg-white/2 p-4 text-center">
+            <Card variant="subtle" padding={false} className="p-4 text-center">
               <Text variant="tertiary" size="xs" className="mb-1 block">
                 Target
               </Text>
@@ -326,16 +325,17 @@ export default function OfflinePage() {
                   Modo: {thermostatState.mode}
                 </Text>
               )}
-            </div>
+            </Card>
           </div>
 
           {/* Stale Data Warning */}
           {thermostatState.isStale && (
-            <div className="mt-4 rounded-lg border border-amber-500/20 bg-amber-500/10 p-2">
-              <Text size="xs" className="text-amber-400">
-                ⚠️ Dati memorizzati {thermostatState.ageMinutes} minuti fa.
-              </Text>
-            </div>
+            <Banner
+              variant="warning"
+              compact
+              className="mt-4"
+              description={`Dati memorizzati ${thermostatState.ageMinutes} minuti fa.`}
+            />
           )}
         </Card>
       )}
@@ -343,7 +343,7 @@ export default function OfflinePage() {
       {/* Footer Info */}
       <Card className="p-4">
         <div className="flex items-center gap-3">
-          <Text className="text-xl">💡</Text>
+          <Lightbulb size={20} className="shrink-0 text-(--text-2)" aria-hidden="true" />
           <Text variant="tertiary" size="sm">
             I dati vengono aggiornati automaticamente quando sei online.
             I comandi in coda verranno eseguiti al ripristino della connessione.

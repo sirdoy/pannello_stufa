@@ -14,12 +14,12 @@ export interface CardAccentBarProps {
 /**
  * CardAccentBar Component - Ember Noir Design System
  *
- * Modern accent bar with glow effects and shimmer animation.
+ * Flat accent bar on the top edge of a card.
  * Positioned at the very top edge of cards with proper corner integration.
  *
  * @param {'ember'|'ocean'|'warning'|'sage'|'danger'} props.colorTheme - Color theme
  * @param {boolean} props.animated - Enable shimmer animation (default: true)
- * @param {boolean} props.pulse - Enable glow pulse animation for active states
+ * @param {boolean} props.pulse - Enable pulse animation for active states
  * @param {'sm'|'md'|'lg'} props.size - Bar thickness (default: 'md')
  * @param {string} props.className - Additional classes
  */
@@ -30,49 +30,17 @@ export default function CardAccentBar({
   size = 'md',
   className = '',
 }: CardAccentBarProps) {
-  // Color theme configurations - Ember Noir palette
+  // Flat accent colour per theme
   const themes = {
-    ember: {
-      gradient: 'from-ember-600 via-flame-500 to-ember-600',
-      glow: 'rgba(237, 111, 16, 0.5)',
-      glowLight: 'rgba(237, 111, 16, 0.35)',
-    },
-    ocean: {
-      gradient: 'from-ocean-500 via-ocean-400 to-ocean-500',
-      glow: 'rgba(67, 125, 174, 0.5)',
-      glowLight: 'rgba(67, 125, 174, 0.35)',
-    },
-    warning: {
-      gradient: 'from-warning-500 via-warning-400 to-warning-500',
-      glow: 'rgba(234, 179, 8, 0.5)',
-      glowLight: 'rgba(234, 179, 8, 0.35)',
-    },
-    sage: {
-      gradient: 'from-sage-500 via-sage-400 to-sage-500',
-      glow: 'rgba(96, 115, 96, 0.5)',
-      glowLight: 'rgba(96, 115, 96, 0.35)',
-    },
-    danger: {
-      gradient: 'from-danger-500 via-danger-400 to-danger-500',
-      glow: 'rgba(239, 68, 68, 0.5)',
-      glowLight: 'rgba(239, 68, 68, 0.35)',
-    },
+    ember: 'bg-(--accent)',
+    ocean: 'bg-ocean-400',
+    warning: 'bg-warning-400',
+    sage: 'bg-sage-400',
+    danger: 'bg-danger-400',
     // Legacy mappings
-    primary: {
-      gradient: 'from-ember-600 via-flame-500 to-ember-600',
-      glow: 'rgba(237, 111, 16, 0.5)',
-      glowLight: 'rgba(237, 111, 16, 0.35)',
-    },
-    info: {
-      gradient: 'from-ocean-500 via-ocean-400 to-ocean-500',
-      glow: 'rgba(67, 125, 174, 0.5)',
-      glowLight: 'rgba(67, 125, 174, 0.35)',
-    },
-    success: {
-      gradient: 'from-sage-500 via-sage-400 to-sage-500',
-      glow: 'rgba(96, 115, 96, 0.5)',
-      glowLight: 'rgba(96, 115, 96, 0.35)',
-    },
+    primary: 'bg-(--accent)',
+    info: 'bg-ocean-400',
+    success: 'bg-sage-400',
   };
 
   // Size configurations
@@ -87,34 +55,14 @@ export default function CardAccentBar({
 
   return (
     <div className={`absolute inset-x-0 top-0 z-10 ${className}`}>
-      {/* Main gradient bar - flush with top edge */}
+      {/* Flat bar - flush with top edge */}
       <div
         className={`
           relative ${barHeight} w-full overflow-hidden
-          bg-linear-to-r ${theme.gradient}
+          ${theme}
           rounded-t-2xl
+          ${animated && pulse ? 'animate-pulse' : ''}
         `}
-        style={{
-          boxShadow: `0 4px 20px ${theme.glow}, 0 2px 8px ${theme.glow}`,
-        }}
-      >
-        {/* Shimmer animation overlay */}
-        {animated && (
-          <div
-            className="animate-shimmer absolute inset-0 w-[200%] bg-linear-to-r from-transparent via-white/25 to-transparent"
-          />
-        )}
-      </div>
-
-      {/* Glow diffusion below the bar */}
-      <div
-        className={`
-          pointer-events-none absolute inset-x-0 top-full h-4
-          ${pulse ? 'animate-pulse' : ''}
-        `}
-        style={{
-          background: `linear-gradient(to bottom, ${theme.glow} 0%, transparent 100%)`,
-        }}
       />
     </div>
   );
@@ -126,16 +74,17 @@ export default function CardAccentBar({
  */
 export function CardAccentCorner({
   colorTheme = 'ember',
-  animated = true,
+  // Kept for API compatibility: the corner accent is static
+  animated: _animated = true,
   corner = 'top-left',
   className = '',
 }) {
   const themes = {
-    ember: 'from-ember-600 via-flame-500 to-ember-600',
-    ocean: 'from-ocean-500 via-ocean-400 to-ocean-500',
-    warning: 'from-warning-500 via-warning-400 to-warning-500',
-    sage: 'from-sage-500 via-sage-400 to-sage-500',
-    danger: 'from-danger-500 via-danger-400 to-danger-500',
+    ember: 'bg-(--accent)',
+    ocean: 'bg-ocean-400',
+    warning: 'bg-warning-400',
+    sage: 'bg-sage-400',
+    danger: 'bg-danger-400',
   };
 
   const positions = {
@@ -145,7 +94,7 @@ export function CardAccentCorner({
     'bottom-right': 'bottom-0 right-0 rounded-br-2xl',
   };
 
-  const gradient = themes[colorTheme as keyof typeof themes] || themes.ember;
+  const fill = themes[colorTheme as keyof typeof themes] || themes.ember;
   const position = positions[corner as keyof typeof positions] || positions['top-left'];
 
   return (
@@ -154,7 +103,7 @@ export function CardAccentCorner({
       <div
         className={`
           absolute top-0 left-0 h-1 w-12
-          bg-linear-to-r ${gradient}
+          ${fill}
           ${corner.includes('right') ? 'rounded-tr' : 'rounded-tl'}
         `}
       />
@@ -162,16 +111,8 @@ export function CardAccentCorner({
       <div
         className={`
           absolute top-0 left-0 h-12 w-1
-          bg-linear-to-b ${gradient}
+          ${fill}
           ${corner.includes('bottom') ? 'rounded-bl' : 'rounded-tl'}
-        `}
-      />
-      {/* Corner glow */}
-      <div
-        className={`
-          absolute -top-1 -left-1 size-8 bg-linear-to-br ${gradient}
-          opacity-40 blur-xl
-          ${animated ? 'animate-pulse' : ''}
         `}
       />
     </div>

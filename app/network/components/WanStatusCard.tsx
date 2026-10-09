@@ -8,6 +8,7 @@ import InfoBox from '@/app/components/ui/InfoBox';
 import Text from '@/app/components/ui/Text';
 import type { WanData } from '@/app/components/devices/network/types';
 import CopyableIp from './CopyableIp';
+import { Clock, Globe, Link, Server } from 'lucide-react';
 
 interface WanStatusCardProps {
   wan: WanData | null;
@@ -57,7 +58,7 @@ export default function WanStatusCard({ wan, isStale, lastUpdated }: WanStatusCa
           {wan.connected ? 'WAN Online' : 'WAN Offline'}
         </Badge>
         {isStale && lastUpdated && (
-          <Text variant="label" size="sm" className="text-slate-400">
+          <Text variant="label" size="sm">
             Aggiornato {formatDistanceToNow(lastUpdated, { locale: it, addSuffix: true })}
           </Text>
         )}
@@ -65,7 +66,7 @@ export default function WanStatusCard({ wan, isStale, lastUpdated }: WanStatusCa
 
       {/* External IP Section */}
       <div className="space-y-2">
-        <Text variant="label" size="sm" className="tracking-wide text-slate-400 uppercase">
+        <Text variant="label" size="sm">
           IP Esterno
         </Text>
         <CopyableIp ip={wan.externalIp || 'N/A'} />
@@ -74,25 +75,25 @@ export default function WanStatusCard({ wan, isStale, lastUpdated }: WanStatusCa
       {/* InfoBox Grid */}
       <div className="grid grid-cols-2 gap-3">
         <InfoBox
-          icon="🕒"
+          icon={<Clock size={18} />}
           label="Uptime"
           value={formatUptime(wan.uptime)}
           variant="sage"
         />
         <InfoBox
-          icon="🌐"
+          icon={<Globe size={18} />}
           label="Gateway"
           value={wan.gateway || 'N/A'}
           variant="ocean"
         />
         <InfoBox
-          icon="🛰️"
+          icon={<Server size={18} />}
           label="DNS"
           value={wan.dns || 'Auto'}
           variant="ocean"
         />
         <InfoBox
-          icon="🔗"
+          icon={<Link size={18} />}
           label="Tipo"
           value={wan.connectionType || 'DHCP'}
           variant="neutral"

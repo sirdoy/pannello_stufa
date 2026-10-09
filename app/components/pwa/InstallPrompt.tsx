@@ -16,7 +16,7 @@
 import { useInstallPrompt } from '@/lib/hooks/useInstallPrompt';
 import { Download, Wifi, Bell, Smartphone, Share, X } from 'lucide-react';
 import Button from '../ui/Button';
-import { Heading, Text } from '../ui';
+import { Card, Heading, Text } from '../ui';
 import { cn } from '@/lib/utils/cn';
 
 export default function InstallPrompt() {
@@ -49,8 +49,7 @@ export default function InstallPrompt() {
         className={cn(
           'fixed inset-x-0 bottom-0 z-55',
           'mx-auto max-w-2xl',
-          'border-t border-slate-700/50 bg-slate-900',
-          ' ',
+          'border-t border-white/8 bg-[rgba(28,25,23,0.92)]',
           'rounded-t-3xl',
           'shadow-liquid-xl',
           'animate-slide-up',
@@ -65,7 +64,7 @@ export default function InstallPrompt() {
           <div
             className={cn(
               'h-1.5 w-12 rounded-full',
-              'bg-slate-700 '
+              'bg-white/20'
             )}
             aria-hidden="true"
           />
@@ -91,26 +90,19 @@ export default function InstallPrompt() {
               level={2}
               size="lg"
               id="install-prompt-title"
-              className="text-slate-100 "
             >
               Installa Pannello Stufa
             </Heading>
           </div>
 
           {/* Close button */}
-          <button
+          <Button.Icon
+            variant="ghost"
+            size="sm"
+            icon={<X size={20} />}
             onClick={dismiss}
-            className={cn(
-              'rounded-lg p-2',
-              'text-slate-400 hover:text-slate-200',
-              'hover:bg-white/6',
-              'transition-all duration-200',
-              ']'
-            )}
             aria-label="Chiudi"
-          >
-            <X size={20} aria-hidden="true" />
-          </button>
+          />
         </div>
 
         {/* Benefits */}
@@ -122,8 +114,8 @@ export default function InstallPrompt() {
               aria-hidden="true"
             />
             <Text
+              variant="secondary"
               size="sm"
-              className="text-slate-300 "
             >
               Funziona anche offline
             </Text>
@@ -136,8 +128,8 @@ export default function InstallPrompt() {
               aria-hidden="true"
             />
             <Text
+              variant="secondary"
               size="sm"
-              className="text-slate-300 "
             >
               Notifiche push in tempo reale
             </Text>
@@ -150,8 +142,8 @@ export default function InstallPrompt() {
               aria-hidden="true"
             />
             <Text
+              variant="secondary"
               size="sm"
-              className="text-slate-300 "
             >
               Accesso rapido dalla home screen
             </Text>
@@ -163,24 +155,19 @@ export default function InstallPrompt() {
           {isIOS ? (
             <>
               {/* iOS Manual Instructions */}
-              <div
-                className={cn(
-                  'rounded-xl p-4',
-                  'border border-slate-700 bg-slate-800',
-                  ' '
-                )}
-              >
+              <Card variant="subtle">
                 <Text
                   size="sm"
-                  className="mb-2 font-semibold text-slate-200 "
+                  weight="semibold"
+                  className="mb-2"
                 >
                   Come installare:
                 </Text>
                 <div className="space-y-2">
                   <div className="flex items-start gap-2">
                     <Text
+                      variant="secondary"
                       size="sm"
-                      className="text-slate-300 "
                     >
                       1. Tocca
                     </Text>
@@ -190,20 +177,20 @@ export default function InstallPrompt() {
                       aria-hidden="true"
                     />
                     <Text
+                      variant="secondary"
                       size="sm"
-                      className="text-slate-300 "
                     >
                       nella barra del browser
                     </Text>
                   </div>
                   <Text
+                    variant="secondary"
                     size="sm"
-                    className="text-slate-300 "
                   >
                     2. Seleziona &quot;Aggiungi alla schermata Home&quot;
                   </Text>
                 </div>
-              </div>
+              </Card>
 
               {/* Dismiss button for iOS */}
               <Button

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { BarChart3, Info, RotateCcw, Save, Settings } from 'lucide-react';
 import { useUser } from '@/lib/auth/useUser';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
@@ -16,6 +17,7 @@ import {
 import { formatHoursToHHMM } from '@/lib/formatUtils';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
+import Banner from '@/app/components/ui/Banner';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 export const dynamic = 'force-dynamic';
@@ -141,45 +143,49 @@ export default function MaintenancePage() {
 
         {/* Current Status Card */}
         <Card variant="glass" className="p-6 sm:p-8">
-          <Heading level={2} size="xl" className="mb-4">📊 Stato Attuale</Heading>
+          <Heading level={2} size="xl" className="mb-4 flex items-center gap-2">
+            <BarChart3 size={18} className="text-(--text-2)" aria-hidden="true" />
+            Stato Attuale
+          </Heading>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="shadow-liquid-sm relative overflow-hidden rounded-lg bg-white/5 p-4 ring-1 ring-white/8 backdrop-blur-2xl ring-inset before:pointer-events-none before:absolute before:inset-0 before:bg-linear-to-br before:from-white/8 before:to-transparent">
-              <Text variant="tertiary" size="sm" className="relative z-10 mb-1">Ore di Utilizzo</Text>
-              <Heading level={3} size="2xl" className="relative z-10">
+            <Card variant="subtle">
+              <Text variant="tertiary" size="sm" className="mb-1">Ore di Utilizzo</Text>
+              <Heading level={3} size="2xl">
                 {formatHoursToHHMM(maintenanceData?.currentHours || 0)}
               </Heading>
-            </div>
+            </Card>
 
-            <div className="shadow-liquid-sm relative overflow-hidden rounded-lg bg-ember-500/15 p-4 ring-1 ring-ember-500/30 backdrop-blur-2xl ring-inset before:pointer-events-none before:absolute before:inset-0 before:bg-linear-to-br before:from-ember-500/20 before:to-transparent">
-              <Text variant="tertiary" size="sm" className="relative z-10 mb-1">Ore Target</Text>
-              <Heading level={3} size="2xl" variant="ember" className="relative z-10">
+            <Card variant="subtle">
+              <Text variant="tertiary" size="sm" className="mb-1">Ore Target</Text>
+              <Heading level={3} size="2xl" variant="ember">
                 {formatHoursToHHMM(maintenanceData?.targetHours || 50)}
               </Heading>
-            </div>
+            </Card>
 
-            <div className="shadow-liquid-sm relative overflow-hidden rounded-lg bg-sage-500/15 p-4 ring-1 ring-sage-500/30 backdrop-blur-2xl ring-inset before:pointer-events-none before:absolute before:inset-0 before:bg-linear-to-br before:from-sage-500/20 before:to-transparent">
-              <Text variant="tertiary" size="sm" className="relative z-10 mb-1">Ore Rimanenti</Text>
-              <Heading level={3} size="2xl" variant="sage" className="relative z-10">
+            <Card variant="subtle">
+              <Text variant="tertiary" size="sm" className="mb-1">Ore Rimanenti</Text>
+              <Heading level={3} size="2xl" variant="sage">
                 {formatHoursToHHMM(Math.max(0, (maintenanceData?.targetHours || 50) - (maintenanceData?.currentHours || 0)))}
               </Heading>
-            </div>
+            </Card>
           </div>
 
           {/* Reset Button */}
-          <div className="mt-4 border-t border-slate-700 pt-4">
+          <div className="mt-4 border-t border-white/8 pt-4">
             <Button
               variant="danger"
               onClick={handleResetRequest}
               disabled={isResetting || (maintenanceData?.currentHours || 0) === 0}
               className="w-full"
+              icon={<RotateCcw size={16} />}
             >
-              🔄 Azzera Contatore Manutenzione
+              Azzera Contatore Manutenzione
             </Button>
           </div>
 
           {maintenanceData?.lastCleanedAt && (
-            <div className="mt-4 border-t border-slate-700 pt-4">
+            <div className="mt-4 border-t border-white/8 pt-4">
               <Text variant="tertiary" size="sm">
                 Ultima pulizia: {new Date(maintenanceData.lastCleanedAt).toLocaleDateString('it-IT', {
                   day: '2-digit',
@@ -195,7 +201,10 @@ export default function MaintenancePage() {
 
         {/* Configuration Card */}
         <Card variant="glass" className="p-6 sm:p-8">
-          <Heading level={2} size="xl" className="mb-4">⚙️ Configurazione</Heading>
+          <Heading level={2} size="xl" className="mb-4 flex items-center gap-2">
+            <Settings size={18} className="text-(--text-2)" aria-hidden="true" />
+            Configurazione
+          </Heading>
 
           <div className="space-y-4">
             <div>
@@ -203,7 +212,6 @@ export default function MaintenancePage() {
                 id="targetHours"
                 type="number"
                 label="Ore di utilizzo prima della pulizia"
-                icon="⏱️"
                 variant="default"
                 min="1"
                 max="1000"
@@ -222,18 +230,15 @@ export default function MaintenancePage() {
               <Text variant="secondary" size="sm" className="mb-2">Preselezioni rapide:</Text>
               <div className="flex flex-wrap gap-2">
                 {[25, 50, 75, 100, 150, 200].map((hours) => (
-                  <button
+                  <Button
                     key={hours}
+                    variant={targetHours === hours ? 'ember' : 'subtle'}
+                    size="sm"
                     onClick={() => setTargetHours(hours)}
-                    className={`rounded-lg px-3 py-1 text-sm font-medium transition-all duration-200 ${
-                      targetHours === hours
-                        ? 'shadow-liquid-sm bg-ember-600 text-white'
-                        : 'shadow-liquid-sm bg-white/5 bg-white/8 text-slate-300 ring-1 ring-white/8 ring-white/15 backdrop-blur-2xl ring-inset hover:bg-white/8 hover:bg-white/12'
-                    }`}
                     disabled={isSaving}
                   >
                     {hours}h
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -243,25 +248,27 @@ export default function MaintenancePage() {
               onClick={handleSave}
               disabled={isSaving || targetHours === maintenanceData?.targetHours}
               className="w-full"
+              icon={<Save size={16} />}
             >
-              {isSaving ? '💾 Salvataggio...' : '💾 Salva Configurazione'}
+              {isSaving ? 'Salvataggio...' : 'Salva Configurazione'}
             </Button>
 
             {saveMessage && (
-              <div className={`rounded-lg p-3 text-sm ${
-                saveMessage.type === 'success'
-                  ? 'bg-sage-100 bg-sage-900/30 text-sage-400'
-                  : 'bg-ember-100 bg-ember-900/30 text-ember-400'
-              }`}>
-                {saveMessage.text}
-              </div>
+              <Banner
+                variant={saveMessage.type === 'success' ? 'success' : 'error'}
+                description={saveMessage.text}
+                compact
+              />
             )}
           </div>
         </Card>
 
         {/* Info Card */}
-        <Card variant="glass" className="border border-ocean-200 border-ocean-800 bg-ocean-50/50 bg-ocean-900/10 p-6 sm:p-8">
-          <Heading level={3} variant="subtle" className="mb-2">ℹ️ Come Funziona</Heading>
+        <Card variant="glass" className="p-6 sm:p-8">
+          <Heading level={3} variant="subtle" className="mb-2 flex items-center gap-2">
+            <Info size={18} aria-hidden="true" />
+            Come Funziona
+          </Heading>
           <ul className="list-inside list-disc space-y-1">
             <li><Text variant="tertiary" size="sm" as="span">Il contatore aumenta automaticamente ogni minuto quando la stufa è in funzione (status WORK)</Text></li>
             <li><Text variant="tertiary" size="sm" as="span">Al raggiungimento delle ore impostate, apparirà un banner di richiesta pulizia</Text></li>
@@ -277,8 +284,8 @@ export default function MaintenancePage() {
         icon="🔄"
         title="Conferma Reset"
         message="Sei sicuro di voler azzerare il contatore di manutenzione? Questa operazione azzererà il contatore a 0.0 ore, registrerà la data e ora della pulizia, sbloccherà l'accensione della stufa se era bloccata e creerà un log dell'operazione."
-        confirmText={isResetting ? '⏳ Attendere...' : '✓ Conferma Reset'}
-        cancelText="✕ Annulla"
+        confirmText={isResetting ? 'Attendere...' : 'Conferma Reset'}
+        cancelText="Annulla"
         confirmVariant="danger"
         onConfirm={handleConfirmReset}
         onCancel={handleCancelReset}

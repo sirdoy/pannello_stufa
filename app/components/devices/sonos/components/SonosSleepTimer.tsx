@@ -1,6 +1,8 @@
 'use client';
 
 import { Timer, X } from 'lucide-react';
+import Button from '@/app/components/ui/Button';
+import Text from '@/app/components/ui/Text';
 
 interface SonosSleepTimerProps {
   remainingSeconds: number | null; // null = no active timer
@@ -21,9 +23,6 @@ function formatRemainingTime(seconds: number): string {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 }
 
-const presetButtonClass =
-  'text-xs px-2 py-1 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-300';
-
 export default function SonosSleepTimer({ remainingSeconds, onSetTimer }: SonosSleepTimerProps) {
   const hasActiveTimer = remainingSeconds !== null && remainingSeconds > 0;
 
@@ -32,27 +31,28 @@ export default function SonosSleepTimer({ remainingSeconds, onSetTimer }: SonosS
       {hasActiveTimer && (
         <div className="flex items-center gap-2">
           <Timer size={14} className="text-ember-400" />
-          <span className="font-mono text-sm text-ember-400">
+          <Text as="span" variant="ember" size="sm" mono>
             {formatRemainingTime(remainingSeconds!)}
-          </span>
-          <button
+          </Text>
+          <Button.Icon
+            variant="ghost"
+            size="sm"
             onClick={() => onSetTimer(0)}
-            className="rounded p-1 text-slate-400 transition-colors hover:text-slate-200"
             aria-label="Annulla timer"
-          >
-            <X size={14} />
-          </button>
+            icon={<X size={14} />}
+          />
         </div>
       )}
       <div className="flex flex-wrap items-center gap-1">
         {PRESETS.map(preset => (
-          <button
+          <Button
             key={preset.seconds}
+            variant="subtle"
+            size="sm"
             onClick={() => onSetTimer(preset.seconds)}
-            className={presetButtonClass}
           >
             {preset.label} min
-          </button>
+          </Button>
         ))}
       </div>
     </div>

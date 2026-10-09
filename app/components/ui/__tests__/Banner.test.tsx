@@ -105,12 +105,11 @@ describe('Banner', () => {
       expect(banner).toHaveClass('border-sage-500/25');
     });
 
-    it('applies ember variant with glow', () => {
+    it('applies ember variant', () => {
       const { container } = render(<Banner title="Ember" variant="ember" />);
       const banner = container.firstChild;
       expect(banner).toHaveClass('bg-ember-500/15');
       expect(banner).toHaveClass('border-ember-500/25');
-      expect(banner).toHaveClass('shadow-ember-glow-sm');
     });
 
     it('falls back to info variant for invalid variant', () => {

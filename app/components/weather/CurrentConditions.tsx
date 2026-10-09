@@ -9,7 +9,7 @@
  * @see CONTEXT.md - Large temp + icon prominent, details grid below
  */
 
-import { Text } from '@/app/components/ui';
+import { Card, Text } from '@/app/components/ui';
 import { Droplets, Wind, Sun, Thermometer, Gauge, Eye, ArrowUp, ArrowDown, Leaf, TrendingUp, TrendingDown, Sunrise, Sunset } from 'lucide-react';
 import type { ReactNode } from 'react';
 import WeatherIcon, { getWeatherLabel } from './WeatherIcon';
@@ -62,7 +62,7 @@ interface WeatherDetailCellProps {
  */
 function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, sublabel }: WeatherDetailCellProps) {
   return (
-    <div className="flex flex-col items-center rounded-xl bg-slate-800/40 p-3 ">
+    <Card variant="subtle" padding={false} className="flex flex-col items-center p-3">
       <span className={`size-5 ${iconColor} mb-1.5`}>
         {icon}
       </span>
@@ -77,7 +77,7 @@ function WeatherDetailCell({ icon, iconColor = 'text-ocean-400', label, value, s
           {sublabel}
         </Text>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -166,7 +166,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
     details.push({
       key: 'wind',
       icon: <Wind className="size-5" />,
-      iconColor: 'text-slate-400',
+      iconColor: 'text-(--text-2)',
       label: 'Vento',
       value: formatWindSpeed(windSpeed),
     });
@@ -216,7 +216,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
     details.push({
       key: 'pressure',
       icon: <Gauge className="size-5" />,
-      iconColor: 'text-slate-400',
+      iconColor: 'text-(--text-2)',
       label: 'Pressione',
       value: `${Math.round(current.pressure)} hPa`,
       sublabel: pressureLabel || null,
@@ -228,7 +228,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
     details.push({
       key: 'visibility',
       icon: <Eye className="size-5" />,
-      iconColor: 'text-slate-400',
+      iconColor: 'text-(--text-2)',
       label: 'Visibilita',
       value: `${Math.round(current.visibility / 1000)} km`,
     });
@@ -316,7 +316,7 @@ export function CurrentConditions({ current, todayForecast = null, hourlyTempera
 
       {/* Sunrise/Sunset row - compact horizontal display */}
       {todayForecast && (todayForecast.sunrise || todayForecast.sunset) && (
-        <div className="mt-3 flex items-center justify-center gap-6 border-t border-slate-700/20 pt-3 ">
+        <div className="mt-3 flex items-center justify-center gap-6 border-t border-white/8 pt-3">
           {todayForecast.sunrise && (
             <div className="flex items-center gap-2">
               <Sunrise className="size-4 text-warning-400" />

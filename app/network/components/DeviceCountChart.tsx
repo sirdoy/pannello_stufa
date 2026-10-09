@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { format } from 'date-fns';
+import Card from '@/app/components/ui/Card';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import type { DeviceCountPoint } from '../hooks/useFritzDeviceCountHistory';
@@ -34,7 +35,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload || payload.length === 0 || !label) return null;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-slate-900 p-3 shadow-xl">
+    <Card variant="subtle" padding={false} className="rounded-lg bg-(--color-slate-900) p-3 shadow-xl">
       <Text size="xs" className="mb-2">
         {format(label, 'dd/MM/yyyy')}
       </Text>
@@ -48,7 +49,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -65,7 +66,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
  */
 export default function DeviceCountChart({ data, loading }: DeviceCountChartProps) {
   return (
-    <div className="rounded-2xl bg-slate-800/30 p-6">
+    <Card variant="elevated" className="p-4 sm:p-6">
       <Heading level={2} size="lg" className="mb-6">
         Dispositivi connessi
       </Heading>
@@ -126,6 +127,6 @@ export default function DeviceCountChart({ data, loading }: DeviceCountChartProp
           </AreaChart>
         </ResponsiveContainer>
       )}
-    </div>
+    </Card>
   );
 }

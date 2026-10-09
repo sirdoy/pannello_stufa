@@ -173,11 +173,10 @@ export default function OfflineBanner({
       <div
         className={cn(
           baseClasses,
-          // Dark mode: slate-800 with high opacity, muted border
-          'bg-slate-800/95',
-          'border-b border-slate-700/50',
-          // Light mode: slate-100 background
-          'backdrop-blur-lg',
+          // Opaque floating surface
+          'bg-(--surface-solid)',
+          'border-b-[0.5px] border-white/8',
+          'backdrop-blur-xl',
           'px-4 py-3',
           className
         )}
@@ -187,7 +186,7 @@ export default function OfflineBanner({
           {/* Main offline message */}
           <div className="flex items-start gap-3">
             {/* Icon - subtle informational, NOT alarming */}
-            <div className="shrink-0 text-slate-400">
+            <div className="shrink-0 text-(--text-2)">
               <WifiOff size={20} strokeWidth={2} aria-hidden="true" />
             </div>
 
@@ -197,7 +196,7 @@ export default function OfflineBanner({
               <Heading
                 level={2}
                 size="sm"
-                className="text-slate-200"
+                className="text-(--text-1)"
               >
                 Sei offline
               </Heading>
@@ -206,7 +205,7 @@ export default function OfflineBanner({
               {lastOnlineAt && (
                 <Text
                   size="xs"
-                  className="mt-0.5 text-slate-400"
+                  className="mt-0.5 text-(--text-2)"
                 >
                   Ultimo aggiornamento:{' '}
                   {formatDistanceToNow(lastOnlineAt, {
@@ -225,8 +224,8 @@ export default function OfflineBanner({
                     className={cn(
                       'flex w-full items-center gap-2',
                       'text-left',
-                      'text-slate-300',
-                      'hover:text-slate-200 hover:text-slate-200',
+                      'text-(--text-2)',
+                      'hover:text-(--text-1)',
                       'transition-colors duration-200'
                     )}
                   >
@@ -263,7 +262,7 @@ export default function OfflineBanner({
                               <Text
                                 size="sm"
                                 className={cn(
-                                  'text-slate-200',
+                                  'text-(--text-1)',
                                   'truncate'
                                 )}
                               >
@@ -272,7 +271,7 @@ export default function OfflineBanner({
                               <Text
                                 size="xs"
                                 className={cn(
-                                  'text-slate-400',
+                                  'text-(--text-2)',
                                 )}
                               >
                                 {cmd.formattedTime}
@@ -287,9 +286,9 @@ export default function OfflineBanner({
                             onClick={() => cmd.id && cancelCommand(cmd.id)}
                             className={cn(
                               'h-8 shrink-0 px-3',
-                              'text-slate-300',
-                              'border-slate-600/50',
-                              'hover:bg-white/10 hover:bg-white/10',
+                              'text-(--text-2)',
+                              'border-white/14',
+                              'hover:bg-white/10',
                             )}
                             aria-label={`Annulla ${cmd.label}`}
                           >

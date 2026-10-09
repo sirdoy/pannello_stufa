@@ -5,6 +5,7 @@ import Heading from '@/app/components/ui/Heading';
 import InfoBox from '@/app/components/ui/InfoBox';
 import Text from '@/app/components/ui/Text';
 import type { RaspiFullData } from '@/app/components/devices/raspi/hooks/useRaspiFullData';
+import { HardDrive, MemoryStick } from 'lucide-react';
 
 interface RaspiMemoryDiskProps {
   data: RaspiFullData | null;
@@ -32,13 +33,13 @@ export default function RaspiMemoryDisk({ data }: RaspiMemoryDiskProps) {
       <Heading level={3}>Memoria e Disco</Heading>
       <div className="grid grid-cols-2 gap-3">
         <InfoBox
-          icon="📊"
+          icon={<MemoryStick size={18} />}
           label="RAM"
           value={`${data.memoryPercent.toFixed(1)}%`}
           variant="ocean"
         />
         <InfoBox
-          icon="💾"
+          icon={<HardDrive size={18} />}
           label="Disco"
           value={`${data.diskPercent.toFixed(1)}%`}
           variant="neutral"

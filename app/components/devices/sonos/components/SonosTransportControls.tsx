@@ -1,6 +1,7 @@
 'use client';
 
 import { Play, Pause, Square, SkipForward, SkipBack } from 'lucide-react';
+import Button from '@/app/components/ui/Button';
 import type { SonosPlaybackResponse } from '@/types/sonosProxy';
 
 interface SonosTransportControlsProps {
@@ -23,49 +24,47 @@ export default function SonosTransportControls({
   onPrevious,
 }: SonosTransportControlsProps) {
   const isPlaying = playback?.transport_state === 'PLAYING';
-  const buttonClass =
-    'p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-200';
 
   return (
     <div className="flex items-center gap-2">
-      <button
+      <Button.Icon
+        variant="subtle"
+        size="sm"
         onClick={() => void onPrevious(groupId)}
-        className={buttonClass}
         aria-label="Precedente"
-      >
-        <SkipBack size={18} />
-      </button>
+        icon={<SkipBack size={18} />}
+      />
       {isPlaying ? (
-        <button
+        <Button.Icon
+          variant="subtle"
+          size="sm"
           onClick={() => void onPause(groupId)}
-          className={buttonClass}
           aria-label="Pausa"
-        >
-          <Pause size={18} />
-        </button>
+          icon={<Pause size={18} />}
+        />
       ) : (
-        <button
+        <Button.Icon
+          variant="subtle"
+          size="sm"
           onClick={() => void onPlay(groupId)}
-          className={buttonClass}
           aria-label="Play"
-        >
-          <Play size={18} />
-        </button>
+          icon={<Play size={18} />}
+        />
       )}
-      <button
+      <Button.Icon
+        variant="subtle"
+        size="sm"
         onClick={() => void onStop(groupId)}
-        className={buttonClass}
         aria-label="Stop"
-      >
-        <Square size={18} />
-      </button>
-      <button
+        icon={<Square size={18} />}
+      />
+      <Button.Icon
+        variant="subtle"
+        size="sm"
         onClick={() => void onNext(groupId)}
-        className={buttonClass}
         aria-label="Successivo"
-      >
-        <SkipForward size={18} />
-      </button>
+        icon={<SkipForward size={18} />}
+      />
     </div>
   );
 }

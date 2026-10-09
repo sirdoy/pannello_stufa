@@ -6,6 +6,7 @@ import { Card, Button, Skeleton, EmptyState, Heading, Text, Banner, Slider, Badg
 import { COLOR_PRESETS, supportsColor } from '@/lib/hue/colorUtils';
 import type { ColorPreset } from '@/lib/hue/colorUtils';
 import { cn } from '@/lib/utils/cn';
+import { ChevronDown, ChevronUp, Home, Lightbulb, Moon, Palette, RefreshCw } from 'lucide-react';
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
 import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
 import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
@@ -100,12 +101,12 @@ export default function LightsPage() {
 
       {success && (
         <div className="mb-6">
-          <Banner variant="success" icon="✅" title={success} dismissible onDismiss={() => setSuccess(null)} />
+          <Banner variant="success" title={success} dismissible onDismiss={() => setSuccess(null)} />
         </div>
       )}
       {lightsData.error && (
         <div className="mb-6">
-          <Banner variant="error" icon="⚠️" title="Errore" description={lightsData.error} dismissible onDismiss={() => lightsData.setError(null)} />
+          <Banner variant="error" title="Errore" description={lightsData.error} dismissible onDismiss={() => lightsData.setError(null)} />
         </div>
       )}
 
@@ -116,15 +117,15 @@ export default function LightsPage() {
             <div><Text variant="label" size="xs" className="mb-1">Luci</Text><Heading level={3} size="lg">{lightsData.lights.length}</Heading></div>
             <div><Text variant="label" size="xs" className="mb-1">Scene</Text><Heading level={3} size="lg">{lightsData.scenes.length}</Heading></div>
           </div>
-          <Button variant="outline" onClick={lightsData.handleRefresh} loading={lightsData.refreshing} size="sm">🔄 Aggiorna</Button>
+          <Button variant="outline" onClick={lightsData.handleRefresh} loading={lightsData.refreshing} size="sm" icon={<RefreshCw size={16} />}>Aggiorna</Button>
         </div>
       </Card>
 
       {lightsData.hasAnyLights && (
-        <Card className="mb-6 border-slate-700/50 bg-linear-to-br from-slate-800/40 to-slate-900/60 p-6">
+        <Card className="mb-6 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-3xl">🏠</span>
+              <Home size={18} className="text-(--text-2)" aria-hidden="true" />
               <div>
                 <Heading level={2} size="md">Tutta la Casa</Heading>
                 <Text variant="secondary" size="sm">{lightsData.totalLightsOn}/{lightsData.lights.length} luci accese</Text>
@@ -132,14 +133,14 @@ export default function LightsPage() {
             </div>
             <div className="flex gap-3">
               {!lightsData.allHouseLightsOn && !lightsData.allHouseLightsOff && (<>
-                <Button variant="ember" onClick={() => lightsCommands.handleAllLightsToggle(true)} disabled={lightsData.refreshing} icon="💡">Accendi Tutte</Button>
-                <Button variant="subtle" onClick={() => lightsCommands.handleAllLightsToggle(false)} disabled={lightsData.refreshing} icon="🌙">Spegni Tutte</Button>
+                <Button variant="ember" onClick={() => lightsCommands.handleAllLightsToggle(true)} disabled={lightsData.refreshing} icon={<Lightbulb size={16} />}>Accendi Tutte</Button>
+                <Button variant="subtle" onClick={() => lightsCommands.handleAllLightsToggle(false)} disabled={lightsData.refreshing} icon={<Moon size={16} />}>Spegni Tutte</Button>
               </>)}
               {lightsData.allHouseLightsOff && (
-                <Button variant="ember" onClick={() => lightsCommands.handleAllLightsToggle(true)} disabled={lightsData.refreshing} icon="💡" className="ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900">Accendi Tutte le Luci</Button>
+                <Button variant="ember" onClick={() => lightsCommands.handleAllLightsToggle(true)} disabled={lightsData.refreshing} icon={<Lightbulb size={16} />}>Accendi Tutte le Luci</Button>
               )}
               {lightsData.allHouseLightsOn && (
-                <Button variant="subtle" onClick={() => lightsCommands.handleAllLightsToggle(false)} disabled={lightsData.refreshing} icon="🌙">Spegni Tutte le Luci</Button>
+                <Button variant="subtle" onClick={() => lightsCommands.handleAllLightsToggle(false)} disabled={lightsData.refreshing} icon={<Moon size={16} />}>Spegni Tutte le Luci</Button>
               )}
             </div>
           </div>
@@ -148,7 +149,7 @@ export default function LightsPage() {
 
       {lightsData.groups.length > 0 && (
         <div className="mb-8 space-y-6">
-          <Heading level={2} size="md">🏠 Stanze</Heading>
+          <Heading level={2} size="md">Stanze</Heading>
           {lightsData.groups.map((group: HueGroup) => {
             const groupLights = lightsData.lights.filter((l: HueLight) => group.lights.includes(l.light_id));
             const groupScenes = lightsData.scenes.filter((s: HueScene) => s.group_id === group.group_id);
@@ -160,8 +161,8 @@ export default function LightsPage() {
             const allOn = groupLights.length > 0 && onCount === groupLights.length;
             const allOff = groupLights.length > 0 && onCount === 0;
             return (
-              <Card key={group.group_id} className="overflow-hidden">
-                <div className={`p-6 ${isOn ? 'bg-linear-to-br from-warning-900/20 to-warning-800/20' : ''}`}>
+              <Card key={group.group_id} padding={false}>
+                <div className="p-6">
                   <div className="mb-4 flex items-start justify-between">
                     <div>
                       <Heading level={3} size="md" className="mb-1">{group.name}</Heading>
@@ -175,12 +176,12 @@ export default function LightsPage() {
                   <div className="mb-4">
                     {!allOn && !allOff && (
                       <div className="grid grid-cols-2 gap-3">
-                        <Button variant="subtle" onClick={() => lightsCommands.handleRoomToggle(group.group_id, true)} disabled={lightsData.refreshing} size="sm" icon="💡">Accendi Stanza</Button>
-                        <Button variant="subtle" onClick={() => lightsCommands.handleRoomToggle(group.group_id, false)} disabled={lightsData.refreshing} size="sm" icon="🌙">Spegni Stanza</Button>
+                        <Button variant="subtle" onClick={() => lightsCommands.handleRoomToggle(group.group_id, true)} disabled={lightsData.refreshing} size="sm" icon={<Lightbulb size={16} />}>Accendi Stanza</Button>
+                        <Button variant="subtle" onClick={() => lightsCommands.handleRoomToggle(group.group_id, false)} disabled={lightsData.refreshing} size="sm" icon={<Moon size={16} />}>Spegni Stanza</Button>
                       </div>
                     )}
-                    {allOff && <Button variant="ember" onClick={() => lightsCommands.handleRoomToggle(group.group_id, true)} disabled={lightsData.refreshing} size="sm" icon="💡" fullWidth className="ring-2 ring-ember-500/30 ring-offset-2 ring-offset-slate-900">Accendi Stanza</Button>}
-                    {allOn && <Button variant="subtle" onClick={() => lightsCommands.handleRoomToggle(group.group_id, false)} disabled={lightsData.refreshing} size="sm" icon="🌙" fullWidth>Spegni Stanza</Button>}
+                    {allOff && <Button variant="ember" onClick={() => lightsCommands.handleRoomToggle(group.group_id, true)} disabled={lightsData.refreshing} size="sm" icon={<Lightbulb size={16} />} fullWidth>Accendi Stanza</Button>}
+                    {allOn && <Button variant="subtle" onClick={() => lightsCommands.handleRoomToggle(group.group_id, false)} disabled={lightsData.refreshing} size="sm" icon={<Moon size={16} />} fullWidth>Spegni Stanza</Button>}
                   </div>
                   {isOn && (
                     <div className="space-y-2">
@@ -192,33 +193,33 @@ export default function LightsPage() {
                     </div>
                   )}
                   {(groupLights.length > 0 || groupScenes.length > 0) && (
-                    <Button variant="ghost" onClick={() => setExpandedRoom(isExpanded ? null : group.group_id)} size="sm" className="mt-4 w-full">
-                      {isExpanded ? '▲ Nascondi Dettagli' : '▼ Mostra Dettagli'} ({groupLights.length} luci, {groupScenes.length} scene)
+                    <Button variant="ghost" onClick={() => setExpandedRoom(isExpanded ? null : group.group_id)} size="sm" className="mt-4 w-full" icon={isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}>
+                      {isExpanded ? 'Nascondi Dettagli' : 'Mostra Dettagli'} ({groupLights.length} luci, {groupScenes.length} scene)
                     </Button>
                   )}
                 </div>
                 {isExpanded && (
-                  <div className="border-t border-slate-700 bg-slate-900/20 p-6">
+                  <div className="border-t border-white/8 p-6">
                     {groupLights.length > 0 && (
                       <>
-                        <Heading level={4} size="sm" className="mb-3">💡 Luci Individuali</Heading>
+                        <Heading level={4} size="sm" className="mb-3">Luci Individuali</Heading>
                         <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-2">
                           {groupLights.map((light: HueLight) => {
                             const briPct = Math.round((light.brightness ?? 0) * 100 / 254);
                             const hasColor = supportsColor(light);
                             return (
-                              <div key={light.light_id} className={cn("rounded-xl border-2 p-4 transition-colors", light.on ? "border-warning-500/50 bg-warning-500/10" : "border-slate-700 bg-slate-800")}>
+                              <Card key={light.light_id} variant="subtle" className={cn(light.on && "border-warning-500/50 bg-warning-500/10")}>
                                 <div className="mb-2 flex items-center justify-between">
                                   <div>
                                     <Text size="sm">{light.name}</Text>
-                                    {hasColor && <Text variant="tertiary" size="xs">🎨 Colore disponibile</Text>}
+                                    {hasColor && <Text variant="tertiary" size="xs">Colore disponibile</Text>}
                                   </div>
                                   {light.on && <Badge variant="ember" size="sm">ON</Badge>}
                                 </div>
                                 <div className="mb-2">
                                   {light.on
-                                    ? <Button variant="subtle" onClick={() => handleLightToggle(light.light_id, false)} disabled={lightsData.refreshing} size="sm" fullWidth icon="🌙">Spegni</Button>
-                                    : <Button variant="ember" onClick={() => handleLightToggle(light.light_id, true)} disabled={lightsData.refreshing} size="sm" fullWidth icon="💡">Accendi</Button>
+                                    ? <Button variant="subtle" onClick={() => handleLightToggle(light.light_id, false)} disabled={lightsData.refreshing} size="sm" fullWidth icon={<Moon size={16} />}>Spegni</Button>
+                                    : <Button variant="ember" onClick={() => handleLightToggle(light.light_id, true)} disabled={lightsData.refreshing} size="sm" fullWidth icon={<Lightbulb size={16} />}>Accendi</Button>
                                   }
                                 </div>
                                 {light.on && (
@@ -235,7 +236,7 @@ export default function LightsPage() {
                                         <Text variant="tertiary" size="xs">Colore</Text>
                                         <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
                                           {COLOR_PRESETS.map(preset => (
-                                            <button key={preset.name} onClick={() => handleLightColorChange(light.light_id, preset)} disabled={changingColor === light.light_id} className="relative aspect-square w-full rounded-lg border-2 border-slate-600 transition-all hover:border-slate-400 active:scale-95 disabled:opacity-50" style={{ backgroundColor: preset.hex }} title={preset.name}>
+                                            <button key={preset.name} onClick={() => handleLightColorChange(light.light_id, preset)} disabled={changingColor === light.light_id} className="relative aspect-square w-full rounded-lg border-2 border-white/14 transition-all hover:border-white/40 active:scale-95 disabled:opacity-50" style={{ backgroundColor: preset.hex }} title={preset.name}>
                                               {changingColor === light.light_id && <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/20"><div className="size-3 animate-spin rounded-full border-2 border-white border-t-transparent"></div></div>}
                                             </button>
                                           ))}
@@ -244,7 +245,7 @@ export default function LightsPage() {
                                     )}
                                   </div>
                                 )}
-                              </div>
+                              </Card>
                             );
                           })}
                         </div>
@@ -252,11 +253,11 @@ export default function LightsPage() {
                     )}
                     {groupScenes.length > 0 && (
                       <>
-                        <Heading level={4} size="sm" className="mb-3">🎨 Scene della Stanza</Heading>
+                        <Heading level={4} size="sm" className="mb-3">Scene della Stanza</Heading>
                         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
                           {groupScenes.map((scene: HueScene) => (
-                            <button key={scene.scene_id} onClick={() => { setActivatingScene(scene.scene_id); lightsCommands.handleSceneActivate(scene.scene_id, scene.group_id).finally(() => setActivatingScene(null)); }} disabled={activatingScene === scene.scene_id} className={cn("relative rounded-xl border-2 p-4 transition-all active:scale-95", activatingScene === scene.scene_id ? "border-warning-500 bg-warning-500/10" : "border-slate-700 hover:border-warning-500/50")}>
-                              <div className="mb-1 text-2xl">🎨</div>
+                            <button key={scene.scene_id} onClick={() => { setActivatingScene(scene.scene_id); lightsCommands.handleSceneActivate(scene.scene_id, scene.group_id).finally(() => setActivatingScene(null)); }} disabled={activatingScene === scene.scene_id} className={cn("relative rounded-2xl border-[0.5px] p-4 transition-colors active:scale-95", activatingScene === scene.scene_id ? "border-warning-500 bg-warning-500/10" : "border-white/6 bg-white/4 hover:bg-white/6")}>
+                              <Palette size={18} className="mx-auto mb-1 text-(--text-2)" aria-hidden="true" />
                               <Text size="xs" className="text-center">{scene.name}</Text>
                               {activatingScene === scene.scene_id && <div className="absolute top-1 right-1"><div className="size-3 animate-spin rounded-full border-2 border-warning-500 border-t-transparent"></div></div>}
                             </button>
@@ -273,7 +274,7 @@ export default function LightsPage() {
       )}
 
       {lightsData.groups.length === 0 && (
-        <EmptyState icon="💡" title="Nessuna stanza trovata" description="Configura le stanze nell'app Philips Hue" />
+        <EmptyState icon={<Lightbulb size={32} />} title="Nessuna stanza trovata" description="Configura le stanze nell'app Philips Hue" />
       )}
     </div>
   );

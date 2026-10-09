@@ -16,6 +16,7 @@ import Card from '@/app/components/ui/Card';
 import Select from '@/app/components/ui/Select';
 import Input from '@/app/components/ui/Input';
 import FormModal from '@/app/components/ui/FormModal';
+import EmptyState from '@/app/components/ui/EmptyState';
 import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
 import { Text } from '@/app/components/ui';
 import { useToast } from '@/app/hooks/useToast';
@@ -482,14 +483,14 @@ export default function DeviceRegistryPage() {
       accessorKey: 'device_type_slug',
       header: 'Tipo',
       cell: ({ row }) => (
-        <code className="font-mono text-sm text-slate-400">{row.original.device_type_slug}</code>
+        <Text as="code" variant="secondary" size="sm" mono>{row.original.device_type_slug}</Text>
       ),
     },
     {
       accessorKey: 'device_id',
       header: 'ID dispositivo',
       cell: ({ row }) => (
-        <code className="font-mono text-sm text-slate-400">{row.original.device_id}</code>
+        <Text as="code" variant="secondary" size="sm" mono>{row.original.device_id}</Text>
       ),
     },
     {
@@ -536,16 +537,16 @@ export default function DeviceRegistryPage() {
         <Card variant="glass" className="p-4 sm:p-6">
           {/* Health stats inline (per D-11) */}
           {health && (
-            <div className="mb-4 flex items-center gap-6 text-sm text-slate-400">
+            <Text as="div" variant="secondary" size="sm" className="mb-4 flex items-center gap-6">
               <span>
                 Tipi dispositivo:{' '}
-                <strong className="text-slate-200">{health.device_types_count}</strong>
+                <Text as="strong" size="sm">{health.device_types_count}</Text>
               </span>
               <span>
                 Dispositivi registrati:{' '}
-                <strong className="text-slate-200">{health.device_registry_count}</strong>
+                <Text as="strong" size="sm">{health.device_registry_count}</Text>
               </span>
-            </div>
+            </Text>
           )}
 
           {/* Toolbar: provider filter + register button (per D-08, D-14) */}
@@ -565,29 +566,26 @@ export default function DeviceRegistryPage() {
 
           {/* Empty state (per D-35) */}
           {devices.length === 0 ? (
-            <div className="py-8 text-center text-slate-400">
-              <p>Nessun dispositivo registrato</p>
-              {!allRegistered && (
-                <Button
-                  variant="ember"
-                  size="sm"
-                  className="mt-4"
-                  onClick={() => setShowRegister(true)}
-                >
-                  Registra dispositivo
-                </Button>
-              )}
-            </div>
+            <EmptyState
+              description="Nessun dispositivo registrato"
+              action={
+                !allRegistered ? (
+                  <Button variant="ember" size="sm" onClick={() => setShowRegister(true)}>
+                    Registra dispositivo
+                  </Button>
+                ) : undefined
+              }
+            />
           ) : (
             <DataTable columns={columns} data={devices} density="compact" />
           )}
 
           {/* Server-side pagination controls (per D-06, Research Pattern 6) */}
           {totalCount > PAGE_SIZE && (
-            <div className="mt-4 flex items-center justify-between text-sm text-slate-400">
-              <span>
+            <div className="mt-4 flex items-center justify-between">
+              <Text as="span" variant="secondary" size="sm">
                 Pagina {page + 1} di {Math.ceil(totalCount / PAGE_SIZE)}
-              </span>
+              </Text>
               <div className="flex gap-2">
                 <Button
                   variant="ghost"
@@ -645,9 +643,9 @@ export default function DeviceRegistryPage() {
             {({ control }) => (
               <>
                 {/* Read-only context (per D-22) */}
-                <div className="mb-2 text-sm text-slate-400">
-                  <p>Provider: <strong className="text-slate-200">{deviceToEdit?.provider_name}</strong></p>
-                  <p>ID: <strong className="text-slate-200">{deviceToEdit?.device_id}</strong></p>
+                <div className="mb-2">
+                  <Text variant="secondary" size="sm">Provider: <Text as="strong" size="sm">{deviceToEdit?.provider_name}</Text></Text>
+                  <Text variant="secondary" size="sm">ID: <Text as="strong" size="sm">{deviceToEdit?.device_id}</Text></Text>
                 </div>
                 <Controller name="custom_name" control={control} render={({ field, fieldState }) => (
                   <Input label="Nome" {...field} error={fieldState.error?.message} />

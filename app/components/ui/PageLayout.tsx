@@ -133,7 +133,7 @@ const PageFooter = forwardRef<HTMLElement, PageFooterProps>(function PageFooter(
     <footer
       ref={ref}
       className={cn(
-        'border-t border-slate-800 py-6 ',
+        'border-t border-white/6 py-6',
         className
       )}
       {...props}

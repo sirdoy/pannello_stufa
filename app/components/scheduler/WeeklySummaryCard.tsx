@@ -3,6 +3,7 @@
 import Card from '../ui/Card';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
+import { BarChart3, Briefcase, Palmtree } from 'lucide-react';
 import { calculateWeeklyStats } from '@/lib/scheduler/schedulerStats';
 import type { WeeklySchedule } from '@/lib/scheduler/schedulerService';
 
@@ -27,7 +28,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
   return (
     <Card variant="glass" className="p-6">
       <Heading level={2} size="lg" className="mb-4 flex items-center gap-2">
-        <span>📊</span>
+        <BarChart3 size={18} className="text-(--text-2)" aria-hidden="true" />
         <span>Riepilogo Settimanale</span>
       </Heading>
 
@@ -59,7 +60,7 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
             {stats.busiestDay && (
               <div className="flex items-center justify-between text-sm">
                 <Text as="span" variant="secondary">Giorno più utilizzato</Text>
-                <Text as="span" className="text-primary-400">
+                <Text as="span" variant="ember">
                   {stats.busiestDay} ({formatHours(stats.dailyHours[stats.busiestDay]!)})
                 </Text>
               </div>
@@ -71,25 +72,25 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
       {/* Power distribution */}
       {stats.totalHours > 0 && (
         <>
-          <div className="mb-4 border-neutral-700 pt-4">
-            <Heading level={3} size="sm" className="mb-3 text-neutral-300">
+          <div className="mb-4 border-t border-white/8 pt-4">
+            <Heading level={3} size="sm" variant="subtle" className="mb-3">
               Distribuzione Potenza
             </Heading>
             <div className="space-y-2">
               {powerPercentages.filter(p => p.hours > 0).map(({ level, hours, percentage }) => (
                 <div key={level} className="flex items-center gap-2">
-                  <span className="w-8 font-medium text-neutral-400">
-                    ⚡P{level}
-                  </span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-700">
+                  <Text as="span" variant="secondary" weight="medium" className="w-8">
+                    P{level}
+                  </Text>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
                     <div
                       className={`h-full transition-all duration-300 ${getPowerBarClass(level)}`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                  <span className="w-16 text-neutral-400">
+                  <Text as="span" variant="secondary" className="w-16">
                     {formatHours(hours)} ({Math.round(percentage)}%)
-                  </span>
+                  </Text>
                 </div>
               ))}
             </div>
@@ -97,26 +98,26 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
 
           {/* Weekdays vs Weekend */}
           {(stats.weekdaysTotal > 0 || stats.weekendTotal > 0) && (
-            <div className="border-neutral-700 pt-4">
+            <div className="border-t border-white/8 pt-4">
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <span>🏢</span>
-                  <span className="text-neutral-400">Settimana</span>
+                  <Briefcase size={16} className="text-(--text-2)" aria-hidden="true" />
+                  <Text as="span" variant="secondary" size="sm">Settimana</Text>
                 </div>
-                <span className="font-medium text-white">
+                <Text as="span" size="sm" weight="medium">
                   {formatHours(stats.weekdaysTotal)} (
                   {Math.round((stats.weekdaysTotal / stats.totalHours) * 100)}%)
-                </span>
+                </Text>
               </div>
               <div className="mt-2 flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <span>🏖️</span>
-                  <span className="text-neutral-400">Weekend</span>
+                  <Palmtree size={16} className="text-(--text-2)" aria-hidden="true" />
+                  <Text as="span" variant="secondary" size="sm">Weekend</Text>
                 </div>
-                <span className="font-medium text-white">
+                <Text as="span" size="sm" weight="medium">
                   {formatHours(stats.weekendTotal)} (
                   {Math.round((stats.weekendTotal / stats.totalHours) * 100)}%)
-                </span>
+                </Text>
               </div>
             </div>
           )}

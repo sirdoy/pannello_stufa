@@ -92,7 +92,7 @@ export default function WifiNetworksTable({ networks, loading, stale }: WifiNetw
       <div className="flex items-center justify-between">
         <Heading level={3}>Reti WiFi</Heading>
         {stale && (
-          <Text variant="label" size="xs" className="text-slate-500">
+          <Text variant="label" size="xs">
             Dati non aggiornati
           </Text>
         )}

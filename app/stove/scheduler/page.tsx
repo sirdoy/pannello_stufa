@@ -11,6 +11,7 @@ import {
   setActiveSchedule,
   type ScheduleMetadata,
 } from '@/lib/scheduler/schedulesApiClient';
+import { CalendarDays, Settings, Undo2 } from 'lucide-react';
 import { logSchedulerAction } from '@/lib/logService';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
@@ -632,7 +633,7 @@ export default function WeeklyScheduler() {
               onClick={() => setManageSchedulesModal(true)}
               className="mt-3 w-full"
               size="sm"
-              icon="⚙️"
+              icon={<Settings size={16} />}
             >
               Gestisci Pianificazioni
             </Button>
@@ -653,7 +654,7 @@ export default function WeeklyScheduler() {
                   variant="subtle"
                   onClick={handleClearSemiManual}
                   className="flex-1"
-                  icon="↩️"
+                  icon={<Undo2 size={16} />}
                   size="sm"
                 >
                   Torna in Automatico
@@ -664,7 +665,7 @@ export default function WeeklyScheduler() {
                   variant="ember"
                   onClick={handleActivateSemiManual}
                   className="flex-1"
-                  icon="⚙️"
+                  icon={<Settings size={16} />}
                   size="sm"
                 >
                   Semi-Auto
@@ -689,8 +690,9 @@ export default function WeeklyScheduler() {
       {/* Weekly Timeline - Always Visible */}
       <Card variant="glass" className="p-6">
         <div className="mb-4">
-          <Heading level={2} size="lg">
-            📅 Panoramica Settimanale
+          <Heading level={2} size="lg" className="flex items-center gap-2">
+            <CalendarDays size={18} className="text-(--text-2)" aria-hidden="true" />
+            Panoramica Settimanale
           </Heading>
         </div>
         <WeeklyTimeline

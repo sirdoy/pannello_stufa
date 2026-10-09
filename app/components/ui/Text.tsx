@@ -23,12 +23,12 @@ const textVariants = cva(
         secondary: 'text-(--text-2)',
         tertiary: 'text-(--text-2)',
         // Accent colors - Ember Noir palette
-        ember: 'text-ember-400 ',
-        ocean: 'text-ocean-400 ',
-        sage: 'text-sage-400 ',
-        warning: 'text-warning-400 ',
-        danger: 'text-danger-400 ',
-        info: 'text-ocean-400 ', // alias for ocean
+        ember: 'text-ember-400',
+        ocean: 'text-ocean-400',
+        sage: 'text-sage-400',
+        warning: 'text-warning-400',
+        danger: 'text-danger-400',
+        info: 'text-ocean-400', // alias for ocean
         // Special variants
         label: 'tracking-wider text-(--text-2) uppercase',
       },
@@ -102,7 +102,7 @@ export interface TextProps extends HTMLAttributes<HTMLElement>, VariantProps<typ
  * <Text variant="tertiary">Highlighted</Text>
  *
  * // Wrong - external color classes
- * <Text className="text-slate-400">Text</Text>
+ * <Text className="text-gray-400">Text</Text>
  */
 const Text = forwardRef<HTMLElement, TextProps>(function Text(
   {

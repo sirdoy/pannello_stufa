@@ -409,7 +409,7 @@ describe('Modal Component', () => {
         </Modal>
       );
       expect(screen.getByText('Description text')).toHaveClass('text-sm');
-      expect(screen.getByText('Description text')).toHaveClass('text-slate-400');
+      expect(screen.getByText('Description text')).toHaveClass('text-(--text-2)');
     });
 
     test('Modal.Footer renders with correct layout', () => {

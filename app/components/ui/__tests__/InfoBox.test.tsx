@@ -17,11 +17,11 @@ describe('InfoBox Component', () => {
   });
 
   describe('Variants', () => {
-    test('neutral variant applies slate text color', () => {
+    test('neutral variant applies the primary text colour', () => {
       const { container } = render(
         <InfoBox icon="📦" label="Test" value="Value" variant="neutral" />
       );
-      const valueEl = container.querySelector('.text-slate-100');
+      const valueEl = container.querySelector('.text-\\(--text-1\\)');
       expect(valueEl).toBeInTheDocument();
     });
 
@@ -69,7 +69,7 @@ describe('InfoBox Component', () => {
       const { container } = render(
         <InfoBox icon="📦" label="Test" value="Value" />
       );
-      const valueEl = container.querySelector('.text-slate-100');
+      const valueEl = container.querySelector('.text-\\(--text-1\\)');
       expect(valueEl).toBeInTheDocument();
     });
   });
@@ -98,6 +98,27 @@ describe('InfoBox Component', () => {
         <InfoBox icon="📦" label="Test" value="Value" className="custom-class" />
       );
       expect(container.firstChild).toHaveClass('custom-class');
+    });
+  });
+
+  describe('Icon element', () => {
+    test('renders an icon element without the emoji font size', () => {
+      render(<InfoBox icon={<svg data-testid="box-icon" />} label="CPU" value="12%" />);
+      const slot = screen.getByTestId('box-icon').parentElement;
+      expect(slot).toHaveClass('size-5');
+      expect(slot).not.toHaveClass('text-2xl');
+      expect(slot).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    test('emoji strings keep the emoji size', () => {
+      render(<InfoBox icon="🏠" label="Casa" value="Home" />);
+      expect(screen.getByText('🏠')).toHaveClass('text-2xl');
+    });
+
+    test('renders without an icon', () => {
+      const { container } = render(<InfoBox label="Solo testo" value="42" />);
+      expect(screen.getByText('Solo testo')).toBeInTheDocument();
+      expect(container.querySelector('[aria-hidden="true"]')).not.toBeInTheDocument();
     });
   });
 });

@@ -11,7 +11,7 @@ import Select from '../ui/Select';
 import { RadioGroup, RadioGroupItem } from '../ui/RadioGroup';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
-import { X } from 'lucide-react';
+import { AlertTriangle, X } from 'lucide-react';
 
 interface ExistingSchedule {
   id: string;
@@ -143,7 +143,7 @@ export default function CreateScheduleModal({
               />
               {error && (
                 <Text variant="ember" size="sm" className="mt-2 flex items-center gap-1">
-                  <span>⚠️</span>
+                  <AlertTriangle size={16} className="shrink-0" aria-hidden="true" />
                   <span>{error}</span>
                 </Text>
               )}
@@ -166,16 +166,16 @@ export default function CreateScheduleModal({
                   value="scratch"
                 >
                   <div>
-                    <div className="font-medium">Da Zero</div>
-                    <div className="text-sm text-neutral-400">Inizia con una pianificazione vuota</div>
+                    <Text as="div" weight="medium">Da Zero</Text>
+                    <Text as="div" variant="secondary" size="sm">Inizia con una pianificazione vuota</Text>
                   </div>
                 </RadioGroupItem>
                 <RadioGroupItem
                   value="copy"
                 >
                   <div>
-                    <div className="font-medium">Copia Esistente</div>
-                    <div className="text-sm text-neutral-400">Duplica una pianificazione</div>
+                    <Text as="div" weight="medium">Copia Esistente</Text>
+                    <Text as="div" variant="secondary" size="sm">Duplica una pianificazione</Text>
                   </div>
                 </RadioGroupItem>
               </RadioGroup>
@@ -186,7 +186,6 @@ export default function CreateScheduleModal({
               <div className="animate-fade-in">
                 <Select
                   label="Copia da"
-                  icon="📋"
                   value={copyFromId}
                   onChange={(e) => {
                     setCopyFromId(e.target.value as string);

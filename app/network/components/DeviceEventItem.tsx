@@ -26,7 +26,7 @@ export default function DeviceEventItem({ event }: DeviceEventItemProps) {
       {/* Timeline dot */}
       <div
         className={`mt-1.5 size-2 shrink-0 rounded-full ${
-          isConnected ? 'bg-sage-400' : 'bg-slate-500'
+          isConnected ? 'bg-sage-400' : 'bg-white/18'
         }`}
       />
 
@@ -34,7 +34,7 @@ export default function DeviceEventItem({ event }: DeviceEventItemProps) {
       <div className="min-w-0 flex-1">
         {/* Device name and status badge */}
         <div className="flex flex-wrap items-center gap-2">
-          <Text size="sm" weight="medium" className="text-slate-100">
+          <Text size="sm" weight="medium">
             {event.deviceName}
           </Text>
           <Badge variant={isConnected ? 'sage' : 'neutral'} size="sm">

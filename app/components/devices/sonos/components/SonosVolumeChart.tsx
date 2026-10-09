@@ -10,6 +10,8 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { format } from 'date-fns';
+import Card from '@/app/components/ui/Card';
+import Text from '@/app/components/ui/Text';
 import type { SonosVolumeHistoryItem } from '@/types/sonosProxy';
 
 interface SonosVolumeChartProps {
@@ -29,14 +31,14 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const avgVolume = payload.find(p => p.dataKey === 'avg_volume')?.value;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-slate-900 p-2 shadow-xl">
-      <p className="mb-1 text-xs text-slate-400">
+    <Card padding={false} className="p-2">
+      <Text variant="secondary" size="xs" className="mb-1">
         {format(label * 1000, 'dd/MM HH:mm')}
-      </p>
+      </Text>
       {avgVolume !== undefined && (
-        <p className="text-xs text-amber-400">Volume: {avgVolume}%</p>
+        <Text variant="warning" size="xs">Volume: {avgVolume}%</Text>
       )}
-    </div>
+    </Card>
   );
 }
 

@@ -49,8 +49,8 @@ describe('ActionButton Component', () => {
     test('renders ghost variant', () => {
       render(<ActionButton icon="✕" variant="ghost" ariaLabel="Close" />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-slate-500/10');
-      expect(button).toHaveClass('text-slate-400');
+      expect(button).toHaveClass('bg-white/6');
+      expect(button).toHaveClass('text-(--text-2)');
     });
 
     test('renders warning variant', () => {

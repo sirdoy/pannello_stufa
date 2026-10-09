@@ -1,5 +1,7 @@
 'use client';
 
+import Button from '@/app/components/ui/Button';
+
 interface SonosGroupControlsProps {
   uid: string;
   isCoordinator: boolean;
@@ -21,13 +23,14 @@ export default function SonosGroupControls({
   if (!isCoordinator && zoneMemberCount > 1) {
     return (
       <div className="mt-2 inline-flex items-center gap-2">
-        <button
+        <Button
+          variant="danger"
+          size="sm"
           onClick={() => void onUnjoinGroup(uid)}
-          className="rounded-md bg-red-500/20 px-2 py-1 text-xs text-red-400 transition-colors hover:bg-red-500/30"
           aria-label="Separa altoparlante dal gruppo"
         >
           Separa
-        </button>
+        </Button>
       </div>
     );
   }
@@ -38,6 +41,7 @@ export default function SonosGroupControls({
 
     return (
       <div className="mt-2 inline-flex items-center gap-2">
+        {/* Native select: ui/Select has no aria-label and no empty value (action menu that resets itself) */}
         <select
           onChange={e => {
             const targetUid = e.target.value;
@@ -48,7 +52,7 @@ export default function SonosGroupControls({
             }
           }}
           defaultValue=""
-          className="rounded-md border-0 bg-slate-700/50 px-2 py-1 text-xs text-slate-300"
+          className="h-11 rounded-xl border-[0.5px] border-white/14 bg-white/6 px-3 text-[13px] text-(--text-1)"
           aria-label="Unisci a un gruppo"
         >
           <option value="" disabled>

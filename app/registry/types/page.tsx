@@ -86,7 +86,7 @@ export default function DeviceTypesPage() {
       accessorKey: 'slug',
       header: 'Slug',
       cell: ({ row }) => (
-        <code className="font-mono text-sm text-slate-400">{row.original.slug}</code>
+        <Text as="code" variant="secondary" size="sm" mono>{row.original.slug}</Text>
       ),
     },
     {
@@ -254,8 +254,8 @@ export default function DeviceTypesPage() {
       >
         {({ control }) => (
           <>
-            <div className="mb-2 text-sm text-slate-400">
-              <p>Slug: <strong className="text-slate-200">{typeToEdit?.slug}</strong></p>
+            <div className="mb-2">
+              <Text variant="secondary" size="sm">Slug: <Text as="strong" size="sm">{typeToEdit?.slug}</Text></Text>
             </div>
             <Controller
               name="label"

@@ -277,14 +277,12 @@ describe('Card', () => {
       expect(footer).toHaveClass('border-t');
     });
 
-    it('CardDivider renders gradient line', () => {
+    it('CardDivider renders a flat hairline', () => {
       const { container } = render(<CardDivider />);
       const divider = container.firstChild;
       expect(divider).toHaveClass('h-px');
       expect(divider).toHaveClass('my-4');
-      expect(divider).toHaveClass('bg-linear-to-r');
-      expect(divider).toHaveClass('from-transparent');
-      expect(divider).toHaveClass('to-transparent');
+      expect(divider).toHaveClass('bg-white/8');
     });
   });
 

@@ -18,20 +18,19 @@ import { cn } from '@/lib/utils/cn';
 const inputVariants = cva(
   // Base styles
   cn(
-    'w-full rounded-xl px-4 py-3',
-    'bg-slate-800/60 backdrop-blur-xl',
-    'text-slate-100 placeholder:text-slate-500',
+    'w-full rounded-xl',
+    'bg-white/6',
+    'text-(--text-1) placeholder:text-(--text-2)',
     'font-display font-medium',
     'focus:outline-none focus-visible:ring-2',
-    'transition-all duration-200',
+    'transition-colors duration-200',
     'disabled:cursor-not-allowed disabled:opacity-50',
-    // Light mode base
   ),
   {
     variants: {
       variant: {
         default: cn(
-          'border border-slate-700/50',
+          'border-[0.5px] border-white/8',
           'focus-visible:border-ember-500/60 focus-visible:ring-ember-500/50',
         ),
         error: cn(
@@ -43,9 +42,15 @@ const inputVariants = cva(
           'focus-visible:border-sage-500/60 focus-visible:ring-sage-500/50'
         ),
       },
+      size: {
+        // Compact field for toolbars and dense forms
+        sm: 'min-h-9 px-3 py-1.5 text-[13px]',
+        md: 'px-4 py-3',
+      },
     },
     defaultVariants: {
       variant: 'default',
+      size: 'md',
     },
   }
 );
@@ -55,8 +60,8 @@ export interface InputProps
     VariantProps<typeof inputVariants> {
   /** Label text */
   label?: string;
-  /** Optional emoji icon */
-  icon?: string;
+  /** Optional icon shown before the label (emoji string or icon element) */
+  icon?: React.ReactNode;
   /** Error message (triggers error variant) */
   error?: string;
   /** Helper text (reserved for future use) */
@@ -79,6 +84,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     label,
     icon,
     variant: externalVariant = 'default',
+    size = 'md',
     error: externalError,
     helperText, // Destructure to prevent passing to DOM (not yet implemented, but documented)
     clearable = false,
@@ -178,11 +184,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         <Label.Root
           htmlFor={inputId}
           className={cn(
-            'mb-2 block font-display text-sm font-semibold',
-            'text-slate-300',
+            'mb-2 flex items-center gap-1.5 font-display text-sm font-semibold',
+            'text-(--text-2)',
           )}
         >
-          {icon && <span className="mr-1.5">{icon}</span>}
+          {icon && <span className="inline-flex shrink-0 items-center" aria-hidden="true">{icon}</span>}
           {label}
         </Label.Root>
       )}
@@ -204,7 +210,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
               aria-invalid={displayError ? 'true' : undefined}
               aria-describedby={displayError ? errorId : undefined}
               className={cn(
-                inputVariants({ variant: computedVariant }),
+                inputVariants({ variant: computedVariant, size }),
                 needsClearPadding && 'pr-10',
                 className
               )}
@@ -220,8 +226,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
                 className={cn(
                   'absolute top-1/2 right-3 -translate-y-1/2',
                   'rounded-full p-1',
-                  'text-slate-400 hover:text-slate-200',
-                  'hover:bg-slate-700/50',
+                  'text-(--text-2) hover:text-(--text-1)',
+                  'hover:bg-white/8',
                   'transition-colors duration-150',
                 )}
               >
@@ -235,14 +241,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           <div
             role="presentation"
             className={cn(
-              inputVariants({ variant: computedVariant }),
+              inputVariants({ variant: computedVariant, size }),
               className
             )}
           />
         )}
       </div>
 
-      {/* Error message and character count row */}
+      {/* Error message and character count row (only when there is something to show) */}
+      {(displayError || (showCount && maxLength)) && (
       <div className="mt-1 flex min-h-5 items-start justify-between">
         {/* Error message */}
         {displayError && (
@@ -263,13 +270,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         {showCount && maxLength && (
           <div
             className={cn(
-              'ml-auto text-sm text-slate-500',
+              'ml-auto text-sm text-(--text-2)',
             )}
           >
             {(currentValue as string)?.length || 0}/{maxLength}
           </div>
         )}
       </div>
+      )}
     </div>
   );
 });

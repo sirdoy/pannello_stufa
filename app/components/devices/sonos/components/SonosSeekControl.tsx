@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useSyncedState } from '@/lib/hooks/useSyncedState';
+import Text from '@/app/components/ui/Text';
 import type { SonosPlaybackResponse } from '@/types/sonosProxy';
 
 interface SonosSeekControlProps {
@@ -71,12 +72,12 @@ export default function SonosSeekControl({ playback, groupId, onSeek }: SonosSee
         onChange={handleChange}
         onMouseUp={handleRelease}
         onTouchEnd={handleRelease}
-        className="h-2 w-full rounded-lg bg-slate-700 accent-success-500 disabled:opacity-50"
+        className="h-2 w-full rounded-lg bg-white/10 accent-ember-500 disabled:opacity-50"
         aria-label="Seek"
       />
-      <div className="flex justify-between text-xs text-slate-400">
-        <span>{formatTime(playback?.position ?? null)}</span>
-        <span>{formatTime(playback?.duration ?? null)}</span>
+      <div className="flex justify-between">
+        <Text as="span" variant="secondary" size="xs">{formatTime(playback?.position ?? null)}</Text>
+        <Text as="span" variant="secondary" size="xs">{formatTime(playback?.duration ?? null)}</Text>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ interface ThermostatTabsProps {
  * ThermostatTabs - Tabbed interface for thermostat page
  *
  * Features:
- * - Three tabs: Schedule, Manual, History
+ * - Three tabs: Programma (schedule), Manuale (manual), Storico (history)
  * - Icons for each tab (Calendar, Sliders, Clock)
  * - Tabs positioned at top on both mobile and desktop
  * - Default tab: Schedule
@@ -43,19 +43,19 @@ function ThermostatTabs({
           value="schedule"
           icon={<Calendar className="size-5" />}
         >
-          Schedule
+          Programma
         </Tabs.Trigger>
         <Tabs.Trigger
           value="manual"
           icon={<SlidersHorizontal className="size-5" />}
         >
-          Manual
+          Manuale
         </Tabs.Trigger>
         <Tabs.Trigger
           value="history"
           icon={<Clock className="size-5" />}
         >
-          History
+          Storico
         </Tabs.Trigger>
       </Tabs.List>
 

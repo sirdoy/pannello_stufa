@@ -19,13 +19,13 @@ describe('SonosPlayModeControls', () => {
   it('shuffle button has active style when play_mode is SHUFFLE', () => {
     render(<SonosPlayModeControls playMode="SHUFFLE" onSetPlayMode={onSetPlayMode} />);
     const shuffleBtn = screen.getByLabelText('Shuffle');
-    expect(shuffleBtn.className).toContain('bg-ember-500/20');
+    expect(shuffleBtn.className).toContain('bg-(--accent)');
   });
 
   it('repeat button has active style when play_mode is REPEAT_ALL', () => {
     render(<SonosPlayModeControls playMode="REPEAT_ALL" onSetPlayMode={onSetPlayMode} />);
     const repeatBtn = screen.getByLabelText('Ripeti');
-    expect(repeatBtn.className).toContain('bg-ember-500/20');
+    expect(repeatBtn.className).toContain('bg-(--accent)');
   });
 
   it('clicking shuffle toggles mode from NORMAL to SHUFFLE_NOREPEAT', () => {
@@ -44,19 +44,19 @@ describe('SonosPlayModeControls', () => {
     render(<SonosPlayModeControls playMode={null} onSetPlayMode={onSetPlayMode} />);
     const shuffleBtn = screen.getByLabelText('Shuffle');
     const repeatBtn = screen.getByLabelText('Ripeti');
-    expect(shuffleBtn.className).not.toContain('bg-ember-500/20');
-    expect(repeatBtn.className).not.toContain('bg-ember-500/20');
+    expect(shuffleBtn.className).not.toContain('bg-(--accent)');
+    expect(repeatBtn.className).not.toContain('bg-(--accent)');
   });
 
   it('shuffle button is inactive for REPEAT_ALL', () => {
     render(<SonosPlayModeControls playMode={'REPEAT_ALL' as SonosPlayMode} onSetPlayMode={onSetPlayMode} />);
     const shuffleBtn = screen.getByLabelText('Shuffle');
-    expect(shuffleBtn.className).not.toContain('bg-ember-500/20');
+    expect(shuffleBtn.className).not.toContain('bg-(--accent)');
   });
 
   it('repeat button is inactive for SHUFFLE_NOREPEAT', () => {
     render(<SonosPlayModeControls playMode={'SHUFFLE_NOREPEAT' as SonosPlayMode} onSetPlayMode={onSetPlayMode} />);
     const repeatBtn = screen.getByLabelText('Ripeti');
-    expect(repeatBtn.className).not.toContain('bg-ember-500/20');
+    expect(repeatBtn.className).not.toContain('bg-(--accent)');
   });
 });

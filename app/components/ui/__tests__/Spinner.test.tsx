@@ -69,7 +69,7 @@ describe('Spinner', () => {
 
     it('applies muted variant', () => {
       const { container } = render(<Spinner variant="muted" />);
-      expect(container.querySelector('svg')).toHaveClass('text-slate-400');
+      expect(container.querySelector('svg')).toHaveClass('text-(--text-2)');
     });
   });
 

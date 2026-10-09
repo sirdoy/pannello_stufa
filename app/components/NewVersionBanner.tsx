@@ -6,6 +6,7 @@ import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
 import { reloadToNewVersion, useNewVersion } from '@/lib/hooks/useNewVersion';
 import Button from './ui/Button';
+import Card from './ui/Card';
 import Text from './ui/Text';
 
 /**
@@ -29,9 +30,9 @@ export default function NewVersionBanner() {
       // Above the bottom navigation and the offline banner (z 60)
       style={{ bottom: 'calc(env(safe-area-inset-bottom) + 96px)', zIndex: 70 }}
     >
-      <div className="flex items-center gap-3 rounded-xl border border-ember-500/25 bg-slate-900/90 p-3 shadow-ember-glow-sm backdrop-blur-lg">
+      <Card padding={false} className="flex items-center gap-3 bg-black/70 p-3">
         <RefreshCw size={20} className="shrink-0 text-ember-400" aria-hidden="true" />
-        <Text className="flex-1 text-sm font-medium text-slate-100">Nuova versione disponibile</Text>
+        <Text size="sm" weight="medium" className="flex-1">Nuova versione disponibile</Text>
         <Button
           variant="ember"
           size="sm"
@@ -43,15 +44,16 @@ export default function NewVersionBanner() {
         >
           Ricarica
         </Button>
-        <button
+        <Button.Icon
           type="button"
+          variant="ghost"
+          size="sm"
+          icon={<X size={18} />}
           onClick={() => setDismissed(true)}
           aria-label="Chiudi"
-          className="shrink-0 rounded-lg p-1 text-slate-400 hover:text-slate-200"
-        >
-          <X size={18} aria-hidden="true" />
-        </button>
-      </div>
+          className="shrink-0"
+        />
+      </Card>
     </div>
   );
 }

@@ -47,7 +47,7 @@ export default function DurationPicker({ value, onChange }: DurationPickerProps)
         onChange={(e) => onChange(fromSlider(Number(e.target.value)))}
         className="
           h-2 w-full cursor-pointer appearance-none rounded-lg
-          bg-slate-700 
+          bg-white/10
 
           [&::-moz-range-thumb]:size-6
           [&::-moz-range-thumb]:cursor-pointer
@@ -69,13 +69,13 @@ export default function DurationPicker({ value, onChange }: DurationPickerProps)
       />
 
       {/* Scale markers */}
-      <div className="flex justify-between text-xs text-slate-500">
+      <Text as="div" variant="tertiary" size="xs" className="flex justify-between">
         <span>5 min</span>
         <span>30 min</span>
         <span>2h</span>
         <span>6h</span>
         <span>12h</span>
-      </div>
+      </Text>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import InfoBox from '@/app/components/ui/InfoBox';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Text from '@/app/components/ui/Text';
 import { formatUptime } from '../utils/formatUptime';
+import { Clock, Router, Wrench } from 'lucide-react';
 
 interface SystemInfoData {
   model: string;
@@ -53,11 +54,11 @@ export default function SystemInfoCard({ data, loading, stale }: SystemInfoCardP
     <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Text variant="label" size="sm" className="tracking-wide text-slate-400 uppercase">
+        <Text variant="label" size="sm">
           Sistema Fritz!Box
         </Text>
         {stale && (
-          <Text variant="label" size="xs" className="text-slate-500">
+          <Text variant="label" size="xs">
             Dati non aggiornati
           </Text>
         )}
@@ -66,19 +67,19 @@ export default function SystemInfoCard({ data, loading, stale }: SystemInfoCardP
       {/* Info grid */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <InfoBox
-          icon="📡"
+          icon={<Router size={18} />}
           label="Modello"
           value={data.model}
           variant="neutral"
         />
         <InfoBox
-          icon="🔧"
+          icon={<Wrench size={18} />}
           label="Firmware"
           value={data.firmware_version}
           variant={data.update_available.length > 0 ? 'warning' : 'neutral'}
         />
         <InfoBox
-          icon="🕒"
+          icon={<Clock size={18} />}
           label="Uptime"
           value={formatUptime(data.device_uptime_seconds)}
           variant="sage"
@@ -91,7 +92,7 @@ export default function SystemInfoCard({ data, loading, stale }: SystemInfoCardP
           <Badge variant="ocean" size="sm">
             Aggiornamento disponibile
           </Badge>
-          <Text variant="label" size="xs" className="text-slate-400">
+          <Text variant="label" size="xs">
             {data.update_available}
           </Text>
         </div>

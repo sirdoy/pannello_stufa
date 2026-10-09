@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AlertTriangle, Check, CircleCheck } from 'lucide-react';
 import { getRecentErrors, resolveError, type ErrorEntry } from '@/lib/errorMonitor';
 import { Card, Button, Pagination, Skeleton, Badge } from '@/app/components/ui';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
@@ -107,7 +108,7 @@ export default function ErrorsPage() {
             Tutti ({errors.length})
           </Button>
           <Button
-            variant={filter === 'active' ? 'ember' : 'outline'}
+            variant={filter === 'active' ? 'ember' : 'ghost'}
             size="sm"
             onClick={() => { setFilter('active'); setCurrentPage(0); }}
           >
@@ -128,7 +129,7 @@ export default function ErrorsPage() {
       <div className="space-y-4">
         {paginatedErrors.length === 0 ? (
           <Card variant="glass" className="p-12 text-center">
-            <span className="mb-4 block text-6xl">✅</span>
+            <CircleCheck size={40} className="mx-auto mb-4 text-sage-400" aria-hidden="true" />
             <Heading level={2} size="xl" className="mb-2">
               Nessun errore trovato
             </Heading>
@@ -149,7 +150,7 @@ export default function ErrorsPage() {
                 />
 
                 {/* Metadata */}
-                <div className="grid grid-cols-1 gap-4 border-t border-slate-700 pt-4 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 border-t border-white/8 pt-4 md:grid-cols-3">
                   <div>
                     <Text variant="tertiary" size="xs" className="mb-1">Data e Ora</Text>
                     <Text size="sm">
@@ -170,9 +171,9 @@ export default function ErrorsPage() {
                     <Text variant="tertiary" size="xs" className="mb-1">Stato</Text>
                     <div className="flex items-center gap-2">
                       {error.resolved ? (
-                        <Badge variant="sage" size="sm" icon="✓">Risolto</Badge>
+                        <Badge variant="sage" size="sm" icon={<Check size={12} />}>Risolto</Badge>
                       ) : (
-                        <Badge variant="warning" size="sm" icon="⚠">Attivo</Badge>
+                        <Badge variant="warning" size="sm" icon={<AlertTriangle size={12} />}>Attivo</Badge>
                       )}
                     </div>
                   </div>
@@ -189,11 +190,11 @@ export default function ErrorsPage() {
 
                 {/* Actions */}
                 {!error.resolved && (
-                  <div className="border-t border-slate-700 pt-4">
+                  <div className="border-t border-white/8 pt-4">
                     <Button
                       variant="success"
                       size="sm"
-                      icon="✓"
+                      icon={<Check size={16} />}
                       onClick={() => handleResolve(error.id)}
                     >
                       Segna come Risolto

@@ -107,13 +107,13 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
           {/* Time header (inside scrollable area) */}
           <div className="mb-2 flex items-center">
             <div className="w-12 shrink-0" /> {/* Spacer for day labels */}
-            <div className="flex flex-1 justify-between px-1 text-xs text-slate-500">
+            <Text as="div" variant="tertiary" size="xs" className="flex flex-1 justify-between px-1">
               <span>00:00</span>
               <span>06:00</span>
               <span>12:00</span>
               <span>18:00</span>
               <span>24:00</span>
-            </div>
+            </Text>
           </div>
 
           {DAY_NAMES.map((dayName, dayIndex) => (
@@ -134,7 +134,7 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
                 {gridLines.map(pos => (
                   <div
                     key={pos}
-                    className="pointer-events-none absolute inset-y-0 z-10 w-px bg-slate-600/30"
+                    className="pointer-events-none absolute inset-y-0 z-10 w-px bg-white/8"
                     style={{ left: `${pos}%` }}
                   />
                 ))}
@@ -151,7 +151,7 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
                 )}
 
                 {/* Slots container */}
-                <div className="flex overflow-hidden rounded-lg bg-slate-800/30 shadow-inner">
+                <div className="flex overflow-hidden rounded-lg bg-white/4">
                   {(slotsByDay[dayIndex]?.length ?? 0) > 0 ? (
                     slotsByDay[dayIndex]?.map((slot, slotIndex) => (
                       <TimelineSlot
@@ -164,7 +164,7 @@ export default function WeeklyTimeline({ schedule, className = '' }: WeeklyTimel
                       />
                     ))
                   ) : (
-                    <div className="flex h-12 flex-1 items-center justify-center bg-slate-700/50">
+                    <div className="flex h-12 flex-1 items-center justify-center bg-white/6">
                       <Text variant="tertiary" size="xs">Nessun dato</Text>
                     </div>
                   )}

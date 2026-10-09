@@ -169,7 +169,7 @@ export default function ScheduleManagementModal({
           {/* Active Schedule Section */}
           {activeSchedule && (
             <div className="mb-6">
-              <Text as="h4" variant="tertiary" size="sm" className="mb-3 tracking-wider uppercase">
+              <Text as="h4" variant="label" size="sm" className="mb-3">
                 Pianificazione Attiva
               </Text>
               <div className="rounded-2xl border-2 border-sage-700/50 bg-sage-950/30 p-4 ">
@@ -227,15 +227,12 @@ export default function ScheduleManagementModal({
           {/* Inactive Schedules Section */}
           {inactiveSchedules.length > 0 && (
             <div>
-              <Text as="h4" variant="tertiary" size="sm" className="mb-3 tracking-wider uppercase">
+              <Text as="h4" variant="label" size="sm" className="mb-3">
                 Altre Pianificazioni
               </Text>
               <div className="space-y-3">
                 {inactiveSchedules.map((schedule) => (
-                  <div
-                    key={schedule.id}
-                    className="rounded-2xl border border-slate-600/40 bg-slate-800/60 p-4 backdrop-blur-xl "
-                  >
+                  <Card key={schedule.id} variant="subtle" padding={false} className="p-4">
                     {editingId === schedule.id ? (
                       <div className="space-y-2">
                         <Input
@@ -267,7 +264,7 @@ export default function ScheduleManagementModal({
                     ) : (
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex min-w-0 flex-1 items-center gap-3">
-                          <div className="size-3 rounded-full bg-slate-500 " />
+                          <div className="size-3 rounded-full bg-white/20" />
                           <Text as="span" className="truncate">
                             {schedule.name}
                           </Text>
@@ -300,7 +297,7 @@ export default function ScheduleManagementModal({
                         </div>
                       </div>
                     )}
-                  </div>
+                  </Card>
                 ))}
               </div>
             </div>

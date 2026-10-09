@@ -19,8 +19,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { PageLayout, Skeleton } from '@/app/components/ui';
-import { cn } from '@/lib/utils/cn';
+import { Button, Card, PageLayout, Skeleton } from '@/app/components/ui';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 import { useBandwidthHistory } from './hooks/useBandwidthHistory';
 import { useDeviceHistory } from './hooks/useDeviceHistory';
@@ -51,9 +50,9 @@ const BandwidthChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-95 items-center justify-center rounded-2xl bg-slate-800/30 p-6">
+      <Card variant="elevated" className="flex h-95 items-center justify-center p-4 sm:p-6">
         <Skeleton className="size-full rounded-xl" />
-      </div>
+      </Card>
     ),
   }
 );
@@ -63,9 +62,9 @@ const BandwidthCorrelationChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-90 items-center justify-center rounded-2xl bg-slate-800/30 p-6">
+      <Card variant="elevated" className="flex h-90 items-center justify-center p-4 sm:p-6">
         <Skeleton className="size-full rounded-xl" />
-      </div>
+      </Card>
     ),
   }
 );
@@ -74,9 +73,9 @@ const DeviceCountChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-80 items-center justify-center rounded-2xl bg-slate-800/30 p-6">
+      <Card variant="elevated" className="flex h-80 items-center justify-center p-4 sm:p-6">
         <Skeleton className="size-full rounded-xl" />
-      </div>
+      </Card>
     ),
   }
 );
@@ -207,7 +206,7 @@ export default function NetworkPage() {
         <BudgetStatsCard data={budgetStats.data} loading={budgetStats.loading} error={budgetStats.error} />
 
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-1 border-b border-white/6 pb-0">
+        <Button.Group>
           {([
             { key: 'dispositivi' as const, label: 'Dispositivi' },
             { key: 'wifi' as const, label: 'WiFi Clients' },
@@ -215,20 +214,16 @@ export default function NetworkPage() {
             { key: 'reti-wifi' as const, label: 'Reti WiFi' },
             { key: 'storico' as const, label: 'Storico grezzo' },
           ]).map((tab) => (
-            <button
+            <Button
               key={tab.key}
+              variant={activeTab === tab.key ? 'ember' : 'subtle'}
+              size="sm"
               onClick={() => setActiveTab(tab.key)}
-              className={cn(
-                '-mb-px border-b-2 px-4 py-2 text-sm font-medium transition-colors',
-                activeTab === tab.key
-                  ? 'border-ember-400 text-ember-400'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
-              )}
             >
               {tab.label}
-            </button>
+            </Button>
           ))}
-        </div>
+        </Button.Group>
 
         {/* Tab Content */}
         {activeTab === 'dispositivi' && (

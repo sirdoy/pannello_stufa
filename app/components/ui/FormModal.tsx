@@ -156,7 +156,7 @@ function SuccessOverlay({ message }: { message?: string }) {
       className={cn(
         'absolute inset-0 z-10',
         'flex flex-col items-center justify-center',
-        'bg-slate-900/95 backdrop-blur-sm',
+        'bg-(--surface-solid) backdrop-blur-xl',
         'rounded-3xl',
         'animate-fade-in'
       )}
@@ -172,7 +172,7 @@ function SuccessOverlay({ message }: { message?: string }) {
         <Check className="size-8 text-sage-400" />
       </div>
       {message && (
-        <p className="mt-4 text-lg font-semibold text-slate-200">
+        <p className="mt-4 text-lg font-semibold text-(--text-1)">
           {message}
         </p>
       )}

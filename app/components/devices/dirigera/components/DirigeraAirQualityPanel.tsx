@@ -1,3 +1,6 @@
+import Badge from '@/app/components/ui/Badge';
+import Card from '@/app/components/ui/Card';
+import Text from '@/app/components/ui/Text';
 import type { DirigeraSensor } from '@/types/dirigeraProxy';
 import {
   AIR_LEVEL_LABELS,
@@ -18,10 +21,10 @@ const LEVEL_TEXT: Record<AirLevel, string> = {
   poor: 'text-danger-400',
 };
 
-const LEVEL_BADGE: Record<AirLevel, string> = {
-  good: 'bg-success-500/20 text-success-400',
-  fair: 'bg-warning-500/20 text-warning-400',
-  poor: 'bg-danger-500/20 text-danger-400',
+const LEVEL_BADGE: Record<AirLevel, 'sage' | 'warning' | 'danger'> = {
+  good: 'sage',
+  fair: 'warning',
+  poor: 'danger',
 };
 
 interface DirigeraAirQualityPanelProps {
@@ -44,25 +47,25 @@ export default function DirigeraAirQualityPanel({ sensors }: DirigeraAirQualityP
         const co2 = co2Level(s.co2);
         const pm25 = pm25Level(s.pm25);
         return (
-          <div key={s.id} className="rounded-2xl bg-slate-800/50 p-4">
+          <Card key={s.id}>
             <div className="mb-3 flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium">
+                <Text size="sm" weight="medium" className="truncate">
                   {s.custom_name ?? s.id}
-                </p>
-                <p className="truncate text-xs text-slate-400">
+                </Text>
+                <Text variant="secondary" size="xs" className="truncate">
                   Qualità dell&apos;aria · {s.room ?? 'Nessuna stanza'}
-                </p>
+                </Text>
               </div>
               {!s.is_reachable ? (
-                <span className="rounded-full bg-danger-500/20 px-2 py-0.5 text-xs text-danger-400">
+                <Badge variant="danger" size="sm">
                   Offline
-                </span>
+                </Badge>
               ) : (
                 overall && (
-                  <span className={`rounded-full px-2 py-0.5 text-xs ${LEVEL_BADGE[overall]}`}>
+                  <Badge variant={LEVEL_BADGE[overall]} size="sm">
                     {AIR_LEVEL_LABELS[overall]}
-                  </span>
+                  </Badge>
                 )
               )}
             </div>
@@ -72,7 +75,7 @@ export default function DirigeraAirQualityPanel({ sensors }: DirigeraAirQualityP
               <Reading label="Temperatura" value={formatTemperature(s.temperature)} />
               <Reading label="Umidità" value={formatHumidity(s.humidity)} />
             </dl>
-          </div>
+          </Card>
         );
       })}
     </div>
@@ -82,7 +85,7 @@ export default function DirigeraAirQualityPanel({ sensors }: DirigeraAirQualityP
 function Reading({ label, value, className = '' }: { label: string; value: string; className?: string }) {
   return (
     <div>
-      <dt className="text-xs text-slate-400">{label}</dt>
+      <Text as="dt" variant="secondary" size="xs">{label}</Text>
       <dd className={`text-lg font-semibold tabular-nums ${className}`}>{value}</dd>
     </div>
   );

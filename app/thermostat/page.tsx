@@ -9,7 +9,7 @@ import BatteryWarning, { ModuleBatteryList } from '@/app/components/devices/ther
 import type { Module } from '@/app/components/devices/thermostat/BatteryWarning';
 import ThermostatTabs from './components/ThermostatTabs';
 import { NETATMO_ROUTES } from '@/lib/routes';
-import { Calendar, Clock } from 'lucide-react';
+import { AlarmClock, Calendar, Clock, DoorOpen, Pause, RefreshCw, Snowflake, House, Router } from 'lucide-react';
 import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 import type { NetatmoRoom, NetatmoModule } from '@/app/components/devices/thermostat/hooks/useThermostatData';
 
@@ -120,7 +120,7 @@ function NetatmoContent() {
           <Banner variant="error">{error}</Banner>
 
           {/* Helpful troubleshooting info */}
-          <Banner variant="info" icon="💡" title="Suggerimenti:" className="mt-6">
+          <Banner variant="info" title="Suggerimenti:" className="mt-6">
             <ul className="mt-2 ml-1 space-y-1">
               <Text as="li" size="sm">Verifica di aver completato l&apos;autenticazione Netatmo</Text>
               <Text as="li" size="sm">Controlla che il tuo account Netatmo sia attivo</Text>
@@ -130,8 +130,8 @@ function NetatmoContent() {
           </Banner>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button variant="ember" onClick={() => refetch()}>
-              🔄 Riprova
+            <Button variant="ember" icon={<RefreshCw size={16} />} onClick={() => refetch()}>
+              Riprova
             </Button>
           </div>
         </Card>
@@ -242,22 +242,22 @@ function NetatmoContent() {
   const modeConfig = {
     schedule: {
       label: 'Programmato',
-      icon: '\u23F0',
+      Icon: AlarmClock,
       colorScheme: 'sage' as const,
     },
     away: {
       label: 'Assenza',
-      icon: '\uD83C\uDFC3',
+      Icon: DoorOpen,
       colorScheme: 'warning' as const,
     },
     hg: {
       label: 'Antigelo',
-      icon: '\u2744\uFE0F',
+      Icon: Snowflake,
       colorScheme: 'ocean' as const,
     },
     off: {
       label: 'Off',
-      icon: '\u23F8\uFE0F',
+      Icon: Pause,
       colorScheme: 'slate' as const,
     },
   };
@@ -312,9 +312,9 @@ function NetatmoContent() {
                         colorScheme={config.colorScheme}
                         onClick={() => handleModeChange(targetMode)}
                         size="sm"
+                        icon={<config.Icon size={16} />}
                       >
-                        <span>{config.icon}</span>
-                        <span>{config.label}</span>
+                        {config.label}
                       </Button>
                     );
                   })}
@@ -355,19 +355,19 @@ function NetatmoContent() {
             <Card variant="glass" className="p-5 sm:p-6">
               <Grid cols={3} gap="sm" className="md:grid-cols-3">
                 <InfoBox
-                  icon="🏠"
+                  icon={<House size={18} />}
                   label="Casa"
                   value={topology.home_name}
                   variant="neutral"
                 />
                 <InfoBox
-                  icon="🚪"
+                  icon={<DoorOpen size={18} />}
                   label="Stanze"
                   value={roomsWithStatus.length}
                   variant="neutral"
                 />
                 <InfoBox
-                  icon="📡"
+                  icon={<Router size={18} />}
                   label="Moduli"
                   value={filteredModulesCount}
                   variant="neutral"
@@ -376,12 +376,12 @@ function NetatmoContent() {
 
               {/* Module Battery Status List */}
               {modulesWithBattery && modulesWithBattery.length > 0 && (
-                <div className="mt-4 border-t border-slate-700/50 pt-4">
+                <div className="mt-4 border-t border-white/8 pt-4">
                   <ModuleBatteryList modules={modulesWithBattery as Module[]} />
                 </div>
               )}
 
-              <div className="mt-4 border-t border-slate-700/50 pt-4">
+              <div className="mt-4 border-t border-white/8 pt-4">
                 <Button
                   variant="subtle"
                   onClick={handleRefresh}
@@ -421,7 +421,7 @@ function NetatmoContent() {
         historyContent={
           <Card variant="glass" className="p-8 text-center">
             <div className="flex flex-col items-center gap-4">
-              <Clock className="size-12 text-slate-400" />
+              <Clock className="size-12 text-(--text-2)" />
               <Heading level={3} size="lg">
                 Storico Temperature
               </Heading>

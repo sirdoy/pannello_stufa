@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronDown, Plus, Check } from 'lucide-react';
+import { CalendarDays, ChevronDown, Plus, Check } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/Popover';
 import Button from '../ui/Button';
+import Card from '../ui/Card';
 import Text from '../ui/Text';
 import { cn } from '@/lib/utils/cn';
 
@@ -51,22 +52,13 @@ export default function ScheduleSelector({
         <button
           disabled={loading}
           className={cn(
-            // Base styles matching design system Select trigger
+            // Custom popover trigger (two-line row): same glass surface as Button subtle
             'flex w-full cursor-pointer items-center justify-between rounded-xl font-display font-medium',
-            'border border-slate-700/50 bg-slate-800/60 backdrop-blur-xl',
-            'text-slate-100',
-            'transition-all duration-200',
-            // Focus ring - ember glow
+            'border-[0.5px] border-white/14 bg-white/6 text-(--text-1)',
+            'transition-colors duration-200',
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
-            'focus-visible:border-ember-500/60',
-            // Hover
-            'hover:border-slate-600/60 hover:bg-slate-800/80',
-            // Disabled
+            'hover:bg-white/10',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            // Light mode
-            ' ',
-            ' ',
-            // Size - matching Select md
             'min-h-14 p-4'
           )}
         >
@@ -74,10 +66,10 @@ export default function ScheduleSelector({
           <div className="flex flex-1 items-center gap-3 text-left">
             <div className="shadow-sage-glow-sm size-2 shrink-0 animate-pulse rounded-full bg-sage-500" />
             <div className="min-w-0 flex-1">
-              <Text variant="tertiary" size="xs">
+              <Text as="span" variant="tertiary" size="xs" className="block">
                 Pianificazione Attiva
               </Text>
-              <Text className="truncate">
+              <Text as="span" className="block truncate">
                 {loading ? 'Caricamento...' : activeSchedule?.name || 'Nessuna'}
               </Text>
             </div>
@@ -86,7 +78,7 @@ export default function ScheduleSelector({
           {/* Right: Dropdown Icon */}
           <ChevronDown
             className={cn(
-              'ml-2 size-5 shrink-0 text-slate-400 transition-transform duration-200',
+              'ml-2 size-5 shrink-0 text-(--text-2) transition-transform duration-200',
               isOpen && 'rotate-180'
             )}
           />
@@ -102,20 +94,20 @@ export default function ScheduleSelector({
           /* No Schedules - Migration Required */
           <div className="p-4">
             <div className="py-4 text-center">
-              <div className="mb-3 text-3xl">📅</div>
+              <CalendarDays size={28} className="mx-auto mb-3 text-(--text-2)" aria-hidden="true" />
               <Text size="sm" variant="secondary" className="mb-2">
                 Nessuna pianificazione trovata
               </Text>
               <Text variant="tertiary" size="xs" className="mb-4">
                 Esegui la migrazione per creare la struttura v2
               </Text>
-              <div className="rounded-xl bg-slate-700/40 p-3 text-left ">
-                <Text as="code" size="xs" className="block font-mono">
+              <Card variant="subtle" padding={false} className="p-3 text-left">
+                <Text as="code" size="xs" mono className="block">
                   npm run migrate:schedules
                 </Text>
-              </div>
+              </Card>
             </div>
-            <div className="mt-3 border-t border-slate-700/50 pt-3 ">
+            <div className="mt-3 border-t border-white/8 pt-3">
               <Button
                 variant="ember"
                 size="sm"
@@ -130,8 +122,8 @@ export default function ScheduleSelector({
         ) : (
           <>
             {/* Active Schedule Section */}
-            <div className="border-b border-slate-700/50 p-3 ">
-              <Text as="div" variant="tertiary" size="xs" className="mb-2 px-2 tracking-wider uppercase">
+            <div className="border-b border-white/8 p-3">
+              <Text as="div" variant="label" className="mb-2 px-2">
                 Attiva
               </Text>
               <div className="flex items-center gap-3 rounded-xl bg-sage-950/30 px-3 py-2 ">
@@ -145,8 +137,8 @@ export default function ScheduleSelector({
 
             {/* Other Schedules Section */}
             {otherSchedules.length > 0 && (
-              <div className="border-b border-slate-700/50 p-3 ">
-                <Text as="div" variant="tertiary" size="xs" className="mb-2 px-2 tracking-wider uppercase">
+              <div className="border-b border-white/8 p-3">
+                <Text as="div" variant="label" className="mb-2 px-2">
                   Disponibili
                 </Text>
                 <div className="space-y-1">
@@ -157,20 +149,18 @@ export default function ScheduleSelector({
                       className={cn(
                         'group flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left',
                         'transition-colors duration-150',
-                        'hover:bg-slate-700/50 '
+                        'hover:bg-white/6'
                       )}
                     >
                       <div className={cn(
                         'size-2 shrink-0 rounded-full transition-colors',
-                        'bg-slate-600 group-hover:bg-ember-500',
-                        ' '
+                        'bg-white/20 group-hover:bg-ember-500'
                       )} />
                       <Text
                         as="div"
                         size="sm"
-                       
                         variant="secondary"
-                        className="flex-1 group-hover:text-slate-100 "
+                        className="flex-1 group-hover:text-(--text-1)"
                       >
                         {schedule.name}
                       </Text>

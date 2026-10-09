@@ -68,39 +68,34 @@ describe('ControlButton Component', () => {
       jest.useRealTimers();
     });
 
-    test('ember variant renders with gradient classes', () => {
+    test('ember variant renders the flat accent', () => {
       render(<ControlButton variant="ember" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-ember-500');
+      expect(button).toHaveClass('bg-(--accent)');
     });
 
-    test('ocean variant renders with ocean gradient', () => {
+    test('ocean variant renders the ocean tint', () => {
       render(<ControlButton variant="ocean" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-ocean-500');
+      expect(button).toHaveClass('bg-ocean-500/20');
     });
 
-    test('sage variant renders with sage gradient', () => {
+    test('sage variant renders the sage tint', () => {
       render(<ControlButton variant="sage" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-sage-500');
+      expect(button).toHaveClass('bg-sage-500/20');
     });
 
-    test('warning variant renders with warning gradient', () => {
+    test('warning variant renders the warning tint', () => {
       render(<ControlButton variant="warning" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-warning-500');
+      expect(button).toHaveClass('bg-warning-500/20');
     });
 
-    test('danger variant renders with danger gradient', () => {
+    test('danger variant renders the danger tint', () => {
       render(<ControlButton variant="danger" onChange={() => {}} />);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-danger-500');
+      expect(button).toHaveClass('bg-danger-500/20');
     });
 
     test('subtle variant renders with glass effect', () => {
@@ -359,7 +354,7 @@ describe('ControlButton Component', () => {
     test('controlButtonVariants returns class string', () => {
       const classes = controlButtonVariants({ variant: 'ember', size: 'md' });
       expect(typeof classes).toBe('string');
-      expect(classes).toContain('from-ember-500');
+      expect(classes).toContain('bg-(--accent)');
     });
   });
 });

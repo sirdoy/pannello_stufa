@@ -7,7 +7,7 @@ import DeviceStatusBadge from './DeviceStatusBadge';
 import DeviceCategoryBadge from './DeviceCategoryBadge';
 import type { DeviceData } from '@/app/components/devices/network/types';
 import type { DeviceCategory } from '@/types/firebase/network';
-import { Card, Heading, Badge } from '@/app/components/ui';
+import { Button, Card, Heading, Badge, Text } from '@/app/components/ui';
 
 interface DeviceListTableProps {
   devices: DeviceData[];
@@ -56,7 +56,7 @@ function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: Devic
       enableSorting: true,
       enableGlobalFilter: true,
       cell: ({ row }) => (
-        <span className="font-mono text-sm text-slate-400">{row.original.ip}</span>
+        <Text as="span" variant="secondary" size="sm" mono>{row.original.ip}</Text>
       ),
     },
     {
@@ -65,7 +65,7 @@ function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: Devic
       enableSorting: true,
       enableGlobalFilter: true,
       cell: ({ row }) => (
-        <span className="font-mono text-xs text-slate-500">{row.original.mac}</span>
+        <Text as="span" variant="secondary" size="xs" mono>{row.original.mac}</Text>
       ),
     },
     {
@@ -88,7 +88,7 @@ function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: Devic
               }}
               onBlur={() => setEditingMac(null)}
               autoFocus
-              className="rounded border border-white/10 bg-slate-800 px-2 py-1 text-xs text-slate-200 focus:border-ember-400 focus:outline-none"
+              className="rounded-lg border border-white/8 bg-(--color-slate-900) px-2 py-1 text-xs text-(--text-1) focus:border-ember-400 focus:outline-none"
             >
               <option value="iot">IoT</option>
               <option value="mobile">Mobile</option>
@@ -134,9 +134,9 @@ function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: Devic
       cell: ({ row }) => {
         const bandwidth = row.original.bandwidth;
         if (!bandwidth || bandwidth === 0) {
-          return <span className="text-slate-500">-</span>;
+          return <Text as="span" variant="tertiary" size="sm">-</Text>;
         }
-        return <span className="text-slate-300">{bandwidth.toFixed(1)} Mbps</span>;
+        return <Text as="span" variant="secondary" size="sm">{bandwidth.toFixed(1)} Mbps</Text>;
       },
     },
   ];
@@ -170,38 +170,29 @@ function DeviceListTable({ devices, isStale: _isStale, onCategoryChange }: Devic
       </div>
 
       {/* Status filter tabs */}
-      <div className="flex gap-4 border-b border-white/6 pb-2">
-        <button
+      <Button.Group>
+        <Button
+          variant={statusFilter === 'all' ? 'ember' : 'subtle'}
+          size="sm"
           onClick={() => setStatusFilter('all')}
-          className={`pb-2 text-sm font-medium transition-colors ${
-            statusFilter === 'all'
-              ? 'border-b-2 border-ember-400 text-ember-400'
-              : 'text-slate-400 hover:text-slate-300'
-          }`}
         >
           Tutti ({devices.length})
-        </button>
-        <button
+        </Button>
+        <Button
+          variant={statusFilter === 'online' ? 'ember' : 'subtle'}
+          size="sm"
           onClick={() => setStatusFilter('online')}
-          className={`pb-2 text-sm font-medium transition-colors ${
-            statusFilter === 'online'
-              ? 'border-b-2 border-ember-400 text-ember-400'
-              : 'text-slate-400 hover:text-slate-300'
-          }`}
         >
           Online ({onlineCount})
-        </button>
-        <button
+        </Button>
+        <Button
+          variant={statusFilter === 'offline' ? 'ember' : 'subtle'}
+          size="sm"
           onClick={() => setStatusFilter('offline')}
-          className={`pb-2 text-sm font-medium transition-colors ${
-            statusFilter === 'offline'
-              ? 'border-b-2 border-ember-400 text-ember-400'
-              : 'text-slate-400 hover:text-slate-300'
-          }`}
         >
           Offline ({offlineCount})
-        </button>
-      </div>
+        </Button>
+      </Button.Group>
 
       {/* DataTable */}
       <DataTable

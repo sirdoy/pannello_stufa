@@ -44,16 +44,16 @@ describe('ProgressBar Component', () => {
     test('renders primary color by default', () => {
       const { container } = render(<ProgressBar value={50} />);
       const bar = container.querySelector('[role="progressbar"]');
-      expect(bar).toHaveClass('from-ember-400');
+      expect(bar).toHaveClass('bg-(--accent)');
     });
 
     test('renders success color', () => {
       const { container } = render(<ProgressBar value={50} color="success" />);
       const bar = container.querySelector('[role="progressbar"]');
-      expect(bar).toHaveClass('from-sage-400');
+      expect(bar).toHaveClass('bg-sage-400');
     });
 
-    test('renders custom gradient', () => {
+    test('renders custom fill classes', () => {
       const { container } = render(
         <ProgressBar value={50} gradient="from-red-400 to-orange-500" />
       );

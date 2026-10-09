@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card } from '@/app/components/ui';
+import { Link2 } from 'lucide-react';
+import { Card, Text } from '@/app/components/ui';
 
 export default function NetatmoAuthorizedPage() {
   const router = useRouter();
@@ -14,12 +15,12 @@ export default function NetatmoAuthorizedPage() {
         // Wait a moment for callback to finish processing
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        setStatus('✅ Connesso con successo! Reindirizzamento...');
+        setStatus('Connesso con successo! Reindirizzamento...');
         await new Promise(resolve => setTimeout(resolve, 1000));
         router.replace('/netatmo');
       } catch (err) {
         console.error('Error during redirect:', err);
-        setStatus('❌ Errore. Reindirizzamento...');
+        setStatus('Errore. Reindirizzamento...');
         await new Promise(resolve => setTimeout(resolve, 2000));
         router.replace('/netatmo');
       }
@@ -32,11 +33,11 @@ export default function NetatmoAuthorizedPage() {
     <div className="mx-auto max-w-2xl px-4 py-16">
       <Card className="p-12 text-center">
         <div className="mb-6">
-          <div className="mx-auto flex size-16 animate-pulse items-center justify-center rounded-full bg-linear-to-br from-ocean-100 to-ocean-200">
-            <span className="text-3xl">🔗</span>
+          <div className="mx-auto flex size-16 animate-pulse items-center justify-center rounded-full bg-white/6">
+            <Link2 size={28} className="text-(--text-2)" aria-hidden="true" />
           </div>
         </div>
-        <p className="text-lg font-medium text-slate-100">{status}</p>
+        <Text size="lg" weight="medium">{status}</Text>
       </Card>
     </div>
   );

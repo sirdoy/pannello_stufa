@@ -11,7 +11,7 @@ import Select from '../ui/Select';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
-import { X } from 'lucide-react';
+import { AlertTriangle, Pencil, Plus, X } from 'lucide-react';
 import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/scheduler/schedulerStats';
 import type { ScheduleInterval } from '@/lib/scheduler/schedulerService';
 
@@ -156,7 +156,7 @@ export default function AddIntervalModal({
             size="xl"
             className="flex items-center gap-2"
           >
-            <span>{mode === 'edit' ? '✏️' : '➕'}</span>
+            {mode === 'edit' ? <Pencil size={18} aria-hidden="true" /> : <Plus size={18} aria-hidden="true" />}
             <span>{mode === 'edit' ? 'Modifica' : 'Aggiungi'} Intervallo - {day}</span>
           </Heading>
           <ActionButton
@@ -173,7 +173,7 @@ export default function AddIntervalModal({
           {/* Start Time */}
           <Input
             type="time"
-            label="⏰ Ora inizio"
+            label="Ora inizio"
             value={start}
             onChange={(e) => setStart(e.target.value)}
           />
@@ -186,10 +186,10 @@ export default function AddIntervalModal({
             <Tabs value={inputMode} onValueChange={(value) => setInputMode(value as 'duration' | 'endTime')} className="w-full">
               <TabsList className="w-full">
                 <TabsTrigger value="duration" className="flex-1">
-                  ⏱️ Durata
+                  Durata
                 </TabsTrigger>
                 <TabsTrigger value="endTime" className="flex-1">
-                  ⏰ Ora Fine
+                  Ora Fine
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -200,7 +200,6 @@ export default function AddIntervalModal({
             <>
               <Select
                 label="Durata"
-                icon="⏱️"
                 value={durationPreset}
                 onChange={(e) => setDurationPreset(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
                 options={DURATION_PRESETS.map(preset => ({
@@ -229,26 +228,27 @@ export default function AddIntervalModal({
           {inputMode === 'endTime' && (
             <Input
               type="time"
-              label="⏰ Ora fine"
+              label="Ora fine"
               value={end}
               onChange={(e) => setEnd(e.target.value)}
             />
           )}
 
           {/* End Time Preview */}
-          <div className="rounded-xl bg-slate-800/50 p-4">
+          <Card variant="subtle" padding={false} className="p-4">
             <Text variant="secondary" size="sm" className="mb-1">
               {inputMode === 'duration' ? 'Orario fine calcolato:' : 'Orario fine selezionato:'}
             </Text>
             <Text size="xl" className="text-2xl">{calculatedEnd}</Text>
             {!isValidInterval() && (
-              <Text variant="danger" size="sm" className="mt-2">
-                ⚠️ {durationPreset === 'custom' && customMinutes < 15
+              <Text variant="danger" size="sm" className="mt-2 flex items-center gap-1.5">
+                <AlertTriangle size={16} className="shrink-0" aria-hidden="true" />
+                {durationPreset === 'custom' && customMinutes < 15
                   ? 'Durata minima: 15 minuti'
                   : 'L\'intervallo non può attraversare la mezzanotte'}
               </Text>
             )}
-          </div>
+          </Card>
 
           {/* Power & Fan */}
           <div className="grid grid-cols-2 gap-4">
@@ -263,7 +263,6 @@ export default function AddIntervalModal({
               </div>
               <Select
                 label="Potenza"
-                icon="⚡"
                 value={power}
                 onChange={(e) => setPower(Number(e.target.value))}
                 options={powerOptions.map(p => ({
@@ -285,7 +284,6 @@ export default function AddIntervalModal({
               </div>
               <Select
                 label="Ventola"
-                icon="💨"
                 value={fan}
                 onChange={(e) => setFan(Number(e.target.value))}
                 options={fanOptions.map(f => ({

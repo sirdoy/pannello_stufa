@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { Check, Clock, Construction, Drama, Home, Hourglass, Lightbulb, Palette, RefreshCw, Smartphone, Sunrise } from 'lucide-react';
 import { Card, Button, Heading, Text } from '@/app/components/ui';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
@@ -13,32 +14,32 @@ export default function AutomationPage() {
 
   const futureFeatures = [
     {
-      icon: '⏰',
+      icon: Clock,
       title: 'Automazioni Temporizzate',
       description: 'Accendi e spegni le luci automaticamente in base all\'ora del giorno'
     },
     {
-      icon: '🌅',
+      icon: Sunrise,
       title: 'Alba e Tramonto',
       description: 'Regola le luci in base ai tempi di alba e tramonto della tua posizione'
     },
     {
-      icon: '🏠',
+      icon: Home,
       title: 'Presenza',
       description: 'Automazioni basate sulla presenza in casa (geofencing)'
     },
     {
-      icon: '🎭',
+      icon: Drama,
       title: 'Scene Dinamiche',
       description: 'Cambia automaticamente scene in base al momento della giornata'
     },
     {
-      icon: '📱',
+      icon: Smartphone,
       title: 'Integrazione Sensori',
       description: 'Automazioni basate su sensori di movimento e luce'
     },
     {
-      icon: '🔄',
+      icon: RefreshCw,
       title: 'Routine',
       description: 'Crea routine complesse con più azioni in sequenza'
     },
@@ -53,9 +54,9 @@ export default function AutomationPage() {
       />
 
       {/* Coming Soon Notice */}
-      <Card className="mb-8 border-2 border-ocean-300 border-ocean-700 bg-linear-to-br from-ocean-50 from-ocean-900/20 to-ocean-100 to-ocean-800/20 p-8">
+      <Card className="mb-8 p-8">
         <div className="flex flex-col items-center text-center">
-          <div className="mb-4 text-6xl">🚧</div>
+          <Construction size={32} className="mb-4 text-warning-400" aria-hidden="true" />
           <Heading level={2} size="lg" className="mb-2">
             Funzionalità in Arrivo - Fase 2
           </Heading>
@@ -66,14 +67,16 @@ export default function AutomationPage() {
             <Button
               variant="ember"
               onClick={() => router.push('/lights')}
+              icon={<Lightbulb size={16} />}
             >
-              💡 Controlla Luci
+              Controlla Luci
             </Button>
             <Button
               variant="outline"
               onClick={() => router.push('/lights/scenes')}
+              icon={<Palette size={16} />}
             >
-              🎨 Vedi Scene
+              Vedi Scene
             </Button>
           </div>
         </div>
@@ -90,7 +93,7 @@ export default function AutomationPage() {
               key={index}
               className="p-6 opacity-60 transition-opacity hover:opacity-100"
             >
-              <div className="mb-3 text-4xl">{feature.icon}</div>
+              <feature.icon size={24} className="mb-3 text-(--text-2)" aria-hidden="true" />
               <Heading level={3} size="sm" className="mb-2">
                 {feature.title}
               </Heading>
@@ -105,7 +108,7 @@ export default function AutomationPage() {
       {/* Current Alternatives */}
       <Card className="p-6">
         <div className="flex items-start gap-3">
-          <span className="text-2xl">💡</span>
+          <Lightbulb size={18} className="mt-0.5 shrink-0 text-(--text-2)" aria-hidden="true" />
           <div>
             <Heading level={3} size="sm" className="mb-2">
               Nel Frattempo...
@@ -115,19 +118,19 @@ export default function AutomationPage() {
             </Text>
             <ul className="space-y-2 text-sm">
               <li className="flex items-start gap-2">
-                <span className="font-bold text-sage-500">✓</span>
+                <Check size={16} className="mt-0.5 shrink-0 text-sage-500" aria-hidden="true" />
                 <Text variant="secondary" size="sm" as="span">Controllo manuale di tutte le luci e stanze</Text>
               </li>
               <li className="flex items-start gap-2">
-                <span className="font-bold text-sage-500">✓</span>
+                <Check size={16} className="mt-0.5 shrink-0 text-sage-500" aria-hidden="true" />
                 <Text variant="secondary" size="sm" as="span">Attivazione rapida delle scene create nell&apos;app Philips Hue</Text>
               </li>
               <li className="flex items-start gap-2">
-                <span className="font-bold text-sage-500">✓</span>
+                <Check size={16} className="mt-0.5 shrink-0 text-sage-500" aria-hidden="true" />
                 <Text variant="secondary" size="sm" as="span">Regolazione luminosità e colore per ogni stanza</Text>
               </li>
               <li className="flex items-start gap-2">
-                <span className="font-bold text-warning-500">⏳</span>
+                <Hourglass size={16} className="mt-0.5 shrink-0 text-warning-500" aria-hidden="true" />
                 <Text variant="secondary" size="sm" as="span">Usa l&apos;app ufficiale Philips Hue per automazioni avanzate temporanee</Text>
               </li>
             </ul>

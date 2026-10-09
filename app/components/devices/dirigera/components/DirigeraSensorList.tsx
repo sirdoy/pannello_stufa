@@ -1,3 +1,4 @@
+import Text from '@/app/components/ui/Text';
 import type { DirigeraSensor } from '@/types/dirigeraProxy';
 import type { SensorFilter } from '../hooks/useDirigeraFullData';
 import DirigeraSensorRow from './DirigeraSensorRow';
@@ -17,9 +18,9 @@ interface DirigeraSensorListProps {
 export default function DirigeraSensorList({ sensors, filter }: DirigeraSensorListProps) {
   if (sensors.length === 0) {
     return (
-      <p className="py-4 text-center text-sm text-slate-400">
+      <Text variant="secondary" size="sm" className="py-4 text-center">
         Nessun sensore trovato
-      </p>
+      </Text>
     );
   }
 

@@ -334,13 +334,12 @@ function UnifiedDevicesContent() {
             const isVisible = device.visible;
 
             return (
-              <div
+              <Card
                 key={device.id}
-                className={`rounded-xl border-2 p-3 transition-all duration-200 sm:p-4 ${
-                  isVisible
-                    ? 'border-ember-600/50 bg-ember-950/10'
-                    : 'border-slate-700/30 bg-slate-900/20 opacity-60'
-                }`}
+                variant="subtle"
+                padding={false}
+                glow={isVisible}
+                className={isVisible ? 'p-3 sm:p-4' : 'p-3 opacity-60 sm:p-4'}
               >
                 <div className="flex items-center justify-between gap-2 sm:gap-4">
                   {/* Left: Icon + Name + Description + Badges */}
@@ -397,7 +396,7 @@ function UnifiedDevicesContent() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

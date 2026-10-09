@@ -103,7 +103,7 @@ export default function Section({
           {/* Category indicator + subtitle */}
           {(subtitle || title) && (
             <div className="mb-2 flex items-center gap-3">
-              <div className="h-1 w-12 rounded-full bg-linear-to-r from-ember-500 to-flame-600" />
+              <div className="h-1 w-12 rounded-full bg-(--accent)" />
               {subtitle && (
                 <Text variant="tertiary" size="sm" uppercase tracking as="span">
                   {subtitle}

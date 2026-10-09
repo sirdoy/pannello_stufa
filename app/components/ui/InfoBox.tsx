@@ -1,11 +1,12 @@
-import type { HTMLAttributes } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 import Text from './Text';
 
 /**
  * InfoBox Component Props
  */
 export interface InfoBoxProps extends HTMLAttributes<HTMLDivElement> {
-  icon: string;
+  /** Emoji string or icon element (e.g. a 18px lucide icon) */
+  icon?: ReactNode;
   label: string;
   value: string | number;
   variant?: 'neutral' | 'ember' | 'ocean' | 'sage' | 'warning' | 'danger';
@@ -20,7 +21,7 @@ export interface InfoBoxProps extends HTMLAttributes<HTMLDivElement> {
  * Supports vertical (default) and horizontal compact layouts.
  *
  * @param {Object} props
- * @param {string} props.icon - Emoji icon
+ * @param {ReactNode} props.icon - Optional emoji or icon element
  * @param {string} props.label - Label text (uppercase)
  * @param {string|number} props.value - Value to display
  * @param {'neutral'|'ember'|'ocean'|'sage'|'warning'|'danger'} props.variant - Color variant for value text
@@ -36,39 +37,43 @@ export default function InfoBox({
   className = '',
   ...props
 }: InfoBoxProps) {
-  // Ember Noir variant colors with light mode support
+  // Value colours (semantic tints)
   const variantClasses: Record<string, string> = {
-    neutral: 'text-slate-100 ',
-    ember: 'text-ember-400 ',
-    ocean: 'text-ocean-400 ',
-    sage: 'text-sage-400 ',
-    warning: 'text-warning-400 ',
-    danger: 'text-danger-400 ',
+    neutral: 'text-(--text-1)',
+    ember: 'text-ember-400',
+    ocean: 'text-ocean-400',
+    sage: 'text-sage-400',
+    warning: 'text-warning-400',
+    danger: 'text-danger-400',
   };
 
   // Compact vertical layout optimized for 2-column grid
   return (
     <div className={`
-      relative overflow-hidden rounded-xl
-      border border-slate-700/40
-      bg-slate-800/50 backdrop-blur-xl
-      transition-all duration-200
-      hover:border-slate-600/50 hover:bg-slate-800/70
-      
-      
-      
-      
+      relative overflow-hidden rounded-2xl
+      border-[0.5px] border-white/6
+      bg-white/4
       ${className}
     `} {...props}>
       <div className="relative z-10 flex min-h-[90px] flex-col items-center justify-center p-3 sm:p-4">
         {/* Icon */}
-        <span className="mb-1.5 text-2xl sm:text-3xl">{icon}</span>
+        {icon !== undefined && icon !== null && icon !== false && icon !== '' && (
+          <span
+            aria-hidden="true"
+            className={
+              typeof icon === 'string'
+                ? 'mb-1.5 text-2xl sm:text-3xl'
+                : 'mb-2 inline-flex size-5 items-center justify-center text-(--text-2)'
+            }
+          >
+            {icon}
+          </span>
+        )}
 
         {/* Label */}
         <Text
           variant="label"
           size="xs"
-         
           as="span"
           className="mb-0.5 text-center"
         >

@@ -2,19 +2,15 @@
 
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import Button from '@/app/components/ui/Button';
+import Skeleton from '@/app/components/ui/Skeleton';
+import Text from '@/app/components/ui/Text';
 import { useTuyaHistory } from '../hooks/useTuyaHistory';
 
 const TuyaEnergyChartInner = dynamic(() => import('./TuyaEnergyChartInner'), {
   ssr: false,
-  loading: () => (
-    <div className="h-50 animate-pulse rounded-xl bg-slate-700/30" />
-  ),
+  loading: () => <Skeleton className="h-50" />,
 });
-
-const activeClass =
-  'text-xs rounded-md px-3 py-1 bg-amber-500/80 text-white transition-colors';
-const inactiveClass =
-  'text-xs rounded-md px-3 py-1 bg-slate-700/50 text-slate-400 hover:bg-slate-700 transition-colors';
 
 interface TuyaEnergyChartProps {
   deviceId: string;
@@ -28,38 +24,41 @@ export default function TuyaEnergyChart({ deviceId }: TuyaEnergyChartProps) {
     <div className="mt-3 space-y-3">
       {/* Period selector */}
       <div className="flex gap-1">
-        <button
+        <Button
+          variant={period === '24h' ? 'ember' : 'subtle'}
+          size="sm"
           onClick={() => setPeriod('24h')}
-          className={period === '24h' ? activeClass : inactiveClass}
           aria-pressed={period === '24h'}
         >
           24h
-        </button>
-        <button
+        </Button>
+        <Button
+          variant={period === '7d' ? 'ember' : 'subtle'}
+          size="sm"
           onClick={() => setPeriod('7d')}
-          className={period === '7d' ? activeClass : inactiveClass}
           aria-pressed={period === '7d'}
         >
           7g
-        </button>
-        <button
+        </Button>
+        <Button
+          variant={period === '30d' ? 'ember' : 'subtle'}
+          size="sm"
           onClick={() => setPeriod('30d')}
-          className={period === '30d' ? activeClass : inactiveClass}
           aria-pressed={period === '30d'}
         >
           30g
-        </button>
+        </Button>
       </div>
 
       {/* Chart area */}
       {loading && (
-        <div className="h-50 animate-pulse rounded-xl bg-slate-700/30" />
+        <Skeleton className="h-50" data-testid="tuya-energy-loading" />
       )}
 
       {!loading && error && (
-        <p className="text-sm text-slate-400">
+        <Text variant="secondary" size="sm">
           {error}
-        </p>
+        </Text>
       )}
 
       {!loading && !error && data && (
@@ -70,9 +69,9 @@ export default function TuyaEnergyChart({ deviceId }: TuyaEnergyChartProps) {
       )}
 
       {!loading && !error && data && data.items.length === 0 && (
-        <p className="text-sm text-slate-400">
+        <Text variant="secondary" size="sm">
           Nessun dato disponibile
-        </p>
+        </Text>
       )}
     </div>
   );

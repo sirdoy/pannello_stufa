@@ -63,11 +63,11 @@ describe('StatusBadge Variants', () => {
       expect(badge).toHaveClass('z-20');
     });
 
-    test('uses ember gradient by default', () => {
+    test('uses the flat accent by default', () => {
       const { container } = render(
         <StatusBadge variant="floating" text="TEST" />
       );
-      const badge = container.querySelector('.from-ember-500');
+      const badge = container.querySelector('.bg-\\(--accent\\)');
       expect(badge).toBeInTheDocument();
     });
 
@@ -87,19 +87,19 @@ describe('StatusBadge Variants', () => {
       expect(br).toHaveClass('-right-1.5');
     });
 
-    test('renders blur effect with pulse', () => {
+    test('pulses when pulse is set', () => {
       const { container } = render(
         <StatusBadge variant="floating" text="TEST" pulse={true} />
       );
-      const blur = container.querySelector('.blur-md.animate-pulse');
+      const blur = container.querySelector('.animate-pulse');
       expect(blur).toBeInTheDocument();
     });
 
-    test('no blur effect without pulse', () => {
+    test('does not pulse without pulse', () => {
       const { container } = render(
         <StatusBadge variant="floating" text="TEST" pulse={false} />
       );
-      const blur = container.querySelector('.blur-md.animate-pulse');
+      const blur = container.querySelector('.animate-pulse');
       expect(blur).not.toBeInTheDocument();
     });
   });

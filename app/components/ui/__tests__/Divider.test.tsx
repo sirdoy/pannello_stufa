@@ -80,19 +80,19 @@ describe('Divider', () => {
     it('applies solid variant classes (default)', () => {
       const { container } = render(<Divider />);
       const line = container.querySelector('.h-px');
-      expect(line).toHaveClass('bg-slate-700');
+      expect(line).toHaveClass('bg-white/8');
     });
 
     it('applies dashed variant classes', () => {
       const { container } = render(<Divider variant="dashed" />);
       const line = container.querySelector('.h-px');
-      expect(line).toHaveClass('border-dashed', 'border-slate-600', 'border-t-2');
+      expect(line).toHaveClass('border-dashed', 'border-white/12', 'border-t-2');
     });
 
-    it('applies gradient variant classes', () => {
+    it('applies gradient variant classes (flat hairline)', () => {
       const { container } = render(<Divider variant="gradient" />);
       const line = container.querySelector('.h-px');
-      expect(line).toHaveClass('bg-linear-to-r', 'from-transparent');
+      expect(line).toHaveClass('bg-white/6');
     });
   });
 
@@ -165,7 +165,7 @@ describe('Divider', () => {
     it('label has proper color classes', () => {
       render(<Divider label="Colors" />);
       const labelSpan = screen.getByText('Colors');
-      expect(labelSpan).toHaveClass('bg-slate-800/80', 'text-slate-300');
+      expect(labelSpan).toHaveClass('bg-(--surface-solid)', 'text-(--text-2)');
     });
 
     it('line behind label is hidden from screen readers', () => {

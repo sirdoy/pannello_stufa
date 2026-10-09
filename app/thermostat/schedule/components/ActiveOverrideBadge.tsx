@@ -110,7 +110,7 @@ export default function ActiveOverrideBadge({
 
         <X
           size={16}
-          className="text-slate-400 transition-colors group-hover:text-ember-400"
+          className="text-(--text-2) transition-colors group-hover:text-ember-400"
         />
       </button>
 

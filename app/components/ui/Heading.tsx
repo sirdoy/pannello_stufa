@@ -31,12 +31,12 @@ const headingVariants = cva(
         gradient: 'text-(--accent)',
         subtle: 'text-(--text-2)',
         // Accent colors - Ember Noir palette
-        ember: 'text-ember-400 ',
-        ocean: 'text-ocean-300 ',
-        sage: 'text-sage-400 ',
-        warning: 'text-warning-400 ',
-        danger: 'text-danger-400 ',
-        info: 'text-ocean-300 ', // alias for ocean (info cards)
+        ember: 'text-ember-400',
+        ocean: 'text-ocean-300',
+        sage: 'text-sage-400',
+        warning: 'text-warning-400',
+        danger: 'text-danger-400',
+        info: 'text-ocean-300', // alias for ocean (info cards)
       },
     },
     defaultVariants: {

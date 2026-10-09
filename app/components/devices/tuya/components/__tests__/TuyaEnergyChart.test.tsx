@@ -67,10 +67,9 @@ describe('TuyaEnergyChart', () => {
   it('shows loading state when fetching', () => {
     mockUseTuyaHistory.mockReturnValue({ data: null, loading: true, error: null });
 
-    const { container } = render(<TuyaEnergyChart deviceId="device-01" />);
+    render(<TuyaEnergyChart deviceId="device-01" />);
 
-    const loadingDiv = container.querySelector('.animate-pulse');
-    expect(loadingDiv).toBeInTheDocument();
+    expect(screen.getByTestId('tuya-energy-loading')).toBeInTheDocument();
   });
 
   it('renders chart with raw granularity dataKey power_w', () => {

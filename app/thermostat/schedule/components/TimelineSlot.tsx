@@ -44,7 +44,7 @@ export default function TimelineSlot({
       {/* Time tooltip on hover */}
       <div className="
         pointer-events-none absolute -bottom-8 left-1/2
-        z-20 -translate-x-1/2 rounded bg-slate-900 px-2 py-1
+        z-20 -translate-x-1/2 rounded bg-black/80 px-2 py-1
         text-xs whitespace-nowrap
         text-white opacity-0
         transition-opacity group-hover:opacity-100

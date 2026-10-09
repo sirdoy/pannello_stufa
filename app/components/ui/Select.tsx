@@ -44,20 +44,16 @@ const selectTriggerVariants = cva(
   [
     // Base styles
     'flex w-full cursor-pointer items-center justify-between rounded-xl font-display font-medium',
-    'border border-slate-700/50 bg-slate-800/60 backdrop-blur-xl',
-    'text-slate-100 placeholder:text-slate-500',
-    'transition-all duration-200',
-    // Focus ring - ember glow
+    'border-[0.5px] border-white/8 bg-white/6',
+    'text-(--text-1) placeholder:text-(--text-2)',
+    'transition-colors duration-200',
+    // Focus ring
     'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
     'focus-visible:border-ember-500/60',
     // Hover
-    'hover:border-slate-600/60 hover:bg-slate-800/80',
+    'hover:border-white/14 hover:bg-white/8',
     // Disabled
     'disabled:cursor-not-allowed disabled:opacity-50',
-    // Light mode
-    ' ',
-    ' ',
-    ' ',
   ],
   {
     variants: {
@@ -67,7 +63,8 @@ const selectTriggerVariants = cva(
         ocean: 'data-[state=open]:border-ocean-500/60 data-[state=open]:ring-2 data-[state=open]:ring-ocean-500/50',
       },
       size: {
-        sm: 'px-3 py-2 text-sm',
+        // Compact trigger for toolbars and dense forms
+        sm: 'min-h-9 px-3 py-1.5 text-[13px]',
         md: 'p-4 text-base',
         lg: 'p-5 text-lg',
       },
@@ -86,8 +83,7 @@ const selectItemVariants = cva(
     'font-display font-medium transition-colors duration-150',
     'outline-none',
     // Hover/highlighted state
-    'data-highlighted:bg-slate-700/50',
-    ']:bg-slate-100',
+    'rounded-lg data-highlighted:bg-white/8',
     // Disabled state
     'data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-40',
   ],
@@ -95,19 +91,16 @@ const selectItemVariants = cva(
     variants: {
       variant: {
         default: [
-          'text-slate-200 ',
-          'data-[state=checked]:bg-ember-900/40 data-[state=checked]:text-ember-300',
-          ']:bg-ember-100/80 ]:text-ember-700',
+          'text-(--text-1)',
+          'data-[state=checked]:bg-ember-500/15 data-[state=checked]:text-ember-300',
         ],
         ember: [
-          'text-slate-200 ',
-          'data-[state=checked]:bg-ember-900/40 data-[state=checked]:text-ember-300',
-          ']:bg-ember-100/80 ]:text-ember-700',
+          'text-(--text-1)',
+          'data-[state=checked]:bg-ember-500/15 data-[state=checked]:text-ember-300',
         ],
         ocean: [
-          'text-slate-200 ',
-          'data-[state=checked]:bg-ocean-900/40 data-[state=checked]:text-ocean-300',
-          ']:bg-ocean-100/80 ]:text-ocean-700',
+          'text-(--text-1)',
+          'data-[state=checked]:bg-ocean-500/15 data-[state=checked]:text-ocean-300',
         ],
       },
     },
@@ -146,7 +139,8 @@ const SelectTrigger = forwardRef<HTMLButtonElement, SelectTriggerProps>(({
     <SelectPrimitive.Icon asChild>
       <ChevronDown
         className={cn(
-          'ml-2 size-5 shrink-0 text-slate-400 transition-transform duration-200',
+          'ml-2 shrink-0 text-(--text-2) transition-transform duration-200',
+          size === 'sm' ? 'size-4' : 'size-5',
         )}
       />
     </SelectPrimitive.Icon>
@@ -180,11 +174,9 @@ const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(({
       className={cn(
         // Base styles
         'relative z-50 max-h-64 min-w-32 overflow-hidden rounded-xl',
-        // Background and border
-        'border border-slate-700/60 bg-slate-800/95 backdrop-blur-2xl',
-        'shadow-lg',
-        // Light mode
-        ' ',
+        // Opaque floating surface
+        'border-[0.5px] border-white/8 bg-(--surface-solid) backdrop-blur-xl',
+        'shadow-[0_8px_32px_rgba(0,0,0,0.4)]',
         // Animation
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
@@ -223,7 +215,7 @@ const SelectItem = forwardRef<HTMLDivElement, SelectItemProps>(({
   >
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     <SelectPrimitive.ItemIndicator className="absolute right-3 flex items-center justify-center">
-      <Check className="size-4 text-ember-400 " />
+      <Check className="size-4 text-ember-400" />
     </SelectPrimitive.ItemIndicator>
   </SelectPrimitive.Item>
 ));
@@ -244,7 +236,7 @@ const SelectLabel = forwardRef<HTMLDivElement, SelectLabelProps>(({ className, .
   <SelectPrimitive.Label
     ref={ref}
     className={cn(
-      'px-4 py-2 text-sm font-semibold text-slate-400',
+      'px-4 py-2 text-sm font-semibold text-(--text-2)',
       className
     )}
     {...props}
@@ -261,7 +253,7 @@ const SelectSeparator = forwardRef<HTMLDivElement, SelectSeparatorProps>(({ clas
   <SelectPrimitive.Separator
     ref={ref}
     className={cn(
-      '-mx-1 my-1 h-px bg-slate-700/50',
+      '-mx-1 my-1 h-px bg-white/8',
       className
     )}
     {...props}
@@ -272,8 +264,12 @@ SelectSeparator.displayName = 'SelectSeparator';
 export interface SelectProps extends Omit<React.ComponentPropsWithoutRef<typeof SelectPrimitive.Root>, 'value' | 'onValueChange'> {
   /** Label text */
   label?: string;
-  /** Optional emoji icon */
-  icon?: string;
+  /** Optional icon shown before the label (emoji string or icon element) */
+  icon?: React.ReactNode;
+  /** Accessible name for the trigger when no visible label is given */
+  'aria-label'?: string;
+  /** Trigger size (sm = compact) */
+  size?: 'sm' | 'md' | 'lg';
   /** Array of {value, label, disabled?} */
   options?: Array<{ value: string | number; label: string; disabled?: boolean }>;
   /** Selected value */
@@ -305,6 +301,8 @@ function Select({
   onChange,
   disabled = false,
   variant = 'default',
+  size = 'md',
+  'aria-label': ariaLabel,
   searchable = false,
   placeholder = 'Select...',
   className = '',
@@ -344,12 +342,12 @@ function Select({
         <label
           id={labelId}
           className={cn(
-            'mb-3 block font-display text-sm font-bold',
-            'text-slate-300 '
+            'mb-2 flex items-center gap-2 font-display text-sm font-semibold',
+            'text-(--text-2)'
           )}
           suppressHydrationWarning
         >
-          {icon && <span className="mr-2">{icon}</span>}
+          {icon && <span className="inline-flex shrink-0 items-center" aria-hidden="true">{icon}</span>}
           {label}
         </label>
       )}
@@ -362,8 +360,10 @@ function Select({
       >
         <SelectTrigger
           variant={variant as 'default' | 'ember' | 'ocean'}
+          size={size}
           className={className}
           aria-labelledby={label ? labelId : undefined}
+          aria-label={label ? undefined : ariaLabel}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

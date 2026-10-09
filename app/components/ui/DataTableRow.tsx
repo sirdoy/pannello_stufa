@@ -102,7 +102,7 @@ export function DataTableRow<TData>({
         aria-selected={row.getIsSelected() || undefined}
         className={cn(
           'border-b border-white/6 last:border-b-0',
-          'text-slate-200',
+          'text-(--text-1)',
           'transition-colors hover:bg-white/2',
           (canExpand || onRowClick) && 'cursor-pointer',
           'focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:outline-none focus-visible:ring-inset',
@@ -128,7 +128,7 @@ export function DataTableRow<TData>({
       {isExpanded && (
         <tr
           data-expansion-row
-          className="border-b border-white/6 bg-slate-800/30 last:border-b-0"
+          className="border-b border-white/6 bg-white/4 last:border-b-0"
           role="row"
         >
           <td colSpan={totalColumns} className="p-4" role="cell">

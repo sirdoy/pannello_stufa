@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { VERSION_HISTORY, APP_VERSION } from '@/lib/version';
 import { FRONTEND_BUILD_ID } from '@/lib/buildVersion';
-import { Card, Heading, Text, StatusBadge, Divider } from '@/app/components/ui';
+import { Calendar, Check, ChevronLeft, ChevronRight, Rocket, Sparkles, Wrench } from 'lucide-react';
+import { Badge, Button, Card, Heading, Text, StatusBadge, Divider } from '@/app/components/ui';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 const ITEMS_PER_PAGE = 10;
@@ -32,25 +33,25 @@ export default function ChangelogPage() {
   // Version type configuration with proper dark-first styling
   const versionConfig = {
     major: {
-      icon: '🚀',
+      Icon: Rocket,
       label: 'Major Release',
       badgeColor: 'ember',
-      accentClass: 'from-ember-500/20 to-flame-500/10 border-ember-500/30',
-      dotClass: 'bg-gradient-to-br from-ember-400 to-flame-500 shadow-[0_0_12px_rgba(237,111,16,0.4)]',
+      dotClass: 'bg-ember-500/20 text-ember-400',
+      legendClass: 'bg-ember-400',
     },
     minor: {
-      icon: '✨',
+      Icon: Sparkles,
       label: 'Minor Update',
       badgeColor: 'sage',
-      accentClass: 'from-sage-500/20 to-sage-500/10 border-sage-500/30',
-      dotClass: 'bg-gradient-to-br from-sage-400 to-sage-500 shadow-[0_0_12px_rgba(96,115,96,0.4)]',
+      dotClass: 'bg-sage-500/20 text-sage-400',
+      legendClass: 'bg-sage-400',
     },
     patch: {
-      icon: '🔧',
+      Icon: Wrench,
       label: 'Patch',
       badgeColor: 'ocean',
-      accentClass: 'from-ocean-500/20 to-ocean-500/10 border-ocean-500/30',
-      dotClass: 'bg-gradient-to-br from-ocean-400 to-ocean-500 shadow-[0_0_12px_rgba(67,125,174,0.4)]',
+      dotClass: 'bg-ocean-500/20 text-ocean-400',
+      legendClass: 'bg-ocean-400',
     },
   } as const;
 
@@ -68,18 +69,16 @@ export default function ChangelogPage() {
       <Card variant="elevated" className="p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Text variant="label" size="xs">Build Corrente</Text>
-          <div className="rounded-xl bg-linear-to-r from-ember-500 to-flame-600 px-4 py-2 text-white shadow-lg shadow-ember-500/25">
-            <Text as="span" variant="body" size="xl" className="font-mono text-white!">
-              {BUILD_LABEL}
-            </Text>
-          </div>
+          <Text as="span" variant="ember" size="xl" mono>
+            {BUILD_LABEL}
+          </Text>
         </div>
       </Card>
 
       {/* Timeline */}
       <div className="relative">
         {/* Vertical timeline line */}
-        <div className="absolute inset-y-8 left-[23px] w-px bg-linear-to-b from-slate-600/50 via-slate-700/30 to-transparent sm:left-[27px]" />
+        <div className="absolute inset-y-8 left-[23px] w-px bg-white/8 sm:left-[27px]" />
 
         <div className="space-y-6">
           {paginatedChangelog.map((version, index) => {
@@ -89,13 +88,13 @@ export default function ChangelogPage() {
             return (
               <div key={version.version} className="animate-fade-in-up relative pl-14 sm:pl-16" style={{ animationDelay: `${index * 50}ms` }}>
                 {/* Timeline dot */}
-                <div className={`absolute top-6 left-0 z-10 flex size-12 items-center justify-center rounded-2xl sm:size-14 ${config.dotClass} transition-all duration-300`}>
-                  <span className="text-xl sm:text-2xl">{config.icon}</span>
+                <div className={`absolute top-6 left-0 z-10 flex size-12 items-center justify-center rounded-2xl sm:size-14 ${config.dotClass}`}>
+                  <config.Icon size={20} aria-hidden="true" />
                 </div>
 
                 <Card variant="default" hover className="overflow-hidden transition-all duration-300">
-                  {/* Header with gradient accent */}
-                  <div className={'p-5 sm:p-6 bg-gradient-to-r ' + config.accentClass + ' border-b border-slate-700/30'}>
+                  {/* Header */}
+                  <div className="border-b border-white/8 p-5 sm:p-6">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex flex-wrap items-center gap-3">
                         <Heading level={2} size="xl">v{version.version}</Heading>
@@ -109,14 +108,12 @@ export default function ChangelogPage() {
 
                         {/* Last versioned release */}
                         {isLatest && (
-                          <span className="animate-pulse-ember rounded-full bg-linear-to-r from-ember-500 to-flame-600 px-2.5 py-1 font-display text-xs font-bold text-white shadow-lg shadow-ember-500/30">
-                            LATEST
-                          </span>
+                          <Badge variant="ember" size="sm">LATEST</Badge>
                         )}
                       </div>
 
                       <Text variant="tertiary" size="sm" className="flex items-center gap-2">
-                        <span className="opacity-70">📅</span>
+                        <Calendar size={14} aria-hidden="true" />
                         {new Date(version.date).toLocaleDateString('it-IT', {
                           day: '2-digit',
                           month: 'short',
@@ -138,7 +135,7 @@ export default function ChangelogPage() {
                         return (
                         <li key={changeIndex} className="group flex items-start gap-3">
                           <span className={'mt-1.5 w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold transition-colors ' + dotClass}>
-                            ✓
+                            <Check size={12} aria-hidden="true" />
                           </span>
                           <Text variant="secondary" className="flex-1 leading-relaxed">{change}</Text>
                         </li>
@@ -157,16 +154,15 @@ export default function ChangelogPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 sm:gap-4">
           {/* Previous Button */}
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
+            icon={<ChevronLeft size={16} />}
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className={'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ' + (currentPage === 1 ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed' : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95')}
           >
-            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
             <span className="hidden sm:inline">Precedente</span>
-          </button>
+          </Button>
 
           {/* Page Numbers */}
           <div className="flex items-center gap-1 sm:gap-2">
@@ -185,37 +181,39 @@ export default function ChangelogPage() {
 
               if (showEllipsisBefore || showEllipsisAfter) {
                 return (
-                  <span key={page} className="px-2 text-slate-500">
+                  <Text as="span" key={page} variant="secondary" className="px-2">
                     ...
-                  </span>
+                  </Text>
                 );
               }
 
               if (!showPage) return null;
 
               return (
-                <button
+                <Button
                   key={page}
+                  variant={isCurrentPage ? 'ember' : 'ghost'}
+                  size="sm"
+                  className="min-w-11 px-0"
                   onClick={() => goToPage(page)}
-                  className={'min-w-[40px] h-10 rounded-xl font-medium transition-all duration-200 ' + (isCurrentPage ? 'bg-gradient-to-r from-ember-500 to-flame-600 text-white shadow-lg shadow-ember-500/25' : 'bg-slate-800/30 text-slate-400 hover:bg-slate-700/50 hover:text-slate-200')}
                 >
                   {page}
-                </button>
+                </Button>
               );
             })}
           </div>
 
           {/* Next Button */}
-          <button
+          <Button
+            variant="subtle"
+            size="sm"
+            icon={<ChevronRight size={16} />}
+            iconPosition="right"
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={'flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ' + (currentPage === totalPages ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed' : 'bg-slate-800/50 text-slate-200 hover:bg-slate-700/50 active:scale-95')}
           >
             <span className="hidden sm:inline">Successiva</span>
-            <svg className="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          </Button>
         </div>
       )}
 
@@ -234,7 +232,7 @@ export default function ChangelogPage() {
           <div className="flex items-center gap-6">
             {Object.entries(versionConfig).map(([type, config]) => (
               <div key={type} className="flex items-center gap-2">
-                <div className={`size-3 rounded-full ${config.dotClass.split('')[0]} ${config.dotClass.split('')[1]}`} />
+                <div className={`size-3 rounded-full ${config.legendClass}`} />
                 <Text variant="tertiary" size="xs">{config.label}</Text>
               </div>
             ))}

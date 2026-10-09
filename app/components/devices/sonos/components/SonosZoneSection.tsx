@@ -11,6 +11,9 @@ import type {
   SonosEqResponse,
   SonosHomeTheaterResponse,
 } from '@/types/sonosProxy';
+import Card from '@/app/components/ui/Card';
+import Heading from '@/app/components/ui/Heading';
+import Text from '@/app/components/ui/Text';
 import type { UseSonosCommandsReturn } from '../hooks/useSonosCommands';
 import SonosNowPlaying from './SonosNowPlaying';
 import SonosTransportControls from './SonosTransportControls';
@@ -62,13 +65,13 @@ export default function SonosZoneSection({
   };
 
   return (
-    <div className="space-y-4 rounded-2xl bg-slate-800/50 p-5 sm:p-6">
+    <Card className="space-y-4">
       {/* Zone header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-100">
+        <Heading level={2} size="lg">
           {zone.label}
-        </h2>
-        <span className="text-xs text-slate-500">{zone.member_count} speaker</span>
+        </Heading>
+        <Text as="span" variant="secondary" size="xs">{zone.member_count} speaker</Text>
       </div>
 
       {/* Now Playing */}
@@ -108,25 +111,25 @@ export default function SonosZoneSection({
       <SonosQueueViewer groupId={zone.group_id} />
 
       {/* Zone volume — affects all speakers in zone */}
-      <div className="border-t border-slate-700/50 pt-3">
-        <h3 className="mb-2 text-sm font-medium text-slate-400">Volume Zona</h3>
+      <div className="border-t border-white/8 pt-3">
+        <Heading level={3} size="sm" variant="subtle" className="mb-2">Volume Zona</Heading>
         <div className="flex items-center gap-3">
-          <span className="w-8 text-right text-xs text-slate-500">{localZoneVolume}%</span>
+          <Text as="span" variant="secondary" size="xs" className="w-8 text-right">{localZoneVolume}%</Text>
           <input
             type="range"
             min={0}
             max={100}
             value={localZoneVolume}
             onChange={handleZoneVolumeChange}
-            className="h-2 w-full rounded-lg bg-slate-700 accent-success-500"
+            className="h-2 w-full rounded-lg bg-white/10 accent-ember-500"
             aria-label="Volume Zona"
           />
         </div>
       </div>
 
       {/* Volume per speaker */}
-      <div className="border-t border-slate-700/50 pt-3">
-        <h3 className="mb-2 text-sm font-medium text-slate-400">Volume Speaker</h3>
+      <div className="border-t border-white/8 pt-3">
+        <Heading level={3} size="sm" variant="subtle" className="mb-2">Volume Speaker</Heading>
         {zone.members.map(member => (
           <SonosSpeakerVolume
             key={member.uid}
@@ -152,6 +155,6 @@ export default function SonosZoneSection({
           />
         ))}
       </div>
-    </div>
+    </Card>
   );
 }

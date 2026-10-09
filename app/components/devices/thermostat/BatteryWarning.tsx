@@ -1,6 +1,8 @@
 'use client';
 
-import { Banner, Text } from '../../ui';
+import { BatteryFull, BatteryLow, BatteryMedium, BatteryWarning as BatteryWarningIcon, Thermometer, Wrench } from 'lucide-react';
+import type { LucideProps } from 'lucide-react';
+import { Badge, Banner, Card, Text } from '../../ui';
 
 export type BatteryState = 'full' | 'high' | 'medium' | 'low' | 'very_low';
 type ModuleType = 'NRV' | 'NATherm1' | 'NAPlug' | 'OTH' | 'OTM' | string;
@@ -42,18 +44,18 @@ interface ModuleBatteryListProps {
 /**
  * Get battery icon based on state
  */
-function getBatteryIcon(state: BatteryState): string {
+function BatteryStateIcon({ state, ...props }: { state: BatteryState } & LucideProps) {
   switch (state) {
     case 'very_low':
-      return '🪫'; // Empty battery
+      return <BatteryWarningIcon {...props} />;
     case 'low':
-      return '🔋'; // Low battery
+      return <BatteryLow {...props} />;
     case 'medium':
-      return '🔋';
+      return <BatteryMedium {...props} />;
     case 'high':
     case 'full':
     default:
-      return '🔋';
+      return <BatteryFull {...props} />;
   }
 }
 
@@ -112,7 +114,7 @@ export default function BatteryWarning({
 
   // Determine banner variant based on severity
   const variant = hasCriticalBattery ? 'error' : 'warning';
-  const icon = hasCriticalBattery ? '🪫' : '🔋';
+  const icon = hasCriticalBattery ? <BatteryWarningIcon size={24} /> : <BatteryLow size={24} />;
 
   // Build title based on count
   const count = lowBatteryModules.length;
@@ -157,20 +159,23 @@ export function BatteryBadge({ batteryState, showLabel = false }: BatteryBadgePr
   }
 
   const isCritical = batteryState === 'very_low';
-  const icon = getBatteryIcon(batteryState);
   const label = getBatteryLabel(batteryState);
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${
-        isCritical
-          ? 'border border-danger-500/40 bg-danger-900/40 text-danger-300'
-          : 'border border-warning-500/40 bg-warning-900/40 text-warning-300'
-      }`}
+    <Badge
+      variant={isCritical ? 'danger' : 'warning'}
+      size="sm"
+      icon={
+        <BatteryStateIcon
+          state={batteryState}
+          size={14}
+          className="block"
+          aria-label={showLabel ? undefined : `Batteria ${label}`}
+        />
+      }
     >
-      <span>{icon}</span>
       {showLabel && <span>{label}</span>}
-    </span>
+    </Badge>
   );
 }
 
@@ -198,38 +203,39 @@ export function ModuleBatteryList({ modules = [] }: ModuleBatteryListProps) {
         Stato Batterie
       </Text>
       <div className="space-y-1">
-        {batteryModules.map(module => (
-          <div
-            key={module.id}
-            className="flex items-center justify-between rounded-lg bg-slate-800/30 px-2 py-1.5"
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-sm">
-                {module.type === 'NRV' ? '🔧' : '🌡️'}
-              </span>
-              <Text size="sm">
-                {module.name || getModuleTypeName(module.type)}
-              </Text>
-            </div>
-            <div className="flex items-center gap-2">
-              {module.battery_state && (
-                <BatteryBadge batteryState={module.battery_state} showLabel />
-              )}
-              {!module.reachable && (
-                <span
-                  className="inline-flex items-center gap-1 rounded-full border border-slate-600/40 bg-slate-700/40 px-2 py-0.5 text-xs font-medium text-slate-400"
-                >
-                  Offline
-                </span>
-              )}
-              {module.battery_state && !['low', 'very_low'].includes(module.battery_state) && (
-                <span className="text-xs text-slate-400">
-                  {getBatteryIcon(module.battery_state)} {getBatteryLabel(module.battery_state)}
-                </span>
-              )}
-            </div>
-          </div>
-        ))}
+        {batteryModules.map(module => {
+          const ModuleIcon = module.type === 'NRV' ? Wrench : Thermometer;
+          return (
+            <Card
+              key={module.id}
+              variant="subtle"
+              padding={false}
+              className="flex items-center justify-between px-3 py-1.5"
+            >
+              <div className="flex items-center gap-2">
+                <ModuleIcon size={16} className="text-(--text-2)" aria-hidden="true" />
+                <Text size="sm">
+                  {module.name || getModuleTypeName(module.type)}
+                </Text>
+              </div>
+              <div className="flex items-center gap-2">
+                {module.battery_state && (
+                  <BatteryBadge batteryState={module.battery_state} showLabel />
+                )}
+                {!module.reachable && (
+                  <Badge variant="neutral" size="sm">
+                    Offline
+                  </Badge>
+                )}
+                {module.battery_state && !['low', 'very_low'].includes(module.battery_state) && (
+                  <Text as="span" variant="tertiary" size="xs" className="inline-flex items-center gap-1">
+                    <BatteryStateIcon state={module.battery_state} size={14} aria-hidden="true" /> {getBatteryLabel(module.battery_state)}
+                  </Text>
+                )}
+              </div>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

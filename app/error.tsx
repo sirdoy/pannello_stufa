@@ -26,7 +26,7 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-950 p-4">
+    <div className="flex min-h-screen items-center justify-center p-4">
       <div className="max-w-md text-center">
         <Heading level={2} variant="ember" className="mb-4">
           Qualcosa e andato storto

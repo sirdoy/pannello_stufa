@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react';
 import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import { ChevronDown } from 'lucide-react';
+import Button from '@/app/components/ui/Button';
+import Text from '@/app/components/ui/Text';
 import type { SonosEqResponse, SetEqRequest } from '@/types/sonosProxy';
 
 interface SonosEqControlsProps {
@@ -50,66 +52,62 @@ export default function SonosEqControls({ uid, eqData, onSetEq }: SonosEqControl
 
   return (
     <div className="mt-2">
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => setIsExpanded(prev => !prev)}
-        className="flex items-center gap-1.5 text-xs text-slate-400 transition-colors hover:text-slate-200"
         aria-label="EQ"
+        icon={<ChevronDown size={14} className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
+        iconPosition="right"
       >
-        <span>EQ</span>
-        <ChevronDown
-          size={12}
-          className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-        />
-      </button>
+        EQ
+      </Button>
 
       {isExpanded && (
         <div className="mt-2 space-y-2">
           {/* Bass slider */}
           <div className="flex items-center gap-3">
-            <span className="w-14 text-xs text-slate-400">Bass</span>
+            <Text as="span" variant="secondary" size="xs" className="w-14">Bass</Text>
             <input
               type="range"
               min={-10}
               max={10}
               value={localBass}
               onChange={handleBassChange}
-              className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500"
+              className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
               aria-label="Bass"
             />
-            <span className="min-w-7 text-right text-xs text-slate-400">
+            <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">
               {formatValue(localBass)}
-            </span>
+            </Text>
           </div>
 
           {/* Treble slider */}
           <div className="flex items-center gap-3">
-            <span className="w-14 text-xs text-slate-400">Treble</span>
+            <Text as="span" variant="secondary" size="xs" className="w-14">Treble</Text>
             <input
               type="range"
               min={-10}
               max={10}
               value={localTreble}
               onChange={handleTrebleChange}
-              className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500"
+              className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
               aria-label="Treble"
             />
-            <span className="min-w-7 text-right text-xs text-slate-400">
+            <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">
               {formatValue(localTreble)}
-            </span>
+            </Text>
           </div>
 
           {/* Loudness toggle */}
-          <button
+          <Button
+            variant={eqData.loudness ? 'ember' : 'subtle'}
+            size="sm"
             onClick={handleLoudnessToggle}
-            className={`rounded-md px-3 py-1 text-xs transition-colors ${
-              eqData.loudness
-                ? 'bg-amber-500/80 text-white'
-                : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
-            }`}
             aria-label={`Loudness ${eqData.loudness ? 'attivo' : 'disattivo'}`}
           >
             Loudness
-          </button>
+          </Button>
         </div>
       )}
     </div>

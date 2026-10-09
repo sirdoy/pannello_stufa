@@ -16,7 +16,8 @@ export interface BottomSheetProps {
   onClose: () => void;
   children?: ReactNode;
   title?: string;
-  icon?: string;
+  /** Title icon (emoji string or icon element) */
+  icon?: ReactNode;
   showCloseButton?: boolean;
   showHandle?: boolean;
   closeOnBackdrop?: boolean;
@@ -87,7 +88,7 @@ export default function BottomSheet({
     <>
       {/* Backdrop */}
       <div
-        className="animate-fadeIn fixed inset-0 bg-slate-950/60 backdrop-blur-sm"
+        className="animate-fadeIn fixed inset-0 bg-black/60 backdrop-blur-sm"
         style={{ zIndex }}
         onClick={handleBackdropClick}
         aria-hidden="true"
@@ -103,19 +104,18 @@ export default function BottomSheet({
       >
         <div
           className={`
-            shadow-liquid-lg 
             max-h-[85vh]
             overflow-y-auto
             rounded-t-3xl
-            border-t border-slate-700/50 
-            bg-slate-900/95
-            p-6 backdrop-blur-3xl
+            border-[0.5px] border-b-0 border-white/8
+            bg-(--surface-solid)
+            p-6 shadow-[0_-8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl
             ${className}
           `}
         >
           {/* Drag Handle */}
           {showHandle && (
-            <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-slate-600/50" />
+            <div className="mx-auto mb-6 h-1.5 w-12 rounded-full bg-white/20" />
           )}
 
           {/* Header */}
@@ -124,7 +124,14 @@ export default function BottomSheet({
               {/* Title */}
               {title && (
                 <Heading level={2} size="2xl" id="bottom-sheet-title" className="flex items-center gap-2">
-                  {icon && <span className="text-2xl">{icon}</span>}
+                  {icon && (
+                    <span
+                      aria-hidden="true"
+                      className={typeof icon === 'string' ? 'text-2xl' : 'inline-flex shrink-0 items-center text-(--text-2)'}
+                    >
+                      {icon}
+                    </span>
+                  )}
                   {title}
                 </Heading>
               )}

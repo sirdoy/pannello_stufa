@@ -71,8 +71,8 @@ export default function ActionButton({
       
     `,
     ghost: `
-      bg-slate-500/10 text-slate-400 ring-slate-500/20
-      hover:bg-slate-500/20 hover:ring-slate-500/40
+      bg-white/6 text-(--text-2) ring-white/10
+      hover:bg-white/10 hover:ring-white/20
         
       
     `,
@@ -88,8 +88,8 @@ export default function ActionButton({
         
     `,
     close: `
-      bg-slate-500/10 text-slate-400 ring-slate-500/20
-      hover:bg-slate-500/20 hover:ring-slate-500/40
+      bg-white/6 text-(--text-2) ring-white/10
+      hover:bg-white/10 hover:ring-white/20
         
     `,
     info: `

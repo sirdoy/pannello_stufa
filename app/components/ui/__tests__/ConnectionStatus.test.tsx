@@ -131,10 +131,10 @@ describe('ConnectionStatus', () => {
       expect(status).toHaveClass('text-sage-400');
     });
 
-    it('applies offline color (slate)', () => {
+    it('applies offline color (muted)', () => {
       const { container } = render(<ConnectionStatus status="offline" />);
       const status = container.firstChild;
-      expect(status).toHaveClass('text-slate-400');
+      expect(status).toHaveClass('text-(--text-2)');
     });
 
     it('applies connecting color (warning)', () => {
@@ -143,10 +143,10 @@ describe('ConnectionStatus', () => {
       expect(status).toHaveClass('text-warning-400');
     });
 
-    it('applies unknown color (muted slate)', () => {
+    it('applies unknown color (dimmer)', () => {
       const { container } = render(<ConnectionStatus status="unknown" />);
       const status = container.firstChild;
-      expect(status).toHaveClass('text-slate-400/70');
+      expect(status).toHaveClass('text-white/40');
     });
 
     it('applies correct dot color for online', () => {

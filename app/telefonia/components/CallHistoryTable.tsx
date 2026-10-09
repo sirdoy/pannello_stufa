@@ -92,7 +92,7 @@ export function formatCallDate(value: string | null | undefined): string | null 
 
 function formatDuration(sec: number | null | undefined): ReactNode {
   if (sec === null || sec === undefined || !Number.isFinite(sec) || sec <= 0) {
-    return <span className="text-slate-500">—</span>;
+    return <Text as="span" variant="tertiary" size="sm">—</Text>;
   }
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
@@ -150,9 +150,9 @@ export default function CallHistoryTable({
       cell: ({ row }) => {
         const number = getCounterpartNumber(row.original);
         return number ? (
-          <span className="font-mono text-slate-200">{number}</span>
+          <Text as="span" size="sm" mono>{number}</Text>
         ) : (
-          <span className="text-slate-500">—</span>
+          <Text as="span" variant="tertiary" size="sm">—</Text>
         );
       },
     },
@@ -161,7 +161,7 @@ export default function CallHistoryTable({
       header: 'Nome',
       enableSorting: false,
       cell: ({ row }) => (
-        <span className="text-slate-300">{row.original.name || '—'}</span>
+        <Text as="span" variant="secondary" size="sm">{row.original.name || '—'}</Text>
       ),
     },
     {
@@ -175,7 +175,7 @@ export default function CallHistoryTable({
       header: 'Data/ora',
       enableSorting: false,
       cell: ({ row }) =>
-        formatCallDate(row.original.date) ?? <span className="text-slate-500">—</span>,
+        formatCallDate(row.original.date) ?? <Text as="span" variant="tertiary" size="sm">—</Text>,
     },
   ];
 
@@ -202,7 +202,7 @@ export default function CallHistoryTable({
         />
       ) : totalCount === 0 && !loading ? (
         <EmptyState
-          icon={<History size={48} className="text-slate-500" />}
+          icon={<History size={48} className="text-(--text-2)" />}
           title="Nessuna chiamata registrata"
           description="Le chiamate appariranno qui non appena il Fritz!Box le registra."
           size="md"

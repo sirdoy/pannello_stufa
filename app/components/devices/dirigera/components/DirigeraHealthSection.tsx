@@ -1,3 +1,5 @@
+import Card from '@/app/components/ui/Card';
+import Text from '@/app/components/ui/Text';
 import type { DirigeraHealthResponse } from '@/types/dirigeraProxy';
 
 interface DirigeraHealthSectionProps {
@@ -12,24 +14,24 @@ interface DirigeraHealthSectionProps {
  */
 export default function DirigeraHealthSection({ health }: DirigeraHealthSectionProps) {
   return (
-    <div className="rounded-2xl bg-slate-800/50 p-4">
+    <Card>
       <div className="flex flex-wrap gap-6">
         {/* Firmware */}
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs text-slate-400">Firmware</span>
-          <span className="text-sm font-medium">{health.firmware_version}</span>
+          <Text as="span" variant="secondary" size="xs">Firmware</Text>
+          <Text as="span" size="sm" weight="medium">{health.firmware_version}</Text>
         </div>
 
         {/* Connected sensors */}
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs text-slate-400">Sensori connessi</span>
-          <span className="text-sm font-medium">{health.connected_sensors}</span>
+          <Text as="span" variant="secondary" size="xs">Sensori connessi</Text>
+          <Text as="span" size="sm" weight="medium">{health.connected_sensors}</Text>
         </div>
 
         {/* Hub reachability */}
         <div className="flex flex-col gap-0.5">
-          <span className="text-xs text-slate-400">Hub raggiungibile</span>
-          <span className="flex items-center gap-1.5 text-sm font-medium">
+          <Text as="span" variant="secondary" size="xs">Hub raggiungibile</Text>
+          <Text as="span" size="sm" weight="medium" className="flex items-center gap-1.5">
             <span
               className={`inline-block size-2 rounded-full ${
                 health.is_reachable ? 'bg-success-500' : 'bg-danger-500'
@@ -37,9 +39,9 @@ export default function DirigeraHealthSection({ health }: DirigeraHealthSectionP
               aria-hidden="true"
             />
             {health.is_reachable ? 'Sì' : 'No'}
-          </span>
+          </Text>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

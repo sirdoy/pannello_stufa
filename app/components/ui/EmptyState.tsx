@@ -51,7 +51,7 @@ const headingSizeMap: Record<string, 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'> 
  * EmptyState Component Props
  */
 export interface EmptyStateProps extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof emptyStateVariants> {
-  icon?: string | ReactNode;
+  icon?: ReactNode;
   title?: string;
   description?: string;
   action?: ReactNode;
@@ -103,8 +103,15 @@ export default function EmptyState({
     <div className={cn(emptyStateVariants({ size }), className)} {...props}>
       {/* Icon */}
       {icon && (
-        <div className={iconSizeMap[size || 'md']} aria-hidden="true">
-          {typeof icon === 'string' ? icon : icon}
+        <div
+          className={
+            typeof icon === 'string'
+              ? iconSizeMap[size || 'md']
+              : 'flex items-center justify-center text-(--text-2)'
+          }
+          aria-hidden="true"
+        >
+          {icon}
         </div>
       )}
 

@@ -2,8 +2,9 @@
 
 import { useState, useSyncExternalStore, MouseEvent } from 'react';
 import styles from './MaintenanceBar.module.css';
+import { AlertTriangle, Check, ChevronDown, Clock, Siren, Wrench } from 'lucide-react';
 import { formatHoursToHHMM } from '@/lib/formatUtils';
-import { Text, StatusBadge } from './ui';
+import { Badge, Button, Card, Text } from './ui';
 
 interface MaintenanceStatus {
   currentHours: number;
@@ -56,44 +57,33 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
     return 'bg-success-600';
   };
 
-  const getTextColor = () => {
-    if (percentage >= 100) return 'text-danger-700';
-    if (percentage >= 80) return 'text-orange-700';
-    if (percentage >= 60) return 'text-yellow-700';
-    return 'text-success-700';
-  };
-
-  const getBadgeColor = () => {
+  // Status colour shared by the badge and the hours text
+  const getStatusVariant = (): 'danger' | 'warning' | 'sage' => {
     if (percentage >= 100) return 'danger';
-    if (percentage >= 80) return 'warning';
     if (percentage >= 60) return 'warning';
     return 'sage';
   };
 
   const getBadgeIcon = () => {
-    if (percentage >= 100) return '🚨';
-    if (percentage >= 80) return '⚠️';
-    if (percentage >= 60) return '⏰';
-    return '✓';
+    if (percentage >= 100) return <Siren size={12} />;
+    if (percentage >= 80) return <AlertTriangle size={12} />;
+    if (percentage >= 60) return <Clock size={12} />;
+    return <Check size={12} />;
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-700/50 bg-slate-800/60 backdrop-blur-xl transition-all duration-300 hover:bg-slate-800/80 ">
+    <Card variant="subtle" padding={false} className="hover:bg-white/6">
       {/* Mini Bar - Always visible */}
       <div className="relative z-10 flex cursor-pointer items-center justify-between p-4" onClick={toggleExpanded}>
         <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="shrink-0 text-lg">🔧</span>
+          <Wrench size={18} className="shrink-0 text-(--text-2)" aria-hidden="true" />
           <Text variant="body" className="shrink-0">Manutenzione</Text>
 
           {/* Badge percentuale - nascosto quando espanso */}
           {!isExpanded && (
-            <StatusBadge
-              variant="badge"
-              color={getBadgeColor() as 'ember' | 'sage' | 'ocean' | 'warning' | 'danger' | 'neutral'}
-              icon={getBadgeIcon()}
-              text={`${percentage.toFixed(0)}%`}
-              className="shrink-0"
-            />
+            <Badge variant={getStatusVariant()} icon={getBadgeIcon()} className="shrink-0">
+              {`${percentage.toFixed(0)}%`}
+            </Badge>
           )}
 
           {/* Info ore compatta - nascosta su mobile e quando espanso */}
@@ -105,33 +95,35 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
         </div>
 
         {/* Toggle button */}
-        <button
-          className="flex shrink-0 items-center gap-2 text-xs text-slate-500 transition-colors hover:text-slate-200 "
+        <Button
+          variant="ghost"
+          size="sm"
+          className="shrink-0"
+          icon={
+            <ChevronDown
+              size={16}
+              className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+            />
+          }
+          iconPosition="right"
           onClick={toggleExpanded}
         >
           <span className="hidden sm:inline">
             {isExpanded ? 'Nascondi' : 'Dettagli'}
           </span>
-          <span className={`transform transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-            ▼
-          </span>
-        </button>
+        </Button>
       </div>
 
       {/* Expanded Details - Conditional */}
       <div className={`${styles.collapseContent} ${isExpanded ? styles.expanded : ''}`}>
         <div className="space-y-3 px-4 pb-4">
           {/* Progress Bar */}
-          <div className="relative h-3 w-full overflow-hidden rounded-full bg-slate-700 ">
+          <div className="relative h-3 w-full overflow-hidden rounded-full bg-white/10">
+            {/* The bar pulses when near the limit */}
             <div
-              className={`h-full ${getBarColor()} transition-all duration-500 ease-out`}
+              className={`h-full ${getBarColor()} transition-all duration-500 ease-out ${isNearLimit ? 'animate-pulse' : ''}`}
               style={{ width: `${Math.min(100, percentage)}%` }}
-            >
-              {/* Animated shimmer effect when near limit */}
-              {isNearLimit && (
-                <div className={`absolute inset-0 bg-linear-to-r from-transparent via-white/30 to-transparent ${styles.shimmer}`} />
-              )}
-            </div>
+            />
           </div>
 
           {/* Info Text */}
@@ -141,12 +133,12 @@ export default function MaintenanceBar({ maintenanceStatus }: MaintenanceBarProp
                 ? 'Pulizia richiesta!'
                 : `${formatHoursToHHMM(remainingHours)} rimanenti`}
             </Text>
-            <span className={`text-xs font-semibold ${getTextColor()}`}>
+            <Text as="span" variant={getStatusVariant()} size="xs" weight="semibold">
               {formatHoursToHHMM(currentHours)} / {formatHoursToHHMM(targetHours)}
-            </span>
+            </Text>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

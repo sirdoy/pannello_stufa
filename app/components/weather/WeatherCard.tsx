@@ -11,7 +11,7 @@
 
 import { useState } from 'react';
 import { SmartHomeCard, Badge, Button, Text } from '@/app/components/ui';
-import { RefreshCw } from 'lucide-react';
+import { Cloud, CloudSun, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { CurrentConditions } from './CurrentConditions';
@@ -123,7 +123,7 @@ export function WeatherCard({
   if (error) {
     return (
       <SmartHomeCard
-        icon="☁️"
+        icon={<Cloud size={18} />}
         title="Meteo"
         colorTheme="ocean"
       >
@@ -135,9 +135,9 @@ export function WeatherCard({
             <Button
               variant="outline"
               size="sm"
+              icon={<RefreshCw className="size-4" />}
               onClick={onRetry}
             >
-              <RefreshCw className="size-4" />
               Riprova
             </Button>
           </div>
@@ -150,7 +150,7 @@ export function WeatherCard({
   if (!weatherData) {
     return (
       <SmartHomeCard
-        icon="🌤️"
+        icon={<CloudSun size={18} />}
         title="Meteo"
         colorTheme="ocean"
       >
@@ -173,21 +173,18 @@ export function WeatherCard({
 
   return (
     <SmartHomeCard
-      icon="🌤️"
+      icon={<CloudSun size={18} />}
       title={locationName ? `Meteo - ${locationName}` : 'Meteo'}
       colorTheme="ocean"
       headerActions={
-        <button
+        <Button.Icon
+          variant="ghost"
+          size="sm"
           onClick={onRefresh}
           disabled={isRefreshing}
           aria-label="Aggiorna meteo"
-          className={cn(
-            "rounded-lg p-2 transition-colors hover:bg-slate-800/60",
-            isRefreshing && "animate-spin"
-          )}
-        >
-          <RefreshCw className="size-4" />
-        </button>
+          icon={<RefreshCw className={cn('size-4', isRefreshing && 'animate-spin')} />}
+        />
       }
     >
       {stale && (
@@ -209,7 +206,7 @@ export function WeatherCard({
 
         {/* Forecast row */}
         {weatherData.forecast && weatherData.forecast.length > 0 && (
-          <div className="mt-6 border-t border-slate-700/30 pt-6 ">
+          <div className="mt-6 border-t border-white/8 pt-6">
             <ForecastRow
               forecast={weatherData.forecast}
               onDayClick={setSelectedDay}

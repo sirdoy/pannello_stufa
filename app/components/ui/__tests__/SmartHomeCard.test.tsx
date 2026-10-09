@@ -353,7 +353,7 @@ describe('SmartHomeCard', () => {
           <p>Content</p>
         </SmartHomeCard>
       );
-      const overlay = container.querySelector('.absolute.inset-0.bg-slate-900\\/50');
+      const overlay = container.querySelector('.absolute.inset-0.bg-black\\/50');
       expect(overlay).toBeInTheDocument();
       expect(overlay).toHaveClass('z-10');
       expect(overlay).toHaveClass('rounded-2xl');

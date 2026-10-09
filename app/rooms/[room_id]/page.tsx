@@ -17,6 +17,7 @@ import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Card from '@/app/components/ui/Card';
 import FormModal from '@/app/components/ui/FormModal';
+import EmptyState from '@/app/components/ui/EmptyState';
 import Select from '@/app/components/ui/Select';
 import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
 import { Text } from '@/app/components/ui';
@@ -209,7 +210,7 @@ export default function RoomDetailPage() {
       accessorKey: 'device_type_slug',
       header: 'Tipo',
       cell: ({ row }) => (
-        <code className="font-mono text-sm text-slate-400">{row.original.device_type_slug}</code>
+        <Text as="code" variant="secondary" size="sm" mono>{row.original.device_type_slug}</Text>
       ),
     },
     {
@@ -253,12 +254,14 @@ export default function RoomDetailPage() {
 
         {/* Empty state */}
         {!isLoading && !roomData.error && !devicesData.error && devices.length === 0 && (
-          <div className="py-8 text-center text-slate-400">
-            <p>Nessun dispositivo assegnato</p>
-            <Button variant="ember" size="sm" className="mt-4" onClick={() => setShowAssign(true)}>
-              Assegna dispositivo
-            </Button>
-          </div>
+          <EmptyState
+            description="Nessun dispositivo assegnato"
+            action={
+              <Button variant="ember" size="sm" onClick={() => setShowAssign(true)}>
+                Assegna dispositivo
+              </Button>
+            }
+          />
         )}
 
         {/* Device list */}

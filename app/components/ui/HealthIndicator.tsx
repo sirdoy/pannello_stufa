@@ -15,10 +15,10 @@ export const healthIndicatorVariants = cva(
   {
     variants: {
       status: {
-        ok: 'text-sage-400 ',
-        warning: 'text-warning-400 ',
-        error: 'text-danger-400 ',
-        critical: 'text-danger-500 ',
+        ok: 'text-sage-400',
+        warning: 'text-warning-400',
+        error: 'text-danger-400',
+        critical: 'text-danger-500',
       },
       size: {
         sm: 'text-xs',

@@ -500,10 +500,10 @@ describe('Popover Component', () => {
 
       await waitFor(() => {
         const content = screen.getByTestId('popover-content');
-        expect(content).toHaveClass('bg-slate-900/95');
+        expect(content).toHaveClass('bg-(--surface-solid)');
         expect(content).toHaveClass('backdrop-blur-xl');
         expect(content).toHaveClass('rounded-2xl');
-        expect(content).toHaveClass('border');
+        expect(content).toHaveClass('border-[0.5px]');
       });
     });
 

@@ -134,7 +134,7 @@ describe('Section', () => {
           <div>Content</div>
         </Section>
       );
-      expect(container.querySelector('.from-ember-500')).toBeInTheDocument();
+      expect(container.querySelector('.bg-\\(--accent\\)')).toBeInTheDocument();
     });
 
     it('does not render header when no title/description/action', () => {
@@ -144,7 +144,7 @@ describe('Section', () => {
         </Section>
       );
       // No header elements
-      expect(container.querySelector('.from-ember-500')).not.toBeInTheDocument();
+      expect(container.querySelector('.bg-\\(--accent\\)')).not.toBeInTheDocument();
     });
   });
 

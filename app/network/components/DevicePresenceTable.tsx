@@ -53,19 +53,19 @@ export default function DevicePresenceTable({
       accessorKey: 'mac',
       header: 'MAC',
       enableSorting: false,
-      cell: ({ row }) => <span className="font-mono text-xs text-slate-400">{row.original.mac}</span>,
+      cell: ({ row }) => <Text as="span" variant="secondary" size="xs" mono>{row.original.mac}</Text>,
     },
     {
       accessorKey: 'name',
       header: 'Nome',
       enableSorting: false,
-      cell: ({ row }) => <span className="text-slate-300">{row.original.name ?? '—'}</span>,
+      cell: ({ row }) => <Text as="span" variant="secondary" size="sm">{row.original.name ?? '—'}</Text>,
     },
     {
       accessorKey: 'ip',
       header: 'IP',
       enableSorting: false,
-      cell: ({ row }) => <span className="font-mono text-xs text-slate-400">{row.original.ip ?? '—'}</span>,
+      cell: ({ row }) => <Text as="span" variant="secondary" size="xs" mono>{row.original.ip ?? '—'}</Text>,
     },
     {
       accessorKey: 'is_online',
@@ -125,7 +125,7 @@ export default function DevicePresenceTable({
         <Skeleton className="h-100 rounded-2xl" />
       ) : items.length === 0 ? (
         <EmptyState
-          icon={<History size={48} className="text-slate-500" />}
+          icon={<History size={48} className="text-(--text-2)" />}
           title="Nessun record di presenza"
           description="Nessun evento di presenza registrato nell'intervallo selezionato."
           size="md"

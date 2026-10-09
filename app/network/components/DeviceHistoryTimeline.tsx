@@ -139,8 +139,8 @@ export default function DeviceHistoryTimeline({
             {groupedEvents.map((group) => (
               <div key={group.date}>
                 {/* Sticky date header */}
-                <div className="sticky top-0 z-10 mb-2 bg-slate-900/95 py-2 backdrop-blur-sm">
-                  <Text size="sm" weight="semibold" className="text-slate-300">
+                <div className="sticky top-0 z-10 mb-2 bg-(--color-slate-900)/95 py-2 backdrop-blur-sm">
+                  <Text variant="secondary" size="sm" weight="semibold">
                     {group.dateLabel}
                   </Text>
                 </div>

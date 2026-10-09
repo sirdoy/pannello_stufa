@@ -1,5 +1,6 @@
 'use client';
 
+import Card from '@/app/components/ui/Card';
 import Text from '@/app/components/ui/Text';
 import type {
   CorrelationInsight,
@@ -21,7 +22,7 @@ interface CorrelationInsightProps {
  *
  * Color-coded by correlation level:
  * - strong-positive/moderate-positive: emerald
- * - none: slate
+ * - none: secondary text
  * - moderate-negative/strong-negative: ember
  *
  * Only renders when status='ready' and insight exists.
@@ -36,7 +37,7 @@ export default function CorrelationInsight({
   }
 
   // Determine color based on correlation level
-  let textColorClass = 'text-slate-400';
+  let textColorClass = '';
   if (insight.level === 'strong-positive' || insight.level === 'moderate-positive') {
     textColorClass = 'text-emerald-400';
   } else if (insight.level === 'moderate-negative' || insight.level === 'strong-negative') {
@@ -44,10 +45,10 @@ export default function CorrelationInsight({
   }
 
   return (
-    <div className="rounded-2xl bg-slate-800/30 p-4">
+    <Card className="p-4">
       {/* Insight Description */}
       <div className="mb-2">
-        <Text className={textColorClass}>
+        <Text variant={textColorClass ? 'body' : 'secondary'} className={textColorClass}>
           {insight.description}
         </Text>
       </div>
@@ -65,6 +66,6 @@ export default function CorrelationInsight({
           Calcolato su {insight.dataPointCount} misurazioni ({insight.activeHours.toFixed(1)}h di stufa attiva)
         </Text>
       </div>
-    </div>
+    </Card>
   );
 }

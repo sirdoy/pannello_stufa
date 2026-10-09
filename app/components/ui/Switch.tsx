@@ -20,13 +20,12 @@ const switchTrackVariants = cva(
     'transition-all duration-(--duration-smooth)',
     'ease-(--ease-move)',
     'cursor-pointer outline-none',
-    // Focus ring - ember glow
+    // Focus ring
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     // Disabled state
     'disabled:cursor-not-allowed disabled:opacity-50',
-    // Unchecked state - dark/light
-    'bg-slate-700 ',
+    // Unchecked state
+    'bg-white/12',
   ],
   {
     variants: {
@@ -37,16 +36,13 @@ const switchTrackVariants = cva(
       },
       variant: {
         ember: [
-          'data-[state=checked]:bg-linear-to-r',
-          'data-[state=checked]:from-ember-500 data-[state=checked]:to-flame-600',
+          'data-[state=checked]:bg-(--accent)',
         ],
         ocean: [
-          'data-[state=checked]:bg-linear-to-r',
-          'data-[state=checked]:from-ocean-500 data-[state=checked]:to-ocean-600',
+          'data-[state=checked]:bg-ocean-500',
         ],
         sage: [
-          'data-[state=checked]:bg-linear-to-r',
-          'data-[state=checked]:from-sage-500 data-[state=checked]:to-sage-600',
+          'data-[state=checked]:bg-sage-500',
         ],
       },
     },

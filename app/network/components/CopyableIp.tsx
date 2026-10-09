@@ -29,7 +29,7 @@ export default function CopyableIp({ ip }: CopyableIpProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="font-mono text-slate-100">{ip}</span>
+      <span className="font-mono text-(--text-1)">{ip}</span>
       <Button
         variant="ghost"
         size="sm"

@@ -11,7 +11,7 @@
  */
 
 import Modal from '@/app/components/ui/Modal';
-import { Text } from '@/app/components/ui';
+import { Card, Text } from '@/app/components/ui';
 import { WeatherIcon } from './WeatherIcon';
 import { formatTemperature, getUVIndexLabel, formatWindSpeed, getAirQualityLabel, getPressureLabel } from './weatherHelpers';
 import { HourlyForecast } from './HourlyForecast';
@@ -76,7 +76,7 @@ interface StatCardProps {
  */
 function StatCard({ icon: Icon, iconColor, label, value, subLabel }: StatCardProps) {
   return (
-    <div className="rounded-xl bg-slate-800/40 p-4 ">
+    <Card variant="subtle">
       <div className="mb-1 flex items-center gap-2">
         <Icon className={`size-4 ${iconColor}`} />
         <Text variant="tertiary" size="xs">{label}</Text>
@@ -85,7 +85,7 @@ function StatCard({ icon: Icon, iconColor, label, value, subLabel }: StatCardPro
       {subLabel && (
         <Text variant="secondary" size="xs">{subLabel}</Text>
       )}
-    </div>
+    </Card>
   );
 }
 
@@ -140,7 +140,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
               {formatTemperature(day.tempMax)}°
             </Text>
           </div>
-          <div className="h-12 w-px bg-slate-700/50 " />
+          <div className="h-12 w-px bg-white/8" />
           <div>
             <Text variant="tertiary" size="xs" className="mb-1">Min</Text>
             <Text size="xl" className="text-3xl text-ocean-400">
@@ -184,13 +184,13 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
         {/* Wind Speed */}
         <StatCard
           icon={Wind}
-          iconColor="text-slate-400"
+          iconColor="text-(--text-2)"
           label="Vento"
           value={day.windSpeed !== undefined ? formatWindSpeed(day.windSpeed) : 'N/D'}
         />
 
         {/* Precipitation */}
-        <div className="rounded-xl bg-slate-800/40 p-4 ">
+        <Card variant="subtle">
           <div className="mb-1 flex items-center gap-2">
             <Droplets
               className="size-4 text-ocean-400"
@@ -200,7 +200,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
             <Text variant="tertiary" size="xs">Precipitazioni</Text>
           </div>
           <Text size="lg">{day.precipChance ?? 0}%</Text>
-        </div>
+        </Card>
 
         {/* Air Quality - only show when data is available */}
         {day.airQuality != null && (
@@ -217,7 +217,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
         {isToday && pressure !== null && (
           <StatCard
             icon={Gauge}
-            iconColor="text-slate-400"
+            iconColor="text-(--text-2)"
             label="Pressione"
             value={`${Math.round(pressure)} hPa`}
             subLabel={getPressureLabel(pressure)}
@@ -249,7 +249,7 @@ export function ForecastDaySheet({ day, isOpen, onClose, hourly = null, isToday 
 
       {/* Hourly forecast - only for today */}
       {isToday && hourly && (
-        <div className="mt-6 border-t border-slate-700/30 pt-4 ">
+        <div className="mt-6 border-t border-white/8 pt-4">
           <Text variant="secondary" size="sm" className="mb-3">
             Previsioni orarie
           </Text>

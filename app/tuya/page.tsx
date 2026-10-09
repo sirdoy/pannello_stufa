@@ -6,7 +6,7 @@ import { useTuyaCommands } from '@/app/components/devices/tuya/hooks/useTuyaComm
 import { TuyaPlugCard } from '@/app/components/devices/tuya/components/TuyaPlugCard';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import Skeleton from '@/app/components/ui/Skeleton';
-import { Banner } from '@/app/components/ui';
+import { Banner, Text } from '@/app/components/ui';
 
 /**
  * /tuya page — Multi-plug control and monitoring
@@ -90,9 +90,9 @@ export default function TuyaPage() {
             />
           ))}
           {plugs.length === 0 && (
-            <p className="col-span-full text-sm text-slate-400">
+            <Text variant="secondary" size="sm" className="col-span-full">
               Nessun plug rilevato.
-            </p>
+            </Text>
           )}
         </div>
       )}

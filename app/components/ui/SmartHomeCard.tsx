@@ -216,7 +216,7 @@ const SmartHomeCard = forwardRef<HTMLDivElement, SmartHomeCardProps>(function Sm
 
         {/* Loading overlay */}
         {isLoading && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-slate-900/50">
+          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-2xl bg-black/50">
             <Spinner size="lg" />
           </div>
         )}

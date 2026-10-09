@@ -1,5 +1,7 @@
 'use client';
 
+import Button from '@/app/components/ui/Button';
+
 interface SonosSourceSwitchProps {
   uid: string;
   role: 'soundbar' | 'sub' | 'surround' | 'speaker';
@@ -21,27 +23,26 @@ export default function SonosSourceSwitch({
   const isTvActive = currentSource === 'tv';
   const isLineInActive = currentSource === 'line_in';
 
-  const activeClass = 'bg-amber-500/80 text-white';
-  const inactiveClass = 'bg-slate-700/50 text-slate-400 hover:bg-slate-700';
-
   return (
     <div className="mt-2 inline-flex items-center gap-1">
-      <button
+      <Button
+        variant={isTvActive ? 'ember' : 'subtle'}
+        size="sm"
         onClick={() => void onSwitchSource(uid, 'tv')}
-        className={`rounded-md px-3 py-1 text-xs transition-colors ${isTvActive ? activeClass : inactiveClass}`}
         aria-label="Sorgente TV"
         aria-pressed={isTvActive}
       >
         TV
-      </button>
-      <button
+      </Button>
+      <Button
+        variant={isLineInActive ? 'ember' : 'subtle'}
+        size="sm"
         onClick={() => void onSwitchSource(uid, 'line_in')}
-        className={`rounded-md px-3 py-1 text-xs transition-colors ${isLineInActive ? activeClass : inactiveClass}`}
         aria-label="Sorgente Line-in"
         aria-pressed={isLineInActive}
       >
         Line-in
-      </button>
+      </Button>
     </div>
   );
 }

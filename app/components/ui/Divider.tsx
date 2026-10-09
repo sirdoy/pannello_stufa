@@ -18,13 +18,14 @@ const dividerVariants = cva(
     variants: {
       variant: {
         solid: [
-          'bg-slate-700',
+          'bg-white/8',
         ],
         dashed: [
-          'border-dashed border-slate-600 bg-transparent',
+          'border-dashed border-white/12 bg-transparent',
         ],
         gradient: [
-          'bg-linear-to-r from-transparent via-slate-600/50 to-transparent',
+          // Kept for API compatibility: same flat hairline, softer
+          'bg-white/6',
         ],
       },
     },
@@ -126,8 +127,7 @@ const Divider = forwardRef<HTMLDivElement, DividerProps>(function Divider(
         <div className="relative flex justify-center">
           <span className={cn(
             'rounded-full px-4 py-1.5 font-display text-xs font-semibold tracking-[0.15em] uppercase backdrop-blur-xl',
-            'border border-slate-700/50 bg-slate-800/80 text-slate-300',
-            ' '
+            'border-[0.5px] border-white/8 bg-(--surface-solid) text-(--text-2)'
           )}>
             {label}
           </span>

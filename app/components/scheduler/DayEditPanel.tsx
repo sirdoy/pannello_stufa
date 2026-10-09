@@ -4,13 +4,15 @@ import { useState } from 'react';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
 import ActionButton from '../ui/ActionButton';
+import Badge from '../ui/Badge';
+import EmptyState from '../ui/EmptyState';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
 import TimeBar from './TimeBar';
 import ScheduleInterval from './ScheduleInterval';
 import IntervalBottomSheet from './IntervalBottomSheet';
 import { getDayTotalHours } from '@/lib/scheduler/schedulerStats';
-import { Copy, Plus } from 'lucide-react';
+import { Check, Copy, Inbox, Plus, Save } from 'lucide-react';
 import type { ScheduleInterval as ScheduleIntervalType } from '@/lib/scheduler/schedulerService';
 
 export interface DayEditPanelProps {
@@ -77,25 +79,27 @@ export default function DayEditPanel({
         {/* Left: Title + Info */}
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center gap-3">
-            <Heading level={3} className="text-2xl">
+            <Heading level={3} size="2xl">
               {day}
             </Heading>
-            <Text as="span" variant="secondary" size="sm" className="rounded-full bg-slate-800/60 px-3 py-1">
+            <Badge variant="neutral" size="lg">
               {intervals.length} {intervals.length === 1 ? 'intervallo' : 'intervalli'}
               {intervals.length > 0 && ` • ${totalHours.toFixed(1)}h`}
-            </Text>
+            </Badge>
           </div>
 
           {/* Save indicator */}
           {saveStatus && (
             <div className="flex items-center">
               {saveStatus.isSaving ? (
-                <Text as="span" size="sm" className="flex animate-pulse items-center gap-1 text-blue-400">
-                  💾 Salvataggio...
+                <Text as="span" variant="ocean" size="sm" className="flex animate-pulse items-center gap-1">
+                  <Save size={16} aria-hidden="true" />
+                  Salvataggio...
                 </Text>
               ) : (
-                <Text as="span" size="sm" className="flex items-center gap-1 text-green-400">
-                  ✓ Salvato
+                <Text as="span" variant="sage" size="sm" className="flex items-center gap-1">
+                  <Check size={16} aria-hidden="true" />
+                  Salvato
                 </Text>
               )}
             </div>
@@ -172,18 +176,22 @@ export default function DayEditPanel({
       {/* Intervals list */}
       <div className="space-y-3">
         {intervals.length === 0 ? (
-          <div className="py-12 text-center">
-            <div className="mb-4 text-5xl">📭</div>
-            <Text variant="tertiary" size="lg" className="mb-2">Nessun intervallo configurato per {day}</Text>
-            <Text variant="tertiary" size="sm" className="mb-4">Aggiungi il primo intervallo per iniziare</Text>
-            <Button
-              variant="success"
-              onClick={() => onAddInterval(day)}
-              icon="+"
-            >
-              Aggiungi primo intervallo
-            </Button>
-          </div>
+          <EmptyState
+            size="lg"
+            level={4}
+            icon={<Inbox size={40} className="text-(--text-2)" />}
+            title={`Nessun intervallo configurato per ${day}`}
+            description="Aggiungi il primo intervallo per iniziare"
+            action={
+              <Button
+                variant="success"
+                onClick={() => onAddInterval(day)}
+                icon={<Plus size={16} />}
+              >
+                Aggiungi primo intervallo
+              </Button>
+            }
+          />
         ) : (
           intervals.map((range, index) => (
             <ScheduleInterval

@@ -208,7 +208,7 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
         {/* Global Search Input */}
         <div className="relative max-w-sm flex-1">
           <Search
-            className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-500"
+            className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-(--text-2)"
             aria-hidden="true"
           />
           <input
@@ -219,10 +219,10 @@ const DataTableToolbar = forwardRef(function DataTableToolbar<TData>(
             aria-label="Search..."
             className={cn(
               'w-full rounded-xl py-2 pr-4 pl-10',
-              'bg-slate-800/60 backdrop-blur-xl',
-              'text-slate-100 placeholder:text-slate-500',
+              'bg-white/6',
+              'text-(--text-1) placeholder:text-(--text-2)',
               'font-display text-sm font-medium',
-              'border border-slate-700/50',
+              'border-[0.5px] border-white/8',
               'focus:outline-none focus-visible:ring-2',
               'focus-visible:border-ember-500/60 focus-visible:ring-ember-500/50',
               'transition-all duration-200',

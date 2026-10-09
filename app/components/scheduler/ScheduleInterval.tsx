@@ -1,5 +1,5 @@
 import { POWER_LABELS, FAN_LABELS } from '@/lib/scheduler/schedulerStats';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Clock, Edit2, Trash2, Wind, Zap } from 'lucide-react';
 import Card from '../ui/Card';
 import ActionButton from '../ui/ActionButton';
 import ProgressBar from '../ui/ProgressBar';
@@ -45,7 +45,7 @@ export default function ScheduleInterval({
         {/* Time Range */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Text className="text-2xl">⏰</Text>
+            <Clock size={18} className="shrink-0 text-(--text-2)" aria-hidden="true" />
             <div>
               <Text size="lg" weight="bold">
                 {range.start} - {range.end}
@@ -102,7 +102,7 @@ export default function ScheduleInterval({
           animated
           leftContent={
             <>
-              <Text as="span" className="text-lg">⚡</Text>
+              <Zap size={16} className="text-(--text-2)" aria-hidden="true" />
               <Text as="span" variant="secondary" size="sm" weight="semibold">
                 Potenza
               </Text>
@@ -128,7 +128,7 @@ export default function ScheduleInterval({
           animated
           leftContent={
             <>
-              <Text as="span" className="text-lg">💨</Text>
+              <Wind size={16} className="text-(--text-2)" aria-hidden="true" />
               <Text as="span" variant="secondary" size="sm" weight="semibold">
                 Ventola
               </Text>

@@ -1,6 +1,7 @@
 'use client';
 
 import { Shuffle, Repeat } from 'lucide-react';
+import Button from '@/app/components/ui/Button';
 import type { SonosPlayMode } from '@/types/sonosProxy';
 
 interface SonosPlayModeControlsProps {
@@ -40,10 +41,6 @@ function composePlayMode(
   return 'NORMAL';
 }
 
-const activeClass = 'p-2 rounded-lg bg-ember-500/20 text-ember-400 transition-colors';
-const inactiveClass =
-  'p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 transition-colors text-slate-500';
-
 export default function SonosPlayModeControls({
   playMode,
   onSetPlayMode,
@@ -52,20 +49,20 @@ export default function SonosPlayModeControls({
 
   return (
     <div className="flex items-center gap-2">
-      <button
+      <Button.Icon
+        variant={isShuffle ? 'ember' : 'subtle'}
+        size="sm"
         onClick={() => onSetPlayMode(composePlayMode(playMode, 'shuffle'))}
-        className={isShuffle ? activeClass : inactiveClass}
         aria-label="Shuffle"
-      >
-        <Shuffle size={16} />
-      </button>
-      <button
+        icon={<Shuffle size={16} />}
+      />
+      <Button.Icon
+        variant={isRepeat ? 'ember' : 'subtle'}
+        size="sm"
         onClick={() => onSetPlayMode(composePlayMode(playMode, 'repeat'))}
-        className={isRepeat ? activeClass : inactiveClass}
         aria-label="Ripeti"
-      >
-        <Repeat size={16} />
-      </button>
+        icon={<Repeat size={16} />}
+      />
     </div>
   );
 }

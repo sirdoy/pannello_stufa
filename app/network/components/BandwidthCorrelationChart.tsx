@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { format } from 'date-fns';
+import Card from '@/app/components/ui/Card';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import type {
@@ -48,7 +49,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   const powerLevelValue = payload.find((p) => p.dataKey === 'powerLevel')?.value ?? 0;
 
   return (
-    <div className="rounded-lg border border-white/10 bg-slate-900 p-3 shadow-xl">
+    <Card variant="subtle" padding={false} className="rounded-lg bg-(--color-slate-900) p-3 shadow-xl">
       <Text size="xs" className="mb-2">
         {format(label, 'HH:mm:ss')}
       </Text>
@@ -76,7 +77,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
           </Text>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -100,7 +101,7 @@ export default function BandwidthCorrelationChart({
   minPoints,
 }: BandwidthCorrelationChartProps) {
   return (
-    <div className="rounded-2xl bg-slate-800/30 p-6">
+    <Card variant="elevated" className="p-4 sm:p-6">
       {/* Header */}
       <div className="mb-6">
         <Heading level={2} size="lg">
@@ -213,6 +214,6 @@ export default function BandwidthCorrelationChart({
           </ComposedChart>
         </ResponsiveContainer>
       )}
-    </div>
+    </Card>
   );
 }

@@ -29,8 +29,8 @@ describe('StatusBadge Component', () => {
       render(<StatusBadge status="OFF" />);
       const statusElement = screen.getByText('OFF');
       expect(statusElement).toBeInTheDocument();
-      // OFF status uses neutral/slate colors
-      expect(statusElement.className).toMatch(/slate/i);
+      // OFF status uses the neutral muted text
+      expect(statusElement).toHaveClass('text-(--text-2)');
     });
 
     test('applies appropriate styling for STANDBY status', () => {
@@ -53,7 +53,7 @@ describe('StatusBadge Component', () => {
       render(<StatusBadge status="UNKNOWN" />);
       const statusElement = screen.getByText('UNKNOWN');
       expect(statusElement).toBeInTheDocument();
-      expect(statusElement.className).toMatch(/slate/i);
+      expect(statusElement).toHaveClass('text-(--text-2)');
     });
 
     test('renders with default styling when no status provided', () => {
@@ -136,7 +136,7 @@ describe('StatusBadge Component', () => {
       render(<StatusBadge status="POWER_OFF" />);
       expect(screen.getByText('❄️')).toBeInTheDocument();
       const statusElement = screen.getByText('POWER_OFF');
-      expect(statusElement.className).toMatch(/slate/i);
+      expect(statusElement).toHaveClass('text-(--text-2)');
     });
 
     test('matches status containing ERROR substring', () => {

@@ -67,18 +67,18 @@ describe('DeviceStatusBadge', () => {
   });
 
   describe('Styling', () => {
-    it('uses text-xs and text-slate-400 for last seen timestamp', () => {
+    it('uses small secondary text for last seen timestamp', () => {
       render(<DeviceStatusBadge active={false} lastSeen={Date.now() - 1000} />);
 
       const lastSeenText = screen.getByText(/Visto/);
-      expect(lastSeenText).toHaveClass('text-xs', 'text-slate-400');
+      expect(lastSeenText).toHaveClass('text-xs', 'text-(--text-2)');
     });
 
-    it('uses text-xs and text-slate-500 for "Mai connesso"', () => {
+    it('uses small secondary text for "Mai connesso"', () => {
       render(<DeviceStatusBadge active={false} />);
 
       const neverConnectedText = screen.getByText('Mai connesso');
-      expect(neverConnectedText).toHaveClass('text-xs', 'text-slate-500');
+      expect(neverConnectedText).toHaveClass('text-xs', 'text-(--text-2)');
     });
   });
 });

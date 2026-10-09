@@ -60,7 +60,7 @@ export interface ConfirmationDialogProps extends ComponentPropsWithoutRef<typeof
 // so confirmation dialogs spawned from inside an open Sheet are interactive.
 const overlayVariants = cva([
   'fixed inset-0 z-300',
-  'bg-slate-950/70 ',
+  'bg-black/60',
   'backdrop-blur-md',
   'data-[state=open]:animate-fade-in',
   'data-[state=closed]:animate-fade-out',
@@ -69,10 +69,10 @@ const overlayVariants = cva([
 // CVA variants for content
 const contentVariants = cva([
   'fixed z-301 p-6',
-  'bg-slate-900/95 ',
-  'backdrop-blur-3xl',
-  'border border-slate-700/50 ',
-  'shadow-card-elevated',
+  'bg-(--surface-solid)',
+  'backdrop-blur-xl',
+  'border-[0.5px] border-white/8',
+  'shadow-[0_8px_32px_rgba(0,0,0,0.4)]',
   'focus:outline-none',
   'overflow-y-auto',
   // Desktop: centered
@@ -222,7 +222,7 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
               <DialogPrimitive.Title
                 className={cn(
                   'font-display text-lg font-semibold',
-                  'text-slate-100 '
+                  'text-(--text-1)'
                 )}
               >
                 {title}
@@ -231,7 +231,7 @@ const ConfirmationDialog = forwardRef<HTMLDivElement, ConfirmationDialogProps>(f
               <DialogPrimitive.Description
                 className={cn(
                   'mt-2 text-sm',
-                  'text-slate-400 '
+                  'text-(--text-2)'
                 )}
               >
                 {description}

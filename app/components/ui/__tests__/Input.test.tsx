@@ -47,7 +47,7 @@ describe('Input Component', () => {
     test('renders default variant', () => {
       render(<Input data-testid="input" />);
       const input = screen.getByTestId('input');
-      expect(input).toHaveClass('border-slate-700/50');
+      expect(input).toHaveClass('border-white/8');
     });
 
     test('renders error variant when error prop provided', () => {
@@ -510,6 +510,37 @@ describe('Input Component', () => {
       const input = screen.getByRole('textbox');
       expect(input).toHaveAttribute('id');
       expect(input.id).toBeTruthy();
+    });
+  });
+
+  describe('Compact size and message row', () => {
+    test('size="sm" renders the compact field', () => {
+      render(<Input data-testid="input" size="sm" />);
+      const input = screen.getByTestId('input');
+      expect(input).toHaveClass('min-h-9');
+      expect(input).not.toHaveClass('py-3');
+    });
+
+    test('default size keeps the standard padding', () => {
+      render(<Input data-testid="input" />);
+      expect(screen.getByTestId('input')).toHaveClass('px-4', 'py-3');
+    });
+
+    test('no message row is rendered without error or counter', () => {
+      const { container } = render(<Input data-testid="input" />);
+      expect(container.querySelector('.min-h-5')).not.toBeInTheDocument();
+    });
+
+    test('message row is rendered with an error', () => {
+      const { container } = render(<Input data-testid="input" error="Campo obbligatorio" />);
+      expect(container.querySelector('.min-h-5')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('Campo obbligatorio');
+    });
+
+    test('accepts an icon element next to the label', () => {
+      render(<Input label="Nome" icon={<svg data-testid="input-icon" />} />);
+      expect(screen.getByTestId('input-icon')).toBeInTheDocument();
+      expect(screen.getByLabelText('Nome')).toBeInTheDocument();
     });
   });
 });

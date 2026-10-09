@@ -4,8 +4,8 @@ import { useState } from 'react';
 import PageLayout from '@/app/components/ui/PageLayout';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Text from '@/app/components/ui/Text';
+import Button from '@/app/components/ui/Button';
 import { Banner } from '@/app/components/ui';
-import { cn } from '@/lib/utils/cn';
 import { useDirigeraFullData } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
 import type { SensorFilter } from '@/app/components/devices/dirigera/hooks/useDirigeraFullData';
 import { useDirigeraStats } from '@/app/components/devices/dirigera/hooks/useDirigeraStats';
@@ -73,20 +73,17 @@ export default function DirigeraPage() {
         {data && filter === 'all' && <DirigeraAirQualityPanel sensors={data.sensors} />}
 
         {/* Filter segmented control */}
-        <div className="flex overflow-hidden rounded-lg border border-slate-700/50">
+        <div className="flex gap-1">
           {FILTERS.map(f => (
-            <button
+            <Button
               key={f.key}
+              variant={filter === f.key ? 'ember' : 'subtle'}
+              size="sm"
               onClick={() => setFilter(f.key)}
-              className={cn(
-                'flex-1 px-3 py-1.5 text-sm font-medium transition-colors',
-                filter === f.key
-                  ? 'bg-ocean-600/80 text-white'
-                  : 'bg-transparent text-slate-400 hover:text-slate-200'
-              )}
+              className="flex-1"
             >
               {f.label}
-            </button>
+            </Button>
           ))}
         </div>
 

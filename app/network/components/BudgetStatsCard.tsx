@@ -65,7 +65,7 @@ export default function BudgetStatsCard({ data, loading, error }: BudgetStatsCar
     <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
       {/* Header row: label + status badge */}
       <div className="flex items-center justify-between">
-        <Text variant="label" size="sm" className="tracking-wide text-slate-400 uppercase">
+        <Text variant="label" size="sm">
           Budget API
         </Text>
         <Badge variant={BADGE_VARIANTS[data.status]} size="sm">
@@ -75,13 +75,13 @@ export default function BudgetStatsCard({ data, loading, error }: BudgetStatsCar
 
       {/* Progress bar */}
       <div>
-        <div className="h-2 w-full rounded-full bg-slate-700/50">
+        <div className="h-2 w-full rounded-full bg-white/8">
           <div
             className={`${STATUS_COLORS[data.status]} h-2 rounded-full transition-all`}
             style={{ width: `${Math.min(data.utilization_percent, 100)}%` }}
           />
         </div>
-        <Text size="sm" className="mt-1 text-slate-400">
+        <Text variant="secondary" size="sm" className="mt-1">
           {data.utilization_percent.toFixed(1)}%
         </Text>
       </div>
@@ -89,25 +89,25 @@ export default function BudgetStatsCard({ data, loading, error }: BudgetStatsCar
       {/* Metrics grid */}
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <Text variant="label" size="xs" className="text-slate-500 uppercase">
+          <Text variant="label" size="xs">
             Finestra
           </Text>
           <Text size="sm">{windowMinutes} min</Text>
         </div>
         <div>
-          <Text variant="label" size="xs" className="text-slate-500 uppercase">
+          <Text variant="label" size="xs">
             Richieste
           </Text>
           <Text size="sm">{data.current_window_requests}</Text>
         </div>
         <div>
-          <Text variant="label" size="xs" className="text-slate-500 uppercase">
+          <Text variant="label" size="xs">
             Limite soft
           </Text>
           <Text size="sm">{data.soft_limit}</Text>
         </div>
         <div>
-          <Text variant="label" size="xs" className="text-slate-500 uppercase">
+          <Text variant="label" size="xs">
             Limite hard
           </Text>
           <Text size="sm">{data.hard_limit}</Text>

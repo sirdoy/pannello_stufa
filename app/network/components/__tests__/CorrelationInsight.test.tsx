@@ -90,7 +90,7 @@ describe('CorrelationInsight', () => {
     expect(descriptionElement).toHaveClass('text-ember-500');
   });
 
-  it('applies slate color for no correlation', () => {
+  it('applies secondary text color for no correlation', () => {
     const noCorrelationInsight: CorrelationInsightType = {
       coefficient: 0.1,
       level: 'none',
@@ -104,6 +104,6 @@ describe('CorrelationInsight', () => {
     );
 
     const descriptionElement = screen.getByText(noCorrelationInsight.description);
-    expect(descriptionElement).toHaveClass('text-slate-400');
+    expect(descriptionElement).toHaveClass('text-(--text-2)');
   });
 });

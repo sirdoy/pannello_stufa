@@ -17,23 +17,19 @@ export const controlButtonVariants = cva(
   [
     'font-display font-black',
     'rounded-xl',
-    'transition-all duration-200',
+    'transition-colors duration-200',
     'flex items-center justify-center',
-    'border border-white/10',
-    'text-white',
-    // Focus ring - ember glow (consistent with Phase 12 components)
+    'border-[0.5px]',
+    // Focus ring
     'focus-visible:outline-none',
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     // Active state
     'active:scale-95',
     // Touch optimization
     'touch-manipulation',
     'select-none',
     // Disabled state
-    'disabled:bg-slate-800 disabled:text-slate-600',
-    'disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none',
-    ' ',
+    'disabled:cursor-not-allowed disabled:opacity-50',
     'disabled:pointer-events-none',
   ],
   {
@@ -41,45 +37,33 @@ export const controlButtonVariants = cva(
       variant: {
         // Primary: warm copper/amber
         ember: [
-          'bg-linear-to-br from-ember-500 to-flame-600',
-          'hover:from-ember-400 hover:to-flame-500',
-          'shadow-ember-glow-sm hover:shadow-ember-glow',
+          'border-transparent bg-(--accent) text-[#1a0d06]',
+          'hover:brightness-110',
         ],
         // Secondary: muted ocean blue
         ocean: [
-          'bg-linear-to-br from-ocean-500 to-ocean-600',
-          'hover:from-ocean-400 hover:to-ocean-500',
-          'shadow-[0_4px_15px_rgba(67,125,174,0.25)]',
-          'hover:shadow-[0_6px_20px_rgba(67,125,174,0.35)]',
+          'border-ocean-400/30 bg-ocean-500/20 text-ocean-300',
+          'hover:bg-ocean-500/30',
         ],
         // Sage: muted green
         sage: [
-          'bg-linear-to-br from-sage-500 to-sage-600',
-          'hover:from-sage-400 hover:to-sage-500',
-          'shadow-[0_4px_15px_rgba(96,115,96,0.25)]',
-          'hover:shadow-[0_6px_20px_rgba(96,115,96,0.35)]',
+          'border-sage-400/30 bg-sage-500/20 text-sage-300',
+          'hover:bg-sage-500/30',
         ],
         // Warning: amber
         warning: [
-          'bg-linear-to-br from-warning-500 to-warning-600',
-          'hover:from-warning-400 hover:to-warning-500',
-          'shadow-[0_4px_15px_rgba(234,179,8,0.25)]',
-          'hover:shadow-[0_6px_20px_rgba(234,179,8,0.35)]',
+          'border-warning-400/30 bg-warning-500/20 text-warning-300',
+          'hover:bg-warning-500/30',
         ],
         // Danger: red
         danger: [
-          'bg-linear-to-br from-danger-500 to-danger-600',
-          'hover:from-danger-400 hover:to-danger-500',
-          'shadow-[0_4px_15px_rgba(239,68,68,0.25)]',
-          'hover:shadow-[0_6px_20px_rgba(239,68,68,0.35)]',
+          'border-danger-400/30 bg-danger-500/20 text-danger-300',
+          'hover:bg-danger-500/30',
         ],
         // Subtle: glass effect
         subtle: [
-          'bg-white/6',
-          'text-slate-200',
+          'border-white/14 bg-white/6 text-white',
           'hover:bg-white/10',
-          ']',
-          ']',
         ],
       },
       size: {

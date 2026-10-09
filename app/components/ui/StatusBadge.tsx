@@ -81,42 +81,36 @@ export default function StatusBadge({
       border: 'border-ember-500/30',
       text: 'text-ember-300',
       dot: 'bg-ember-500',
-      glow: 'shadow-ember-glow-sm',
     },
     sage: {
       bg: 'bg-sage-500/20',
       border: 'border-sage-500/30',
       text: 'text-sage-300',
       dot: 'bg-sage-500',
-      glow: 'shadow-[0_0_10px_rgba(96,115,96,0.3)]',
     },
     ocean: {
       bg: 'bg-ocean-500/20',
       border: 'border-ocean-500/30',
       text: 'text-ocean-300',
       dot: 'bg-ocean-500',
-      glow: 'shadow-[0_0_10px_rgba(67,125,174,0.3)]',
     },
     warning: {
       bg: 'bg-warning-500/20',
       border: 'border-warning-500/30',
       text: 'text-warning-300',
       dot: 'bg-warning-500',
-      glow: 'shadow-[0_0_10px_rgba(234,179,8,0.3)]',
     },
     danger: {
       bg: 'bg-danger-500/20',
       border: 'border-danger-500/30',
       text: 'text-danger-300',
       dot: 'bg-danger-500',
-      glow: 'shadow-[0_0_10px_rgba(239,68,68,0.3)]',
     },
     neutral: {
-      bg: 'bg-slate-500/15',
-      border: 'border-slate-500/25',
-      text: 'text-slate-400',
-      dot: 'bg-slate-500',
-      glow: '',
+      bg: 'bg-white/6',
+      border: 'border-white/12',
+      text: 'text-(--text-2)',
+      dot: 'bg-white/40',
     },
   };
 
@@ -160,8 +154,8 @@ export default function StatusBadge({
           ${sizes.display.padding}
           rounded-2xl
           ${colors.bg}
-          border ${colors.border}
-          ${pulse ? `animate-pulse-ember ${colors.glow}` : ''}
+          border-[0.5px] ${colors.border}
+          ${pulse ? 'animate-pulse' : ''}
           ${className}
         `.trim().replace(/\s+/g, ' ')}
       >
@@ -200,27 +194,14 @@ export default function StatusBadge({
     return (
       <div className={`absolute ${positionStyles[position]} z-20 ${className}`}>
         <div className="relative">
-          {/* Glow background */}
-          {pulse && (
-            <div className={`
-              absolute inset-0
-              ${colors.dot}
-              opacity-30
-              rounded-full
-              blur-md
-              animate-pulse
-            `.trim().replace(/\s+/g, ' ')} />
-          )}
           {/* Badge */}
           <div className={`
             relative
-            bg-gradient-to-br from-ember-500 to-flame-600
-            text-white
+            bg-(--accent)
+            text-[#1a0d06]
             px-2.5 py-1
             rounded-full
-            shadow-lg
-            ring-2 ring-slate-900/50
-            
+            ${pulse ? 'animate-pulse' : ''}
           `.trim().replace(/\s+/g, ' ')}>
             <span className="font-display text-xs font-bold">
               {resolvedIcon && <span className="mr-1">{resolvedIcon}</span>}
@@ -242,9 +223,9 @@ export default function StatusBadge({
         font-display font-semibold
         rounded-full
         ${colors.bg}
-        border ${colors.border}
+        border-[0.5px] ${colors.border}
         ${colors.text}
-        ${pulse ? `animate-glow-pulse ${colors.glow}` : ''}
+        ${pulse ? 'animate-pulse' : ''}
         ${className}
       `.trim().replace(/\s+/g, ' ')}
     >

@@ -122,7 +122,6 @@ export default function ManualOverrideSheet({
       isOpen={isOpen}
       onClose={onClose}
       title="Manual Boost"
-      icon="🔥"
     >
       {/* Success state */}
       {success ? (
@@ -164,7 +163,6 @@ export default function ManualOverrideSheet({
           {error && (
             <Banner
               variant="error"
-              icon="⚠️"
               description={error}
               compact
             />

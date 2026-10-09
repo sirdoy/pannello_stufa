@@ -47,10 +47,10 @@ import { cn } from '@/lib/utils/cn';
 const contentVariants = cva(
   [
     'z-50 rounded-2xl p-4',
-    'bg-slate-900/95 ',
+    'bg-(--surface-solid)',
     'backdrop-blur-xl',
-    'border border-slate-700/50 ',
-    'shadow-card-elevated',
+    'border-[0.5px] border-white/8',
+    'shadow-[0_8px_32px_rgba(0,0,0,0.4)]',
     // Animation - scale from 95% + fade
     'data-[state=open]:animate-scale-in',
     'data-[state=closed]:animate-fade-out',
@@ -71,7 +71,7 @@ const contentVariants = cva(
 
 // CVA variants for arrow
 const arrowVariants = cva([
-  'fill-slate-900/95 ',
+  'fill-(--surface-solid)',
 ]);
 
 /**
@@ -151,9 +151,8 @@ const PopoverClose = forwardRef<React.ElementRef<typeof PopoverPrimitive.Close>,
         ref={ref}
         className={cn(
           'rounded-xl p-2',
-          'text-slate-400 hover:text-slate-200',
-          ' ',
-          '] hover:bg-white/6',
+          'text-(--text-2) hover:text-(--text-1)',
+          'hover:bg-white/6',
           'transition-colors duration-200',
           'focus:outline-none focus-visible:ring-2 focus-visible:ring-ember-500/50',
           className

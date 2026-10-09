@@ -29,24 +29,24 @@ const toastVariants = cva(
     variants: {
       variant: {
         success: [
-          'bg-sage-900/90 ',
+          'bg-sage-900/90',
           'border-sage-500/30',
-          'text-sage-100 ',
+          'text-sage-100',
         ],
         error: [
-          'bg-danger-900/90 ',
+          'bg-danger-900/90',
           'border-danger-500/30',
-          'text-danger-100 ',
+          'text-danger-100',
         ],
         warning: [
-          'bg-warning-900/90 ',
+          'bg-warning-900/90',
           'border-warning-500/30',
-          'text-warning-100 ',
+          'text-warning-100',
         ],
         info: [
-          'bg-ocean-900/90 ',
+          'bg-ocean-900/90',
           'border-ocean-500/30',
-          'text-ocean-100 ',
+          'text-ocean-100',
         ],
       },
     },

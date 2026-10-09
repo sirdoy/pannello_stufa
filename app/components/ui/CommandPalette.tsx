@@ -109,7 +109,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
       <div
         className={cn(
           'fixed inset-0 z-50',
-          'bg-slate-950/70 ',
+          'bg-black/60',
           'backdrop-blur-md'
         )}
         aria-hidden="true"
@@ -131,10 +131,10 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
           className={cn(
             'flex flex-col',
             'rounded-3xl',
-            'border border-slate-700/50 ',
-            'bg-slate-900/95 ',
-            'backdrop-blur-3xl',
-            'shadow-card-elevated',
+            'border-[0.5px] border-white/8',
+            'bg-(--surface-solid)',
+            'backdrop-blur-xl',
+            'shadow-[0_8px_32px_rgba(0,0,0,0.4)]',
             'overflow-hidden',
             // Mobile: fill available space
             'h-full md:h-auto'
@@ -148,9 +148,9 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
               'w-full p-4',
               'text-lg font-medium',
               'bg-transparent',
-              'border-b border-slate-700/50 ',
-              'text-slate-100 ',
-              'placeholder:text-slate-500 ',
+              'border-b border-white/8',
+              'text-(--text-1)',
+              'placeholder:text-(--text-2)',
               'focus:outline-none'
             )}
           />
@@ -167,7 +167,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
             <Command.Empty
               className={cn(
                 'py-8 text-center',
-                'text-sm text-slate-500 '
+                'text-sm text-(--text-2)'
               )}
             >
               No results found.
@@ -183,7 +183,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
                   '**:[[cmdk-group-heading]]:px-3 **:[[cmdk-group-heading]]:py-2',
                   '**:[[cmdk-group-heading]]:text-xs **:[[cmdk-group-heading]]:font-semibold',
                   '**:[[cmdk-group-heading]]:tracking-wider **:[[cmdk-group-heading]]:uppercase',
-                  ']]:text-slate-400 **:[[cmdk-group-heading]]:text-slate-500'
+                  '**:[[cmdk-group-heading]]:text-(--text-2)'
                 )}
               >
                 {group.items?.map((item) => (
@@ -196,11 +196,11 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
                       'rounded-xl p-3',
                       'text-sm font-medium',
                       'cursor-pointer',
-                      'text-slate-300 ',
+                      'text-(--text-1)',
                       // Selection state (via data attribute from cmdk)
-                      ']:bg-slate-100 data-[selected=true]:bg-slate-700/50',
+                      'data-[selected=true]:bg-white/8',
                       // Hover state
-                      'hover:bg-slate-700/30 ',
+                      'hover:bg-white/6',
                       // Transition
                       'transition-colors duration-150',
                       // Disabled state
@@ -210,7 +210,7 @@ const CommandPalette = forwardRef<HTMLDivElement, CommandPaletteProps>(function 
                     <div className="flex items-center gap-3">
                       {/* Icon (user decision: all items have icons) */}
                       {item.icon && (
-                        <span className="shrink-0 text-slate-400 " aria-hidden="true">
+                        <span className="shrink-0 text-(--text-2)" aria-hidden="true">
                           {item.icon}
                         </span>
                       )}

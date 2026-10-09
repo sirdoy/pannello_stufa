@@ -2,6 +2,8 @@
 
 import { getDayTotalHours, getPowerGradient } from '@/lib/scheduler/schedulerStats';
 import Button from '../ui/Button';
+import Card from '../ui/Card';
+import Text from '../ui/Text';
 import type { WeeklySchedule } from '@/lib/scheduler/schedulerService';
 
 const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
@@ -23,37 +25,28 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
         const hasIntervals = intervals.length > 0;
 
         return (
-          <div
+          <Card
             key={day}
-            className={`
-              flex items-center gap-3 rounded-xl p-3 transition-all duration-200
-              ${isSelected
-                ? 'bg-primary-900/20 ring-primary-500'
-                : 'bg-white/3 hover:bg-neutral-100 hover:bg-white/5'
-              }
-            `}
+            variant="subtle"
+            padding={false}
+            glow={isSelected}
+            className={`flex items-center gap-3 p-3 ${isSelected ? 'bg-ember-500/10' : 'hover:bg-white/6'}`}
           >
             {/* Day name */}
             <div className="w-12 shrink-0">
-              <span className={`
-                text-sm font-medium
-                ${isSelected
-                  ? 'text-primary-300'
-                  : 'text-neutral-300'
-                }
-              `}>
+              <Text as="span" variant={isSelected ? 'ember' : 'secondary'} size="sm" weight="medium">
                 {dayShortNames[dayIndex]}
-              </span>
+              </Text>
             </div>
 
             {/* Timeline bar (24h) */}
             <div className="relative flex-1">
-              <div className="relative h-8 w-full overflow-hidden rounded-lg bg-neutral-700">
+              <div className="relative h-8 w-full overflow-hidden rounded-lg bg-white/10">
                 {/* Reference grid lines */}
                 {[0, 6, 12, 18, 24].map(hour => (
                   <div
                     key={hour}
-                    className="absolute inset-y-0 w-px bg-neutral-600"
+                    className="absolute inset-y-0 w-px bg-white/10"
                     style={{ left: `${(hour / 24) * 100}%` }}
                   />
                 ))}
@@ -80,7 +73,7 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
                         width: `${width}%`,
                         background: getPowerGradient(interval.power),
                       }}
-                      title={`${interval.start} - ${interval.end} | ⚡P${interval.power} 💨V${interval.fan}`}
+                      title={`${interval.start} - ${interval.end} | P${interval.power} V${interval.fan}`}
                     />
                   );
                 })}
@@ -88,15 +81,15 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
                 {/* Empty state overlay */}
                 {!hasIntervals && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-neutral-500">
+                    <Text as="span" variant="tertiary">
                       Nessun intervallo
-                    </span>
+                    </Text>
                   </div>
                 )}
               </div>
 
               {/* Time labels (optional, show on hover) */}
-              <div className="pointer-events-none absolute inset-x-0 -bottom-4 flex justify-between text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="pointer-events-none absolute inset-x-0 -bottom-4 flex justify-between text-(--text-2) opacity-0 transition-opacity group-hover:opacity-100">
                 <span>0h</span>
                 <span>6h</span>
                 <span>12h</span>
@@ -107,15 +100,15 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
 
             {/* Total hours badge */}
             <div className="w-16 shrink-0 text-right">
-              <span className={`
-                text-sm font-medium
-                ${hasIntervals
-                  ? 'text-neutral-300'
-                  : 'text-neutral-600'
-                }
-              `}>
+              <Text
+                as="span"
+                variant="secondary"
+                size="sm"
+                weight="medium"
+                className={hasIntervals ? '' : 'opacity-50'}
+              >
                 {totalHours.toFixed(1)}h
-              </span>
+              </Text>
             </div>
 
             {/* Select button */}
@@ -129,7 +122,7 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
                 {isSelected ? 'Attivo' : 'Modifica'}
               </Button>
             </div>
-          </div>
+          </Card>
         );
       })}
     </div>

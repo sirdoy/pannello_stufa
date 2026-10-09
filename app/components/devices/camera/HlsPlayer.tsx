@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Maximize, Minimize } from 'lucide-react';
+import { Maximize, Minimize, VideoOff } from 'lucide-react';
 import type HlsInstance from 'hls.js';
 import { Text, Button } from '../../ui';
 
@@ -246,7 +246,7 @@ export default function HlsPlayer({
 
   if (error) {
     return (
-      <div className={`relative flex items-center justify-center bg-slate-800 ${className}`}>
+      <div className={`relative flex items-center justify-center bg-black/40 ${className}`}>
         {poster && (
           <img
             src={poster}
@@ -255,7 +255,7 @@ export default function HlsPlayer({
           />
         )}
         <div className="relative z-10 p-4 text-center">
-          <span className="mb-2 block text-3xl">📹</span>
+          <VideoOff size={32} className="mx-auto mb-2 text-(--text-2)" aria-hidden="true" />
           <Text variant="secondary" size="sm">{error}</Text>
         </div>
       </div>
@@ -265,10 +265,10 @@ export default function HlsPlayer({
   return (
     <div
       ref={containerRef}
-      className={`relative bg-slate-900 ${className} ${isFullscreen ? 'flex items-center justify-center' : ''}`}
+      className={`relative bg-black ${className} ${isFullscreen ? 'flex items-center justify-center' : ''}`}
     >
       {loading && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-900/80">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/80">
           <div className="flex flex-col items-center gap-2">
             <div className="size-8 animate-spin rounded-full border-2 border-ocean-500 border-t-transparent" />
             <Text variant="secondary" size="sm">
@@ -294,7 +294,7 @@ export default function HlsPlayer({
           variant="ghost"
           size="sm"
           aria-label={isFullscreen ? 'Esci da schermo intero' : 'Schermo intero'}
-          className="absolute right-2 bottom-2 z-20 bg-slate-900/70 backdrop-blur-sm hover:bg-slate-800/90"
+          className="absolute right-2 bottom-2 z-20 bg-black/70 backdrop-blur-sm hover:bg-black/90"
         />
       )}
     </div>

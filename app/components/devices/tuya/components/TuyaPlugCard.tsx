@@ -1,6 +1,12 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import Badge from '@/app/components/ui/Badge';
+import Button from '@/app/components/ui/Button';
+import Card from '@/app/components/ui/Card';
+import Input from '@/app/components/ui/Input';
+import Text from '@/app/components/ui/Text';
 import type { TuyaPlug } from '@/types/tuyaProxy';
 import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import TuyaEnergyChart from './TuyaEnergyChart';
@@ -21,10 +27,10 @@ function formatCountdown(s: number): string {
   return `${m}:${sec}`;
 }
 
-const freshnessColors: Record<TuyaPlug['data_freshness'], string> = {
-  LIVE: 'bg-emerald-500',
-  STALE: 'bg-amber-500',
-  UNREACHABLE: 'bg-red-500',
+const freshnessVariants: Record<TuyaPlug['data_freshness'], 'sage' | 'warning' | 'danger'> = {
+  LIVE: 'sage',
+  STALE: 'warning',
+  UNREACHABLE: 'danger',
 };
 
 const freshnessLabels: Record<TuyaPlug['data_freshness'], string> = {
@@ -79,95 +85,90 @@ export function TuyaPlugCard({
   };
 
   return (
-    <div className="space-y-3 rounded-xl border border-slate-700 bg-slate-800/50 p-4">
+    <Card className="space-y-3">
       {/* Header row */}
       <div className="flex items-center justify-between">
-        <span className="truncate pr-2 text-sm font-semibold text-slate-100">
+        <Text as="span" size="sm" weight="semibold" className="truncate pr-2">
           {displayName}
-        </span>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <span
-            className={`size-2 rounded-full ${freshnessColors[plug.data_freshness]}`}
-          />
-          <span className="text-xs text-slate-400">
-            {freshnessLabels[plug.data_freshness]}
-          </span>
-        </div>
+        </Text>
+        <Badge variant={freshnessVariants[plug.data_freshness]} size="sm" className="shrink-0">
+          {freshnessLabels[plug.data_freshness]}
+        </Badge>
       </div>
 
       {/* Power and metrics row */}
       <div className="space-y-1">
-        <p className="text-2xl font-bold text-amber-400">
+        <Text variant="warning" weight="bold" className="text-2xl">
           {plug.power_w != null && !isUnreachable
             ? `${plug.power_w.toFixed(1)} W`
             : '-- W'}
-        </p>
-        <p className="text-xs text-slate-400">
+        </Text>
+        <Text variant="secondary" size="xs">
           {plug.voltage_v?.toFixed(0) ?? '--'} V /{''}
           {plug.current_ma?.toFixed(0) ?? '--'} mA
-        </p>
+        </Text>
       </div>
 
       {/* Toggle button */}
-      <button
+      <Button
+        variant={plug.switch_on ? 'ember' : 'subtle'}
+        size="sm"
+        fullWidth
         onClick={() => onToggle(plug.device_id, plug.switch_on ?? false)}
         disabled={isUnreachable}
-        className={`w-full rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-          plug.switch_on
-            ? 'bg-amber-500/80 text-white hover:bg-amber-500 disabled:opacity-50'
-            : 'bg-slate-700/50 text-slate-300 hover:bg-slate-700 disabled:opacity-50'
-        }`}
         aria-label={plug.switch_on ? 'Spegni' : 'Accendi'}
       >
         {plug.switch_on ? 'Acceso' : 'Spento'}
-      </button>
+      </Button>
 
       {/* Timer section */}
-      <div className="border-t border-slate-700/50 pt-3">
+      <div className="border-t border-white/8 pt-3">
         {hasActiveTimer ? (
           <div className="flex items-center justify-between">
-            <span className="font-mono text-sm text-slate-300">
+            <Text as="span" size="sm" mono>
               {formatCountdown(remaining)}
-            </span>
-            <button
-              onClick={() => onCancelTimer(plug.device_id)}
-              className="rounded-md bg-red-500/20 px-2 py-1 text-xs text-red-400 transition-colors hover:bg-red-500/30"
-            >
+            </Text>
+            <Button variant="danger" size="sm" onClick={() => onCancelTimer(plug.device_id)}>
               Annulla
-            </button>
+            </Button>
           </div>
         ) : (
-          <div className="flex items-center gap-2">
-            <input
+          <div className="flex items-start gap-2">
+            <Input
               type="number"
               min={1}
               max={MAX_TIMER_MINUTES}
               placeholder="min"
               value={timerMinutes}
               onChange={(e) => setTimerMinutes(e.target.value)}
-              className="w-16 rounded-md border border-slate-600 bg-slate-700/50 px-2 py-1 text-xs text-slate-200"
+              containerClassName="w-24"
+              className="px-3 py-2.5 text-sm"
               aria-label="Minuti timer"
             />
-            <button
+            <Button
+              variant="subtle"
+              size="sm"
               onClick={handleSetTimer}
               disabled={!timerMinutes || parseInt(timerMinutes, 10) <= 0}
-              className="rounded-md bg-slate-700/50 px-2 py-1 text-xs text-slate-300 transition-colors hover:bg-slate-700 disabled:opacity-50"
             >
               Imposta
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       {/* Expand/collapse energy chart */}
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
+        fullWidth
         onClick={() => setExpanded((prev) => !prev)}
-        className="w-full text-left text-xs text-slate-400 transition-colors hover:text-slate-300"
+        icon={expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
       >
-        {expanded ? '▲ Nascondi storico' : '▼ Storico energia'}
-      </button>
+        {expanded ? 'Nascondi storico' : 'Storico energia'}
+      </Button>
 
       {expanded && <TuyaEnergyChart deviceId={plug.device_id} />}
-    </div>
+    </Card>
   );
 }

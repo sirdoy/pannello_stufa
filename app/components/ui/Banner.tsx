@@ -45,7 +45,6 @@ export const bannerVariants = cva(
         ember: [
           'bg-ember-500/15',
           'border-ember-500/25',
-          'shadow-ember-glow-sm',
         ],
       },
       compact: {
@@ -65,29 +64,29 @@ export const bannerVariants = cva(
  */
 const textVariants = {
   info: {
-    title: 'text-ocean-200 ',
-    description: 'text-ocean-300 ',
-    icon: 'text-ocean-400 ',
+    title: 'text-ocean-200',
+    description: 'text-ocean-300',
+    icon: 'text-ocean-400',
   },
   warning: {
-    title: 'text-warning-200 ',
-    description: 'text-warning-300 ',
-    icon: 'text-warning-400 ',
+    title: 'text-warning-200',
+    description: 'text-warning-300',
+    icon: 'text-warning-400',
   },
   error: {
-    title: 'text-danger-200 ',
-    description: 'text-danger-300 ',
-    icon: 'text-danger-400 ',
+    title: 'text-danger-200',
+    description: 'text-danger-300',
+    icon: 'text-danger-400',
   },
   success: {
-    title: 'text-sage-200 ',
-    description: 'text-sage-300 ',
-    icon: 'text-sage-400 ',
+    title: 'text-sage-200',
+    description: 'text-sage-300',
+    icon: 'text-sage-400',
   },
   ember: {
-    title: 'text-ember-200 ',
-    description: 'text-ember-300 ',
-    icon: 'text-ember-400 ',
+    title: 'text-ember-200',
+    description: 'text-ember-300',
+    icon: 'text-ember-400',
   },
 };
 
@@ -260,7 +259,7 @@ export default function Banner({
             className={cn(
               'shrink-0 p-1.5',
               'rounded-lg',
-              'text-slate-400 hover:text-slate-200',
+              'text-(--text-2) hover:text-(--text-1)',
               'hover:bg-white/6',
               'transition-all duration-200',
             )}

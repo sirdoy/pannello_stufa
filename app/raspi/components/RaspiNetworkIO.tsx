@@ -5,6 +5,7 @@ import Heading from '@/app/components/ui/Heading';
 import InfoBox from '@/app/components/ui/InfoBox';
 import Text from '@/app/components/ui/Text';
 import type { RaspiFullData } from '@/app/components/devices/raspi/hooks/useRaspiFullData';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
 interface RaspiNetworkIOProps {
   data: RaspiFullData | null;
@@ -32,13 +33,13 @@ export default function RaspiNetworkIO({ data }: RaspiNetworkIOProps) {
       <Heading level={3}>Rete</Heading>
       <div className="grid grid-cols-2 gap-3">
         <InfoBox
-          icon="⬆️"
+          icon={<ArrowUp size={18} />}
           label="Inviati"
           value={formatBytes(data.networkBytesSent)}
           variant="sage"
         />
         <InfoBox
-          icon="⬇️"
+          icon={<ArrowDown size={18} />}
           label="Ricevuti"
           value={formatBytes(data.networkBytesRecv)}
           variant="ocean"

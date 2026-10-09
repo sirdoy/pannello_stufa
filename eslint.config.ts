@@ -52,6 +52,41 @@ const eslintConfig = [
     },
   },
 
+  // Design system (M73): no hand-picked surface/text colours or gradients in class names. Use Card, Text,
+  // Heading, Button, Badge or the tokens (text-(--text-1), text-(--text-2), bg-white/4, border-white/8).
+  // The dev-only debug pages are not migrated yet (workspace ROADMAP M75).
+  {
+    name: "project/design-system-colours",
+    files: ["app/**/*.tsx"],
+    // Later blocks replace the rule of earlier ones: the files exempt from the <h1> check above are listed again
+    ignores: [
+      "app/debug/**",
+      "app/layout.tsx",
+      "app/components/EmberGlass/PageHeader.tsx",
+      "app/page.tsx",
+      "app/loading.tsx",
+      "app/auth/login/page.tsx",
+      "**/__tests__/**",
+      "**/*.test.tsx",
+    ],
+    rules: {
+      "no-restricted-syntax": ["error",
+        {
+          selector: "JSXOpeningElement[name.name='h1']",
+          message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title.",
+        },
+        {
+          selector: "JSXOpeningElement[name.name='Heading'] > JSXAttribute[name.name='level'][value.expression.value=1]",
+          message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title; section titles start at level 2.",
+        },
+        {
+          selector: "Literal[value=/(^|[\\s:])((bg|text|border)-slate-|bg-linear-to-)/], TemplateElement[value.raw=/(^|[\\s:])((bg|text|border)-slate-|bg-linear-to-)/]",
+          message: "No hand-picked slate colours or gradients: use the design-system components or tokens (.claude/rules/design-system.md).",
+        },
+      ],
+    },
+  },
+
   // Unused vars: a leading underscore marks a deliberately unused binding
   {
     name: "project/unused-vars",

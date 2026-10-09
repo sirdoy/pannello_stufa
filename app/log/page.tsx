@@ -1,6 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+import {
+  AlarmClock, Brush, Calendar, ClipboardList, FileText, Flame, Home, Lightbulb, LightbulbOff, Link, Music, Palette, RefreshCw,
+  Settings, Snowflake, Sun, Thermometer, Unplug, Wind, Wrench, Zap, type LucideIcon,
+} from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { onValue, ref } from 'firebase/database';
 import Card from '@/app/components/ui/Card';
@@ -71,52 +75,57 @@ export default function LogPage() {
     });
   };
 
-  const getIcon = (action: string, device?: string): string => {
+  const pickIcon = (action: string, device?: string): LucideIcon => {
     const actionLower = action.toLowerCase();
 
     // Device-specific icons first
     if (device === 'stove') {
-      if (actionLower.includes('accensione')) return '🔥';
-      if (actionLower.includes('spegnimento')) return '❄️';
-      if (actionLower.includes('ventola') || actionLower.includes('ventilazione')) return '💨';
-      if (actionLower.includes('potenza')) return '⚡';
-      if (actionLower.includes('pulizia')) return '🧹';
-      if (actionLower.includes('scheduler') || actionLower.includes('modalità')) return '⏰';
-      return '🔥'; // Default stove icon
+      if (actionLower.includes('accensione')) return Flame;
+      if (actionLower.includes('spegnimento')) return Snowflake;
+      if (actionLower.includes('ventola') || actionLower.includes('ventilazione')) return Wind;
+      if (actionLower.includes('potenza')) return Zap;
+      if (actionLower.includes('pulizia')) return Brush;
+      if (actionLower.includes('scheduler') || actionLower.includes('modalità')) return AlarmClock;
+      return Flame; // Default stove icon
     }
 
     if (device === 'thermostat') {
-      if (actionLower.includes('temperatura')) return '🌡️';
-      if (actionLower.includes('modalità') || actionLower.includes('mode')) return '⚙️';
-      if (actionLower.includes('calibra')) return '🔧';
-      if (actionLower.includes('sincronizzazione')) return '🔄';
-      if (actionLower.includes('connessione')) return '🔗';
-      if (actionLower.includes('disconnessione')) return '🔌';
-      return '🌡️'; // Default thermostat icon
+      if (actionLower.includes('temperatura')) return Thermometer;
+      if (actionLower.includes('modalità') || actionLower.includes('mode')) return Settings;
+      if (actionLower.includes('calibra')) return Wrench;
+      if (actionLower.includes('sincronizzazione')) return RefreshCw;
+      if (actionLower.includes('connessione')) return Link;
+      if (actionLower.includes('disconnessione')) return Unplug;
+      return Thermometer; // Default thermostat icon
     }
 
     if (device === 'lights') {
-      if (actionLower.includes('accesa') || actionLower.includes('on')) return '💡';
-      if (actionLower.includes('spenta') || actionLower.includes('off')) return '🌑';
-      if (actionLower.includes('luminosità') || actionLower.includes('brightness')) return '☀️';
-      if (actionLower.includes('scena')) return '🎭';
-      if (actionLower.includes('stanza')) return '🏠';
-      if (actionLower.includes('connessione')) return '🔗';
-      if (actionLower.includes('disconnessione')) return '🔌';
-      return '💡'; // Default lights icon
+      if (actionLower.includes('accesa') || actionLower.includes('on')) return Lightbulb;
+      if (actionLower.includes('spenta') || actionLower.includes('off')) return LightbulbOff;
+      if (actionLower.includes('luminosità') || actionLower.includes('brightness')) return Sun;
+      if (actionLower.includes('scena')) return Palette;
+      if (actionLower.includes('stanza')) return Home;
+      if (actionLower.includes('connessione')) return Link;
+      if (actionLower.includes('disconnessione')) return Unplug;
+      return Lightbulb; // Default lights icon
     }
 
-    if (device === 'sonos') return '🎵';
+    if (device === 'sonos') return Music;
 
     // Legacy fallback (for old logs without device field)
-    if (actionLower.includes('accensione')) return '🔥';
-    if (actionLower.includes('spegnimento')) return '❄️';
-    if (actionLower.includes('ventola')) return '💨';
-    if (actionLower.includes('potenza')) return '⚡';
-    if (actionLower.includes('scheduler') || actionLower.includes('modalità')) return '⏰';
-    if (actionLower.includes('netatmo') || actionLower.includes('temperatura')) return '🌡️';
-    if (actionLower.includes('intervallo')) return '📅';
-    return '📄';
+    if (actionLower.includes('accensione')) return Flame;
+    if (actionLower.includes('spegnimento')) return Snowflake;
+    if (actionLower.includes('ventola')) return Wind;
+    if (actionLower.includes('potenza')) return Zap;
+    if (actionLower.includes('scheduler') || actionLower.includes('modalità')) return AlarmClock;
+    if (actionLower.includes('netatmo') || actionLower.includes('temperatura')) return Thermometer;
+    if (actionLower.includes('intervallo')) return Calendar;
+    return FileText;
+  };
+
+  const getIcon = (action: string, device?: string): ReactNode => {
+    const Icon = pickIcon(action, device);
+    return <Icon size={20} className="text-(--text-2)" aria-hidden="true" />;
   };
 
   const getDeviceBadge = (device?: string): { label: string; icon?: string; color: 'primary' | 'info' | 'warning' | 'success' | 'neutral' } => {
@@ -182,9 +191,9 @@ export default function LogPage() {
           <Button
             variant={deviceFilter === 'all' ? 'subtle' : 'ghost'}
             size="sm"
-            icon="🏠"
+            icon={<Home size={16} />}
             onClick={() => setDeviceFilter('all')}
-            className={deviceFilter === 'all' ? 'ring-1 ring-slate-500/30' : ''}
+            className={deviceFilter === 'all' ? 'ring-1 ring-white/14' : ''}
           >
             Tutti ({deviceCounts.all})
           </Button>
@@ -194,7 +203,7 @@ export default function LogPage() {
             <Button
               variant={deviceFilter === 'stove' ? 'ember' : 'ghost'}
               size="sm"
-              icon="🔥"
+              icon={<Flame size={16} />}
               onClick={() => setDeviceFilter('stove')}
               className={deviceFilter !== 'stove' ? 'text-ember-400 hover:bg-ember-500/10' : ''}
             >
@@ -207,7 +216,7 @@ export default function LogPage() {
             <Button
               variant={deviceFilter === 'thermostat' ? 'ember' : 'ghost'}
               size="sm"
-              icon="🌡️"
+              icon={<Thermometer size={16} />}
               onClick={() => setDeviceFilter('thermostat')}
               className={deviceFilter !== 'thermostat' ? 'text-ocean-400 hover:bg-ocean-500/10' : ''}
             >
@@ -220,7 +229,7 @@ export default function LogPage() {
             <Button
               variant={deviceFilter === 'lights' ? 'subtle' : 'ghost'}
               size="sm"
-              icon="💡"
+              icon={<Lightbulb size={16} />}
               onClick={() => setDeviceFilter('lights')}
               className={deviceFilter === 'lights'
                 ? 'bg-warning-500/20 text-warning-300'
@@ -235,7 +244,7 @@ export default function LogPage() {
             <Button
               variant={deviceFilter === 'sonos' ? 'success' : 'ghost'}
               size="sm"
-              icon="🎵"
+              icon={<Music size={16} />}
               onClick={() => setDeviceFilter('sonos')}
               className={deviceFilter !== 'sonos' ? 'text-sage-400 hover:bg-sage-500/10' : ''}
             >
@@ -249,7 +258,7 @@ export default function LogPage() {
       <Card variant="default">
         {filteredLog.length === 0 ? (
           <EmptyState
-            icon="📋"
+            icon={<ClipboardList size={48} className="text-(--text-2)" />}
             title="Nessuna azione registrata"
             description={deviceFilter !== 'all'
               ? 'Non ci sono log per questo dispositivo'

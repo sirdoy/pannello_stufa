@@ -5,6 +5,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import {
   Card,
   Heading,
+  Text,
   Badge,
   Banner,
   EmptyState,
@@ -53,7 +54,7 @@ export default function DectHandsetsTable({
       header: 'Nome',
       enableSorting: true,
       cell: ({ row }) => (
-        <span className="font-medium text-slate-200">{row.original.name}</span>
+        <Text as="span" size="sm" weight="medium">{row.original.name}</Text>
       ),
     },
     {
@@ -61,7 +62,7 @@ export default function DectHandsetsTable({
       header: 'ID',
       enableSorting: true,
       cell: ({ row }) => (
-        <span className="font-mono text-xs text-slate-400">{row.original.dect_id}</span>
+        <Text as="span" variant="secondary" size="xs" mono>{row.original.dect_id}</Text>
       ),
     },
     {
@@ -70,7 +71,7 @@ export default function DectHandsetsTable({
       enableSorting: false,
       // TR-064 does not expose the model: backend always sends null.
       cell: ({ row }) => (
-        <span className="text-slate-300">{row.original.model ?? '—'}</span>
+        <Text as="span" variant="secondary" size="sm">{row.original.model ?? '—'}</Text>
       ),
     },
     {
@@ -114,7 +115,7 @@ export default function DectHandsetsTable({
         />
       ) : handsets.length === 0 ? (
         <EmptyState
-          icon={<Phone size={48} className="text-slate-500" />}
+          icon={<Phone size={48} className="text-(--text-2)" />}
           title="Nessuna cornetta DECT registrata"
           description="Registra una cornetta dal pannello di controllo del Fritz!Box per vederla qui."
           size="md"

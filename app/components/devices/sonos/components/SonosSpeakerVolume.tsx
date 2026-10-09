@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { VolumeX, Volume2 } from 'lucide-react';
 import type { SonosVolumeResponse, SonosEqResponse, SonosHomeTheaterResponse, SetEqRequest, SetHomeTheaterRequest } from '@/types/sonosProxy';
+import Button from '@/app/components/ui/Button';
+import Text from '@/app/components/ui/Text';
 import SonosEqControls from './SonosEqControls';
 import SonosHomeTheater from './SonosHomeTheater';
 import SonosSourceSwitch from './SonosSourceSwitch';
@@ -72,20 +74,16 @@ export default function SonosSpeakerVolume({
     <div className="space-y-1">
       {/* Volume row */}
       <div className="flex items-center gap-3 py-2">
-        <span className="min-w-25 truncate text-sm text-slate-300">
+        <Text as="span" size="sm" className="min-w-25 truncate">
           {speakerName}
-        </span>
-        <button
+        </Text>
+        <Button.Icon
+          variant="ghost"
+          size="sm"
           onClick={() => void onSetMute(uid, !isMuted)}
-          className="rounded-md p-1.5 transition-colors hover:bg-slate-700/50"
           aria-label={isMuted ? 'Attiva audio' : 'Disattiva audio'}
-        >
-          {isMuted ? (
-            <VolumeX size={16} className="text-red-400" />
-          ) : (
-            <Volume2 size={16} className="text-slate-400" />
-          )}
-        </button>
+          icon={isMuted ? <VolumeX size={16} className="text-danger-400" /> : <Volume2 size={16} />}
+        />
         <input
           type="range"
           min={0}
@@ -93,10 +91,10 @@ export default function SonosSpeakerVolume({
           value={localVolume}
           onChange={handleVolumeChange}
           disabled={isDisabled}
-          className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500 disabled:opacity-50"
+          className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500 disabled:opacity-50"
           aria-label={`Volume ${speakerName}`}
         />
-        <span className="min-w-8 text-right text-xs text-slate-400">{localVolume}%</span>
+        <Text as="span" variant="secondary" size="xs" className="min-w-8 text-right">{localVolume}%</Text>
       </div>
 
       {/* Source switch — inline, soundbar only per D-15 */}

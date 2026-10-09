@@ -56,7 +56,7 @@ export default function TamStatusCard({
       <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Voicemail size={24} aria-hidden="true" className="text-slate-400" />
+            <Voicemail size={24} aria-hidden="true" className="text-(--text-2)" />
             <Heading level={2} size="lg">Segreteria</Heading>
           </div>
           <HealthIndicator status="error" label="Errore" size="md" />
@@ -77,7 +77,7 @@ export default function TamStatusCard({
       <Card variant="elevated" className="space-y-4 p-4 sm:p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Voicemail size={24} aria-hidden="true" className="text-slate-400" />
+            <Voicemail size={24} aria-hidden="true" className="text-(--text-2)" />
             <Heading level={2} size="lg">Segreteria</Heading>
           </div>
           <HealthIndicator status="error" label="Errore" size="md" />
@@ -94,7 +94,7 @@ export default function TamStatusCard({
 
   const tam = status.tam;
   const enabled = tam.tam_enabled === true;
-  const iconColor = enabled ? 'text-ember-400' : 'text-slate-400';
+  const iconColor = enabled ? 'text-ember-400' : 'text-(--text-2)';
   const healthStatus = enabled ? 'ok' : 'warning';
   const healthLabel = enabled ? 'Attiva' : 'Disattiva';
   const newMessages = tam.new_messages ?? 0;

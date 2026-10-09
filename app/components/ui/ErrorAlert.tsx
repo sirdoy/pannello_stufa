@@ -62,11 +62,11 @@ export default function ErrorAlert({ errorCode, errorDescription, className = ''
         {errorDescription || errorInfo.description}
       </span>
       {showSuggestion && suggestion && (
-        <span className="mt-3 block rounded-lg bg-slate-800/40 p-3 ring-1 ring-slate-700/50 backdrop-blur-2xl ring-inset ">
-          <span className="mb-1 block text-sm font-medium text-slate-300 ">
+        <span className="mt-3 block rounded-xl border-[0.5px] border-white/6 bg-white/4 p-3">
+          <span className="mb-1 block text-sm font-medium text-(--text-1)">
             💡 Suggerimento:
           </span>
-          <span className="block text-sm text-slate-400 ">
+          <span className="block text-sm text-(--text-2)">
             {suggestion}
           </span>
         </span>
@@ -113,17 +113,17 @@ export function ErrorBadge({ errorCode, className = '' }: ErrorBadgeProps) {
   const errorInfo = getErrorInfo(errorCode);
   const { severity } = errorInfo;
 
-  // Ember Noir severity colors
+  // Severity tints (same recipe as Badge)
   const getSeverityClasses = () => {
     switch (severity) {
       case ERROR_SEVERITY.CRITICAL:
-        return 'bg-gradient-to-r from-danger-500 to-danger-600 text-white shadow-[0_2px_8px_rgba(239,68,68,0.3)]';
+        return 'border-[0.5px] border-danger-400/40 bg-danger-500/30 text-danger-200';
       case ERROR_SEVERITY.ERROR:
-        return 'bg-gradient-to-r from-danger-400 to-danger-500 text-white shadow-[0_2px_8px_rgba(239,68,68,0.25)]';
+        return 'border-[0.5px] border-danger-400/30 bg-danger-500/20 text-danger-300';
       case ERROR_SEVERITY.WARNING:
-        return 'bg-gradient-to-r from-warning-400 to-warning-500 text-white shadow-[0_2px_8px_rgba(234,179,8,0.25)]';
+        return 'border-[0.5px] border-warning-400/30 bg-warning-500/20 text-warning-300';
       default:
-        return 'bg-gradient-to-r from-ocean-400 to-ocean-500 text-white shadow-[0_2px_8px_rgba(67,125,174,0.25)]';
+        return 'border-[0.5px] border-ocean-400/30 bg-ocean-500/20 text-ocean-300';
     }
   };
 

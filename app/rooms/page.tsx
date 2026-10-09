@@ -15,6 +15,7 @@ import Skeleton from '@/app/components/ui/Skeleton';
 import Card from '@/app/components/ui/Card';
 import Input from '@/app/components/ui/Input';
 import FormModal from '@/app/components/ui/FormModal';
+import EmptyState from '@/app/components/ui/EmptyState';
 import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
 import { Text } from '@/app/components/ui';
 import { useToast } from '@/app/hooks/useToast';
@@ -175,9 +176,9 @@ export default function RoomsPage() {
       accessorKey: 'description',
       header: 'Descrizione',
       cell: ({ row }) => (
-        <span className="block max-w-xs truncate text-slate-400">
+        <Text as="span" variant="secondary" className="block max-w-xs truncate">
           {row.original.description ?? '\u2014'}
-        </span>
+        </Text>
       ),
       enableSorting: false,
     },
@@ -228,18 +229,18 @@ export default function RoomsPage() {
       <Card variant="glass" className="p-4 sm:p-6">
         {/* Health stats inline (per D-27) */}
         {health !== null && (
-          <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-slate-400 sm:gap-6">
+          <Text as="div" variant="secondary" size="sm" className="mb-4 flex flex-wrap items-center gap-4 sm:gap-6">
             <span>
-              Stanze: <strong className="text-slate-200">{health.room_count}</strong>
+              Stanze: <Text as="strong" size="sm">{health.room_count}</Text>
             </span>
             <span>
               Dispositivi assegnati:{' '}
-              <strong className="text-slate-200">{health.total_device_count}</strong>
+              <Text as="strong" size="sm">{health.total_device_count}</Text>
             </span>
             <span>
-              Orfani: <strong className="text-slate-200">{health.orphan_device_count}</strong>
+              Orfani: <Text as="strong" size="sm">{health.orphan_device_count}</Text>
             </span>
-          </div>
+          </Text>
         )}
 
         {/* Toolbar: stato + create buttons (per D-08, D-05) */}
@@ -260,17 +261,14 @@ export default function RoomsPage() {
 
         {/* Empty state */}
         {!loading && !error && rooms.length === 0 && (
-          <div className="py-8 text-center text-slate-400">
-            <p>Nessuna stanza creata</p>
-            <Button
-              variant="ember"
-              size="sm"
-              className="mt-4"
-              onClick={() => setShowCreate(true)}
-            >
-              Crea stanza
-            </Button>
-          </div>
+          <EmptyState
+            description="Nessuna stanza creata"
+            action={
+              <Button variant="ember" size="sm" onClick={() => setShowCreate(true)}>
+                Crea stanza
+              </Button>
+            }
+          />
         )}
 
         {/* Room list */}

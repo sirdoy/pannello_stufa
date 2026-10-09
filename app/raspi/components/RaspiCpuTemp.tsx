@@ -4,6 +4,7 @@ import Card from '@/app/components/ui/Card';
 import Heading from '@/app/components/ui/Heading';
 import InfoBox from '@/app/components/ui/InfoBox';
 import type { RaspiFullData } from '@/app/components/devices/raspi/hooks/useRaspiFullData';
+import { Cpu, Thermometer } from 'lucide-react';
 
 interface RaspiCpuTempProps {
   data: RaspiFullData | null;
@@ -24,13 +25,13 @@ export default function RaspiCpuTemp({ data }: RaspiCpuTempProps) {
       <Heading level={3}>CPU e Temperatura</Heading>
       <div className="grid grid-cols-2 gap-3">
         <InfoBox
-          icon="💻"
+          icon={<Cpu size={18} />}
           label="CPU"
           value={`${data.cpuPercent.toFixed(1)}%`}
           variant="sage"
         />
         <InfoBox
-          icon="🌡️"
+          icon={<Thermometer size={18} />}
           label="Temperatura"
           value={tempValue}
           variant="ember"

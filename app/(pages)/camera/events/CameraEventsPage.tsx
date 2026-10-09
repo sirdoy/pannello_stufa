@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { CalendarDays, Clock, Video, VideoOff } from 'lucide-react';
 import { CAMERA_ROUTES } from '@/lib/routes';
 import {
   Section,
@@ -196,7 +197,7 @@ export default function CameraEventsPage() {
         <PageHeader title="Eventi" backHref="/camera" />
         <Section spacing="none">
           <EmptyState
-            icon="📹"
+            icon={<VideoOff size={48} className="text-(--text-2)" />}
             title="Nessun evento registrato"
             description="Non sono stati trovati eventi registrati dalle tue videocamere."
           />
@@ -268,11 +269,11 @@ export default function CameraEventsPage() {
           {Object.entries(groupedEvents).map(([date, dateEvents]) => (
             <Card key={date}>
               <CardHeader>
-                <CardTitle icon="📅" level={2}>
+                <CardTitle icon={<CalendarDays size={20} className="text-(--text-2)" />} level={2}>
                   {date}
-                  <span className="ml-2 text-sm font-normal text-slate-400">
+                  <Text as="span" variant="secondary" size="sm" weight="normal" className="ml-2">
                     ({dateEvents.length} {dateEvents.length === 1 ? 'evento' : 'eventi'})
-                  </span>
+                  </Text>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -284,10 +285,10 @@ export default function CameraEventsPage() {
                       <button
                         key={event.event_id}
                         onClick={() => setSelectedEvent(event)}
-                        className="group flex w-full items-center gap-4 rounded-xl bg-slate-800/50 p-3 text-left transition-all hover:bg-slate-700/50 hover:ring-2 hover:ring-ocean-500"
+                        className="flex w-full cursor-pointer items-center gap-4 rounded-2xl border-[0.5px] border-white/6 bg-white/4 p-3 text-left transition-colors hover:bg-white/6"
                       >
                         {/* Snapshot preview */}
-                        <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg bg-slate-900 sm:h-24 sm:w-40">
+                        <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg bg-black/40 sm:h-24 sm:w-40">
                           {event.snapshot_url ? (
                             <img
                               src={event.snapshot_url}
@@ -324,15 +325,17 @@ export default function CameraEventsPage() {
                           )}
 
                           <div className="mt-1 flex flex-wrap items-center gap-3">
-                            <Text variant="tertiary" size="xs">
-                              🕐 {new Date(event.timestamp * 1000).toLocaleTimeString('it-IT', {
+                            <Text variant="tertiary" size="xs" className="flex items-center gap-1">
+                              <Clock size={12} aria-hidden="true" />
+                              {new Date(event.timestamp * 1000).toLocaleTimeString('it-IT', {
                                 hour: '2-digit',
                                 minute: '2-digit',
                               })}
                             </Text>
                             {cameras.length > 1 && cameraName && (
-                              <Text variant="tertiary" size="xs">
-                                📹 {cameraName}
+                              <Text variant="tertiary" size="xs" className="flex items-center gap-1">
+                                <Video size={12} aria-hidden="true" />
+                                {cameraName}
                               </Text>
                             )}
                           </div>

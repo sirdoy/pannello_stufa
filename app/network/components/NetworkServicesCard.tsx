@@ -53,11 +53,11 @@ function CollapsibleSection({
       >
         <span className="text-sm font-medium">
           {title}{''}
-          <span className="text-slate-400">({count})</span>
+          <Text as="span" variant="secondary" size="sm">({count})</Text>
         </span>
         <ChevronDown
           className={cn(
-            'size-4 text-slate-400 transition-transform',
+            'size-4 text-(--text-2) transition-transform',
             isOpen && 'rotate-180',
           )}
         />
@@ -102,7 +102,7 @@ export default function NetworkServicesCard({
       header: 'MAC',
       enableSorting: false,
       cell: ({ row }) => (
-        <span className="font-mono text-xs text-slate-400">{row.original.mac}</span>
+        <Text as="span" variant="secondary" size="xs" mono>{row.original.mac}</Text>
       ),
     },
     {
@@ -171,7 +171,7 @@ export default function NetworkServicesCard({
           Servizi di rete
         </Heading>
         {stale && (
-          <Text variant="label" size="xs" className="text-slate-500">
+          <Text variant="label" size="xs">
             Dati non aggiornati
           </Text>
         )}
@@ -193,7 +193,7 @@ export default function NetworkServicesCard({
               density="compact"
             />
           ) : (
-            <Text size="sm" className="px-1 text-slate-500">
+            <Text variant="secondary" size="sm" className="px-1">
               Nessuna riserva DHCP configurata
             </Text>
           )}
@@ -213,7 +213,7 @@ export default function NetworkServicesCard({
               density="compact"
             />
           ) : (
-            <Text size="sm" className="px-1 text-slate-500">
+            <Text variant="secondary" size="sm" className="px-1">
               Nessuna regola di port forwarding configurata
             </Text>
           )}
@@ -228,7 +228,7 @@ export default function NetworkServicesCard({
           {upnp ? (
             <div className="space-y-3 px-1">
               <div className="flex items-center gap-2">
-                <Text size="sm" className="text-slate-400">
+                <Text variant="secondary" size="sm">
                   Stato:
                 </Text>
                 <Badge variant={upnp.enabled ? 'sage' : 'neutral'} size="sm">
@@ -237,22 +237,22 @@ export default function NetworkServicesCard({
               </div>
               {upnp.upnp_ports.length > 0 && (
                 <div className="space-y-1">
-                  <Text size="sm" className="font-medium text-slate-400">
+                  <Text variant="secondary" size="sm" weight="medium">
                     Porte UPnP attive:
                   </Text>
                   {upnp.upnp_ports.map((port, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-sm">
-                      <span className="font-mono text-slate-300">{port.external_port}</span>
-                      <span className="text-slate-500">→</span>
-                      <span className="font-mono text-slate-300">{port.internal_client}:{port.internal_port}</span>
-                      <span className="text-slate-500">{port.protocol}</span>
+                    <div key={idx} className="flex items-center gap-2">
+                      <Text as="span" variant="secondary" size="sm" mono>{port.external_port}</Text>
+                      <Text as="span" variant="tertiary" size="sm">→</Text>
+                      <Text as="span" variant="secondary" size="sm" mono>{port.internal_client}:{port.internal_port}</Text>
+                      <Text as="span" variant="tertiary" size="sm">{port.protocol}</Text>
                     </div>
                   ))}
                 </div>
               )}
             </div>
           ) : (
-            <Text size="sm" className="px-1 text-slate-500">
+            <Text variant="secondary" size="sm" className="px-1">
               Dati UPnP non disponibili
             </Text>
           )}
@@ -269,7 +269,7 @@ export default function NetworkServicesCard({
               {/* Nodes */}
               {mesh.nodes.length > 0 && (
                 <div className="space-y-2">
-                  <Text size="sm" className="font-medium text-slate-400">
+                  <Text variant="secondary" size="sm" weight="medium">
                     Nodi ({mesh.node_count}):
                   </Text>
                   {mesh.nodes.map((node) => (
@@ -277,10 +277,10 @@ export default function NetworkServicesCard({
                       key={node.uid}
                       className="flex flex-wrap items-center gap-2"
                     >
-                      <span className="text-sm font-medium text-slate-200">
+                      <Text as="span" size="sm" weight="medium">
                         {node.name}
-                      </span>
-                      <span className="text-xs text-slate-500">{node.model}</span>
+                      </Text>
+                      <Text as="span" variant="tertiary" size="xs">{node.model}</Text>
                       <Badge
                         variant={node.is_meshed ? 'ocean' : 'neutral'}
                         size="sm"
@@ -295,26 +295,26 @@ export default function NetworkServicesCard({
               {/* Links */}
               {mesh.links.length > 0 && (
                 <div className="space-y-2">
-                  <Text size="sm" className="font-medium text-slate-400">
+                  <Text variant="secondary" size="sm" weight="medium">
                     Connessioni ({mesh.link_count}):
                   </Text>
                   {mesh.links.map((link, idx) => (
-                    <div key={idx} className="text-sm text-slate-300">
+                    <Text key={idx} as="div" variant="secondary" size="sm">
                       <span className="font-medium">{link.source_name}</span>
-                      <span className="text-slate-500"> → </span>
+                      <span> → </span>
                       <span className="font-medium">{link.target_name}</span>
                       {link.cur_rx_kbps !== null && (
-                        <span className="ml-2 text-slate-500">
+                        <span className="ml-2">
                           ↓{Math.round(link.cur_rx_kbps / 1000)} Mbps ↑{Math.round((link.cur_tx_kbps ?? 0) / 1000)} Mbps
                         </span>
                       )}
-                    </div>
+                    </Text>
                   ))}
                 </div>
               )}
             </div>
           ) : (
-            <Text size="sm" className="px-1 text-slate-500">
+            <Text variant="secondary" size="sm" className="px-1">
               Dati topologia mesh non disponibili
             </Text>
           )}

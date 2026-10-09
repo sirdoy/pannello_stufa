@@ -12,7 +12,7 @@ import Heading from './Heading';
  *
  * Variant: default, elevated, subtle, outlined, glass
  * hover: boolean - Enable hover effects
- * glow: boolean - Add ember glow effect
+ * glow: boolean - Accent (ember) border
  * padding: boolean - Include default padding (default: true)
  */
 export const cardVariants = cva(
@@ -109,7 +109,14 @@ const CardTitle = forwardRef<HTMLDivElement, CardTitleProps>(
   function CardTitle({ children, icon, level = 2, className, ...props }, ref) {
     return (
       <div ref={ref} className={cn('flex items-center gap-3', className)} {...props}>
-        {icon && <span className="text-2xl sm:text-3xl">{icon}</span>}
+        {icon && (
+          <span
+            aria-hidden={typeof icon === 'string' ? undefined : true}
+            className={typeof icon === 'string' ? 'text-2xl sm:text-3xl' : 'inline-flex shrink-0 items-center text-(--text-2)'}
+          >
+            {icon}
+          </span>
+        )}
         <Heading level={level} size="lg">
           {children}
         </Heading>
@@ -166,7 +173,7 @@ const CardDivider = forwardRef<HTMLDivElement, CardDividerProps>(
       <div
         ref={ref}
         className={cn(
-          'my-4 h-px bg-linear-to-r from-transparent via-white/8 to-transparent',
+          'my-4 h-px bg-white/8',
           className
         )}
         {...props}

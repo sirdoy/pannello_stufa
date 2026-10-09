@@ -48,9 +48,8 @@ const radioItemVariants = cva(
   [
     // Base circle styles
     'aspect-square shrink-0 rounded-full border-2 transition-all duration-200',
-    // Focus ring - ember glow
+    // Focus ring
     'focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:outline-none',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     // Disabled state
     'disabled:cursor-not-allowed disabled:opacity-50',
     'data-disabled:cursor-not-allowed data-disabled:opacity-50',
@@ -59,16 +58,13 @@ const radioItemVariants = cva(
     variants: {
       variant: {
         ember: [
-          'border-slate-500 data-[state=checked]:border-ember-500',
-          ' ]:border-ember-600',
+          'border-white/30 data-[state=checked]:border-ember-500',
         ],
         ocean: [
-          'border-slate-500 data-[state=checked]:border-ocean-500',
-          ' ]:border-ocean-600',
+          'border-white/30 data-[state=checked]:border-ocean-500',
         ],
         sage: [
-          'border-slate-500 data-[state=checked]:border-sage-500',
-          ' ]:border-sage-600',
+          'border-white/30 data-[state=checked]:border-sage-500',
         ],
       },
       size: {
@@ -89,9 +85,9 @@ const radioIndicatorVariants = cva(
   {
     variants: {
       variant: {
-        ember: 'bg-ember-500 ',
-        ocean: 'bg-ocean-500 ',
-        sage: 'bg-sage-500 ',
+        ember: 'bg-ember-500',
+        ocean: 'bg-ocean-500',
+        sage: 'bg-sage-500',
       },
       size: {
         sm: 'size-2',
@@ -174,7 +170,7 @@ const RadioGroupItem = forwardRef<HTMLButtonElement, RadioGroupItemProps>(({
           htmlFor={id}
           className={cn(
             'cursor-pointer text-base font-medium select-none',
-            'text-slate-200 ',
+            'text-(--text-1)',
             props.disabled && 'cursor-not-allowed opacity-50'
           )}
         >

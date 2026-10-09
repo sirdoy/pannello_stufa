@@ -3,6 +3,8 @@
 import { useState, useRef } from 'react';
 import { useSyncedState } from '@/lib/hooks/useSyncedState';
 import { ChevronDown } from 'lucide-react';
+import Button from '@/app/components/ui/Button';
+import Text from '@/app/components/ui/Text';
 import type { SonosHomeTheaterResponse, SetHomeTheaterRequest } from '@/types/sonosProxy';
 
 interface SonosHomeTheaterProps {
@@ -58,126 +60,124 @@ export default function SonosHomeTheater({ uid, role, htData, onSetHomeTheater }
     }, 250);
   };
 
-  const toggleClass = (active: boolean | null) =>
-    `text-xs px-3 py-1 rounded-md transition-colors ${
-      active
-        ? 'bg-amber-500/80 text-white'
-        : 'bg-slate-700 text-slate-400 hover:bg-slate-600'
-    }`;
+  const toggleVariant = (active: boolean | null) => (active ? 'ember' : 'subtle');
 
   const formatValue = (v: number) => (v >= 0 ? `+${v}` : `${v}`);
 
   return (
     <div className="mt-2">
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => setIsExpanded(prev => !prev)}
-        className="flex items-center gap-1.5 text-xs text-slate-400 transition-colors hover:text-slate-200"
         aria-label="Home Theater"
+        icon={<ChevronDown size={14} className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`} />}
+        iconPosition="right"
       >
-        <span>Home Theater</span>
-        <ChevronDown
-          size={12}
-          className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-        />
-      </button>
+        Home Theater
+      </Button>
 
       {isExpanded && (
         <div className="mt-2 space-y-2">
           {/* Toggle buttons row */}
           <div className="flex flex-wrap gap-2">
-            <button
+            <Button
+              variant={toggleVariant(htData.night_mode)}
+              size="sm"
               onClick={() => void onSetHomeTheater(uid, { night_mode: !htData.night_mode })}
-              className={toggleClass(htData.night_mode)}
               aria-label={`Modalita notte ${htData.night_mode ? 'attiva' : 'disattiva'}`}
             >
               Modalita notte
-            </button>
+            </Button>
 
-            <button
+            <Button
+              variant={toggleVariant(htData.dialog_mode)}
+              size="sm"
               onClick={() => void onSetHomeTheater(uid, { dialog_mode: !htData.dialog_mode })}
-              className={toggleClass(htData.dialog_mode)}
               aria-label={`Dialogo ${htData.dialog_mode ? 'attivo' : 'disattivo'}`}
             >
               Dialogo
-            </button>
+            </Button>
 
-            <button
+            <Button
+              variant={toggleVariant(htData.sub_enabled)}
+              size="sm"
               onClick={() => void onSetHomeTheater(uid, { sub_enabled: !htData.sub_enabled })}
-              className={toggleClass(htData.sub_enabled)}
               aria-label={`Subwoofer ${htData.sub_enabled ? 'attivo' : 'disattivo'}`}
             >
               Subwoofer
-            </button>
+            </Button>
 
-            <button
+            <Button
+              variant={toggleVariant(htData.surround_enabled)}
+              size="sm"
               onClick={() => void onSetHomeTheater(uid, { surround_enabled: !htData.surround_enabled })}
-              className={toggleClass(htData.surround_enabled)}
               aria-label={`Surround ${htData.surround_enabled ? 'attivo' : 'disattivo'}`}
             >
               Surround
-            </button>
+            </Button>
           </div>
 
           {/* Sub gain slider — visible only when sub_enabled */}
           {htData.sub_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="w-24 shrink-0 text-xs text-slate-400">
+              <Text as="span" variant="secondary" size="xs" className="w-24 shrink-0">
                 Guadagno Sub
-              </span>
+              </Text>
               <input
                 type="range"
                 min={-15}
                 max={15}
                 value={localSubGain}
                 onChange={handleSubGainChange}
-                className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500"
+                className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
                 aria-label="Guadagno Sub"
               />
-              <span className="min-w-7 text-right text-xs text-slate-400">
+              <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">
                 {formatValue(localSubGain)}
-              </span>
+              </Text>
             </div>
           )}
 
           {/* Surround TV volume slider — visible only when surround_enabled */}
           {htData.surround_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="w-24 shrink-0 text-xs text-slate-400">
+              <Text as="span" variant="secondary" size="xs" className="w-24 shrink-0">
                 Volume Surround TV
-              </span>
+              </Text>
               <input
                 type="range"
                 min={-15}
                 max={15}
                 value={localSurroundTv}
                 onChange={handleSurroundTvChange}
-                className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500"
+                className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
                 aria-label="Volume Surround TV"
               />
-              <span className="min-w-7 text-right text-xs text-slate-400">
+              <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">
                 {formatValue(localSurroundTv)}
-              </span>
+              </Text>
             </div>
           )}
 
           {/* Surround music volume slider — visible only when surround_enabled */}
           {htData.surround_enabled === true && (
             <div className="flex items-center gap-3">
-              <span className="w-24 shrink-0 text-xs text-slate-400">
+              <Text as="span" variant="secondary" size="xs" className="w-24 shrink-0">
                 Volume Surround Musica
-              </span>
+              </Text>
               <input
                 type="range"
                 min={-15}
                 max={15}
                 value={localSurroundMusic}
                 onChange={handleSurroundMusicChange}
-                className="h-2 flex-1 appearance-none rounded-lg bg-slate-700/50 accent-emerald-500"
+                className="h-2 flex-1 appearance-none rounded-lg bg-white/10 accent-ember-500"
                 aria-label="Volume Surround Musica"
               />
-              <span className="min-w-7 text-right text-xs text-slate-400">
+              <Text as="span" variant="secondary" size="xs" className="min-w-7 text-right">
                 {formatValue(localSurroundMusic)}
-              </span>
+              </Text>
             </div>
           )}
         </div>

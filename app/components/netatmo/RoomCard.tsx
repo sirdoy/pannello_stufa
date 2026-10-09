@@ -1,7 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, Button, Heading, Text, Badge } from '@/app/components/ui';
+import {
+  AlarmClock, Battery, BatteryLow, BatteryWarning, Bath, BedDouble, Briefcase, Check, CookingPot, DoorOpen, Flame,
+  Hand, Home, Link2, Minus, Pause, Plug, Plus, Radio, Settings, SlidersHorizontal, Sofa, Target, Thermometer,
+  WifiOff, Wrench, X,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Card, Button, Banner, Heading, Text, Badge } from '@/app/components/ui';
 import { BatteryBadge } from '@/app/components/devices/thermostat/BatteryWarning';
 import type { BatteryState } from '@/app/components/devices/thermostat/BatteryWarning';
 import { NETATMO_ROUTES } from '@/lib/routes';
@@ -47,53 +53,54 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
   const isHeating = room.heating || false;
 
   // Get device type icon and label
-  function getDeviceIcon(module: ModuleData | null): { icon: string; label: string } {
-    if (!module) return { icon: '📡', label: 'Dispositivo' };
+  function getDeviceIcon(module: ModuleData | null): { Icon: LucideIcon; label: string } {
+    if (!module) return { Icon: Radio, label: 'Dispositivo' };
 
-    const types: Record<string, { icon: string; label: string }> = {
-      NATherm1: { icon: '🌡️', label: 'Termostato' },
-      NRV: { icon: '🔧', label: 'Valvola' },
-      NAPlug: { icon: '🔌', label: 'Relè' },
-      OTM: { icon: '⚙️', label: 'Modulo OpenTherm' },
-      OTH: { icon: '🎛️', label: 'Termostato OpenTherm' },
+    const types: Record<string, { Icon: LucideIcon; label: string }> = {
+      NATherm1: { Icon: Thermometer, label: 'Termostato' },
+      NRV: { Icon: Wrench, label: 'Valvola' },
+      NAPlug: { Icon: Plug, label: 'Relè' },
+      OTM: { Icon: Settings, label: 'Modulo OpenTherm' },
+      OTH: { Icon: SlidersHorizontal, label: 'Termostato OpenTherm' },
     };
 
-    return types[module.type] || { icon: '📡', label: module.type || 'Sconosciuto' };
+    return types[module.type] || { Icon: Radio, label: module.type || 'Sconosciuto' };
   }
 
-  // Temperature color coding with dark mode
+  // Temperature color coding (data colours)
   function getTempColor(temp?: number, setpoint?: number): string {
-    if (!temp || !setpoint) return 'text-slate-400 ';
+    if (!temp || !setpoint) return 'text-(--text-2) ';
     const diff = temp - setpoint;
     if (diff >= 0.5) return 'text-sage-400 ';
     if (diff <= -1) return 'text-ember-400 ';
     return 'text-warning-400 ';
   }
 
-  // Mode badge config with dark mode colors
-  function getModeBadge(mode?: string): { text: string; color: string; icon: string } {
-    const badges: Record<string, { text: string; color: string; icon: string }> = {
-      manual: { text: 'Manuale', color: 'flame', icon: '✋' },
-      home: { text: 'Casa', color: 'sage', icon: '🏠' },
-      max: { text: 'Max', color: 'warning', icon: '🔥' },
-      off: { text: 'Off', color: 'slate', icon: '⏸️' },
-      schedule: { text: 'Programmato', color: 'ocean', icon: '⏰' },
+  // Mode badge config (Badge variant + icon)
+  type ModeBadge = { text: string; variant: 'ember' | 'sage' | 'warning' | 'neutral' | 'ocean'; Icon: LucideIcon };
+  function getModeBadge(mode?: string): ModeBadge {
+    const badges: Record<string, ModeBadge> = {
+      manual: { text: 'Manuale', variant: 'ember', Icon: Hand },
+      home: { text: 'Casa', variant: 'sage', Icon: Home },
+      max: { text: 'Max', variant: 'warning', Icon: Flame },
+      off: { text: 'Off', variant: 'neutral', Icon: Pause },
+      schedule: { text: 'Programmato', variant: 'ocean', Icon: AlarmClock },
     };
     return (badges[mode || 'schedule'] ?? badges.schedule)!;
   }
 
   // Room type display info
-  function getRoomTypeInfo(type?: string): { icon: string; label: string } {
-    const types: Record<string, { icon: string; label: string }> = {
-      livingroom: { icon: '🛋️', label: 'Soggiorno' },
-      bedroom: { icon: '🛏️', label: 'Camera' },
-      kitchen: { icon: '🍳', label: 'Cucina' },
-      bathroom: { icon: '🚿', label: 'Bagno' },
-      office: { icon: '💼', label: 'Ufficio' },
-      corridor: { icon: '🚪', label: 'Corridoio' },
-      custom: { icon: '🏠', label: 'Personalizzata' },
+  function getRoomTypeInfo(type?: string): { Icon: LucideIcon; label: string } {
+    const types: Record<string, { Icon: LucideIcon; label: string }> = {
+      livingroom: { Icon: Sofa, label: 'Soggiorno' },
+      bedroom: { Icon: BedDouble, label: 'Camera' },
+      kitchen: { Icon: CookingPot, label: 'Cucina' },
+      bathroom: { Icon: Bath, label: 'Bagno' },
+      office: { Icon: Briefcase, label: 'Ufficio' },
+      corridor: { Icon: DoorOpen, label: 'Corridoio' },
+      custom: { Icon: Home, label: 'Personalizzata' },
     };
-    return types[type || 'custom'] || { icon: '🏠', label: 'Stanza' };
+    return types[type || 'custom'] || { Icon: Home, label: 'Stanza' };
   }
 
   async function setTemperature(temp: number) {
@@ -188,15 +195,6 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
   const badge = getModeBadge(room.mode);
   const roomInfo = getRoomTypeInfo(room.type);
 
-  // Badge color classes with dark mode
-  const badgeColors: Record<string, string> = {
-    ocean: 'bg-ocean-900/40 text-ocean-300 border-ocean-700 ',
-    flame: 'bg-flame-900/40 text-flame-300 border-flame-700 ',
-    sage: 'bg-sage-900/40 text-sage-300 border-sage-700 ',
-    warning: 'bg-warning-900/40 text-warning-300 border-warning-700 ',
-    slate: 'bg-slate-800 text-slate-300 border-slate-700 ',
-  };
-
   // Get battery/offline/stoveSync status from room
   const hasLowBattery = room.hasLowBattery || false;
   const hasCriticalBattery = room.hasCriticalBattery || false;
@@ -204,7 +202,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
   const stoveSync = room.stoveSync || false;
 
   return (
-    <Card variant="glass" className="hover:shadow-liquid-lg relative overflow-visible p-5 transition-all duration-300 sm:p-6">
+    <Card variant="glass" className="relative overflow-visible p-5 sm:p-6">
       {/* Floating badges container */}
       <div className="absolute -top-2 right-2 z-20 flex items-center gap-2">
         {/* Battery warning badge */}
@@ -213,7 +211,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
             variant={hasCriticalBattery ? 'danger' : 'warning'}
             size="sm"
             pulse={hasCriticalBattery}
-            icon={<span>{hasCriticalBattery ? '🪫' : '🔋'}</span>}
+            icon={hasCriticalBattery ? <BatteryWarning size={14} className="block" /> : <BatteryLow size={14} className="block" />}
           >
             <span className="hidden sm:inline">{hasCriticalBattery ? 'Critica' : 'Bassa'}</span>
           </Badge>
@@ -221,21 +219,21 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
 
         {/* Offline badge */}
         {isOffline && (
-          <Badge variant="neutral" size="sm" icon={<span>📵</span>}>
+          <Badge variant="neutral" size="sm" icon={<WifiOff size={14} className="block" />}>
             <span className="hidden sm:inline">Offline</span>
           </Badge>
         )}
 
         {/* Heating indicator badge */}
         {isHeating && (
-          <Badge variant="ember" size="sm" pulse icon={<span>🔥</span>}>
+          <Badge variant="ember" size="sm" pulse icon={<Flame size={14} className="block" />}>
             <span className="hidden sm:inline">Attivo</span>
           </Badge>
         )}
 
         {/* Stove sync indicator badge - shown when stove is ON and controlling this valve */}
         {stoveSync && (
-          <Badge variant="warning" size="sm" icon={<span>🔥</span>}>
+          <Badge variant="warning" size="sm" icon={<Flame size={14} className="block" />}>
             <span className="hidden sm:inline">Stufa</span>
           </Badge>
         )}
@@ -245,7 +243,7 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
       <div className="mb-4">
         {/* Row 1: Room icon + Name (full width) */}
         <div className="mb-2 flex items-center gap-3">
-          <span className="shrink-0 text-2xl">{roomInfo.icon}</span>
+          <roomInfo.Icon size={18} className="shrink-0 text-(--text-2)" aria-hidden="true" />
           <div className="min-w-0 flex-1">
             <Heading level={3} size="lg" className="truncate" title={room.name}>
               {room.name}
@@ -260,29 +258,26 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
         <div className="flex flex-wrap items-center gap-2">
           {/* Device type badge */}
           {room.deviceType === 'thermostat' && (
-            <span className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold ${badgeColors.ocean}`}>
-              <span className="text-base">🌡️</span>
-              <span>Termostato</span>
-            </span>
+            <Badge variant="ocean" icon={<Thermometer size={14} className="block" />}>
+              Termostato
+            </Badge>
           )}
           {room.deviceType === 'valve' && (
-            <span className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold ${badgeColors.flame}`}>
-              <span>🔧</span>
-              <span>Valvola</span>
-            </span>
+            <Badge variant="ember" icon={<Wrench size={14} className="block" />}>
+              Valvola
+            </Badge>
           )}
 
           {/* Mode badge */}
-          <span className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs font-semibold ${badgeColors[badge.color] || badgeColors.ocean}`}>
-            <span>{badge.icon}</span>
-            <span>{badge.text}</span>
-          </span>
+          <Badge variant={badge.variant} icon={<badge.Icon size={14} className="block" />}>
+            {badge.text}
+          </Badge>
         </div>
       </div>
 
-      {/* Temperature Display - Glass container */}
+      {/* Temperature Display */}
       {room.setpoint !== undefined ? (
-        <div className="] mb-4 rounded-2xl border border-white/5 bg-white/5 p-4 backdrop-blur-xl ">
+        <Card variant="subtle" className="mb-4">
           <div className="flex items-baseline gap-2">
             {room.temperature !== undefined ? (
               <>
@@ -306,49 +301,44 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
           <Text variant="tertiary" size="xs" className="mt-2">
             {room.temperature !== undefined ? 'Attuale / Setpoint' : 'Sensore non disponibile / Setpoint'}
           </Text>
-        </div>
+        </Card>
       ) : (
-        <div className="mb-4 rounded-xl border border-warning-700 bg-warning-900/20 p-3 backdrop-blur-sm">
-          <Text variant="warning" size="sm" className="flex items-center gap-2">
-            <span>⚠️</span>
-            <span>Stanza non configurata o fuori linea</span>
-          </Text>
-        </div>
+        <Banner variant="warning" compact className="mb-4">
+          <Text variant="warning" size="sm">Stanza non configurata o fuori linea</Text>
+        </Banner>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="mb-4 rounded-xl border border-danger-700 bg-danger-900/30 p-3 backdrop-blur-sm">
+        <Banner variant="error" compact className="mb-4">
           <Text variant="danger" size="sm">{error}</Text>
-        </div>
+        </Banner>
       )}
 
       {/* Temperature Editor */}
       {editingTemp ? (
         <div className="space-y-3">
-          <div className="] flex items-center gap-3 rounded-xl border border-white/10 bg-white/4 p-3 backdrop-blur-sm">
-            <Button
+          <Card variant="subtle" padding={false} className="flex items-center gap-3 p-3">
+            <Button.Icon
               variant="subtle"
               size="sm"
               onClick={() => setTargetTemp(Math.max(5, targetTemp - 0.5))}
-              className="size-12"
-            >
-              −
-            </Button>
+              icon={<Minus size={18} />}
+              aria-label="Diminuisci temperatura"
+            />
             <div className="flex-1 text-center">
               <span className="text-3xl font-black text-ocean-400 ">
                 {targetTemp.toFixed(1)}°
               </span>
             </div>
-            <Button
+            <Button.Icon
               variant="subtle"
               size="sm"
               onClick={() => setTargetTemp(Math.min(30, targetTemp + 0.5))}
-              className="size-12"
-            >
-              +
-            </Button>
-          </div>
+              icon={<Plus size={18} />}
+              aria-label="Aumenta temperatura"
+            />
+          </Card>
           <div className="flex gap-2">
             <Button
               variant="success"
@@ -356,18 +346,18 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
               loading={loading}
               className="flex-1"
               size="sm"
+              icon={<Check size={16} />}
             >
-              ✓ Conferma
+              Conferma
             </Button>
-            <Button
+            <Button.Icon
               variant="subtle"
               onClick={() => setEditingTemp(false)}
               disabled={loading}
               size="sm"
-              className="w-12"
-            >
-              ✕
-            </Button>
+              icon={<X size={16} />}
+              aria-label="Annulla"
+            />
           </div>
         </div>
       ) : (
@@ -378,8 +368,9 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
             disabled={loading || !hasSetpoint}
             size="sm"
             title={!hasSetpoint ? 'Stanza non configurata' : 'Imposta temperatura manuale'}
+            icon={<Target size={16} />}
           >
-            🎯 Imposta
+            Imposta
           </Button>
           <Button
             variant="success"
@@ -387,8 +378,9 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
             disabled={loading || !hasSetpoint}
             size="sm"
             title={!hasSetpoint ? 'Stanza non configurata' : 'Ritorna alla programmazione'}
+            icon={<Home size={16} />}
           >
-            🏠 Auto
+            Auto
           </Button>
           <Button
             variant="ghost"
@@ -396,15 +388,16 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
             disabled={loading || !hasSetpoint}
             size="sm"
             title={!hasSetpoint ? 'Stanza non configurata' : 'Spegni riscaldamento'}
+            icon={<Pause size={16} />}
           >
-            ⏸️ Off
+            Off
           </Button>
         </div>
       )}
 
       {/* Module Details with Battery Status */}
       {room.roomModules && room.roomModules.length > 0 && (
-        <div className="mt-4 border-t border-white/5 pt-4 ">
+        <div className="mt-4 border-t border-white/8 pt-4">
           <Text variant="secondary" size="xs" className="mb-2">
             Dispositivi ({room.roomModules.length})
           </Text>
@@ -413,15 +406,17 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
               const deviceInfo = getDeviceIcon(module);
               const isModuleOffline = module.reachable === false;
               return (
-                <div
+                <Card
                   key={module.id}
-                  className={`flex items-center gap-2 rounded-xl border p-2.5 backdrop-blur-sm transition-all duration-200 ${
-                    isModuleOffline
-                      ? 'border-slate-600/30 bg-slate-800/40 '
-                      : '] ] border-white/5 bg-white/4 hover:bg-white/8'
-                  }`}
+                  variant="subtle"
+                  padding={false}
+                  className="flex items-center gap-2 p-2.5"
                 >
-                  <span className={`shrink-0 text-lg ${isModuleOffline ? 'opacity-50' : ''}`}>{deviceInfo.icon}</span>
+                  <deviceInfo.Icon
+                    size={18}
+                    className={`shrink-0 text-(--text-2) ${isModuleOffline ? 'opacity-50' : ''}`}
+                    aria-hidden="true"
+                  />
                   <div className="min-w-0 flex-1">
                     <Text variant="body" size="xs" className={`truncate ${isModuleOffline ? 'opacity-60' : ''}`}>
                       {module.name}
@@ -437,24 +432,24 @@ export default function RoomCard({ room, homeId, onRefresh }: RoomCardProps) {
                     )}
                     {/* Show battery OK for non-critical states */}
                     {module.battery_state && !['low', 'very_low'].includes(module.battery_state) && (
-                      <span className="text-xs text-sage-400 " title={`Batteria: ${module.battery_state}`}>
-                        🔋
+                      <span className="text-sage-400" title={`Batteria: ${module.battery_state}`}>
+                        <Battery size={16} aria-hidden="true" />
                       </span>
                     )}
                     {/* Offline badge */}
                     {isModuleOffline && (
-                      <span className="inline-flex items-center gap-1 rounded-full border border-slate-600/40 bg-slate-700/60 px-1.5 py-0.5 text-xs font-medium text-slate-300 ">
-                        📵 Offline
-                      </span>
+                      <Badge variant="neutral" size="sm" icon={<WifiOff size={12} className="block" />}>
+                        Offline
+                      </Badge>
                     )}
                     {/* Bridge indicator */}
                     {module.bridge && !isModuleOffline && (
-                      <Text variant="tertiary" size="xs" as="span" title="Connesso tramite bridge">
-                        🔗
-                      </Text>
+                      <span className="text-(--text-2)" title="Connesso tramite bridge">
+                        <Link2 size={14} aria-hidden="true" />
+                      </span>
                     )}
                   </div>
-                </div>
+                </Card>
               );
             })}
           </div>

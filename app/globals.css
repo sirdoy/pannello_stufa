@@ -307,6 +307,8 @@
   --glass-blur: 24px;
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), inset 0 0 0 0.5px rgba(255, 255, 255, 0.03);
+  /* Opaque floating surface: dropdowns, popovers, dialogs, sticky table headers */
+  --surface-solid: rgba(28, 25, 23, 0.96);
 
   /* Accent — runtime-overridable via setProperty + inline pre-paint script (D-07, D-08); 6 oklch presets in /debug/design-system-v2 (D-05) */
   --accent: oklch(0.68 0.17 45);

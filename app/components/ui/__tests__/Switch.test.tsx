@@ -199,11 +199,10 @@ describe('Switch', () => {
       });
     });
 
-    it('applies ember gradient when checked', () => {
+    it('applies the flat accent when checked', () => {
       render(<Switch variant="ember" checked label="Ember" />);
       const switchElement = screen.getByRole('switch');
-      // Verify gradient classes are present
-      expect(switchElement).toHaveClass('data-[state=checked]:bg-linear-to-r');
+      expect(switchElement).toHaveClass('data-[state=checked]:bg-(--accent)');
     });
   });
 

@@ -53,21 +53,19 @@ export default function LoadingOverlay({
       aria-busy="true"
     >
       {/* Backdrop - Ember Noir dark/light blur */}
-      <div className="absolute inset-0 transform-gpu bg-slate-950/70 backdrop-blur-xl will-change-[backdrop-filter] " />
+      <div className="absolute inset-0 transform-gpu bg-black/60 backdrop-blur-sm will-change-[backdrop-filter]" />
 
       {/* Loading card */}
       <div className="animate-spring-in relative z-10 transform-gpu will-change-transform">
         <div className="
-          ,0,0,0.15)] relative
+          relative
           flex min-w-70
           flex-col
           items-center
-          gap-5 overflow-hidden rounded-3xl border
-          border-slate-700/60 bg-slate-800/90 px-8 py-10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]
-          backdrop-blur-2xl sm:min-w-80
+          gap-5 overflow-hidden rounded-3xl border-[0.5px]
+          border-white/8 bg-(--surface-solid) px-8 py-10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+          backdrop-blur-xl sm:min-w-80
           sm:gap-6 sm:px-10
-          
-          
           sm:py-12
         ">
           {/* Animated spinner icon */}
@@ -78,13 +76,12 @@ export default function LoadingOverlay({
             {/* Icon container */}
             <div className="
               relative
-              animate-pulse rounded-2xl border
-              border-white/10 bg-linear-to-br from-ember-500
-              to-flame-600
-              p-5 shadow-ember-glow
+              animate-pulse rounded-2xl border-[0.5px]
+              border-ember-400/30 bg-ember-500/20
+              p-5 text-ember-300
               sm:p-6
             ">
-              <span className="inline-block animate-bounce text-5xl sm:text-6xl">
+              <span className={typeof icon === 'string' ? 'inline-block animate-bounce text-5xl sm:text-6xl' : 'flex animate-bounce items-center justify-center'}>
                 {icon}
               </span>
             </div>

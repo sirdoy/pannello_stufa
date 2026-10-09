@@ -250,7 +250,7 @@ describe('DataTable', () => {
       const table = container.querySelector('table');
       expect(table).toHaveClass('[&_thead]:sticky');
       expect(table).toHaveClass('[&_thead]:top-0');
-      expect(table).toHaveClass('[&_thead]:bg-slate-900');
+      expect(table).toHaveClass('[&_thead]:bg-(--surface-solid)');
       expect(table).toHaveClass('[&_thead]:z-10');
     });
 
@@ -385,7 +385,7 @@ describe('DataTable', () => {
         <DataTable data={mockData} columns={mockColumns} />
       );
       const thead = container.querySelector('thead');
-      expect(thead).toHaveClass('bg-slate-800/50');
+      expect(thead).toHaveClass('bg-white/4');
     });
   });
 
@@ -964,7 +964,6 @@ describe('DataTable', () => {
 
       const scrollContainer = container.querySelector('.overflow-x-auto');
       expect(scrollContainer).toHaveClass('scrollbar-thin');
-      expect(scrollContainer).toHaveClass('scrollbar-thumb-slate-700');
     });
   });
 

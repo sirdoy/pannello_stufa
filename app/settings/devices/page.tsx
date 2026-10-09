@@ -172,13 +172,11 @@ export default function DevicesSettingsPage() {
             const isEnabled = preferences[device.id] === true;
 
             return (
-              <div
+              <Card
                 key={device.id}
-                className={`stagger-item rounded-xl border-2 p-4 transition-all duration-200 ${
-                  isEnabled
-                    ? 'border-ember-600 bg-ember-950/30'
-                    : 'border-slate-600 bg-white/2'
-                }`}
+                variant="subtle"
+                glow={isEnabled}
+                className="stagger-item"
                 style={{ '--stagger-index': index } as React.CSSProperties}
               >
                 <div className="flex items-start justify-between gap-4">
@@ -206,7 +204,7 @@ export default function DevicesSettingsPage() {
                     size="md"
                   />
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>

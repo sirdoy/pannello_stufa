@@ -103,7 +103,7 @@ export default function RawBandwidthTable({
       header: 'IP esterno',
       enableSorting: false,
       cell: ({ row }) => (
-        <span className="font-mono text-xs text-slate-400">{row.original.external_ip ?? '—'}</span>
+        <Text as="span" variant="secondary" size="xs" mono>{row.original.external_ip ?? '—'}</Text>
       ),
     },
   ];
@@ -129,7 +129,7 @@ export default function RawBandwidthTable({
         <Skeleton className="h-100 rounded-2xl" />
       ) : items.length === 0 ? (
         <EmptyState
-          icon={<History size={48} className="text-slate-500" />}
+          icon={<History size={48} className="text-(--text-2)" />}
           title="Nessun record di bandwidth"
           description="Il Fritz!Box non ha ancora raccolto dati per l'intervallo selezionato."
           size="md"

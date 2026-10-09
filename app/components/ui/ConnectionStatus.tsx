@@ -14,10 +14,10 @@ export const connectionStatusVariants = cva(
   {
     variants: {
       status: {
-        online: 'text-sage-400 ',
-        offline: 'text-slate-400 ',
-        connecting: 'text-warning-400 ',
-        unknown: 'text-slate-400/70 ',
+        online: 'text-sage-400',
+        offline: 'text-(--text-2)',
+        connecting: 'text-warning-400',
+        unknown: 'text-white/40',
       },
       size: {
         sm: 'text-xs',
@@ -40,10 +40,10 @@ export const dotVariants = cva(
   {
     variants: {
       status: {
-        online: 'bg-sage-500 ',
-        offline: 'bg-slate-500 ',
-        connecting: 'animate-pulse bg-warning-500 ',
-        unknown: 'bg-slate-400 ',
+        online: 'bg-sage-500',
+        offline: 'bg-white/40',
+        connecting: 'animate-pulse bg-warning-500',
+        unknown: 'bg-white/25',
       },
       size: {
         sm: 'size-1.5',

@@ -79,10 +79,10 @@ export default function TemperaturePicker({
       </div>
 
       {/* Min/max labels */}
-      <div className="flex justify-between px-4 text-xs text-slate-500">
+      <Text as="div" variant="tertiary" size="xs" className="flex justify-between px-4">
         <span>{min}°C</span>
         <span>{max}°C</span>
-      </div>
+      </Text>
     </div>
   );
 }

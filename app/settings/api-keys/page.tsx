@@ -130,9 +130,9 @@ export default function ApiKeysPage() {
       accessorKey: 'id',
       header: 'ID',
       cell: ({ row }) => (
-        <code className="font-mono text-sm text-slate-400">
+        <Text as="code" variant="secondary" size="sm" mono>
           {row.original.id}
-        </code>
+        </Text>
       ),
       enableSorting: false,
     },
@@ -154,7 +154,7 @@ export default function ApiKeysPage() {
         row.original.last_used_at ? (
           formatRelativeTime(Date.parse(row.original.last_used_at))
         ) : (
-          <span className="text-slate-500">Mai usata</span>
+          <Text as="span" variant="tertiary">Mai usata</Text>
         ),
       enableSorting: true,
     },
@@ -295,7 +295,7 @@ export default function ApiKeysPage() {
 
         <div className="mt-4 space-y-3">
           <Text size="sm" variant="secondary">
-            Nome: <span className="text-slate-200">{revealedKeyName}</span>
+            Nome: <Text as="span" size="sm">{revealedKeyName}</Text>
           </Text>
 
           {/*
@@ -304,12 +304,11 @@ export default function ApiKeysPage() {
             `select-all` lets the user click-once to select the whole secret as
             a manual-copy fallback (rule 6).
           */}
-          <code
-            className="block rounded-lg bg-slate-800 p-3 font-mono text-sm break-all text-slate-100"
-            style={{ userSelect: 'all' }}
-          >
-            {revealedKey}
-          </code>
+          <Card variant="subtle" padding={false} className="p-3">
+            <Text as="code" size="sm" mono className="block break-all" style={{ userSelect: 'all' }}>
+              {revealedKey}
+            </Text>
+          </Card>
         </div>
 
         <Modal.Footer>

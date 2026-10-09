@@ -46,8 +46,8 @@ export interface ConfirmDialogProps {
   onConfirm: () => void;
   /** Cancel action handler */
   onCancel: () => void;
-  /** Dialog icon emoji */
-  icon?: string;
+  /** Dialog icon (emoji string or icon element) */
+  icon?: React.ReactNode;
 }
 
 export default function ConfirmDialog({
@@ -102,7 +102,7 @@ export default function ConfirmDialog({
   // dialog was off-centre and its buttons off-screen (ROADMAP M11).
   return createPortal(
     <div
-      className="animate-fadeIn fixed inset-0 z-9999 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm "
+      className="animate-fadeIn fixed inset-0 z-9999 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
       onClick={onCancel}
       role="dialog"
       aria-modal="true"
@@ -110,11 +110,18 @@ export default function ConfirmDialog({
     >
       <Card
         variant="elevated"
-        className="animate-scaleIn max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto p-6"
+        className="animate-scaleIn max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto bg-(--surface-solid) p-6"
         onClick={(e: React.MouseEvent) => e.stopPropagation()}
       >
         <div className="mb-6 text-center">
-          <div className="mb-4 text-5xl">{icon}</div>
+          {icon && (
+            <div
+              aria-hidden="true"
+              className={typeof icon === 'string' ? 'mb-4 text-5xl' : 'mb-4 flex justify-center text-(--text-2)'}
+            >
+              {icon}
+            </div>
+          )}
           <Heading level={2} size="xl" id="dialog-title" className="mb-2">
             {title}
           </Heading>

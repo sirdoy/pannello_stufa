@@ -1,4 +1,8 @@
-import { BatteryLow } from 'lucide-react';
+import { BatteryLow, DoorClosed, DoorOpen, Eye, Radio, Wind } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import Badge from '@/app/components/ui/Badge';
+import Card from '@/app/components/ui/Card';
+import Text from '@/app/components/ui/Text';
 import type { DirigeraSensor, DirigeraDataFreshness } from '@/types/dirigeraProxy';
 import { formatCo2, isAirSensor } from '@/lib/dirigera/airQuality';
 import { formatLux, motionLabel } from '@/lib/dirigera/motion';
@@ -8,10 +12,10 @@ interface DirigeraSensorRowProps {
   showFreshness: boolean;
 }
 
-const FRESHNESS_COLORS: Record<DirigeraDataFreshness, string> = {
-  LIVE: 'bg-success-500/20 text-success-400',
-  STALE: 'bg-warning-500/20 text-warning-400',
-  UNREACHABLE: 'bg-danger-500/20 text-danger-400',
+const FRESHNESS_VARIANTS: Record<DirigeraDataFreshness, 'sage' | 'warning' | 'danger'> = {
+  LIVE: 'sage',
+  STALE: 'warning',
+  UNREACHABLE: 'danger',
 };
 
 /**
@@ -27,15 +31,15 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
   const isAir = isAirSensor(sensor);
 
   // Type-specific icon
-  let sensorIcon: string;
+  let SensorIcon: LucideIcon;
   if (isContact) {
-    sensorIcon = sensor.is_open ? '🚪' : '🔒';
+    SensorIcon = sensor.is_open ? DoorOpen : DoorClosed;
   } else if (isMotion) {
-    sensorIcon = '👁️';
+    SensorIcon = Eye;
   } else if (isAir) {
-    sensorIcon = '🌬️';
+    SensorIcon = Wind;
   } else {
-    sensorIcon = '📡';
+    SensorIcon = Radio;
   }
 
   // Type-specific state text
@@ -53,13 +57,13 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
         <span className={sensor.is_detected ? 'text-warning-400' : 'text-success-400'}>
           {motionLabel(sensor)}
         </span>
-        {lux !== null && <span className="text-slate-300"> · {lux}</span>}
+        {lux !== null && <span className="text-(--text-1)"> · {lux}</span>}
       </>
     );
   } else if (isAir) {
-    stateText = <span className="text-slate-300">{formatCo2(sensor.co2)}</span>;
+    stateText = <span className="text-(--text-1)">{formatCo2(sensor.co2)}</span>;
   } else {
-    stateText = <span className="text-slate-400">—</span>;
+    stateText = <span className="text-(--text-2)">—</span>;
   }
 
   // Battery
@@ -75,42 +79,38 @@ export default function DirigeraSensorRow({ sensor, showFreshness }: DirigeraSen
       : null;
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl bg-slate-800/50 px-4 py-3">
+    <Card variant="subtle" padding={false} className="flex items-center justify-between gap-4 px-4 py-3">
       {/* Left: icon + name + room */}
       <div className="flex min-w-0 items-center gap-3">
-        <span className="shrink-0 text-xl" aria-hidden="true">
-          {sensorIcon}
-        </span>
+        <SensorIcon size={18} className="shrink-0 text-(--text-2)" aria-hidden="true" />
         <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{sensor.custom_name ?? sensor.id}</p>
-          <p className="truncate text-xs text-slate-400">
+          <Text size="sm" weight="medium" className="truncate">{sensor.custom_name ?? sensor.id}</Text>
+          <Text variant="secondary" size="xs" className="truncate">
             {sensor.room ?? 'Nessuna stanza'}
-          </p>
+          </Text>
         </div>
       </div>
 
       {/* Right: state + battery + freshness */}
       <div className="flex shrink-0 items-center gap-3">
         {/* Type-specific state */}
-        <span className="text-sm">{stateText}</span>
+        <Text as="span" size="sm">{stateText}</Text>
 
         {/* Battery */}
-        <span className="flex items-center gap-1 text-xs text-slate-400">
+        <Text as="span" variant="secondary" size="xs" className="flex items-center gap-1">
           {showBatteryWarning && (
             <BatteryLow className="size-4 text-warning-400" aria-hidden="true" />
           )}
           {batteryText}
-        </span>
+        </Text>
 
         {/* Freshness badge */}
         {freshness !== null && (
-          <span
-            className={`rounded-full px-2 py-0.5 text-xs ${FRESHNESS_COLORS[freshness]}`}
-          >
+          <Badge variant={FRESHNESS_VARIANTS[freshness]} size="sm">
             {freshness}
-          </span>
+          </Badge>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

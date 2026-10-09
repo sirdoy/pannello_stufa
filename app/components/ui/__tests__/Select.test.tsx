@@ -729,4 +729,43 @@ describe('Select Component', () => {
       consoleSpy.mockRestore();
     });
   });
+
+  describe('Compact size and unlabelled trigger', () => {
+    test('aria-label names the trigger when there is no visible label', () => {
+      render(
+        <Select aria-label="Periodo" options={mockOptions} value={1} onChange={jest.fn()} />
+      );
+      expect(screen.getByRole('combobox', { name: 'Periodo' })).toBeInTheDocument();
+    });
+
+    test('visible label wins over aria-label', () => {
+      render(
+        <Select label="Visibile" aria-label="Nascosta" options={mockOptions} value={1} onChange={jest.fn()} />
+      );
+      const trigger = screen.getByRole('combobox', { name: 'Visibile' });
+      expect(trigger).not.toHaveAttribute('aria-label');
+    });
+
+    test('size="sm" renders the compact trigger', () => {
+      render(
+        <Select aria-label="Periodo" size="sm" options={mockOptions} value={1} onChange={jest.fn()} />
+      );
+      const trigger = screen.getByRole('combobox');
+      expect(trigger).toHaveClass('min-h-9');
+      expect(trigger).not.toHaveClass('p-4');
+    });
+
+    test('accepts an icon element next to the label', () => {
+      render(
+        <Select
+          label="Con icona"
+          icon={<svg data-testid="select-icon" />}
+          options={mockOptions}
+          value={1}
+          onChange={jest.fn()}
+        />
+      );
+      expect(screen.getByTestId('select-icon')).toBeInTheDocument();
+    });
+  });
 });

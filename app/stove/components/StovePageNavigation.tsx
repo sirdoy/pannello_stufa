@@ -10,6 +10,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Activity, AlertTriangle, CalendarDays, Check, Clock, Home, Siren, Timer, Wrench, Zap } from 'lucide-react';
 import { Card, Heading, Text, Badge, Button } from '@/app/components/ui';
 import MaintenanceBar from '@/app/components/MaintenanceBar';
 import SchedulerEngineBanner from '@/app/components/SchedulerEngineBanner';
@@ -31,7 +32,7 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
       {/* Quick Navigation */}
       <div className="space-y-4">
         <div className="flex items-center gap-3 px-1">
-          <span className="text-2xl">⚡</span>
+          <Zap size={18} className="text-(--text-2)" aria-hidden="true" />
           <Heading level={2} size="xl">
             Accesso Rapido
           </Heading>
@@ -42,11 +43,12 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           <Link href="/stove/scheduler" className="group block">
             <Card
               variant="glass"
-              className="hover:shadow-sage-glow h-full transition-all duration-300 hover:scale-102 hover:border-sage-500/40"
+              hover
+              className="h-full"
             >
               <div className="flex items-start gap-4">
                 <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-sage-500/30 bg-sage-900/50 transition-colors group-hover:border-sage-500/60">
-                  <span className="text-3xl">📅</span>
+                  <CalendarDays size={22} className="text-sage-400" aria-hidden="true" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
@@ -60,8 +62,12 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
                     Orari accensione automatica
                   </Text>
                   <div className="mt-3">
-                    <Badge variant={schedulerEnabled ? 'sage' : 'neutral'} size="sm">
-                      {schedulerEnabled ? '⏰ Attivo' : '🔧 Manuale'}
+                    <Badge
+                      variant={schedulerEnabled ? 'sage' : 'neutral'}
+                      size="sm"
+                      icon={schedulerEnabled ? <Clock size={12} /> : <Wrench size={12} />}
+                    >
+                      {schedulerEnabled ? 'Attivo' : 'Manuale'}
                     </Badge>
                   </div>
                 </div>
@@ -73,11 +79,12 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           <Link href="/stove/maintenance" className="group block">
             <Card
               variant="glass"
-              className="hover:shadow-ocean-glow h-full transition-all duration-300 hover:scale-102 hover:border-ocean-500/40"
+              hover
+              className="h-full"
             >
               <div className="flex items-start gap-4">
                 <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-ocean-500/30 bg-ocean-900/50 transition-colors group-hover:border-ocean-500/60">
-                  <span className="text-3xl">🔧</span>
+                  <Wrench size={22} className="text-ocean-400" aria-hidden="true" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
@@ -92,10 +99,14 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
                   </Text>
                   {maintenanceStatus && (
                     <div className="mt-3">
-                      <Badge variant={maintenanceStatus.needsCleaning ? 'warning' : 'ocean'} size="sm">
+                      <Badge
+                        variant={maintenanceStatus.needsCleaning ? 'warning' : 'ocean'}
+                        size="sm"
+                        icon={maintenanceStatus.needsCleaning ? <AlertTriangle size={12} /> : <Timer size={12} />}
+                      >
                         {maintenanceStatus.needsCleaning
-                          ? '⚠️ Pulizia richiesta'
-                          : `⏱️ ${formatHoursToHHMM(maintenanceStatus.currentHours || 0)}`}
+                          ? 'Pulizia richiesta'
+                          : formatHoursToHHMM(maintenanceStatus.currentHours || 0)}
                       </Badge>
                     </div>
                   )}
@@ -108,11 +119,12 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
           <Link href="/stove/errors" className="group block">
             <Card
               variant="glass"
-              className="h-full transition-all duration-300 hover:scale-102 hover:border-ember-500/40 hover:shadow-ember-glow"
+              hover
+              className="h-full"
             >
               <div className="flex items-start gap-4">
                 <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-ember-500/30 bg-ember-900/50 transition-colors group-hover:border-ember-500/60">
-                  <span className="text-3xl">🚨</span>
+                  <Siren size={22} className="text-ember-400" aria-hidden="true" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <Heading
@@ -126,8 +138,12 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
                     Errori e diagnostica
                   </Text>
                   <div className="mt-3">
-                    <Badge variant={errorCode !== 0 ? 'danger' : 'neutral'} size="sm">
-                      {errorCode !== 0 ? `⚠️ Errore ${errorCode}` : '✓ Nessun errore'}
+                    <Badge
+                      variant={errorCode !== 0 ? 'danger' : 'neutral'}
+                      size="sm"
+                      icon={errorCode !== 0 ? <AlertTriangle size={12} /> : <Check size={12} />}
+                    >
+                      {errorCode !== 0 ? `Errore ${errorCode}` : 'Nessun errore'}
                     </Badge>
                   </div>
                 </div>
@@ -141,7 +157,7 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
       {maintenanceStatus && (
         <div className="space-y-4">
           <div className="flex items-center gap-3 px-1">
-            <span className="text-2xl">📊</span>
+            <Activity size={18} className="text-(--text-2)" aria-hidden="true" />
             <Heading level={2} size="xl">
               Stato Sistema
             </Heading>
@@ -157,7 +173,7 @@ export default function StovePageNavigation(props: StovePageNavigationProps) {
 
       {/* Back Navigation */}
       <div className="flex justify-center pt-4 pb-8">
-        <Button variant="ghost" icon="🏠" onClick={() => router.push('/')}>
+        <Button variant="ghost" icon={<Home size={18} />} onClick={() => router.push('/')}>
           Torna alla Home
         </Button>
       </div>

@@ -45,7 +45,7 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
   };
 
   return (
-    <li className="mb-4 flex items-start gap-3 border-b border-slate-700/30 pb-4 last:mb-0 last:border-b-0 last:pb-0">
+    <li className="mb-4 flex items-start gap-3 border-b border-white/8 pb-4 last:mb-0 last:border-b-0 last:pb-0">
       {/* Icon */}
       <div className="mt-0.5 shrink-0 text-2xl">{getIcon(entry.action, entry.device)}</div>
 
@@ -103,12 +103,12 @@ export default function LogEntry({ entry, formatDate, getIcon, getDeviceBadge }:
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
             {entry.day && (
               <Text variant="tertiary" size="xs">
-                📅 Giorno: <Text as="span" variant="secondary" size="xs">{entry.day}</Text>
+                Giorno: <Text as="span" variant="secondary" size="xs">{entry.day}</Text>
               </Text>
             )}
             {entry.roomName && (
               <Text variant="tertiary" size="xs">
-                🏠 Stanza: <Text as="span" variant="secondary" size="xs">{entry.roomName}</Text>
+                Stanza: <Text as="span" variant="secondary" size="xs">{entry.roomName}</Text>
               </Text>
             )}
           </div>

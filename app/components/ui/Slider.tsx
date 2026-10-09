@@ -46,9 +46,9 @@ const rangeVariants = cva(
   {
     variants: {
       variant: {
-        ember: 'bg-linear-to-r from-ember-500 to-flame-500',
-        ocean: 'bg-linear-to-r from-ocean-500 to-ocean-600',
-        sage: 'bg-linear-to-r from-sage-500 to-sage-600',
+        ember: 'bg-(--accent)',
+        ocean: 'bg-ocean-500',
+        sage: 'bg-sage-500',
       },
     },
     defaultVariants: {
@@ -188,7 +188,7 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
       <SliderPrimitive.Track
         className={cn(
           'relative h-2 w-full grow overflow-hidden rounded-full',
-          'bg-slate-700',
+          'bg-white/8',
         )}
       >
         {/* Range fill */}
@@ -208,7 +208,7 @@ const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
             <div
               className={cn(
                 'absolute -top-8 left-1/2 -translate-x-1/2',
-                'rounded bg-slate-800 px-2 py-1 text-xs text-white',
+                'rounded-lg border-[0.5px] border-white/8 bg-(--surface-solid) px-2 py-1 text-xs text-(--text-1)',
                 'pointer-events-none whitespace-nowrap',
               )}
             >

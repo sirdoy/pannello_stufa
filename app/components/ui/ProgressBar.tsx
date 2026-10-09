@@ -21,13 +21,12 @@ export interface ProgressBarProps extends HTMLAttributes<HTMLDivElement> {
 /**
  * ProgressBar Component - Ember Noir Design System
  *
- * Reusable progress indicator with gradient support and customizable styling.
+ * Reusable progress indicator with a flat fill.
  * Used for power/fan indicators, maintenance tracking, and percentage displays.
- * Handles dark/light mode internally.
  *
  * @param {Object} props - Component props
  * @param {number} props.value - Progress value (0-100)
- * @param {string} props.gradient - Custom Tailwind gradient classes
+ * @param {string} props.gradient - Custom Tailwind fill classes (overrides the variant colour)
  * @param {'ember'|'ocean'|'sage'|'warning'|'danger'} props.variant - Color variant
  * @param {'sm'|'md'|'lg'} props.size - Bar height
  * @param {boolean} props.animated - Enable smooth transitions
@@ -54,17 +53,17 @@ export default function ProgressBar({
   // Map legacy color prop to variant
   const resolvedVariant = color || variant;
 
-  // Ember Noir color variants
-  const variantGradients: Record<string, string> = {
-    ember: 'from-ember-400 via-ember-500 to-flame-600',
-    ocean: 'from-ocean-400 via-ocean-500 to-ocean-600',
-    sage: 'from-sage-400 via-sage-500 to-sage-600',
-    warning: 'from-warning-400 via-warning-500 to-warning-600',
-    danger: 'from-danger-400 via-danger-500 to-danger-600',
+  // Flat fill per variant
+  const variantFills: Record<string, string> = {
+    ember: 'bg-(--accent)',
+    ocean: 'bg-ocean-400',
+    sage: 'bg-sage-400',
+    warning: 'bg-warning-400',
+    danger: 'bg-danger-400',
     // Legacy mappings
-    primary: 'from-ember-400 via-ember-500 to-flame-600',
-    success: 'from-sage-400 via-sage-500 to-sage-600',
-    info: 'from-ocean-400 via-ocean-500 to-ocean-600',
+    primary: 'bg-(--accent)',
+    success: 'bg-sage-400',
+    info: 'bg-ocean-400',
   };
 
   // Size variants
@@ -74,7 +73,7 @@ export default function ProgressBar({
     lg: 'h-4',
   };
 
-  const gradientClass = gradient || variantGradients[resolvedVariant] || variantGradients.ember;
+  const fillClass = gradient || variantFills[resolvedVariant] || variantFills.ember;
   const clampedValue = Math.min(Math.max(value, 0), 100);
 
   return (
@@ -96,15 +95,15 @@ export default function ProgressBar({
       {/* Progress Bar */}
       <div
         className={`
-          relative rounded-full overflow-hidden backdrop-blur-sm
-          bg-slate-700/50 
+          relative rounded-full overflow-hidden
+          bg-white/8
           ${sizeClasses[size]}
         `.trim().replace(/\s+/g, ' ')}
       >
         <div
           className={`
-            absolute inset-y-0 left-0 bg-gradient-to-r ${gradientClass}
-            rounded-full shadow-md
+            absolute inset-y-0 left-0 ${fillClass}
+            rounded-full
             ${animated ? 'transition-all duration-500' : ''}
           `.trim().replace(/\s+/g, ' ')}
           style={{ width: `${clampedValue}%` }}

@@ -90,9 +90,7 @@ describe('SonosHistoryChart', () => {
   it('renders loading state as skeleton when loading is true', () => {
     mockUseSonosHistory.mockReturnValue(makeMockHistory({ loading: true }));
     render(<SonosHistoryChart zones={mockZones} speakers={mockSpeakers} />);
-    // Loading skeleton is a div with animate-pulse class
-    const skeleton = document.querySelector('.animate-pulse');
-    expect(skeleton).toBeInTheDocument();
+    expect(screen.getByTestId('sonos-history-loading')).toBeInTheDocument();
   });
 
   it('renders error message when error is set', () => {

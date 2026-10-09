@@ -16,6 +16,8 @@ import { getCurrentLocation } from '@/lib/geolocation';
 import Input from '@/app/components/ui/Input';
 import Button from '@/app/components/ui/Button';
 import Banner from '@/app/components/ui/Banner';
+import { ChevronDown, ChevronUp, MapPin } from 'lucide-react';
+import Card from '@/app/components/ui/Card';
 import { Text } from '@/app/components/ui';
 import { cn } from '@/lib/utils/cn';
 
@@ -205,15 +207,13 @@ export default function LocationSearch({
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Es. Milano, Roma, Napoli..."
-          icon="🔍"
         />
 
         {/* Suggestions dropdown */}
         {suggestions.length > 0 && (
           <ul className={cn(
-            'absolute z-10 mt-1 w-full overflow-hidden rounded-lg border shadow-lg',
-            'border-slate-700 bg-slate-800',
-            ' '
+            'absolute z-10 mt-1 w-full overflow-hidden rounded-2xl border-[0.5px] shadow-lg',
+            'border-white/8 bg-[rgba(28,25,23,0.96)] backdrop-blur-xl',
           )}>
             {suggestions.map((s) => (
               <li key={s.id}>
@@ -222,10 +222,10 @@ export default function LocationSearch({
                   onClick={() => handleSelectSuggestion(s)}
                   className={cn(
                     'flex w-full items-center gap-3 px-4 py-3 text-left transition-colors',
-                    'hover:bg-slate-700',
+                    'hover:bg-white/6',
                   )}
                 >
-                  <span className="shrink-0 text-ocean-400">📍</span>
+                  <MapPin size={16} className="shrink-0 text-ocean-400" aria-hidden="true" />
                   <div className="min-w-0">
                     <Text className="truncate">{s.name}</Text>
                     <Text variant="tertiary" size="sm" className="truncate">
@@ -253,7 +253,7 @@ export default function LocationSearch({
           onClick={handleUseMyLocation}
           disabled={isLocating}
           loading={isLocating}
-          icon="📍"
+          icon={<MapPin size={16} />}
           className="w-full sm:w-auto"
         >
           Usa la mia posizione
@@ -261,25 +261,20 @@ export default function LocationSearch({
       </div>
 
       {/* Advanced section toggle */}
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="sm"
         onClick={() => setShowAdvanced(!showAdvanced)}
-        className={cn(
-          'mt-4 flex items-center gap-1 text-sm',
-          'text-slate-400 hover:text-slate-300',
-          ' '
-        )}
+        icon={showAdvanced ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        className="mt-4"
       >
-        <span className="text-xs">{showAdvanced ? '▲' : '▼'}</span>
         Avanzate
-      </button>
+      </Button>
 
       {/* Manual coordinates section */}
       {showAdvanced && (
-        <div className={cn(
-          'mt-3 space-y-3 rounded-lg p-4',
-          'bg-slate-800/40',
-        )}>
+        <Card variant="subtle" className="mt-3 space-y-3">
           <Text variant="secondary" size="sm">
             Inserisci coordinate manualmente
           </Text>
@@ -302,7 +297,7 @@ export default function LocationSearch({
           <Button variant="subtle" size="sm" onClick={handleManualSubmit}>
             Usa coordinate
           </Button>
-        </div>
+        </Card>
       )}
 
       {/* Error display */}

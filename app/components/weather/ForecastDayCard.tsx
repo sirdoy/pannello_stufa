@@ -10,7 +10,7 @@
  */
 
 import { cn } from '@/lib/utils/cn';
-import { Text } from '@/app/components/ui';
+import { Card, Text } from '@/app/components/ui';
 import { WeatherIcon } from './WeatherIcon';
 import { formatTemperature } from './weatherHelpers';
 import { format, parseISO } from 'date-fns';
@@ -81,14 +81,11 @@ export function ForecastDayCard({
   };
 
   return (
-    <div
-      className={cn(
-        'flex cursor-pointer flex-col items-center rounded-xl p-3',
-        'bg-slate-800/40 hover:bg-slate-800/60',
-        ' ',
-        'transition-colors duration-200',
-        className
-      )}
+    <Card
+      variant="subtle"
+      hover
+      padding={false}
+      className={cn('flex flex-col items-center p-3', className)}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -140,7 +137,7 @@ export function ForecastDayCard({
           </Text>
         </div>
       )}
-    </div>
+    </Card>
   );
 }
 

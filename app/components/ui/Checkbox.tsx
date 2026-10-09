@@ -21,13 +21,12 @@ const checkboxVariants = cva(
     'rounded-md border-2 transition-all duration-200',
     'flex items-center justify-center',
     'cursor-pointer outline-none',
-    // Focus ring - ember glow
+    // Focus ring
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
     // Disabled state
     'disabled:cursor-not-allowed disabled:opacity-50',
     // Base border (unchecked)
-    'border-slate-500 ',
+    'border-white/30',
   ],
   {
     variants: {
@@ -38,39 +37,29 @@ const checkboxVariants = cva(
       },
       variant: {
         primary: [
-          'hover:border-ember-400 ',
+          'hover:border-ember-400',
           'data-[state=checked]:border-ember-500 data-[state=checked]:bg-ember-500',
           'data-[state=indeterminate]:border-ember-500 data-[state=indeterminate]:bg-ember-500',
-          ']:bg-ember-600 ]:border-ember-600',
-          ']:bg-ember-600 ]:border-ember-600',
         ],
         ember: [
-          'hover:border-ember-400 ',
+          'hover:border-ember-400',
           'data-[state=checked]:border-ember-500 data-[state=checked]:bg-ember-500',
           'data-[state=indeterminate]:border-ember-500 data-[state=indeterminate]:bg-ember-500',
-          ']:bg-ember-600 ]:border-ember-600',
-          ']:bg-ember-600 ]:border-ember-600',
         ],
         ocean: [
-          'hover:border-ocean-400 ',
+          'hover:border-ocean-400',
           'data-[state=checked]:border-ocean-500 data-[state=checked]:bg-ocean-500',
           'data-[state=indeterminate]:border-ocean-500 data-[state=indeterminate]:bg-ocean-500',
-          ']:bg-ocean-600 ]:border-ocean-600',
-          ']:bg-ocean-600 ]:border-ocean-600',
         ],
         sage: [
-          'hover:border-sage-400 ',
+          'hover:border-sage-400',
           'data-[state=checked]:border-sage-500 data-[state=checked]:bg-sage-500',
           'data-[state=indeterminate]:border-sage-500 data-[state=indeterminate]:bg-sage-500',
-          ']:bg-sage-600 ]:border-sage-600',
-          ']:bg-sage-600 ]:border-sage-600',
         ],
         flame: [
-          'hover:border-flame-400 ',
+          'hover:border-flame-400',
           'data-[state=checked]:border-flame-500 data-[state=checked]:bg-flame-500',
           'data-[state=indeterminate]:border-flame-500 data-[state=indeterminate]:bg-flame-500',
-          ']:bg-flame-600 ]:border-flame-600',
-          ']:bg-flame-600 ]:border-flame-600',
         ],
       },
     },
@@ -193,7 +182,7 @@ const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(
           htmlFor={id}
           className={cn(
             'text-sm font-medium select-none',
-            'text-white ',
+            'text-white',
             disabled ? 'cursor-not-allowed' : 'cursor-pointer'
           )}
         >

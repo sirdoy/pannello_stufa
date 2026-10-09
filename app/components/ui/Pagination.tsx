@@ -30,19 +30,14 @@ export default function Pagination({
   hasPrev,
   hasNext,
 }: PaginationProps): React.ReactElement {
-  const buttonBaseClasses = 'px-4 py-2.5 rounded-xl font-medium transition-all duration-200';
+  const buttonBaseClasses = 'px-4 py-2.5 rounded-xl border-[0.5px] font-medium transition-colors duration-200';
 
   const enabledClasses = `
-    bg-slate-700/50 hover:bg-slate-600/60 text-slate-200
-      
-    ring-1 ring-slate-600/30 
-    shadow-liquid-sm
+    border-white/14 bg-white/6 hover:bg-white/10 text-white
   `;
 
   const disabledClasses = `
-    bg-slate-800/30 text-slate-500 cursor-not-allowed
-     
-    ring-1 ring-slate-700/20 
+    border-white/6 bg-white/4 text-(--text-2) opacity-55 cursor-not-allowed
   `;
 
   return (

@@ -35,20 +35,20 @@ describe('SonosSourceSwitch', () => {
     expect(screen.getByText('Line-in')).toBeInTheDocument();
   });
 
-  it('TV button has amber accent when currentSource is tv', () => {
+  it('TV button has the accent variant when currentSource is tv', () => {
     render(
       <SonosSourceSwitch uid="RINCON_A" role="soundbar" onSwitchSource={onSwitchSource} currentSource="tv" />
     );
     const tvButton = screen.getByLabelText('Sorgente TV');
-    expect(tvButton.className).toContain('bg-amber-500');
+    expect(tvButton.className).toContain('bg-(--accent)');
   });
 
-  it('Line-in button has amber accent when currentSource is line_in', () => {
+  it('Line-in button has the accent variant when currentSource is line_in', () => {
     render(
       <SonosSourceSwitch uid="RINCON_A" role="soundbar" onSwitchSource={onSwitchSource} currentSource="line_in" />
     );
     const lineInButton = screen.getByLabelText('Sorgente Line-in');
-    expect(lineInButton.className).toContain('bg-amber-500');
+    expect(lineInButton.className).toContain('bg-(--accent)');
   });
 
   it('no button is highlighted when currentSource is streaming', () => {
@@ -57,8 +57,8 @@ describe('SonosSourceSwitch', () => {
     );
     const tvButton = screen.getByLabelText('Sorgente TV');
     const lineInButton = screen.getByLabelText('Sorgente Line-in');
-    expect(tvButton.className).not.toContain('bg-amber-500');
-    expect(lineInButton.className).not.toContain('bg-amber-500');
+    expect(tvButton.className).not.toContain('bg-(--accent)');
+    expect(lineInButton.className).not.toContain('bg-(--accent)');
   });
 
   it('calls onSwitchSource with tv when TV button is clicked', () => {

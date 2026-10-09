@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, EmptyState, Heading, Text, Banner } from '@/app/components/ui';
+import { ArrowLeft, Palette, RefreshCw } from 'lucide-react';
 import type { HueScene, HueGroup } from '@/types/hueProxy';
 import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
@@ -37,13 +38,13 @@ function SceneCard({ scene, activatingScene, onActivate }: SceneCardProps) {
       key={scene.scene_id}
       onClick={() => onActivate(scene.scene_id, scene.group_id, scene.name || 'Scena')}
       disabled={isActivating}
-      className={`relative w-full rounded-2xl border-2 p-6 transition-all duration-200 active:scale-95 ${
+      className={`relative w-full rounded-2xl border-[0.5px] p-6 transition-colors active:scale-95 ${
         isActivating
-          ? 'border-warning-500 bg-warning-50 bg-warning-900/20'
-          : 'border-slate-200 border-slate-700 bg-white/3 bg-white/60 hover:border-warning-300 hover:border-warning-600 hover:bg-warning-50 hover:bg-warning-900/20'
+          ? 'border-warning-500 bg-warning-500/10'
+          : 'border-white/6 bg-white/4 hover:bg-white/6'
       }`}
     >
-      <div className="mb-3 text-4xl">🎨</div>
+      <Palette size={24} className="mx-auto mb-3 text-(--text-2)" aria-hidden="true" />
       <Text size="sm" className="text-center">
         {scene.name || 'Scena'}
       </Text>
@@ -159,7 +160,7 @@ export default function ScenesPage() {
           <Text variant="secondary" className="mb-6">
             Il bridge Hue non e raggiungibile tramite il proxy. Verifica che Home Assistant sia attivo.
           </Text>
-          <Button variant="ember" onClick={() => router.push('/')}>← Torna alla Homepage</Button>
+          <Button variant="ember" onClick={() => router.push('/')} icon={<ArrowLeft size={16} />}>Torna alla Homepage</Button>
         </Card>
       </div>
     );
@@ -180,14 +181,14 @@ export default function ScenesPage() {
 
       {success && (
         <div className="mb-6">
-          <Banner variant="success" icon="✅" title="Successo" description={success}
+          <Banner variant="success" title="Successo" description={success}
             dismissible onDismiss={() => setSuccess(null)} />
         </div>
       )}
 
       {error && (
         <div className="mb-6">
-          <Banner variant="error" icon="⚠️" title="Errore" description={error}
+          <Banner variant="error" title="Errore" description={error}
             dismissible onDismiss={() => setError(null)} />
         </div>
       )}
@@ -201,13 +202,13 @@ export default function ScenesPage() {
             </Text>
           </div>
           <Button variant="outline" onClick={async () => { setRefreshing(true); await fetchData(); setRefreshing(false); }}
-            loading={refreshing} size="sm">
-            🔄 Aggiorna
+            loading={refreshing} size="sm" icon={<RefreshCw size={16} />}>
+            Aggiorna
           </Button>
         </div>
 
         {rooms.length > 1 && (
-          <div className="mt-4 border-t border-slate-200 border-slate-700 pt-4">
+          <div className="mt-4 border-t border-white/8 pt-4">
             <Text variant="secondary" size="xs" className="mb-2">Filtra per stanza:</Text>
             <div className="flex flex-wrap gap-2">
               <Button variant={selectedRoom === 'all' ? 'ember' : 'outline'}
@@ -252,7 +253,7 @@ export default function ScenesPage() {
       )}
 
       {filteredScenes.length === 0 && (
-        <EmptyState icon="🎨" title="Nessuna scena disponibile"
+        <EmptyState icon={<Palette size={32} />} title="Nessuna scena disponibile"
           description="Crea scene nell'app Philips Hue per vederle qui" />
       )}
     </div>

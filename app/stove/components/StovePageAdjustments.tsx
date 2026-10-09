@@ -7,6 +7,7 @@
  * Props in, JSX out. No state management.
  */
 
+import { SlidersHorizontal, Wind, Zap } from 'lucide-react';
 import { Card, Banner, Heading, Text, ControlButton } from '@/app/components/ui';
 
 export interface StovePageAdjustmentsProps {
@@ -25,21 +26,21 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-3 px-1">
-        <span className="text-2xl">🎛️</span>
+        <SlidersHorizontal size={18} className="text-(--text-2)" aria-hidden="true" />
         <Heading level={2} size="xl">
           Regolazioni
         </Heading>
       </div>
 
       {schedulerEnabled && !semiManualMode && (
-        <Banner variant="info" icon="ℹ️" description="La modifica attiverà la modalità Semi-Manuale" compact />
+        <Banner variant="info" description="La modifica attiverà la modalità Semi-Manuale" compact />
       )}
 
       {/* Fan Control */}
       <Card variant="glass" className="overflow-hidden">
         <div className="mb-5 flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl border-2 border-ocean-500/50 bg-ocean-900/50 sm:size-12">
-            <span className="text-xl sm:text-2xl">💨</span>
+            <Wind size={18} className="text-ocean-400" aria-hidden="true" />
           </div>
           <Heading level={3} size="lg">
             Ventilazione
@@ -58,10 +59,10 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
               Livello
             </Text>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-black text-ocean-400 sm:text-6xl">
+              <Text as="span" variant="ocean" weight="black" className="text-5xl sm:text-6xl">
                 {fanLevel ?? '-'}
-              </span>
-              <span className="text-xl font-bold text-slate-500">/6</span>
+              </Text>
+              <Text as="span" variant="tertiary" size="xl" weight="bold">/6</Text>
             </div>
           </div>
           <ControlButton
@@ -77,7 +78,7 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
       <Card variant="glass" className="overflow-hidden">
         <div className="mb-5 flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl border-2 border-ember-500/50 bg-ember-900/50 sm:size-12">
-            <span className="text-xl sm:text-2xl">⚡</span>
+            <Zap size={18} className="text-ember-400" aria-hidden="true" />
           </div>
           <Heading level={3} size="lg">
             Potenza
@@ -96,10 +97,10 @@ export default function StovePageAdjustments(props: StovePageAdjustmentsProps) {
               Livello
             </Text>
             <div className="flex items-baseline gap-1">
-              <span className="text-5xl font-black text-ember-400 sm:text-6xl">
+              <Text as="span" variant="ember" weight="black" className="text-5xl sm:text-6xl">
                 {powerLevel ?? '-'}
-              </span>
-              <span className="text-xl font-bold text-slate-500">/5</span>
+              </Text>
+              <Text as="span" variant="tertiary" size="xl" weight="bold">/5</Text>
             </div>
           </div>
           <ControlButton

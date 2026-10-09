@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge } from '@/app/components/ui';
+import { Badge, Text } from '@/app/components/ui';
 import { formatDistanceToNow } from 'date-fns';
 import { it } from 'date-fns/locale';
 
@@ -42,11 +42,11 @@ function DeviceStatusBadge({ active, lastSeen }: DeviceStatusBadgeProps) {
     <div className="flex flex-col gap-1">
       <Badge variant="danger" size="sm">Offline</Badge>
       {lastSeen ? (
-        <span className="text-xs text-slate-400">
+        <Text as="span" variant="secondary" size="xs">
           Visto {formatDistanceToNow(new Date(lastSeen), { addSuffix: true, locale: it })}
-        </span>
+        </Text>
       ) : (
-        <span className="text-xs text-slate-500">Mai connesso</span>
+        <Text as="span" variant="tertiary" size="xs">Mai connesso</Text>
       )}
     </div>
   );

@@ -44,9 +44,9 @@ function Kbd({ children, className, ...props }: KbdProps) {
         'inline-flex items-center justify-center',
         'rounded-md px-2 py-1',
         'font-mono text-xs font-medium',
-        'bg-slate-700/50 ',
-        'text-slate-300 ',
-        'border border-slate-600/50 ',
+        'bg-white/8',
+        'text-(--text-1)',
+        'border-[0.5px] border-white/12',
         'shadow-sm',
         className
       )}

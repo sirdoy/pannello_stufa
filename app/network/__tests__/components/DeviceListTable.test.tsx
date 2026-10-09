@@ -73,6 +73,13 @@ jest.mock('@/app/components/ui', () => ({
   Badge: ({ children, variant, size }: { children?: ReactNode; variant?: string; size?: string }) => (
     <span data-variant={variant} data-size={size}>{children}</span>
   ),
+  Button: Object.assign(
+    ({ children, variant, onClick }: { children?: ReactNode; variant?: string; onClick?: () => void }) => (
+      <button data-variant={variant} onClick={onClick}>{children}</button>
+    ),
+    { Group: ({ children }: { children?: ReactNode }) => <div role="group">{children}</div> },
+  ),
+  Text: ({ children }: { children?: ReactNode }) => <span>{children}</span>,
 }));
 
 // Mock DeviceCategoryBadge component
@@ -227,21 +234,21 @@ describe('DeviceListTable', () => {
       expect(row1).toHaveAttribute('data-active', 'false');
     });
 
-    it('highlights active filter tab with ember underline', () => {
+    it('highlights active filter tab with the ember variant', () => {
       render(<DeviceListTable devices={mockDevices} isStale={false} />);
 
       const allButton = screen.getByText(/Tutti \(4\)/);
       const onlineButton = screen.getByText(/Online \(2\)/);
 
       // All tab should be active by default
-      expect(allButton).toHaveClass('text-ember-400', 'border-b-2', 'border-ember-400');
+      expect(allButton).toHaveAttribute('data-variant', 'ember');
 
       // Click online tab
       fireEvent.click(onlineButton);
 
       // Online tab should now be active
-      expect(onlineButton).toHaveClass('text-ember-400', 'border-b-2', 'border-ember-400');
-      expect(allButton).not.toHaveClass('text-ember-400');
+      expect(onlineButton).toHaveAttribute('data-variant', 'ember');
+      expect(allButton).toHaveAttribute('data-variant', 'subtle');
     });
   });
 

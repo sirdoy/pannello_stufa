@@ -21,6 +21,7 @@ import Badge from '@/app/components/ui/Badge';
 import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
 import Button from '@/app/components/ui/Button';
+import EmptyState from '@/app/components/ui/EmptyState';
 import { Text, Heading } from '@/app/components/ui';
 
 // --- useHouseStatus hook (per D-18, D-21) ---
@@ -176,36 +177,36 @@ export default function RoomStatusPage() {
       <Card variant="glass" className="p-4 sm:p-6">
         {/* Stats row: house summary + health stats (per D-06, D-07, D-08) */}
         {(houseStatus !== null || health !== null) && (
-          <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-slate-400 sm:gap-6">
+          <Text as="div" variant="secondary" size="sm" className="mb-4 flex flex-wrap items-center gap-4 sm:gap-6">
             {houseStatus !== null && (
               <>
                 <span>
-                  Totale: <strong className="text-slate-200">{houseStatus.total_devices}</strong>
+                  Totale: <Text as="strong" size="sm">{houseStatus.total_devices}</Text>
                 </span>
                 <span>
                   Disponibili:{' '}
-                  <strong className="text-slate-200">{houseStatus.total_available}</strong>
+                  <Text as="strong" size="sm">{houseStatus.total_available}</Text>
                 </span>
                 <span>
                   Non disponibili:{' '}
-                  <strong className="text-slate-200">{houseStatus.total_unavailable}</strong>
+                  <Text as="strong" size="sm">{houseStatus.total_unavailable}</Text>
                 </span>
               </>
             )}
             {health !== null && (
               <>
                 <span>
-                  Stanze: <strong className="text-slate-200">{health.room_count}</strong>
+                  Stanze: <Text as="strong" size="sm">{health.room_count}</Text>
                 </span>
                 <span>
-                  Assegnati: <strong className="text-slate-200">{health.total_device_count}</strong>
+                  Assegnati: <Text as="strong" size="sm">{health.total_device_count}</Text>
                 </span>
                 <span>
-                  Orfani: <strong className="text-slate-200">{health.orphan_device_count}</strong>
+                  Orfani: <Text as="strong" size="sm">{health.orphan_device_count}</Text>
                 </span>
               </>
             )}
-          </div>
+          </Text>
         )}
 
         {/* Toolbar: Aggiorna button (per D-20) */}
@@ -223,17 +224,14 @@ export default function RoomStatusPage() {
 
         {/* Empty state (per D-24) */}
         {!loading && !error && houseStatus !== null && houseStatus.rooms.length === 0 && (
-          <div className="py-8 text-center text-slate-400">
-            <p>Nessuna stanza configurata</p>
-            <Button
-              variant="ember"
-              size="sm"
-              className="mt-4"
-              onClick={() => router.push('/rooms')}
-            >
-              Vai alle stanze
-            </Button>
-          </div>
+          <EmptyState
+            description="Nessuna stanza configurata"
+            action={
+              <Button variant="ember" size="sm" onClick={() => router.push('/rooms')}>
+                Vai alle stanze
+              </Button>
+            }
+          />
         )}
 
         {/* Room cards grid (per D-09) */}
@@ -257,7 +255,7 @@ export default function RoomStatusPage() {
 
                 {/* Empty room state (per D-25) */}
                 {room.devices.length === 0 && (
-                  <p className="py-2 text-sm text-slate-400">Nessun dispositivo assegnato</p>
+                  <Text variant="secondary" size="sm" className="py-2">Nessun dispositivo assegnato</Text>
                 )}
 
                 {/* Device rows (per D-12) */}
@@ -269,15 +267,13 @@ export default function RoomStatusPage() {
                         <div key={device.device_registry_id} className="flex flex-col gap-1">
                           <div className="flex flex-wrap items-center gap-2">
                             {/* Device name */}
-                            <span className="text-sm text-slate-200">{device.custom_name}</span>
+                            <Text as="span" size="sm">{device.custom_name}</Text>
                             {/* Provider badge (per D-14) */}
                             <Badge variant={getProviderBadgeVariant(device.provider_name)} size="sm">
                               {device.provider_name}
                             </Badge>
                             {/* Device type mono (per D-15) */}
-                            <code className="font-mono text-sm text-slate-400">
-                              {device.device_type}
-                            </code>
+                            <Text as="code" variant="secondary" size="sm" mono>{device.device_type}</Text>
                             {/* Status badge (per D-13) */}
                             {device.status === 'available' ? (
                               <Badge variant="sage" size="sm">
@@ -291,7 +287,7 @@ export default function RoomStatusPage() {
                           </div>
                           {/* Provider-specific data (per D-16) */}
                           {deviceData !== null && (
-                            <span className="ml-1 text-xs text-slate-400">{deviceData}</span>
+                            <Text as="span" variant="secondary" size="xs" className="ml-1">{deviceData}</Text>
                           )}
                         </div>
                       );

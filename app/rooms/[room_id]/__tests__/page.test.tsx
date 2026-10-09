@@ -153,7 +153,10 @@ jest.mock('@/app/components/ui/Card', () => ({
 // Mock ui barrel exports
 jest.mock('@/app/components/ui', () => ({
   Heading: ({ children }: { children?: React.ReactNode }) => <h2>{children}</h2>,
-  Text: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
+  // Honour `as` so the slug column can be checked as a <code> element
+  Text: ({ children, as: Tag = 'span' }: { children?: React.ReactNode; as?: React.ElementType }) => (
+    <Tag>{children}</Tag>
+  ),
 }));
 
 // Mock Select (no-op — FormModal mock bypasses children render)

@@ -1,5 +1,10 @@
 'use client';
 
+import Button from '@/app/components/ui/Button';
+import Card from '@/app/components/ui/Card';
+import Heading from '@/app/components/ui/Heading';
+import Spinner from '@/app/components/ui/Spinner';
+import Text from '@/app/components/ui/Text';
 import type { SensorTelemetryReading } from '@/types/dirigeraProxy';
 import { formatCo2, formatHumidity, formatPm25, formatTemperature } from '@/lib/dirigera/airQuality';
 
@@ -40,39 +45,39 @@ export default function DirigeraTelemetryPanel({
   loadMore,
 }: DirigeraTelemetryPanelProps) {
   const staleBadge = stale && loading
-    ? <span className="ml-2 text-xs text-ember-400">Aggiornamento…</span>
+    ? <Text as="span" variant="ember" size="xs" weight="normal" className="ml-2">Aggiornamento…</Text>
     : stale && !loading
-      ? <span className="ml-2 text-xs text-slate-400">Dati non aggiornati</span>
+      ? <Text as="span" variant="secondary" size="xs" weight="normal" className="ml-2">Dati non aggiornati</Text>
       : null;
 
   return (
-    <div className="rounded-2xl bg-slate-800/50 p-4">
+    <Card>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-100">
+        <Heading level={2} size="lg">
           Telemetria
           {staleBadge}
-        </h2>
+        </Heading>
       </div>
 
       {/* Loading state — no items yet */}
       {loading && items.length === 0 && (
-        <div className="py-8 text-center">
-          <div className="inline-block size-8 animate-spin rounded-full border-2 border-slate-600 border-t-ember-500" />
+        <div className="flex justify-center py-8">
+          <Spinner size="lg" label="Caricamento" />
         </div>
       )}
 
       {/* Error state — no items */}
       {error && items.length === 0 && (
-        <p className="py-4 text-center text-sm text-slate-400">
+        <Text variant="secondary" size="sm" className="py-4 text-center">
           Impossibile caricare la telemetria
-        </p>
+        </Text>
       )}
 
       {/* Empty state — not loading, no error, no items */}
       {items.length === 0 && !loading && !error && (
-        <p className="py-4 text-center text-sm text-slate-400">
+        <Text variant="secondary" size="sm" className="py-4 text-center">
           Nessuna telemetria
-        </p>
+        </Text>
       )}
 
       {/* Data state */}
@@ -81,7 +86,7 @@ export default function DirigeraTelemetryPanel({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-xs tracking-wide text-slate-400 uppercase">
+                <tr className="text-xs tracking-wide text-(--text-2) uppercase">
                   <th className="pb-2 text-left">Sensore</th>
                   <th className="pb-2 text-left">Batteria</th>
                   <th className="pb-2 text-left">Lux</th>
@@ -91,7 +96,7 @@ export default function DirigeraTelemetryPanel({
               </thead>
               <tbody>
                 {items.map(reading => (
-                  <tr key={reading.id} className="border-t border-slate-700/50">
+                  <tr key={reading.id} className="border-t border-white/8">
                     <td className="py-2">{reading.sensor_id}</td>
                     <td className="py-2">
                       {reading.battery_percentage !== null
@@ -104,7 +109,7 @@ export default function DirigeraTelemetryPanel({
                         : '—'}
                     </td>
                     <td className="py-2 whitespace-nowrap">{airText(reading)}</td>
-                    <td className="py-2 text-slate-400">
+                    <td className="py-2 text-(--text-2)">
                       {new Intl.DateTimeFormat('it-IT', {
                         dateStyle: 'short',
                         timeStyle: 'medium',
@@ -119,18 +124,20 @@ export default function DirigeraTelemetryPanel({
           {/* Load more button — hidden when all items loaded */}
           {items.length < total && (
             <div className="mt-4 flex justify-center">
-              <button
+              <Button
                 type="button"
+                variant="subtle"
+                size="sm"
                 onClick={loadMore}
                 disabled={isLoadingMore}
-                className="w-full rounded-lg border border-slate-700 px-4 py-2 text-sm hover:border-ember-500 focus-visible:ring-2 focus-visible:ring-ember-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                className="w-full sm:w-auto"
               >
                 {isLoadingMore ? 'Caricamento...' : 'Carica altri 50'}
-              </button>
+              </Button>
             </div>
           )}
         </>
       )}
-    </div>
+    </Card>
   );
 }

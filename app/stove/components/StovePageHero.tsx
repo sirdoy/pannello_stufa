@@ -2,7 +2,6 @@
  * StovePageHero Component
  *
  * Immersive hero section for stove/page.tsx:
- * - Decorative background pattern
  * - Error badges
  * - Large status icon and label
  * - Metrics grid (fan + power gauges)
@@ -12,7 +11,8 @@
  * Props in, JSX out. No state management.
  */
 
-import { Card, Button, Text } from '@/app/components/ui';
+import { AlertTriangle, CalendarDays, Clock, Flame, Settings, Snowflake, Undo2, Wind, Wrench, Zap } from 'lucide-react';
+import { Card, Button, Text, Badge } from '@/app/components/ui';
 import type { StovePageStatusConfig, StovePageTheme } from '../stovePageTheme';
 import type { StoveState } from '@/types/thermorossiProxy';
 
@@ -62,27 +62,12 @@ export default function StovePageHero(props: StovePageHeroProps) {
 
   return (
     <Card variant="glass" padding={false} className="relative overflow-hidden">
-      {/* Decorative Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 30% 20%, ${
-              statusConfig.theme === 'ember' ? 'rgba(237,111,16,0.3)' : 'rgba(100,100,100,0.2)'
-            } 0%, transparent 50%),
-                                  radial-gradient(circle at 70% 80%, ${
-              statusConfig.theme === 'ember' ? 'rgba(254,86,16,0.2)' : 'rgba(100,100,100,0.1)'
-            } 0%, transparent 50%)`,
-          }}
-        />
-      </div>
-
       {/* Badges */}
       <div className="absolute inset-x-4 top-4 z-20 flex justify-end">
         {errorCode !== 0 && (
-          <div className="animate-pulse rounded-full bg-danger-500/90 px-3 py-1.5 text-white shadow-lg backdrop-blur-sm">
-            <span className="text-xs font-bold">⚠️ ERR {errorCode}</span>
-          </div>
+          <Badge variant="danger" className="animate-pulse" icon={<AlertTriangle size={12} />}>
+            ERR {errorCode}
+          </Badge>
         )}
       </div>
 
@@ -91,7 +76,6 @@ export default function StovePageHero(props: StovePageHeroProps) {
         <div className="mb-8 text-center">
           {/* Large Status Icon */}
           <div className={`relative mb-4 inline-block ${statusConfig.pulse ? 'animate-pulse' : ''}`}>
-            <div className={`absolute inset-0 rounded-full blur-3xl ${theme.accentBg} scale-150`} />
             <span className="relative text-8xl drop-shadow-2xl sm:text-9xl" style={{ lineHeight: 1 }}>
               {statusConfig.icon}
             </span>
@@ -106,7 +90,7 @@ export default function StovePageHero(props: StovePageHeroProps) {
             {statusConfig.label}
           </div>
           {statusConfig.label !== status?.toUpperCase() && (
-            <Text size="sm" className="font-mono text-slate-500">
+            <Text variant="tertiary" size="sm" mono>
               {status}
             </Text>
           )}
@@ -115,54 +99,50 @@ export default function StovePageHero(props: StovePageHeroProps) {
         {/* Metrics Grid */}
         <div className="mb-8 grid grid-cols-2 gap-4 sm:gap-6">
           {/* Fan Level Gauge */}
-          <div
-            className={`relative overflow-hidden rounded-2xl border  bg-slate-900/60 backdrop-blur-xl ${theme.border} p-5 sm:p-6`}
-          >
+          <Card variant="subtle" padding={false} className="p-5 sm:p-6">
             <div className="flex flex-col items-center">
-              <span className="mb-2 text-3xl sm:text-4xl">💨</span>
-              <Text size="xs" className="mb-1 tracking-wider text-slate-400 uppercase">
+              <Wind size={18} className="mb-2 text-ocean-400" aria-hidden="true" />
+              <Text variant="label" className="mb-1">
                 Ventola
               </Text>
               <div className="flex items-baseline">
-                <span className="text-4xl font-black text-ocean-400 sm:text-5xl">
+                <Text as="span" variant="ocean" weight="black" className="text-4xl sm:text-5xl">
                   {fanLevel ?? '-'}
-                </span>
-                <span className="text-lg font-bold text-slate-600 sm:text-xl">/6</span>
+                </Text>
+                <Text as="span" variant="tertiary" size="lg" weight="bold" className="sm:text-xl">/6</Text>
               </div>
               {/* Mini bar indicator */}
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-800">
+              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
                 <div
-                  className="h-full bg-linear-to-r from-ocean-500 to-ocean-400 transition-all duration-300"
+                  className="h-full bg-ocean-400 transition-all duration-300"
                   style={{ width: fanLevel ? `${(fanLevel / 6) * 100}%` : '0%' }}
                 />
               </div>
             </div>
-          </div>
+          </Card>
 
           {/* Power Level Gauge */}
-          <div
-            className={`relative overflow-hidden rounded-2xl border  bg-slate-900/60 backdrop-blur-xl ${theme.border} p-5 sm:p-6`}
-          >
+          <Card variant="subtle" padding={false} className="p-5 sm:p-6">
             <div className="flex flex-col items-center">
-              <span className="mb-2 text-3xl sm:text-4xl">⚡</span>
-              <Text size="xs" className="mb-1 tracking-wider text-slate-400 uppercase">
+              <Zap size={18} className="mb-2 text-ember-400" aria-hidden="true" />
+              <Text variant="label" className="mb-1">
                 Potenza
               </Text>
               <div className="flex items-baseline">
-                <span className="text-4xl font-black text-ember-400 sm:text-5xl">
+                <Text as="span" variant="ember" weight="black" className="text-4xl sm:text-5xl">
                   {powerLevel ?? '-'}
-                </span>
-                <span className="text-lg font-bold text-slate-600 sm:text-xl">/5</span>
+                </Text>
+                <Text as="span" variant="tertiary" size="lg" weight="bold" className="sm:text-xl">/5</Text>
               </div>
               {/* Mini bar indicator */}
-              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-800">
+              <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/10">
                 <div
-                  className="h-full bg-linear-to-r from-ember-500 to-flame-400 transition-all duration-300"
+                  className="h-full bg-ember-400 transition-all duration-300"
                   style={{ width: powerLevel ? `${(powerLevel / 5) * 100}%` : '0%' }}
                 />
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Primary Action Buttons */}
@@ -170,7 +150,7 @@ export default function StovePageHero(props: StovePageHeroProps) {
           <Button
             variant="ember"
             size="lg"
-            icon="🔥"
+            icon={<Flame size={18} />}
             onClick={onIgnite}
             disabled={loading || isAccesa || needsMaintenance}
             className="h-16 text-base font-bold sm:h-20 sm:text-lg"
@@ -180,7 +160,7 @@ export default function StovePageHero(props: StovePageHeroProps) {
           <Button
             variant="subtle"
             size="lg"
-            icon="❄️"
+            icon={<Snowflake size={18} />}
             onClick={onShutdown}
             disabled={loading || isSpenta}
             className="h-16 text-base font-bold sm:h-20 sm:text-lg"
@@ -190,9 +170,7 @@ export default function StovePageHero(props: StovePageHeroProps) {
         </div>
 
         {/* Mode Indicator */}
-        <div
-          className={`rounded-2xl border  bg-slate-900/50 backdrop-blur-xl ${theme.border} p-4 sm:p-5`}
-        >
+        <Card variant="subtle" padding={false} className="p-4 sm:p-5">
           <div className="flex items-center gap-4">
             <div
               className={`flex size-12 shrink-0 items-center justify-center rounded-xl sm:size-14 ${
@@ -203,19 +181,18 @@ export default function StovePageHero(props: StovePageHeroProps) {
                   : 'border-2 border-ember-500/50 bg-ember-900/50'
               }`}
             >
-              <span className="text-2xl sm:text-3xl">
-                {schedulerEnabled && semiManualMode ? '⚙️' : schedulerEnabled ? '⏰' : '🔧'}
-              </span>
+              {schedulerEnabled && semiManualMode ? (
+                <Settings size={18} className="text-warning-400" aria-hidden="true" />
+              ) : schedulerEnabled ? (
+                <Clock size={18} className="text-sage-400" aria-hidden="true" />
+              ) : (
+                <Wrench size={18} className="text-ember-400" aria-hidden="true" />
+              )}
             </div>
             <div className="min-w-0 flex-1">
               <Text
-                className={`text-base sm:text-lg ${
-                  schedulerEnabled && semiManualMode
-                    ? 'text-warning-400'
-                    : schedulerEnabled
-                    ? 'text-sage-400'
-                    : 'text-ember-400'
-                }`}
+                variant={schedulerEnabled && semiManualMode ? 'warning' : schedulerEnabled ? 'sage' : 'ember'}
+                className="sm:text-lg"
               >
                 {schedulerEnabled && semiManualMode ? 'Semi-manuale' : schedulerEnabled ? 'Automatica' : 'Manuale'}
               </Text>
@@ -243,15 +220,15 @@ export default function StovePageHero(props: StovePageHeroProps) {
           {/* Mode Action Buttons */}
           <div className="mt-4 flex flex-wrap gap-2">
             {schedulerEnabled && semiManualMode && (
-              <Button variant="outline" size="sm" onClick={onClearSemiManual}>
-                ↩️ Torna Automatico
+              <Button variant="subtle" size="sm" icon={<Undo2 size={16} />} onClick={onClearSemiManual}>
+                Torna Automatico
               </Button>
             )}
-            <Button variant="outline" size="sm" onClick={onNavigateToScheduler}>
-              📅 Pianificazione
+            <Button variant="subtle" size="sm" icon={<CalendarDays size={16} />} onClick={onNavigateToScheduler}>
+              Pianificazione
             </Button>
           </div>
-        </div>
+        </Card>
       </div>
     </Card>
   );

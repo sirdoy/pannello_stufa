@@ -1,5 +1,6 @@
 'use client';
 
+import Text from '@/app/components/ui/Text';
 import type { SonosPlaybackResponse } from '@/types/sonosProxy';
 
 interface SonosNowPlayingProps {
@@ -13,15 +14,15 @@ export default function SonosNowPlaying({ playback }: SonosNowPlayingProps) {
   const isPaused = playback?.transport_state === 'PAUSED_PLAYBACK';
 
   if (!title && !isPlaying && !isPaused) {
-    return <p className="text-sm text-slate-400 italic">Nessuna riproduzione</p>;
+    return <Text variant="secondary" size="sm" className="italic">Nessuna riproduzione</Text>;
   }
 
   return (
     <div>
-      <p className="truncate text-base font-medium text-slate-100">
+      <Text weight="medium" className="truncate">
         {title ?? 'Nessuna riproduzione'}
-      </p>
-      {artist && <p className="truncate text-sm text-slate-400">{artist}</p>}
+      </Text>
+      {artist && <Text variant="secondary" size="sm" className="truncate">{artist}</Text>}
     </div>
   );
 }

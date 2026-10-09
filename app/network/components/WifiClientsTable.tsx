@@ -3,6 +3,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import Card from '@/app/components/ui/Card';
 import Badge from '@/app/components/ui/Badge';
+import Button from '@/app/components/ui/Button';
 import { DataTable } from '@/app/components/ui';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
@@ -44,7 +45,7 @@ function SignalStrengthBars({ quality }: { quality: number }) {
       {[1, 2, 3, 4].map((b) => (
         <div
           key={b}
-          className={`w-1.5 rounded-sm ${b <= bars ? 'bg-sage-400' : 'bg-slate-600'}`}
+          className={`w-1.5 rounded-sm ${b <= bars ? 'bg-sage-400' : 'bg-white/18'}`}
           style={{ height: `${b * 4}px` }}
         />
       ))}
@@ -92,7 +93,7 @@ export default function WifiClientsTable({
       header: 'MAC',
       enableSorting: false,
       cell: ({ row }) => (
-        <span className="font-mono text-xs text-slate-400">{row.original.mac}</span>
+        <Text as="span" variant="secondary" size="xs" mono>{row.original.mac}</Text>
       ),
     },
     {
@@ -135,21 +136,18 @@ export default function WifiClientsTable({
         </Heading>
 
         {/* Band filter */}
-        <div className="flex gap-1">
+        <Button.Group>
           {BAND_FILTERS.map(({ value, label }) => (
-            <button
+            <Button
               key={value}
+              variant={band === value ? 'ember' : 'subtle'}
+              size="sm"
               onClick={() => onBandChange(value)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                band === value
-                  ? 'border border-ember-400/30 bg-ember-500/20 text-ember-300'
-                  : 'border border-transparent text-slate-400 hover:text-slate-200'
-              }`}
             >
               {label}
-            </button>
+            </Button>
           ))}
-        </div>
+        </Button.Group>
       </div>
 
       {/* Content */}

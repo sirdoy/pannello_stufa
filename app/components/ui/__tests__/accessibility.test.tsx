@@ -868,11 +868,12 @@ describe('Accessibility Test Suite - All Components', () => {
       });
     });
 
-    describe('Focus ring offset for dark/light mode', () => {
-      test('ControlButton has dark mode offset', () => {
+    describe('Focus ring on the glass surface', () => {
+      test('ControlButton has the accent focus ring', () => {
         render(<ControlButton onChange={() => {}} />);
         const button = screen.getByRole('button');
-        expect(button).toHaveClass('focus-visible:ring-offset-slate-900');
+        expect(button).toHaveClass('focus-visible:ring-2');
+        expect(button).toHaveClass('focus-visible:ring-ember-500/50');
       });
     });
   });

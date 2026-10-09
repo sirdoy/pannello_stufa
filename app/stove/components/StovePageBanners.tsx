@@ -11,6 +11,7 @@
  * Props in, JSX out. No state management.
  */
 
+import { Check, Hourglass, Settings } from 'lucide-react';
 import { Banner, Button } from '@/app/components/ui';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
 import type { MaintenanceStatus } from '@/lib/maintenance/maintenanceService';
@@ -62,7 +63,6 @@ export default function StovePageBanners(props: StovePageBannersProps) {
         <div className="mb-6" data-testid="stove-pellet-low-banner">
           <Banner
             variant="warning"
-            icon="🪵"
             title="Pellet in riserva"
             description="Il pellet sta per finire: ricarica il serbatoio della stufa."
           />
@@ -74,7 +74,6 @@ export default function StovePageBanners(props: StovePageBannersProps) {
         <div className="mb-6">
           <Banner
             variant="warning"
-            icon="🧹"
             title="Pulizia Stufa Richiesta"
             description={
               <>
@@ -89,15 +88,17 @@ export default function StovePageBanners(props: StovePageBannersProps) {
                   onClick={onConfirmCleaning}
                   disabled={cleaningInProgress}
                   size="sm"
+                  icon={cleaningInProgress ? <Hourglass size={16} /> : <Check size={16} />}
                 >
-                  {cleaningInProgress ? '⏳ Conferma...' : '✓ Ho Pulito'}
+                  {cleaningInProgress ? 'Conferma...' : 'Ho Pulito'}
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="subtle"
                   onClick={onNavigateToMaintenance}
                   size="sm"
+                  icon={<Settings size={16} />}
                 >
-                  ⚙️ Impostazioni
+                  Impostazioni
                 </Button>
               </>
             }
@@ -110,7 +111,7 @@ export default function StovePageBanners(props: StovePageBannersProps) {
         <div className="mb-6">
           <Banner
             variant="info"
-            icon="⏳"
+            icon={<Hourglass size={24} />}
             title={`${pendingCommands.length} comando/i in attesa`}
             description="Verranno eseguiti al ripristino connessione."
           />

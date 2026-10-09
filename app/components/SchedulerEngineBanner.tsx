@@ -110,19 +110,12 @@ export default function SchedulerEngineBanner({ variant = 'banner' }: SchedulerE
 
   if (variant === 'inline') {
     return (
-      <div
-        data-testid="scheduler-engine-banner"
-        className="flex items-center gap-4 rounded-xl border border-warning-500/40 bg-warning-900/30 p-5 backdrop-blur-xl"
-      >
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border-2 border-warning-500/50 bg-warning-900/40">
-          <span className="text-2xl">⚠️</span>
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="font-display text-base font-bold text-warning-300">Motore stufa fermo</p>
-          <p className="mt-0.5 text-sm text-warning-400">
-            {detail} • La pianificazione automatica non sta girando
-          </p>
-        </div>
+      <div data-testid="scheduler-engine-banner">
+        <Banner
+          variant="warning"
+          title="Motore stufa fermo"
+          description={<>{detail} • La pianificazione automatica non sta girando</>}
+        />
       </div>
     );
   }
@@ -131,7 +124,6 @@ export default function SchedulerEngineBanner({ variant = 'banner' }: SchedulerE
     <div data-testid="scheduler-engine-banner">
       <Banner
         variant="warning"
-        icon="⚠️"
         title="Motore stufa fermo"
         description={<>{detail}. La pianificazione automatica sul Pi non sta girando.</>}
       />

@@ -22,6 +22,10 @@ function readHashTab(): TabValue | null {
   return ['stove', 'netatmo', 'hue', 'weather', 'firebase', 'scheduler'].includes(hash) ? hash : null;
 }
 
+function readIsLocalhost(): boolean {
+  return window.location.hostname === 'localhost';
+}
+
 export default function ApiDebugPage() {
   // Tab from the URL hash (null on the server and during hydration), overridden by user choice
   const hashTab = useSyncExternalStore(subscribeNoop, readHashTab, () => null);
@@ -30,13 +34,15 @@ export default function ApiDebugPage() {
   const [autoRefresh, setAutoRefresh] = useState<boolean>(false);
   const [lastRefresh, setLastRefresh] = useState<number | null>(null);
 
-  // Detect environment
-  const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  // Environment from the hostname: false on the server and during hydration, so both render the same badge
+  // (reading window in render made the server print PROD and the client DEV, workspace ROADMAP T12)
+  const isDev = useSyncExternalStore(subscribeNoop, readIsLocalhost, () => false);
 
-  // Update URL hash when tab changes
+  // Write the hash only for a tab the user picked: writing the default during hydration replaced the hash of
+  // a deep link (/debug/api#hue) before it was read
   useEffect(() => {
-    window.location.hash = activeTab;
-  }, [activeTab]);
+    if (pickedTab) window.location.hash = pickedTab;
+  }, [pickedTab]);
 
   // Keyboard shortcuts
   useEffect(() => {

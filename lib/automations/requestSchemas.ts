@@ -22,6 +22,9 @@ const schedulingFields = {
   max_triggers_per_hour: z.number().int().min(0).optional(),
   active_hours_start: hhmmSchema,
   active_hours_end: hhmmSchema,
+  // Hold rules (workspace ROADMAP D13): the backend checks the actions can be held.
+  mode: z.enum(['edge', 'hold']).optional(),
+  priority: z.number().int().min(0).max(1000).optional(),
 };
 
 // POST: condition and at least one action are required by the backend.

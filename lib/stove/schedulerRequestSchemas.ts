@@ -54,6 +54,21 @@ export const maintenancePatchBody = z
   .strict()
   .refine((b) => Object.keys(b).length > 0, 'Nessun campo da aggiornare');
 
+const powerLevel = z.number().int().min(1).max(5);
+
+export const climatePatchBody = z
+  .object({
+    enabled: z.boolean().optional(),
+    room_id: z.string().min(1).optional(),
+    min_power: powerLevel.optional(),
+    max_power: powerLevel.optional(),
+    kp: z.number().positive().max(10).optional(),
+    ti_minutes: z.number().min(5).max(600).optional(),
+    fan_by_power: z.array(z.number().int().min(1).max(6)).length(5).optional(),
+  })
+  .strict()
+  .refine((b) => Object.keys(b).length > 0, 'Nessun campo da aggiornare');
+
 /** Positive integer path id, or null. */
 export function parseId(raw: string | undefined): number | null {
   if (!raw || !/^\d+$/.test(raw)) return null;

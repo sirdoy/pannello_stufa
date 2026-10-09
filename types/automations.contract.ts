@@ -217,6 +217,12 @@ export type ActionItem = NetatmoSetRoomTempAction
 // ----- 5. Rule DTOs -----
 
 // api/automations/models.py — AutomationRule (line 251-265)
+// "edge": actions run once when the condition turns true.
+// "hold": the rule keeps its targets while the condition is true and gives them back when it
+// turns false (automations.md#hold-rules). Only netatmo_set_room_temp (manual) and
+// thermorossi set_power / set_fan actions can be held.
+export type RuleMode = 'edge' | 'hold';
+
 export interface AutomationRule {
   id: number;
   name: string;
@@ -230,6 +236,8 @@ export interface AutomationRule {
   last_triggered_at?: number | null; // Unix seconds
   active_hours_start?: string | null; // HH:MM
   active_hours_end?: string | null;   // HH:MM
+  mode: RuleMode;
+  priority: number; // 0-1000, higher wins between hold rules on one target
   created_at: number; // Unix seconds
   updated_at: number; // Unix seconds
 }
@@ -247,6 +255,8 @@ export interface AutomationRuleCreate {
   max_triggers_per_hour?: number;
   active_hours_start?: string | null; // HH:MM
   active_hours_end?: string | null;   // HH:MM
+  mode?: RuleMode;   // default "edge"
+  priority?: number; // default 0
 }
 
 // api/automations/models.py — AutomationRulePatch (line 283-294)
@@ -261,6 +271,8 @@ export interface AutomationRulePatch {
   max_triggers_per_hour?: number;
   active_hours_start?: string | null; // HH:MM
   active_hours_end?: string | null;   // HH:MM
+  mode?: RuleMode;
+  priority?: number;
 }
 
 

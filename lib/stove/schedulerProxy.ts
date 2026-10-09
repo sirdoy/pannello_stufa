@@ -7,6 +7,9 @@
 
 import { haDelete, haGet, haPatch, haPost, haPut } from '@/lib/haClient';
 import type {
+  ClimateLogResponse,
+  ClimatePatch,
+  ClimateState,
   ExecutionLogResponse,
   MaintenanceCleanResponse,
   MaintenanceState,
@@ -70,6 +73,16 @@ export const getNextAction = () => haGet<NextActionResponse>(`${BASE}/scheduler/
 
 export const getExecutionLog = (query: string) =>
   haGet<ExecutionLogResponse>(`${BASE}/scheduler/log${query ? `?${query}` : ''}`);
+
+// Climate control (ROADMAP D16) -------------------------------------------------
+
+export const getClimate = () => haGet<ClimateState>(`${BASE}/scheduler/climate`);
+
+export const patchClimate = (body: ClimatePatch) =>
+  haPatch<ClimateState>(`${BASE}/scheduler/climate`, body);
+
+export const getClimateLog = (query: string) =>
+  haGet<ClimateLogResponse>(`${BASE}/scheduler/climate/log${query ? `?${query}` : ''}`);
 
 // Maintenance ----------------------------------------------------------------
 

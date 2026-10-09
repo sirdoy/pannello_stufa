@@ -135,6 +135,25 @@ describe('PATCH /api/v1/automations/[rule_id]', () => {
     expect(mockAutomationsProxy.updateAutomation).toHaveBeenCalledWith('rule-123', expect.any(Object));
   });
 
+  it('forwards the hold fields and rejects invalid ones (ROADMAP D13)', async () => {
+    mockAutomationsProxy.updateAutomation.mockResolvedValue(mockRule);
+    const patch = (body: unknown) => {
+      mockParseJson.mockResolvedValue(body);
+      const request = new Request('http://localhost:3000/api/v1/automations/rule-123', {
+        method: 'PATCH',
+      });
+      return PATCH(asNextRequest(request), mockContext);
+    };
+
+    expect((await patch({ mode: 'hold', priority: 100 })).status).toBe(200);
+    expect(mockAutomationsProxy.updateAutomation).toHaveBeenCalledWith('rule-123', {
+      mode: 'hold',
+      priority: 100,
+    });
+    expect((await patch({ mode: 'sometimes' })).status).toBe(400);
+    expect((await patch({ priority: -1 })).status).toBe(400);
+  });
+
   // BL-03 (REVIEW iteration 2): the route now Zod-validates the PATCH body
   // and uses .strict() so AutomationRulePatch's no-trigger invariant (D-12)
   // is enforced at the API boundary — clients cannot smuggle arbitrary keys

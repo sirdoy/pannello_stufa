@@ -104,6 +104,54 @@ export interface SchedulerEngineHealth {
   healthy: boolean;
 }
 
+/** GET / PATCH /scheduler/climate: stove levels from a room temperature (ROADMAP D16). */
+export interface ClimateState {
+  enabled: boolean;
+  room_id: string | null; // Netatmo room id
+  min_power: number; // 1-5
+  max_power: number; // 1-5
+  kp: number; // power levels per °C
+  ti_minutes: number;
+  fan_by_power: number[]; // 5 fan levels (1-6), one per power level
+  updated_at: number | null; // Unix seconds
+  live: {
+    setpoint: number | null; // programmed setpoint of the room now
+    temperature: number | null;
+    error: number | null; // setpoint − temperature
+    power_level: number | null; // null while the controller is not driving the stove
+    fan_level: number | null;
+    integral: number;
+  };
+}
+
+export type ClimatePatch = Partial<
+  Pick<
+    ClimateState,
+    'enabled' | 'min_power' | 'max_power' | 'kp' | 'ti_minutes' | 'fan_by_power'
+  > & { room_id: string }
+>;
+
+/** GET /scheduler/climate/log. */
+export interface ClimateLogResponse {
+  items: {
+    timestamp: number; // Unix seconds
+    setpoint: number;
+    temperature: number;
+    integral: number;
+    output: number;
+    power: number;
+    fan: number;
+    frozen: boolean; // a hold rule held the power
+  }[];
+}
+
+/** WS `scheduler` event `engine.tick`: levels the engine wants and their source (D13, D16). */
+export interface EngineTargetLevels {
+  power_level: number;
+  fan_level: number;
+  source: 'slot' | 'climate' | 'hold';
+}
+
 /** WS topic `scheduler` snapshot `data`. */
 export interface SchedulerSnapshotData {
   schedules: ScheduleSummary[];

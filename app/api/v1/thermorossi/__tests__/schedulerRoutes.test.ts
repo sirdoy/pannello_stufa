@@ -20,6 +20,8 @@ import * as mode from '../scheduler/mode/route';
 import * as engine from '../scheduler/engine/route';
 import * as override from '../scheduler/override/route';
 import * as log from '../scheduler/log/route';
+import * as climate from '../scheduler/climate/route';
+import * as climateLog from '../scheduler/climate/log/route';
 import * as maintenance from '../maintenance/route';
 import * as confirmCleaning from '../../../maintenance/confirm-cleaning/route';
 
@@ -164,5 +166,31 @@ describe('scheduler engine heartbeat (ROADMAP V8)', () => {
     expect(res.status).toBe(200);
     expect(mocked.getEngineHealth).toHaveBeenCalledTimes(1);
     expect(await res.json()).toMatchObject(health);
+  });
+});
+
+describe('climate control (ROADMAP D16)', () => {
+  it('forwards GET and a valid PATCH', async () => {
+    const state = { enabled: true, room_id: '2313748176', live: { setpoint: 20 } };
+    mocked.getClimate.mockResolvedValue(state as never);
+    expect(await (await climate.GET(req(), ctx())).json()).toMatchObject(state);
+
+    const body = { enabled: true, room_id: '2313748176', max_power: 4, fan_by_power: [1, 3, 4, 5, 6] };
+    expect((await climate.PATCH(req(body), ctx())).status).toBe(200);
+    expect(mocked.patchClimate).toHaveBeenCalledWith(body);
+  });
+
+  it('rejects invalid PATCH bodies before the Pi', async () => {
+    for (const body of [{}, { max_power: 6 }, { fan_by_power: [1, 2] }, { kp: 0 }, { evil: 1 }]) {
+      expect((await climate.PATCH(req(body), ctx())).status).toBe(400);
+    }
+    expect(mocked.patchClimate).not.toHaveBeenCalled();
+  });
+
+  it('log forwards only a numeric limit', async () => {
+    await climateLog.GET(req(undefined, '?limit=50&offset=3'), ctx());
+    expect(mocked.getClimateLog).toHaveBeenCalledWith('limit=50');
+    await climateLog.GET(req(undefined, '?limit=abc'), ctx());
+    expect(mocked.getClimateLog).toHaveBeenLastCalledWith('');
   });
 });

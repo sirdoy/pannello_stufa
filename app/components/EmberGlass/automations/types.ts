@@ -16,7 +16,7 @@ export type {
   ActionItem,
 } from '@/types/automations';
 
-import type { TriggerType, ActionItem } from '@/types/automations';
+import type { TriggerType, ActionItem, RuleMode } from '@/types/automations';
 
 /** UI-internal: a leaf condition (any type from ConditionNode minus and/or).
  *
@@ -57,6 +57,8 @@ export interface UIDraft {
   max_triggers_per_hour: number;
   active_hours_start: string | null;
   active_hours_end: string | null;
+  mode: RuleMode;
+  priority: number;
 }
 
 /** Empty draft for "Nuova automazione" flow. */
@@ -72,5 +74,7 @@ export function emptyDraft(): UIDraft {
     max_triggers_per_hour: 0,
     active_hours_start: null,
     active_hours_end: null,
+    mode: 'edge',
+    priority: 0,
   };
 }

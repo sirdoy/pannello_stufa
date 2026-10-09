@@ -7,6 +7,7 @@
  */
 import type { AutomationExecution } from '@/types/automations';
 import { useAutomationHistory } from '../hooks/useAutomationHistory';
+import { parseHoldEvent } from '../lib/hold';
 
 const STATUS: Record<AutomationExecution['status'], { label: string; color: string }> = {
   success: { label: 'Completata', color: '#6aa86a' },
@@ -69,6 +70,11 @@ export function HistorySection({ ruleId }: HistorySectionProps) {
       >
         {items.map((ex) => {
           const status = STATUS[ex.status] ?? { label: ex.status, color: 'var(--text-2)' };
+          // Hold rules (D13) write one row when the hold starts and one when it ends
+          const hold = parseHoldEvent(ex.trigger_snapshot, ruleId);
+          const label = hold
+            ? `${hold.hold === 'started' ? 'Tenuta avviata' : 'Tenuta terminata'}${ex.status === 'success' ? '' : ` · ${status.label}`}`
+            : status.label;
           return (
             <li
               key={ex.id}
@@ -85,7 +91,7 @@ export function HistorySection({ ruleId }: HistorySectionProps) {
                   aria-hidden
                   style={{ width: 7, height: 7, borderRadius: 999, background: status.color, flexShrink: 0 }}
                 />
-                <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{status.label}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{label}</span>
                 {ex.trigger_source === 'manual' && (
                   <span style={{ fontSize: 10, color: 'var(--text-2)' }}>manuale</span>
                 )}
@@ -100,7 +106,12 @@ export function HistorySection({ ruleId }: HistorySectionProps) {
                   {formatWhen(ex.triggered_at)}
                 </span>
               </div>
-              {ex.error_message && (
+              {hold?.targets.map((line) => (
+                <div key={line} style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 4, marginLeft: 15 }}>
+                  {line}
+                </div>
+              ))}
+              {ex.error_message && !hold && (
                 <div style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 4, marginLeft: 15 }}>
                   {ex.error_message}
                 </div>

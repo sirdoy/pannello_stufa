@@ -361,7 +361,7 @@ export const SETTINGS_MENU: Record<string, SettingsMenuItem> = {
     name: 'Automazione Stufa',
     icon: '🔥',
     route: '/settings/thermostat',
-    description: 'Controllo PID stufa-termostato',
+    description: 'Potenza della stufa dalla temperatura della stanza',
   },
   LOG: {
     id: 'log',

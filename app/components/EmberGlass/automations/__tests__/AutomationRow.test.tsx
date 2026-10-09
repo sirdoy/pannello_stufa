@@ -303,3 +303,15 @@ describe('AutomationRow', () => {
     });
   });
 });
+
+describe('AutomationRow — hold rules (ROADMAP D13)', () => {
+  it('shows the hold pill with the priority only for hold rules', () => {
+    const { rerender } = render(
+      <AutomationRow rule={makeRule({ mode: 'hold', priority: 100 })} onOpen={jest.fn()} onToggle={jest.fn()} />
+    );
+    expect(screen.getByText('finché è vero · priorità 100')).toBeInTheDocument();
+    rerender(<AutomationRow rule={makeRule({ mode: 'edge', priority: 0 })} onOpen={jest.fn()} onToggle={jest.fn()} />);
+    expect(screen.queryByText(/finché è vero/)).toBeNull();
+  });
+});
+

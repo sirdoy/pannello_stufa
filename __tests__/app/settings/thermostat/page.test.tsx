@@ -1,129 +1,146 @@
 /**
- * Unit tests for Thermostat Settings Page
- * Tests auth race condition fix
+ * /settings/thermostat — stove climate control (workspace ROADMAP D16, D18).
  */
-
-import { render, screen, waitFor } from '@testing-library/react';
-import { useRouter } from 'next/navigation';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import ThermostatSettingsPage from '@/app/settings/thermostat/page';
-import { useUser } from '@/lib/auth/useUser';
+import type { ClimateState } from '@/types/thermorossiScheduler';
 
-// Mock Next.js router
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
+const API = '/api/v1/thermorossi/scheduler/climate';
 
-// Mock useUser hook
-jest.mock('@/lib/auth/useUser', () => ({
-  useUser: jest.fn(),
-}));
+function climate(overrides: Partial<ClimateState> = {}): ClimateState {
+  return {
+    enabled: true,
+    room_id: 'sala',
+    min_power: 1,
+    max_power: 5,
+    kp: 1.5,
+    ti_minutes: 60,
+    fan_by_power: [1, 3, 4, 5, 6],
+    updated_at: 1791540000,
+    live: { setpoint: 20, temperature: 19.5, error: 0.5, power_level: 2, fan_level: 3, integral: 0.1 },
+    ...overrides,
+  };
+}
 
-// Mock child components
-jest.mock('@/app/components/SettingsLayout', () => {
-  return function MockSettingsLayout({ children, title }: { children?: React.ReactNode; title?: React.ReactNode }) {
-    return (
-      <div data-testid="settings-layout">
-        <h1>{title}</h1>
-        {children}
-      </div>
+const ROOMS = {
+  rooms: [
+    { room_id: 'sala', room_name: 'Salotto' },
+    { room_id: 'cucina', room_name: 'Cucina' },
+  ],
+};
+const LOG = {
+  items: [
+    { timestamp: 1791540000, setpoint: 20, temperature: 19.5, integral: 0, output: 1.75, power: 2, fan: 3, frozen: false },
+    { timestamp: 1791539000, setpoint: 20, temperature: 21, integral: 0, output: 1, power: 1, fan: 1, frozen: true },
+  ],
+};
+
+/** Serves GET state / rooms / log and records PATCH bodies; PATCH answers with the merged state. */
+function mockApi(initial: ClimateState, options: { failGet?: boolean; failPatch?: boolean } = {}) {
+  let state = initial;
+  const patches: unknown[] = [];
+  global.fetch = jest.fn(async (url: string, init?: RequestInit) => {
+    if (init?.method === 'PATCH') {
+      if (options.failPatch) return { ok: false, json: async () => ({}) };
+      const body = JSON.parse(String(init.body));
+      patches.push(body);
+      state = { ...state, ...body };
+      return { ok: true, json: async () => state };
+    }
+    if (url === API) return { ok: !options.failGet, json: async () => state };
+    if (url.startsWith(`${API}/log`)) return { ok: true, json: async () => LOG };
+    return { ok: true, json: async () => ROOMS };
+  }) as unknown as typeof fetch;
+  return patches;
+}
+
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
+describe('ThermostatSettingsPage — climate control', () => {
+  it('shows the state, the live readings, the room and the latest decisions', async () => {
+    mockApi(climate());
+    render(<ThermostatSettingsPage />);
+
+    expect(await screen.findByTestId('climate-state')).toHaveTextContent('Attivo');
+    const live = within(screen.getByTestId('climate-live'));
+    expect(live.getByText('20 °C')).toBeInTheDocument();
+    expect(live.getByText('19,5 °C')).toBeInTheDocument();
+    expect(live.getByText('P2 · V3')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText('Stanza')).toHaveDisplayValue('Salotto'));
+    const rows = await screen.findAllByTestId('climate-log-row');
+    expect(rows).toHaveLength(2);
+    expect(rows[1]).toHaveTextContent('P1 · V1 (tenuta)');
+  });
+
+  it('turns the control off with one PATCH', async () => {
+    const patches = mockApi(climate());
+    render(<ThermostatSettingsPage />);
+
+    fireEvent.click(await screen.findByRole('switch', { name: 'Spegni il controllo climatico' }));
+
+    await waitFor(() => expect(screen.getByTestId('climate-state')).toHaveTextContent('Spento'));
+    expect(patches).toEqual([{ enabled: false }]);
+  });
+
+  it('cannot be turned on before a room is chosen; choosing one saves it', async () => {
+    const patches = mockApi(
+      climate({ enabled: false, room_id: null, live: { ...climate().live, setpoint: null, temperature: null } })
     );
-  };
-});
-
-jest.mock('@/app/components/netatmo/PidAutomationPanel', () => {
-  return function MockPidAutomationPanel() {
-    return <div data-testid="pid-automation-panel">PidAutomationPanel</div>;
-  };
-});
-
-describe('ThermostatSettingsPage - Auth Race Condition Fix', () => {
-  const mockPush = jest.fn();
-  const mockUseUser = useUser as jest.Mock;
-
-  beforeEach(() => {
-    jest.clearAllMocks();
-    (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
-  });
-
-  it('should show loading skeleton while auth is loading', () => {
-    // Auth is still loading
-    mockUseUser.mockReturnValue({ user: null, isLoading: true });
-
     render(<ThermostatSettingsPage />);
 
-    // Should show settings layout with title
-    expect(screen.getByText('Impostazioni termostato')).toBeInTheDocument();
+    expect(await screen.findByRole('switch', { name: 'Attiva il controllo climatico' })).toBeDisabled();
+    await screen.findByRole('option', { name: 'Cucina' });
+    fireEvent.change(screen.getByLabelText('Stanza'), { target: { value: 'cucina' } });
 
-    // Should show skeleton (check for animate-pulse class or shimmer)
-    const skeleton = document.querySelector('[class*="animate"]');
-    expect(skeleton).toBeTruthy();
-
-    // Should NOT show actual content yet
-    expect(screen.queryByTestId('pid-automation-panel')).not.toBeInTheDocument();
+    await waitFor(() => expect(patches).toEqual([{ room_id: 'cucina' }]));
+    await waitFor(() =>
+      expect(screen.getByRole('switch', { name: 'Attiva il controllo climatico' })).not.toBeDisabled()
+    );
   });
 
-  it('should redirect to login when not authenticated', async () => {
-    // Auth finished loading, but no user
-    mockUseUser.mockReturnValue({ user: null, isLoading: false });
-
+  it('saves the tuning only when it changed and is valid', async () => {
+    const patches = mockApi(climate());
     render(<ThermostatSettingsPage />);
+    const save = await screen.findByRole('button', { name: 'Salva regolazione' });
+    expect(save).toBeDisabled();
 
-    // Should trigger redirect to login
-    await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/auth/login');
+    fireEvent.change(screen.getByLabelText('Potenza minima'), { target: { value: '4' } });
+    fireEvent.change(screen.getByLabelText('Potenza massima'), { target: { value: '3' } });
+    expect(screen.getByRole('alert')).toHaveTextContent('minima non può superare');
+    expect(save).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText('Potenza minima'), { target: { value: '2' } });
+    fireEvent.change(screen.getByLabelText('P5'), { target: { value: '5' } });
+    fireEvent.click(save);
+
+    await waitFor(() => expect(patches).toHaveLength(1));
+    expect(patches[0]).toEqual({
+      min_power: 2,
+      max_power: 3,
+      kp: 1.5,
+      ti_minutes: 60,
+      fan_by_power: [1, 3, 4, 5, 5],
     });
-
-    // Should show redirect message (briefly before redirect)
-    expect(screen.getByText(/Accesso richiesto/i)).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent('Regolazione salvata');
   });
 
-  it('should render content when authenticated', () => {
-    // Auth finished loading, user is authenticated
-    const mockUser = { sub: 'auth0|123', email: 'test@example.com' };
-    mockUseUser.mockReturnValue({ user: mockUser, isLoading: false });
-
+  it('explains missing inputs and reports failures', async () => {
+    mockApi(climate({ live: { ...climate().live, setpoint: null, power_level: null, fan_level: null } }), {
+      failPatch: true,
+    });
     render(<ThermostatSettingsPage />);
 
-    // Should show settings layout
-    expect(screen.getByText('Impostazioni termostato')).toBeInTheDocument();
-
-    // Should show PID automation panel
-    expect(screen.getByTestId('pid-automation-panel')).toBeInTheDocument();
-
-    // Should NOT redirect
-    expect(mockPush).not.toHaveBeenCalled();
+    expect(await screen.findByText(/Dati mancanti/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('switch', { name: 'Spegni il controllo climatico' }));
+    expect(await screen.findByRole('status')).toHaveTextContent('Salvataggio non riuscito');
+    expect(screen.getByTestId('climate-state')).toHaveTextContent('Attivo');
   });
 
-  it('should not make API calls while auth is loading', () => {
-    // Auth is still loading
-    mockUseUser.mockReturnValue({ user: null, isLoading: true });
-
-    const { container } = render(<ThermostatSettingsPage />);
-
-    // Verify panel is not rendered (so it can't make API calls)
-    expect(screen.queryByTestId('pid-automation-panel')).not.toBeInTheDocument();
-
-    // Verify only skeleton is shown
-    const skeleton = container.querySelector('[class*="Skeleton"]');
-    expect(skeleton || container.innerHTML.includes('animate')).toBeTruthy();
-  });
-
-  it('should handle auth state transitions correctly', async () => {
-    // Start with loading state — set mock BEFORE render so component sees correct initial state
-    mockUseUser.mockReturnValue({ user: null, isLoading: true });
-    const { rerender } = render(<ThermostatSettingsPage />);
-
-    // Should show skeleton (no panels yet)
-    expect(screen.queryByTestId('pid-automation-panel')).not.toBeInTheDocument();
-
-    // Auth completes - user is authenticated
-    const mockUser = { sub: 'auth0|123', email: 'test@example.com' };
-    mockUseUser.mockReturnValue({ user: mockUser, isLoading: false });
-    rerender(<ThermostatSettingsPage />);
-
-    // Should now show content
-    await waitFor(() => {
-      expect(screen.getByTestId('pid-automation-panel')).toBeInTheDocument();
-    });
+  it('shows an error when the state cannot be loaded', async () => {
+    mockApi(climate(), { failGet: true });
+    render(<ThermostatSettingsPage />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Impossibile caricare');
   });
 });

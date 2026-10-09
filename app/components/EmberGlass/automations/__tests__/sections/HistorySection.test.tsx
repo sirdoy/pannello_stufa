@@ -91,4 +91,37 @@ describe('HistorySection', () => {
     expect(await screen.findAllByTestId('automation-history-row')).toHaveLength(1);
     expect(fetchMock.mock.calls.length).toBeGreaterThan(callsBeforeRetry);
   });
+
+  it('describes hold rows from their snapshot (ROADMAP D13)', async () => {
+    mockHistory({
+      0: {
+        items: [
+          execution({
+            id: 2,
+            trigger_snapshot: JSON.stringify({
+              hold: 'released',
+              targets: { 'netatmo_room:h:r': 'held_by:14', 'stove:power': 'scheduler' },
+            }),
+          }),
+          execution({
+            id: 1,
+            status: 'failure',
+            error_message: 'netatmo_room:h:r: error: netatmo down',
+            trigger_snapshot: JSON.stringify({
+              hold: 'started',
+              targets: { 'netatmo_room:h:r': 'error: netatmo down' },
+            }),
+          }),
+        ],
+        total_count: 2,
+      },
+    });
+    render(<HistorySection ruleId={7} />);
+
+    expect(await screen.findByText('Tenuta terminata')).toBeInTheDocument();
+    expect(screen.getByText('Valvola: tenuta dalla regola 14')).toBeInTheDocument();
+    expect(screen.getByText('Potenza stufa: passata allo scheduler della stufa')).toBeInTheDocument();
+    expect(screen.getByText('Tenuta avviata · Fallita')).toBeInTheDocument();
+    expect(screen.getByText('Valvola: errore: netatmo down')).toBeInTheDocument();
+  });
 });

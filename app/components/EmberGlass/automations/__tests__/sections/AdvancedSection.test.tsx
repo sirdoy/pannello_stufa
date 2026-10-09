@@ -14,6 +14,10 @@ describe('AdvancedSection (AUTO-06)', () => {
     maxPerHour: 0,
     onMinIntervalChange: jest.fn(),
     onMaxPerHourChange: jest.fn(),
+    mode: 'edge' as const,
+    priority: 0,
+    onModeChange: jest.fn(),
+    onPriorityChange: jest.fn(),
   };
 
   beforeEach(() => {
@@ -93,5 +97,41 @@ describe('AdvancedSection (AUTO-06)', () => {
     render(<AdvancedSection {...defaultProps} minInterval={60} maxPerHour={5} />);
     expect(screen.getByLabelText('Intervallo minimo fra attivazioni')).toHaveValue(60);
     expect(screen.getByLabelText('Massimo attivazioni per ora')).toHaveValue(5);
+  });
+});
+
+describe('AdvancedSection — hold rules (ROADMAP D13)', () => {
+  const props = {
+    minInterval: 0,
+    maxPerHour: 0,
+    onMinIntervalChange: jest.fn(),
+    onMaxPerHourChange: jest.fn(),
+    mode: 'edge' as const,
+    priority: 0,
+    onModeChange: jest.fn(),
+    onPriorityChange: jest.fn(),
+  };
+
+  it('switches to hold from the segmented control', () => {
+    const onModeChange = jest.fn();
+    render(<AdvancedSection {...props} onModeChange={onModeChange} />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Finché è vero' }));
+    expect(onModeChange).toHaveBeenCalledWith('hold');
+  });
+
+  it('hold mode shows the priority and hides the frequency limits', () => {
+    const onPriorityChange = jest.fn();
+    render(<AdvancedSection {...props} mode="hold" priority={50} onPriorityChange={onPriorityChange} />);
+    expect(screen.getByLabelText('Priorità')).toHaveValue(50);
+    expect(screen.queryByText('Massimo attivazioni/ora')).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Priorità'), { target: { value: '100' } });
+    expect(onPriorityChange).toHaveBeenCalledWith(100);
+  });
+
+  it('shows the hold error only in hold mode', () => {
+    const { rerender } = render(<AdvancedSection {...props} mode="hold" holdError="Azione non tenibile" />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Azione non tenibile');
+    rerender(<AdvancedSection {...props} mode="edge" holdError="Azione non tenibile" />);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

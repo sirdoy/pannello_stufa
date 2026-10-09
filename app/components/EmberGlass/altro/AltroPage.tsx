@@ -170,7 +170,7 @@ export function AltroPage(): React.ReactElement {
             <AltroRow icon={MapPin} label="Posizione" href="/settings/location" />
             <AltroRow
               icon={Thermometer}
-              label="Termostato"
+              label="Clima"
               href="/settings/thermostat"
             />
           </div>

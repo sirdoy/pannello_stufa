@@ -532,3 +532,29 @@ describe('JSON error inline row', () => {
     expect(screen.queryByText('JSON non valido')).not.toBeInTheDocument();
   });
 });
+
+// ── Hold rules (ROADMAP D13) ──────────────────────────────────────────────────
+
+describe('Hold rules', () => {
+  it('blocks the save while a hold rule has an action that cannot be held', () => {
+    renderEdit(
+      makeRule({ name: 'X', mode: 'hold', priority: 50, actions: [{ type: 'log_event', message: 'm' }] })
+    );
+    expect(screen.getByRole('button', { name: 'Salva modifiche' })).toBeDisabled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Finché è vero');
+  });
+
+  it('allows the save when every action can be held', () => {
+    renderEdit(
+      makeRule({
+        name: 'X',
+        mode: 'hold',
+        priority: 50,
+        actions: [{ type: 'thermorossi', command: 'set_power', power_level: 1 }],
+      })
+    );
+    expect(screen.getByRole('button', { name: 'Salva modifiche' })).not.toBeDisabled();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+});
+

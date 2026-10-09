@@ -162,6 +162,9 @@ export function AutomationRow({ rule, onOpen, onToggle }: AutomationRowProps) {
           <Pill>{actionCount === 1 ? '1 azione' : `${actionCount} azioni`}</Pill>
         )}
 
+        {/* Hold rules keep their value while the condition is true (ROADMAP D13) */}
+        {rule.mode === 'hold' && <Pill>finché è vero · priorità {rule.priority ?? 0}</Pill>}
+
         {/* Pill 4: Last run (muted) */}
         <Pill muted>ultima esecuzione: {lastRun ?? 'mai'}</Pill>
       </div>

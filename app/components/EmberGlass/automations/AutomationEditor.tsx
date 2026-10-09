@@ -29,6 +29,7 @@ import { apiToDraft, draftToApi, computePatchDelta } from './lib/automations-map
 // This plan IMPORTS them; it does not create them.
 // Plan 06's ActionsSection imports the same module.
 import { withKey, stripKeys, type KeyedAction } from './lib/with-key';
+import { isHoldable } from './lib/hold';
 import { TextInput } from './primitives/TextInput';
 import { FieldLabel } from './primitives/FieldLabel';
 import { TriggerSection } from './sections/TriggerSection';
@@ -176,10 +177,16 @@ export function AutomationEditor({
     JSON.stringify(canonicalize(baseline)) !== JSON.stringify(canonicalize(draft));
 
   const hasJsonError = Array.from(actionValidation.values()).some((v) => v === false);
+  // A hold rule can only keep a valve setpoint or the stove levels (ROADMAP D13)
+  const holdError =
+    draft.mode === 'hold' && !draft.actions.every(isHoldable)
+      ? 'Con "Finché è vero" le azioni possono essere solo: temperatura manuale di una valvola, potenza o ventola della stufa.'
+      : null;
   const saveAllowed =
     draft.name.trim().length >= 1 &&
     draft.actions.length >= 1 &&
-    !hasJsonError;
+    !hasJsonError &&
+    !holdError;
 
   const condCount = countDraftConditions(draft.conditions);
   const actionCount = draft.actions.length;
@@ -353,7 +360,19 @@ export function AutomationEditor({
           maxPerHour={draft.max_triggers_per_hour}
           onMinIntervalChange={(v) => setDraft({ ...draft, min_interval_seconds: v })}
           onMaxPerHourChange={(v) => setDraft({ ...draft, max_triggers_per_hour: v })}
+          mode={draft.mode}
+          priority={draft.priority}
+          onModeChange={(v) => setDraft({ ...draft, mode: v })}
+          onPriorityChange={(v) => setDraft({ ...draft, priority: v })}
+          holdError={holdError}
         />
+      )}
+
+      {/* The hold error lives in the Avanzate tab: repeat it wherever the user is */}
+      {holdError && activeTab !== 3 && (
+        <div role="alert" style={{ fontSize: 11, fontWeight: 600, color: '#ff6676', marginTop: 12 }}>
+          {holdError}
+        </div>
       )}
 
       {/* Inline JSON error row (between section body and footer when hasJsonError) */}

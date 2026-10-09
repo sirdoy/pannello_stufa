@@ -124,12 +124,13 @@ describe('AltroPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('link', { name: /stufa/i })).toHaveAttribute('href', '/stove');
     });
-    // Termostato matches both the Dispositivi row (/thermostat) and the
-    // Impostazioni "Termostato" row (/settings/thermostat). Narrow by href.
+    // The Impostazioni row for /settings/thermostat is labelled "Clima" (D18);
+    // narrow by href anyway.
     const termoLinks = screen.getAllByRole('link', { name: /termostato/i });
     const deviceTermo = termoLinks.find(
       (a) => a.getAttribute('href') === '/thermostat'
     );
     expect(deviceTermo).toBeDefined();
+    expect(screen.getByRole('link', { name: /^clima$/i })).toHaveAttribute('href', '/settings/thermostat');
   });
 });

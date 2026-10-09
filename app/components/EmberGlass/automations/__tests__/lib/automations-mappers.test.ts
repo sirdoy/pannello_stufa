@@ -298,3 +298,23 @@ describe('computePatchDelta', () => {
     expect(patch).not.toHaveProperty('trigger');
   });
 });
+
+describe('hold fields (ROADMAP D13)', () => {
+  test('apiToDraft defaults to edge / 0 for rules from an older backend', () => {
+    const draft = apiToDraft(mockRule());
+    expect([draft.mode, draft.priority]).toEqual(['edge', 0]);
+  });
+
+  test('mode and priority round-trip and enter the PATCH delta', () => {
+    const rule = mockRule({ mode: 'hold', priority: 50 } as Partial<AutomationRule>);
+    const api = draftToApi(apiToDraft(rule));
+    expect([api.mode, api.priority]).toEqual(['hold', 50]);
+
+    const patch = computePatchDelta(
+      mockRule({ mode: 'edge', priority: 0 } as Partial<AutomationRule>),
+      mockRule({ mode: 'hold', priority: 100 } as Partial<AutomationRule>)
+    );
+    expect(patch).toEqual({ mode: 'hold', priority: 100 });
+  });
+});
+

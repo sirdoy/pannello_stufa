@@ -38,6 +38,8 @@ export function apiToDraft(rule: AutomationRule): UIDraft {
     max_triggers_per_hour: rule.max_triggers_per_hour,
     active_hours_start: rule.active_hours_start ?? null,
     active_hours_end: rule.active_hours_end ?? null,
+    mode: rule.mode ?? 'edge',
+    priority: rule.priority ?? 0,
   };
 }
 
@@ -106,6 +108,8 @@ export function draftToApi(draft: UIDraft): AutomationRuleCreate {
     max_triggers_per_hour: draft.max_triggers_per_hour,
     active_hours_start: draft.active_hours_start ?? undefined,
     active_hours_end: draft.active_hours_end ?? undefined,
+    mode: draft.mode,
+    priority: draft.priority,
   };
 }
 
@@ -184,7 +188,7 @@ function canonicalize(value: unknown): unknown {
  * Field whitelist (matches AutomationRulePatch fields):
  *   name, description, enabled, condition, actions,
  *   min_interval_seconds, max_triggers_per_hour,
- *   active_hours_start, active_hours_end
+ *   active_hours_start, active_hours_end, mode, priority
  */
 export function computePatchDelta(
   original: AutomationRule,
@@ -200,6 +204,8 @@ export function computePatchDelta(
     'max_triggers_per_hour',
     'active_hours_start',
     'active_hours_end',
+    'mode',
+    'priority',
   ] as const;
 
   type PatchField = (typeof patchFields)[number];

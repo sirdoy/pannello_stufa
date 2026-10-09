@@ -402,8 +402,10 @@ export type AutomationsTriggerSnapshotCause =
   | null;
 
 export interface AutomationsTriggerSnapshotAuto {
-  changed: string[]; // empty on a retry that ran without a sensor delta
+  changed: string[]; // empty on a cron run and on a retry that ran without a sensor delta
   result: boolean;
+  kind?: 'cron'; // only on a run started by a schedule_cron trigger
+  cron?: string; // the cron expression of that run
   retry?: number; // 1..3, only on a re-run after an edge whose actions all failed
   cause?: Exclude<AutomationsTriggerSnapshotCause, null>;
 }

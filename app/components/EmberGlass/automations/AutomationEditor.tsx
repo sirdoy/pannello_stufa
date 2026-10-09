@@ -36,6 +36,7 @@ import { ConditionsSection } from './sections/ConditionsSection';
 import { ActionsSection } from './sections/ActionsSection';
 import { AdvancedSection } from './sections/AdvancedSection';
 import { HistorySection } from './sections/HistorySection';
+import { RunSection } from './sections/RunSection';
 // ConfirmationDialog ships as a DEFAULT export — `import { ConfirmationDialog }` is incorrect.
 // Verified by direct read of app/components/ui/ConfirmationDialog.tsx.
 import ConfirmationDialog from '@/app/components/ui/ConfirmationDialog';
@@ -140,6 +141,8 @@ export function AutomationEditor({
   const tabs: readonly string[] = !isNew && rule ? [...TABS, HISTORY_TAB] : TABS;
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  // Bumped after "Esegui ora" so an open Storico tab reloads its first page.
+  const [runCount, setRunCount] = useState(0);
 
   // Map<actionKey: string, isValid: boolean>
   // Keyed by stable per-action __key (NOT row index) — BLOCKER 1 fix.
@@ -240,6 +243,16 @@ export function AutomationEditor({
         />
       </div>
 
+      {/* Prova / Esegui ora — saved rules only (D1) */}
+      {!isNew && rule && (
+        <RunSection
+          ruleId={rule.id}
+          ruleName={rule.name}
+          isDirty={isDirty}
+          onTriggered={() => setRunCount((n) => n + 1)}
+        />
+      )}
+
       {/* 4-tab segmented control (16px margin-bottom) */}
       <div
         role="tablist"
@@ -333,7 +346,7 @@ export function AutomationEditor({
           mintActionKey={withKey}
         />
       )}
-      {activeTab === 4 && rule && <HistorySection ruleId={rule.id} />}
+      {activeTab === 4 && rule && <HistorySection key={runCount} ruleId={rule.id} />}
       {activeTab === 3 && (
         <AdvancedSection
           minInterval={draft.min_interval_seconds}

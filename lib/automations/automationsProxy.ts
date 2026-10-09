@@ -9,11 +9,20 @@
  *   /api/v1/automations                      - GET list, POST create
  *   /api/v1/automations/{rule_id}            - GET single, PATCH update, DELETE
  *   /api/v1/automations/{rule_id}/history - GET execution history
+ *   /api/v1/automations/{rule_id}/trigger  - POST run the actions now
+ *   /api/v1/automations/{rule_id}/evaluate - POST dry-run the conditions
  */
 
 import { haGet, haPost, haPatch, haDelete } from '@/lib/haClient';
 import type { PaginatedResponse } from '@/types/common';
-import type { AutomationRule, AutomationCreate, AutomationUpdate, AutomationExecution } from '@/types/automations';
+import type {
+  AutomationRule,
+  AutomationCreate,
+  AutomationUpdate,
+  AutomationExecution,
+  TriggerResponse,
+  EvaluateResponse,
+} from '@/types/automations';
 
 /** Get paginated list of automation rules */
 async function getAutomations(params?: { limit?: number; offset?: number }): Promise<PaginatedResponse<AutomationRule>> {
@@ -57,6 +66,16 @@ async function getExecutions(ruleId: string, params?: { limit?: number; offset?:
   );
 }
 
+/** Run the saved rule's actions now, bypassing conditions and safety guards */
+async function triggerAutomation(ruleId: string): Promise<TriggerResponse> {
+  return haPost<TriggerResponse>(`/api/v1/automations/${ruleId}/trigger`, {});
+}
+
+/** Dry-run the saved rule's condition tree (no action runs, nothing is logged) */
+async function evaluateAutomation(ruleId: string): Promise<EvaluateResponse> {
+  return haPost<EvaluateResponse>(`/api/v1/automations/${ruleId}/evaluate`, {});
+}
+
 /** Automations proxy client */
 export const automationsProxy = {
   getAutomations,
@@ -65,4 +84,6 @@ export const automationsProxy = {
   updateAutomation,
   deleteAutomation,
   getExecutions,
+  triggerAutomation,
+  evaluateAutomation,
 };

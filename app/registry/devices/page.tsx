@@ -525,7 +525,7 @@ export default function DeviceRegistryPage() {
   ];
 
   return (
-    <SettingsLayout title="Registro dispositivi" icon="📋" backHref="/registry/types">
+    <SettingsLayout title="Registro dispositivi" backHref="/registry/types">
       <Text variant="secondary">Gestisci i dispositivi registrati nel sistema</Text>
 
       {error && <Banner variant="error">{error}</Banner>}

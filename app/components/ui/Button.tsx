@@ -14,97 +14,40 @@ import { useHaptic } from '@/app/hooks/useHaptic';
  * Size: sm (44px), md (48px), lg (56px) - iOS minimum touch targets
  */
 export const buttonVariants = cva(
-  // Base classes
+  // Base classes: EmberGlass flat buttons (same look as formStyles primary / secondary)
   [
-    'font-display font-semibold',
+    'font-body font-semibold',
     'rounded-xl',
-    'transition-all',
-    'duration-(--duration-smooth)',
-    'ease-(--ease-move)',
-    'flex items-center justify-center gap-2.5',
+    'transition-colors',
+    'duration-(--duration-fast)',
+    'flex items-center justify-center gap-2',
     'relative overflow-hidden',
     'select-none',
-    // Focus ring - ember glow (consistent with Phase 12 components)
     'focus-visible:outline-none',
     'focus-visible:ring-2 focus-visible:ring-ember-500/50',
-    'focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900',
-    // Active state - spring physics for responsive feel
     'active:scale-97',
-    'active:duration-(--duration-fast)',
-    'active:ease-spring-subtle',
-    // Disabled state
-    'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50',
+    'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-55',
   ],
   {
     variants: {
       variant: {
-        // Primary action - Warm ember gradient
-        ember: [
-          'bg-linear-to-br from-ember-500 via-ember-600 to-flame-600',
-          'text-white',
-          'shadow-[0_2px_8px_rgba(237,111,16,0.25),0_1px_2px_rgba(0,0,0,0.1)]',
-          'hover:from-ember-400 hover:via-ember-500 hover:to-flame-500',
-          'hover:shadow-[0_4px_16px_rgba(237,111,16,0.35),0_2px_4px_rgba(0,0,0,0.1)]',
-          'hover:-translate-y-0.5',
-          'hover:ease-spring-subtle',
-        ],
-        // Secondary action - Subtle glass
-        subtle: [
-          'bg-white/6',
-          'text-slate-200',
-          'border border-white/8',
-          'hover:bg-white/10',
-          'hover:border-white/12',
-          'hover:-translate-y-0.5',
-          'hover:ease-spring-subtle',
-          ']',
-          ']',
-          ']',
-          ']',
-        ],
-        // Ghost - Transparent with hover
-        ghost: [
-          'bg-transparent',
-          'text-slate-300',
-          'hover:bg-white/6',
-          'hover:text-slate-100',
-          ']',
-        ],
-        // Success action - Muted sage green
-        success: [
-          'bg-linear-to-br from-sage-500 via-sage-600 to-sage-700',
-          'text-white',
-          'shadow-[0_2px_8px_rgba(96,115,96,0.25),0_1px_2px_rgba(0,0,0,0.1)]',
-          'hover:from-sage-400 hover:via-sage-500 hover:to-sage-600',
-          'hover:shadow-[0_4px_16px_rgba(96,115,96,0.35)]',
-          'hover:-translate-y-0.5',
-          'hover:ease-spring-subtle',
-        ],
-        // Danger action - Red
-        danger: [
-          'bg-linear-to-br from-danger-500 via-danger-600 to-danger-700',
-          'text-white',
-          'shadow-[0_2px_8px_rgba(239,68,68,0.25),0_1px_2px_rgba(0,0,0,0.1)]',
-          'hover:from-danger-400 hover:via-danger-500 hover:to-danger-600',
-          'hover:shadow-[0_4px_16px_rgba(239,68,68,0.35)]',
-          'hover:-translate-y-0.5',
-          'hover:ease-spring-subtle',
-        ],
-        // Outline - Border only
-        outline: [
-          'bg-transparent',
-          'text-ember-400',
-          'border-2 border-ember-500/40',
-          'hover:bg-ember-500/10',
-          'hover:border-ember-500/60',
-          'hover:-translate-y-0.5',
-          'hover:ease-spring-subtle',
-        ],
+        // Primary action - flat accent, dark label
+        ember: 'bg-(--accent) font-bold text-[#1a0d06] hover:brightness-110',
+        // Secondary action - glass
+        subtle: 'border-[0.5px] border-white/14 bg-white/6 text-white hover:bg-white/10',
+        // Ghost - transparent with hover
+        ghost: 'bg-transparent text-(--text-2) hover:bg-white/6 hover:text-white',
+        // Success / danger - tinted, like a toned Pill
+        success: 'border-[0.5px] border-sage-400/30 bg-sage-500/20 text-sage-300 hover:bg-sage-500/30',
+        danger: 'border-[0.5px] border-danger-400/30 bg-danger-500/20 text-danger-300 hover:bg-danger-500/30',
+        // Outline - accent border only
+        outline: 'border-[0.5px] border-ember-500/50 bg-transparent text-ember-400 hover:bg-ember-500/10',
       },
       size: {
-        sm: 'min-h-11 px-4 py-2.5 text-sm',
-        md: 'min-h-12 px-5 py-3 text-base',
-        lg: 'min-h-14 px-6 py-4 text-lg',
+        // Heights keep the 44px minimum touch target
+        sm: 'min-h-11 px-3.5 py-2 text-[13px]',
+        md: 'min-h-12 px-5 py-2.5 text-[15px]',
+        lg: 'min-h-14 px-6 py-3 text-base',
       },
       fullWidth: {
         true: 'w-full',
@@ -126,48 +69,14 @@ export const buttonVariants = cva(
       { iconOnly: true, size: 'sm', className: 'p-2.5 min-w-11 px-0' },
       { iconOnly: true, size: 'md', className: 'p-3 min-w-12 px-0' },
       { iconOnly: true, size: 'lg', className: 'p-4 min-w-14 px-0' },
-      // subtle + colorScheme compound variants
-      {
-        variant: 'subtle',
-        colorScheme: 'sage',
-        className: 'bg-sage-500/20 text-sage-300 border border-sage-500/40 shadow-sm ',
-      },
-      {
-        variant: 'subtle',
-        colorScheme: 'ocean',
-        className: 'bg-ocean-500/20 text-ocean-300 border border-ocean-500/40 shadow-sm ',
-      },
-      {
-        variant: 'subtle',
-        colorScheme: 'warning',
-        className: 'bg-warning-500/20 text-warning-300 border border-warning-500/40 shadow-sm ',
-      },
-      {
-        variant: 'subtle',
-        colorScheme: 'slate',
-        className: 'bg-slate-500/20 text-slate-300 border border-slate-500/40 shadow-sm ',
-      },
-      // ghost + colorScheme compound variants
-      {
-        variant: 'ghost',
-        colorScheme: 'sage',
-        className: 'text-sage-300 hover:bg-sage-500/10 ',
-      },
-      {
-        variant: 'ghost',
-        colorScheme: 'ocean',
-        className: 'text-ocean-300 hover:bg-ocean-500/10 ',
-      },
-      {
-        variant: 'ghost',
-        colorScheme: 'warning',
-        className: 'text-warning-300 hover:bg-warning-500/10 ',
-      },
-      {
-        variant: 'ghost',
-        colorScheme: 'slate',
-        className: 'text-slate-300 hover:bg-slate-500/10 ',
-      },
+      { variant: 'subtle', colorScheme: 'sage', className: 'border-sage-400/30 bg-sage-500/20 text-sage-300' },
+      { variant: 'subtle', colorScheme: 'ocean', className: 'border-ocean-400/30 bg-ocean-500/20 text-ocean-300' },
+      { variant: 'subtle', colorScheme: 'warning', className: 'border-warning-400/30 bg-warning-500/20 text-warning-300' },
+      { variant: 'subtle', colorScheme: 'slate', className: 'border-white/14 bg-white/6 text-(--text-2)' },
+      { variant: 'ghost', colorScheme: 'sage', className: 'text-sage-300 hover:bg-sage-500/10' },
+      { variant: 'ghost', colorScheme: 'ocean', className: 'text-ocean-300 hover:bg-ocean-500/10' },
+      { variant: 'ghost', colorScheme: 'warning', className: 'text-warning-300 hover:bg-warning-500/10' },
+      { variant: 'ghost', colorScheme: 'slate', className: 'text-(--text-2) hover:bg-white/6' },
     ],
     defaultVariants: {
       variant: 'ember',
@@ -182,9 +91,9 @@ export const buttonVariants = cva(
  * Icon size mapping relative to button size
  */
 const iconSizes = {
-  sm: 'text-lg',
-  md: 'text-xl',
-  lg: 'text-2xl',
+  sm: 'text-base',
+  md: 'text-lg',
+  lg: 'text-xl',
 } as const;
 
 export interface ButtonProps
@@ -288,7 +197,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
       {/* Button content */}
       <span
         className={cn(
-          'flex items-center justify-center gap-2.5',
+          'flex items-center justify-center gap-2',
           loading && 'invisible'
         )}
       >

@@ -29,8 +29,8 @@ describe('TimeRangeSelector', () => {
     const activeButton = screen.getByRole('button', { name: /24h/i });
     const inactiveButton = screen.getByRole('button', { name: /1h/i });
 
-    // Active button should have ember gradient classes
-    expect(activeButton.className).toContain('from-ember-500');
+    // Active button is the flat accent (ember) variant
+    expect(activeButton.className).toContain('bg-(--accent)');
 
     // Inactive button should have subtle variant classes
     expect(inactiveButton.className).toContain('bg-white/6');

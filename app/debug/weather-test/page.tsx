@@ -31,7 +31,7 @@ export default function WeatherTestPage() {
   const [state, setState] = useState<TestState>('data');
 
   return (
-    <PageLayout title="Weather Card Test">
+    <PageLayout header={<PageLayout.Header title="Weather Card Test" backHref="/debug" />}>
       <div className="mx-auto max-w-2xl space-y-4 p-4">
         <div className="mb-4 flex gap-2">
           <Button

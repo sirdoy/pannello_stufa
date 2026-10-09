@@ -23,6 +23,7 @@ import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 import type { CameraStatus, CameraEvent, DataFreshness } from '@/types/netatmoProxy';
 import { pickStreamUrl } from '@/lib/netatmo/cameraStreamUrl';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 export default function CameraDashboard() {
   const router = useRouter();
@@ -192,316 +193,327 @@ export default function CameraDashboard() {
 
   if (loading) {
     return (
-      <Section title="Videocamere" description="Caricamento..." spacing="lg" level={1}>
-        <Grid cols={2} gap="lg">
-          <Skeleton.Card className="min-h-100" />
-          <Skeleton.Card className="min-h-100" />
-        </Grid>
-      </Section>
+      <>
+        <PageHeader title="Videocamere" description="Caricamento..." backHref="/altro" />
+        <Section spacing="none">
+          <Grid cols={2} gap="lg">
+            <Skeleton.Card className="min-h-100" />
+            <Skeleton.Card className="min-h-100" />
+          </Grid>
+        </Section>
+      </>
     );
   }
 
   if (error) {
     return (
-      <Section title="Videocamere" spacing="lg" level={1}>
-        <Banner
-          variant="error"
-          title="Errore"
-          description={error}
-        />
-        <Button variant="ember" onClick={handleRefresh} className="mt-4">
-          Riprova
-        </Button>
-      </Section>
+      <>
+        <PageHeader title="Videocamere" backHref="/altro" />
+        <Section spacing="none">
+          <Banner
+            variant="error"
+            title="Errore"
+            description={error}
+          />
+          <Button variant="ember" onClick={handleRefresh} className="mt-4">
+            Riprova
+          </Button>
+        </Section>
+      </>
     );
   }
 
   if (cameras.length === 0) {
     return (
-      <Section title="Videocamere" spacing="lg" level={1}>
-        <EmptyState
-          icon="📹"
-          title="Nessuna videocamera trovata"
-          description="Non sono state trovate videocamere Netatmo nel tuo account."
-        />
-      </Section>
+      <>
+        <PageHeader title="Videocamere" backHref="/altro" />
+        <Section spacing="none">
+          <EmptyState
+            icon="📹"
+            title="Nessuna videocamera trovata"
+            description="Non sono state trovate videocamere Netatmo nel tuo account."
+          />
+        </Section>
+      </>
     );
   }
 
   const isStale = dataFreshness === 'UNREACHABLE';
 
   return (
-    <Section
-      title="Videocamere"
-      description="Visualizza le tue videocamere Netatmo"
-      spacing="lg"
-      level={1}
-      action={
-        <div className="flex gap-2">
-          <Button
-            variant="subtle"
-            size="sm"
-            onClick={() => router.push('/camera/events')}
-          >
-            Tutti gli eventi
-          </Button>
-          <Button
-            variant="subtle"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            {refreshing ? 'Aggiornamento...' : 'Aggiorna'}
-          </Button>
-        </div>
-      }
-    >
-      {/* Staleness banner */}
-      {isStale && (
-        <Banner
-          variant="warning"
-          title="Dati non aggiornati"
-          description="La videocamera potrebbe essere offline. I dati mostrati potrebbero non essere recenti."
-        />
-      )}
+    <>
+      <PageHeader
+        title="Videocamere"
+        description="Visualizza le tue videocamere Netatmo"
+        backHref="/altro"
+        actions={
+          <div className="flex gap-2">
+            <Button
+              variant="subtle"
+              size="sm"
+              onClick={() => router.push('/camera/events')}
+            >
+              Tutti gli eventi
+            </Button>
+            <Button
+              variant="subtle"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+            >
+              {refreshing ? 'Aggiornamento...' : 'Aggiorna'}
+            </Button>
+          </div>
+        }
+      />
+      <Section spacing="none">
+        {/* Staleness banner */}
+        {isStale && (
+          <Banner
+            variant="warning"
+            title="Dati non aggiornati"
+            description="La videocamera potrebbe essere offline. I dati mostrati potrebbero non essere recenti."
+          />
+        )}
 
-      <Grid cols={2} gap="lg">
-        {/* Camera list */}
-        <Card>
-          <CardHeader>
-            <CardTitle icon="📹" level={2}>Le tue telecamere</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {cameras.map(camera => (
-              <div
-                key={camera.camera_id}
-                className={`cursor-pointer rounded-xl p-4 transition-all duration-200 ${
-                  selectedCameraId === camera.camera_id
-                    ? 'border-2 border-ocean-500 bg-ocean-500/20'
-                    : 'border-2 border-transparent bg-slate-800/50 hover:bg-slate-700/50'
-                }`}
-                onClick={() => setSelectedCameraId(camera.camera_id)}
-              >
-                <div className="flex items-center gap-4">
-                  {/* Snapshot thumbnail */}
-                  <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-700">
-                    {snapshotUrls[camera.camera_id] && !snapshotErrors[camera.camera_id] ? (
-                      <img
-                        src={snapshotUrls[camera.camera_id]}
-                        alt={camera.name ?? camera.camera_id}
-                        className="size-full object-cover"
-                        onError={() => setSnapshotErrors(prev => ({ ...prev, [camera.camera_id]: true }))}
-                      />
-                    ) : (
-                      <div className="flex size-full items-center justify-center">
-                        <Text variant="tertiary" size="xs">N/D</Text>
+        <Grid cols={2} gap="lg">
+          {/* Camera list */}
+          <Card>
+            <CardHeader>
+              <CardTitle icon="📹" level={2}>Le tue telecamere</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {cameras.map(camera => (
+                <div
+                  key={camera.camera_id}
+                  className={`cursor-pointer rounded-xl p-4 transition-all duration-200 ${
+                    selectedCameraId === camera.camera_id
+                      ? 'border-2 border-ocean-500 bg-ocean-500/20'
+                      : 'border-2 border-transparent bg-slate-800/50 hover:bg-slate-700/50'
+                  }`}
+                  onClick={() => setSelectedCameraId(camera.camera_id)}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Snapshot thumbnail */}
+                    <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-700">
+                      {snapshotUrls[camera.camera_id] && !snapshotErrors[camera.camera_id] ? (
+                        <img
+                          src={snapshotUrls[camera.camera_id]}
+                          alt={camera.name ?? camera.camera_id}
+                          className="size-full object-cover"
+                          onError={() => setSnapshotErrors(prev => ({ ...prev, [camera.camera_id]: true }))}
+                        />
+                      ) : (
+                        <div className="flex size-full items-center justify-center">
+                          <Text variant="tertiary" size="xs">N/D</Text>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <Heading level={3} size="md" className="truncate">{camera.name ?? camera.camera_id}</Heading>
+                      <Text variant="tertiary" size="sm">
+                        {getCameraTypeName(camera.device_type ?? '')}
+                      </Text>
+                      <div className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                        camera.status === 'on'
+                          ? 'bg-sage-500/20 text-sage-400'
+                          : 'bg-slate-600/50 text-slate-400'
+                      }`}>
+                        {camera.status === 'on' ? 'Attiva' : 'Inattiva'}
                       </div>
-                    )}
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <Heading level={3} size="md" className="truncate">{camera.name ?? camera.camera_id}</Heading>
-                    <Text variant="tertiary" size="sm">
-                      {getCameraTypeName(camera.device_type ?? '')}
-                    </Text>
-                    <div className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                      camera.status === 'on'
-                        ? 'bg-sage-500/20 text-sage-400'
-                        : 'bg-slate-600/50 text-slate-400'
-                    }`}>
-                      {camera.status === 'on' ? 'Attiva' : 'Inattiva'}
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Selected camera details */}
-        {selectedCamera && (
-          <Card>
-            <CardHeader>
-              <CardTitle icon="🎥" level={2}>{selectedCamera.name ?? selectedCamera.camera_id}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* Video/Snapshot toggle */}
-              {selectedCamera.status === 'on' && !isStale && (
-                <div className="mb-4 flex gap-2">
-                  <Button
-                    variant={!isLiveMode ? 'ember' : 'subtle'}
-                    size="sm"
-                    onClick={() => setIsLiveMode(false)}
-                  >
-                    Snapshot
-                  </Button>
-                  <Button
-                    variant={isLiveMode ? 'ember' : 'subtle'}
-                    size="sm"
-                    onClick={handleEnterLiveMode}
-                  >
-                    Live
-                  </Button>
-                </div>
-              )}
-
-              {/* Video preview */}
-              <div className="relative mb-4 aspect-video overflow-hidden rounded-xl bg-slate-800">
-                {isLiveMode && selectedCamera.status === 'on' && streamUrl ? (
-                  // Live video mode — stream URL obtained
-                  <HlsPlayer
-                    src={streamUrl}
-                    poster={snapshotUrls[selectedCamera.camera_id] ?? ''}
-                    className="size-full"
-                    onError={() => {
-                      setIsLiveMode(false);
-                      setStreamError(true);
-                    }}
-                  />
-                ) : isLiveMode && streamLoading ? (
-                  // Stream URL is being fetched
-                  <div className="flex size-full flex-col items-center justify-center gap-2">
-                    <div className="size-8 animate-spin rounded-full border-2 border-ocean-500 border-t-transparent" />
-                    <Text variant="secondary">Connessione al live...</Text>
-                  </div>
-                ) : isLiveMode && streamError ? (
-                  // Stream fetch failed
-                  <div className="flex size-full flex-col items-center justify-center gap-2">
-                    <span className="text-4xl opacity-50">📡</span>
-                    <Text variant="secondary">Live non disponibile</Text>
-                  </div>
-                ) : snapshotUrls[selectedCamera.camera_id] && !snapshotErrors[selectedCamera.camera_id] ? (
-                  // Snapshot mode — URL redirects to Netatmo CDN
-                  <img
-                    src={snapshotUrls[selectedCamera.camera_id]}
-                    alt={selectedCamera.name ?? selectedCamera.camera_id}
-                    className="size-full object-cover"
-                    onError={() => setSnapshotErrors(prev => ({ ...prev, [selectedCamera.camera_id]: true }))}
-                  />
-                ) : (
-                  <div className="flex size-full flex-col items-center justify-center gap-2">
-                    <span className="text-4xl opacity-50">📹</span>
-                    <Text variant="secondary">Snapshot non disponibile</Text>
-                  </div>
-                )}
-
-                {/* Status badge overlay */}
-                {!isLiveMode && (
-                  <div className={`absolute top-3 right-3 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm ${
-                    selectedCamera.status === 'on'
-                      ? 'bg-sage-500/80 text-white'
-                      : 'bg-slate-600/80 text-slate-300'
-                  }`}>
-                    {selectedCamera.status === 'on' ? 'Attiva' : 'Inattiva'}
-                  </div>
-                )}
-              </div>
-
-              {/* Camera info */}
-              <div className="mb-6 grid grid-cols-2 gap-3">
-                <div className="rounded-lg bg-slate-800/50 p-3">
-                  <Text variant="label" size="xs">Tipo</Text>
-                  <Text variant="body" size="sm" className="mt-1">
-                    {getCameraTypeName(selectedCamera.device_type ?? '')}
-                  </Text>
-                </div>
-                <div className="rounded-lg bg-slate-800/50 p-3">
-                  <Text variant="label" size="xs">Stato</Text>
-                  <Text variant={selectedCamera.status === 'on' ? 'sage' : 'secondary'} size="sm" className="mt-1">
-                    {selectedCamera.status === 'on' ? 'Attiva' : 'Inattiva'}
-                  </Text>
-                </div>
-                <div className="rounded-lg bg-slate-800/50 p-3">
-                  <Text variant="label" size="xs">Monitoraggio</Text>
-                  <div className="mt-1 flex items-center gap-2">
-                    <Switch
-                      checked={monitoringStates[selectedCamera.camera_id] ?? false}
-                      onCheckedChange={(val) => handleMonitoringToggle(selectedCamera.camera_id, val)}
-                      disabled={isStale || (monitoringLoading[selectedCamera.camera_id] ?? false)}
-                      size="sm"
-                      variant="ocean"
-                      label="Monitoraggio camera"
-                    />
-                    <Text variant={monitoringStates[selectedCamera.camera_id] ? 'sage' : 'secondary'} size="sm">
-                      {monitoringStates[selectedCamera.camera_id] ? 'Attivo' : 'Disattivo'}
-                    </Text>
-                  </div>
-                </div>
-                {selectedCamera.sd_status && (
-                  <div className="rounded-lg bg-slate-800/50 p-3">
-                    <Text variant="label" size="xs">SD Card</Text>
-                    <Text variant="body" size="sm" className="mt-1">
-                      {selectedCamera.sd_status === 'on' ? 'Presente' : 'Assente'}
-                    </Text>
-                  </div>
-                )}
-              </div>
-
-              {/* Recent events for this camera */}
-              <Heading level={3} size="sm" className="mb-3">Eventi recenti</Heading>
-              {cameraEvents.length > 0 ? (
-                <div className="max-h-80 space-y-2 overflow-y-auto">
-                  {cameraEvents.slice(0, 10).map(event => (
-                    <button
-                      key={event.event_id}
-                      onClick={() => setSelectedEvent(event)}
-                      className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-slate-800/50 p-2 text-left transition-colors hover:bg-slate-700/50"
-                    >
-                      {/* Snapshot preview */}
-                      <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-md bg-slate-700">
-                        {event.snapshot_url ? (
-                          <img
-                            src={event.snapshot_url}
-                            alt={getEventTypeName(event.event_type)}
-                            className="size-full object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const sibling = target.nextSibling as HTMLElement | null;
-                              if (sibling) sibling.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div className={`absolute inset-0 items-center justify-center ${event.snapshot_url ? 'hidden' : 'flex'}`}>
-                          <span className="text-lg opacity-60">
-                            {getEventIcon(event.event_type)}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <Text variant="body" size="sm">
-                          {getEventTypeName(event.event_type)}
-                        </Text>
-                        <Text variant="tertiary" size="xs">
-                          {new Date(event.timestamp * 1000).toLocaleString('it-IT', {
-                            weekday: 'short',
-                            day: '2-digit',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </Text>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="py-6 text-center">
-                  <Text variant="secondary" size="sm">Nessun evento recente per questa camera</Text>
-                </div>
-              )}
+              ))}
             </CardContent>
           </Card>
-        )}
-      </Grid>
 
-      {/* Event preview modal */}
-      {selectedEvent && (
-        <EventPreviewModal
-          event={selectedEvent}
-          onClose={() => setSelectedEvent(null)}
-        />
-      )}
-    </Section>
+          {/* Selected camera details */}
+          {selectedCamera && (
+            <Card>
+              <CardHeader>
+                <CardTitle icon="🎥" level={2}>{selectedCamera.name ?? selectedCamera.camera_id}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {/* Video/Snapshot toggle */}
+                {selectedCamera.status === 'on' && !isStale && (
+                  <div className="mb-4 flex gap-2">
+                    <Button
+                      variant={!isLiveMode ? 'ember' : 'subtle'}
+                      size="sm"
+                      onClick={() => setIsLiveMode(false)}
+                    >
+                      Snapshot
+                    </Button>
+                    <Button
+                      variant={isLiveMode ? 'ember' : 'subtle'}
+                      size="sm"
+                      onClick={handleEnterLiveMode}
+                    >
+                      Live
+                    </Button>
+                  </div>
+                )}
+
+                {/* Video preview */}
+                <div className="relative mb-4 aspect-video overflow-hidden rounded-xl bg-slate-800">
+                  {isLiveMode && selectedCamera.status === 'on' && streamUrl ? (
+                    // Live video mode — stream URL obtained
+                    <HlsPlayer
+                      src={streamUrl}
+                      poster={snapshotUrls[selectedCamera.camera_id] ?? ''}
+                      className="size-full"
+                      onError={() => {
+                        setIsLiveMode(false);
+                        setStreamError(true);
+                      }}
+                    />
+                  ) : isLiveMode && streamLoading ? (
+                    // Stream URL is being fetched
+                    <div className="flex size-full flex-col items-center justify-center gap-2">
+                      <div className="size-8 animate-spin rounded-full border-2 border-ocean-500 border-t-transparent" />
+                      <Text variant="secondary">Connessione al live...</Text>
+                    </div>
+                  ) : isLiveMode && streamError ? (
+                    // Stream fetch failed
+                    <div className="flex size-full flex-col items-center justify-center gap-2">
+                      <span className="text-4xl opacity-50">📡</span>
+                      <Text variant="secondary">Live non disponibile</Text>
+                    </div>
+                  ) : snapshotUrls[selectedCamera.camera_id] && !snapshotErrors[selectedCamera.camera_id] ? (
+                    // Snapshot mode — URL redirects to Netatmo CDN
+                    <img
+                      src={snapshotUrls[selectedCamera.camera_id]}
+                      alt={selectedCamera.name ?? selectedCamera.camera_id}
+                      className="size-full object-cover"
+                      onError={() => setSnapshotErrors(prev => ({ ...prev, [selectedCamera.camera_id]: true }))}
+                    />
+                  ) : (
+                    <div className="flex size-full flex-col items-center justify-center gap-2">
+                      <span className="text-4xl opacity-50">📹</span>
+                      <Text variant="secondary">Snapshot non disponibile</Text>
+                    </div>
+                  )}
+
+                  {/* Status badge overlay */}
+                  {!isLiveMode && (
+                    <div className={`absolute top-3 right-3 rounded-full px-3 py-1 text-xs font-medium backdrop-blur-sm ${
+                      selectedCamera.status === 'on'
+                        ? 'bg-sage-500/80 text-white'
+                        : 'bg-slate-600/80 text-slate-300'
+                    }`}>
+                      {selectedCamera.status === 'on' ? 'Attiva' : 'Inattiva'}
+                    </div>
+                  )}
+                </div>
+
+                {/* Camera info */}
+                <div className="mb-6 grid grid-cols-2 gap-3">
+                  <div className="rounded-lg bg-slate-800/50 p-3">
+                    <Text variant="label" size="xs">Tipo</Text>
+                    <Text variant="body" size="sm" className="mt-1">
+                      {getCameraTypeName(selectedCamera.device_type ?? '')}
+                    </Text>
+                  </div>
+                  <div className="rounded-lg bg-slate-800/50 p-3">
+                    <Text variant="label" size="xs">Stato</Text>
+                    <Text variant={selectedCamera.status === 'on' ? 'sage' : 'secondary'} size="sm" className="mt-1">
+                      {selectedCamera.status === 'on' ? 'Attiva' : 'Inattiva'}
+                    </Text>
+                  </div>
+                  <div className="rounded-lg bg-slate-800/50 p-3">
+                    <Text variant="label" size="xs">Monitoraggio</Text>
+                    <div className="mt-1 flex items-center gap-2">
+                      <Switch
+                        checked={monitoringStates[selectedCamera.camera_id] ?? false}
+                        onCheckedChange={(val) => handleMonitoringToggle(selectedCamera.camera_id, val)}
+                        disabled={isStale || (monitoringLoading[selectedCamera.camera_id] ?? false)}
+                        size="sm"
+                        variant="ocean"
+                        label="Monitoraggio camera"
+                      />
+                      <Text variant={monitoringStates[selectedCamera.camera_id] ? 'sage' : 'secondary'} size="sm">
+                        {monitoringStates[selectedCamera.camera_id] ? 'Attivo' : 'Disattivo'}
+                      </Text>
+                    </div>
+                  </div>
+                  {selectedCamera.sd_status && (
+                    <div className="rounded-lg bg-slate-800/50 p-3">
+                      <Text variant="label" size="xs">SD Card</Text>
+                      <Text variant="body" size="sm" className="mt-1">
+                        {selectedCamera.sd_status === 'on' ? 'Presente' : 'Assente'}
+                      </Text>
+                    </div>
+                  )}
+                </div>
+
+                {/* Recent events for this camera */}
+                <Heading level={3} size="sm" className="mb-3">Eventi recenti</Heading>
+                {cameraEvents.length > 0 ? (
+                  <div className="max-h-80 space-y-2 overflow-y-auto">
+                    {cameraEvents.slice(0, 10).map(event => (
+                      <button
+                        key={event.event_id}
+                        onClick={() => setSelectedEvent(event)}
+                        className="flex w-full cursor-pointer items-center gap-3 rounded-lg bg-slate-800/50 p-2 text-left transition-colors hover:bg-slate-700/50"
+                      >
+                        {/* Snapshot preview */}
+                        <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded-md bg-slate-700">
+                          {event.snapshot_url ? (
+                            <img
+                              src={event.snapshot_url}
+                              alt={getEventTypeName(event.event_type)}
+                              className="size-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                const sibling = target.nextSibling as HTMLElement | null;
+                                if (sibling) sibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className={`absolute inset-0 items-center justify-center ${event.snapshot_url ? 'hidden' : 'flex'}`}>
+                            <span className="text-lg opacity-60">
+                              {getEventIcon(event.event_type)}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <Text variant="body" size="sm">
+                            {getEventTypeName(event.event_type)}
+                          </Text>
+                          <Text variant="tertiary" size="xs">
+                            {new Date(event.timestamp * 1000).toLocaleString('it-IT', {
+                              weekday: 'short',
+                              day: '2-digit',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </Text>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-6 text-center">
+                    <Text variant="secondary" size="sm">Nessun evento recente per questa camera</Text>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </Grid>
+
+        {/* Event preview modal */}
+        {selectedEvent && (
+          <EventPreviewModal
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+          />
+        )}
+      </Section>
+    </>
   );
 }

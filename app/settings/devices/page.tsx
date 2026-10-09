@@ -124,7 +124,7 @@ export default function DevicesSettingsPage() {
   // Loading state
   if (userLoading || isLoading) {
     return (
-      <SettingsLayout title="Gestione Dispositivi" icon="📱">
+      <SettingsLayout title="Gestione Dispositivi">
         <Skeleton className="h-96 w-full" />
       </SettingsLayout>
     );
@@ -133,7 +133,7 @@ export default function DevicesSettingsPage() {
   // Not authenticated
   if (!user) {
     return (
-      <SettingsLayout title="Gestione Dispositivi" icon="📱">
+      <SettingsLayout title="Gestione Dispositivi">
         <Banner variant="warning">
           Devi effettuare l&apos;accesso per gestire i dispositivi
         </Banner>
@@ -142,7 +142,7 @@ export default function DevicesSettingsPage() {
   }
 
   return (
-    <SettingsLayout title="Gestione Dispositivi" icon="📱">
+    <SettingsLayout title="Gestione Dispositivi">
       {/* Description */}
       <Text variant="tertiary" className="text-sm sm:text-base">
         Abilita o disabilita i dispositivi da visualizzare in homepage e nel menu

@@ -18,39 +18,39 @@ import Text from './Text';
 export const bannerVariants = cva(
   // Base classes
   [
-    'rounded-xl backdrop-blur-lg',
+    'rounded-2xl',
     'transition-all duration-300',
     'animate-fade-in-up',
-    'border',
+    'border-[0.5px]',
   ],
   {
     variants: {
       variant: {
         info: [
-          '] bg-ocean-500/15',
-          'border-ocean-500/25 ',
+          'bg-ocean-500/15',
+          'border-ocean-500/25',
         ],
         warning: [
-          '] bg-warning-500/15',
-          'border-warning-500/25 ',
+          'bg-warning-500/15',
+          'border-warning-500/25',
         ],
         error: [
-          '] bg-danger-500/15',
-          'border-danger-500/25 ',
+          'bg-danger-500/15',
+          'border-danger-500/25',
         ],
         success: [
-          '] bg-sage-500/15',
-          'border-sage-500/25 ',
+          'bg-sage-500/15',
+          'border-sage-500/25',
         ],
         ember: [
-          '] bg-ember-500/15',
-          'border-ember-500/25 ',
-          'shadow-ember-glow-sm ',
+          'bg-ember-500/15',
+          'border-ember-500/25',
+          'shadow-ember-glow-sm',
         ],
       },
       compact: {
         true: 'p-3',
-        false: 'p-4 sm:p-5',
+        false: 'p-4',
       },
     },
     defaultVariants: {
@@ -263,7 +263,6 @@ export default function Banner({
               'text-slate-400 hover:text-slate-200',
               'hover:bg-white/6',
               'transition-all duration-200',
-              ']'
             )}
             aria-label="Dismiss"
           >

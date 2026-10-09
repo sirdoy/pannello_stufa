@@ -5,8 +5,8 @@ import { db } from '@/lib/firebase';
 import { onValue, ref } from 'firebase/database';
 import Card from '@/app/components/ui/Card';
 import Skeleton from '@/app/components/ui/Skeleton';
-import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import Button from '@/app/components/ui/Button';
 import EmptyState from '@/app/components/ui/EmptyState';
 import LogEntry from '@/app/components/log/LogEntry';
@@ -157,20 +157,25 @@ export default function LogPage() {
   const hasNext = startIndex + PAGE_SIZE < filteredLog.length;
   const hasPrev = currentPage > 0;
 
+  const pageHeader = (
+    <PageHeader title="Storico azioni" description="Tutte le azioni registrate nel sistema" backHref="/altro" />
+  );
+
   if (loading) {
-    return <Skeleton.LogPage />;
+    return (
+      <>
+        <div className="mx-auto max-w-5xl">{pageHeader}</div>
+        <Skeleton.LogPage />
+      </>
+    );
   }
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <Heading level={1} size="3xl" className="mb-2">📋 Storico Azioni</Heading>
-        <Text variant="secondary">Tutte le azioni registrate nel sistema</Text>
-      </div>
+    <div className="mx-auto max-w-5xl space-y-6">
+      {pageHeader}
 
       {/* Filters Card */}
-      <Card variant="default" className="p-4 sm:p-6">
+      <Card variant="default">
         <Text variant="label" className="mb-3">Filtra per dispositivo</Text>
         <div className="flex flex-wrap gap-2">
           {/* All */}
@@ -241,7 +246,7 @@ export default function LogPage() {
       </Card>
 
       {/* Log Entries */}
-      <Card variant="default" className="p-4 sm:p-6">
+      <Card variant="default">
         {filteredLog.length === 0 ? (
           <EmptyState
             icon="📋"

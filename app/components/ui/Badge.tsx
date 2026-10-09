@@ -18,9 +18,9 @@ export const badgeVariants = cva(
   // Base classes
   [
     'inline-flex items-center gap-1.5',
-    'font-display font-semibold',
+    'font-body font-semibold',
     'rounded-full',
-    'border',
+    'border-[0.5px]',
     'transition-all duration-(--duration-fast)',
   ],
   {
@@ -58,15 +58,15 @@ export const badgeVariants = cva(
         ],
         // Neutral - Off/inactive state
         neutral: [
-          'bg-slate-500/10',
-          'border-slate-400/20',
-          'text-slate-400',
+          'bg-white/6',
+          'border-white/8',
+          'text-(--text-2)',
         ],
       },
       size: {
-        sm: 'px-2 py-0.5 text-xs',
-        md: 'px-3 py-1 text-sm',
-        lg: 'px-4 py-1.5 text-base',
+        sm: 'px-2 py-0.5 text-[10px]',
+        md: 'px-2.5 py-1 text-xs',
+        lg: 'px-3 py-1 text-sm',
       },
       pulse: {
         true: 'animate-glow-pulse',

@@ -49,7 +49,7 @@ describe('SystemInfoCard', () => {
   it('renders skeleton rows when loading', () => {
     render(<SystemInfoCard data={null} loading={true} stale={false} />);
     // Skeletons are rendered (card with skeleton children)
-    const card = document.querySelector('[class*="rounded-2xl"]');
+    const card = document.querySelector('[class*="rounded-(--r-card)"]');
     expect(card).toBeInTheDocument();
   });
 

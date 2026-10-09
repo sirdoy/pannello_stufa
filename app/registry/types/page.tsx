@@ -173,7 +173,7 @@ export default function DeviceTypesPage() {
   };
 
   return (
-    <SettingsLayout title="Tipi dispositivo" icon="🏷️" backHref="/">
+    <SettingsLayout title="Tipi dispositivo">
       <Text variant="secondary">
         Gestisci i tipi di dispositivo disponibili nel registro
       </Text>

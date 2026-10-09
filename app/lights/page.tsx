@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils/cn';
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
 import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
 import type { HueLight, HueGroup, HueScene } from '@/types/hueProxy';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 export default function LightsPage() {
   const router = useRouter();
@@ -69,13 +70,21 @@ export default function LightsPage() {
     finally { setChangingColor(null); }
   }
 
-  if (lightsData.loading) return <Skeleton.LightsCard />;
+  if (lightsData.loading) {
+    return (
+      <div className="mx-auto max-w-7xl">
+        <PageHeader title="Luci" backHref="/altro" />
+        <Skeleton.LightsCard />
+      </div>
+    );
+  }
 
   if (!lightsData.connected) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <PageHeader title="Luci" backHref="/altro" />
         <Card className="p-8">
-          <Heading level={1} size="lg" className="mb-4">Bridge Hue Non Connesso</Heading>
+          <Heading level={2} size="lg" className="mb-4">Bridge Hue Non Connesso</Heading>
           <Text variant="secondary" className="mb-6">
             Il bridge Hue non e raggiungibile tramite il proxy. Verifica che Home Assistant sia attivo e il bridge sia connesso.
           </Text>
@@ -86,14 +95,8 @@ export default function LightsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <div className="mb-4 flex items-center justify-between">
-          <Button variant="ghost" onClick={() => router.push('/')} size="sm">← Indietro</Button>
-        </div>
-        <Heading level={1} size="2xl" className="mb-2">Controllo Luci Philips Hue</Heading>
-        <Text variant="secondary">Gestisci stanze, luci individuali e scene</Text>
-      </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader title="Luci" description="Gestisci stanze, luci individuali e scene" backHref="/altro" />
 
       {success && (
         <div className="mb-6">

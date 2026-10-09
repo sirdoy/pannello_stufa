@@ -82,19 +82,27 @@ function NetatmoContent() {
     setRefreshing(false);
   }
 
-  if (loading) {
-    return <Skeleton.NetatmoPage />;
-  }
+  const pageHeader = (
+    <PageLayout.Header
+      title="Termostato"
+      description="Gestisci temperature e riscaldamento di tutte le stanze"
+      backHref="/altro"
+    />
+  );
 
-  // Show skeleton while redirecting (redirect happens in useEffect above)
-  if (!connected) {
-    return <Skeleton.NetatmoPage />;
+  // Show skeleton while loading or redirecting (redirect happens in useEffect above)
+  if (loading || !connected) {
+    return (
+      <PageLayout maxWidth="7xl" header={pageHeader}>
+        <Skeleton.NetatmoPage />
+      </PageLayout>
+    );
   }
 
   // Show error if topology failed to load
   if (!topology && error) {
     return (
-      <PageLayout maxWidth="7xl">
+      <PageLayout maxWidth="7xl" header={pageHeader}>
         <Card variant="elevated" className="p-6 sm:p-8">
           <Heading level={2} size="2xl" className="mb-4">
             Errore Connessione Netatmo
@@ -242,15 +250,7 @@ function NetatmoContent() {
   };
 
   return (
-    <PageLayout
-      maxWidth="7xl"
-      header={
-        <PageLayout.Header
-          title="Controllo Netatmo"
-          description="Gestisci temperature e riscaldamento di tutte le stanze"
-        />
-      }
-    >
+    <PageLayout maxWidth="7xl" header={pageHeader}>
       {/* Error Alert - above tabs */}
       {error && (
         <div className="mb-6">

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import TelefoniaPage from '../page';
 
 const pushMock = jest.fn();
@@ -123,10 +123,8 @@ describe('TelefoniaPage', () => {
     errorSpy.mockRestore();
   });
 
-  it('clicking "Indietro" calls router.push("/")', () => {
+  it('renders the "Indietro" link to /altro', () => {
     render(<TelefoniaPage />);
-    const back = screen.getByRole('button', { name: 'Torna alla homepage' });
-    fireEvent.click(back);
-    expect(pushMock).toHaveBeenCalledWith('/');
+    expect(screen.getByRole('link', { name: 'Indietro' })).toHaveAttribute('href', '/altro');
   });
 });

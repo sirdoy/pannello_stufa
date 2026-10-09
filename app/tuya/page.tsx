@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useTuyaData } from '@/app/components/devices/tuya/hooks/useTuyaData';
 import { useTuyaCommands } from '@/app/components/devices/tuya/hooks/useTuyaCommands';
 import { TuyaPlugCard } from '@/app/components/devices/tuya/components/TuyaPlugCard';
-import Heading from '@/app/components/ui/Heading';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import Skeleton from '@/app/components/ui/Skeleton';
 import { Banner } from '@/app/components/ui';
 
@@ -50,8 +50,8 @@ export default function TuyaPage() {
   // Loading guard — only on initial load (no cached data)
   if (loading && !plugs) {
     return (
-      <div className="space-y-6 p-4 sm:p-6">
-        <Skeleton className="h-10 w-48 rounded-xl" />
+      <div className="space-y-6">
+        <PageHeader title="Tuya Smart Plug" backHref="/altro" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-65 rounded-xl" />
@@ -62,14 +62,8 @@ export default function TuyaPage() {
   }
 
   return (
-    <div className="space-y-6 p-4 sm:p-6">
-      {/* Page header */}
-      <div className="flex items-center gap-3">
-        <span className="text-2xl" aria-hidden="true">🔌</span>
-        <Heading level={1} size="2xl">
-          Tuya Smart Plug
-        </Heading>
-      </div>
+    <div className="space-y-6">
+      <PageHeader title="Tuya Smart Plug" backHref="/altro" />
 
       {/* Stale banner */}
       {stale && plugs && (

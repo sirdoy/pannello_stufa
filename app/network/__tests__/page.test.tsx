@@ -375,9 +375,7 @@ describe('NetworkPage', () => {
   });
 
   describe('Navigation', () => {
-    it('back button navigates to home', async () => {
-      const user = userEvent.setup();
-
+    it('back link points to the parent page', () => {
       const wanData = {
         connected: true,
         uptime: 3600,
@@ -395,12 +393,7 @@ describe('NetworkPage', () => {
 
       render(<NetworkPage />);
 
-      const backButton = screen.getByRole('button', { name: /indietro/i });
-      expect(backButton).toBeInTheDocument();
-
-      await user.click(backButton);
-
-      expect(mockPush).toHaveBeenCalledWith('/');
+      expect(screen.getByRole('link', { name: 'Indietro' })).toHaveAttribute('href', '/altro');
     });
   });
 

@@ -498,9 +498,10 @@ describe('SmartHomeCard', () => {
         </SmartHomeCard>
       );
       const card = container.firstChild;
-      // Card elevated variant classes
-      expect(card).toHaveClass('bg-slate-850/90');
-      expect(card).toHaveClass('shadow-card-elevated');
+      // Card elevated variant classes (EmberGlass glass surface)
+      expect(card).toHaveClass('bg-white/4');
+      expect(card).toHaveClass('border-white/8');
+      expect(card).toHaveClass('backdrop-blur-xl');
     });
 
     it('uses Card with padding=false', () => {
@@ -512,7 +513,7 @@ describe('SmartHomeCard', () => {
       const card = container.firstChild;
       // Card should not have its own padding classes since we use padding={false}
       // (padding is handled by internal content wrapper)
-      expect(card).not.toHaveClass('p-5');
+      expect(card).not.toHaveClass('p-(--pad-card)');
     });
 
     it('renders CardAccentBar', () => {

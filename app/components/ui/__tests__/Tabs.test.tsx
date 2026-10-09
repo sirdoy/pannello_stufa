@@ -274,7 +274,7 @@ describe('Tabs Component', () => {
 
       const trigger = screen.getByRole('tab', { name: 'Small Tab' });
       expect(trigger).toHaveClass('px-3');
-      expect(trigger).toHaveClass('py-2');
+      expect(trigger).toHaveClass('py-1.5');
       expect(trigger).toHaveClass('text-xs');
       expect(trigger).toHaveClass('min-h-9');
     });
@@ -290,9 +290,9 @@ describe('Tabs Component', () => {
       );
 
       const trigger = screen.getByRole('tab', { name: 'Medium Tab' });
-      expect(trigger).toHaveClass('px-4');
-      expect(trigger).toHaveClass('py-2.5');
-      expect(trigger).toHaveClass('text-sm');
+      expect(trigger).toHaveClass('px-3.5');
+      expect(trigger).toHaveClass('py-1.5');
+      expect(trigger).toHaveClass('text-[13px]');
       expect(trigger).toHaveClass('min-h-11');
     });
 
@@ -307,9 +307,9 @@ describe('Tabs Component', () => {
       );
 
       const trigger = screen.getByRole('tab', { name: 'Large Tab' });
-      expect(trigger).toHaveClass('px-5');
-      expect(trigger).toHaveClass('py-3');
-      expect(trigger).toHaveClass('text-base');
+      expect(trigger).toHaveClass('px-4');
+      expect(trigger).toHaveClass('py-2');
+      expect(trigger).toHaveClass('text-sm');
       expect(trigger).toHaveClass('min-h-12');
     });
   });

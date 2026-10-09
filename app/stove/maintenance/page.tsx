@@ -16,6 +16,7 @@ import {
 import { formatHoursToHHMM } from '@/lib/formatUtils';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 export const dynamic = 'force-dynamic';
 
@@ -98,37 +99,45 @@ export default function MaintenancePage() {
     setShowResetConfirm(false);
   };
 
+  const pageHeader = (
+    <PageHeader
+      title="Manutenzione"
+      description="Configura gli intervalli di pulizia della stufa"
+      backHref="/stove"
+    />
+  );
+
   if (isLoading || loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Heading level={1} className="sr-only">Manutenzione</Heading>
-        <Text variant="tertiary">Caricamento...</Text>
+      <div className="mx-auto max-w-2xl">
+        {pageHeader}
+        <div className="flex items-center justify-center py-20">
+          <Text variant="tertiary">Caricamento...</Text>
+        </div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Heading level={1} className="sr-only">Manutenzione</Heading>
-        <Card variant="glass" className="p-8 text-center">
-          <Text variant="tertiary" className="mb-4">Accesso non autorizzato</Text>
-          <Link href="/auth/login">
-            <Button variant="ember">Accedi</Button>
-          </Link>
-        </Card>
+      <div className="mx-auto max-w-2xl">
+        {pageHeader}
+        <div className="flex items-center justify-center py-20">
+          <Card variant="glass" className="p-8 text-center">
+            <Text variant="tertiary" className="mb-4">Accesso non autorizzato</Text>
+            <Link href="/auth/login">
+              <Button variant="ember">Accedi</Button>
+            </Link>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
     <>
-      <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <Heading level={1} size="3xl" className="mb-2">🔧 Manutenzione</Heading>
-          <Text variant="tertiary">Configura gli intervalli di pulizia della stufa</Text>
-        </div>
+      <div className="mx-auto max-w-2xl space-y-6">
+        {pageHeader}
 
         {/* Current Status Card */}
         <Card variant="glass" className="p-6 sm:p-8">

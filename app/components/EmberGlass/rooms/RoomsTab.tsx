@@ -23,6 +23,7 @@ import { ROOMS } from './lib/rooms-config';
 import { getDevicesForRoom } from './lib/getDevicesForRoom';
 import { RoomCard } from './RoomCard';
 import { RoomSheet } from './RoomSheet';
+import { PageHeader } from '../PageHeader';
 import type { AggregatorState } from './types';
 
 export function RoomsTab(){
@@ -110,35 +111,12 @@ export function RoomsTab(){
 
   return (
     <>
-      {/* Page chrome — D-43: 70px top safe-area padding + title block */}
-      <div style={{ paddingTop: 70 }}>
-        {/* Title block — D-48: "{N} stanze" 13px dim caps + "Stanze" 30px display */}
-        <div style={{ padding: '0 20px 20px' }}>
-          <div
-            style={{
-              fontSize: 13,
-              color: 'var(--text-2)',
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-            }}
-          >
-            {ROOMS.length} stanze
-          </div>
-          <div
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 30,
-              fontWeight: 600,
-              color: '#fff',
-              letterSpacing: -0.8,
-            }}
-          >Stanze</div>
-        </div>
+      <div>
+        <PageHeader title="Stanze" eyebrow={`${ROOMS.length} stanze`} />
 
-        {/* 2-col RoomCard grid — D-43: repeat(2,1fr), gap 12, padding 0 12px */}
+        {/* 2-col RoomCard grid — D-43: repeat(2,1fr), gap 12 */}
         <div
           style={{
-            padding: '0 12px',
             display: 'grid',
             gridTemplateColumns: 'repeat(2, 1fr)',
             gap: 12,

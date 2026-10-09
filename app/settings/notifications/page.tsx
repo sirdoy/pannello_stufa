@@ -13,6 +13,7 @@
 
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { GlassCard } from '@/app/components/EmberGlass/GlassCard';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import { InlineToggle } from '@/app/components/EmberGlass/InlineToggle';
 import { errorTextStyle, okTextStyle, secondaryButtonStyle } from '@/app/components/EmberGlass/formStyles';
 import {
@@ -402,7 +403,7 @@ export default function NotificationsSettingsPage() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 26, fontWeight: 700, margin: '4px 0 18px' }}>Notifiche</h1>
+      <PageHeader title="Notifiche" backHref="/altro" />
       <ThisDeviceSection key={deviceKey} onChanged={refresh} />
       <PreferencesSection />
       <DevicesSection devices={devices} error={devicesError} onRemove={removeDevice} />

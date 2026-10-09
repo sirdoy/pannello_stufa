@@ -86,9 +86,9 @@ describe('Badge', () => {
     it('applies neutral variant by default', () => {
       const { container } = render(<Badge>Default</Badge>);
       const badge = container.firstChild;
-      expect(badge).toHaveClass('bg-slate-500/10');
-      expect(badge).toHaveClass('border-slate-400/20');
-      expect(badge).toHaveClass('text-slate-400');
+      expect(badge).toHaveClass('bg-white/6');
+      expect(badge).toHaveClass('border-white/8');
+      expect(badge).toHaveClass('text-(--text-2)');
     });
   });
 
@@ -98,23 +98,23 @@ describe('Badge', () => {
       const badge = container.firstChild;
       expect(badge).toHaveClass('px-2');
       expect(badge).toHaveClass('py-0.5');
-      expect(badge).toHaveClass('text-xs');
+      expect(badge).toHaveClass('text-[10px]');
     });
 
     it('applies md size variant by default', () => {
       const { container } = render(<Badge>Medium</Badge>);
       const badge = container.firstChild;
-      expect(badge).toHaveClass('px-3');
+      expect(badge).toHaveClass('px-2.5');
       expect(badge).toHaveClass('py-1');
-      expect(badge).toHaveClass('text-sm');
+      expect(badge).toHaveClass('text-xs');
     });
 
     it('applies lg size variant', () => {
       const { container } = render(<Badge size="lg">Large</Badge>);
       const badge = container.firstChild;
-      expect(badge).toHaveClass('px-4');
-      expect(badge).toHaveClass('py-1.5');
-      expect(badge).toHaveClass('text-base');
+      expect(badge).toHaveClass('px-3');
+      expect(badge).toHaveClass('py-1');
+      expect(badge).toHaveClass('text-sm');
     });
   });
 
@@ -186,10 +186,10 @@ describe('Badge', () => {
       expect(badge).toHaveClass('inline-flex');
       expect(badge).toHaveClass('items-center');
       expect(badge).toHaveClass('gap-1.5');
-      expect(badge).toHaveClass('font-display');
+      expect(badge).toHaveClass('font-body');
       expect(badge).toHaveClass('font-semibold');
       expect(badge).toHaveClass('rounded-full');
-      expect(badge).toHaveClass('border');
+      expect(badge).toHaveClass('border-[0.5px]');
       expect(badge).toHaveClass('transition-all');
       expect(badge).toHaveClass('duration-(--duration-fast)');
     });
@@ -262,9 +262,9 @@ describe('Badge', () => {
     it('uses design token colors for contrast (neutral variant)', () => {
       const { container } = render(<Badge variant="neutral">Neutral</Badge>);
       const badge = container.firstChild;
-      // Neutral uses slate tokens for consistent contrast
-      expect(badge).toHaveClass('bg-slate-500/10');
-      expect(badge).toHaveClass('text-slate-400');
+      // Neutral uses the glass surface and the --text-2 token for consistent contrast
+      expect(badge).toHaveClass('bg-white/6');
+      expect(badge).toHaveClass('text-(--text-2)');
     });
 
     // Decorative icons should have aria-hidden (A11Y-07)

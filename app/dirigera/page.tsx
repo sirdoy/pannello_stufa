@@ -1,11 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import PageLayout from '@/app/components/ui/PageLayout';
 import Skeleton from '@/app/components/ui/Skeleton';
-import Button from '@/app/components/ui/Button';
-import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import { Banner } from '@/app/components/ui';
 import { cn } from '@/lib/utils/cn';
@@ -37,7 +34,6 @@ const FILTERS: { key: SensorFilter; label: string }[] = [
  * - Loading skeleton shows on initial load and filter change
  */
 export default function DirigeraPage() {
-  const router = useRouter();
   const [filter, setFilter] = useState<SensorFilter>('all');
   const { data, loading, stale, error } = useDirigeraFullData(filter);
   const stats = useDirigeraStats();
@@ -47,32 +43,18 @@ export default function DirigeraPage() {
   // Loading guard — only on initial load or filter change (no cached data)
   if (loading && !data) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-12 w-48 rounded-xl" />
-        <Skeleton className="h-20 rounded-2xl" />
-        <Skeleton className="h-12 rounded-lg" />
-        <Skeleton className="h-45 rounded-2xl" />
-      </div>
+      <PageLayout header={<PageLayout.Header title="DIRIGERA" backHref="/altro" />}>
+        <div className="space-y-6">
+          <Skeleton className="h-20 rounded-2xl" />
+          <Skeleton className="h-12 rounded-lg" />
+          <Skeleton className="h-45 rounded-2xl" />
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <PageLayout
-      header={
-        <PageLayout.Header>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => router.push('/')}>
-                ← Indietro
-              </Button>
-              <div>
-                <Heading level={1} size="2xl">DIRIGERA</Heading>
-              </div>
-            </div>
-          </div>
-        </PageLayout.Header>
-      }
-    >
+    <PageLayout header={<PageLayout.Header title="DIRIGERA" backHref="/altro" />}>
       <div className="space-y-6">
         {/* Stale banner — shows when data exists but latest fetch failed */}
         {stale && (

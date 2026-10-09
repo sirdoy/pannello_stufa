@@ -491,7 +491,7 @@ function SettingsPageContent() {
   // Loading state
   if (userLoading) {
     return (
-      <SettingsLayout title="Impostazioni" icon="⚙️">
+      <SettingsLayout title="Impostazioni">
         <Skeleton className="h-64 w-full" />
       </SettingsLayout>
     );
@@ -500,7 +500,7 @@ function SettingsPageContent() {
   // Not authenticated
   if (!user) {
     return (
-      <SettingsLayout title="Impostazioni" icon="⚙️">
+      <SettingsLayout title="Impostazioni">
         <Card variant="glass">
           <Text variant="secondary">Devi essere autenticato per accedere alle impostazioni.</Text>
         </Card>
@@ -509,7 +509,7 @@ function SettingsPageContent() {
   }
 
   return (
-    <SettingsLayout title="Impostazioni" icon="⚙️">
+    <SettingsLayout title="Impostazioni">
       <Tabs value={currentTab} onValueChange={handleTabChange}>
         <Tabs.List>
           <Tabs.Trigger value="posizione" icon={<MapPin size={18} />}>Posizione</Tabs.Trigger>
@@ -529,7 +529,7 @@ function SettingsPageContent() {
 export default function SettingsPage() {
   return (
     <Suspense fallback={
-      <SettingsLayout title="Impostazioni" icon="⚙️">
+      <SettingsLayout title="Impostazioni">
         <Skeleton className="h-64 w-full" />
       </SettingsLayout>
     }>

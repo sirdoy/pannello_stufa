@@ -1,10 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import PageLayout from '@/app/components/ui/PageLayout';
 import Skeleton from '@/app/components/ui/Skeleton';
-import Button from '@/app/components/ui/Button';
-import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import { Banner } from '@/app/components/ui';
 import { useRaspiFullData } from '@/app/components/devices/raspi/hooks/useRaspiFullData';
@@ -22,39 +19,24 @@ import RaspiNetworkIO from './components/RaspiNetworkIO';
  * - Loading skeleton shows on initial load before data arrives
  */
 export default function RaspiPage() {
-  const router = useRouter();
   const { data, loading, stale, error } = useRaspiFullData();
 
   // Loading guard — only on initial load (no cached data)
   if (loading && !data) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-12 w-48 rounded-xl" />
-        <Skeleton className="h-40 rounded-2xl" />
-        <Skeleton className="h-50 rounded-2xl" />
-        <Skeleton className="h-55 rounded-2xl" />
-        <Skeleton className="h-40 rounded-2xl" />
-      </div>
+      <PageLayout header={<PageLayout.Header title="Raspberry Pi" backHref="/altro" />}>
+        <div className="space-y-6">
+          <Skeleton className="h-40 rounded-2xl" />
+          <Skeleton className="h-50 rounded-2xl" />
+          <Skeleton className="h-55 rounded-2xl" />
+          <Skeleton className="h-40 rounded-2xl" />
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <PageLayout
-      header={
-        <PageLayout.Header>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => router.push('/')}>
-                ← Indietro
-              </Button>
-              <div>
-                <Heading level={1} size="2xl">Raspberry Pi</Heading>
-              </div>
-            </div>
-          </div>
-        </PageLayout.Header>
-      }
-    >
+    <PageLayout header={<PageLayout.Header title="Raspberry Pi" backHref="/altro" />}>
       <div className="space-y-6">
         {/* Stale banner — shows when data exists but latest fetch failed */}
         {stale && (

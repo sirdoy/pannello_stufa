@@ -99,8 +99,8 @@ describe('Heading', () => {
     it('uses design token colors ensuring readable contrast', () => {
       render(<Heading variant="default">Default</Heading>);
       const heading = screen.getByRole('heading');
-      // text-slate-100 on dark bg provides sufficient contrast
-      expect(heading).toHaveClass('text-slate-100');
+      // --text-1 token on the dark background provides sufficient contrast
+      expect(heading).toHaveClass('text-(--text-1)');
     });
 
     it('should have no a11y violations with all sizes', async () => {
@@ -151,23 +151,20 @@ describe('Heading', () => {
     it('applies default variant classes', () => {
       render(<Heading>Default</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('text-slate-100');
+      expect(heading).toHaveClass('text-(--text-1)');
     });
 
-    it('applies gradient variant classes', () => {
+    it('applies gradient variant classes (flat accent colour)', () => {
       render(<Heading variant="gradient">Gradient</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('bg-linear-to-r');
-      expect(heading).toHaveClass('from-ember-500');
-      expect(heading).toHaveClass('to-flame-600');
-      expect(heading).toHaveClass('bg-clip-text');
-      expect(heading).toHaveClass('text-transparent');
+      expect(heading).toHaveClass('text-(--accent)');
+      expect(heading).not.toHaveClass('text-transparent');
     });
 
     it('applies subtle variant classes', () => {
       render(<Heading variant="subtle">Subtle</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('text-slate-400');
+      expect(heading).toHaveClass('text-(--text-2)');
     });
 
     it('applies ember variant classes', () => {
@@ -209,7 +206,7 @@ describe('Heading', () => {
     it('applies base classes to all variants', () => {
       render(<Heading>Title</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('font-bold');
+      expect(heading).toHaveClass('font-semibold');
       expect(heading).toHaveClass('font-display');
     });
   });
@@ -218,7 +215,7 @@ describe('Heading', () => {
     it('auto-calculates 3xl size for level 1', () => {
       render(<Heading level={1}>Title</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('text-3xl');
+      expect(heading).toHaveClass('text-[28px]');
     });
 
     it('auto-calculates 2xl size for level 2', () => {
@@ -236,7 +233,7 @@ describe('Heading', () => {
     it('auto-calculates lg size for level 4', () => {
       render(<Heading level={4}>Title</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('text-lg');
+      expect(heading).toHaveClass('text-[17px]');
     });
 
     it('auto-calculates md (text-base) size for level 5', () => {
@@ -275,28 +272,28 @@ describe('Heading', () => {
     it('renders lg size correctly', () => {
       render(<Heading size="lg">Large</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('text-lg');
+      expect(heading).toHaveClass('text-[17px]');
     });
 
-    it('renders xl size correctly with responsive class', () => {
+    it('renders xl size correctly without responsive class', () => {
       render(<Heading size="xl">XL</Heading>);
       const heading = screen.getByRole('heading');
       expect(heading).toHaveClass('text-xl');
-      expect(heading).toHaveClass('sm:text-2xl');
+      expect(heading).not.toHaveClass('sm:text-2xl');
     });
 
-    it('renders 2xl size correctly with responsive class', () => {
+    it('renders 2xl size correctly without responsive class', () => {
       render(<Heading size="2xl">2XL</Heading>);
       const heading = screen.getByRole('heading');
       expect(heading).toHaveClass('text-2xl');
-      expect(heading).toHaveClass('sm:text-3xl');
+      expect(heading).not.toHaveClass('sm:text-3xl');
     });
 
-    it('renders 3xl size correctly with responsive class', () => {
+    it('renders 3xl size correctly without responsive class', () => {
       render(<Heading size="3xl">3XL</Heading>);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('text-3xl');
-      expect(heading).toHaveClass('sm:text-4xl');
+      expect(heading).toHaveClass('text-[28px]');
+      expect(heading).not.toHaveClass('sm:text-4xl');
     });
   });
 
@@ -306,7 +303,7 @@ describe('Heading', () => {
       const heading = screen.getByRole('heading');
       expect(heading).toHaveClass('mt-4');
       expect(heading).toHaveClass('mb-2');
-      expect(heading).toHaveClass('font-bold'); // base class preserved
+      expect(heading).toHaveClass('font-semibold'); // base class preserved
     });
 
     it('custom className takes precedence via cn()', () => {
@@ -333,9 +330,9 @@ describe('Heading', () => {
 
     it('headingVariants generates correct class string', () => {
       const classes = headingVariants({ size: 'lg', variant: 'ember' });
-      expect(classes).toContain('text-lg');
+      expect(classes).toContain('text-[17px]');
       expect(classes).toContain('text-ember-400');
-      expect(classes).toContain('font-bold');
+      expect(classes).toContain('font-semibold');
     });
   });
 });

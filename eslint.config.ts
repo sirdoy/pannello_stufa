@@ -25,6 +25,33 @@ const eslintConfig = [
     },
   },
 
+  // Design system (workspace ROADMAP M72, ../.claude/rules/design-system.md): the page title is always the shared
+  // PageHeader, never a hand-made <h1>. Home (dashboard grid) and login (no app chrome) keep a plain <h1>.
+  {
+    name: "project/design-system",
+    files: ["app/**/*.tsx"],
+    ignores: [
+      "app/components/EmberGlass/PageHeader.tsx",
+      "app/page.tsx",
+      "app/loading.tsx",
+      "app/auth/login/page.tsx",
+      "**/__tests__/**",
+      "**/*.test.tsx",
+    ],
+    rules: {
+      "no-restricted-syntax": ["error",
+        {
+          selector: "JSXOpeningElement[name.name='h1']",
+          message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title.",
+        },
+        {
+          selector: "JSXOpeningElement[name.name='Heading'] > JSXAttribute[name.name='level'][value.expression.value=1]",
+          message: "Use PageHeader (app/components/EmberGlass/PageHeader.tsx) for the page title; section titles start at level 2.",
+        },
+      ],
+    },
+  },
+
   // Unused vars: a leading underscore marks a deliberately unused binding
   {
     name: "project/unused-vars",

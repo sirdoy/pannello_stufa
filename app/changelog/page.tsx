@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { VERSION_HISTORY, APP_VERSION } from '@/lib/version';
 import { FRONTEND_BUILD_ID } from '@/lib/buildVersion';
 import { Card, Heading, Text, StatusBadge, Divider } from '@/app/components/ui';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -57,38 +58,20 @@ export default function ChangelogPage() {
 
   return (
     <div className="animate-fade-in mx-auto max-w-4xl space-y-8">
-      {/* Header Card */}
-      <Card variant="elevated" className="overflow-hidden">
-        {/* Gradient accent bar */}
-        <div className="h-1 bg-linear-to-r from-ember-500 via-flame-500 to-ember-600" />
+      <PageHeader
+        title="Changelog"
+        description={`Storico delle versioni fino alla v${APP_VERSION}. Da allora ogni rilascio è identificato dal commit della build.`}
+        backHref="/altro"
+      />
 
-        <div className="p-6 sm:p-8">
-          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex-1">
-              <div className="mb-3 flex items-center gap-3">
-                <div className="flex size-12 items-center justify-center rounded-2xl border border-ember-500/30 bg-linear-to-br from-ember-500/20 to-flame-500/10">
-                  <span className="text-2xl">📋</span>
-                </div>
-                <div>
-                  <Heading level={1} size="2xl">Changelog</Heading>
-                  <Text variant="tertiary" size="sm">Storico versioni</Text>
-                </div>
-              </div>
-              <Text variant="secondary" size="sm" className="max-w-md">
-                Storico delle versioni fino alla v{APP_VERSION}. Da allora ogni rilascio è identificato dal commit
-                della build.
-              </Text>
-            </div>
-
-            {/* Current Build Badge */}
-            <div className="flex flex-col items-start gap-2 sm:items-end">
-              <Text variant="label" size="xs">Build Corrente</Text>
-              <div className="rounded-xl bg-linear-to-r from-ember-500 to-flame-600 px-4 py-2 text-white shadow-lg shadow-ember-500/25">
-                <Text as="span" variant="body" size="xl" className="font-mono text-white!">
-                  {BUILD_LABEL}
-                </Text>
-              </div>
-            </div>
+      {/* Current Build Badge */}
+      <Card variant="elevated" className="p-6 sm:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Text variant="label" size="xs">Build Corrente</Text>
+          <div className="rounded-xl bg-linear-to-r from-ember-500 to-flame-600 px-4 py-2 text-white shadow-lg shadow-ember-500/25">
+            <Text as="span" variant="body" size="xl" className="font-mono text-white!">
+              {BUILD_LABEL}
+            </Text>
           </div>
         </div>
       </Card>

@@ -104,7 +104,7 @@ describe('Card', () => {
       expect(card).toHaveClass('cursor-pointer');
     });
 
-    it('glow variant maintains readability with ember glow', () => {
+    it('glow variant maintains readability with ember border', () => {
       const { container } = render(
         <Card glow>
           <p>Glowing content</p>
@@ -112,8 +112,7 @@ describe('Card', () => {
       );
       const card = container.firstChild;
       // Glow uses design token colors for consistent contrast
-      expect(card).toHaveClass('shadow-ember-glow');
-      expect(card).toHaveClass('border-ember-500/20');
+      expect(card).toHaveClass('border-ember-500/30');
     });
 
     it('should have no a11y violations with all sub-components', async () => {
@@ -140,27 +139,31 @@ describe('Card', () => {
     it('applies default variant classes correctly', () => {
       const { container } = render(<Card>Content</Card>);
       const card = container.firstChild;
-      expect(card).toHaveClass('rounded-2xl');
-      expect(card).toHaveClass('transition-all');
+      expect(card).toHaveClass('rounded-(--r-card)');
+      expect(card).toHaveClass('transition-colors');
       expect(card).toHaveClass('relative');
       expect(card).toHaveClass('overflow-hidden');
-      expect(card).toHaveClass('bg-slate-900/80');
-      expect(card).toHaveClass('border');
-      expect(card).toHaveClass('shadow-card');
+      expect(card).toHaveClass('bg-white/4');
+      expect(card).toHaveClass('border-[0.5px]');
+      expect(card).toHaveClass('border-white/8');
+      expect(card).toHaveClass('backdrop-blur-xl');
     });
 
-    it('applies elevated variant classes', () => {
+    it('applies elevated variant classes (same glass surface as default)', () => {
       const { container } = render(<Card variant="elevated">Content</Card>);
       const card = container.firstChild;
-      expect(card).toHaveClass('bg-slate-850/90');
-      expect(card).toHaveClass('shadow-card-elevated');
+      expect(card).toHaveClass('bg-white/4');
+      expect(card).toHaveClass('border-white/8');
+      expect(card).toHaveClass('backdrop-blur-xl');
     });
 
     it('applies subtle variant classes', () => {
       const { container } = render(<Card variant="subtle">Content</Card>);
       const card = container.firstChild;
-      expect(card).toHaveClass('bg-white/3');
-      expect(card).not.toHaveClass('shadow-card');
+      expect(card).toHaveClass('bg-white/4');
+      expect(card).toHaveClass('border-white/6');
+      expect(card).toHaveClass('rounded-2xl');
+      expect(card).not.toHaveClass('backdrop-blur-xl');
     });
 
     it('applies outlined variant classes', () => {
@@ -173,16 +176,15 @@ describe('Card', () => {
     it('applies glass variant classes', () => {
       const { container } = render(<Card variant="glass">Content</Card>);
       const card = container.firstChild;
-      expect(card).toHaveClass('bg-slate-900/70');
-      expect(card).toHaveClass('backdrop-blur-2xl');
-      expect(card).toHaveClass('backdrop-saturate-150');
+      expect(card).toHaveClass('bg-white/4');
+      expect(card).toHaveClass('backdrop-blur-xl');
+      expect(card).toHaveClass('backdrop-saturate-180');
     });
 
     it('applies hover classes when hover=true', () => {
       const { container } = render(<Card hover>Content</Card>);
       const card = container.firstChild;
-      expect(card).toHaveClass('hover:shadow-card-hover');
-      expect(card).toHaveClass('hover:-translate-y-0.5');
+      expect(card).toHaveClass('hover:bg-white/6');
       expect(card).toHaveClass('cursor-pointer');
     });
 
@@ -192,25 +194,22 @@ describe('Card', () => {
       expect(card).not.toHaveClass('cursor-pointer');
     });
 
-    it('applies glow classes when glow=true', () => {
+    it('applies the ember border when glow=true', () => {
       const { container } = render(<Card glow>Content</Card>);
       const card = container.firstChild;
-      expect(card).toHaveClass('shadow-ember-glow');
-      expect(card).toHaveClass('border-ember-500/20');
+      expect(card).toHaveClass('border-ember-500/30');
     });
 
     it('applies padding by default', () => {
       const { container } = render(<Card>Content</Card>);
       const card = container.firstChild;
-      expect(card).toHaveClass('p-5');
-      expect(card).toHaveClass('sm:p-6');
+      expect(card).toHaveClass('p-(--pad-card)');
     });
 
     it('removes padding when padding=false', () => {
       const { container } = render(<Card padding={false}>Content</Card>);
       const card = container.firstChild;
-      expect(card).not.toHaveClass('p-5');
-      expect(card).not.toHaveClass('sm:p-6');
+      expect(card).not.toHaveClass('p-(--pad-card)');
     });
   });
 
@@ -328,7 +327,7 @@ describe('Card', () => {
     it('cardVariants is exported and returns string', () => {
       const classes = cardVariants({ variant: 'default' });
       expect(typeof classes).toBe('string');
-      expect(classes).toContain('rounded-2xl');
+      expect(classes).toContain('rounded-(--r-card)');
     });
   });
 
@@ -377,7 +376,7 @@ describe('Card', () => {
       );
       const card = container.firstChild;
       expect(card).toHaveClass('my-custom-class');
-      expect(card).toHaveClass('rounded-2xl'); // base class preserved
+      expect(card).toHaveClass('rounded-(--r-card)'); // base class preserved
     });
 
     it('merges custom className with CardHeader', () => {

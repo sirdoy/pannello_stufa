@@ -595,20 +595,24 @@ export default function WeeklyScheduler() {
     }
   };
 
+  const pageHeader = (
+    <PageLayout.Header
+      title="Pianificazione Settimanale"
+      description="Gestisci gli orari di accensione automatica della stufa"
+      backHref="/stove"
+    />
+  );
+
   if (loading) {
-    return <Skeleton.Scheduler />;
+    return (
+      <PageLayout maxWidth="7xl" header={pageHeader}>
+        <Skeleton.Scheduler />
+      </PageLayout>
+    );
   }
 
   return (
-    <PageLayout
-      maxWidth="7xl"
-      header={
-        <PageLayout.Header
-          title="Pianificazione Settimanale"
-          description="Gestisci gli orari di accensione automatica della stufa"
-        />
-      }
-    >
+    <PageLayout maxWidth="7xl" header={pageHeader}>
       {/* Header Row - 2 columns on desktop */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Left: Mode and Schedule Selector */}

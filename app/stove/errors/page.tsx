@@ -1,15 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { getRecentErrors, resolveError, type ErrorEntry } from '@/lib/errorMonitor';
 import { Card, Button, Pagination, Skeleton, Badge } from '@/app/components/ui';
 import ErrorAlert from '@/app/components/ui/ErrorAlert';
 import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 export default function ErrorsPage() {
-  const router = useRouter();
   const [errors, setErrors] = useState<ErrorEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(0);
@@ -70,11 +69,19 @@ export default function ErrorsPage() {
     return `${hours}h ${minutes}m`;
   };
 
+  const pageHeader = (
+    <PageHeader
+      title="Storico allarmi"
+      description="Registro completo degli errori e allarmi della stufa"
+      backHref="/stove"
+    />
+  );
+
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl space-y-6">
+        {pageHeader}
         <Skeleton.Card>
-          <Skeleton className="mb-6 h-8 w-64" />
           {[...Array(5)].map((_, i) => (
             <div key={i} className="mb-4">
               <Skeleton className="h-24 w-full" />
@@ -87,27 +94,9 @@ export default function ErrorsPage() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-6">
-      {/* Header */}
-      <Card variant="glass" className="p-6">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Heading level={1} size="3xl" className="flex items-center gap-3">
-              <span>🚨</span>
-              Storico Allarmi
-            </Heading>
-            <Text variant="tertiary" size="sm" className="mt-1">
-              Registro completo degli errori e allarmi della stufa
-            </Text>
-          </div>
-          <Button
-            variant="outline"
-            icon="🏠"
-            onClick={() => router.push('/')}
-          >
-            Torna alla Home
-          </Button>
-        </div>
+      {pageHeader}
 
+      <Card variant="glass" className="p-6">
         {/* Filter Tabs */}
         <Button.Group>
           <Button

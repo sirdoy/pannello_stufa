@@ -88,15 +88,15 @@ describe('Text', () => {
     it('muted text maintains contrast via design tokens (secondary)', () => {
       render(<Text variant="secondary">Muted text</Text>);
       const text = screen.getByText('Muted text');
-      // text-slate-300 on dark bg (slate-900) provides 7.14:1 contrast ratio
-      expect(text).toHaveClass('text-slate-300');
+      // --text-2 token: muted text colour of the EmberGlass palette
+      expect(text).toHaveClass('text-(--text-2)');
     });
 
     it('muted text maintains contrast via design tokens (tertiary)', () => {
       render(<Text variant="tertiary">Subtle text</Text>);
       const text = screen.getByText('Subtle text');
-      // text-slate-400 on dark bg (slate-900) provides 4.66:1 contrast ratio (AA)
-      expect(text).toHaveClass('text-slate-400');
+      // tertiary shares the --text-2 token with secondary
+      expect(text).toHaveClass('text-(--text-2)');
     });
 
     // All sizes pass axe checks
@@ -128,19 +128,19 @@ describe('Text', () => {
     it('applies body variant classes (default)', () => {
       render(<Text>Body</Text>);
       const text = screen.getByText('Body');
-      expect(text).toHaveClass('text-slate-100');
+      expect(text).toHaveClass('text-(--text-1)');
     });
 
     it('applies secondary variant classes', () => {
       render(<Text variant="secondary">Secondary</Text>);
       const text = screen.getByText('Secondary');
-      expect(text).toHaveClass('text-slate-300');
+      expect(text).toHaveClass('text-(--text-2)');
     });
 
     it('applies tertiary variant classes', () => {
       render(<Text variant="tertiary">Tertiary</Text>);
       const text = screen.getByText('Tertiary');
-      expect(text).toHaveClass('text-slate-400');
+      expect(text).toHaveClass('text-(--text-2)');
     });
 
     it('applies ember variant classes', () => {
@@ -182,7 +182,7 @@ describe('Text', () => {
     it('applies label variant classes with uppercase and tracking', () => {
       render(<Text variant="label">Label</Text>);
       const text = screen.getByText('Label');
-      expect(text).toHaveClass('text-slate-400');
+      expect(text).toHaveClass('text-(--text-2)');
       expect(text).toHaveClass('uppercase');
       expect(text).toHaveClass('tracking-wider');
     });
@@ -360,7 +360,7 @@ describe('Text', () => {
       const text = screen.getByText('Text');
       expect(text).toHaveClass('mt-4');
       expect(text).toHaveClass('mb-2');
-      expect(text).toHaveClass('text-slate-100'); // variant class preserved
+      expect(text).toHaveClass('text-(--text-1)'); // variant class preserved
     });
 
     it('custom className takes precedence via cn()', () => {
@@ -392,7 +392,7 @@ describe('Text', () => {
 
     it('textVariants generates correct class string', () => {
       const classes = textVariants({ variant: 'secondary', size: 'lg', weight: 'bold' });
-      expect(classes).toContain('text-slate-300');
+      expect(classes).toContain('text-(--text-2)');
       expect(classes).toContain('text-lg');
       expect(classes).toContain('font-bold');
     });

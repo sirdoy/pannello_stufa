@@ -63,77 +63,79 @@ describe('Button Component', () => {
   });
 
   describe('CVA Variants', () => {
-    test('default variant is ember with gradient classes', () => {
+    test('default variant is ember with flat accent classes', () => {
       render(<Button>Default</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-ember-500');
+      expect(button).toHaveClass('bg-(--accent)');
+      expect(button).not.toHaveClass('bg-linear-to-br');
     });
 
-    test('ember variant renders with gradient', () => {
+    test('ember variant renders flat accent', () => {
       render(<Button variant="ember">Ember</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-ember-500');
-      expect(button).toHaveClass('via-ember-600');
-      expect(button).toHaveClass('to-flame-600');
+      expect(button).toHaveClass('bg-(--accent)');
+      expect(button).toHaveClass('font-bold');
+      expect(button).toHaveClass('text-[#1a0d06]');
     });
 
     test('subtle variant renders with glass effect', () => {
       render(<Button variant="subtle">Subtle</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-white/6');
-      expect(button).toHaveClass('border');
+      expect(button).toHaveClass('border-[0.5px]');
+      expect(button).toHaveClass('border-white/14');
     });
 
     test('ghost variant renders transparent', () => {
       render(<Button variant="ghost">Ghost</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-transparent');
-      expect(button).toHaveClass('text-slate-300');
+      expect(button).toHaveClass('text-(--text-2)');
     });
 
-    test('success variant renders with sage gradient', () => {
+    test('success variant renders with sage tint', () => {
       render(<Button variant="success">Success</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-sage-500');
+      expect(button).toHaveClass('bg-sage-500/20');
+      expect(button).toHaveClass('border-sage-400/30');
+      expect(button).toHaveClass('text-sage-300');
     });
 
-    test('danger variant renders with danger gradient', () => {
+    test('danger variant renders with danger tint', () => {
       render(<Button variant="danger">Danger</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-danger-500');
+      expect(button).toHaveClass('bg-danger-500/20');
+      expect(button).toHaveClass('border-danger-400/30');
+      expect(button).toHaveClass('text-danger-300');
     });
 
     test('outline variant renders with border', () => {
       render(<Button variant="outline">Outline</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-transparent');
-      expect(button).toHaveClass('border-2');
-      expect(button).toHaveClass('border-ember-500/40');
+      expect(button).toHaveClass('border-[0.5px]');
+      expect(button).toHaveClass('border-ember-500/50');
     });
 
     test('size sm applies correct min-h class', () => {
       render(<Button size="sm">Small</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('min-h-11');
-      expect(button).toHaveClass('text-sm');
+      expect(button).toHaveClass('text-[13px]');
     });
 
     test('size md applies correct min-h class', () => {
       render(<Button size="md">Medium</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('min-h-12');
-      expect(button).toHaveClass('text-base');
+      expect(button).toHaveClass('text-[15px]');
     });
 
     test('size lg applies correct min-h class', () => {
       render(<Button size="lg">Large</Button>);
       const button = screen.getByRole('button');
       expect(button).toHaveClass('min-h-14');
-      expect(button).toHaveClass('text-lg');
+      expect(button).toHaveClass('text-base');
     });
 
     test('fullWidth applies w-full class', () => {
@@ -181,7 +183,7 @@ describe('Button Component', () => {
       render(<Button disabled>Disabled</Button>);
       const button = screen.getByRole('button');
       expect(button).toBeDisabled();
-      expect(button).toHaveClass('disabled:opacity-50');
+      expect(button).toHaveClass('disabled:opacity-55');
     });
 
     test('loading shows spinner and disables button', () => {
@@ -473,7 +475,7 @@ describe('Button Component', () => {
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-sage-500/20');
       expect(button).toHaveClass('text-sage-300');
-      expect(button).toHaveClass('border-sage-500/40');
+      expect(button).toHaveClass('border-sage-400/30');
     });
 
     test('subtle + ocean applies ocean tinting', () => {
@@ -485,7 +487,7 @@ describe('Button Component', () => {
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-ocean-500/20');
       expect(button).toHaveClass('text-ocean-300');
-      expect(button).toHaveClass('border-ocean-500/40');
+      expect(button).toHaveClass('border-ocean-400/30');
     });
 
     test('subtle + warning applies warning tinting', () => {
@@ -497,7 +499,7 @@ describe('Button Component', () => {
       const button = screen.getByRole('button');
       expect(button).toHaveClass('bg-warning-500/20');
       expect(button).toHaveClass('text-warning-300');
-      expect(button).toHaveClass('border-warning-500/40');
+      expect(button).toHaveClass('border-warning-400/30');
     });
 
     test('subtle + slate applies slate tinting', () => {
@@ -507,9 +509,9 @@ describe('Button Component', () => {
         </Button>
       );
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-slate-500/20');
-      expect(button).toHaveClass('text-slate-300');
-      expect(button).toHaveClass('border-slate-500/40');
+      expect(button).toHaveClass('bg-white/6');
+      expect(button).toHaveClass('text-(--text-2)');
+      expect(button).toHaveClass('border-white/14');
     });
 
     test('ghost + colorScheme applies text color', () => {
@@ -526,9 +528,8 @@ describe('Button Component', () => {
     test('colorScheme without variant uses default (ember) - colorScheme ignored', () => {
       render(<Button colorScheme="sage">Test</Button>);
       const button = screen.getByRole('button');
-      // Should still have ember gradient
-      expect(button).toHaveClass('bg-linear-to-br');
-      expect(button).toHaveClass('from-ember-500');
+      // Should still have the flat ember accent
+      expect(button).toHaveClass('bg-(--accent)');
       // Should NOT have sage colors
       expect(button).not.toHaveClass('bg-sage-500/20');
     });
@@ -540,8 +541,8 @@ describe('Button Component', () => {
         </Button>
       );
       const button = screen.getByRole('button');
-      // Should still have ember gradient
-      expect(button).toHaveClass('from-ember-500');
+      // Should still have the flat ember accent
+      expect(button).toHaveClass('bg-(--accent)');
       // Should NOT have sage colors
       expect(button).not.toHaveClass('bg-sage-500/20');
     });

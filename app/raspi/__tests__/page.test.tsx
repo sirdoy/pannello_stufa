@@ -28,7 +28,12 @@ jest.mock('@/app/components/ui/PageLayout', () => {
       {children}
     </div>
   );
-  const PageHeader = ({ children }: { children?: React.ReactNode }) => <header>{children}</header>;
+  const PageHeader = ({ title, backHref }: { title?: string; backHref?: string }) => (
+    <header>
+      {backHref && <a href={backHref} aria-label="Indietro" />}
+      <h1>{title}</h1>
+    </header>
+  );
   (PageLayout as typeof PageLayout & { Header: typeof PageHeader }).Header = PageHeader;
   return { __esModule: true, default: PageLayout };
 });
@@ -114,11 +119,12 @@ describe('/raspi page', () => {
     expect(screen.getByText('Rete')).toBeInTheDocument();
   });
 
-  it('renders "← Indietro" back button', () => {
+  it('renders the shared page header with a back link to /altro', () => {
     mockUseRaspiFullData.mockReturnValue({ data: baseData, loading: false, stale: false, error: null });
     render(<RaspiPage />);
 
-    expect(screen.getByText('← Indietro')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Raspberry Pi');
+    expect(screen.getByRole('link', { name: 'Indietro' })).toHaveAttribute('href', '/altro');
   });
 
   it('shows skeletons when loading && no data', () => {

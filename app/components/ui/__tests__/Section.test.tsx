@@ -220,7 +220,7 @@ describe('Section', () => {
     it('uses 3xl size for h1', () => {
       render(<Section title="Main Title" level={1}>Content</Section>);
       const heading = screen.getByRole('heading', { level: 1 });
-      expect(heading).toHaveClass('text-3xl');
+      expect(heading).toHaveClass('text-[28px]');
     });
 
     it('uses 2xl size for h2 (default)', () => {

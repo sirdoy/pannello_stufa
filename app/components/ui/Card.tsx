@@ -16,60 +16,34 @@ import Heading from './Heading';
  * padding: boolean - Include default padding (default: true)
  */
 export const cardVariants = cva(
-  // Base classes
+  // Base classes: the EmberGlass glass surface (same tokens as GlassCard)
   [
-    'rounded-2xl',
-    'transition-all',
+    'rounded-(--r-card)',
+    'transition-colors',
     'duration-(--duration-smooth)',
-    'ease-(--ease-move)',
     'relative',
     'overflow-hidden',
   ],
   {
     variants: {
       variant: {
-        default: [
-          'border border-white/6 bg-slate-900/80 shadow-card backdrop-blur-xl',
-          ' ]',
-          ',0,0,0.08)]',
-        ],
-        elevated: [
-          'border border-white/8 bg-slate-850/90 shadow-card-elevated backdrop-blur-xl',
-          ' ]',
-          ',0,0,0.12)]',
-        ],
-        subtle: [
-          'border border-white/4 bg-white/3',
-          '] ]',
-        ],
-        outlined: [
-          'border border-white/12 bg-transparent',
-          ']',
-        ],
-        glass: [
-          'border border-white/8 bg-slate-900/70 shadow-card backdrop-blur-2xl backdrop-saturate-150',
-          ' ]',
-        ],
+        default: 'border-[0.5px] border-white/8 bg-white/4 shadow-[0_8px_32px_rgba(0,0,0,0.18)] backdrop-blur-xl backdrop-saturate-180',
+        elevated: 'border-[0.5px] border-white/8 bg-white/4 shadow-[0_8px_32px_rgba(0,0,0,0.18)] backdrop-blur-xl backdrop-saturate-180',
+        glass: 'border-[0.5px] border-white/8 bg-white/4 shadow-[0_8px_32px_rgba(0,0,0,0.18)] backdrop-blur-xl backdrop-saturate-180',
+        // Inner surface for a card nested in a card (same as AltroRow / SheetBtn)
+        subtle: 'rounded-2xl border-[0.5px] border-white/6 bg-white/4',
+        outlined: 'border-[0.5px] border-white/12 bg-transparent',
       },
       hover: {
-        true: [
-          'cursor-pointer hover:-translate-y-0.5 hover:shadow-card-hover',
-          'hover:border-white/10',
-          'hover:ease-spring-subtle',
-          ',0,0,0.15)]',
-          ']',
-        ],
-        false: [],
+        true: 'cursor-pointer hover:bg-white/6',
+        false: '',
       },
       glow: {
-        true: [
-          'border-ember-500/20 shadow-ember-glow',
-          ',111,16,0.12)]',
-        ],
-        false: [],
+        true: 'border-ember-500/30',
+        false: '',
       },
       padding: {
-        true: 'p-5 sm:p-6',
+        true: 'p-(--pad-card)',
         false: '',
       },
     },
@@ -171,7 +145,6 @@ const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
         ref={ref}
         className={cn(
           'mt-5 border-t border-white/6 pt-4',
-          ']',
           className
         )}
         {...props}
@@ -194,7 +167,6 @@ const CardDivider = forwardRef<HTMLDivElement, CardDividerProps>(
         ref={ref}
         className={cn(
           'my-4 h-px bg-linear-to-r from-transparent via-white/8 to-transparent',
-          ']',
           className
         )}
         {...props}

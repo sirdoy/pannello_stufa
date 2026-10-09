@@ -60,15 +60,14 @@ const TabsContext = createContext<TabsContextValue>({ value: undefined });
 // CVA variants for TabsList
 const listVariants = cva(
   [
-    'relative flex gap-1',
-    'border-b border-white/6',
-    ']',
+    'relative flex gap-0.5',
+    'rounded-[11px] border-[0.5px] border-white/8 bg-white/5 p-[3px]',
   ],
   {
     variants: {
       orientation: {
         horizontal: 'flex-row',
-        vertical: 'flex-col border-r border-b-0',
+        vertical: 'flex-col',
       },
       overflow: {
         scroll: 'scrollbar-hide overflow-x-auto',
@@ -85,25 +84,24 @@ const listVariants = cva(
 // CVA variants for TabsTrigger
 const triggerVariants = cva(
   [
-    'min-h-11 px-4 py-2.5',
-    'font-display text-sm font-medium',
-    'text-slate-400 hover:text-slate-200',
-    ' ',
+    'shrink-0 rounded-lg',
+    'font-body font-semibold',
+    'text-(--text-2) hover:text-white',
     'transition-colors duration-(--duration-fast)',
     // Focus ring
     'focus-visible:ring-2 focus-visible:ring-ember-500/50 focus-visible:outline-none focus-visible:ring-inset',
     // Active state
-    'data-[state=active]:text-slate-100',
-    ']:text-slate-900',
+    'data-[state=active]:bg-white/12 data-[state=active]:text-white',
     // Disabled state
     'disabled:pointer-events-none disabled:opacity-50',
   ],
   {
     variants: {
       size: {
-        sm: 'min-h-9 px-3 py-2 text-xs',
-        md: 'min-h-11 px-4 py-2.5 text-sm',
-        lg: 'min-h-12 px-5 py-3 text-base',
+        sm: 'min-h-9 px-3 py-1.5 text-xs',
+        // md and lg keep the 44px minimum touch target
+        md: 'min-h-11 px-3.5 py-1.5 text-[13px]',
+        lg: 'min-h-12 px-4 py-2 text-sm',
       },
     },
     defaultVariants: { size: 'md' },
@@ -160,7 +158,8 @@ const TabsList = forwardRef<React.ElementRef<typeof TabsPrimitive.List>, TabsLis
         {/* Sliding indicator */}
         <span
           className={cn(
-            'absolute bg-ember-500',
+            // Segmented look: the active tab is a filled pill, the sliding underline is not shown
+            'absolute hidden bg-ember-500',
             'transition-all duration-(--duration-smooth)',
             // Use spring easing with subtle overshoot for polished feel
             'ease-spring-subtle',
@@ -198,7 +197,7 @@ const TabsTrigger = forwardRef<React.ElementRef<typeof TabsPrimitive.Trigger>, T
         {...props}
       >
         <span className="flex items-center gap-2">
-          {icon && <span className="shrink-0 text-lg" aria-hidden="true">{icon}</span>}
+          {icon && <span className="shrink-0 text-base" aria-hidden="true">{icon}</span>}
           {children}
         </span>
       </TabsPrimitive.Trigger>

@@ -25,11 +25,11 @@ export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
 export default function Skeleton({ className = '', ...props }: SkeletonProps) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
       {...props}
     >
       {/* Shimmer overlay effect */}
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
     </div>
   );
 }
@@ -44,7 +44,7 @@ interface SkeletonCardProps extends HTMLAttributes<HTMLDivElement> {
 Skeleton.Card = function SkeletonCard({ children, className = '', ...props }: SkeletonCardProps) {
   return (
     <div
-      className={`,0,0,0.1)] rounded-2xl border border-slate-700/50 bg-slate-800/80 shadow-[0_4px_20px_rgba(0,0,0,0.3)] backdrop-blur-xl ${className}`}
+      className={`rounded-(--r-card) border-[0.5px] border-white/8 bg-white/4 ${className}`}
       {...props}
     >
       {children}
@@ -393,9 +393,6 @@ Skeleton.Scheduler = function SkeletonScheduler() {
     <div className="animate-spring-in mx-auto max-w-5xl space-y-8">
       {/* Header Card */}
       <Skeleton.Card className="p-8">
-        {/* Title */}
-        <Skeleton className="mb-8 h-8 w-64 sm:h-9 sm:w-80" />
-
         {/* Status e toggle */}
         <div className="mb-4 flex flex-col gap-4 rounded-xl bg-slate-100/80 bg-slate-800/60 p-4 sm:flex-row sm:items-center sm:justify-between">
           {/* ModeIndicator */}
@@ -528,12 +525,7 @@ Skeleton.LogEntry = function SkeletonLogEntry() {
  */
 Skeleton.LogPage = function SkeletonLogPage() {
   return (
-    <div className="animate-spring-in mx-auto max-w-5xl space-y-8 px-4 py-8">
-      {/* Header */}
-      <div className="mb-8 text-center">
-        <Skeleton className="mx-auto mb-2 h-9 w-64" />
-        <Skeleton className="mx-auto h-5 w-80" />
-      </div>
+    <div className="animate-spring-in mx-auto max-w-5xl space-y-8">
 
       {/* Filters Card */}
       <Skeleton.Card className="p-6 sm:p-8">
@@ -670,12 +662,7 @@ Skeleton.Changelog = function SkeletonChangelog() {
  */
 Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
   return (
-    <div className="animate-spring-in mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8">
-        <Skeleton className="mb-2 h-9 w-64 sm:w-80" />
-        <Skeleton className="h-5 w-80 sm:w-96" />
-      </div>
+    <div className="animate-spring-in mx-auto max-w-7xl">
 
       {/* Mode Control Card */}
       <Skeleton.Card className="mb-8 p-8">
@@ -749,13 +736,7 @@ Skeleton.NetatmoPage = function SkeletonNetatmoPage() {
  */
 Skeleton.SchedulePage = function SkeletonSchedulePage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="mb-4 h-6 w-24 animate-pulse rounded bg-slate-700/50" />
-        <div className="mb-2 h-10 w-64 animate-pulse rounded bg-slate-700/50" />
-        <div className="h-5 w-96 animate-pulse rounded bg-slate-700/50" />
-      </div>
+    <div className="mx-auto max-w-4xl">
 
       {/* Selector card */}
       <div className="mb-6 rounded-2xl bg-slate-800/50 p-6">
@@ -785,9 +766,9 @@ Skeleton.SchedulePage = function SkeletonSchedulePage() {
 Skeleton.RaspiCard = function SkeletonRaspiCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
     >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
     </div>
   );
 
@@ -822,9 +803,9 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
   // Internal SkeletonPulse component
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
     >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
     </div>
   );
 
@@ -875,9 +856,9 @@ Skeleton.NetworkCard = function SkeletonNetworkCard() {
 Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
     >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
     </div>
   );
 
@@ -911,9 +892,9 @@ Skeleton.DirigeraCard = function SkeletonDirigeraCard() {
 Skeleton.TuyaCard = function SkeletonTuyaCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
     >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
     </div>
   );
 
@@ -945,9 +926,9 @@ Skeleton.TuyaCard = function SkeletonTuyaCard() {
 Skeleton.SonosCard = function SkeletonSonosCard() {
   const SkeletonPulse = ({ className = '' }: { className?: string }) => (
     <div
-      className={`relative overflow-hidden rounded-xl bg-slate-700/50 ${className}`}
+      className={`relative overflow-hidden rounded-xl bg-white/5 ${className}`}
     >
-      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-slate-600/30 to-transparent " />
+      <div className="animate-shimmer absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/8 to-transparent" />
     </div>
   );
 

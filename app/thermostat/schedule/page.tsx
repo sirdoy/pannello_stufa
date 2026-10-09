@@ -1,6 +1,5 @@
 'use client';
 import { Suspense, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Card, Heading, Text, Button, Skeleton } from '@/app/components/ui';
 import { useScheduleData } from '@/lib/hooks/useScheduleData';
 import { useRoomStatus } from '@/lib/hooks/useRoomStatus';
@@ -8,7 +7,8 @@ import ScheduleSelector from './components/ScheduleSelector';
 import WeeklyTimeline from './components/WeeklyTimeline';
 import ManualOverrideSheet from './components/ManualOverrideSheet';
 import ActiveOverrideBadge from './components/ActiveOverrideBadge';
-import { ArrowLeft, RefreshCw, Calendar, Flame } from 'lucide-react';
+import { RefreshCw, Flame } from 'lucide-react';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 interface Room {
   id: string;
@@ -23,8 +23,21 @@ interface Schedule {
   [key: string]: unknown;
 }
 
+const PAGE_DESCRIPTION = 'Vista dettagliata delle programmazioni settimanali';
+
+/** Loading state: the page header stays visible above the skeleton. */
+function ScheduleFallback() {
+  return (
+    <>
+      <div className="mx-auto max-w-4xl">
+        <PageHeader title="Programmazione" description={PAGE_DESCRIPTION} backHref="/thermostat" style={{ marginBottom: 0 }} />
+      </div>
+      <Skeleton.SchedulePage />
+    </>
+  );
+}
+
 function ScheduleContent() {
-  const router = useRouter();
   const { schedules, activeSchedule, homeId, loading, error, refetch } = useScheduleData();
   const { rooms, refetch: refetchRooms } = useRoomStatus();
   const [showOverrideSheet, setShowOverrideSheet] = useState<boolean>(false);
@@ -33,12 +46,13 @@ function ScheduleContent() {
   const roomsWithOverride = (rooms as Room[]).filter(r => r.mode === 'manual');
 
   if (loading) {
-    return <Skeleton.SchedulePage />;
+    return <ScheduleFallback />;
   }
 
   if (error) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <div className="mx-auto max-w-4xl">
+        <PageHeader title="Programmazione" description={PAGE_DESCRIPTION} backHref="/thermostat" />
         <Card variant="elevated" className="p-6">
           <Text variant="danger">{error}</Text>
         </Card>
@@ -53,30 +67,12 @@ function ScheduleContent() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      {/* Header with back button */}
-      <div className="mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.push('/thermostat')}
-          className="mb-4"
-        >
-          <ArrowLeft size={16} className="mr-1" />
-          Termostato
-        </Button>
-
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <Heading level={1} size="3xl" className="flex items-center gap-3">
-              <Calendar className="text-ember-400" />
-              Programmazione
-            </Heading>
-            <Text variant="secondary" className="mt-1">
-              Vista dettagliata delle programmazioni settimanali
-            </Text>
-          </div>
-
+    <div className="mx-auto max-w-4xl">
+      <PageHeader
+        title="Programmazione"
+        description={PAGE_DESCRIPTION}
+        backHref="/thermostat"
+        actions={
           <Button
             variant="subtle"
             size="sm"
@@ -85,8 +81,8 @@ function ScheduleContent() {
           >
             Aggiorna
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Schedule selector card */}
       <Card variant="glass" className="mb-6 p-5 sm:p-6">
@@ -174,7 +170,7 @@ function ScheduleContent() {
 
 export default function SchedulePage() {
   return (
-    <Suspense fallback={<Skeleton.SchedulePage />}>
+    <Suspense fallback={<ScheduleFallback />}>
       <ScheduleContent />
     </Suspense>
   );

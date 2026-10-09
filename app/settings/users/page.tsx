@@ -11,6 +11,7 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { GlassCard } from '@/app/components/EmberGlass/GlassCard';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import {
   errorTextStyle,
   inputStyle,
@@ -393,7 +394,7 @@ function UsersSection() {
 export default function UsersSettingsPage() {
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 26, fontWeight: 700, margin: '4px 0 18px' }}>Account e utenti</h1>
+      <PageHeader title="Account e utenti" backHref="/altro" />
       <PasswordSection />
       <UsersSection />
     </div>

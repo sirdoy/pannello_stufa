@@ -2,7 +2,7 @@
  * /altro route-level test (Phase 181 D-14 fourth bullet, route-level).
  *
  * Mocks the AltroPage child to keep this test focused on the route-shape
- * contract (sr-only h1 + child mount). Body-level coverage lives in
+ * contract (child mount; the visible h1 comes from PageHeader inside AltroPage). Body-level coverage lives in
  * app/components/EmberGlass/altro/__tests__/AltroPage.test.tsx.
  */
 import { render, screen } from '@testing-library/react';
@@ -13,9 +13,10 @@ jest.mock('@/app/components/EmberGlass/altro/AltroPage', () => ({
 }));
 
 describe('/altro route', () => {
-  it('renders the AltroPage component inside an sr-only-titled section', () => {
+  it('renders the AltroPage component without a wrapper heading', () => {
     render(<AltroRoute />);
-    expect(screen.getByText('Altro')).toBeInTheDocument(); // sr-only h1
+    // The h1 is rendered by PageHeader inside AltroPage (stubbed here), not by the route
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
     expect(screen.getByTestId('altro-page-stub')).toBeInTheDocument();
   });
 });

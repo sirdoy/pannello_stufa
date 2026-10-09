@@ -87,8 +87,12 @@ describe('PageLayout', () => {
       expect(screen.getByText('Custom Header Content')).toBeInTheDocument();
     });
 
-    it('accepts custom className', () => {
-      render(<PageHeader title="Test" className="custom-header" />);
+    it('accepts custom className with custom children', () => {
+      render(
+        <PageHeader className="custom-header">
+          <div>Custom Header Content</div>
+        </PageHeader>
+      );
       expect(screen.getByRole('banner')).toHaveClass('custom-header');
     });
   });

@@ -132,7 +132,7 @@ export default function DashboardSettingsPage() {
   // Loading state
   if (userLoading || isLoading) {
     return (
-      <SettingsLayout title="Personalizza home" icon="🏠">
+      <SettingsLayout title="Personalizza home">
         <Skeleton className="h-64 w-full" />
       </SettingsLayout>
     );
@@ -141,7 +141,7 @@ export default function DashboardSettingsPage() {
   // Not authenticated
   if (!user) {
     return (
-      <SettingsLayout title="Personalizza home" icon="🏠">
+      <SettingsLayout title="Personalizza home">
         <Card variant="glass">
           <Text variant="secondary">
             Devi essere autenticato per personalizzare la home.
@@ -152,7 +152,7 @@ export default function DashboardSettingsPage() {
   }
 
   return (
-    <SettingsLayout title="Personalizza home" icon="🏠">
+    <SettingsLayout title="Personalizza home">
       {/* Card list */}
       <div className="space-y-3">
         {cards.map((card, index) => (

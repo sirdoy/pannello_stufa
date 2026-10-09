@@ -1,11 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import PageLayout from '@/app/components/ui/PageLayout';
 import Skeleton from '@/app/components/ui/Skeleton';
-import Button from '@/app/components/ui/Button';
-import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import { Banner } from '@/app/components/ui';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
@@ -25,7 +22,6 @@ import { sortZonesPlayingFirst } from '@/lib/sonos/sortZones';
  * - Loading skeleton on initial load before data arrives
  */
 export default function SonosPage() {
-  const router = useRouter();
   const { data, loading, stale, error, fetchData, applyMutation } = useSonosFullData();
   const [commandError, setCommandError] = useState<string | null>(null);
   const commands = useSonosCommands({ fetchData, applyMutation, setError: setCommandError });
@@ -33,31 +29,17 @@ export default function SonosPage() {
   // Loading guard — only on initial load (no cached data)
   if (loading && !data) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-12 w-48 rounded-xl" />
-        <Skeleton className="h-50 rounded-2xl" />
-        <Skeleton className="h-50 rounded-2xl" />
-      </div>
+      <PageLayout header={<PageLayout.Header title="Sonos" backHref="/altro" />}>
+        <div className="space-y-6">
+          <Skeleton className="h-50 rounded-2xl" />
+          <Skeleton className="h-50 rounded-2xl" />
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <PageLayout
-      header={
-        <PageLayout.Header>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={() => router.push('/')}>
-                ← Indietro
-              </Button>
-              <div>
-                <Heading level={1} size="2xl">Sonos</Heading>
-              </div>
-            </div>
-          </div>
-        </PageLayout.Header>
-      }
-    >
+    <PageLayout header={<PageLayout.Header title="Sonos" backHref="/altro" />}>
       <div className="space-y-6">
         {/* Stale banner — shows when data exists but latest fetch failed */}
         {stale && <Banner variant="warning" title="Dati non aggiornati" compact={true} />}

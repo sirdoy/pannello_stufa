@@ -19,9 +19,9 @@ const textVariants = cva(
     variants: {
       variant: {
         // Neutral hierarchy
-        body: 'text-slate-100 ',
-        secondary: 'text-slate-300 ',
-        tertiary: 'text-slate-400 ',
+        body: 'text-(--text-1)',
+        secondary: 'text-(--text-2)',
+        tertiary: 'text-(--text-2)',
         // Accent colors - Ember Noir palette
         ember: 'text-ember-400 ',
         ocean: 'text-ocean-400 ',
@@ -30,7 +30,7 @@ const textVariants = cva(
         danger: 'text-danger-400 ',
         info: 'text-ocean-400 ', // alias for ocean
         // Special variants
-        label: 'tracking-wider text-slate-400 uppercase',
+        label: 'tracking-wider text-(--text-2) uppercase',
       },
       size: {
         xs: 'text-xs',

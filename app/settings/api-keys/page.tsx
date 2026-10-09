@@ -191,7 +191,7 @@ export default function ApiKeysPage() {
   const isEmpty = !loading && keys.length === 0 && !error;
 
   return (
-    <SettingsLayout title="API Keys" icon="🔑" backHref="/">
+    <SettingsLayout title="API Keys">
       <Text variant="secondary">
         Gestisci le chiavi per accedere alle API.
       </Text>

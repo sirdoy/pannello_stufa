@@ -18,9 +18,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { PageLayout, Skeleton, Button, Heading } from '@/app/components/ui';
+import { PageLayout, Skeleton } from '@/app/components/ui';
 import { cn } from '@/lib/utils/cn';
 import { useNetworkData } from '@/app/components/devices/network/hooks/useNetworkData';
 import { useBandwidthHistory } from './hooks/useBandwidthHistory';
@@ -88,13 +87,10 @@ import type { DeviceCategory } from '@/types/firebase/network';
 type NetworkTab = 'dispositivi' | 'wifi' | 'servizi' | 'reti-wifi' | 'storico';
 
 export default function NetworkPage() {
-  const router = useRouter();
   const networkData = useNetworkData({ enrichVendors: true });
   const bandwidthHistory = useBandwidthHistory();
   const deviceHistory = useDeviceHistory();
   const correlation = useBandwidthCorrelation();
-
-  const handleBack = () => router.push('/');
 
   // Tab state
   const [activeTab, setActiveTab] = useState<NetworkTab>('dispositivi');
@@ -181,35 +177,21 @@ export default function NetworkPage() {
   // Loading skeleton guard - only on initial load (no cached data)
   if (networkData.loading && !networkData.wan && networkData.devices.length === 0) {
     return (
-      <div className="space-y-6">
-        <Skeleton className="h-12 w-48 rounded-xl" />
-        <Skeleton className="h-25 rounded-2xl" />
-        <Skeleton className="h-70 rounded-2xl" />
-        <Skeleton className="h-10 w-full rounded-xl" />
-        <Skeleton className="h-100 rounded-2xl" />
-        <Skeleton className="h-95 rounded-2xl" />
-        <Skeleton className="h-75 rounded-2xl" />
-      </div>
+      <PageLayout header={<PageLayout.Header title="Rete" backHref="/altro" />}>
+        <div className="space-y-6">
+          <Skeleton className="h-25 rounded-2xl" />
+          <Skeleton className="h-70 rounded-2xl" />
+          <Skeleton className="h-10 w-full rounded-xl" />
+          <Skeleton className="h-100 rounded-2xl" />
+          <Skeleton className="h-95 rounded-2xl" />
+          <Skeleton className="h-75 rounded-2xl" />
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <PageLayout
-      header={
-        <PageLayout.Header>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" onClick={handleBack}>
-                ← Indietro
-              </Button>
-              <div>
-                <Heading level={1} size="2xl">Rete</Heading>
-              </div>
-            </div>
-          </div>
-        </PageLayout.Header>
-      }
-    >
+    <PageLayout header={<PageLayout.Header title="Rete" backHref="/altro" />}>
       <div className="space-y-6">
         {/* System Info Card - above WAN status card */}
         <SystemInfoCard data={systemInfo.data} loading={systemInfo.loading} stale={systemInfo.stale} />

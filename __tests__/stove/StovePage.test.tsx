@@ -179,15 +179,13 @@ describe('StovePage', () => {
     expect(screen.getByTestId('stove-page-navigation')).toBeInTheDocument();
   });
 
-  it('applies correct theme classes based on status', () => {
+  it('keeps the shared app background: no page-level full-screen gradient', () => {
     mockUseStoveData.mockReturnValue(createMockStoveData({ status: 'working' }));
 
     const { container } = render(<StovePage />);
 
-    // Check for ember theme gradient
-    const gradientDiv = container.querySelector('.bg-linear-to-br');
-    expect(gradientDiv).toBeInTheDocument();
-    expect(gradientDiv?.className).toContain('from-ember-950');
+    expect(container.querySelector('.fixed.inset-0.bg-linear-to-br')).toBeNull();
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Stufa');
   });
 
   it('calls handleIgnite when StovePageHero fires onIgnite', async () => {

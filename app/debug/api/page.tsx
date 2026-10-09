@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useEffect, useSyncExternalStore } from 'react';
-import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import Button from '@/app/components/ui/Button';
 import Tabs from '@/app/components/ui/Tabs';
 import Badge from '@/app/components/ui/Badge';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import StoveTab from '@/app/debug/components/tabs/StoveTab';
 import NetatmoTab from '@/app/debug/components/tabs/NetatmoTab';
 import HueTab from '@/app/debug/components/tabs/HueTab';
@@ -70,23 +70,23 @@ export default function ApiDebugPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 text-slate-100">
+    <div className="text-slate-100">
       <div className="mx-auto max-w-7xl space-y-6">
-        {/* Header */}
+        <PageHeader
+          title="API Debug Console"
+          description="Test all system components and monitor live API responses"
+          backHref="/debug"
+          actions={
+            <Badge variant={isDev ? 'ocean' : 'ember'} size="sm">
+              {isDev ? 'DEV' : 'PROD'}
+            </Badge>
+          }
+        />
+
+        {/* Toolbar */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <div className="flex items-center gap-3">
-              <Heading level={1} variant="ember">
-                🔌 API Debug Console
-              </Heading>
-              <Badge variant={isDev ? 'ocean' : 'ember'} size="sm">
-                {isDev ? 'DEV' : 'PROD'}
-              </Badge>
-            </div>
-            <Text variant="secondary" className="mt-1">
-              Test all system components and monitor live API responses
-            </Text>
-            <Text size="sm" variant="secondary" className="mt-2">
+            <Text size="sm" variant="secondary">
               Keyboard: <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">1-6</kbd> = Switch tabs,{''}
               <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">⌘R</kbd> = Refresh,{''}
               <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-xs">A</kbd> = Auto-refresh

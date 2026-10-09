@@ -1,8 +1,14 @@
-# Design System - Ember Noir v3.0
+# Design System - EmberGlass
 
-Dark-first design system with warm accents and WCAG AA accessibility.
+One design system for every page (workspace ROADMAP M72): rules in
+[../../.claude/rules/design-system.md](../../.claude/rules/design-system.md).
 
-**Live Preview**: `/debug/design-system` (interactive examples with copy-to-clipboard)
+- Page title: `PageHeader` (`app/components/EmberGlass/PageHeader.tsx`), the only `<h1>` of a page.
+- Glass surfaces, sheets, device cards: `app/components/EmberGlass/`.
+- Base components below (`app/components/ui/`) share the EmberGlass look since M72: flat accent buttons, glass
+  cards, segmented tabs. Colour and size values quoted further down may predate M72: the code wins.
+
+**Live Preview**: `/debug/design-system-v2`
 
 ---
 
@@ -126,7 +132,7 @@ import { Button, Card, SmartHomeCard } from '@/app/components/ui';
 
 ### Foundation (Slate)
 
-```
+```text
 slate-950  #0c0a09  /* Deepest background */
 slate-900  #1c1917  /* Primary dark */
 slate-400  #a8a29e  /* Secondary text */
@@ -135,7 +141,7 @@ slate-200  #e7e5e4  /* Primary text (dark) */
 
 ### Ember (Signature)
 
-```
+```text
 ember-500  #ed6f10  /* Primary accent */
 ember-400  #f18d33  /* Active (dark) */
 ember-700  #b83d09  /* Active (light) */
@@ -143,7 +149,7 @@ ember-700  #b83d09  /* Active (light) */
 
 ### Semantic
 
-```
+```text
 sage-500    #607360  /* Success */
 ocean-500   #437dae  /* Info */
 warning-500 #eab308  /* Warning */
@@ -353,7 +359,7 @@ info('New version available', {
 
 ---
 
-## Typography
+## Typography scale
 
 ### Fonts
 

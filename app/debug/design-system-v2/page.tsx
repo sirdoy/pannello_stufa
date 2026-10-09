@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import { Section01Hue } from './sections/Section01Hue';
 import { Section02Ambient } from './sections/Section02Ambient';
 import { Section03Tokens } from './sections/Section03Tokens';
@@ -41,45 +42,12 @@ export default function DesignSystemV2Page(): React.ReactElement {
         zIndex: 1,
       }}
     >
-      {/* Page header — verbatim from Phase 174 page.tsx lines 119-156 */}
-      <header style={{ marginBottom: 32 }}>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: '1.2px',
-            textTransform: 'uppercase',
-            color: 'var(--text-2)',
-          }}
-        >
-          DESIGN SYSTEM · v2
-        </p>
-        <h1
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 40,
-            fontWeight: 600,
-            lineHeight: 1.05,
-            letterSpacing: '-1px',
-            color: 'var(--text-1)',
-            margin: 0,
-          }}
-        >
-          Ember Glass
-        </h1>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 16,
-            fontWeight: 400,
-            color: 'var(--text-2)',
-            marginTop: 8,
-          }}
-        >
-          Riferimento token e picker live · Phase 174
-        </p>
-      </header>
+      <PageHeader
+        title="Ember Glass"
+        eyebrow="Design system · v2"
+        description="Riferimento token e picker live · Phase 174"
+        backHref="/debug"
+      />
 
       <hr style={{ border: 0, borderTop: '0.5px solid var(--glass-border)', margin: '24px 0' }} />
 

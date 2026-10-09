@@ -94,27 +94,17 @@ export default function TransitionsDebugPage() {
   ];
 
   return (
-    <PageLayout maxWidth="7xl">
+    <PageLayout
+      maxWidth="7xl"
+      header={
+        <PageLayout.Header
+          title="Page Transitions Demo"
+          description="Sistema di transizioni cinematografiche con View Transitions API + CSS fallback"
+          backHref="/debug"
+        />
+      }
+    >
       <div className="space-y-8">
-      {/* Header */}
-      <div className="space-y-4">
-        <TransitionLink
-          href="/debug"
-          className="inline-flex items-center gap-2 text-slate-400 transition-colors hover:text-ember-400"
-        >
-          <ArrowLeft className="size-5" />
-          <Text>Torna a Debug</Text>
-        </TransitionLink>
-
-        <div>
-          <Heading level={1} className="mb-2">
-            🎬 Page Transitions Demo
-          </Heading>
-          <Text variant="tertiary">
-            Sistema di transizioni cinematografiche con View Transitions API + CSS fallback
-          </Text>
-        </div>
-      </div>
 
       {/* Current Status */}
       <Card glow className="border-2 border-ember-500/20 p-6">

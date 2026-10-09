@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Card, Button, Heading, Text } from '@/app/components/ui';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 /**
  * Automation Page - Philips Hue automation (Phase 2)
@@ -44,25 +45,12 @@ export default function AutomationPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8">
-        <Button
-          variant="ghost"
-          onClick={() => router.push('/lights')}
-          size="sm"
-          className="mb-4"
-        >
-          ← Indietro
-        </Button>
-
-        <Heading level={1} size="2xl" className="mb-2">
-          Automazioni Philips Hue
-        </Heading>
-        <Text variant="secondary">
-          Controlla automaticamente le luci in base a orari, presenza e condizioni
-        </Text>
-      </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader
+        title="Automazioni Philips Hue"
+        description="Controlla automaticamente le luci in base a orari, presenza e condizioni"
+        backHref="/lights"
+      />
 
       {/* Coming Soon Notice */}
       <Card className="mb-8 border-2 border-ocean-300 border-ocean-700 bg-linear-to-br from-ocean-50 from-ocean-900/20 to-ocean-100 to-ocean-800/20 p-8">

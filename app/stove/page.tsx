@@ -14,7 +14,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/auth/useUser';
-import { Heading, Skeleton, LoadingOverlay, Toast } from '@/app/components/ui';
+import { Skeleton, LoadingOverlay, Toast } from '@/app/components/ui';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
@@ -92,6 +93,7 @@ export default function StovePage() {
   if (stoveData.initialLoading) {
     return (
       <div className="space-y-8">
+        <PageHeader title="Stufa" backHref="/altro" />
         <Skeleton className="h-125 rounded-3xl" />
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {[1, 2, 3].map((i) => (
@@ -104,13 +106,7 @@ export default function StovePage() {
 
   return (
     <div className="relative">
-      <Heading level={1} className="sr-only">
-        Controllo Stufa
-      </Heading>
-
-      {/* Full-screen ambient gradient + glow */}
-      <div className={`fixed inset-0 -z-10 bg-linear-to-br ${theme.bg} transition-all duration-1000`} />
-      <div className={`pointer-events-none fixed inset-0 -z-10 transition-all duration-1000 ${theme.glow}`} />
+      <PageHeader title="Stufa" backHref="/altro" />
 
       <LoadingOverlay show={stoveData.loading} message={stoveData.loadingMessage} icon="🔥" />
 

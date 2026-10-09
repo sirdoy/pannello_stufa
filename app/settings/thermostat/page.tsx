@@ -11,6 +11,7 @@
 
 import { useEffect, useState } from 'react';
 import { GlassCard } from '@/app/components/EmberGlass/GlassCard';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 import { InlineToggle } from '@/app/components/EmberGlass/InlineToggle';
 import {
   errorTextStyle,
@@ -154,7 +155,7 @@ export default function ThermostatSettingsPage() {
   if (loadError) {
     return (
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, margin: '4px 0 18px' }}>Clima stufa</h1>
+        <PageHeader title="Clima stufa" backHref="/altro" />
         <p role="alert" style={errorTextStyle}>
           {loadError}
         </p>
@@ -164,7 +165,7 @@ export default function ThermostatSettingsPage() {
   if (!state || !tuning) {
     return (
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <h1 style={{ fontSize: 26, fontWeight: 700, margin: '4px 0 18px' }}>Clima stufa</h1>
+        <PageHeader title="Clima stufa" backHref="/altro" />
         <p style={mutedStyle}>Caricamento…</p>
       </div>
     );
@@ -181,7 +182,7 @@ export default function ThermostatSettingsPage() {
 
   return (
     <div style={{ maxWidth: 720, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 26, fontWeight: 700, margin: '4px 0 18px' }}>Clima stufa</h1>
+      <PageHeader title="Clima stufa" backHref="/altro" />
 
       <GlassCard style={cardStyle} data-testid="climate-main-card">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>

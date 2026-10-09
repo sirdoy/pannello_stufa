@@ -1,69 +1,33 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import Button from './ui/Button';
-import Heading from './ui/Heading';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { PageHeader } from './EmberGlass/PageHeader';
 
 interface SettingsLayoutProps {
   children: ReactNode;
   title: string;
-  icon?: string;
+  description?: string;
   showBackButton?: boolean;
   backHref?: string;
 }
 
 /**
- * SettingsLayout - Unified layout wrapper for all settings pages
+ * SettingsLayout - Layout wrapper for settings / registry pages
  *
- * Provides:
- * - Consistent full-page background with dark mode support
- * - Consistent padding and max-width container
- * - Optional back button
- * - Consistent header styling
+ * Provides the shared EmberGlass page header (back button to the parent
+ * route, "Altro" by default) and a centred column for the page content.
  */
 export default function SettingsLayout({
   children,
   title,
-  icon,
+  description,
   showBackButton = true,
-  backHref
+  backHref = '/altro',
 }: SettingsLayoutProps) {
-  const router = useRouter();
-
-  const handleBack = () => {
-    if (backHref) {
-      router.push(backHref);
-    } else {
-      router.back();
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-900 via-slate-900 to-slate-800 p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto max-w-4xl space-y-6">
-        {/* Header with optional back button */}
-        <div className="flex items-center gap-4">
-          {showBackButton && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleBack}
-              className="shrink-0"
-              aria-label="Torna indietro"
-            >
-              ← Indietro
-            </Button>
-          )}
-          <Heading level={1} className="flex items-center gap-2">
-            {icon && <span className="text-3xl sm:text-4xl">{icon}</span>}
-            {title}
-          </Heading>
-        </div>
-
-        {/* Page content */}
-        {children}
-      </div>
+    <div className="mx-auto max-w-4xl space-y-6">
+      <PageHeader title={title} description={description} backHref={showBackButton ? backHref : undefined} />
+      {children}
     </div>
   );
 }

@@ -13,10 +13,5 @@ import { AltroPage } from '@/app/components/EmberGlass/altro/AltroPage';
 export const dynamic = 'force-dynamic';
 
 export default function AltroRoute() {
-  return (
-    <section className="py-8 sm:py-12 lg:py-16">
-      <h1 className="sr-only">Altro</h1>
-      <AltroPage />
-    </section>
-  );
+  return <AltroPage />;
 }

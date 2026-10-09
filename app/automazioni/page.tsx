@@ -15,10 +15,5 @@ import { AutomationsTab } from '@/app/components/EmberGlass/automations';
 export const dynamic = 'force-dynamic';
 
 export default function AutomazioniPage() {
-  return (
-    <section className="py-8 sm:py-12 lg:py-16">
-      <h1 className="sr-only">Automazioni</h1>
-      <AutomationsTab />
-    </section>
-  );
+  return <AutomationsTab />;
 }

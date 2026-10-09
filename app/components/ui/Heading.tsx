@@ -14,22 +14,22 @@ import { cn } from '@/lib/utils/cn';
  */
 const headingVariants = cva(
   // Base classes
-  'font-display font-bold',
+  'font-display font-semibold tracking-tight',
   {
     variants: {
       size: {
         sm: 'text-sm',
         md: 'text-base',
-        lg: 'text-lg',
-        xl: 'text-xl sm:text-2xl',
-        '2xl': 'text-2xl sm:text-3xl',
-        '3xl': 'text-3xl sm:text-4xl',
+        lg: 'text-[17px]',
+        xl: 'text-xl',
+        '2xl': 'text-2xl',
+        '3xl': 'text-[28px]',
       },
       variant: {
         // Neutral hierarchy
-        default: 'text-slate-100 ',
-        gradient: 'bg-linear-to-r from-ember-500 to-flame-600 bg-clip-text text-transparent',
-        subtle: 'text-slate-400 ',
+        default: 'text-(--text-1)',
+        gradient: 'text-(--accent)',
+        subtle: 'text-(--text-2)',
         // Accent colors - Ember Noir palette
         ember: 'text-ember-400 ',
         ocean: 'text-ocean-300 ',

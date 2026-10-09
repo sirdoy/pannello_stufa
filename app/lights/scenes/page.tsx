@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Skeleton, EmptyState, Heading, Text, Banner } from '@/app/components/ui';
 import type { HueScene, HueGroup } from '@/types/hueProxy';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 /** JSON bodies of GET /api/v1/hue/scenes and /api/v1/hue/groups (or an error payload) */
 interface HueScenesApiResponse {
@@ -140,13 +141,21 @@ export default function ScenesPage() {
     }
   }
 
-  if (loading) return <Skeleton.LightsCard />;
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl">
+        <PageHeader title="Scene" backHref="/lights" />
+        <Skeleton.LightsCard />
+      </div>
+    );
+  }
 
   if (!connected) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <PageHeader title="Scene" backHref="/lights" />
         <Card className="p-8">
-          <Heading level={1} size="lg" className="mb-4">Bridge Hue Non Connesso</Heading>
+          <Heading level={2} size="lg" className="mb-4">Bridge Hue Non Connesso</Heading>
           <Text variant="secondary" className="mb-6">
             Il bridge Hue non e raggiungibile tramite il proxy. Verifica che Home Assistant sia attivo.
           </Text>
@@ -166,14 +175,8 @@ export default function ScenesPage() {
   })).filter(group => group.scenes.length > 0);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-8">
-        <Button variant="ghost" onClick={() => router.push('/lights')} size="sm" className="mb-4">
-          ← Indietro
-        </Button>
-        <Heading level={1} size="2xl" className="mb-2">Scene Philips Hue</Heading>
-        <Text variant="secondary">Attiva le tue scene preferite con un click</Text>
-      </div>
+    <div className="mx-auto max-w-7xl">
+      <PageHeader title="Scene" description="Attiva le tue scene preferite con un click" backHref="/lights" />
 
       {success && (
         <div className="mb-6">

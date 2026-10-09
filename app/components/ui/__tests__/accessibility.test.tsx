@@ -844,7 +844,6 @@ describe('Accessibility Test Suite - All Components', () => {
         const button = screen.getByRole('button');
         expect(button).toHaveClass('focus-visible:ring-2');
         expect(button).toHaveClass('focus-visible:ring-ember-500/50');
-        expect(button).toHaveClass('focus-visible:ring-offset-2');
       });
 
       test('Checkbox has focus ring classes', () => {
@@ -870,12 +869,6 @@ describe('Accessibility Test Suite - All Components', () => {
     });
 
     describe('Focus ring offset for dark/light mode', () => {
-      test('Button has dark mode offset', () => {
-        render(<Button>Test</Button>);
-        const button = screen.getByRole('button');
-        expect(button).toHaveClass('focus-visible:ring-offset-slate-900');
-      });
-
       test('ControlButton has dark mode offset', () => {
         render(<ControlButton onChange={() => {}} />);
         const button = screen.getByRole('button');

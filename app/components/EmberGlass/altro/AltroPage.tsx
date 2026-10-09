@@ -42,6 +42,7 @@ import {
 } from 'lucide-react';
 import { GlassCard } from '../GlassCard';
 import { CardHead } from '../CardHead';
+import { PageHeader } from '../PageHeader';
 import { AltroRow } from './AltroRow';
 import { getNavigationStructureWithPreferences } from '@/lib/devices/deviceRegistry';
 
@@ -83,35 +84,12 @@ export function AltroPage(): React.ReactElement {
   const enabledDevices = navStructure.devices ?? [];
 
   return (
-    <div style={{ paddingTop: 70 }}>
-      {/* Title block (mirrors RoomsTab.tsx:118-139) */}
-      <div style={{ padding: '0 20px 20px' }}>
-        <div
-          style={{
-            fontSize: 12,
-            color: 'var(--text-2)',
-            textTransform: 'uppercase',
-            letterSpacing: 1,
-          }}
-        >
-          Menu principale
-        </div>
-        <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 24,
-            fontWeight: 600,
-            color: '#fff',
-            letterSpacing: -0.8,
-          }}
-        >
-          Altro
-        </div>
-      </div>
+    <div>
+      <PageHeader title="Altro" eyebrow="Menu principale" />
 
       {/* Grouped stack of GlassCards */}
       <div
-        style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 24 }}
+        style={{ display: 'flex', flexDirection: 'column', gap: 24 }}
       >
         {/* Group 1: Dispositivi (data-driven) */}
         <GlassCard style={groupCardStyle}>

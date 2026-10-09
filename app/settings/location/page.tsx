@@ -96,7 +96,7 @@ export default function LocationSettingsPage() {
   // Loading state
   if (userLoading || isLoading) {
     return (
-      <SettingsLayout title="Posizione" icon="📍">
+      <SettingsLayout title="Posizione">
         <Skeleton className="h-64 w-full" />
       </SettingsLayout>
     );
@@ -105,7 +105,7 @@ export default function LocationSettingsPage() {
   // Not authenticated
   if (!user) {
     return (
-      <SettingsLayout title="Posizione" icon="📍">
+      <SettingsLayout title="Posizione">
         <Card variant="glass">
           <Text variant="secondary">
             Devi essere autenticato per configurare la posizione.
@@ -116,7 +116,7 @@ export default function LocationSettingsPage() {
   }
 
   return (
-    <SettingsLayout title="Posizione" icon="📍">
+    <SettingsLayout title="Posizione">
       {/* Description */}
       <Text variant="secondary">
         Configura la posizione per le previsioni meteo

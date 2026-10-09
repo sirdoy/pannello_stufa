@@ -18,6 +18,7 @@ import {
 import { getEventTypeName, getEventIcon } from '@/lib/netatmo/netatmoCameraApi';
 import EventPreviewModal from '@/app/components/devices/camera/EventPreviewModal';
 import type { CameraStatus, CameraEvent } from '@/types/netatmoProxy';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 export default function CameraEventsPage() {
   const router = useRouter();
@@ -153,50 +154,59 @@ export default function CameraEventsPage() {
 
   if (loading) {
     return (
-      <Section title="Eventi Camera" description="Caricamento..." spacing="lg" level={1}>
-        <div className="space-y-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton.Card key={i} className="h-24" />
-          ))}
-        </div>
-      </Section>
+      <>
+        <PageHeader title="Eventi" description="Caricamento..." backHref="/camera" />
+        <Section spacing="none">
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton.Card key={i} className="h-24" />
+            ))}
+          </div>
+        </Section>
+      </>
     );
   }
 
   if (error) {
     return (
-      <Section title="Eventi Camera" spacing="lg" level={1}>
-        <Banner
-          variant="error"
-          title="Errore"
-          description={error}
-        />
-        <div className="mt-4 flex gap-2">
-          <Button variant="ember" onClick={handleRefresh}>
-            Riprova
-          </Button>
-          <Button variant="subtle" onClick={() => router.push('/camera')}>
-            Torna alle camere
-          </Button>
-        </div>
-      </Section>
+      <>
+        <PageHeader title="Eventi" backHref="/camera" />
+        <Section spacing="none">
+          <Banner
+            variant="error"
+            title="Errore"
+            description={error}
+          />
+          <div className="mt-4 flex gap-2">
+            <Button variant="ember" onClick={handleRefresh}>
+              Riprova
+            </Button>
+            <Button variant="subtle" onClick={() => router.push('/camera')}>
+              Torna alle camere
+            </Button>
+          </div>
+        </Section>
+      </>
     );
   }
 
   if (events.length === 0) {
     return (
-      <Section title="Eventi Camera" spacing="lg" level={1}>
-        <EmptyState
-          icon="📹"
-          title="Nessun evento registrato"
-          description="Non sono stati trovati eventi registrati dalle tue videocamere."
-        />
-        <div className="mt-4 text-center">
-          <Button variant="subtle" onClick={() => router.push('/camera')}>
-            Torna alle camere
-          </Button>
-        </div>
-      </Section>
+      <>
+        <PageHeader title="Eventi" backHref="/camera" />
+        <Section spacing="none">
+          <EmptyState
+            icon="📹"
+            title="Nessun evento registrato"
+            description="Non sono stati trovati eventi registrati dalle tue videocamere."
+          />
+          <div className="mt-4 text-center">
+            <Button variant="subtle" onClick={() => router.push('/camera')}>
+              Torna alle camere
+            </Button>
+          </div>
+        </Section>
+      </>
     );
   }
 
@@ -206,20 +216,12 @@ export default function CameraEventsPage() {
     : `${filteredEvents.length} eventi (filtrati da ${totalEvents} totali)`;
 
   return (
-    <Section
-      title="Eventi Camera"
-      description={eventsDescription}
-      spacing="lg"
-      level={1}
-      action={
-        <div className="flex gap-2">
-          <Button
-            variant="subtle"
-            size="sm"
-            onClick={() => router.push('/camera')}
-          >
-            Torna alle camere
-          </Button>
+    <>
+      <PageHeader
+        title="Eventi"
+        description={eventsDescription}
+        backHref="/camera"
+        actions={
           <Button
             variant="subtle"
             size="sm"
@@ -228,138 +230,139 @@ export default function CameraEventsPage() {
           >
             {refreshing ? 'Aggiornamento...' : 'Aggiorna'}
           </Button>
-        </div>
-      }
-    >
-      {/* Camera filter */}
-      {cameras.length > 1 && (
-        <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
-          <Button
-            variant={selectedCameraId === 'all' ? 'ember' : 'subtle'}
-            size="sm"
-            onClick={() => {
-              setSelectedCameraId('all');
-              setDisplayCount(20);
-            }}
-          >
-            Tutte le camere
-          </Button>
-          {cameras.map(camera => (
+        }
+      />
+      <Section spacing="none">
+        {/* Camera filter */}
+        {cameras.length > 1 && (
+          <div className="mb-6 flex gap-2 overflow-x-auto pb-2">
             <Button
-              key={camera.camera_id}
-              variant={selectedCameraId === camera.camera_id ? 'ember' : 'subtle'}
+              variant={selectedCameraId === 'all' ? 'ember' : 'subtle'}
               size="sm"
               onClick={() => {
-                setSelectedCameraId(camera.camera_id);
+                setSelectedCameraId('all');
                 setDisplayCount(20);
               }}
-              className="whitespace-nowrap"
             >
-              {camera.name ?? camera.camera_id}
+              Tutte le camere
             </Button>
-          ))}
-        </div>
-      )}
+            {cameras.map(camera => (
+              <Button
+                key={camera.camera_id}
+                variant={selectedCameraId === camera.camera_id ? 'ember' : 'subtle'}
+                size="sm"
+                onClick={() => {
+                  setSelectedCameraId(camera.camera_id);
+                  setDisplayCount(20);
+                }}
+                className="whitespace-nowrap"
+              >
+                {camera.name ?? camera.camera_id}
+              </Button>
+            ))}
+          </div>
+        )}
 
-      {/* Events grouped by date */}
-      <div className="space-y-6">
-        {Object.entries(groupedEvents).map(([date, dateEvents]) => (
-          <Card key={date}>
-            <CardHeader>
-              <CardTitle icon="📅" level={2}>
-                {date}
-                <span className="ml-2 text-sm font-normal text-slate-400">
-                  ({dateEvents.length} {dateEvents.length === 1 ? 'evento' : 'eventi'})
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {dateEvents.map(event => {
-                  const cameraName = getCameraName(event);
+        {/* Events grouped by date */}
+        <div className="space-y-6">
+          {Object.entries(groupedEvents).map(([date, dateEvents]) => (
+            <Card key={date}>
+              <CardHeader>
+                <CardTitle icon="📅" level={2}>
+                  {date}
+                  <span className="ml-2 text-sm font-normal text-slate-400">
+                    ({dateEvents.length} {dateEvents.length === 1 ? 'evento' : 'eventi'})
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {dateEvents.map(event => {
+                    const cameraName = getCameraName(event);
 
-                  return (
-                    <button
-                      key={event.event_id}
-                      onClick={() => setSelectedEvent(event)}
-                      className="group flex w-full items-center gap-4 rounded-xl bg-slate-800/50 p-3 text-left transition-all hover:bg-slate-700/50 hover:ring-2 hover:ring-ocean-500"
-                    >
-                      {/* Snapshot preview */}
-                      <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg bg-slate-900 sm:h-24 sm:w-40">
-                        {event.snapshot_url ? (
-                          <img
-                            src={event.snapshot_url}
-                            alt={getEventTypeName(event.event_type)}
-                            className="size-full object-cover"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).style.display = 'none';
-                            }}
-                          />
-                        ) : null}
-                        <div className={`absolute inset-0 flex items-center justify-center ${event.snapshot_url ? 'opacity-0' : ''}`}>
-                          <span className="text-2xl opacity-60">
-                            {getEventIcon(event.event_type)}
-                          </span>
+                    return (
+                      <button
+                        key={event.event_id}
+                        onClick={() => setSelectedEvent(event)}
+                        className="group flex w-full items-center gap-4 rounded-xl bg-slate-800/50 p-3 text-left transition-all hover:bg-slate-700/50 hover:ring-2 hover:ring-ocean-500"
+                      >
+                        {/* Snapshot preview */}
+                        <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-lg bg-slate-900 sm:h-24 sm:w-40">
+                          {event.snapshot_url ? (
+                            <img
+                              src={event.snapshot_url}
+                              alt={getEventTypeName(event.event_type)}
+                              className="size-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          ) : null}
+                          <div className={`absolute inset-0 flex items-center justify-center ${event.snapshot_url ? 'opacity-0' : ''}`}>
+                            <span className="text-2xl opacity-60">
+                              {getEventIcon(event.event_type)}
+                            </span>
+                          </div>
                         </div>
-                      </div>
 
-                      {/* Event info */}
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-1 flex items-center gap-2">
-                          <span className="text-lg">
-                            {getEventIcon(event.event_type)}
-                          </span>
-                          <Text variant="body">
-                            {getEventTypeName(event.event_type)}
-                          </Text>
-                        </div>
+                        {/* Event info */}
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex items-center gap-2">
+                            <span className="text-lg">
+                              {getEventIcon(event.event_type)}
+                            </span>
+                            <Text variant="body">
+                              {getEventTypeName(event.event_type)}
+                            </Text>
+                          </div>
 
-                        {/* Event message (if available) */}
-                        {event.message && (
-                          <Text variant="secondary" size="sm" className="line-clamp-2">
-                            {stripHtml(event.message)}
-                          </Text>
-                        )}
-
-                        <div className="mt-1 flex flex-wrap items-center gap-3">
-                          <Text variant="tertiary" size="xs">
-                            🕐 {new Date(event.timestamp * 1000).toLocaleTimeString('it-IT', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </Text>
-                          {cameras.length > 1 && cameraName && (
-                            <Text variant="tertiary" size="xs">
-                              📹 {cameraName}
+                          {/* Event message (if available) */}
+                          {event.message && (
+                            <Text variant="secondary" size="sm" className="line-clamp-2">
+                              {stripHtml(event.message)}
                             </Text>
                           )}
+
+                          <div className="mt-1 flex flex-wrap items-center gap-3">
+                            <Text variant="tertiary" size="xs">
+                              🕐 {new Date(event.timestamp * 1000).toLocaleTimeString('it-IT', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </Text>
+                            {cameras.length > 1 && cameraName && (
+                              <Text variant="tertiary" size="xs">
+                                📹 {cameraName}
+                              </Text>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Infinite scroll sentinel for virtual scrolling */}
-      {hasMore && (
-        <div ref={loadMoreRef} className="flex justify-center py-4">
-          <Text variant="tertiary" size="sm">
-            Mostrando {displayedEvents.length} di {filteredEvents.length} eventi
-          </Text>
+                      </button>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-      )}
 
-      {/* Event preview modal */}
-      {selectedEvent && (
-        <EventPreviewModal
-          event={selectedEvent}
-          onClose={() => setSelectedEvent(null)}
-        />
-      )}
-    </Section>
+        {/* Infinite scroll sentinel for virtual scrolling */}
+        {hasMore && (
+          <div ref={loadMoreRef} className="flex justify-center py-4">
+            <Text variant="tertiary" size="sm">
+              Mostrando {displayedEvents.length} di {filteredEvents.length} eventi
+            </Text>
+          </div>
+        )}
+
+        {/* Event preview modal */}
+        {selectedEvent && (
+          <EventPreviewModal
+            event={selectedEvent}
+            onClose={() => setSelectedEvent(null)}
+          />
+        )}
+      </Section>
+    </>
   );
 }

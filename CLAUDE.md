@@ -30,7 +30,10 @@ npm run lint
    `../.claude/hooks/fe-build-before-commit.sh`. Adding/removing npm packages (`npm install <pkg>`,
    `npm uninstall <pkg>`) is allowed autonomously; commit `package.json` + `package-lock.json` together
 5. **ALWAYS** create/update unit tests
-6. **USE** design system → EmberGlass (`app/components/EmberGlass/`), preview `/debug/design-system-v2`
+6. **USE** design system → EmberGlass, sempre e su ogni pagina (regola `../.claude/rules/design-system.md`, M72):
+   testata `PageHeader`, superfici/azioni/testo/stato dai componenti di `app/components/EmberGlass/` e
+   `app/components/ui/` (stesso stile); niente markup o colori a mano se esiste un componente, se manca lo si
+   aggiunge al design system. Preview `/debug/design-system-v2`
 7. A task finito: test scoped, commit e push **senza chiedere** (push su `main` = deploy Vercel), poi verifica in
    produzione — regola `../.claude/rules/task-closing.md`
 8. **USE** scoped test subsets in verification — NEVER `npm test` alone from agents or PLAN.md `<verify><automated>`
@@ -101,8 +104,9 @@ export const dynamic = 'force-dynamic';
 // Client Components
 'use client';
 
-// UI: Variants only
-<Heading variant="ember">Title</Heading>
+// UI: shared page header + variants only (M72)
+<PageHeader title="Rete" backHref="/altro" />
+<Heading level={2} variant="ember">Title</Heading>
 
 // React Compiler (reactCompiler: true): a value read from outside React (localStorage, Notification.permission)
 // in render is memoized as constant → keep it in useState and set it again after a change (M48)
@@ -118,7 +122,7 @@ const [state, setState] = useState(initial); /* after toggle: */ setState(readDe
 | Term | Meaning |
 |------|---------|
 | Multi-Device | Centralized registry, Self-Contained Pattern |
-| EmberGlass | UI attuale (GlassCard, CardHead, Sheet, cards/, sheets/), dark-only. `app/components/ui` = legacy Ember Noir in dismissione |
+| EmberGlass | Unico design system, dark-only: `app/components/EmberGlass/` (PageHeader, GlassCard, CardHead, Sheet, cards/, sheets/) + `app/components/ui/` (componenti di base con lo stesso stile: Button, Card, Heading, Text, Badge, Banner, Tabs, DataTable…) |
 | Scheduler | Manual / Automatic / Semi-Manual modes (sul Pi) |
 | Maintenance | Ore di lavoro contate sul Pi, accensione bloccata se needsCleaning |
 

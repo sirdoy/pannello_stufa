@@ -477,12 +477,11 @@ describe('Banner', () => {
   });
 
   describe('Base Classes', () => {
-    it('always has rounded-xl and backdrop-blur-lg classes', () => {
+    it('always has rounded-2xl and hairline border classes', () => {
       const { container } = render(<Banner title="Test" />);
       const banner = container.firstChild;
-      expect(banner).toHaveClass('rounded-xl');
-      expect(banner).toHaveClass('backdrop-blur-lg');
-      expect(banner).toHaveClass('border');
+      expect(banner).toHaveClass('rounded-2xl');
+      expect(banner).toHaveClass('border-[0.5px]');
     });
   });
 });

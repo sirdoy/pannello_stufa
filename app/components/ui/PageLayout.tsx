@@ -5,8 +5,7 @@ import { forwardRef } from 'react';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
-import Heading from './Heading';
-import Text from './Text';
+import { PageHeader as EmberPageHeader } from '../EmberGlass/PageHeader';
 
 /**
  * PageLayout Variants - CVA Configuration
@@ -51,6 +50,8 @@ export interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
   description?: string;
   /** Action buttons */
   actions?: React.ReactNode;
+  /** Parent route for the back button (omit on tab roots) */
+  backHref?: string;
   /** Custom children (overrides structured content) */
   children?: React.ReactNode;
 }
@@ -58,13 +59,14 @@ export interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
 /**
  * PageHeader Component - Header slot for PageLayout
  *
- * Renders title, description, and optional actions.
+ * Renders the EmberGlass PageHeader (title, description, back button, actions).
  */
 const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(function PageHeader(
   {
     title,
     description,
     actions,
+    backHref,
     className,
     children,
     ...props
@@ -84,33 +86,7 @@ const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(function PageHeader(
     );
   }
 
-  return (
-    <header
-      ref={ref}
-      className={cn('py-6 sm:py-8', className)}
-      {...props}
-    >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          {title && (
-            <Heading level={1} size="2xl">
-              {title}
-            </Heading>
-          )}
-          {description && (
-            <Text variant="secondary" className="max-w-2xl">
-              {description}
-            </Text>
-          )}
-        </div>
-        {actions && (
-          <div className="flex shrink-0 items-center gap-2">
-            {actions}
-          </div>
-        )}
-      </div>
-    </header>
-  );
+  return <EmberPageHeader title={title ?? ''} description={description} backHref={backHref} actions={actions} />;
 });
 
 export interface PageContentProps extends React.HTMLAttributes<HTMLDivElement> {

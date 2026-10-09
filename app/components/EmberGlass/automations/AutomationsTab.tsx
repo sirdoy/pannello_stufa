@@ -9,7 +9,6 @@
  * Design rules:
  *  - D-02: inline-style + var(--token) only. Zero Tailwind for visual values.
  *  - D-13: create dispatches POST body; update dispatches PATCH delta (via hook).
- *  - paddingTop: 70 accounts for the Phase 181 nav bar overlay.
  *
  * Bundle source: automations.jsx lines 102-169
  */
@@ -19,6 +18,7 @@ import { Plus } from 'lucide-react';
 import type { AutomationRule, AutomationRuleCreate, AutomationRulePatch } from '@/types/automations';
 import { useAutomationsList } from '@/app/hooks/useAutomationsList';
 import { Sheet } from '../Sheet';
+import { PageHeader } from '../PageHeader';
 import { AutomationRow } from './AutomationRow';
 import { AutomationEditor } from './AutomationEditor';
 
@@ -59,70 +59,38 @@ export function AutomationsTab() {
 
   return (
     <>
-      <div style={{ paddingTop: 70 }}>
-        {/* Page header: counter + headline + Nuova button */}
-        <div
-          style={{
-            padding: '0 20px',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            marginBottom: 16,
-            gap: 12,
-          }}
-        >
-          <div>
-            <div
+      <div>
+        <PageHeader
+          title="Automazioni"
+          eyebrow={`${enabledCount} di ${totalCount} attive`}
+          actions={
+            <button
+              type="button"
+              onClick={() => setEditingRule('new')}
+              aria-label="Nuova automazione"
               style={{
-                fontSize: 13,
-                color: 'var(--text-2)',
-                textTransform: 'uppercase',
-                letterSpacing: 1,
-                marginBottom: 4,
-              }}
-            >
-              {enabledCount} di {totalCount} attive
-            </div>
-            <div
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: 30,
-                fontWeight: 600,
+                height: 38,
+                padding: '0 14px',
+                borderRadius: 999,
+                background: 'var(--accent)',
+                border: 'none',
                 color: '#fff',
-                letterSpacing: -0.8,
-                lineHeight: 1.2,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                flexShrink: 0,
               }}
             >
-              Automazioni
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setEditingRule('new')}
-            aria-label="Nuova automazione"
-            style={{
-              height: 38,
-              padding: '0 14px',
-              borderRadius: 999,
-              background: 'var(--accent)',
-              border: 'none',
-              color: '#fff',
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              flexShrink: 0,
-            }}
-          >
-            <Plus size={14} /> Nuova
-          </button>
-        </div>
+              <Plus size={14} /> Nuova
+            </button>
+          }
+        />
 
         {/* Rule list */}
-        <div style={{ padding: '0 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {/* Empty state */}
           {!loading && rules.length === 0 && (
             <div

@@ -21,6 +21,8 @@ export { PlayingBars } from './PlayingBars';
 export { InlineToggle } from './InlineToggle';
 export type { InlineToggleProps } from './InlineToggle';
 export { GlassCardSkeleton } from './GlassCardSkeleton';
+export { PageHeader } from './PageHeader';
+export type { PageHeaderProps } from './PageHeader';
 export { default as StoveCard } from './cards/StoveCard';
 export { default as ClimateCard } from './cards/ClimateCard';
 export { default as LightsCard } from './cards/LightsCard';

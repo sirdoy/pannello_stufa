@@ -21,7 +21,6 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import Tabs from '@/app/components/ui/Tabs';
 import Card from '@/app/components/ui/Card';
 import Button from '@/app/components/ui/Button';
-import Heading from '@/app/components/ui/Heading';
 import Text from '@/app/components/ui/Text';
 import Banner from '@/app/components/ui/Banner';
 import Skeleton from '@/app/components/ui/Skeleton';
@@ -132,6 +131,16 @@ function NotificheContent() {
 // ============================================================================
 // MAIN PAGE
 // ============================================================================
+function DebugPageHeader() {
+  return (
+    <PageLayout.Header
+      title="API Debug Console"
+      description="Debug e test di tutti gli endpoint API"
+      backHref="/altro"
+    />
+  );
+}
+
 function DebugPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -177,20 +186,11 @@ function DebugPageContent() {
   }, [handleTabChange, handleManualRefresh]);
 
   return (
-    <PageLayout maxWidth="7xl">
+    <PageLayout maxWidth="7xl" header={<DebugPageHeader />}>
       <div className="space-y-6">
-        {/* Header */}
+        {/* Toolbar */}
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <Heading level={1} className="flex items-center gap-3">
-              <span>🐛</span>
-              API Debug Console
-            </Heading>
-            <Text variant="tertiary" size="sm" className="mt-1">
-              Debug e test di tutti gli endpoint API
-            </Text>
-          </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button
               variant="outline"
               onClick={handleManualRefresh}
@@ -288,7 +288,7 @@ function DebugPageContent() {
 export default function DebugPage() {
   return (
     <Suspense fallback={
-      <PageLayout maxWidth="7xl">
+      <PageLayout maxWidth="7xl" header={<DebugPageHeader />}>
         <Skeleton className="h-64 w-full" />
       </PageLayout>
     }>

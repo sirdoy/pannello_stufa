@@ -11,6 +11,7 @@ import {
 } from '@/lib/pwa/offlineStateCache';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
+import { PageHeader } from '@/app/components/EmberGlass/PageHeader';
 
 /**
  * Enhanced Offline Page
@@ -92,12 +93,10 @@ export default function OfflinePage() {
   // If back online, show reconnecting message
   if (isOnline) {
     return (
-      <div className="mx-auto max-w-2xl py-12">
+      <div className="mx-auto max-w-2xl">
+        <PageHeader title="Connessione ripristinata" />
         <Card className="p-8 text-center">
           <Text className="mb-4 text-6xl">🌐</Text>
-          <Heading level={1} size="2xl" className="mb-4">
-            Connessione ripristinata
-          </Heading>
           <Text variant="tertiary" className="mb-6">
             Reindirizzamento alla home...
           </Text>
@@ -112,7 +111,9 @@ export default function OfflinePage() {
   const hasCachedData = stoveState || thermostatState;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 px-4 py-8">
+    <div className="mx-auto max-w-2xl space-y-6">
+      <PageHeader title="Offline" />
+
       {/* Offline Banner */}
       <Banner
         variant="warning"

@@ -10,6 +10,7 @@ export type PushEvent =
   | 'stove_unexpected_off'
   | 'stove_alarm'
   | 'stove_status_work'
+  | 'stove_shutdown_missed'
   | 'stove_pellet_low'
   | 'stove_unreachable'
   | 'stove_reachable'

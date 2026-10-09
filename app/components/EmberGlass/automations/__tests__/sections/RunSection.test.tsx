@@ -64,7 +64,7 @@ describe('RunSection', () => {
     expect(rows[1]).toHaveTextContent('Fascia oraria · vera');
     expect(rows[1]).toHaveTextContent('22:00 <= 22:30 < 06:00');
     expect(rows[2]).toHaveTextContent('Soglia sensore · falsa');
-    expect(rows[3]).toHaveTextContent('Stato dispositivo · non valutata');
+    expect(rows[3]).toHaveTextContent('Sensore o dispositivo · non valutata');
     expect(rows[3]).not.toHaveTextContent('short-circuit');
   });
 

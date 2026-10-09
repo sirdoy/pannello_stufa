@@ -42,7 +42,7 @@ export {
 } from './forms/TriggerForms';
 export {
   TimeWindowForm,
-  DeviceStateForm,
+  SensorConditionForm,
   TemperatureRangeForm,
   AlwaysTrueForm,
   ConditionForm,

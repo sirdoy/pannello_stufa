@@ -3,7 +3,9 @@
  * Phase 180 — Plan 05 Task 2: ConditionItem.tsx
  *
  * Leaf row with type-select + per-type form + remove button.
- * D-09b (conditions parallel): legacy sensor types rendered as readonly "Tipo non supportato" row.
+ * D-09b (conditions parallel): legacy sensor types rendered as readonly "Tipo non supportato" row
+ * (sensor_state_change, netatmo_temperature_threshold); device_state and sensor_threshold share
+ * the "Sensore o dispositivo" entry.
  * T-180-05-02: switching type uses defaultCondition (wipes irrelevant fields — no field leakage).
  * D-02: inline-style + var(--token) only.
  */
@@ -26,12 +28,15 @@ export function ConditionItem({ cond, onChange, onRemove }: ConditionItemProps) 
   // Composite nodes are handled by ConditionGroup, never reach ConditionItem
   if (cond.type === 'and' || cond.type === 'or') return null;
 
+  // A threshold on a sensor is edited by the same form as device_state (ROADMAP M70)
+  const pickerType = cond.type === 'sensor_threshold' ? 'device_state' : cond.type;
+
   // Look up tone from catalog; fall back for legacy/unknown types
-  const current = CONDITION_TYPES.find((c) => c.id === cond.type);
+  const current = CONDITION_TYPES.find((c) => c.id === pickerType);
   const tone = current?.tone ?? 'var(--text-2)';
 
   // Determine if current cond is a legacy type not in the picker
-  const isLegacy = !PICKER_IDS.includes(cond.type as PickerId);
+  const isLegacy = !PICKER_IDS.includes(pickerType as PickerId);
 
   // Dropdown options: the picker types + (if legacy, show it as an extra non-creatable option)
   const options: Array<{ id: string; label: string }> = [
@@ -41,7 +46,7 @@ export function ConditionItem({ cond, onChange, onRemove }: ConditionItemProps) 
 
   const handleTypeChange = (newType: string) => {
     // Only picker types can be set from the dropdown (T-180-05-02)
-    if ((PICKER_IDS as readonly string[]).includes(newType)) {
+    if (newType !== pickerType && (PICKER_IDS as readonly string[]).includes(newType)) {
       onChange(defaultCondition(newType as PickerId));
     }
     // Legacy types cannot be set FROM the dropdown — only preserved if loaded from API
@@ -59,7 +64,7 @@ export function ConditionItem({ cond, onChange, onRemove }: ConditionItemProps) 
       {/* Header: type-select + remove button */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
         <select
-          value={cond.type}
+          value={pickerType}
           onChange={(e) => handleTypeChange(e.target.value)}
           aria-label="Tipo condizione"
           style={{

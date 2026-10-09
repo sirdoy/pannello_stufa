@@ -55,13 +55,15 @@ export const TRIGGER_TYPES = [
 }>;
 
 // ─── CONDITION_TYPES (3 picker entries) ────────────────────────────────────
+// 'device_state' is the entry for every condition on a sensor: the form saves it as
+// device_state (equal to) or sensor_threshold (above / below), ROADMAP M70.
 // temperature_range is not offered (ROADMAP D17): the backend has no sensor behind it and
 // always answers true. A rule that already has one still shows it (ConditionItem, legacy).
 type ConditionPickerType = 'time_window' | 'device_state' | 'always_true';
 
 export const CONDITION_TYPES = [
   { id: 'time_window' as const, label: 'Fascia oraria', Icon: Clock, tone: '#5eafff' },
-  { id: 'device_state' as const, label: 'Stato dispositivo', Icon: Home, tone: '#ffb84a' },
+  { id: 'device_state' as const, label: 'Sensore o dispositivo', Icon: Home, tone: '#ffb84a' },
   { id: 'always_true' as const, label: 'Sempre vero', Icon: Check, tone: 'var(--text-2)' },
 ] as const satisfies ReadonlyArray<{
   id: ConditionPickerType;
@@ -116,8 +118,8 @@ export function defaultTrigger(type: TriggerType['type']): TriggerType {
 
 /**
  * Returns a default ConditionNode for the picker types.
- * Sensor leaves (sensor_state_change, sensor_threshold, netatmo_temperature_threshold)
- * are NOT supported in the picker per D-08 — they are preserved on round-trip only.
+ * sensor_state_change and netatmo_temperature_threshold are not in the picker: they are
+ * preserved on round-trip only.
  */
 export function defaultCondition(type: ConditionPickerType): ConditionNode {
   switch (type) {

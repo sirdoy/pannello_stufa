@@ -70,6 +70,19 @@ describe('automationsProxy', () => {
     delete process.env.HA_API_KEY;
   });
 
+  describe('getSensors()', () => {
+    it('calls GET /api/v1/automations/sensors', async () => {
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ sensors: [] }) });
+
+      const result = await automationsProxy.getSensors();
+
+      const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(url).toBe(`${TEST_PROXY_URL}/api/v1/automations/sensors`);
+      expect((options.headers as Record<string, string>)['X-API-Key']).toBe(TEST_API_KEY);
+      expect(result).toEqual({ sensors: [] });
+    });
+  });
+
   describe('getAutomations()', () => {
     it('calls GET /api/v1/automations without query params by default', async () => {
       mockFetch.mockResolvedValueOnce({

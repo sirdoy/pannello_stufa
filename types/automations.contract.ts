@@ -326,6 +326,27 @@ export interface EvaluateResponse {
   trace: TraceNode;
 }
 
+// api/automations/models.py — AutomationSensor (GET /automations/sensors)
+export type AutomationSensorValueType = 'boolean' | 'number' | 'string';
+
+export interface AutomationSensor {
+  sensor_id: string;                         // "provider:device_id:metric", ready for a condition leaf
+  provider: string;                          // netatmo | hue | tuya | thermorossi | sonos | dirigera
+  device_id: string;
+  device_name: string | null;                // null when the device has no name (stove, unnamed plug)
+  room: string | null;                       // DIRIGERA room, null elsewhere
+  metric: string;
+  value: boolean | number | string | null;   // current value in the provider cache
+  value_type: AutomationSensorValueType;
+  unit: string | null;                       // "°C", "W", "lux", "%", ...
+  options: string[] | null;                  // allowed values of an enumerated string metric
+}
+
+// api/automations/models.py — AutomationSensorsResponse
+export interface AutomationSensorsResponse {
+  sensors: AutomationSensor[];
+}
+
 
 // ----- 7. Capabilities -----
 

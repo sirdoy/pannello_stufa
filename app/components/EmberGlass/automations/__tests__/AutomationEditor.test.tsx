@@ -316,6 +316,34 @@ describe('malformed cron of a new rule (ROADMAP M69)', () => {
   });
 });
 
+describe('incomplete sensor condition (ROADMAP M70)', () => {
+  it('blocks the save until a device is chosen', () => {
+    const rule = makeRule({
+      name: 'X',
+      condition: { type: 'device_state', sensor_id: '', expected_state: '' },
+    });
+    renderEdit(rule);
+    expect(screen.getByRole('button', { name: 'Salva modifiche' })).toBeDisabled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Condizione: scegli il dispositivo da leggere.');
+  });
+
+  it('a threshold on a listed sensor leaves the save enabled', () => {
+    const rule = makeRule({
+      name: 'X',
+      condition: {
+        type: 'sensor_threshold',
+        sensor_id: 'netatmo:r1:temperature',
+        metric: 'temperature',
+        operator: 'lt',
+        threshold: 18,
+      },
+    });
+    renderEdit(rule);
+    expect(screen.getByRole('button', { name: 'Salva modifiche' })).not.toBeDisabled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});
+
 describe('incomplete action (ROADMAP D17)', () => {
   it('blocks the save and says what is missing', () => {
     const rule = makeRule({

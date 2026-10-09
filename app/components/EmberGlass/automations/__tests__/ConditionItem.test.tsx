@@ -7,6 +7,31 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import React from 'react';
 import { ConditionItem } from '../ConditionItem';
 import type { ConditionNode } from '@/types/automations';
+import { resetAutomationSensorsCache } from '../hooks/useAutomationSensors';
+
+beforeEach(() => {
+  resetAutomationSensorsCache();
+  global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
+    status: 200,
+    json: async () => ({
+      sensors: [
+        {
+          sensor_id: 'netatmo:r1:temperature',
+          provider: 'netatmo',
+          device_id: 'r1',
+          device_name: 'Sala',
+          room: null,
+          metric: 'temperature',
+          value: 19.5,
+          value_type: 'number',
+          unit: '°C',
+          options: null,
+        },
+      ],
+    }),
+  }) as unknown as typeof fetch;
+});
 
 // ─── Picker types ────────────────────────────────────────────────────────────
 
@@ -23,7 +48,7 @@ describe('ConditionItem — picker types', () => {
     expect(select).toBeInTheDocument();
     // temperature_range is not offered: the backend always answers true (ROADMAP D17)
     expect(screen.getByRole('option', { name: /fascia oraria/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /stato dispositivo/i })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: /sensore o dispositivo/i })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: /intervallo temperatura/i })).not.toBeInTheDocument();
     expect(screen.getByRole('option', { name: /sempre vero/i })).toBeInTheDocument();
   });
@@ -46,10 +71,29 @@ describe('ConditionItem — picker types', () => {
     expect(screen.getByText('A')).toBeInTheDocument();
   });
 
-  it('renders DeviceStateForm body for device_state type', () => {
+  it('renders the sensor form body for device_state type', async () => {
     const cond: ConditionNode = { type: 'device_state', sensor_id: '', expected_state: '' };
     render(<ConditionItem cond={cond} onChange={jest.fn()} onRemove={jest.fn()} />);
-    expect(screen.getByText('Sensore (ID)')).toBeInTheDocument();
+    expect(await screen.findByRole('combobox', { name: 'Dispositivo' })).toBeInTheDocument();
+  });
+
+  it('shows a sensor_threshold under "Sensore o dispositivo", not as legacy (ROADMAP M70)', async () => {
+    const onChange = jest.fn();
+    const cond: ConditionNode = {
+      type: 'sensor_threshold',
+      sensor_id: 'netatmo:r1:temperature',
+      metric: 'temperature',
+      operator: 'lt',
+      threshold: 18,
+    };
+    render(<ConditionItem cond={cond} onChange={onChange} onRemove={jest.fn()} />);
+    const select = screen.getByRole('combobox', { name: /tipo condizione/i });
+    expect(select).toHaveValue('device_state');
+    expect(select.querySelectorAll('option')).toHaveLength(3);
+    expect(await screen.findByRole('combobox', { name: 'Cosa leggere' })).toBeInTheDocument();
+    // Choosing the same entry again must not wipe the threshold
+    fireEvent.change(select, { target: { value: 'device_state' } });
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('renders TemperatureRangeForm body for temperature_range type', () => {
@@ -132,7 +176,7 @@ describe('ConditionItem — legacy type fallback (D-09b)', () => {
   });
 
   it('still renders remove button for legacy types', () => {
-    const cond = { type: 'sensor_threshold' } as unknown as ConditionNode;
+    const cond = { type: 'netatmo_temperature_threshold' } as unknown as ConditionNode;
     render(<ConditionItem cond={cond} onChange={jest.fn()} onRemove={jest.fn()} />);
     expect(screen.getByRole('button', { name: 'Rimuovi condizione' })).toBeInTheDocument();
   });

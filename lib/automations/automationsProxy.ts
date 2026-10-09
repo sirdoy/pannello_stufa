@@ -11,6 +11,7 @@
  *   /api/v1/automations/{rule_id}/history - GET execution history
  *   /api/v1/automations/{rule_id}/trigger  - POST run the actions now
  *   /api/v1/automations/{rule_id}/evaluate - POST dry-run the conditions
+ *   /api/v1/automations/sensors            - GET sensors a condition can read
  */
 
 import { haGet, haPost, haPatch, haDelete } from '@/lib/haClient';
@@ -22,6 +23,7 @@ import type {
   AutomationExecution,
   TriggerResponse,
   EvaluateResponse,
+  AutomationSensorsResponse,
 } from '@/types/automations';
 
 /** Get paginated list of automation rules */
@@ -76,6 +78,11 @@ async function evaluateAutomation(ruleId: string): Promise<EvaluateResponse> {
   return haPost<EvaluateResponse>(`/api/v1/automations/${ruleId}/evaluate`, {});
 }
 
+/** Sensors the engine can read in a condition, with name and current value (ROADMAP M70) */
+async function getSensors(): Promise<AutomationSensorsResponse> {
+  return haGet<AutomationSensorsResponse>('/api/v1/automations/sensors');
+}
+
 /** Automations proxy client */
 export const automationsProxy = {
   getAutomations,
@@ -86,4 +93,5 @@ export const automationsProxy = {
   getExecutions,
   triggerAutomation,
   evaluateAutomation,
+  getSensors,
 };

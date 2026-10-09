@@ -1,8 +1,8 @@
 /**
  * Tests for thermostat page - Netatmo connection handling
  *
- * This test verifies the fix for the setState-in-render bug where
- * router.replace() was called during render phase instead of in useEffect.
+ * A not-connected thermostat shows a notice on the page: it never redirects
+ * (the old target /netatmo does not exist).
  */
 
 import { render, screen, waitFor } from '@testing-library/react';
@@ -58,7 +58,9 @@ jest.mock('@/app/components/ui', () => {
       NetatmoPage: () => <div data-testid="skeleton">Loading...</div>,
     },
     ErrorAlert: ({ message }: { message: string }) => <div data-testid="error">{message}</div>,
-    Banner: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+    Banner: ({ children, title }: { children?: React.ReactNode; title?: string }) => (
+      <div data-testid={title === 'Termostato non collegato' ? 'not-connected' : undefined}>{title}{children}</div>
+    ),
     Heading: ({ children }: { children: React.ReactNode }) => <h1>{children}</h1>,
     Text: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
     Grid: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -117,80 +119,25 @@ describe('NetatmoPage - setState-in-render fix', () => {
     jest.clearAllMocks();
   });
 
-  test('should NOT call router.replace during render (setState-in-render bug)', async () => {
-    // Mock API to return "not connected" response
+  test('stays on the page with a notice when Netatmo is not connected', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       json: async () => ({
         error: 'Nessun refresh token disponibile',
       }),
     });
 
-    // Track if router.replace is called synchronously during render
-    let routerCalledDuringRender = false;
-    const originalReplace = mockRouter.replace;
-    mockRouter.replace = jest.fn((...args) => {
-      // If this is called before the first useEffect runs, it's a bug
-      routerCalledDuringRender = true;
-      return originalReplace(...args);
-    });
-
-    // Render the component
     render(<NetatmoPage />);
 
-    // Router should NOT be called synchronously during render
-    expect(routerCalledDuringRender).toBe(false);
+    // Skeleton while loading
+    expect(screen.getByTestId('skeleton')).toBeInTheDocument();
 
-    // Wait for the useEffect to run and call router.replace
     await waitFor(() => {
-      expect(mockRouter.replace).toHaveBeenCalledWith('/netatmo');
+      expect(screen.getByTestId('not-connected')).toHaveTextContent('Termostato non collegato');
     });
 
-    // Verify skeleton is shown while redirecting
-    expect(screen.getByTestId('skeleton')).toBeInTheDocument();
-  });
-
-  test('should show skeleton immediately when not connected', async () => {
-    // Mock API to return "not connected" response
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      json: async () => ({
-        error: 'Nessun refresh token disponibile',
-      }),
-    });
-
-    render(<NetatmoPage />);
-
-    // Should show loading skeleton initially
-    expect(screen.getByTestId('skeleton')).toBeInTheDocument();
-
-    // Wait for loading to complete
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/v1/netatmo/homesdata');
-    });
-
-    // Should still show skeleton (not connected state)
-    expect(screen.getByTestId('skeleton')).toBeInTheDocument();
-  });
-
-  test('should redirect in useEffect, not in render', async () => {
-    // Mock API to return "not connected" response
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      json: async () => ({
-        error: 'Nessun refresh token disponibile',
-      }),
-    });
-
-    render(<NetatmoPage />);
-
-    // Initial render should not call router
+    // The old redirect went to /netatmo, a page that does not exist (404)
     expect(mockRouter.replace).not.toHaveBeenCalled();
-
-    // Wait for useEffect to fire after state updates
-    await waitFor(() => {
-      expect(mockRouter.replace).toHaveBeenCalledWith('/netatmo');
-    }, { timeout: 2000 });
-
-    // Verify redirect happens only once
-    expect(mockRouter.replace).toHaveBeenCalledTimes(1);
+    expect(mockRouter.push).not.toHaveBeenCalled();
   });
 
   test('should not redirect when connected', async () => {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Card, Button, Skeleton, Banner, Heading, Text, Grid, InfoBox, PageLayout } from '@/app/components/ui';
 import RoomCard from '@/app/components/netatmo/RoomCard';
@@ -31,7 +31,6 @@ interface RoomWithStatus extends NetatmoRoom {
 
 function NetatmoContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { connected, topology, status, loading, error, refetch } = useThermostatData();
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [, setOauthError] = useState<string | null>(null);
@@ -48,13 +47,6 @@ function NetatmoContent() {
       window.history.replaceState({}, '', '/thermostat');
     }
   }, [searchParams]);
-
-  // Redirect to /netatmo if not connected (must be in useEffect to avoid setState-in-render)
-  useEffect(() => {
-    if (!loading && !connected) {
-      router.replace('/netatmo');
-    }
-  }, [loading, connected, router]);
 
   async function handleModeChange(newMode: string): Promise<void> {
     try {
@@ -90,11 +82,28 @@ function NetatmoContent() {
     />
   );
 
-  // Show skeleton while loading or redirecting (redirect happens in useEffect above)
-  if (loading || !connected) {
+  if (loading) {
     return (
       <PageLayout maxWidth="7xl" header={pageHeader}>
         <Skeleton.NetatmoPage />
+      </PageLayout>
+    );
+  }
+
+  // Not connected: stay on the page (there is no /netatmo page to send the user to, ROADMAP M72)
+  if (!connected) {
+    return (
+      <PageLayout maxWidth="7xl" header={pageHeader}>
+        <Banner
+          variant="warning"
+          title="Termostato non collegato"
+          description={error ?? 'Netatmo non risponde: riprova tra poco.'}
+          actions={
+            <Button variant="subtle" size="sm" onClick={() => refetch()}>
+              Riprova
+            </Button>
+          }
+        />
       </PageLayout>
     );
   }
@@ -131,7 +140,11 @@ function NetatmoContent() {
   }
 
   if (!topology) {
-    return <Skeleton.NetatmoPage />;
+    return (
+      <PageLayout maxWidth="7xl" header={pageHeader}>
+        <Skeleton.NetatmoPage />
+      </PageLayout>
+    );
   }
 
   const rooms = topology.rooms || [];

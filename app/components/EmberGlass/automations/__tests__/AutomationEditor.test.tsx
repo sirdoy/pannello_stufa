@@ -14,11 +14,21 @@ import type { AutomationRule } from '@/types/automations';
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 
 jest.mock('../sections/TriggerSection', () => ({
-  TriggerSection: ({ trigger, isNew }: {
-    trigger: unknown; isNew: boolean;
+  TriggerSection: ({ trigger, isNew, onChange }: {
+    trigger: unknown; isNew: boolean; onChange: (t: unknown) => void;
   }) => (
     <div data-testid="trigger-section" data-isnew={String(isNew)}>
       <span data-testid="trigger-type">{(trigger as { type?: string } | null)?.type ?? 'null'}</span>
+      <button
+        data-testid="hook-set-cron"
+        onClick={(e) =>
+          onChange({ type: 'schedule_cron', cron_expression: (e.target as HTMLElement).dataset.expr ?? '0 99 * * *' })
+        }
+      />
+      <button
+        data-testid="hook-set-good-cron"
+        onClick={() => onChange({ type: 'schedule_cron', cron_expression: '0 22 * * *' })}
+      />
     </div>
   ),
 }));
@@ -285,6 +295,24 @@ describe('Save guard (D-14)', () => {
     fireEvent.click(screen.getByTestId('hook-set-last-validation-false'));
     const saveBtn = screen.getByRole('button', { name: 'Salva modifiche' });
     expect(saveBtn).toBeDisabled();
+  });
+});
+
+describe('malformed cron of a new rule (ROADMAP M69)', () => {
+  it('blocks the creation until the expression is valid', async () => {
+    renderNew();
+    fireEvent.change(screen.getByLabelText('Nome automazione'), { target: { value: 'Sera' } });
+    fireEvent.click(screen.getByRole('tab', { name: /Azioni/ }));
+    await act(async () => {
+      fireEvent.click(screen.getByTestId('hook-swap-last-to-log-event'));
+    });
+    const save = screen.getByRole('button', { name: 'Crea automazione' });
+    expect(save).not.toBeDisabled();
+    fireEvent.click(screen.getByRole('tab', { name: /Trigger|Quando|Avvio/ }));
+    fireEvent.click(screen.getByTestId('hook-set-cron'));
+    expect(save).toBeDisabled();
+    fireEvent.click(screen.getByTestId('hook-set-good-cron'));
+    expect(save).not.toBeDisabled();
   });
 });
 

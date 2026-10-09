@@ -72,6 +72,28 @@ describe('ScheduleCronForm', () => {
   });
 });
 
+describe('ScheduleCronForm — validation and local time (ROADMAP M69)', () => {
+  const noop = () => undefined;
+
+  it('says the time is the local one', () => {
+    render(<ScheduleCronForm trigger={{ type: 'schedule_cron', cron_expression: '0 8 * * *' }} onChange={noop} isNew />);
+    expect(screen.getByText(/orario è quello di casa/)).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  it('shows what is wrong in a malformed expression of a new rule', () => {
+    render(<ScheduleCronForm trigger={{ type: 'schedule_cron', cron_expression: '0 25 * * *' }} onChange={noop} isNew />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Ora: 25 è fuori da 0–23.');
+  });
+
+  it('does not complain about the read-only trigger of an existing rule', () => {
+    render(
+      <ScheduleCronForm trigger={{ type: 'schedule_cron', cron_expression: 'bad' }} onChange={noop} isNew={false} />
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});
+
 describe('ManualApiCallForm', () => {
   test('renders Italian info copy verbatim, no inputs', () => {
     render(<ManualApiCallForm trigger={{ type: 'manual_api_call' }} onChange={() => {}} isNew />);

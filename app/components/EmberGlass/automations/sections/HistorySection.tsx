@@ -8,6 +8,7 @@
 import type { AutomationExecution } from '@/types/automations';
 import { useAutomationHistory } from '../hooks/useAutomationHistory';
 import { parseHoldEvent } from '../lib/hold';
+import { isCronRun } from '../lib/cron';
 
 const STATUS: Record<AutomationExecution['status'], { label: string; color: string }> = {
   success: { label: 'Completata', color: '#6aa86a' },
@@ -94,6 +95,9 @@ export function HistorySection({ ruleId }: HistorySectionProps) {
                 <span style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>{label}</span>
                 {ex.trigger_source === 'manual' && (
                   <span style={{ fontSize: 10, color: 'var(--text-2)' }}>manuale</span>
+                )}
+                {isCronRun(ex.trigger_snapshot) && (
+                  <span style={{ fontSize: 10, color: 'var(--text-2)' }}>a orario</span>
                 )}
                 <span
                   style={{

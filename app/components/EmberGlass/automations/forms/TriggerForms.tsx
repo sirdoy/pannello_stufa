@@ -13,6 +13,7 @@ import type { ScheduleCronTrigger, ManualApiCallTrigger, TriggerType } from '@/t
 import { TextInput } from '../primitives/TextInput';
 import { CronHint } from '../primitives/CronHint';
 import { FieldLabel } from '../primitives/FieldLabel';
+import { cronError } from '../lib/cron';
 
 // ─── ScheduleCronForm ───────────────────────────────────────────────────────
 
@@ -27,6 +28,8 @@ export function ScheduleCronForm({
   onChange,
   isNew,
 }: ScheduleCronFormProps) {
+  // Only while it can still be fixed: the trigger is read-only after creation (M69)
+  const error = isNew ? cronError(trigger.cron_expression) : null;
   return (
     <div>
       <FieldLabel htmlFor="trigger-cron">Espressione cron</FieldLabel>
@@ -47,8 +50,13 @@ export function ScheduleCronForm({
           fontFamily: 'var(--font-body)',
         }}
       >
-        Formato: min ora giorno mese giorno_sett.
+        Formato: min ora giorno mese giorno_sett. L&apos;orario è quello di casa (ora italiana).
       </div>
+      {error && (
+        <div role="alert" style={{ fontSize: 11, fontWeight: 600, color: '#ff6676', marginTop: 6 }}>
+          {error}
+        </div>
+      )}
       <CronHint expr={trigger.cron_expression} />
     </div>
   );

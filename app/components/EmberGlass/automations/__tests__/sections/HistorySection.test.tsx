@@ -37,6 +37,22 @@ afterEach(() => {
 });
 
 describe('HistorySection', () => {
+  it('labels the rows started by the cron of the rule (ROADMAP M69)', async () => {
+    mockHistory({
+      0: {
+        items: [
+          execution({ id: 1, trigger_snapshot: '{"changed":[],"result":true,"kind":"cron","cron":"0 22 * * *"}' }),
+          execution({ id: 2, trigger_snapshot: '{"changed":["hue:1:on"],"result":true}' }),
+        ],
+        total_count: 2,
+      },
+    });
+    render(<HistorySection ruleId={7} />);
+    const rows = await screen.findAllByTestId('automation-history-row');
+    expect(rows[0]).toHaveTextContent('a orario');
+    expect(rows[1]).not.toHaveTextContent('a orario');
+  });
+
   it('fetches the first page of the rule history', async () => {
     const fetchMock = mockHistory({ 0: { items: [], total_count: 0 } });
     render(<HistorySection ruleId={7} />);

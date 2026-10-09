@@ -31,6 +31,7 @@ import { apiToDraft, draftToApi, computePatchDelta } from './lib/automations-map
 import { withKey, stripKeys, type KeyedAction } from './lib/with-key';
 import { isHoldable } from './lib/hold';
 import { incompleteActionMessage } from './lib/action-complete';
+import { cronError } from './lib/cron';
 import { TextInput } from './primitives/TextInput';
 import { FieldLabel } from './primitives/FieldLabel';
 import { TriggerSection } from './sections/TriggerSection';
@@ -186,12 +187,18 @@ export function AutomationEditor({
   // An action saved without its value would do nothing: the backend answers 422 (ROADMAP D17)
   const actionError =
     draft.actions.map(incompleteActionMessage).find((message) => message !== null) ?? null;
+  // A malformed cron is refused by the backend on create (M69); the form shows the message
+  const triggerError =
+    isNew && draft.trigger?.type === 'schedule_cron'
+      ? cronError(draft.trigger.cron_expression)
+      : null;
   const saveAllowed =
     draft.name.trim().length >= 1 &&
     draft.actions.length >= 1 &&
     !hasJsonError &&
     !holdError &&
-    !actionError;
+    !actionError &&
+    !triggerError;
 
   const condCount = countDraftConditions(draft.conditions);
   const actionCount = draft.actions.length;

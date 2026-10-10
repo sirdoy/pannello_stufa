@@ -302,6 +302,10 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
       // Keep the last known state; with no reading at all the state is unknown, not "off".
       setUnreachable(true);
       if (!hasReading.current) setStatus('unknown');
+      // Schedule and maintenance do not depend on the stove answering: without them the UI
+      // would say "manual mode" for a stove that follows its schedule.
+      void fetchSchedulerMode();
+      void fetchMaintenanceStatus();
     } finally {
       setInitialLoading(false);
     }

@@ -588,6 +588,9 @@ describe('useStoveData', () => {
       expect(result.current.status).toBe('unknown');
       expect(result.current.isSpenta).toBe(false);
       expect(result.current.isAccesa).toBe(false);
+      // Mode and maintenance are still read: they do not need the stove.
+      expect(schedulerService.getFullSchedulerMode).toHaveBeenCalled();
+      expect(maintenanceService.getMaintenanceStatus).toHaveBeenCalled();
     });
 
     // The polling mock runs the callback on every render: switch the answer with a flag

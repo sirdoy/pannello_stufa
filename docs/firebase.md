@@ -42,9 +42,9 @@ firebase-root/
 ├── errors/{errorId}/          # errorCode, severity, resolved, timestamp
 ├── changelog/{version}/       # legacy, non più usato (M36)
 ├── users/{userId}/
-│   ├── deviceConfig/          # dispositivi visibili e ordine
-│   └── dashboardPreferences/  # push: iscrizioni sul Pi, non qui (M48)
-├── devicePreferences/{userId}/ # stove, thermostat, lights, sonos
+│   ├── deviceConfig/          # card della home: visibili e ordine (/settings?tab=dispositivi)
+│   └── dashboardPreferences/  # legacy (M79): letto solo dalla migrazione verso deviceConfig
+├── devicePreferences/{userId}/ # legacy (M79): letto solo dalla migrazione verso deviceConfig
 ├── netatmo/                   # refresh_token, home_id, topology, etc.
 └── hue/                       # refresh_token, username, bridge_ip
 ```

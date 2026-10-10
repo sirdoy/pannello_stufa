@@ -38,6 +38,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // M79: the two legacy pages wrote Firebase paths the home never reads; one page is left
+  async redirects() {
+    return [
+      { source: '/settings/dashboard', destination: '/settings?tab=dispositivi', permanent: false },
+      { source: '/settings/devices', destination: '/settings?tab=dispositivi', permanent: false },
+    ];
+  },
   // Next.js 16: Enable Turbopack in dev (PWA is disabled in dev anyway)
   // Build uses --webpack flag for PWA compatibility
   turbopack: {},

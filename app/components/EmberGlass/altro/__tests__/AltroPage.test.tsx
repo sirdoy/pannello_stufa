@@ -46,9 +46,7 @@ describe('AltroPage', () => {
   test('1: renders 4 group titles (Dispositivi, Sistema, Impostazioni, Account)', async () => {
     render(<AltroPage />);
     // Group titles render inside CardHead (the styled label div with
-    // letter-spacing: 0.2px). "Dispositivi" appears twice (group title +
-    // Impostazioni "Dispositivi" row label) — assert at least one match for
-    // the title text.
+    // letter-spacing: 0.2px).
     const titles = await screen.findAllByText('Dispositivi');
     expect(titles.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Sistema')).toBeInTheDocument();
@@ -98,7 +96,7 @@ describe('AltroPage', () => {
     await screen.findByRole('link', { name: /^esci$/i });
     const hrefs = screen
       .getAllByRole('link')
-      .map((a) => a.getAttribute('href') ?? '')
+      .map((a) => (a.getAttribute('href') ?? '').split('?')[0] ?? '')
       .filter((h) => h.startsWith('/') && !h.startsWith('/auth/'));
     expect(hrefs.length).toBeGreaterThan(0);
     const appDir = path.join(process.cwd(), 'app');
@@ -117,6 +115,18 @@ describe('AltroPage', () => {
     expect(allLinks).not.toContain('/settings/account');
     expect(allLinks).not.toContain('/settings/gdpr');
     expect(allLinks).not.toContain('/settings/privacy');
+  });
+
+  test('6: one entry for the home cards, pointing at the page that writes deviceConfig (M79)', async () => {
+    render(<AltroPage />);
+    await screen.findByRole('link', { name: /^esci$/i });
+    expect(screen.getByRole('link', { name: /^card della home$/i })).toHaveAttribute(
+      'href',
+      '/settings?tab=dispositivi'
+    );
+    const allLinks = screen.getAllByRole('link').map((a) => a.getAttribute('href'));
+    expect(allLinks).not.toContain('/settings/dashboard');
+    expect(allLinks).not.toContain('/settings/devices');
   });
 
   test('5: Dispositivi rows render with Italian names from the mocked registry', async () => {

@@ -47,7 +47,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
     fetchGetEndpoint('schedules', '/api/v1/thermorossi/schedules');
     fetchGetEndpoint('schedulesActive', '/api/v1/thermorossi/scheduler/mode');
     fetchGetEndpoint('locationConfig', '/api/config/location');
-    fetchGetEndpoint('dashboardConfig', '/api/config/dashboard');
+    fetchGetEndpoint('deviceConfig', '/api/devices/config');
   }, [fetchGetEndpoint]);
 
   // Initial fetch
@@ -131,14 +131,14 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
           />
 
           <EndpointCard
-            name="Dashboard Config"
-            url="/api/config/dashboard"
-            response={getResponses.dashboardConfig}
-            loading={loadingGet.dashboardConfig ?? false}
-            timing={timings.dashboardConfig}
-            onRefresh={() => fetchGetEndpoint('dashboardConfig', '/api/config/dashboard')}
-            onCopyUrl={() => copyUrlToClipboard('/api/config/dashboard')}
-            isCopied={copiedUrl === '/api/config/dashboard'}
+            name="Device Config"
+            url="/api/devices/config"
+            response={getResponses.deviceConfig}
+            loading={loadingGet.deviceConfig ?? false}
+            timing={timings.deviceConfig}
+            onRefresh={() => fetchGetEndpoint('deviceConfig', '/api/devices/config')}
+            onCopyUrl={() => copyUrlToClipboard('/api/devices/config')}
+            isCopied={copiedUrl === '/api/devices/config'}
           />
         </div>
       </div>
@@ -162,7 +162,7 @@ export default function FirebaseTab({ autoRefresh, refreshTrigger }: FirebaseTab
             <br />
             <code className="text-xs">config/location</code> - Latitude/longitude for weather
             <br />
-            <code className="text-xs">config/dashboard</code> - Dashboard preferences
+            <code className="text-xs">users/&#123;uid&#125;/deviceConfig</code> - Home cards: visibility and order
           </Text>
         </div>
       </div>

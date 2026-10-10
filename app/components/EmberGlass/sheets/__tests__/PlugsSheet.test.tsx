@@ -263,3 +263,39 @@ describe('PlugsSheet pending (ROADMAP M80)', () => {
     expect(toggleOf('frigo')).not.toHaveAttribute('aria-busy');
   });
 });
+
+describe('PlugsSheet failed command (ROADMAP M82)', () => {
+  const toggleOf = (slug: string) =>
+    screen.getByTestId(`plugs-sheet-plug-${slug}-toggle`).querySelector('[role="switch"]') as HTMLElement;
+
+  it('a refused command shows a banner naming the plug', async () => {
+    mockTogglePlug.mockClear();
+    mockTogglePlug.mockResolvedValueOnce(null);
+    render(<PlugsSheetSelfFetch />);
+    expect(screen.queryByTestId('plugs-sheet-command-error')).not.toBeInTheDocument();
+
+    await act(async () => {
+      fireEvent.click(toggleOf('lavatrice'));
+    });
+
+    const banner = screen.getByTestId('plugs-sheet-command-error');
+    expect(banner).toHaveTextContent('Comando non riuscito');
+    expect(banner).toHaveTextContent('Lavatrice non ha confermato il comando');
+  });
+
+  it('the banner goes away with the next command and stays away when it succeeds', async () => {
+    mockTogglePlug.mockClear();
+    mockTogglePlug.mockResolvedValueOnce(null);
+    render(<PlugsSheetSelfFetch />);
+    await act(async () => {
+      fireEvent.click(toggleOf('lavatrice'));
+    });
+    expect(screen.getByTestId('plugs-sheet-command-error')).toBeInTheDocument();
+
+    mockTogglePlug.mockResolvedValueOnce({ data_confirmed: true });
+    await act(async () => {
+      fireEvent.click(toggleOf('frigo'));
+    });
+    expect(screen.queryByTestId('plugs-sheet-command-error')).not.toBeInTheDocument();
+  });
+});

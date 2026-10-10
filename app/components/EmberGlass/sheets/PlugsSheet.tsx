@@ -32,15 +32,17 @@
  *   join hook tracked under 178-CONTEXT.md `<deferred>` "PlugsSheet
  *   per-row room subtitle".
  *
- * Pitfall 10 (silent failure):
- *   `useTuyaCommands.togglePlug` is NOT wrapped in `useRetryableCommand`.
- *   Failures return `null`; the next 60s data tick (Phase 96 polling) reverts
- *   the optimistic toggle state. No per-toggle error UI.
+ * Failed command (ROADMAP M82):
+ *   `useTuyaCommands.togglePlug` returns `null` when the plug refuses or does
+ *   not confirm. The optimistic flip is reverted and a `Banner` names the plug,
+ *   until the next command.
  *
  * No manual memoization hooks (D-33 — React Compiler 1.0 discipline).
  */
 
+import { useState } from 'react';
 import { Plug, TriangleAlert } from 'lucide-react';
+import { Banner } from '@/app/components/ui';
 import {
   useTuyaData,
   type UseTuyaDataReturn,
@@ -96,6 +98,7 @@ export interface PlugsSheetProps {
 
 export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
   const actions = usePendingActions();
+  const [failedPlug, setFailedPlug] = useState<string | null>(null);
   // Loading skeleton (D-26) — sized to roughly match the final layout.
   if (tuyaData.loading && tuyaData.plugs === null) {
     return (
@@ -233,6 +236,17 @@ export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
         </div>
       </div>
 
+      {failedPlug !== null && (
+        <div data-testid="plugs-sheet-command-error" style={{ marginBottom: 14 }}>
+          <Banner
+            compact
+            variant="error"
+            title="Comando non riuscito"
+            description={`${failedPlug} non ha confermato il comando. Riprova tra poco.`}
+          />
+        </div>
+      )}
+
       {/* Plug list (bundle sheets.jsx:441-465) */}
       <div
         style={{
@@ -324,12 +338,14 @@ export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
                   pending={actions.isPending(p.id)}
                   onChange={() => {
                     const next = !p.on;
+                    setFailedPlug(null);
                     tuyaData.setPlugOptimistic(p.id, next);
                     void actions.run(p.id, async () => {
                       const result = await cmds.togglePlug(p.id, p.on);
                       if (!result) {
-                        // Command failed — revert the optimistic flip
+                        // Command failed — revert the optimistic flip and say so
                         tuyaData.setPlugOptimistic(p.id, p.on);
+                        setFailedPlug(p.name);
                       }
                       // Reconcile with proxy state either way
                       void tuyaData.refetch();

@@ -20,7 +20,6 @@ import {
   type NextScheduledAction,
 } from '@/lib/scheduler/schedulerService';
 import { STOVE_ROUTES } from '@/lib/routes';
-import { logError, shouldNotify } from '@/lib/errorMonitor';
 import { getMaintenanceStatus, type MaintenanceStatus } from '@/lib/maintenance/maintenanceService';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
@@ -133,7 +132,6 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
   // Error monitoring states
   const [errorCode, setErrorCode] = useState(0);
   const [errorDescription, setErrorDescription] = useState('');
-  const previousErrorCode = useRef(0);
   const [pelletLow, setPelletLow] = useState(false);
 
   // Maintenance states
@@ -222,24 +220,9 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
       setLastPollAt(data.last_poll_at ? new Date(data.last_poll_at) : new Date());
       setPelletLow(data.pellet_low === true);
 
-      // Error handling — identical logic to HTTP path (per D-02)
-      if (data.stove_state === 'alarm') {
-        const code = data.error_code ?? 0;
-        const desc = data.error_description ?? '';
-        setErrorCode(code);
-        setErrorDescription(desc);
-        if (code !== 0) {
-          void logError(code, desc, { status: data.stove_state, source: 'status_monitor' });
-          if (shouldNotify(code, previousErrorCode.current)) {
-            // TODO: send push notification (same as HTTP path)
-          }
-        }
-        previousErrorCode.current = code;
-      } else {
-        setErrorCode(0);
-        setErrorDescription('');
-        previousErrorCode.current = 0;
-      }
+      // Alarm — identical logic to HTTP path (per D-02)
+      setErrorCode(data.error_code ?? 0);
+      setErrorDescription(data.error_code ? data.error_description ?? '' : '');
 
       // Clear initial loading (per Research pitfall 4)
       setInitialLoading(false);
@@ -270,29 +253,10 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
       setLastPollAt(last_poll_at ? new Date(last_poll_at) : null);
       setPelletLow(json.pellet_low === true);
 
-      if (stove_state === 'alarm') {
-        const code = error_code ?? 0;
-        const desc = error_description ?? '';
-        setErrorCode(code);
-        setErrorDescription(desc);
-        if (code !== 0) {
-          await logError(code, desc, { status: stove_state, source: 'status_monitor' });
-          if (shouldNotify(code, previousErrorCode.current)) {
-            // Browser notification (immediate)
-            // await sendErrorNotification(code, desc);
-
-            // Push notification (to all user devices)
-            // if (userId) {
-            //   await sendErrorPushNotification(code, desc, userId);
-            // }
-          }
-        }
-        previousErrorCode.current = code;
-      } else {
-        setErrorCode(0);
-        setErrorDescription('');
-        previousErrorCode.current = 0;
-      }
+      // D22: an alarm is an error_code, whatever the state (a running stove keeps its
+      // state). The Pi stores the episodes and sends the push.
+      setErrorCode(error_code ?? 0);
+      setErrorDescription(error_code ? error_description ?? '' : '');
 
       await fetchSchedulerMode();
       await fetchMaintenanceStatus();

@@ -8,7 +8,6 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import * as schedulerService from '@/lib/scheduler/schedulerService';
 import * as maintenanceService from '@/lib/maintenance/maintenanceService';
-import * as errorMonitor from '@/lib/errorMonitor';
 import { useOnlineStatus } from '@/lib/hooks/useOnlineStatus';
 import { useBackgroundSync } from '@/lib/hooks/useBackgroundSync';
 import { useAdaptivePolling } from '@/lib/hooks/useAdaptivePolling';
@@ -19,7 +18,6 @@ import type { UseAdaptivePollingOptions } from '@/lib/hooks/useAdaptivePolling';
 // Mock all external dependencies
 jest.mock('@/lib/scheduler/schedulerService');
 jest.mock('@/lib/maintenance/maintenanceService');
-jest.mock('@/lib/errorMonitor');
 jest.mock('@/lib/hooks/useOnlineStatus');
 jest.mock('@/lib/hooks/useBackgroundSync');
 jest.mock('@/app/context/WebSocketContext');
@@ -81,8 +79,6 @@ describe('useStoveData', () => {
       triggerSync: jest.fn(),
     });
 
-    jest.mocked(errorMonitor.logError).mockResolvedValue(undefined);
-    jest.mocked(errorMonitor.shouldNotify).mockReturnValue(false);
     jest.mocked(schedulerService.getFullSchedulerMode).mockResolvedValue({
       enabled: false,
       semiManual: false,
@@ -324,7 +320,6 @@ describe('useStoveData', () => {
       }),
     });
 
-    jest.mocked(errorMonitor.shouldNotify).mockReturnValue(false);
 
     const { result } = renderHook(() =>
       useStoveData({
@@ -477,7 +472,6 @@ describe('useStoveData', () => {
       }),
     });
 
-    jest.mocked(errorMonitor.shouldNotify).mockReturnValue(false);
 
     const { result } = renderHook(() =>
       useStoveData({
@@ -525,38 +519,33 @@ describe('useStoveData', () => {
     expect(typeof result.current.fetchStatusAndUpdate).toBe('function');
   });
 
-  it('logs errors when stove_state is alarm with non-zero error_code', async () => {
+  // ROADMAP D22: a stove still running keeps its state, the alarm is the error_code.
+  it('reports the alarm of a stove that is still running', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: jest.fn().mockResolvedValue({
-        stove_state: 'alarm',
-        power_level: null,
-        fan_level: null,
+        stove_state: 'working',
+        power_level: 1,
+        fan_level: 1,
         data_freshness: 'LIVE',
         last_poll_at: '2026-03-19T12:00:00Z',
-        error_code: 5,
-        error_description: 'Test error',
+        error_code: 8192,
+        error_description: 'Cassetto cenere pieno',
+        alarm_codes: ['ash_drawer_full'],
       }),
     });
 
-    jest.mocked(errorMonitor.shouldNotify).mockReturnValue(false);
-
-    renderHook(() =>
+    const { result } = renderHook(() =>
       useStoveData({
         userId: mockUserId,
       })
     );
 
     await waitFor(() => {
-      expect(errorMonitor.logError).toHaveBeenCalledWith(
-        5,
-        'Test error',
-        expect.objectContaining({
-          status: 'alarm',
-          source: 'status_monitor',
-        })
-      );
+      expect(result.current.errorCode).toBe(8192);
+      expect(result.current.errorDescription).toBe('Cassetto cenere pieno');
     });
+    expect(result.current.status).toBe('working');
   });
 
   // ROADMAP M78: a failed read used to set the state to "off" while the stove could be burning.

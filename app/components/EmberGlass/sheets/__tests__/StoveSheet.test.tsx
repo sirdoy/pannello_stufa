@@ -176,12 +176,12 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05, M77)', () => {
     expect(screen.queryByTestId('stove-sheet-back-to-auto')).toBeNull();
   });
 
-  test('alarm: banner with code and description, link to the alarm history', () => {
+  test('alarm: banner with the description, link to the alarm history', () => {
     stoveDataOverride = { status: 'alarm', errorCode: 12, errorDescription: 'Mancata accensione' };
     render(<StoveSheetSelfFetch />);
     expect(screen.getByTestId('stove-sheet-state')).toHaveTextContent('In allarme');
     const alarm = screen.getByTestId('stove-sheet-alarm');
-    expect(alarm).toHaveTextContent('Allarme 12');
+    expect(alarm).toHaveTextContent('Stufa in allarme');
     expect(alarm).toHaveTextContent('Mancata accensione');
     fireEvent.click(screen.getByRole('button', { name: 'Storico allarmi' }));
     expect(mockPush).toHaveBeenCalledWith('/stove/errors');

@@ -10,7 +10,7 @@
  * - ApiError TIMEOUT on AbortError
  */
 
-import { getStatus, getPower, getFan, getHealth, getHistory, sendIgnite, sendShutdown, setPower, setFan, setWaterTemp } from '@/lib/stove/thermorossiProxy';
+import { getStatus, getPower, getFan, getHealth, getHistory, getErrorEvents, sendIgnite, sendShutdown, setPower, setFan, setWaterTemp } from '@/lib/stove/thermorossiProxy';
 import { ApiError, ERROR_CODES } from '@/lib/core/apiErrors';
 
 // Mock global fetch
@@ -118,6 +118,22 @@ describe('convenience wrapper endpoints', () => {
 
     const [url] = mockFetch.mock.calls[0] as [string, RequestInit];
     expect(url).toBe(`${TEST_PROXY_URL}/api/v1/thermorossi/history`);
+  });
+
+  it('getErrorEvents() calls /api/v1/thermorossi/errors and forwards the query', async () => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ items: [], total_count: 0, limit: 50, offset: 0 }),
+    });
+
+    await getErrorEvents();
+    await getErrorEvents(new URLSearchParams({ limit: '200' }));
+
+    const urls = mockFetch.mock.calls.map(([url]) => url as string);
+    expect(urls).toEqual([
+      `${TEST_PROXY_URL}/api/v1/thermorossi/errors`,
+      `${TEST_PROXY_URL}/api/v1/thermorossi/errors?limit=200`,
+    ]);
   });
 });
 

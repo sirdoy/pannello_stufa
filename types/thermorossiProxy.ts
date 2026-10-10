@@ -32,7 +32,8 @@ export type DataFreshness = 'LIVE' | 'STALE';
 /**
  * Full response from proxy GET /api/v1/thermorossi/status.
  * Returns the current stove state including power level, fan level, and freshness.
- * Alarm fields are only populated when stove_state === 'alarm'.
+ * An alarm is set when error_code is not null: the stove reports 'alarm' only
+ * when it is off, a stove still running keeps its state (D22).
  */
 export interface ThermorossiStatusResponse {
   stove_state: StoveState;
@@ -40,11 +41,35 @@ export interface ThermorossiStatusResponse {
   fan_level: number | null;         // 1-6
   data_freshness: DataFreshness;
   last_poll_at: string | null;      // ISO 8601
-  error_code: number | null;        // only when stove_state === 'alarm'
-  error_description: string | null; // only when stove_state === 'alarm'
+  error_code: number | null;        // alarm code (local alarm mask or WiNet Error), null without alarm
+  error_description: string | null; // alarm text, null without alarm
+  alarm_codes?: string[] | null;    // local alarm bits that are set (D22); null when the module was not read
   pellet_low?: boolean | null;      // reserve sensor of the local WiNet module (D11); null when not read
   custom_name?: string | null;      // registry override for device display name
   device_type?: string | null;      // registry device type slug
+}
+
+// =============================================================================
+// ALARM EPISODES
+// =============================================================================
+
+/** One alarm episode from proxy GET /api/v1/thermorossi/errors (D22). */
+export interface ThermorossiErrorEvent {
+  id: number;
+  error_code: number;
+  error_description: string | null;
+  started_at: number;               // Unix epoch (seconds)
+  last_seen_at: number;             // Unix epoch (seconds)
+  ended_at: number | null;          // null while the alarm is active
+  active: boolean;
+}
+
+/** Paginated alarm episodes, newest first. */
+export interface ThermorossiErrorEventsResponse {
+  items: ThermorossiErrorEvent[];
+  total_count: number;
+  limit: number;
+  offset: number;
 }
 
 // =============================================================================

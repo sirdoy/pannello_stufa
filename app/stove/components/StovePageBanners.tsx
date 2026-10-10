@@ -56,7 +56,6 @@ export default function StovePageBanners(props: StovePageBannersProps) {
             errorCode={errorCode}
             errorDescription={errorDescription}
             showDetailsButton={true}
-            showSuggestion={true}
           />
         </div>
       )}

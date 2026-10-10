@@ -108,7 +108,7 @@ export default function StoveCard() {
   // Last line: what is wrong first, otherwise what the schedule does next.
   const schedule = describeStoveSchedule(stove);
   const detail: { text: string; warn: boolean } = isAlarm
-    ? { text: stove.errorCode ? `Errore ${stove.errorCode}` : 'Controlla la stufa', warn: false }
+    ? { text: stove.errorDescription || 'Controlla la stufa', warn: false }
     : unreachable
       ? { text: 'Non risponde', warn: true }
       : isStale

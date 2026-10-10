@@ -25,6 +25,7 @@ import type {
   ThermorossiFanResponse,
   ThermorossiHealthResponse,
   ThermorossiHistoryResponse,
+  ThermorossiErrorEventsResponse,
   ThermorossiCommandResponse,
 } from '@/types/thermorossiProxy';
 
@@ -74,6 +75,18 @@ export async function getHistory(params?: URLSearchParams): Promise<ThermorossiH
     ? `/api/v1/thermorossi/history?${params.toString()}`
     : '/api/v1/thermorossi/history';
   return haGet<ThermorossiHistoryResponse>(endpoint);
+}
+
+/**
+ * Fetch the alarm episodes of the stove, newest first.
+ * Calls GET /api/v1/thermorossi/errors on the HA proxy.
+ * @param params - Optional URLSearchParams (limit, offset)
+ */
+export async function getErrorEvents(params?: URLSearchParams): Promise<ThermorossiErrorEventsResponse> {
+  const endpoint = params
+    ? `/api/v1/thermorossi/errors?${params.toString()}`
+    : '/api/v1/thermorossi/errors';
+  return haGet<ThermorossiErrorEventsResponse>(endpoint);
 }
 
 // =============================================================================

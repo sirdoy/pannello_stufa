@@ -91,18 +91,19 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     expect(getByTestId('stove-detail')).toHaveTextContent('Accende alle 18:15');
   });
 
-  test('(b2) alarm: red state word, error code, lit status dot', () => {
+  test('(b2) alarm: red state word, alarm text, lit status dot', () => {
     useStoveDataMock.mockReturnValue({
       status: 'alarm',
       isAccesa: false,
       powerLevel: 1,
       fanLevel: 1,
       staleness: null,
-      errorCode: 12,
+      errorCode: 1,
+      errorDescription: 'Pellet esaurito o braciere da pulire',
     });
     const { getByTestId } = render(<StoveCard />);
     expect(getByTestId('stove-state')).toHaveTextContent('Allarme');
-    expect(getByTestId('stove-detail')).toHaveTextContent('Errore 12');
+    expect(getByTestId('stove-detail')).toHaveTextContent('Pellet esaurito o braciere da pulire');
     expect(getByTestId('status-dot')).toHaveAttribute('data-on', 'true');
     expect(getByTestId('status-dot').getAttribute('style') ?? '').toContain('#ff6676');
   });

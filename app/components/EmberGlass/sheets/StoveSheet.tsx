@@ -160,7 +160,7 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
             <Banner
               compact
               variant="error"
-              title={stoveData.errorCode ? `Allarme ${stoveData.errorCode}` : 'Stufa in allarme'}
+              title="Stufa in allarme"
               description={stoveData.errorDescription || 'Controlla la stufa prima di riaccenderla.'}
               actions={
                 <Button variant="subtle" size="sm" onClick={() => onNavigate('/stove/errors')}>

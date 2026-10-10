@@ -107,6 +107,38 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     expect(getByTestId('status-dot').getAttribute('style') ?? '').toContain('#ff6676');
   });
 
+  // ROADMAP M78: a failed read keeps the last known state and says the stove does not answer.
+  test('(b3) unreachable with a last known state: state kept, "Non risponde", amber dot', () => {
+    useStoveDataMock.mockReturnValue({
+      status: 'working',
+      isAccesa: true,
+      powerLevel: 2,
+      fanLevel: 3,
+      staleness: null,
+      unreachable: true,
+    });
+    const { getByTestId } = render(<StoveCard />);
+    expect(getByTestId('stove-state')).toHaveTextContent('Accesa');
+    expect(getByTestId('stove-detail')).toHaveTextContent('Non risponde');
+    expect(getByTestId('status-dot').getAttribute('style') ?? '').toContain('#ffb84a');
+  });
+
+  test('(b4) unreachable with no reading: never "Spenta"', () => {
+    useStoveDataMock.mockReturnValue({
+      status: 'unknown',
+      isAccesa: false,
+      powerLevel: null,
+      fanLevel: null,
+      staleness: null,
+      unreachable: true,
+    });
+    const { getByTestId, queryByText } = render(<StoveCard />);
+    expect(queryByText('Spenta')).toBeNull();
+    expect(getByTestId('stove-state')).toHaveTextContent('—');
+    expect(getByTestId('stove-detail')).toHaveTextContent('Non risponde');
+    expect(getByTestId('status-dot')).toHaveAttribute('data-on', 'true');
+  });
+
   test('(c) clicking card opens sheet (translateY(0) and stove-sheet body mounted)', () => {
     useStoveDataMock.mockReturnValue({
       isAccesa: true,

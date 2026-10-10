@@ -70,6 +70,10 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
   const state = getStoveStateDisplay(stoveData.status, isAccesa);
   const schedule = describeStoveSchedule(stoveData);
   const isStale = stoveData.staleness?.isStale ?? false;
+  // ROADMAP M78: the last read failed. With no reading at all the state is unknown: the only
+  // command that is safe blind is the shutdown (same choice as the engine on the Pi, D20).
+  const unreachable = stoveData.unreachable ?? false;
+  const canShutDown = isAccesa || stoveData.status === 'unknown';
   const busy = pending !== null || Boolean(stoveData.loading);
 
   // Loading skeleton (D-26) — first-load only, before any cached data lands.
@@ -141,7 +145,7 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
           <div data-testid="stove-sheet-schedule" style={{ marginTop: 6, fontSize: 13, color: 'var(--text-1)' }}>
             {schedule.nextLong ? `${schedule.mode} · ${schedule.nextLong.toLowerCase()}` : `Modalità ${schedule.mode.toLowerCase()}`}
           </div>
-          {!isStale && typeof stoveData.lastUpdatedAt === 'number' && (
+          {!isStale && !unreachable && typeof stoveData.lastUpdatedAt === 'number' && (
             <div data-testid="stove-sheet-updated" style={{ marginTop: 2, fontSize: 12, color: 'var(--text-2)' }}>
               Aggiornata {formatStoveWhen(stoveData.lastUpdatedAt)}
             </div>
@@ -166,7 +170,21 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
             />
           </div>
         )}
-        {isStale && (
+        {unreachable && (
+          <div data-testid="stove-sheet-unreachable">
+            <Banner
+              compact
+              variant="warning"
+              title="Stufa non raggiungibile"
+              description={
+                typeof stoveData.lastUpdatedAt === 'number'
+                  ? `Ultima lettura ${formatStoveWhen(stoveData.lastUpdatedAt)}: lo stato può essere diverso.`
+                  : 'Nessuna lettura disponibile: non so se è accesa o spenta.'
+              }
+            />
+          </div>
+        )}
+        {isStale && !unreachable && (
           <div data-testid="stove-sheet-stale">
             <Banner
               compact
@@ -299,16 +317,16 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
       {/* Primary action. Cleaning due blocks the ignition only: shutting down always stays possible. */}
       <div style={{ marginTop: 18 }}>
         <Button
-          variant={isAccesa ? 'danger' : 'ember'}
+          variant={canShutDown ? 'danger' : 'ember'}
           size="lg"
           fullWidth
           icon={<Power size={18} strokeWidth={2.2} />}
           loading={pending?.kind === 'toggle'}
-          disabled={busy || (!isAccesa && needsCleaning)}
+          disabled={busy || (!canShutDown && needsCleaning)}
           data-testid="stove-sheet-primary-action"
-          onClick={() => void run({ kind: 'toggle' }, isAccesa ? cmds.handleShutdown : cmds.handleIgnite)}
+          onClick={() => void run({ kind: 'toggle' }, canShutDown ? cmds.handleShutdown : cmds.handleIgnite)}
         >
-          {isAccesa ? 'Spegni stufa' : needsCleaning ? 'Pulizia richiesta' : 'Accendi stufa'}
+          {canShutDown ? 'Spegni stufa' : needsCleaning ? 'Pulizia richiesta' : 'Accendi stufa'}
         </Button>
         {pending?.kind === 'toggle' && (
           <div
@@ -316,7 +334,7 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
             role="status"
             style={{ marginTop: 8, textAlign: 'center', fontSize: 12, color: 'var(--text-2)' }}
           >
-            {isAccesa ? 'Spegnimento in corso…' : 'Accensione in corso…'}
+            {canShutDown ? 'Spegnimento in corso…' : 'Accensione in corso…'}
           </div>
         )}
       </div>

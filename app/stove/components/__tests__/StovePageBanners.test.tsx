@@ -30,3 +30,19 @@ describe('StovePageBanners — pellet reserve', () => {
     expect(screen.queryByTestId('stove-pellet-low-banner')).toBeNull();
   });
 });
+
+// ROADMAP M78: a failed status read keeps the last state and says so.
+describe('StovePageBanners — unreachable stove', () => {
+  it('shows the warning when the last read failed', () => {
+    render(<StovePageBanners {...baseProps} unreachable />);
+
+    expect(screen.getByTestId('stove-unreachable-banner')).toBeInTheDocument();
+    expect(screen.getByText('Stufa non raggiungibile')).toBeInTheDocument();
+  });
+
+  it('shows nothing when the stove answers', () => {
+    render(<StovePageBanners {...baseProps} />);
+
+    expect(screen.queryByTestId('stove-unreachable-banner')).toBeNull();
+  });
+});

@@ -559,6 +559,77 @@ describe('useStoveData', () => {
     });
   });
 
+  // ROADMAP M78: a failed read used to set the state to "off" while the stove could be burning.
+  describe('unreachable stove (M78)', () => {
+    const working = {
+      ok: true,
+      json: jest.fn().mockResolvedValue({
+        stove_state: 'working',
+        power_level: 3,
+        fan_level: 4,
+        data_freshness: 'LIVE',
+        last_poll_at: '2026-03-19T12:00:00Z',
+        error_code: null,
+        error_description: null,
+      }),
+    };
+
+    beforeEach(() => {
+      jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    });
+
+    it('first read fails: state unknown, not off', async () => {
+      global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 503 });
+
+      const { result } = renderHook(() => useStoveData({ userId: mockUserId }));
+
+      await waitFor(() => expect(result.current.initialLoading).toBe(false));
+      expect(result.current.unreachable).toBe(true);
+      expect(result.current.status).toBe('unknown');
+      expect(result.current.isSpenta).toBe(false);
+      expect(result.current.isAccesa).toBe(false);
+    });
+
+    // The polling mock runs the callback on every render: switch the answer with a flag
+    // instead of queueing one-shot responses.
+    it('a later read fails: last known state and levels are kept', async () => {
+      let down = false;
+      global.fetch = jest.fn(() => Promise.resolve(down ? { ok: false, status: 503 } : working)) as never;
+
+      const { result } = renderHook(() => useStoveData({ userId: mockUserId }));
+      await waitFor(() => expect(result.current.status).toBe('working'));
+      expect(result.current.unreachable).toBe(false);
+
+      down = true;
+      await act(async () => {
+        await result.current.fetchStatusAndUpdate();
+      });
+
+      expect(result.current.unreachable).toBe(true);
+      expect(result.current.status).toBe('working');
+      expect(result.current.isAccesa).toBe(true);
+      expect(result.current.powerLevel).toBe(3);
+    });
+
+    it('the next successful read clears the flag', async () => {
+      let down = true;
+      global.fetch = jest.fn(() => Promise.resolve(down ? { ok: false, status: 503 } : working)) as never;
+
+      const { result, unmount } = renderHook(() => useStoveData({ userId: mockUserId }));
+      await waitFor(() => expect(result.current.unreachable).toBe(true));
+
+      down = false;
+      // Not awaited inside act: each successful read re-renders and the polling mock reads again.
+      act(() => {
+        void result.current.fetchStatusAndUpdate();
+      });
+
+      await waitFor(() => expect(result.current.unreachable).toBe(false));
+      expect(result.current.status).toBe('working');
+      unmount();
+    });
+  });
+
   it('refetches once after a background-synced command, not in a loop (M32)', async () => {
     // WS open: polling suppressed, so every status fetch comes from the sync effect
     jest.mocked(useWebSocketContext).mockReturnValue({

@@ -28,6 +28,7 @@ export function getStovePageStatusConfig(status: StoveState | string): StovePage
   if (!status) return { label: 'CARICAMENTO', Icon: Loader, theme: 'neutral', pulse: true };
 
   const s = status.toUpperCase();
+  if (s === 'UNKNOWN') return { label: 'STATO NON NOTO', Icon: CircleHelp, theme: 'warning', pulse: false };
   if (s.includes('WORK')) return { label: 'IN FUNZIONE', Icon: Flame, theme: 'ember', pulse: true };
   if (s.includes('OFF')) return { label: 'SPENTA', Icon: Power, theme: 'neutral', pulse: false };
   if (s.includes('START')) return { label: 'AVVIO', Icon: Rocket, theme: 'ocean', pulse: true };

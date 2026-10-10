@@ -20,6 +20,7 @@ describe('getStoveStateDisplay', () => {
     ['standby', 'In attesa', 'Attesa', 'warn'],
     ['cleaning', 'Pulizia in corso', 'Pulizia', 'warn'],
     ['alarm', 'In allarme', 'Allarme', 'danger'],
+    ['unknown', 'Stato non noto', '—', 'muted'],
   ] as const)('%s → %s / %s (%s)', (status, label, short, tone) => {
     expect(getStoveStateDisplay(status, false)).toEqual({ label, short, tone });
   });

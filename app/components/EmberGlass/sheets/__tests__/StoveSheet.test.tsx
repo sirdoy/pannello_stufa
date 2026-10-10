@@ -54,6 +54,7 @@ jest.mock('@/app/components/devices/stove/hooks/useStoveCommands', () => ({
 const baseStoveData = {
   status: undefined as string | undefined,
   loading: false,
+  unreachable: false,
   pelletLow: false,
   staleness: null as { isStale: boolean; cachedAt: Date | null; ageSeconds: number } | null,
   lastUpdatedAt: null as number | null,
@@ -196,6 +197,37 @@ describe('StoveSheet (SHEET-02 / CONTEXT D-05, M77)', () => {
     render(<StoveSheetSelfFetch />);
     expect(screen.getByTestId('stove-sheet-stale')).toHaveTextContent('Ultima lettura 47 min fa');
     expect(screen.queryByTestId('stove-sheet-updated')).toBeNull();
+  });
+
+  // ROADMAP M78
+  test('unreachable with a last reading: banner with its time, state kept', () => {
+    stoveDataOverride = {
+      status: 'working',
+      isAccesa: true,
+      unreachable: true,
+      lastUpdatedAt: todayAt(21, 4).getTime(),
+    };
+    render(<StoveSheetSelfFetch />);
+    expect(screen.getByTestId('stove-sheet-state')).toHaveTextContent('In funzione');
+    const banner = screen.getByTestId('stove-sheet-unreachable');
+    expect(banner).toHaveTextContent('Stufa non raggiungibile');
+    expect(banner).toHaveTextContent('Ultima lettura alle 21:04');
+    expect(screen.queryByTestId('stove-sheet-updated')).toBeNull();
+    expect(screen.queryByTestId('stove-sheet-stale')).toBeNull();
+  });
+
+  test('unreachable with no reading: state not known, the primary action shuts down', async () => {
+    stoveDataOverride = { status: 'unknown', isAccesa: false, unreachable: true, powerLevel: null, fanLevel: null };
+    render(<StoveSheetSelfFetch />);
+    expect(screen.getByTestId('stove-sheet-state')).toHaveTextContent('Stato non noto');
+    expect(screen.getByTestId('stove-sheet-unreachable')).toHaveTextContent('Nessuna lettura disponibile');
+    const btn = screen.getByTestId('stove-sheet-primary-action');
+    expect(btn).toHaveTextContent('Spegni stufa');
+    await act(async () => {
+      fireEvent.click(btn);
+    });
+    expect(mockHandleShutdown).toHaveBeenCalledTimes(1);
+    expect(mockHandleIgnite).not.toHaveBeenCalled();
   });
 
   test('pellet reserve shows its banner', () => {

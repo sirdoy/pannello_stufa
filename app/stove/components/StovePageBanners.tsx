@@ -21,6 +21,8 @@ export interface StovePageBannersProps {
   errorCode: number;
   errorDescription: string;
   pelletLow: boolean;
+  /** The last status read failed (ROADMAP M78) */
+  unreachable?: boolean;
   needsMaintenance: boolean;
   maintenanceStatus: MaintenanceStatus | null;
   cleaningInProgress: boolean;
@@ -35,6 +37,7 @@ export default function StovePageBanners(props: StovePageBannersProps) {
     errorCode,
     errorDescription,
     pelletLow,
+    unreachable = false,
     needsMaintenance,
     maintenanceStatus,
     cleaningInProgress,
@@ -54,6 +57,17 @@ export default function StovePageBanners(props: StovePageBannersProps) {
             errorDescription={errorDescription}
             showDetailsButton={true}
             showSuggestion={true}
+          />
+        </div>
+      )}
+
+      {/* Last status read failed: the state below is the last known one (ROADMAP M78) */}
+      {unreachable && (
+        <div className="mb-6" data-testid="stove-unreachable-banner">
+          <Banner
+            variant="warning"
+            title="Stufa non raggiungibile"
+            description="La stufa non risponde: lo stato mostrato è l'ultimo letto e può essere diverso."
           />
         </div>
       )}

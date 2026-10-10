@@ -77,6 +77,8 @@ export interface UseStoveDataReturn {
   hasPendingCommands: boolean;
   pendingCommands: FormattedCommand[];
   staleness: StalenessInfo | null;
+  /** The last status read failed: the state shown is the last known one, or 'unknown' (ROADMAP M78). */
+  unreachable: boolean;
 
   // Timestamp for LastUpdated component
   lastUpdatedAt: number | null;
@@ -144,6 +146,9 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
   // Staleness state — derived from proxy data_freshness field
   const [isStale, setIsStale] = useState(false);
   const [lastPollAt, setLastPollAt] = useState<Date | null>(null);
+  // ROADMAP M78: a failed read must not turn into "off" — the stove may be burning.
+  const [unreachable, setUnreachable] = useState(false);
+  const hasReading = useRef(false);
 
   // Staleness object: populated when STALE or when lastPollAt is available
   const staleness: StalenessInfo | null = isStale
@@ -207,6 +212,8 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
       // Map WS fields to hook state — ThermorossiData is now ThermorossiStatusResponse
       // so stove_state is already StoveState (no cast needed)
       setStatus(data.stove_state);
+      hasReading.current = true;
+      setUnreachable(false);
       setFanLevel(data.fan_level);
       setPowerLevel(data.power_level);
 
@@ -255,6 +262,8 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
       const { stove_state, power_level, fan_level, data_freshness, last_poll_at, error_code, error_description } = json;
 
       setStatus(stove_state);
+      hasReading.current = true;
+      setUnreachable(false);
       setFanLevel(fan_level);
       setPowerLevel(power_level);
       setIsStale(data_freshness === 'STALE');
@@ -290,7 +299,9 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
     } catch (err) {
       if (isFetchInterrupted(err)) return;
       console.error('Errore stato:', err);
-      setStatus('off');
+      // Keep the last known state; with no reading at all the state is unknown, not "off".
+      setUnreachable(true);
+      if (!hasReading.current) setStatus('unknown');
     } finally {
       setInitialLoading(false);
     }
@@ -361,6 +372,7 @@ export function useStoveData(_params: UseStoveDataParams = {}): UseStoveDataRetu
     hasPendingCommands,
     pendingCommands,
     staleness,
+    unreachable,
 
     // Timestamp
     lastUpdatedAt,

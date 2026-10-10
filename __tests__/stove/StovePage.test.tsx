@@ -97,6 +97,7 @@ const createMockStoveData = (overrides: Record<string, unknown> = {}) => ({
   fetchMaintenanceStatus: jest.fn(),
   fetchSchedulerMode: jest.fn(),
   lastUpdatedAt: null,
+  unreachable: false,
   ...overrides,
 });
 

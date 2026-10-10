@@ -31,7 +31,7 @@ const STATES: Record<StoveState, StoveStateDisplay> = {
   standby: { label: 'In attesa', short: 'Attesa', tone: 'warn' },
   cleaning: { label: 'Pulizia in corso', short: 'Pulizia', tone: 'warn' },
   alarm: { label: 'In allarme', short: 'Allarme', tone: 'danger' },
-  unknown: { label: 'Stato sconosciuto', short: '—', tone: 'muted' },
+  unknown: { label: 'Stato non noto', short: '—', tone: 'muted' },
 };
 
 /** `isAccesa` decides when the status is missing or not a known state. */

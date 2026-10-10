@@ -96,7 +96,9 @@ export default function StoveCard() {
 
   // D-25: stale → amber StatusDot. `staleness` is StalenessInfo | null.
   const isStale = stove.staleness?.isStale ?? false;
-  const dotColor = isAlarm ? DANGER : isStale ? WARN : undefined;
+  // ROADMAP M78: the last read failed → same amber dot, and the card says so.
+  const unreachable = stove.unreachable ?? false;
+  const dotColor = isAlarm ? DANGER : isStale || unreachable ? WARN : undefined;
 
   // ROADMAP M9: cleaning due (counted on the Pi) blocks ignition → visible on the card itself.
   const needsCleaning = stove.needsMaintenance;
@@ -107,7 +109,9 @@ export default function StoveCard() {
   const schedule = describeStoveSchedule(stove);
   const detail: { text: string; warn: boolean } = isAlarm
     ? { text: stove.errorCode ? `Errore ${stove.errorCode}` : 'Controlla la stufa', warn: false }
-    : isStale
+    : unreachable
+      ? { text: 'Non risponde', warn: true }
+      : isStale
       ? {
           text: stove.staleness?.cachedAt ? `Dati di ${formatStoveAge(stove.staleness.ageSeconds)} fa` : 'Dati non aggiornati',
           warn: true,
@@ -145,7 +149,7 @@ export default function StoveCard() {
                   <Wrench size={11} strokeWidth={2.4} aria-hidden />
                 </HeadBadge>
               )}
-              <StatusDot on={stove.isAccesa || isAlarm} color={dotColor} />
+              <StatusDot on={stove.isAccesa || isAlarm || unreachable} color={dotColor} />
             </span>
           }
         />

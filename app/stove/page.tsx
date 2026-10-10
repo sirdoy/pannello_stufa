@@ -115,6 +115,7 @@ export default function StovePage() {
           errorCode={stoveData.errorCode}
           errorDescription={stoveData.errorDescription}
           pelletLow={stoveData.pelletLow}
+          unreachable={stoveData.unreachable}
           needsMaintenance={stoveData.needsMaintenance}
           maintenanceStatus={stoveData.maintenanceStatus}
           cleaningInProgress={stoveData.cleaningInProgress}

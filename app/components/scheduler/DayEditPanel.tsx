@@ -25,6 +25,8 @@ export interface DayEditPanelProps {
   saveStatus?: {
     isSaving: boolean;
   };
+  /** Climate control decides power and fan: slots show the time range only */
+  hideLevels?: boolean;
 }
 
 interface BottomSheetData {
@@ -40,6 +42,7 @@ export default function DayEditPanel({
   onDeleteInterval,
   onDuplicate,
   saveStatus,
+  hideLevels = false,
 }: DayEditPanelProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
@@ -169,6 +172,7 @@ export default function DayEditPanel({
             onClick={handleIntervalClick}
             onIntervalClick={handleTimelineIntervalClick}
             height="h-12"
+            hideLevels={hideLevels}
           />
         </div>
       )}
@@ -203,6 +207,7 @@ export default function DayEditPanel({
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
               onClick={() => handleIntervalClick(index)}
+              hideLevels={hideLevels}
             />
           ))
         )}
@@ -215,6 +220,7 @@ export default function DayEditPanel({
         onClose={() => setBottomSheetData(null)}
         onEdit={handleBottomSheetEdit}
         onDelete={handleBottomSheetDelete}
+        hideLevels={hideLevels}
       />
     </Card>
   );

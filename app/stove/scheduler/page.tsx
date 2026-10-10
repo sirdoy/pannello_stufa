@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { getWeeklySchedule, getFullSchedulerMode, getNextScheduledChange, type ScheduleInterval } from '@/lib/scheduler/schedulerService';
 import { saveSchedule as apiSaveSchedule, setSchedulerMode, setSemiManualMode, clearSemiManualMode } from '@/lib/scheduler/schedulerApiClient';
 import {
@@ -15,8 +16,8 @@ import { CalendarDays, Settings, Trash2, Undo2 } from 'lucide-react';
 import { logSchedulerAction } from '@/lib/logService';
 import { useWebSocketContext } from '@/app/context/WebSocketContext';
 import { ReadyState } from '@/lib/hooks/useWebSocketManager';
-import type { SchedulerWsPayload } from '@/types/thermorossiScheduler';
-import { Card, Button, ModeIndicator, Skeleton, Toast, ConfirmDialog, Heading, PageLayout } from '@/app/components/ui';
+import type { ClimateState, SchedulerWsPayload } from '@/types/thermorossiScheduler';
+import { Banner, Card, Button, ModeIndicator, Skeleton, Toast, ConfirmDialog, Heading, PageLayout } from '@/app/components/ui';
 import WeeklyTimeline from '@/app/components/scheduler/WeeklyTimeline';
 import DayEditPanel from '@/app/components/scheduler/DayEditPanel';
 import WeeklySummaryCard from '@/app/components/scheduler/WeeklySummaryCard';
@@ -66,6 +67,7 @@ interface SaveStatus {
 }
 
 export default function WeeklyScheduler() {
+  const router = useRouter();
   const [schedule, setSchedule] = useState<DaySchedule>(() =>
     daysOfWeek.reduce((acc, day) => {
       acc[day] = [];
@@ -100,6 +102,24 @@ export default function WeeklyScheduler() {
     day: null,
   });
   const [selectedDay, setSelectedDay] = useState<DayOfWeek>('Lunedì');
+  // Climate control on: slots only say when the stove is on (workspace ROADMAP D25)
+  const [climateLevels, setClimateLevels] = useState<{ power: number; fan: number } | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/v1/thermorossi/scheduler/climate')
+      .then(async (res) => {
+        if (!res.ok) return;
+        const climate = (await res.json()) as ClimateState;
+        if (alive && climate.enabled && climate.room_id) {
+          setClimateLevels({ power: climate.fallback_power, fan: climate.fallback_fan });
+        }
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   // Multi-schedule management states
   const [schedules, setSchedules] = useState<ScheduleMetadata[]>([]);
@@ -588,8 +608,25 @@ export default function WeeklyScheduler() {
     );
   }
 
+  const hideLevels = climateLevels !== null;
+
   return (
     <PageLayout maxWidth="7xl" header={pageHeader}>
+      {hideLevels && (
+        <Banner
+          variant="info"
+          title="Clima stufa attivo"
+          actions={
+            <Button variant="subtle" size="sm" onClick={() => router.push('/settings/thermostat')}>
+              Apri Clima stufa
+            </Button>
+          }
+        >
+          Le fasce decidono solo quando la stufa è accesa. Potenza e ventola le decide il clima dalla temperatura
+          della stanza.
+        </Banner>
+      )}
+
       {/* Header Row - 2 columns on desktop */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Left: Mode and Schedule Selector */}
@@ -660,7 +697,7 @@ export default function WeeklyScheduler() {
         </Card>
 
         {/* Right: Weekly Stats */}
-        <WeeklySummaryCard schedule={schedule} />
+        <WeeklySummaryCard schedule={schedule} hideLevels={hideLevels} />
       </div>
 
       {/* Weekly Timeline - Always Visible */}
@@ -675,6 +712,7 @@ export default function WeeklyScheduler() {
           schedule={schedule}
           selectedDay={selectedDay}
           onSelectDay={setSelectedDay as (day: string) => void}
+          hideLevels={hideLevels}
         />
       </Card>
 
@@ -687,6 +725,7 @@ export default function WeeklyScheduler() {
         onDeleteInterval={(index) => handleRemoveIntervalRequest(selectedDay, index)}
         onDuplicate={(day: string) => handleDuplicateDay(day as DayOfWeek)}
         saveStatus={saveStatus.day === selectedDay ? saveStatus : undefined}
+        hideLevels={hideLevels}
       />
 
       {/* Confirm Delete Dialog */}
@@ -720,6 +759,7 @@ export default function WeeklyScheduler() {
         suggestedStart={addIntervalModal.suggestedStart}
         onConfirm={handleConfirmAddInterval}
         onCancel={handleCancelAddInterval}
+        climateLevels={climateLevels}
       />
 
       {/* Create Schedule Modal */}

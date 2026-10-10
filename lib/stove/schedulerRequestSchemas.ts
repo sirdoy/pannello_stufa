@@ -65,6 +65,8 @@ export const climatePatchBody = z
     kp: z.number().positive().max(10).optional(),
     ti_minutes: z.number().min(5).max(600).optional(),
     fan_by_power: z.array(z.number().int().min(1).max(6)).length(5).optional(),
+    fallback_power: powerLevel.optional(),
+    fallback_fan: z.number().int().min(1).max(6).optional(),
   })
   .strict()
   .refine((b) => Object.keys(b).length > 0, 'Nessun campo da aggiornare');

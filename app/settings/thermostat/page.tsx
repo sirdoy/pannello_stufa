@@ -37,7 +37,10 @@ const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minm
 type Room = { id: string; name: string };
 type Status = { ok: boolean; text: string } | null;
 /** Tuning fields edited locally and saved together. */
-type Tuning = Pick<ClimateState, 'min_power' | 'max_power' | 'kp' | 'ti_minutes' | 'fan_by_power'>;
+type Tuning = Pick<
+  ClimateState,
+  'min_power' | 'max_power' | 'kp' | 'ti_minutes' | 'fan_by_power' | 'fallback_power' | 'fallback_fan'
+>;
 
 const tuningOf = (s: ClimateState): Tuning => ({
   min_power: s.min_power,
@@ -45,6 +48,8 @@ const tuningOf = (s: ClimateState): Tuning => ({
   kp: s.kp,
   ti_minutes: s.ti_minutes,
   fan_by_power: [...s.fan_by_power],
+  fallback_power: s.fallback_power,
+  fallback_fan: s.fallback_fan,
 });
 
 function degrees(value: number | null): string {
@@ -204,8 +209,8 @@ export default function ThermostatSettingsPage() {
         </div>
         <p style={{ ...mutedStyle, marginTop: 12 }}>
           Con la stufa accesa in una fascia, potenza e ventola seguono la temperatura della stanza rispetto al
-          setpoint del programma Netatmo. Vale con la stufa accesa dallo scheduler o a mano; i livelli della fascia
-          valgono solo per l&apos;accensione. Se imposti potenza o ventola a mano, il controllo si ferma finché la
+          setpoint del programma Netatmo. Vale con la stufa accesa dallo scheduler o a mano; le fasce decidono solo
+          quando la stufa è accesa. Se imposti potenza o ventola a mano, il controllo si ferma finché la
           stufa si spegne o lo scheduler riprende.
         </p>
 
@@ -238,7 +243,8 @@ export default function ThermostatSettingsPage() {
         </div>
         {state.room_id && (live.setpoint === null || live.temperature === null) && (
           <p style={{ ...mutedStyle, margin: '12px 0 0' }}>
-            Dati mancanti (casa non in programma, o temperatura più vecchia di 20 minuti): la stufa segue la fascia.
+            Dati mancanti (casa non in programma, o temperatura più vecchia di 20 minuti): la stufa usa i livelli di
+            riserva.
           </p>
         )}
         {state.enabled && live.paused && (
@@ -321,6 +327,28 @@ export default function ThermostatSettingsPage() {
               }
             />
           ))}
+        </div>
+
+        <h3 style={{ fontSize: 13, fontWeight: 700, margin: '18px 0 4px' }}>Livelli di riserva</h3>
+        <p style={mutedStyle}>
+          Usati all&apos;accensione e quando mancano setpoint o temperatura. Con il clima attivo sostituiscono potenza
+          e ventola delle fasce.
+        </p>
+        <div style={{ ...gridStyle, marginBottom: 16 }}>
+          <LevelSelect
+            id="climate-fallback-power"
+            label="Potenza di riserva"
+            value={tuning.fallback_power}
+            options={POWER_LEVELS}
+            onChange={(v) => setTuning({ ...tuning, fallback_power: v })}
+          />
+          <LevelSelect
+            id="climate-fallback-fan"
+            label="Ventola di riserva"
+            value={tuning.fallback_fan}
+            options={FAN_LEVELS}
+            onChange={(v) => setTuning({ ...tuning, fallback_fan: v })}
+          />
         </div>
 
         {rangeInvalid && (

@@ -13,6 +13,8 @@ export interface IntervalBottomSheetProps {
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  /** Climate control decides power and fan: show the time range only */
+  hideLevels?: boolean;
 }
 
 export default function IntervalBottomSheet({
@@ -21,6 +23,7 @@ export default function IntervalBottomSheet({
   onClose,
   onEdit,
   onDelete,
+  hideLevels = false,
 }: IntervalBottomSheetProps) {
   if (!isOpen || !range) return null;
 
@@ -53,19 +56,21 @@ export default function IntervalBottomSheet({
         {getDuration()}
       </Text>
 
-      {/* Potenza */}
-      <div className="mb-5">
-        <ProgressBar
-          value={powerLabel.percent}
-          gradient={powerLabel.gradient}
-          size="md"
-          animated
-          leftContent={
-            <>
-              <Zap size={16} className="text-(--text-2)" aria-hidden="true" />
-              <Text as="span" variant="secondary" size="sm">
-                Potenza
-              </Text>
+      {!hideLevels && (
+        <>
+          {/* Potenza */}
+          <div className="mb-5">
+            <ProgressBar
+              value={powerLabel.percent}
+              gradient={powerLabel.gradient}
+              size="md"
+              animated
+              leftContent={
+                <>
+                  <Zap size={16} className="text-(--text-2)" aria-hidden="true" />
+                  <Text as="span" variant="secondary" size="sm">
+                    Potenza
+                  </Text>
             </>
           }
           rightContent={
@@ -108,6 +113,8 @@ export default function IntervalBottomSheet({
           }
         />
       </div>
+        </>
+      )}
 
       {/* Action Buttons */}
       <div className="flex gap-3">

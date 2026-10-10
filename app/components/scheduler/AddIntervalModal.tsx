@@ -10,6 +10,7 @@ import Input from '../ui/Input';
 import Select from '../ui/Select';
 import Heading from '../ui/Heading';
 import Text from '../ui/Text';
+import Banner from '../ui/Banner';
 import { Tabs, TabsList, TabsTrigger } from '../ui/Tabs';
 import { AlertTriangle, Pencil, Plus, X } from 'lucide-react';
 import { getPowerBadgeClass, getFanBadgeClass } from '@/lib/scheduler/schedulerStats';
@@ -31,6 +32,12 @@ export interface AddIntervalModalProps {
   suggestedStart?: string;
   onConfirm: (interval: ScheduleInterval & { duration: number }) => void;
   onCancel: () => void;
+  /**
+   * Climate control is on: it decides power and fan, so the modal asks only
+   * for the time range. A new slot is saved with these levels (the fallback
+   * ones of climate control); an edited slot keeps the levels it had.
+   */
+  climateLevels?: { power: number; fan: number } | null;
 }
 
 export default function AddIntervalModal({
@@ -41,6 +48,7 @@ export default function AddIntervalModal({
   suggestedStart = '00:00',
   onConfirm,
   onCancel,
+  climateLevels = null,
 }: AddIntervalModalProps) {
   const [inputMode, setInputMode] = useState<'duration' | 'endTime'>('duration');
   const [start, setStart] = useState(suggestedStart);
@@ -76,8 +84,8 @@ export default function AddIntervalModal({
       setStart(suggestedStart);
       setDurationPreset(30);
       setCustomMinutes(60);
-      setPower(2);
-      setFan(3);
+      setPower(climateLevels?.power ?? 2);
+      setFan(climateLevels?.fan ?? 3);
       setInputMode('duration');
     }
   }
@@ -250,50 +258,58 @@ export default function AddIntervalModal({
             )}
           </Card>
 
-          {/* Power & Fan */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <div className="mb-2 flex items-center gap-2">
-                <span className={`rounded-md px-2 py-1 text-xs font-bold ${getPowerBadgeClass(power)}`}>
-                  P{power}
-                </span>
-                <Text as="span" variant="secondary" size="sm">
-                  Livello {power}
-                </Text>
-              </div>
-              <Select
-                label="Potenza"
-                value={power}
-                onChange={(e) => setPower(Number(e.target.value))}
-                options={powerOptions.map(p => ({
-                  value: p,
-                  label: `Livello ${p}`,
-                }))}
-                variant="ember"
-              />
-            </div>
+          {climateLevels && (
+            <Banner variant="info" compact title="Potenza e ventola le decide il clima">
+              Con il clima stufa attivo la fascia dice solo quando la stufa è accesa.
+            </Banner>
+          )}
 
-            <div>
-              <div className="mb-2 flex items-center gap-2">
-                <span className={`rounded-md px-2 py-1 text-xs font-bold ${getFanBadgeClass(fan)}`}>
-                  V{fan}
-                </span>
-                <Text as="span" variant="secondary" size="sm">
-                  Livello {fan}
-                </Text>
+          {/* Power & Fan */}
+          {!climateLevels && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <span className={`rounded-md px-2 py-1 text-xs font-bold ${getPowerBadgeClass(power)}`}>
+                    P{power}
+                  </span>
+                  <Text as="span" variant="secondary" size="sm">
+                    Livello {power}
+                  </Text>
+                </div>
+                <Select
+                  label="Potenza"
+                  value={power}
+                  onChange={(e) => setPower(Number(e.target.value))}
+                  options={powerOptions.map(p => ({
+                    value: p,
+                    label: `Livello ${p}`,
+                  }))}
+                  variant="ember"
+                />
               </div>
-              <Select
-                label="Ventola"
-                value={fan}
-                onChange={(e) => setFan(Number(e.target.value))}
-                options={fanOptions.map(f => ({
-                  value: f,
-                  label: `Livello ${f}`,
-                }))}
-                variant="default"
-              />
+
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <span className={`rounded-md px-2 py-1 text-xs font-bold ${getFanBadgeClass(fan)}`}>
+                    V{fan}
+                  </span>
+                  <Text as="span" variant="secondary" size="sm">
+                    Livello {fan}
+                  </Text>
+                </div>
+                <Select
+                  label="Ventola"
+                  value={fan}
+                  onChange={(e) => setFan(Number(e.target.value))}
+                  options={fanOptions.map(f => ({
+                    value: f,
+                    label: `Livello ${f}`,
+                  }))}
+                  variant="default"
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Actions */}

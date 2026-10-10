@@ -16,6 +16,8 @@ function climate(overrides: Partial<ClimateState> = {}): ClimateState {
     kp: 1.5,
     ti_minutes: 60,
     fan_by_power: [1, 3, 4, 5, 6],
+    fallback_power: 1,
+    fallback_fan: 1,
     updated_at: 1791540000,
     live: { setpoint: 20, temperature: 19.5, error: 0.5, power_level: 2, fan_level: 3, integral: 0.1 },
     ...overrides,
@@ -113,6 +115,8 @@ describe('ThermostatSettingsPage — climate control', () => {
 
     fireEvent.change(screen.getByLabelText('Potenza minima'), { target: { value: '2' } });
     fireEvent.change(screen.getByLabelText('P5'), { target: { value: '5' } });
+    fireEvent.change(screen.getByLabelText('Potenza di riserva'), { target: { value: '2' } });
+    fireEvent.change(screen.getByLabelText('Ventola di riserva'), { target: { value: '3' } });
     fireEvent.click(save);
 
     await waitFor(() => expect(patches).toHaveLength(1));
@@ -122,6 +126,8 @@ describe('ThermostatSettingsPage — climate control', () => {
       kp: 1.5,
       ti_minutes: 60,
       fan_by_power: [1, 3, 4, 5, 5],
+      fallback_power: 2,
+      fallback_fan: 3,
     });
     expect(await screen.findByRole('status')).toHaveTextContent('Regolazione salvata');
   });

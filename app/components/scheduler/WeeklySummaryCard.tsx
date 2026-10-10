@@ -9,9 +9,11 @@ import type { WeeklySchedule } from '@/lib/scheduler/schedulerService';
 
 export interface WeeklySummaryCardProps {
   schedule: WeeklySchedule;
+  /** Climate control decides power and fan: no power distribution */
+  hideLevels?: boolean;
 }
 
-export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) {
+export default function WeeklySummaryCard({ schedule, hideLevels = false }: WeeklySummaryCardProps) {
   const stats = calculateWeeklyStats(schedule);
 
   // Format hours with 1 decimal
@@ -72,29 +74,31 @@ export default function WeeklySummaryCard({ schedule }: WeeklySummaryCardProps) 
       {/* Power distribution */}
       {stats.totalHours > 0 && (
         <>
-          <div className="mb-4 border-t border-white/8 pt-4">
-            <Heading level={3} size="sm" variant="subtle" className="mb-3">
-              Distribuzione Potenza
-            </Heading>
-            <div className="space-y-2">
-              {powerPercentages.filter(p => p.hours > 0).map(({ level, hours, percentage }) => (
-                <div key={level} className="flex items-center gap-2">
-                  <Text as="span" variant="secondary" weight="medium" className="w-8">
-                    P{level}
-                  </Text>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
-                    <div
-                      className={`h-full transition-all duration-300 ${getPowerBarClass(level)}`}
-                      style={{ width: `${percentage}%` }}
-                    />
+          {!hideLevels && (
+            <div className="mb-4 border-t border-white/8 pt-4">
+              <Heading level={3} size="sm" variant="subtle" className="mb-3">
+                Distribuzione Potenza
+              </Heading>
+              <div className="space-y-2">
+                {powerPercentages.filter(p => p.hours > 0).map(({ level, hours, percentage }) => (
+                  <div key={level} className="flex items-center gap-2">
+                    <Text as="span" variant="secondary" weight="medium" className="w-8">
+                      P{level}
+                    </Text>
+                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className={`h-full transition-all duration-300 ${getPowerBarClass(level)}`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <Text as="span" variant="secondary" className="w-16">
+                      {formatHours(hours)} ({Math.round(percentage)}%)
+                    </Text>
                   </div>
-                  <Text as="span" variant="secondary" className="w-16">
-                    {formatHours(hours)} ({Math.round(percentage)}%)
-                  </Text>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Weekdays vs Weekend */}
           {(stats.weekdaysTotal > 0 || stats.weekendTotal > 0) && (

@@ -15,6 +15,8 @@ export interface ScheduleIntervalProps {
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
   onClick?: () => void;
+  /** Climate control decides power and fan: show the time range only */
+  hideLevels?: boolean;
 }
 
 export default function ScheduleInterval({
@@ -25,6 +27,7 @@ export default function ScheduleInterval({
   onMouseEnter,
   onMouseLeave,
   onClick,
+  hideLevels = false,
 }: ScheduleIntervalProps) {
   const powerLabel = POWER_LABELS[range.power as keyof typeof POWER_LABELS];
   const fanLabel = FAN_LABELS[range.fan as keyof typeof FAN_LABELS];
@@ -94,18 +97,20 @@ export default function ScheduleInterval({
           </div>
         </div>
 
-        {/* Power Progress Bar */}
-        <ProgressBar
-          value={powerLabel.percent}
-          gradient={powerLabel.gradient}
-          size="md"
-          animated
-          leftContent={
-            <>
-              <Zap size={16} className="text-(--text-2)" aria-hidden="true" />
-              <Text as="span" variant="secondary" size="sm" weight="semibold">
-                Potenza
-              </Text>
+        {!hideLevels && (
+          <>
+            {/* Power Progress Bar */}
+            <ProgressBar
+              value={powerLabel.percent}
+              gradient={powerLabel.gradient}
+              size="md"
+              animated
+              leftContent={
+                <>
+                  <Zap size={16} className="text-(--text-2)" aria-hidden="true" />
+                  <Text as="span" variant="secondary" size="sm" weight="semibold">
+                    Potenza
+                  </Text>
             </>
           }
           rightContent={
@@ -145,6 +150,8 @@ export default function ScheduleInterval({
             </>
           }
         />
+          </>
+        )}
       </div>
     </Card>
   );

@@ -113,6 +113,8 @@ export interface ClimateState {
   kp: number; // power levels per °C
   ti_minutes: number;
   fan_by_power: number[]; // 5 fan levels (1-6), one per power level
+  fallback_power: number; // 1-5: ignition and no-decision level, in place of the slot one (D25)
+  fallback_fan: number; // 1-6
   updated_at: number | null; // Unix seconds
   live: {
     setpoint: number | null; // programmed setpoint of the room now
@@ -128,7 +130,14 @@ export interface ClimateState {
 export type ClimatePatch = Partial<
   Pick<
     ClimateState,
-    'enabled' | 'min_power' | 'max_power' | 'kp' | 'ti_minutes' | 'fan_by_power'
+    | 'enabled'
+    | 'min_power'
+    | 'max_power'
+    | 'kp'
+    | 'ti_minutes'
+    | 'fan_by_power'
+    | 'fallback_power'
+    | 'fallback_fan'
   > & { room_id: string }
 >;
 
@@ -150,7 +159,7 @@ export interface ClimateLogResponse {
 export interface EngineTargetLevels {
   power_level: number | null; // null outside automatic mode when nobody decides that level
   fan_level: number | null;
-  source: 'slot' | 'climate' | 'hold' | 'manual';
+  source: 'slot' | 'fallback' | 'climate' | 'hold' | 'manual';
 }
 
 /** WS topic `scheduler` snapshot `data`. */

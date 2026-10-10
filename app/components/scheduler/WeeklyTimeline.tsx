@@ -7,15 +7,24 @@ import Text from '../ui/Text';
 import type { WeeklySchedule } from '@/lib/scheduler/schedulerService';
 
 const daysOfWeek = ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'];
+/** Colour of every slot while climate control decides the levels */
+const CLIMATE_SLOT_LEVEL = 3;
 const dayShortNames = ['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'];
 
 export interface WeeklyTimelineProps {
   schedule: WeeklySchedule;
   selectedDay: string;
   onSelectDay: (day: string) => void;
+  /** Climate control decides power and fan: every slot looks the same */
+  hideLevels?: boolean;
 }
 
-export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: WeeklyTimelineProps) {
+export default function WeeklyTimeline({
+  schedule,
+  selectedDay,
+  onSelectDay,
+  hideLevels = false,
+}: WeeklyTimelineProps) {
   return (
     <div className="space-y-2">
       {daysOfWeek.map((day, dayIndex) => {
@@ -66,14 +75,22 @@ export default function WeeklyTimeline({ schedule, selectedDay, onSelectDay }: W
                     <div
                       key={idx}
                       role="img"
-                      aria-label={`Intervallo ${interval.start} - ${interval.end}, potenza ${interval.power}, ventola ${interval.fan}`}
+                      aria-label={
+                        hideLevels
+                          ? `Intervallo ${interval.start} - ${interval.end}`
+                          : `Intervallo ${interval.start} - ${interval.end}, potenza ${interval.power}, ventola ${interval.fan}`
+                      }
                       className="absolute inset-y-0 transition-all duration-200 hover:opacity-90"
                       style={{
                         left: `${left}%`,
                         width: `${width}%`,
-                        background: getPowerGradient(interval.power),
+                        background: getPowerGradient(hideLevels ? CLIMATE_SLOT_LEVEL : interval.power),
                       }}
-                      title={`${interval.start} - ${interval.end} | P${interval.power} V${interval.fan}`}
+                      title={
+                        hideLevels
+                          ? `${interval.start} - ${interval.end}`
+                          : `${interval.start} - ${interval.end} | P${interval.power} V${interval.fan}`
+                      }
                     />
                   );
                 })}

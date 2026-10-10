@@ -175,13 +175,28 @@ describe('climate control (ROADMAP D16)', () => {
     mocked.getClimate.mockResolvedValue(state as never);
     expect(await (await climate.GET(req(), ctx())).json()).toMatchObject(state);
 
-    const body = { enabled: true, room_id: '2313748176', max_power: 4, fan_by_power: [1, 3, 4, 5, 6] };
+    const body = {
+      enabled: true,
+      room_id: '2313748176',
+      max_power: 4,
+      fan_by_power: [1, 3, 4, 5, 6],
+      fallback_power: 2,
+      fallback_fan: 3,
+    };
     expect((await climate.PATCH(req(body), ctx())).status).toBe(200);
     expect(mocked.patchClimate).toHaveBeenCalledWith(body);
   });
 
   it('rejects invalid PATCH bodies before the Pi', async () => {
-    for (const body of [{}, { max_power: 6 }, { fan_by_power: [1, 2] }, { kp: 0 }, { evil: 1 }]) {
+    for (const body of [
+      {},
+      { max_power: 6 },
+      { fan_by_power: [1, 2] },
+      { kp: 0 },
+      { fallback_power: 6 },
+      { fallback_fan: 0 },
+      { evil: 1 },
+    ]) {
       expect((await climate.PATCH(req(body), ctx())).status).toBe(400);
     }
     expect(mocked.patchClimate).not.toHaveBeenCalled();

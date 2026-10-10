@@ -14,6 +14,8 @@ export interface TimeBarProps {
   onClick: (index: number) => void;
   onIntervalClick?: (index: number, range: ScheduleInterval) => void;
   height?: string;
+  /** Climate control decides power and fan: time range only */
+  hideLevels?: boolean;
 }
 
 interface TooltipData {
@@ -29,6 +31,7 @@ export default function TimeBar({
   onHover,
   onClick,
   onIntervalClick,
+  hideLevels = false,
 }: TimeBarProps) {
   const totalMinutes = 24 * 60;
   const [tooltipData, setTooltipData] = useState<TooltipData | null>(null);
@@ -74,7 +77,11 @@ export default function TimeBar({
             <div
               key={idx}
               role="button"
-              aria-label={`Intervallo ${range.start} - ${range.end}, potenza ${range.power}, ventola ${range.fan}`}
+              aria-label={
+                hideLevels
+                  ? `Intervallo ${range.start} - ${range.end}`
+                  : `Intervallo ${range.start} - ${range.end}, potenza ${range.power}, ventola ${range.fan}`
+              }
               tabIndex={0}
               className={`absolute inset-y-0 cursor-pointer transition-all duration-200 ${
                 isActive
@@ -121,16 +128,18 @@ export default function TimeBar({
               <Clock size={12} aria-hidden="true" />
               {tooltipData.range.start} - {tooltipData.range.end}
             </div>
-            <div className="flex gap-3">
-              <span className="flex items-center gap-1">
-                <Zap size={12} aria-hidden="true" />
-                Potenza: {tooltipData.range.power}
-              </span>
-              <span className="flex items-center gap-1">
-                <Wind size={12} aria-hidden="true" />
-                Ventola: {tooltipData.range.fan}
-              </span>
-            </div>
+            {!hideLevels && (
+              <div className="flex gap-3">
+                <span className="flex items-center gap-1">
+                  <Zap size={12} aria-hidden="true" />
+                  Potenza: {tooltipData.range.power}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Wind size={12} aria-hidden="true" />
+                  Ventola: {tooltipData.range.fan}
+                </span>
+              </div>
+            )}
           </div>
           {/* Freccia del tooltip */}
           <div className="absolute bottom-0 left-1/2 z-10 -translate-x-1/2 translate-y-full transform">

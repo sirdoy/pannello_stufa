@@ -239,6 +239,24 @@ describe('SensorConditionForm', () => {
     expect(onChange).toHaveBeenCalledWith({ ...cond, expected_state: 'false' });
   });
 
+  it('"Da almeno" sets for_seconds in minutes and clearing it removes the wait (D26)', async () => {
+    const onChange = jest.fn();
+    const cond: SensorCondition = { type: 'device_state', sensor_id: 'dirigera:w1:is_open', expected_state: 'false' };
+    const { rerender } = render(<SensorConditionForm cond={cond} onChange={onChange} />);
+    const heldFor = await screen.findByLabelText('Da almeno, in minuti');
+    expect(heldFor).toHaveValue(null);
+    fireEvent.change(heldFor, { target: { value: '5' } });
+    expect(onChange).toHaveBeenLastCalledWith({ ...cond, for_seconds: 300 });
+
+    const timed: SensorCondition = { ...cond, for_seconds: 300 };
+    rerender(<SensorConditionForm cond={timed} onChange={onChange} />);
+    expect(screen.getByLabelText('Da almeno, in minuti')).toHaveValue(5);
+    fireEvent.change(screen.getByRole('combobox', { name: 'Valore' }), { target: { value: 'true' } });
+    expect(onChange).toHaveBeenLastCalledWith({ ...timed, expected_state: 'true' });
+    fireEvent.change(screen.getByLabelText('Da almeno, in minuti'), { target: { value: '' } });
+    expect(onChange).toHaveBeenLastCalledWith(cond);
+  });
+
   it('a stove rule written with another entity slot is still recognised and keeps its id', async () => {
     const onChange = jest.fn();
     const cond: SensorCondition = { type: 'device_state', sensor_id: 'thermorossi:_:stove_state', expected_state: 'working' };

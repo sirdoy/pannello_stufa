@@ -220,14 +220,33 @@ function metricOf(sensorId: string): string {
   return sensorId.split(':').slice(2).join(':');
 }
 
-/** The leaf for "sensor <operator> value": equality is `device_state`, the rest a threshold. */
+/** Longest wait the engine accepts on a sensor leaf (`for_seconds`, ROADMAP D26). */
+export const MAX_FOR_MINUTES = 1440;
+
+/** Minutes typed in the form → `for_seconds`, or null when the leaf must match at once. */
+export function minutesToForSeconds(minutes: number | null): number | null {
+  if (minutes === null || !Number.isFinite(minutes) || minutes <= 0) return null;
+  return Math.min(Math.max(Math.round(minutes * 60), 1), MAX_FOR_MINUTES * 60);
+}
+
+/** `for_seconds` of a leaf as the minutes the form shows, null when it has none. */
+export function forSecondsToMinutes(forSeconds: number | null | undefined): number | null {
+  return typeof forSeconds === 'number' && forSeconds > 0 ? Math.round((forSeconds / 60) * 100) / 100 : null;
+}
+
+/**
+ * The leaf for "sensor <operator> value": equality is `device_state`, the rest a threshold.
+ * `forSeconds` makes it match only after the comparison has held that long (D26).
+ */
 export function buildSensorCondition(
   sensorId: string,
   operator: SensorOperator,
   value: string,
+  forSeconds: number | null = null,
 ): SensorCondition {
+  const held = forSeconds !== null && forSeconds > 0 ? { for_seconds: forSeconds } : {};
   if (operator === 'eq') {
-    return { type: 'device_state', sensor_id: sensorId, expected_state: value };
+    return { type: 'device_state', sensor_id: sensorId, expected_state: value, ...held };
   }
   const threshold = Number(value);
   return {
@@ -236,6 +255,7 @@ export function buildSensorCondition(
     metric: metricOf(sensorId),
     operator,
     threshold: value.trim() !== '' && Number.isFinite(threshold) ? threshold : 0,
+    ...held,
   };
 }
 

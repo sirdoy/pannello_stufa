@@ -34,6 +34,7 @@ export interface SensorStateChangeLeaf {
   sensor_id: string;
   from_state?: string | null;
   to_state?: string | null;
+  for_seconds?: number | null; // 1..86400: matches only after the comparison held this long
 }
 
 // api/automations/models.py — SensorThresholdLeaf
@@ -43,6 +44,7 @@ export interface SensorThresholdLeaf {
   metric: string;
   operator: 'gt' | 'lt' | 'gte' | 'lte';
   threshold: number;
+  for_seconds?: number | null; // 1..86400, see automations.md#timed-leaves-for_seconds
 }
 
 // api/automations/models.py — NetatmoTemperatureThresholdLeaf
@@ -66,6 +68,7 @@ export interface DeviceStateCondition {
   type: 'device_state';
   sensor_id: string;
   expected_state: string;
+  for_seconds?: number | null; // 1..86400, see automations.md#timed-leaves-for_seconds
 }
 
 // api/automations/models.py — TemperatureRangeCondition
@@ -424,7 +427,7 @@ export type AutomationsTriggerSnapshotCause =
   | null;
 
 export interface AutomationsTriggerSnapshotAuto {
-  changed: string[]; // empty on a cron run and on a retry that ran without a sensor delta
+  changed: string[]; // empty on a cron run, a retry without a sensor delta, a for_seconds time elapsed
   result: boolean;
   kind?: 'cron'; // only on a run started by a schedule_cron trigger
   cron?: string; // the cron expression of that run

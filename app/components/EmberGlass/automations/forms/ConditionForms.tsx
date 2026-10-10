@@ -28,15 +28,18 @@ import { TwoCol } from '../primitives/TwoCol';
 import { EmberSelect } from '../primitives/EmberSelect';
 import { useAutomationSensors } from '../hooks/useAutomationSensors';
 import {
+  MAX_FOR_MINUTES,
   OPERATOR_OPTIONS,
   booleanLabels,
   booleanWord,
   buildSensorCondition,
   defaultConditionForSensor,
   findSensor,
+  forSecondsToMinutes,
   formatSensorValue,
   groupSensorsByDevice,
   metricLabel,
+  minutesToForSeconds,
   optionLabel,
   readComparison,
   type SensorCondition,
@@ -106,8 +109,15 @@ export function SensorConditionForm({ cond, onChange }: ConditionFormProps<Senso
   const { operator, value } = readComparison(cond);
   const unknownId = cond.sensor_id !== '' && sensor === null;
   const manual = manualChosen || error !== null || devices.length === 0 || unknownId;
+  const forSeconds = cond.for_seconds ?? null;
   const setComparison = (nextOperator: SensorOperator, nextValue: string) =>
-    onChange(buildSensorCondition(cond.sensor_id, nextOperator, nextValue));
+    onChange(buildSensorCondition(cond.sensor_id, nextOperator, nextValue, forSeconds));
+  const heldFor = (
+    <HeldFor
+      forSeconds={forSeconds}
+      onChange={(next) => onChange(buildSensorCondition(cond.sensor_id, operator, value, next))}
+    />
+  );
 
   if (manual) {
     const why =
@@ -124,7 +134,7 @@ export function SensorConditionForm({ cond, onChange }: ConditionFormProps<Senso
         <TextInput
           id="cond-sensor"
           value={cond.sensor_id}
-          onChange={(v) => onChange(buildSensorCondition(v, operator, value))}
+          onChange={(v) => onChange(buildSensorCondition(v, operator, value, forSeconds))}
           placeholder="es. dirigera:<id sensore>:is_open"
           aria-label="ID sensore"
         />
@@ -185,13 +195,14 @@ export function SensorConditionForm({ cond, onChange }: ConditionFormProps<Senso
             )}
           </div>
         </TwoCol>
+        {heldFor}
       </div>
     );
   }
 
   const device = sensor ? devices.find((d) => d.key === `${sensor.provider}:${sensor.device_id}`) : undefined;
   const pick = (next: AutomationSensor | undefined) => {
-    if (next) onChange(defaultConditionForSensor(next));
+    if (next) onChange({ ...defaultConditionForSensor(next), ...(forSeconds ? { for_seconds: forSeconds } : {}) });
   };
 
   return (
@@ -227,9 +238,35 @@ export function SensorConditionForm({ cond, onChange }: ConditionFormProps<Senso
           />
           <div style={{ height: 8 }} />
           <SensorComparison sensor={sensor} operator={operator} value={value} onChange={setComparison} />
+          {heldFor}
         </>
       )}
     </div>
+  );
+}
+
+interface HeldForProps {
+  forSeconds: number | null;
+  onChange: (forSeconds: number | null) => void;
+}
+
+/** How long the comparison must have held before the leaf is true (`for_seconds`, ROADMAP D26). */
+function HeldFor({ forSeconds, onChange }: HeldForProps) {
+  return (
+    <>
+      <div style={{ height: 8 }} />
+      <FieldLabel htmlFor="cond-held-for" small>Da almeno (vuoto = subito)</FieldLabel>
+      <NumInput
+        id="cond-held-for"
+        value={forSecondsToMinutes(forSeconds)}
+        allowNull
+        min={1}
+        max={MAX_FOR_MINUTES}
+        unit="min"
+        onChange={(v) => onChange(minutesToForSeconds(v))}
+        aria-label="Da almeno, in minuti"
+      />
+    </>
   );
 }
 

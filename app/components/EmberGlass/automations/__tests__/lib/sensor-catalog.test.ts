@@ -7,9 +7,11 @@ import {
   buildSensorCondition,
   defaultConditionForSensor,
   findSensor,
+  forSecondsToMinutes,
   formatSensorValue,
   groupSensorsByDevice,
   incompleteConditionMessage,
+  minutesToForSeconds,
   readComparison,
 } from '../../lib/sensor-catalog';
 
@@ -93,6 +95,30 @@ describe('condition leaves', () => {
       threshold: 12.5,
     });
     expect(buildSensorCondition('tuya:p1:power_w', 'lt', 'on')).toMatchObject({ threshold: 0 });
+  });
+
+  it('adds for_seconds only when the leaf has to wait (D26)', () => {
+    expect(buildSensorCondition('dirigera:m1:is_detected', 'eq', 'false', 300)).toEqual({
+      type: 'device_state',
+      sensor_id: 'dirigera:m1:is_detected',
+      expected_state: 'false',
+      for_seconds: 300,
+    });
+    expect(buildSensorCondition('tuya:p1:power_w', 'lt', '5', 60)).toMatchObject({ for_seconds: 60 });
+    expect(buildSensorCondition('a:b:c', 'eq', 'on', null)).not.toHaveProperty('for_seconds');
+    expect(buildSensorCondition('a:b:c', 'eq', 'on', 0)).not.toHaveProperty('for_seconds');
+  });
+
+  it('converts the minutes of the form to for_seconds and back', () => {
+    expect(minutesToForSeconds(5)).toBe(300);
+    expect(minutesToForSeconds(0.5)).toBe(30);
+    expect(minutesToForSeconds(null)).toBeNull();
+    expect(minutesToForSeconds(0)).toBeNull();
+    expect(minutesToForSeconds(5000)).toBe(86400);
+    expect(forSecondsToMinutes(300)).toBe(5);
+    expect(forSecondsToMinutes(90)).toBe(1.5);
+    expect(forSecondsToMinutes(null)).toBeNull();
+    expect(forSecondsToMinutes(undefined)).toBeNull();
   });
 
   it('reads the comparison back from both leaf types', () => {

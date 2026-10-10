@@ -51,7 +51,7 @@ jest.mock('../sections/ActionsSection', () => ({
     mintActionKey,
   }: {
     actions: Array<{ __key: string; type: string }>;
-    onChange: (a: Array<{ __key: string; type: string }>) => void;
+    onChange: (a: Array<{ __key: string; type: string; message?: string }>) => void;
     onValidationChange?: (actionKey: string, isValid: boolean) => void;
     mintActionKey: (action: { type: string }) => { type: string; __key: string };
   }) => (
@@ -117,6 +117,8 @@ function makeRule(overrides: Partial<AutomationRule> = {}): AutomationRule {
     max_triggers_per_hour: 0,
     last_triggered_at: null,
     created_at: 1700000000,
+    mode: 'edge',
+    priority: 0,
     updated_at: 1700000000,
     ...overrides,
   };

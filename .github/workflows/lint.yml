@@ -27,3 +27,7 @@ jobs:
       # Errors only: warn-level rules (tailwind class order etc.) are skipped by --quiet
       - name: ESLint (errors only)
         run: npm run lint:ci
+
+      # Tests included: jest and the build do not type-check them
+      - name: TypeScript
+        run: npm run type-check

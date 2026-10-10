@@ -41,6 +41,8 @@ function makeRule(overrides: Partial<AutomationRule> = {}): AutomationRule {
     active_hours_start: null,
     active_hours_end: null,
     created_at: 1000,
+    mode: 'edge',
+    priority: 0,
     updated_at: 1000,
     ...overrides,
   };

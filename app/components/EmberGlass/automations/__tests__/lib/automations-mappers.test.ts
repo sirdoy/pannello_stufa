@@ -18,6 +18,8 @@ function mockRule(overrides: Partial<AutomationRule> = {}): AutomationRule {
     active_hours_end: null,
     last_triggered_at: null,
     created_at: 1700000000,
+    mode: 'edge',
+    priority: 0,
     updated_at: 1700000000,
     ...overrides,
   };

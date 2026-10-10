@@ -35,6 +35,8 @@ const mockRule = {
   max_triggers_per_hour: 0,
   last_triggered_at: null,
   created_at: 1735689600,
+  mode: 'edge' as const,
+  priority: 0,
   updated_at: 1735689600,
 };
 

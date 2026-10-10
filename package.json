@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "lint:ci": "eslint . --quiet",
+    "type-check": "next typegen && tsc --noEmit -p tsconfig.typecheck.json",
     "test": "jest",
     "test:random": "jest --randomize",
     "test:watch": "jest --watch",

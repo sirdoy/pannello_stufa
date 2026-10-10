@@ -140,7 +140,7 @@ describe('what to receive (M61)', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('switch', { name: 'Disattiva notifica: Allarme stufa' }));
     });
-    const [url, init] = (global.fetch as jest.Mock).mock.calls.at(-1);
+    const [url, init] = (global.fetch as jest.Mock).mock.calls.slice(-1)[0];
     expect(url).toBe('/api/v1/notifications/preferences');
     expect(init.method).toBe('PUT');
     expect(JSON.parse(init.body)).toEqual({ events: { stove_alarm: false } });

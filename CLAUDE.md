@@ -18,6 +18,7 @@ npm run test:api        # API route tests
 npm run test:components # UI component tests
 npm run test:pages      # Pages / route tests
 npm run lint
+npm run type-check      # tsc on the whole repo, tests included (CI `lint.yml`)
 ```
 
 ## Rules
@@ -43,6 +44,10 @@ npm run lint
    contratto partono dal backend. **NEVER** edit `types/automations.contract.ts` by hand: è copia identica di
    `../docs/api/automations.types.ts` (`cp ../docs/api/automations.types.ts types/automations.contract.ts`).
 10. **NEVER** call the backend from client components: il browser usa solo route Next; `lib/haClient.ts` è server-only.
+11. **RUN** `npm run type-check` dopo aver cambiato un tipo condiviso (`types/`, contratto): Jest e `next build` non
+    controllano i tipi dei file di test, quindi un campo nuovo obbligatorio rompe i dati finti in silenzio (da
+    **T11**: 20 errori dopo **D13**). Lo script usa `tsconfig.typecheck.json`, che esclude `.next/dev`: la cache di
+    `next dev` tiene i tipi di route cancellate e `tsc -p .` li segnala come errori finti.
 
 ## Backend integration
 

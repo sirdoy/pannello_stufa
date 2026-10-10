@@ -1,60 +1,68 @@
 /**
- * PlugBody tests — Phase 179 Plan 05
- *
- * Read-only: 2 StatChips (Ora + Oggi) with kW/W boundary formatting.
- * Covers TDD behaviors 7-10 from plan.
+ * PlugBody — readings of a smart plug (ROADMAP M84): power now ("Ora") and energy counter
+ * ("Energia"). The switch is in the card header, not here.
  */
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 
-import { PlugBody } from '@/app/components/EmberGlass/rooms/bodies/PlugBody';
-import type { RoomDevice } from '@/app/components/EmberGlass/rooms/types';
+import { render, screen, within } from '@testing-library/react';
+import { PlugBody } from '../../bodies/PlugBody';
+import type { RoomDevice } from '../../types';
 
-function makeDevice(power: number, today_kwh: number): RoomDevice {
+function makeDevice(extra: Record<string, unknown>): RoomDevice {
   return {
+    id: 22,
     kind: 'plug',
-    name: 'Presa',
+    name: 'Presa bollitore',
     on: true,
-    value: `${power}W`,
-    tone: '#f5c84a',
-    extra: { power, today_kwh },
+    statusLabel: 'Accesa',
+    value: '450W',
+    tone: '#ffb84a',
+    extra: { id: 'plug-1', ...extra },
   };
 }
 
+function chipValue(label: string): string | null {
+  const chip = screen.getByText(label).parentElement!;
+  return within(chip).getByTestId('stat-chip-value').textContent;
+}
+
 describe('PlugBody', () => {
-  test('Test 7: renders 2 StatChips with labels Ora and Oggi', () => {
-    render(<PlugBody device={makeDevice(450, 2.4)} />);
-    expect(screen.getByText('Ora')).toBeInTheDocument();
-    expect(screen.getByText('Oggi')).toBeInTheDocument();
+  it('shows the two readings "Ora" and "Energia" and no control', () => {
+    render(<PlugBody device={makeDevice({ power: 450, today_kwh: 2.44 })} />);
+
+    expect(screen.getAllByTestId('stat-chip')).toHaveLength(2);
+    expect(chipValue('Ora')).toBe('450W');
+    expect(chipValue('Energia')).toBe('2.4 kWh');
+    expect(screen.queryByText('Oggi')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument();
   });
 
-  test('Test 8: power < 1000W renders NW format (no space) — "450W"', () => {
-    render(<PlugBody device={makeDevice(450, 1.0)} />);
-    expect(screen.getByText('450W')).toBeInTheDocument();
+  it.each([
+    [0, '0W'],
+    [12.6, '13W'],
+    [999, '999W'],
+    [1000, '1.0kW'],
+    [1500, '1.5kW'],
+    [2300, '2.3kW'],
+  ])('formats %s watts as %s', (power, expected) => {
+    render(<PlugBody device={makeDevice({ power, today_kwh: 0 })} />);
+    expect(chipValue('Ora')).toBe(expected);
   });
 
-  test('Test 8b: power=999W renders "999W"', () => {
-    render(<PlugBody device={makeDevice(999, 0)} />);
-    expect(screen.getByText('999W')).toBeInTheDocument();
+  it.each([
+    [0, '0.0 kWh'],
+    [0.84, '0.8 kWh'],
+    [12, '12.0 kWh'],
+    [128.36, '128.4 kWh'],
+  ])('formats %s kWh as %s', (today_kwh, expected) => {
+    render(<PlugBody device={makeDevice({ power: 0, today_kwh })} />);
+    expect(chipValue('Energia')).toBe(expected);
   });
 
-  test('Test 9: power >= 1000W renders X.YkW format — "1.5kW"', () => {
-    render(<PlugBody device={makeDevice(1500, 3.0)} />);
-    expect(screen.getByText('1.5kW')).toBeInTheDocument();
-  });
+  it('shows zero when the plug sent no reading', () => {
+    render(<PlugBody device={makeDevice({})} />);
 
-  test('Test 9b: power=1000W renders "1.0kW"', () => {
-    render(<PlugBody device={makeDevice(1000, 0)} />);
-    expect(screen.getByText('1.0kW')).toBeInTheDocument();
-  });
-
-  test('Test 10: today_kwh renders as N.N kWh (with space — D-55)', () => {
-    render(<PlugBody device={makeDevice(450, 2.4)} />);
-    expect(screen.getByText('2.4 kWh')).toBeInTheDocument();
-  });
-
-  test('Test 10b: today_kwh=0 renders "0.0 kWh"', () => {
-    render(<PlugBody device={makeDevice(0, 0)} />);
-    expect(screen.getByText('0.0 kWh')).toBeInTheDocument();
+    expect(chipValue('Ora')).toBe('0W');
+    expect(chipValue('Energia')).toBe('0.0 kWh');
   });
 });

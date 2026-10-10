@@ -1,145 +1,162 @@
 /**
- * DeviceBody jest spec — Plan 179-08 (ROOMS-04 / CONTEXT D-26).
+ * DeviceBody spec: dispatch from device.kind to its body, and `hasDeviceBody` (ROADMAP M84).
  *
- * Mocks all *Body imports so DeviceBody can be tested in isolation.
- * Each mock renders a data-testid indicating which body was selected.
- *
- * Tests:
- *   1. kind='stove' → StoveBody
- *   2. kind='thermo' → ThermoBody
- *   3. kind='valve' → ValveBody (ThermoBody.tsx exports both)
- *   4. kind='light' → LightBody; 'plug' → PlugBody; 'sonos' → SonosBody;
- *      'tv' → TvBody; 'shade' → ShadeBody; 'camera' → CameraBody; 'sensor' → SensorBody
- *   5. unknown kind → renders nothing (null)
+ * The bodies are stubs that expose which one was picked and whether `onError` was passed.
+ * A device without a reading has no body: it would show made-up values (rule M78). The stove is
+ * the exception: it keeps the safe command (switch off).
  */
 
-import { render, screen } from '@testing-library/react';
-import type { RoomDevice } from '../types';
+import { fireEvent, render, screen } from '@testing-library/react';
+import type { DeviceKind, RoomDevice } from '../types';
 
-// Stub all *Body imports
-jest.mock('../bodies/StoveBody', () => ({
-  StoveBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-stove-body-${device.name}`} />
-  ),
-}));
+type BodyProps = { device: RoomDevice; onError?: (message: string | null) => void };
 
-jest.mock('../bodies/ThermoBody', () => ({
-  ThermoBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-thermo-body-${device.name}`} />
-  ),
-  ValveBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-valve-body-${device.name}`} />
-  ),
-}));
+function mockBody(name: string) {
+  return function MockBody({ device, onError }: BodyProps) {
+    return (
+      <button
+        type="button"
+        data-testid={`mock-${name}-body`}
+        data-device={device.id}
+        data-has-on-error={String(typeof onError === 'function')}
+        onClick={() => onError?.(`${name} failed`)}
+      />
+    );
+  };
+}
 
-jest.mock('../bodies/LightBody', () => ({
-  LightBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-light-body-${device.name}`} />
-  ),
-}));
+jest.mock('../bodies/StoveBody', () => ({ StoveBody: mockBody('stove') }));
+jest.mock('../bodies/ThermoBody', () => ({ ThermoBody: mockBody('thermo') }));
+jest.mock('../bodies/LightBody', () => ({ LightBody: mockBody('light') }));
+jest.mock('../bodies/PlugBody', () => ({ PlugBody: mockBody('plug') }));
+jest.mock('../bodies/SonosBody', () => ({ SonosBody: mockBody('sonos') }));
+jest.mock('../bodies/CameraBody', () => ({ CameraBody: mockBody('camera') }));
+jest.mock('../bodies/SensorBody', () => ({ SensorBody: mockBody('sensor') }));
+jest.mock('../bodies/HostBody', () => ({ HostBody: mockBody('host') }));
 
-jest.mock('../bodies/PlugBody', () => ({
-  PlugBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-plug-body-${device.name}`} />
-  ),
-}));
+import { DeviceBody, hasDeviceBody } from '../DeviceBody';
 
-jest.mock('../bodies/SonosBody', () => ({
-  SonosBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-sonos-body-${device.name}`} />
-  ),
-}));
+/** Extra payload that gives each kind something to show */
+const EXTRA: Record<DeviceKind, Record<string, unknown>> = {
+  stove: { powerLevel: 3, fanLevel: 2 },
+  thermo: { current: 20, target: 21, roomId: 'r1' },
+  valve: { current: 20, target: 21, roomId: 'r2' },
+  light: { lightId: '5', brightness: 80 },
+  plug: { id: 'plug-1', power: 12, today_kwh: 1 },
+  sonos: { id: 'RINCON_A:1', track: '', artist: '', volume: 20 },
+  camera: { cameraId: 'cam-1', sd: 'on', power: 'on' },
+  sensor: { sensor: { id: 's-1' } },
+  host: { cpu: 7.5, temperature: 52, memory: 40 },
+};
 
-jest.mock('../bodies/TvBody', () => ({
-  TvBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-tv-body-${device.name}`} />
-  ),
-}));
+function makeDevice(kind: DeviceKind, over: Partial<RoomDevice> = {}): RoomDevice {
+  return { id: 1, kind, name: 'Test', on: true, value: '', tone: '#fff', extra: EXTRA[kind], ...over };
+}
 
-jest.mock('../bodies/ShadeBody', () => ({
-  ShadeBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-shade-body-${device.name}`} />
-  ),
-}));
+describe('hasDeviceBody', () => {
+  it.each<DeviceKind>(['stove', 'thermo', 'valve', 'light', 'plug', 'sonos', 'camera', 'sensor', 'host'])(
+    'a %s with a reading has a body',
+    (kind) => {
+      expect(hasDeviceBody(makeDevice(kind))).toBe(true);
+    },
+  );
 
-jest.mock('../bodies/CameraBody', () => ({
-  CameraBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-camera-body-${device.name}`} />
-  ),
-}));
+  it.each<DeviceKind>(['thermo', 'valve', 'light', 'plug', 'sonos', 'camera', 'sensor', 'host'])(
+    'an unreachable %s has no body, even with a payload',
+    (kind) => {
+      expect(hasDeviceBody(makeDevice(kind, { unreachable: true }))).toBe(false);
+    },
+  );
 
-jest.mock('../bodies/SensorBody', () => ({
-  SensorBody: ({ device }: { device: RoomDevice }) => (
-    <div data-testid={`mock-sensor-body-${device.name}`} />
-  ),
-}));
+  it('an unreachable stove keeps its body: the safe command (switch off) stays available', () => {
+    expect(hasDeviceBody(makeDevice('stove', { unreachable: true, extra: {} }))).toBe(true);
+  });
 
-import { DeviceBody } from '../DeviceBody';
+  it('a sensor still loading (no sensor payload) has no body', () => {
+    expect(hasDeviceBody(makeDevice('sensor', { extra: {}, statusLabel: 'In attesa' }))).toBe(false);
+  });
 
-const makeDevice = (kind: RoomDevice['kind'], name = 'Test'): RoomDevice => ({
-  kind,
-  name,
-  on: true,
-  value: '',
-  tone: '#fff',
-  extra: {},
+  it('a camera still loading (no camera id) has no body', () => {
+    expect(hasDeviceBody(makeDevice('camera', { extra: {}, statusLabel: 'In attesa' }))).toBe(false);
+  });
+
+  it('a host without CPU stats (the Netatmo relay, a Pi without data) has no body', () => {
+    expect(hasDeviceBody(makeDevice('host', { extra: {} }))).toBe(false);
+    expect(hasDeviceBody(makeDevice('host', { extra: { cpu: null, temperature: null, memory: null } }))).toBe(false);
+  });
+
+  it('a host with 0% CPU still has a body', () => {
+    expect(hasDeviceBody(makeDevice('host', { extra: { cpu: 0 } }))).toBe(true);
+  });
 });
 
-describe('DeviceBody (ROOMS-04 / CONTEXT D-26)', () => {
-  it('Test 1: renders StoveBody for kind="stove"', () => {
-    render(<DeviceBody device={makeDevice('stove', 'Stufa')} />);
-    expect(screen.getByTestId('mock-stove-body-Stufa')).toBeInTheDocument();
+describe('DeviceBody', () => {
+  it.each<[DeviceKind, string]>([
+    ['stove', 'stove'],
+    ['thermo', 'thermo'],
+    ['valve', 'thermo'],
+    ['light', 'light'],
+    ['plug', 'plug'],
+    ['sonos', 'sonos'],
+    ['camera', 'camera'],
+    ['sensor', 'sensor'],
+    ['host', 'host'],
+  ])('kind "%s" renders the %s body with the device', (kind, body) => {
+    const { container } = render(<DeviceBody device={makeDevice(kind, { id: 33 })} />);
+    expect(screen.getByTestId(`mock-${body}-body`)).toHaveAttribute('data-device', '33');
+    expect(container.children).toHaveLength(1);
   });
 
-  it('Test 2: renders ThermoBody for kind="thermo"', () => {
-    render(<DeviceBody device={makeDevice('thermo', 'Thermo')} />);
-    expect(screen.getByTestId('mock-thermo-body-Thermo')).toBeInTheDocument();
+  it.each<DeviceKind>(['stove', 'thermo', 'valve', 'light', 'sonos'])(
+    'the %s body can send commands: it receives onError',
+    (kind) => {
+      const onError = jest.fn();
+      const { container } = render(<DeviceBody device={makeDevice(kind)} onError={onError} />);
+      const body = container.firstElementChild as HTMLElement;
+      expect(body).toHaveAttribute('data-has-on-error', 'true');
+      fireEvent.click(body);
+      expect(onError).toHaveBeenCalledTimes(1);
+      expect(onError).toHaveBeenCalledWith(expect.stringMatching(/ failed$/));
+    },
+  );
+
+  it.each<DeviceKind>(['plug', 'camera', 'sensor', 'host'])(
+    'the %s body is read-only: it does not receive onError',
+    (kind) => {
+      const onError = jest.fn();
+      const { container } = render(<DeviceBody device={makeDevice(kind)} onError={onError} />);
+      expect(container.firstElementChild).toHaveAttribute('data-has-on-error', 'false');
+    },
+  );
+
+  it.each<DeviceKind>(['thermo', 'valve', 'light', 'plug', 'sonos', 'camera', 'sensor', 'host'])(
+    'renders nothing for an unreachable %s',
+    (kind) => {
+      const { container } = render(<DeviceBody device={makeDevice(kind, { unreachable: true })} />);
+      expect(container).toBeEmptyDOMElement();
+    },
+  );
+
+  it('renders the stove body for an unreachable stove, with onError', () => {
+    const onError = jest.fn();
+    render(<DeviceBody device={makeDevice('stove', { unreachable: true, on: false })} onError={onError} />);
+    expect(screen.getByTestId('mock-stove-body')).toHaveAttribute('data-has-on-error', 'true');
   });
 
-  it('Test 3: renders ValveBody for kind="valve"', () => {
-    render(<DeviceBody device={makeDevice('valve', 'Valve')} />);
-    expect(screen.getByTestId('mock-valve-body-Valve')).toBeInTheDocument();
+  it('renders nothing for a device without a reading to show', () => {
+    const { container } = render(
+      <>
+        <DeviceBody device={makeDevice('sensor', { extra: {} })} />
+        <DeviceBody device={makeDevice('camera', { extra: {} })} />
+        <DeviceBody device={makeDevice('host', { extra: {} })} />
+      </>,
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 
-  it('Test 4a: renders LightBody for kind="light"', () => {
-    render(<DeviceBody device={makeDevice('light', 'Luce')} />);
-    expect(screen.getByTestId('mock-light-body-Luce')).toBeInTheDocument();
-  });
-
-  it('Test 4b: renders PlugBody for kind="plug"', () => {
-    render(<DeviceBody device={makeDevice('plug', 'Presa')} />);
-    expect(screen.getByTestId('mock-plug-body-Presa')).toBeInTheDocument();
-  });
-
-  it('Test 4c: renders SonosBody for kind="sonos"', () => {
-    render(<DeviceBody device={makeDevice('sonos', 'Sonos')} />);
-    expect(screen.getByTestId('mock-sonos-body-Sonos')).toBeInTheDocument();
-  });
-
-  it('Test 4d: renders TvBody for kind="tv"', () => {
-    render(<DeviceBody device={makeDevice('tv', 'TV')} />);
-    expect(screen.getByTestId('mock-tv-body-TV')).toBeInTheDocument();
-  });
-
-  it('Test 4e: renders ShadeBody for kind="shade"', () => {
-    render(<DeviceBody device={makeDevice('shade', 'Tapparella')} />);
-    expect(screen.getByTestId('mock-shade-body-Tapparella')).toBeInTheDocument();
-  });
-
-  it('Test 4f: renders CameraBody for kind="camera"', () => {
-    render(<DeviceBody device={makeDevice('camera', 'Camera')} />);
-    expect(screen.getByTestId('mock-camera-body-Camera')).toBeInTheDocument();
-  });
-
-  it('Test 4g: renders SensorBody for kind="sensor"', () => {
-    render(<DeviceBody device={makeDevice('sensor', 'Sensore')} />);
-    expect(screen.getByTestId('mock-sensor-body-Sensore')).toBeInTheDocument();
-  });
-
-  it('Test 5: renders nothing for unknown kind (returns null)', () => {
-    // Cast to never to test the default branch
-    const unknownDevice = { ...makeDevice('stove', 'X'), kind: 'unknown' as never };
-    const { container } = render(<DeviceBody device={unknownDevice} />);
-    expect(container.firstChild).toBeNull();
+  it('renders nothing for an unknown kind', () => {
+    const unknown = { ...makeDevice('stove'), kind: 'tv' as never };
+    const { container } = render(<DeviceBody device={unknown} />);
+    expect(container).toBeEmptyDOMElement();
   });
 });

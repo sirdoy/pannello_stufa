@@ -1,104 +1,109 @@
 /**
- * RoomCard jest spec — Plan 179-03 (ROOMS-02 / CONTEXT D-18..D-19).
+ * RoomCard spec: chip-grid card of a Pi room (ROADMAP M84).
  *
- * Tests chip-grid card composition: GlassCard + CardHead + 3-col chip grid,
- * +N overflow chip, empty state, tone-tinted count badge, and onOpen callback.
- *
- * GlassCard auto-wraps in Pressable when onOpen is set (Phase 177 D-19 +
- * GlassCard.tsx:83-92). No manual Pressable wrap needed in RoomCard.
+ * GlassCard + CardHead + 3-col grid of six cells (with more devices the last one is "+N"), empty state, count
+ * badge tinted with the room tone, onOpen on tap.
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
-import type { RoomConfig, RoomDevice } from '../types';
-
-// RoomCard is not created yet — these tests will fail (RED phase)
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import type { DeviceKind, RoomConfig, RoomDevice } from '../types';
 import { RoomCard } from '../RoomCard';
 
-// Fixture: room with tone
-const room: RoomConfig = {
-  name: 'Soggiorno',
-  tone: '#f5c84a',
-  icon: 'home',
-};
+const room: RoomConfig = { id: 7, name: 'Sala', tone: '#f5c84a', icon: 'sofa' };
 
-// Fixtures: 7 devices (to test overflow + 6-chip slice)
-const makeDevice = (i: number, on = false): RoomDevice => ({
-  kind: 'light',
-  name: `Luce ${i}`,
-  on,
-  value: '80%',
-  tone: '#f5c84a',
-  extra: {},
-});
+function makeDevice(id: number, on = false, kind: DeviceKind = 'light'): RoomDevice {
+  return { id, kind, name: `Device ${id}`, on, value: '', tone: '#f5c84a', extra: {} };
+}
 
-const sixDevices: RoomDevice[] = Array.from({ length: 6 }, (_, i) => makeDevice(i, i % 2 === 0));
-const sevenDevices: RoomDevice[] = Array.from({ length: 7 }, (_, i) => makeDevice(i, i % 2 === 0));
-const activeDevices: RoomDevice[] = [
-  { kind: 'light', name: 'Luce 1', on: true, value: '80%', tone: '#f5c84a', extra: {} },
-  { kind: 'light', name: 'Luce 2', on: false, value: '20%', tone: '#f5c84a', extra: {} },
-];
-const allOffDevices: RoomDevice[] = [
-  { kind: 'light', name: 'Luce 1', on: false, value: '0%', tone: '#f5c84a', extra: {} },
-];
+const devices = (n: number): RoomDevice[] => Array.from({ length: n }, (_, i) => makeDevice(i + 1, i % 2 === 0));
 
 describe('RoomCard', () => {
-  test('Test 1: renders the room name in CardHead label slot', () => {
-    render(<RoomCard room={room} devices={activeDevices} onOpen={jest.fn()} />);
-    expect(screen.getByText('Soggiorno')).toBeTruthy();
+  it('is identified by the id of the Pi room and shows its name', () => {
+    render(<RoomCard room={room} devices={devices(2)} onOpen={jest.fn()} />);
+    const card = screen.getByTestId('room-card-7');
+    expect(within(card).getByText('Sala')).toBeInTheDocument();
   });
 
-  test('Test 2: active count badge shows "{activeCount}/{total}" with tabular-nums font', () => {
-    render(<RoomCard room={room} devices={activeDevices} onOpen={jest.fn()} />);
-    // 1 on, 1 off → "1/2"
-    const badge = screen.getByText('1/2');
-    expect(badge).toBeTruthy();
-    expect(badge.style.fontVariantNumeric).toBe('tabular-nums');
-  });
-
-  test('Test 3: when activeCount > 0, badge text color is room.tone; when activeCount === 0, color is var(--text-2)', () => {
-    const { rerender } = render(
-      <RoomCard room={room} devices={activeDevices} onOpen={jest.fn()} />,
+  it('two rooms with the same name keep distinct cards', () => {
+    render(
+      <>
+        <RoomCard room={room} devices={[]} onOpen={jest.fn()} />
+        <RoomCard room={{ ...room, id: 8 }} devices={[]} onOpen={jest.fn()} />
+      </>,
     );
-    // 1 active → tone color
-    const activeBadge = screen.getByText('1/2') as HTMLElement;
-    expect(activeBadge.style.color).not.toBe('var(--text-2)');
-
-    rerender(<RoomCard room={room} devices={allOffDevices} onOpen={jest.fn()} />);
-    // 0 active → var(--text-2)
-    const zeroBadge = screen.getByText('0/1') as HTMLElement;
-    expect(zeroBadge.style.color).toBe('var(--text-2)');
+    expect(screen.getByTestId('room-card-7')).toBeInTheDocument();
+    expect(screen.getByTestId('room-card-8')).toBeInTheDocument();
   });
 
-  test('Test 4: renders 6 DeviceChips when given 6+ devices (slice(0, 6))', () => {
-    const { container } = render(<RoomCard room={room} devices={sixDevices} onOpen={jest.fn()} />);
-    // DeviceChip renders with data-testid="device-chip-{kind}"
-    const chips = container.querySelectorAll('[data-testid^="device-chip-"]');
-    expect(chips.length).toBe(6);
+  it('badge shows "active/total" in the room tone when something is on', () => {
+    render(<RoomCard room={room} devices={[makeDevice(1, true), makeDevice(2, false), makeDevice(3, true)]} onOpen={jest.fn()} />);
+    const badge = screen.getByText('2/3');
+    expect(badge.style.fontVariantNumeric).toBe('tabular-nums');
+    expect(badge).toHaveStyle({ color: '#f5c84a' });
   });
 
-  test('Test 5: renders "+N" overflow chip when devices.length > 6 (7 devices → 6 chips + "+1")', () => {
-    const { container } = render(<RoomCard room={room} devices={sevenDevices} onOpen={jest.fn()} />);
-    const chips = container.querySelectorAll('[data-testid^="device-chip-"]');
-    expect(chips.length).toBe(6);
-    // Overflow chip shows "+1"
-    expect(screen.getByText('+1')).toBeTruthy();
+  it('badge is dimmed when nothing is on', () => {
+    render(<RoomCard room={room} devices={[makeDevice(1), makeDevice(2)]} onOpen={jest.fn()} />);
+    expect(screen.getByText('0/2').style.color).toBe('var(--text-2)');
   });
 
-  test('Test 6: renders "Nessun dispositivo" text when devices.length === 0', () => {
+  it('a device that does not answer is counted in the total, not as active', () => {
+    const silent: RoomDevice = { ...makeDevice(2), statusLabel: 'Non risponde', unreachable: true };
+    render(<RoomCard room={room} devices={[makeDevice(1, true), silent]} onOpen={jest.fn()} />);
+    expect(screen.getByText('1/2')).toBeInTheDocument();
+  });
+
+  it('renders one chip per device, by kind', () => {
+    const mixed = [makeDevice(1, true, 'stove'), makeDevice(2, false, 'valve'), makeDevice(3, true, 'host')];
+    render(<RoomCard room={room} devices={mixed} onOpen={jest.fn()} />);
+    const card = screen.getByTestId('room-card-7');
+    expect(within(card).getByTestId('device-chip-stove')).toHaveAttribute('data-on', 'true');
+    expect(within(card).getByTestId('device-chip-valve')).toHaveAttribute('data-on', 'false');
+    expect(within(card).getByTestId('device-chip-host')).toBeInTheDocument();
+    expect(screen.queryByTestId('room-card-7-overflow')).not.toBeInTheDocument();
+  });
+
+  it('6 devices fill the grid without an overflow chip', () => {
+    render(<RoomCard room={room} devices={devices(6)} onOpen={jest.fn()} />);
+    expect(screen.getAllByTestId(/^device-chip-/)).toHaveLength(6);
+    expect(screen.queryByTestId('room-card-7-overflow')).not.toBeInTheDocument();
+  });
+
+  it('more than 6 devices: 5 chips and a "+N" cell, six cells in all', () => {
+    render(<RoomCard room={room} devices={devices(9)} onOpen={jest.fn()} />);
+    expect(screen.getAllByTestId(/^device-chip-/)).toHaveLength(5);
+    const overflow = screen.getByTestId('room-card-7-overflow');
+    expect(overflow).toHaveTextContent('+4');
+    expect(overflow).toHaveAttribute('aria-label', '4 altri dispositivi');
+    expect(overflow.parentElement?.children).toHaveLength(6);
+    // The badge still counts every device, hidden ones included
+    expect(screen.getByText('5/9')).toBeInTheDocument();
+  });
+
+  it('7 devices: the "+N" cell counts the two devices without a chip', () => {
+    render(<RoomCard room={room} devices={devices(7)} onOpen={jest.fn()} />);
+    expect(screen.getAllByTestId(/^device-chip-/)).toHaveLength(5);
+    expect(screen.getByTestId('room-card-7-overflow')).toHaveTextContent('+2');
+  });
+
+  it('a room without devices says so and shows "0/0"', () => {
     render(<RoomCard room={room} devices={[]} onOpen={jest.fn()} />);
-    expect(screen.getByText('Nessun dispositivo')).toBeTruthy();
-    // No chip grid
-    const { container } = render(<RoomCard room={room} devices={[]} onOpen={jest.fn()} />);
-    const chips = container.querySelectorAll('[data-testid^="device-chip-"]');
-    expect(chips.length).toBe(0);
+    expect(screen.getByText('Nessun dispositivo')).toBeInTheDocument();
+    expect(screen.getByText('0/0')).toBeInTheDocument();
+    expect(screen.queryByTestId(/^device-chip-/)).not.toBeInTheDocument();
   });
 
-  test('Test 7: clicking the rendered card invokes the onOpen callback', () => {
+  it('a tap on the card calls onOpen', () => {
     const onOpen = jest.fn();
-    const { container } = render(<RoomCard room={room} devices={activeDevices} onOpen={onOpen} />);
-    // GlassCard with onOpen auto-wraps in Pressable which adds onClick to root
-    const card = container.firstElementChild as HTMLElement;
-    fireEvent.click(card);
+    render(<RoomCard room={room} devices={devices(2)} onOpen={onOpen} />);
+    fireEvent.click(screen.getByTestId('room-card-7'));
+    expect(onOpen).toHaveBeenCalledTimes(1);
+  });
+
+  it('a tap on a chip opens the room too (chips are not controls)', () => {
+    const onOpen = jest.fn();
+    render(<RoomCard room={room} devices={devices(2)} onOpen={onOpen} />);
+    fireEvent.click(screen.getAllByTestId('device-chip-light')[0]!);
     expect(onOpen).toHaveBeenCalledTimes(1);
   });
 });

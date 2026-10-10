@@ -1,16 +1,16 @@
 /**
- * Phase 179 — Rooms tab canonical type contracts.
+ * Rooms tab type contracts (ROADMAP M84).
  *
- * RoomDevice, RoomConfig, DeviceKind, AggregatorState are the stable
- * contracts consumed by every Wave 1+ component (RoomCard, RoomSheet,
- * DeviceCard, DeviceBody, all *Body files, rooms-config.ts, getDevicesForRoom.ts).
- *
- * AggregatorState field shapes match RESEARCH.md §Aggregator Reconciliation
- * (NOT the bundle's idealized state fixture).
- *
- * Stability contract: these types are frozen at Wave 0 and MUST NOT change
- * without updating all downstream consumers.
+ * Rooms and their members come from the Pi (`GET /api/rooms/house/status`); each member is joined
+ * with the live data of its provider hook through the registry `device_id`.
  */
+
+import type { HueLight } from '@/types/hueProxy';
+import type { TuyaPlug } from '@/types/tuyaProxy';
+import type { DirigeraSensor } from '@/types/dirigeraProxy';
+import type { CameraStatus } from '@/types/netatmoProxy';
+import type { NetatmoTopology, NetatmoStatus } from '@/app/components/devices/thermostat/hooks/useThermostatData';
+import type { SonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 
 export type DeviceKind =
   | 'stove'
@@ -19,82 +19,45 @@ export type DeviceKind =
   | 'light'
   | 'plug'
   | 'sonos'
-  | 'tv'
-  | 'shade'
   | 'camera'
-  | 'sensor';
+  | 'sensor'
+  | 'host';
+
+export type RoomIcon = 'home' | 'sofa' | 'kitchen' | 'bed' | 'bath' | 'door' | 'garage' | 'box';
 
 export interface RoomConfig {
-  name: 'Soggiorno' | 'Cucina' | 'Camera' | 'Studio' | 'Bagno' | 'Ingresso';
+  /** Room id on the Pi */
+  id: number;
+  name: string;
   tone: string; // 'var(--accent)' or hex
-  icon: 'home' | 'moon' | 'droplet';
+  icon: RoomIcon;
 }
 
 export interface RoomDevice {
+  /** Registry id of the device: stable key inside a room */
+  id: number;
   kind: DeviceKind;
-  name: string; // displayed in DeviceCard header
+  name: string;
+  /** Lit in the card and counted as active (light on, window open, music playing, heating) */
   on: boolean;
-  value: string; // status-line right-side string ("21.3° → 21°", "450W", etc.) — see UI-SPEC §Copywriting Contract
-  tone: string; // category color used by DeviceChip + DeviceCard tinting
-  mock?: boolean; // true for EXTRA_DEVICES static entries
-  extra: Record<string, unknown>; // kind-specific payload — bodies down-cast (see UI-SPEC §Data Aggregation Contract)
+  /** First part of the status line; defaults to "Attivo" / "Inattivo" */
+  statusLabel?: string;
+  /** Second part of the status line ("21.3° → 21°", "450W") */
+  value: string;
+  tone: string;
+  /** The provider has no reading for this device: never shown as a device state (rule M78) */
+  unreachable?: boolean;
+  /** Kind-specific payload read by the bodies */
+  extra: Record<string, unknown>;
 }
 
-/**
- * AggregatorState — the literal built by RoomsTab orchestrator from real hook outputs.
- *
- * Field shapes are verified against live hooks (RESEARCH.md §Aggregator Reconciliation):
- * - stove: no `temp` field exposed by useStoveData; `powerLevel`/`fanLevel` nullable → coerce ?? 0
- * - thermostat: zones merged from topology.rooms + status.rooms; kind from modules.type (NATherm1 → thermo, NRV → valve)
- * - lights: room_name from HueLight.room_name (string | null); brightness 0-254 → caller converts to 0-100%
- * - plugs: id from device_id; name from custom_name ?? device_id; on from switch_on === true; power from power_w ?? 0
- * - sonos: groups from zones[]; playing from playback[group_id].transport_state === 'PLAYING'; volume from volumes[coordinator_uid].volume
- */
-export interface AggregatorState {
-  stove: {
-    on: boolean;
-    temp: number; // placeholder — useStoveData has no temp field; aggregator passes 0 (RESEARCH deviation)
-    powerLevel: number;
-    fanLevel: number;
-    target?: number; // placeholder — no Thermorossi setpoint endpoint (deferred)
-  };
-  thermostat: {
-    zones: Array<{
-      name: string;
-      on: boolean;
-      current: number;
-      target: number;
-      kind: 'thermo' | 'valve';
-      roomId: string;
-    }>;
-  };
-  lights: {
-    lights: Array<{
-      name: string;
-      on: boolean;
-      room_name: string | null;
-      groupId: string;
-      brightness?: number; // 0-100 percent (caller converts from Hue's 0-254)
-    }>;
-  };
-  plugs: {
-    plugs: Array<{
-      id: string;
-      name: string;
-      on: boolean;
-      power: number;
-      today_kwh?: number;
-    }>;
-  };
-  sonos: {
-    groups: Array<{
-      id: string;
-      name: string;
-      playing: boolean;
-      track: string;
-      artist: string;
-      volume: number;
-      coordinator: string;
-    }>;
-  };
+/** Live data of the provider hooks, as the Rooms tab reads them. `null` = not loaded yet. */
+export interface LiveState {
+  stove: { on: boolean; powerLevel: number | null; fanLevel: number | null; unreachable: boolean } | null;
+  thermostat: { topology: NetatmoTopology | null; status: NetatmoStatus | null };
+  lights: HueLight[] | null;
+  plugs: TuyaPlug[] | null;
+  sonos: SonosFullData | null;
+  sensors: DirigeraSensor[] | null;
+  cameras: CameraStatus[] | null;
 }

@@ -1,97 +1,107 @@
 /**
- * DeviceChip jest spec — Plan 179-03 (ROOMS-02 / CONTEXT D-20).
+ * DeviceChip spec: 1:1 chip of a device inside RoomCard.
  *
- * Tests 1:1 aspect-ratio chip with color-mix tone tinting on/off,
- * 5x5 dot pinned top:3 right:3 when on, and no click handler.
+ * Tone tint and glow dot when the device is on, dim when off; the icon comes from the kind;
+ * the chip has no click handler (taps reach the card).
  */
 
-import { render } from '@testing-library/react';
-import type { RoomDevice } from '../types';
-
-// DeviceChip is not created yet — these tests will fail (RED phase)
+import { render, screen } from '@testing-library/react';
+import { Flame, Lightbulb, Music, Plug, Radar, Server, Thermometer, Video } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import type { DeviceKind, RoomDevice } from '../types';
+import { CATEGORY_ORDER, ICON_FOR } from '../lib/rooms-config';
 import { DeviceChip } from '../DeviceChip';
 
-const onLight: RoomDevice = {
-  kind: 'light',
-  name: 'Lampada salotto',
-  on: true,
-  value: '80%',
-  tone: '#f5c84a',
-  extra: {},
-};
+function makeDevice(over: Partial<RoomDevice> = {}): RoomDevice {
+  return { id: 1, kind: 'light', name: 'Lampada', on: true, value: '80%', tone: '#f5c84a', extra: {}, ...over };
+}
 
-const offShade: RoomDevice = {
-  kind: 'shade',
-  name: 'Tapparella',
-  on: false,
-  value: '60%',
-  tone: '#b0b0b0',
-  extra: {},
-};
+const TONE = /#f5c84a|rgb\(245, 200, 74\)/;
+
+const offSensor = makeDevice({ kind: 'sensor', name: 'Finestra', on: false, value: '', tone: '#5ec8d8' });
 
 describe('DeviceChip', () => {
-  test('Test 1: renders an icon sized 14px when given a device.kind mapped through ICON_FOR', () => {
-    const { container } = render(<DeviceChip device={onLight} />);
-    // lucide renders an svg
+  it('is identified by the kind and exposes the on state', () => {
+    render(<DeviceChip device={makeDevice()} />);
+    expect(screen.getByTestId('device-chip-light')).toHaveAttribute('data-on', 'true');
+  });
+
+  it('renders the 14px icon of the kind', () => {
+    const { container } = render(<DeviceChip device={makeDevice()} />);
     const svg = container.querySelector('svg');
-    expect(svg).toBeTruthy();
-    // icon size 14 is passed as width/height on the svg
     expect(svg?.getAttribute('width')).toBe('14');
+    expect(svg?.classList.contains('lucide-lightbulb')).toBe(true);
   });
 
-  test('Test 2: when device.on === true, background and border use color-mix with tone', () => {
-    const { container } = render(<DeviceChip device={onLight} />);
-    const chip = container.firstElementChild as HTMLElement;
-    const bg = chip.style.background;
-    const border = chip.style.border;
-    // JSDOM converts #f5c84a to rgb(245, 200, 74) in computed style
-    expect(bg).toContain('color-mix');
-    expect(border).toContain('color-mix');
-    // Verify tinting (color-mix uses either hex or rgb form)
-    const bgContainsTone = bg.includes('#f5c84a') || bg.includes('245, 200, 74') || bg.includes('rgb(245');
-    const borderContainsTone = border.includes('#f5c84a') || border.includes('245, 200, 74') || border.includes('rgb(245');
-    expect(bgContainsTone).toBe(true);
-    expect(borderContainsTone).toBe(true);
+  it('every kind the Pi can send has an icon', () => {
+    const expected: Record<DeviceKind, LucideIcon> = {
+      stove: Flame,
+      thermo: Thermometer,
+      valve: Thermometer,
+      light: Lightbulb,
+      plug: Plug,
+      sonos: Music,
+      camera: Video,
+      sensor: Radar,
+      host: Server,
+    };
+    for (const kind of CATEGORY_ORDER) {
+      expect(ICON_FOR[kind]).toBe(expected[kind]);
+      const { container, unmount } = render(<DeviceChip device={makeDevice({ kind })} />);
+      expect(screen.getByTestId(`device-chip-${kind}`).querySelector('svg')).not.toBeNull();
+      expect(container.querySelectorAll('svg')).toHaveLength(1);
+      unmount();
+    }
   });
 
-  test('Test 3: when device.on === false, background is rgba(255,255,255,0.04) and border is rgba(255,255,255,0.06)', () => {
-    const { container } = render(<DeviceChip device={offShade} />);
-    const chip = container.firstElementChild as HTMLElement;
-    const bg = chip.style.background;
-    const border = chip.style.border;
-    expect(bg).toBe('rgba(255, 255, 255, 0.04)');
-    expect(border).toContain('rgba(255, 255, 255, 0.06)');
+  it('on: background, border and icon colour use the device tone', () => {
+    render(<DeviceChip device={makeDevice()} />);
+    const chip = screen.getByTestId('device-chip-light');
+    expect(chip.style.background).toContain('color-mix');
+    // jsdom rewrites the hex inside color-mix() as rgb()
+    expect(chip.style.background).toMatch(TONE);
+    expect(chip.style.border).toMatch(TONE);
+    expect(chip).toHaveStyle({ color: '#f5c84a' });
   });
 
-  test('Test 4: when device.on === true, a 5x5 dot is rendered with position:absolute top:3 right:3 and boxShadow', () => {
-    const { container } = render(<DeviceChip device={onLight} />);
-    // Use span[aria-hidden] to distinguish the dot from the lucide SVG (which also has aria-hidden="true")
+  it('off: dim background and border, no tone', () => {
+    render(<DeviceChip device={offSensor} />);
+    const chip = screen.getByTestId('device-chip-sensor');
+    expect(chip).toHaveAttribute('data-on', 'false');
+    expect(chip.style.background).toBe('rgba(255, 255, 255, 0.04)');
+    expect(chip.style.border).toContain('rgba(255, 255, 255, 0.06)');
+    expect(chip.style.color).toBe('var(--text-2)');
+  });
+
+  it('on: a 5x5 glow dot is pinned to the top right', () => {
+    const { container } = render(<DeviceChip device={makeDevice()} />);
     const dot = container.querySelector('span[aria-hidden="true"]') as HTMLElement | null;
-    expect(dot).toBeTruthy();
+    expect(dot).not.toBeNull();
     expect(dot?.style.position).toBe('absolute');
     expect(dot?.style.top).toBe('3px');
     expect(dot?.style.right).toBe('3px');
     expect(dot?.style.width).toBe('5px');
     expect(dot?.style.height).toBe('5px');
-    expect(dot?.style.boxShadow).toContain('#f5c84a');
+    expect(dot?.style.boxShadow).toMatch(TONE);
   });
 
-  test('Test 5: when device.on === false, NO dot is rendered', () => {
-    const { container } = render(<DeviceChip device={offShade} />);
-    // Use span[aria-hidden] to distinguish the dot from the lucide SVG
-    const dot = container.querySelector('span[aria-hidden="true"]');
-    expect(dot).toBeNull();
+  it('off: no dot', () => {
+    const { container } = render(<DeviceChip device={offSensor} />);
+    expect(container.querySelector('span[aria-hidden="true"]')).toBeNull();
   });
 
-  test('Test 6: aspect ratio is 1 / 1', () => {
-    const { container } = render(<DeviceChip device={onLight} />);
-    const chip = container.firstElementChild as HTMLElement;
+  it('a device that does not answer looks off', () => {
+    const silent = makeDevice({ on: false, statusLabel: 'Non risponde', unreachable: true });
+    const { container } = render(<DeviceChip device={silent} />);
+    expect(screen.getByTestId('device-chip-light')).toHaveAttribute('data-on', 'false');
+    expect(container.querySelector('span[aria-hidden="true"]')).toBeNull();
+  });
+
+  it('is a square without a click handler', () => {
+    render(<DeviceChip device={makeDevice()} />);
+    const chip = screen.getByTestId('device-chip-light');
     expect(chip.style.aspectRatio).toBe('1 / 1');
-  });
-
-  test('Test 7: component renders no click handler (onclick is null)', () => {
-    const { container } = render(<DeviceChip device={onLight} />);
-    const chip = container.firstElementChild as HTMLElement;
     expect(chip.onclick).toBeNull();
+    expect(chip.tagName).toBe('DIV');
   });
 });

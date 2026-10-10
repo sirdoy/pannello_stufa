@@ -17,6 +17,7 @@
  */
 import type { CSSProperties, MouseEvent } from 'react';
 import type { LucideIcon } from 'lucide-react';
+import Spinner from '@/app/components/ui/Spinner';
 
 export interface SliderRowProps {
   label: string;
@@ -27,6 +28,8 @@ export interface SliderRowProps {
   tone?: string;
   Icon?: LucideIcon;
   disabled?: boolean;
+  /** Command sent and not yet settled (ROADMAP M81): spinner next to the value, taps ignored */
+  pending?: boolean;
   onChange?: (next: number) => void;
 }
 
@@ -39,13 +42,14 @@ export function SliderRow({
   tone = 'var(--accent)',
   Icon,
   disabled = false,
+  pending = false,
   onChange,
 }: SliderRowProps){
   // Clamp + compute fill percentage
   const range = max === min ? 1 : max - min;
   const pct = Math.max(0, Math.min(100, ((value - min) / range) * 100));
 
-  const interactive = !disabled && typeof onChange === 'function';
+  const interactive = !disabled && !pending && typeof onChange === 'function';
 
   function handleTrackClick(e: MouseEvent<HTMLDivElement>) {
     if (!interactive) return;
@@ -110,7 +114,10 @@ export function SliderRow({
           {Icon ? <Icon size={12} strokeWidth={2} /> : null}
           <span>{label}</span>
         </div>
-        <span style={valueStyle}>{value}{unit}</span>
+        <span style={{ ...valueStyle, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          {pending ? <Spinner size="xs" variant="current" aria-hidden data-testid="slider-row-spinner" /> : null}
+          {value}{unit}
+        </span>
       </div>
       <div
         data-testid="slider-row-track"
@@ -121,6 +128,7 @@ export function SliderRow({
         aria-valuemin={interactive ? min : undefined}
         aria-valuemax={interactive ? max : undefined}
         aria-disabled={disabled || undefined}
+        aria-busy={pending || undefined}
       >
         <div data-testid="slider-row-fill" style={fillStyle} />
       </div>

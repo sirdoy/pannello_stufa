@@ -1,38 +1,34 @@
 'use client';
 /**
- * SonosBody — Phase 179 Plan 07
- * Bundle source: rooms.jsx:411-426
+ * SonosBody — track line, volume and transport of a Sonos zone.
  *
- * Renders Sonos audio body: track-line + Volume SliderRow + ControlRow with
- * SkipBack / Play-Pause / SkipForward buttons.
- *
- * Volume override note (RESEARCH §Aggregator Reconciliation Sonos):
- *   - CONTEXT D-31 prescribed per-speaker targeting (overridden per RESEARCH Pitfall 7).
- *   - handleSetZoneVolume(group_id, value) sets the whole group's volume.
- *   - Matches Phase 178 SonosSheet line 92 precedent.
- *   - device.extra.id is the group_id (== coordinator_uid for Sonos).
- *
- * D-02: inline-style + var(--token) only.
- * D-37 / D-67: no memoization hooks — inline handlers allowed.
- * T-179-07-01: 250ms debounce prevents volume command flood on drag.
- * T-179-07-02: handleSetZoneVolume — whole-group targeting (NOT per-speaker).
- * T-179-07-03: all button handlers gate `if (!groupId)` — defensive against empty id.
+ * `device.extra.id` is the group id of the zone the speaker plays in; volume and transport act on
+ * the whole zone. The volume is sent 250 ms after the last tap. Every control shows its command
+ * in progress and the others are locked meanwhile (ROADMAP M81).
  */
-import { useEffect, useState } from 'react';
 import { Pause, Play, SkipBack, SkipForward, Volume2 } from 'lucide-react';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 import { useSonosCommands } from '@/app/components/devices/sonos/hooks/useSonosCommands';
-import { useDebounce } from '@/app/hooks/useDebounce';
+import { usePendingActions } from '../../usePendingActions';
+import { useSyncedSetting } from '../useSyncedSetting';
 import { SliderRow } from '../primitives/SliderRow';
 import { ControlRow } from '../primitives/ControlRow';
 import { MiniButton } from '../primitives/MiniButton';
 import type { RoomDevice } from '../types';
 
-export function SonosBody({ device }: { device: RoomDevice }){
+export interface SonosBodyProps {
+  device: RoomDevice;
+  onError?: (message: string | null) => void;
+}
+
+export function SonosBody({ device, onError }: SonosBodyProps) {
   const data = useSonosFullData();
-  // RESEARCH §Aggregator Reconciliation Sonos + Phase 178 SonosSheet precedent:
-  // prefer handleSetZoneVolume(group_id, vol) — targets the whole group (Pitfall 7).
-  const cmds = useSonosCommands({ fetchData: data.fetchData, applyMutation: data.applyMutation, setError: () => {} });
+  const cmds = useSonosCommands({
+    fetchData: data.fetchData,
+    applyMutation: data.applyMutation,
+    setError: (message) => onError?.(message),
+  });
+  const actions = usePendingActions();
 
   // device.extra.id is the group_id for Sonos (== coordinator_uid per AggregatorState.sonos)
   const groupId = String(device.extra.id ?? '');
@@ -40,21 +36,15 @@ export function SonosBody({ device }: { device: RoomDevice }){
   const track = (device.extra.track as string | undefined) ?? '';
   const artist = (device.extra.artist as string | undefined) ?? '';
 
-  // D-56: omit artist when placeholder '—' (em dash) or empty
   const showArtist = artist.length > 0 && artist !== '—';
 
-  // Volume debounce — 250ms per Phase 16.0 / Phase 178 D-08
-  const [pending, setPending] = useState<number>(initialVolume);
-  const debounced = useDebounce(pending, 250);
-
-  useEffect(() => {
-    if (!groupId) return;
-    // Skip if value matches initial (no actual user interaction yet)
-    if (debounced === initialVolume) return;
-    // T-179-07-02: whole-group volume (Pitfall 7 — see RESEARCH §Aggregator Reconciliation Sonos)
-    void cmds.handleSetZoneVolume(groupId, debounced);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debounced]);
+  const [pending, setPending] = useSyncedSetting({
+    serverValue: initialVolume,
+    delayMs: 250,
+    enabled: groupId !== '',
+    busy: actions.anyPending,
+    send: (value) => void actions.run('volume', () => cmds.handleSetZoneVolume(groupId, value)),
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
@@ -80,16 +70,18 @@ export function SonosBody({ device }: { device: RoomDevice }){
         unit="%"
         Icon={Volume2}
         tone={device.tone}
-        disabled={!device.on}
+        pending={actions.isPending('volume')}
         onChange={(next) => { setPending(next); }}
       />
       <ControlRow>
         <MiniButton
           Icon={SkipBack}
           ariaLabel="Brano precedente"
+          pending={actions.isPending('previous')}
+          disabled={actions.anyPending && !actions.isPending('previous')}
           onClick={() => {
             if (!groupId) return;
-            void cmds.handlePrevious(groupId);
+            void actions.run('previous', () => cmds.handlePrevious(groupId));
           }}
         />
         <MiniButton
@@ -97,18 +89,21 @@ export function SonosBody({ device }: { device: RoomDevice }){
           filled={device.on}
           tone={device.tone}
           ariaLabel={device.on ? 'Pausa' : 'Riproduci'}
+          pending={actions.isPending('transport')}
+          disabled={actions.anyPending && !actions.isPending('transport')}
           onClick={() => {
             if (!groupId) return;
-            if (device.on) void cmds.handlePause(groupId);
-            else void cmds.handlePlay(groupId);
+            void actions.run('transport', () => (device.on ? cmds.handlePause(groupId) : cmds.handlePlay(groupId)));
           }}
         />
         <MiniButton
           Icon={SkipForward}
           ariaLabel="Brano successivo"
+          pending={actions.isPending('next')}
+          disabled={actions.anyPending && !actions.isPending('next')}
           onClick={() => {
             if (!groupId) return;
-            void cmds.handleNext(groupId);
+            void actions.run('next', () => cmds.handleNext(groupId));
           }}
         />
       </ControlRow>

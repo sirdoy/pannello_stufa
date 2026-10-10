@@ -108,4 +108,65 @@ describe('SliderRow (D-36)', () => {
     }
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  describe('pending (ROADMAP M81)', () => {
+    const RECT = {
+      left: 0, right: 200, width: 200, top: 0, bottom: 10, height: 10, x: 0, y: 0, toJSON: () => {},
+    } as DOMRect;
+
+    function track(): HTMLElement {
+      const el = screen.getByTestId('slider-row-track');
+      jest.spyOn(el, 'getBoundingClientRect').mockReturnValue(RECT);
+      return el;
+    }
+
+    test('not pending: no spinner, no busy state, track is a slider', () => {
+      render(<SliderRow label="Volume" value={50} unit="%" onChange={jest.fn()} />);
+      expect(screen.queryByTestId('slider-row-spinner')).not.toBeInTheDocument();
+      const el = screen.getByTestId('slider-row-track');
+      expect(el).not.toHaveAttribute('aria-busy');
+      expect(el).toHaveAttribute('role', 'slider');
+      expect(el.style.cursor).toBe('pointer');
+    });
+
+    test('pending: spinner next to the value, which stays visible', () => {
+      render(<SliderRow label="Volume" value={50} unit="%" onChange={jest.fn()} pending />);
+      const spinner = screen.getByTestId('slider-row-spinner');
+      expect(spinner).toBeInTheDocument();
+      expect(spinner.parentElement).toHaveTextContent('50%');
+    });
+
+    test('pending: track is busy and not interactive', () => {
+      render(<SliderRow label="Volume" value={50} unit="%" onChange={jest.fn()} pending />);
+      const el = screen.getByTestId('slider-row-track');
+      expect(el).toHaveAttribute('aria-busy', 'true');
+      expect(el).not.toHaveAttribute('role');
+      expect(el).not.toHaveAttribute('aria-valuenow');
+      expect(el.style.cursor).toBe('default');
+    });
+
+    test('pending: a tap on the track does NOT call onChange', () => {
+      const onChange = jest.fn();
+      render(<SliderRow label="Volume" value={50} unit="%" onChange={onChange} pending />);
+      fireEvent.click(track(), { clientX: 150 });
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    test('pending is not dimmed like disabled', () => {
+      render(<SliderRow label="Volume" value={50} unit="%" onChange={jest.fn()} pending />);
+      expect(screen.getByTestId('slider-row').style.opacity).toBe('1');
+      expect(screen.getByTestId('slider-row-track')).not.toHaveAttribute('aria-disabled');
+    });
+
+    test('onChange is called again once pending is over', () => {
+      const onChange = jest.fn();
+      const { rerender } = render(<SliderRow label="Volume" value={50} unit="%" onChange={onChange} pending />);
+      fireEvent.click(track(), { clientX: 150 });
+      rerender(<SliderRow label="Volume" value={50} unit="%" onChange={onChange} />);
+      expect(screen.queryByTestId('slider-row-spinner')).not.toBeInTheDocument();
+      fireEvent.click(track(), { clientX: 150 });
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith(75);
+    });
+  });
 });

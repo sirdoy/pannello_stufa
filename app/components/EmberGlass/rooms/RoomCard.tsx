@@ -1,10 +1,11 @@
 'use client';
 
 /**
- * RoomCard — Phase 179 (ROOMS-02 / CONTEXT D-18..D-19)
+ * RoomCard — Phase 179 (ROOMS-02 / CONTEXT D-18..D-19); rooms come from the Pi since M84.
  *
  * Chip-grid card: GlassCard (Phase 177) + CardHead (Phase 177) +
- * 3-col DeviceChip grid (≤6 chips) + "+N" overflow chip + empty state.
+ * 3-col DeviceChip grid of six cells (the last one is the "+N" counter when there are more
+ * devices) + empty state.
  *
  * Visual contract verbatim from bundle `rooms.jsx:158-189`.
  *
@@ -30,12 +31,15 @@ export interface RoomCardProps {
   onOpen: () => void;
 }
 
+const MAX_CELLS = 6;
+
 export function RoomCard({ room, devices, onOpen }: RoomCardProps){
   const Icon = ICON_FOR[room.icon];
   const activeCount = devices.filter((d) => d.on).length;
   const total = devices.length;
-  const visible = devices.slice(0, 6);
-  const overflowCount = Math.max(0, total - 6);
+  // Six cells (two rows of three): with more devices the last cell is the "+N" counter
+  const visible = total > MAX_CELLS ? devices.slice(0, MAX_CELLS - 1) : devices;
+  const overflowCount = total - visible.length;
 
   const countBadge = (
     <span
@@ -53,7 +57,7 @@ export function RoomCard({ room, devices, onOpen }: RoomCardProps){
     <GlassCard
       tone={room.tone}
       onOpen={onOpen}
-      data-testid={`room-card-${room.name.toLowerCase()}`}
+      data-testid={`room-card-${room.id}`}
     >
       <CardHead Icon={Icon} label={room.name} tone={room.tone} right={countBadge} />
       <div style={{ marginTop: 10, flex: 1 }}>
@@ -77,12 +81,12 @@ export function RoomCard({ room, devices, onOpen }: RoomCardProps){
               alignContent: 'start',
             }}
           >
-            {visible.map((d, i) => (
-              <DeviceChip key={`${d.kind}-${d.name}-${i}`} device={d} />
+            {visible.map((d) => (
+              <DeviceChip key={d.id} device={d} />
             ))}
             {overflowCount > 0 ? (
               <div
-                data-testid={`room-card-${room.name.toLowerCase()}-overflow`}
+                data-testid={`room-card-${room.id}-overflow`}
                 aria-label={`${overflowCount} altri dispositivi`}
                 style={{
                   aspectRatio: '1 / 1',

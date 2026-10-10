@@ -15,10 +15,12 @@
  * DeviceCard.test.tsx mocks ./DeviceBody so this component is independently green.
  */
 
+import { useState } from 'react';
+import Banner from '@/app/components/ui/Banner';
 import { Pressable } from '../Pressable';
 import { ICON_FOR } from './lib/rooms-config';
 import { DevicePrimaryControl } from './DevicePrimaryControl';
-import { DeviceBody } from './DeviceBody';
+import { DeviceBody, hasDeviceBody } from './DeviceBody';
 import type { RoomDevice } from './types';
 
 export interface DeviceCardProps {
@@ -28,12 +30,15 @@ export interface DeviceCardProps {
 export function DeviceCard({ device }: DeviceCardProps){
   const Icon = ICON_FOR[device.kind];
   const tone = device.tone;
-  const slug = `${device.kind}-${device.name.toLowerCase().replace(/\s+/g, '-')}`;
+  // A refused command of the header control or of the body, shown in the card (rule M77)
+  const [error, setError] = useState<string | null>(null);
+  const statusLabel = device.statusLabel ?? (device.on ? 'Attivo' : 'Inattivo');
 
   return (
     <Pressable
       as="div"
-      data-testid={`stanze-device-${slug}`}
+      data-testid={`stanze-device-${device.id}`}
+      data-kind={device.kind}
       style={{
         borderRadius: 16,
         padding: 14,
@@ -46,7 +51,7 @@ export function DeviceCard({ device }: DeviceCardProps){
       }}
     >
       {/* Header row — bundle rooms.jsx:282-309 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         {/* 40×40 icon tile */}
         <div
           style={{
@@ -75,17 +80,27 @@ export function DeviceCard({ device }: DeviceCardProps){
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{device.name}</div>
           <div style={{ fontSize: 11, color: 'var(--text-2)', marginTop: 2 }}>
-            {device.on ? 'Attivo' : 'Inattivo'}
+            {statusLabel}
             {device.value ? ` · ${device.value}` : ''}
           </div>
         </div>
 
         {/* Right-slot: DevicePrimaryControl */}
-        <DevicePrimaryControl device={device} />
+        <DevicePrimaryControl device={device} onError={setError} />
       </div>
 
-      {/* Body slot — DeviceBody ships in Plan 08 (Wave 3) */}
-      <DeviceBody device={device} />
+      {/* No reading, no controls: a body would show made-up values (rule M78) */}
+      {hasDeviceBody(device) ? (
+        <div style={{ marginTop: 12 }}>
+          <DeviceBody device={device} onError={setError} />
+        </div>
+      ) : null}
+
+      {error ? (
+        <div style={{ marginTop: 10 }} data-testid="stanze-device-error">
+          <Banner variant="error" compact dismissible onDismiss={() => setError(null)} description={error} />
+        </div>
+      ) : null}
     </Pressable>
   );
 }

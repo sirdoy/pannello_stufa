@@ -1,8 +1,7 @@
 /**
  * Phase 179 — Rooms tab barrel export.
  *
- * Exports every component, primitive, body, lib symbol, and type
- * per CONTEXT D-68. Phase 181+ can import via:
+ * Exports every component, primitive, body, lib symbol, and type:
  *   import { RoomsTab } from '@/app/components/EmberGlass/rooms';
  */
 
@@ -18,18 +17,17 @@ export { DeviceChip } from './DeviceChip';
 export { DeviceCard } from './DeviceCard';
 export type { DeviceCardProps } from './DeviceCard';
 export { DevicePrimaryControl } from './DevicePrimaryControl';
-export { DeviceBody } from './DeviceBody';
+export { DeviceBody, hasDeviceBody } from './DeviceBody';
 
 // Bodies
 export { StoveBody } from './bodies/StoveBody';
-export { ThermoBody, ValveBody } from './bodies/ThermoBody';
+export { ThermoBody } from './bodies/ThermoBody';
 export { LightBody } from './bodies/LightBody';
 export { PlugBody } from './bodies/PlugBody';
 export { SonosBody } from './bodies/SonosBody';
-export { TvBody } from './bodies/TvBody';
-export { ShadeBody } from './bodies/ShadeBody';
 export { CameraBody } from './bodies/CameraBody';
 export { SensorBody } from './bodies/SensorBody';
+export { HostBody } from './bodies/HostBody';
 
 // Primitives
 export { StatChip } from './primitives/StatChip';
@@ -43,18 +41,19 @@ export { MiniButton } from './primitives/MiniButton';
 export type { MiniButtonProps } from './primitives/MiniButton';
 
 // Lib + types
-export { getDevicesForRoom } from './lib/getDevicesForRoom';
+export { useHouseStatus } from './useHouseStatus';
+export { buildRoomDevices } from './lib/buildRoomDevices';
 export {
-  ROOMS,
-  ROOM_ALIASES,
-  EXTRA_DEVICES,
+  roomConfig,
   ICON_FOR,
+  TONE_FOR_KIND,
   CATEGORY_ORDER,
   CATEGORY_LABEL,
 } from './lib/rooms-config';
 export type {
   RoomDevice,
   RoomConfig,
+  RoomIcon,
   DeviceKind,
-  AggregatorState,
+  LiveState,
 } from './types';

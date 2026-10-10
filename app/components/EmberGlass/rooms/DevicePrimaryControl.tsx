@@ -1,76 +1,65 @@
 'use client';
 /**
- * DevicePrimaryControl — Plan 179-04 (ROOMS-04 / CONTEXT D-25)
+ * DevicePrimaryControl — right side of a DeviceCard header.
  *
- * Right-aligned header control for DeviceCard. Dispatches by device.kind
- * to 5 branches:
- *   - sonos     → 40×40 round play/pause button
- *   - camera    → LIVE pill (10px caps, letterSpacing 0.6) + pulsing dot
- *   - sensor    → OK pill
- *   - light/plug/thermo/valve → InlineToggle (command-wired)
- *   - stove/tv/shade → 40px empty placeholder div
+ *   - light / plug → InlineToggle on the single device
+ *   - sonos        → round play / pause button
+ *   - anything else has no one-tap command: nothing is rendered
  *
- * CRITICAL — Pitfall 3: setRoomMode second arg is 'manual' | 'home', NOT
- * 'on' | 'off'. The TypeScript union `SetRoomThermpointRequest['mode']` is
- * 'manual' | 'home'. Toggle logic: device.on → 'home'; !device.on → 'manual'.
+ * Every control shows the command in progress and ignores a second tap until it settles
+ * (ROADMAP M81, rule "Comando in corso"). Each sub-component fetches its own commands hook.
  *
- * Pitfall 8: gate setRoomMode on homeId !== '' (topology resolves async).
- *
- * Per-body self-fetch pattern — CONTEXT D-39 / Phase 178 D-04. Each sub-component
- * imports its own data + commands hooks.
- *
- * RC-clean: no manual memo hooks — Phase 71/95/178 D-33 React Compiler discipline.
- * Inline-style + var(--token) — CONTEXT D-02.
- * Bundle source: rooms.jsx:319-352.
+ * RC-clean: no manual memo hooks.
  */
 
 import { Pause, Play } from 'lucide-react';
+import Spinner from '@/app/components/ui/Spinner';
 import { InlineToggle } from '../InlineToggle';
+import { usePendingActions } from '../usePendingActions';
 import { useSonosFullData } from '@/app/components/devices/sonos/hooks/useSonosFullData';
 import { useSonosCommands } from '@/app/components/devices/sonos/hooks/useSonosCommands';
-import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
-import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
 import { useTuyaCommands } from '@/app/components/devices/tuya/hooks/useTuyaCommands';
-import { useThermostatData } from '@/app/components/devices/thermostat/hooks/useThermostatData';
-import { useThermostatCommands } from '@/app/components/devices/thermostat/hooks/useThermostatCommands';
-import { useRouter } from 'next/navigation';
+import { useRoomLightCommands } from './useRoomLightCommands';
 import type { RoomDevice } from './types';
 
-export function DevicePrimaryControl({ device }: { device: RoomDevice }){
+export interface DevicePrimaryControlProps {
+  device: RoomDevice;
+  /** Reports a refused command to the card, which shows it (null clears it) */
+  onError?: (message: string | null) => void;
+}
+
+export function DevicePrimaryControl({ device, onError }: DevicePrimaryControlProps) {
+  if (device.unreachable) return null;
   switch (device.kind) {
-    case 'sonos':
-      return <SonosControl device={device} />;
-    case 'camera':
-      return <CameraPill />;
-    case 'sensor':
-      return <SensorPill />;
-    case 'light':
-      return <LightToggle device={device} />;
-    case 'plug':
-      return <PlugToggle device={device} />;
-    case 'thermo':
-    case 'valve':
-      return <ThermoToggle device={device} />;
-    case 'stove':
-    case 'tv':
-    case 'shade':
-    default:
-      return <div style={{ width: 40 }} aria-hidden="true" />;
+    case 'sonos': return <SonosControl device={device} onError={onError} />;
+    case 'light': return <LightToggle device={device} onError={onError} />;
+    case 'plug':  return <PlugToggle device={device} onError={onError} />;
+    default:      return null;
   }
 }
 
-// --- Sub-components (self-fetch per CONTEXT D-39) ---
-
-function SonosControl({ device }: { device: RoomDevice }) {
+function SonosControl({ device, onError }: DevicePrimaryControlProps) {
   const sonosData = useSonosFullData();
-  const cmds = useSonosCommands({ fetchData: sonosData.fetchData, applyMutation: sonosData.applyMutation, setError: () => {} });
+  const cmds = useSonosCommands({
+    fetchData: sonosData.fetchData,
+    applyMutation: sonosData.applyMutation,
+    setError: (message) => onError?.(message),
+  });
+  const actions = usePendingActions();
   const groupId = String(device.extra['id'] ?? '');
   const playing = device.on;
+  const pending = actions.isPending('transport');
   return (
     <button
       type="button"
       aria-label={playing ? 'Pausa' : 'Riproduci'}
-      onClick={() => void (playing ? cmds.handlePause(groupId) : cmds.handlePlay(groupId))}
+      aria-busy={pending || undefined}
+      aria-disabled={pending || undefined}
+      onClick={() => {
+        if (!groupId) return;
+        onError?.(null);
+        void actions.run('transport', () => (playing ? cmds.handlePause(groupId) : cmds.handlePlay(groupId)));
+      }}
       style={{
         width: 40,
         height: 40,
@@ -81,117 +70,57 @@ function SonosControl({ device }: { device: RoomDevice }) {
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        cursor: 'pointer',
+        cursor: pending ? 'default' : 'pointer',
       }}
     >
-      {playing ? <Pause size={16} /> : <Play size={16} />}
+      {pending ? (
+        <Spinner size="sm" variant="current" aria-hidden data-testid="sonos-control-spinner" />
+      ) : playing ? (
+        <Pause size={16} />
+      ) : (
+        <Play size={16} />
+      )}
     </button>
   );
 }
 
-function CameraPill() {
-  return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        padding: '4px 8px',
-        borderRadius: 99,
-        background: 'rgba(255,255,255,0.06)', // AUDIT-EXCEPTION (rooms.jsx:330)
-      }}
-    >
-      {/* Pulsing dot */}
-      <span
-        style={{
-          width: 6,
-          height: 6,
-          borderRadius: 99,
-          background: 'var(--accent)',
-          boxShadow: '0 0 6px var(--accent)',
-        }}
-      />
-      <span style={{ fontSize: 10, color: '#fff', textTransform: 'uppercase', letterSpacing: 0.6 }}>
-        LIVE
-      </span>
-    </div>
-  );
-}
-
-function SensorPill() {
-  return (
-    <div
-      style={{
-        padding: '4px 10px',
-        borderRadius: 99,
-        background: 'rgba(255,255,255,0.06)', // AUDIT-EXCEPTION (rooms.jsx:337)
-      }}
-    >
-      <span style={{ fontSize: 10, color: '#fff', textTransform: 'uppercase', letterSpacing: 0.6 }}>
-        OK
-      </span>
-    </div>
-  );
-}
-
-function LightToggle({ device }: { device: RoomDevice }) {
-  const router = useRouter();
-  const data = useLightsData();
-  const cmds = useLightsCommands({
-    lightsData: {
-      setRefreshing: data.setRefreshing,
-      setLoadingMessage: data.setLoadingMessage,
-      setError: data.setError,
-      fetchData: data.fetchData,
-      groups: data.groups,
-      checkConnection: data.checkConnection,
-      connected: data.connected,
-    },
-    router,
-  });
-  const groupId = String(device.extra['groupId'] ?? '');
+function LightToggle({ device, onError }: DevicePrimaryControlProps) {
+  const cmds = useRoomLightCommands(onError);
+  const actions = usePendingActions();
+  const lightId = String(device.extra['lightId'] ?? '');
   return (
     <InlineToggle
       on={device.on}
       color={device.tone}
+      pending={actions.isPending('toggle')}
+      aria-label={`${device.on ? 'Spegni' : 'Accendi'} ${device.name}`}
       onChange={(e) => {
         e.stopPropagation();
-        void cmds.handleRoomToggle(groupId, !device.on);
+        if (!lightId) return;
+        void actions.run('toggle', () => cmds.handleLightToggle(lightId, !device.on));
       }}
     />
   );
 }
 
-function PlugToggle({ device }: { device: RoomDevice }) {
+function PlugToggle({ device, onError }: DevicePrimaryControlProps) {
   const cmds = useTuyaCommands();
+  const actions = usePendingActions();
   const id = String(device.extra['id'] ?? '');
   return (
     <InlineToggle
       on={device.on}
       color={device.tone}
+      pending={actions.isPending('toggle')}
+      aria-label={`${device.on ? 'Spegni' : 'Accendi'} ${device.name}`}
       onChange={(e) => {
         e.stopPropagation();
-        void cmds.togglePlug(id, device.on);
-      }}
-    />
-  );
-}
-
-function ThermoToggle({ device }: { device: RoomDevice }) {
-  const data = useThermostatData();
-  const homeId = data.topology?.home_id ?? '';
-  const { setRoomMode } = useThermostatCommands({ homeId, refetch: data.refetch });
-  const roomId = String(device.extra['roomId'] ?? '');
-  // Pitfall 3: setRoomMode mode union is 'manual' | 'home', NOT 'on' | 'off'
-  // Pitfall 8: gate on homeId !== '' to avoid POST with empty home_id
-  return (
-    <InlineToggle
-      on={device.on}
-      color={device.tone}
-      onChange={(e) => {
-        e.stopPropagation();
-        if (!homeId || !roomId) return;
-        void setRoomMode(roomId, device.on ? 'home' : 'manual');
+        if (!id) return;
+        onError?.(null);
+        void actions.run('toggle', async () => {
+          const done = await cmds.togglePlug(id, device.on);
+          if (!done) onError?.('La presa non ha confermato il comando');
+        });
       }}
     />
   );

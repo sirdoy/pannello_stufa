@@ -1,102 +1,216 @@
 /**
- * DeviceCard jest spec — Plan 179-04 (ROOMS-04 / CONTEXT D-23/D-24/D-61).
+ * DeviceCard spec: row of a device inside RoomSheet (ROADMAP M84).
  *
- * Mocks DevicePrimaryControl and DeviceBody imports so the card renders in
- * isolation without requiring Wave 2/3 dependencies.
- *
- * Tests 1-7 cover:
- *   1. 40×40 icon tile sizing
- *   2. device.name rendered at 15px 600 weight
- *   3. Status line ("Attivo · value" / "Inattivo · value")
- *   4. DevicePrimaryControl right-slot rendered
- *   5. DeviceBody body slot rendered
- *   6. Tone-tinted background when on, plain when off
- *   7. Pressable as="div" wrap (data-testid present, no onClick at root)
+ * DevicePrimaryControl and the bodies are stubs that can report an error through `onError`;
+ * `hasDeviceBody` is the real one. Covers the status line, the body shown only when the device
+ * has a reading, and the error banner fed by the control and by the body.
  */
 
-import { render, screen } from '@testing-library/react';
-import { DeviceCard } from '../DeviceCard';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { RoomDevice } from '../types';
 
-// Mock DevicePrimaryControl
+type SlotProps = { device: RoomDevice; onError?: (message: string | null) => void };
+
 jest.mock('../DevicePrimaryControl', () => ({
-  DevicePrimaryControl: () => <div data-testid="mock-primary-control" />,
+  DevicePrimaryControl: ({ device, onError }: SlotProps) => (
+    <div data-testid="mock-primary-control" data-device={device.id}>
+      <button type="button" onClick={() => onError?.('La presa non ha confermato il comando')}>control fails</button>
+      <button type="button" onClick={() => onError?.(null)}>control clears</button>
+    </div>
+  ),
 }));
 
-// Mock DeviceBody — Phase 179 Plan 08 shipped the real file, so this is a
-// regular (non-virtual) mock that isolates DeviceCard from the body
-// dispatcher's per-kind hooks (e.g. LightBody → useLightsData → WS context).
-jest.mock('../DeviceBody', () => ({
-  DeviceBody: () => <div data-testid="mock-body" />,
-}));
+jest.mock('../DeviceBody', () => {
+  const actual = jest.requireActual<typeof import('../DeviceBody')>('../DeviceBody');
+  return {
+    hasDeviceBody: actual.hasDeviceBody,
+    DeviceBody: ({ device, onError }: SlotProps) => (
+      <div data-testid="mock-body" data-device={device.id}>
+        <button type="button" onClick={() => onError?.('Luce non raggiungibile')}>body fails</button>
+      </div>
+    ),
+  };
+});
 
-const baseDevice: RoomDevice = {
-  kind: 'light',
-  name: 'Luce soggiorno',
-  on: true,
-  value: '80%',
-  tone: '#f5c84a',
-  extra: { groupId: 'g1' },
-};
+import { DeviceCard } from '../DeviceCard';
 
-describe('DeviceCard (ROOMS-04 / CONTEXT D-23/D-24/D-61)', () => {
-  it('Test 1: renders 40×40 icon tile', () => {
-    render(<DeviceCard device={baseDevice} />);
-    // The icon tile container should be present
-    const iconTile = document.querySelector('[style*="width: 40px"]') as HTMLElement | null;
-    expect(iconTile).not.toBeNull();
-    expect(iconTile?.style.height).toBe('40px');
+function makeDevice(over: Partial<RoomDevice> = {}): RoomDevice {
+  return {
+    id: 11,
+    kind: 'light',
+    name: 'Lampada',
+    on: true,
+    statusLabel: 'Accesa',
+    value: '80%',
+    tone: '#f5c84a',
+    extra: { lightId: '5', brightness: 80 },
+    ...over,
+  };
+}
+
+describe('DeviceCard: header', () => {
+  it('is identified by the registry id and exposes the kind', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    const card = screen.getByTestId('stanze-device-11');
+    expect(card).toHaveAttribute('data-kind', 'light');
+    expect(within(card).getByText('Lampada')).toBeInTheDocument();
+    expect(card.querySelector('svg.lucide-lightbulb')).not.toBeNull();
   });
 
-  it('Test 2: renders device.name with correct text', () => {
-    render(<DeviceCard device={baseDevice} />);
-    expect(screen.getByText('Luce soggiorno')).toBeInTheDocument();
+  it('two devices with the same name keep distinct cards', () => {
+    render(
+      <>
+        <DeviceCard device={makeDevice({ id: 11 })} />
+        <DeviceCard device={makeDevice({ id: 12 })} />
+      </>,
+    );
+    expect(screen.getByTestId('stanze-device-11')).toBeInTheDocument();
+    expect(screen.getByTestId('stanze-device-12')).toBeInTheDocument();
   });
 
-  it('Test 3: status line shows "Attivo · value" when on', () => {
-    render(<DeviceCard device={baseDevice} />);
-    expect(screen.getByText(/Attivo/)).toBeInTheDocument();
-    expect(screen.getByText(/Attivo · 80%/)).toBeInTheDocument();
+  it('status line is "statusLabel · value"', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    expect(screen.getByText('Accesa · 80%')).toBeInTheDocument();
   });
 
-  it('Test 3b: status line shows "Inattivo · value" when off', () => {
-    const offDevice: RoomDevice = { ...baseDevice, on: false, value: '0%' };
-    render(<DeviceCard device={offDevice} />);
-    expect(screen.getByText(/Inattivo · 0%/)).toBeInTheDocument();
+  it('status line has no separator when there is no value', () => {
+    render(<DeviceCard device={makeDevice({ on: false, statusLabel: 'Spenta', value: '' })} />);
+    expect(screen.getByText('Spenta')).toBeInTheDocument();
+    expect(screen.queryByText(/·/)).not.toBeInTheDocument();
   });
 
-  it('Test 4: renders DevicePrimaryControl right-slot', () => {
-    render(<DeviceCard device={baseDevice} />);
-    expect(screen.getByTestId('mock-primary-control')).toBeInTheDocument();
+  it('without a statusLabel falls back to "Attivo" / "Inattivo"', () => {
+    const { rerender } = render(<DeviceCard device={makeDevice({ statusLabel: undefined })} />);
+    expect(screen.getByText('Attivo · 80%')).toBeInTheDocument();
+
+    rerender(<DeviceCard device={makeDevice({ statusLabel: undefined, on: false, value: '' })} />);
+    expect(screen.getByText('Inattivo')).toBeInTheDocument();
   });
 
-  it('Test 5: renders DeviceBody body slot', () => {
-    render(<DeviceCard device={baseDevice} />);
-    expect(screen.getByTestId('mock-body')).toBeInTheDocument();
+  it('on: tinted with the device tone; off: plain', () => {
+    const { rerender } = render(<DeviceCard device={makeDevice()} />);
+    const card = screen.getByTestId('stanze-device-11');
+    expect(card.style.background).toContain('linear-gradient');
+    expect(card.style.background).toMatch(/#f5c84a|rgb\(245, 200, 74\)/);
+
+    rerender(<DeviceCard device={makeDevice({ on: false })} />);
+    expect(card.style.background).toMatch(/rgba\(255,?\s*255,?\s*255,?\s*0\.03\)/);
   });
 
-  it('Test 6: applies tone-tinted gradient background when on', () => {
-    render(<DeviceCard device={baseDevice} />);
-    const testId = 'stanze-device-light-luce-soggiorno';
-    const container = screen.getByTestId(testId);
-    expect(container.style.background).toContain('linear-gradient');
+  it('the card itself is not a control', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    expect(screen.getByTestId('stanze-device-11').onclick).toBeNull();
   });
 
-  it('Test 6b: applies plain background when off', () => {
-    const offDevice: RoomDevice = { ...baseDevice, on: false };
-    render(<DeviceCard device={offDevice} />);
-    const testId = 'stanze-device-light-luce-soggiorno';
-    const container = screen.getByTestId(testId);
-    // jsdom normalizes rgba by adding spaces: 'rgba(255,255,255,0.03)' → 'rgba(255, 255, 255, 0.03)'
-    expect(container.style.background).toMatch(/rgba\(255,?\s*255,?\s*255,?\s*0\.03\)/);
+  it('gives the device to the primary control', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    expect(screen.getByTestId('mock-primary-control')).toHaveAttribute('data-device', '11');
+  });
+});
+
+describe('DeviceCard: body', () => {
+  it('shows the body of a device with a reading', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    expect(screen.getByTestId('mock-body')).toHaveAttribute('data-device', '11');
   });
 
-  it('Test 7: outer container has correct data-testid and no onClick', () => {
-    render(<DeviceCard device={baseDevice} />);
-    const testId = 'stanze-device-light-luce-soggiorno';
-    const container = screen.getByTestId(testId);
-    expect(container).toBeInTheDocument();
-    // No onClick handler on the Pressable as="div" wrapper
-    expect(container.onclick).toBeNull();
+  it('a device that does not answer says so and has no body', () => {
+    render(
+      <DeviceCard
+        device={makeDevice({ on: false, statusLabel: 'Non risponde', value: '', unreachable: true })}
+      />,
+    );
+    expect(screen.getByText('Non risponde')).toBeInTheDocument();
+    expect(screen.queryByText(/Inattivo|Spenta/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId('mock-body')).not.toBeInTheDocument();
+  });
+
+  it('a stove that does not answer keeps its body (safe "Spegni" command)', () => {
+    render(
+      <DeviceCard
+        device={makeDevice({
+          kind: 'stove',
+          on: false,
+          statusLabel: 'Non risponde',
+          value: '',
+          unreachable: true,
+          extra: {},
+        })}
+      />,
+    );
+    expect(screen.getByText('Non risponde')).toBeInTheDocument();
+    expect(screen.getByTestId('mock-body')).toHaveAttribute('data-device', '11');
+  });
+
+  it('a device still loading ("In attesa") has no body', () => {
+    render(
+      <DeviceCard
+        device={makeDevice({ kind: 'sensor', on: false, statusLabel: 'In attesa', value: '', extra: {} })}
+      />,
+    );
+    expect(screen.getByText('In attesa')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-body')).not.toBeInTheDocument();
+  });
+
+  it('the Netatmo relay ("Collegato", no stats) has no body', () => {
+    render(
+      <DeviceCard device={makeDevice({ kind: 'host', on: false, statusLabel: 'Collegato', value: '', extra: {} })} />,
+    );
+    expect(screen.getByText('Collegato')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-body')).not.toBeInTheDocument();
+  });
+});
+
+describe('DeviceCard: refused command', () => {
+  it('shows no error at first', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    expect(screen.queryByTestId('stanze-device-error')).not.toBeInTheDocument();
+  });
+
+  it('shows the error reported by the primary control', () => {
+    render(<DeviceCard device={makeDevice({ kind: 'plug', extra: { id: 'plug-1' } })} />);
+    fireEvent.click(screen.getByRole('button', { name: 'control fails' }));
+    expect(screen.getByTestId('stanze-device-error')).toHaveTextContent('La presa non ha confermato il comando');
+  });
+
+  it('shows the error reported by the body, inside the same card', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'body fails' }));
+    const card = screen.getByTestId('stanze-device-11');
+    expect(within(card).getByTestId('stanze-device-error')).toHaveTextContent('Luce non raggiungibile');
+  });
+
+  it('a later error replaces the previous one', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'control fails' }));
+    fireEvent.click(screen.getByRole('button', { name: 'body fails' }));
+    expect(screen.getAllByTestId('stanze-device-error')).toHaveLength(1);
+    expect(screen.getByTestId('stanze-device-error')).toHaveTextContent('Luce non raggiungibile');
+  });
+
+  it('onError(null) clears the error (a new command started)', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'body fails' }));
+    fireEvent.click(screen.getByRole('button', { name: 'control clears' }));
+    expect(screen.queryByTestId('stanze-device-error')).not.toBeInTheDocument();
+  });
+
+  it('the user can dismiss the error', () => {
+    render(<DeviceCard device={makeDevice()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'body fails' }));
+    fireEvent.click(within(screen.getByTestId('stanze-device-error')).getByRole('button', { name: 'Dismiss' }));
+    expect(screen.queryByTestId('stanze-device-error')).not.toBeInTheDocument();
+  });
+
+  it('an error of one device is not shown in the card of another', () => {
+    render(
+      <>
+        <DeviceCard device={makeDevice({ id: 11 })} />
+        <DeviceCard device={makeDevice({ id: 12 })} />
+      </>,
+    );
+    fireEvent.click(within(screen.getByTestId('stanze-device-11')).getByRole('button', { name: 'body fails' }));
+    expect(within(screen.getByTestId('stanze-device-11')).getByTestId('stanze-device-error')).toBeInTheDocument();
+    expect(within(screen.getByTestId('stanze-device-12')).queryByTestId('stanze-device-error')).not.toBeInTheDocument();
   });
 });

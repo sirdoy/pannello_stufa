@@ -1,17 +1,11 @@
 'use client';
 /**
- * StoveBody — Phase 179 Plan 05
- * Bundle source: rooms.jsx:360-381 + CONTEXT D-27
+ * StoveBody — power and fan readings of the stove, with −, on / off and + (one power step per tap).
  *
- * Renders 3 StatChips (Target/Fiamma/Ventola) + ControlRow with Meno/Power/Più.
- * Self-fetches via useStoveData + useStoveCommands (D-39 per-body self-fetch pattern).
- *
- * Critical pitfalls observed:
- * - Target chip shows powerLevel/5 — no temp/target fields on live hook (RESEARCH Pitfall 1)
- * - Power level clamped 1..5 before dispatch (T-179-05-01 mitigate)
- * - handleIgnite gated on !needsCleaning (Phase 178 D-05)
- *
- * D-02: inline-style + var(--token) only. D-37: no useMemo/useCallback. D-67: inline handlers.
+ * Every button shows its command in progress and the others are locked until it settles
+ * (ROADMAP M81); a refused command is reported to the card (rule M77: never `void handler()`
+ * without a catch). Ignition stays blocked while cleaning is required. When the stove does not
+ * answer only "Spegni" is left (rule M78).
  */
 
 import { useRouter } from 'next/navigation';
@@ -19,12 +13,18 @@ import { Minus, Plus, Power } from 'lucide-react';
 import { useUser } from '@/lib/auth/useUser';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
+import { usePendingActions } from '../../usePendingActions';
 import { StatChip } from '../primitives/StatChip';
 import { ControlRow } from '../primitives/ControlRow';
 import { MiniButton } from '../primitives/MiniButton';
 import type { RoomDevice } from '../types';
 
-export function StoveBody({ device }: { device: RoomDevice }){
+export interface StoveBodyProps {
+  device: RoomDevice;
+  onError?: (message: string | null) => void;
+}
+
+export function StoveBody({ device, onError }: StoveBodyProps) {
   const router = useRouter();
   const { user } = useUser();
   const stoveData = useStoveData({ userId: user?.sub });
@@ -46,48 +46,68 @@ export function StoveBody({ device }: { device: RoomDevice }){
     user,
   });
 
-  // Prefer live hook values; powerLevel/fanLevel nullable → coerce to 0
-  const powerLevel = stoveData.powerLevel ?? 0;
-  const fanLevel = stoveData.fanLevel ?? 0;
+  const actions = usePendingActions();
+  const powerLevel = stoveData.powerLevel;
+  const fanLevel = stoveData.fanLevel;
   const needsCleaning = stoveData.needsMaintenance;
+
+  const send = (key: string, command: () => Promise<void>) => {
+    onError?.(null);
+    void actions.run(key, async () => {
+      try {
+        await command();
+      } catch (err) {
+        onError?.(err instanceof Error ? err.message : 'Comando non riuscito');
+      }
+    });
+  };
+  const lockedFor = (key: string) => actions.anyPending && !actions.isPending(key);
+  const setPower = (key: string, next: number) =>
+    send(key, () => cmds.handlePowerChange({ target: { value: String(next) } }));
+
+  // No reading: no levels to show, only the safe command (rule M78)
+  if (device.unreachable) {
+    return (
+      <ControlRow>
+        <MiniButton
+          Icon={Power}
+          label="Spegni"
+          pending={actions.isPending('power')}
+          onClick={() => send('power', () => cmds.handleShutdown())}
+        />
+      </ControlRow>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
-        {/* Target: powerLevel/5 — no temp/target on live hook (RESEARCH Pitfall 1) */}
-        <StatChip label="Target" value={`${powerLevel}/5`} tone={device.tone} />
-        <StatChip label="Fiamma" value={String(powerLevel)} tone={device.tone} />
-        <StatChip label="Ventola" value={String(fanLevel)} tone={device.tone} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
+        <StatChip label="Potenza" value={powerLevel === null ? '—' : `${powerLevel}/5`} tone={device.tone} />
+        <StatChip label="Ventola" value={fanLevel === null ? '—' : `${fanLevel}/6`} tone={device.tone} />
       </div>
       <ControlRow>
         <MiniButton
           Icon={Minus}
           label="Meno"
-          onClick={() => {
-            const next = Math.max(1, powerLevel - 1);
-            void cmds.handlePowerChange({ target: { value: String(next) } });
-          }}
+          pending={actions.isPending('down')}
+          disabled={!device.on || powerLevel === null || powerLevel <= 1 || lockedFor('down')}
+          onClick={() => setPower('down', Math.max(1, (powerLevel ?? 1) - 1))}
         />
         <MiniButton
           Icon={Power}
-          label="Power"
+          label={device.on ? 'Spegni' : 'Accendi'}
           filled={device.on}
           tone={device.tone}
-          onClick={() => {
-            if (device.on) {
-              void cmds.handleShutdown();
-            } else if (!needsCleaning) {
-              void cmds.handleIgnite();
-            }
-          }}
+          pending={actions.isPending('power')}
+          disabled={(!device.on && needsCleaning) || lockedFor('power')}
+          onClick={() => send('power', () => (device.on ? cmds.handleShutdown() : cmds.handleIgnite()))}
         />
         <MiniButton
           Icon={Plus}
           label="Più"
-          onClick={() => {
-            const next = Math.min(5, powerLevel + 1);
-            void cmds.handlePowerChange({ target: { value: String(next) } });
-          }}
+          pending={actions.isPending('up')}
+          disabled={!device.on || powerLevel === null || powerLevel >= 5 || lockedFor('up')}
+          onClick={() => setPower('up', Math.min(5, (powerLevel ?? 1) + 1))}
         />
       </ControlRow>
       {needsCleaning && (

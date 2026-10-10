@@ -97,6 +97,7 @@ const mockHouseStatus: HouseStatusResponse = {
       devices: [
         {
           device_registry_id: 1,
+          device_id: '1',
           custom_name: 'Luce salotto',
           provider_name: 'hue',
           device_type: 'light',
@@ -105,6 +106,7 @@ const mockHouseStatus: HouseStatusResponse = {
         },
         {
           device_registry_id: 2,
+          device_id: '70:ee:50:00:00:02',
           custom_name: 'Sensore temp',
           provider_name: 'netatmo',
           device_type: 'sensor',
@@ -122,6 +124,7 @@ const mockHouseStatus: HouseStatusResponse = {
       devices: [
         {
           device_registry_id: 3,
+          device_id: '04:00:00:00:00:03',
           custom_name: 'Termostato',
           provider_name: 'netatmo',
           device_type: 'thermostat',
@@ -327,6 +330,7 @@ describe('RoomStatusPage', () => {
                   devices: [
                     {
                       device_registry_id: 10,
+                      device_id: 'bf1234567890',
                       custom_name: 'Presa TV',
                       provider_name: 'tuya',
                       device_type: 'plug',
@@ -335,6 +339,7 @@ describe('RoomStatusPage', () => {
                     },
                     {
                       device_registry_id: 11,
+                      device_id: 'raspberry',
                       custom_name: 'Raspberry',
                       provider_name: 'raspi',
                       device_type: 'ha',

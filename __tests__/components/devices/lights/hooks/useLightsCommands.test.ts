@@ -355,6 +355,88 @@ describe('useLightsCommands', () => {
     expect(mockLightsData.fetchData).not.toHaveBeenCalled();
   });
 
+  it('handleLightBrightnessChange sends the single light brightness as 0-254 (M84)', async () => {
+    mockExecute.mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useLightsCommands({
+        lightsData: mockLightsData,
+        router: mockRouter,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleLightBrightnessChange('5', 75);
+    });
+
+    // Math.round(75 * 254 / 100) = 191
+    expect(mockExecute).toHaveBeenCalledTimes(1);
+    expect(mockExecute).toHaveBeenCalledWith(
+      '/api/v1/hue/lights/5/state',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ brightness: 191 }),
+      })
+    );
+    expect(mockLightsData.setError).toHaveBeenCalledWith(null);
+    expect(mockLightsData.fetchData).toHaveBeenCalled();
+    expect(mockLightsData.setRefreshing).toHaveBeenLastCalledWith(false);
+  });
+
+  it.each([
+    [0, 0],
+    [1, 3],
+    [50, 127],
+    [100, 254],
+  ])('handleLightBrightnessChange maps %i%% to brightness %i', async (percent, brightness) => {
+    mockExecute.mockResolvedValue({
+      ok: true,
+      json: jest.fn().mockResolvedValue(mockCommandResponse),
+    });
+
+    const { result } = renderHook(() =>
+      useLightsCommands({
+        lightsData: mockLightsData,
+        router: mockRouter,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleLightBrightnessChange('9', percent);
+    });
+
+    expect(mockExecute).toHaveBeenCalledWith(
+      '/api/v1/hue/lights/9/state',
+      expect.objectContaining({ body: JSON.stringify({ brightness }) })
+    );
+  });
+
+  it('handleLightBrightnessChange sets error "Luce non raggiungibile" on 409 and does not refetch', async () => {
+    mockExecute.mockResolvedValue({
+      ok: false,
+      status: 409,
+      json: jest.fn().mockResolvedValue({}),
+    });
+
+    const { result } = renderHook(() =>
+      useLightsCommands({
+        lightsData: mockLightsData,
+        router: mockRouter,
+      })
+    );
+
+    await act(async () => {
+      await result.current.handleLightBrightnessChange('5', 40);
+    });
+
+    expect(mockLightsData.setError).toHaveBeenCalledWith('Luce non raggiungibile');
+    expect(mockLightsData.fetchData).not.toHaveBeenCalled();
+    expect(mockLightsData.setRefreshing).toHaveBeenLastCalledWith(false);
+  });
+
   it('handleRoomToggle sets error "Luce non raggiungibile" on 409', async () => {
     mockExecute.mockResolvedValue({
       ok: false,

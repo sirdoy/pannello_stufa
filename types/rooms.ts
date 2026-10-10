@@ -96,6 +96,8 @@ export interface HostStatus {
 
 export interface DeviceStatus {
   device_registry_id: number;
+  /** Registry device_id: the provider-native id (Hue light id, Netatmo module id, Sonos uid). Backend M84. */
+  device_id: string;
   custom_name: string;
   provider_name: string;
   device_type: string;

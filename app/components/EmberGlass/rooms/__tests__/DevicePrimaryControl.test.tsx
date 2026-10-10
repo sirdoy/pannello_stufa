@@ -1,292 +1,369 @@
 /**
- * DevicePrimaryControl jest spec — Plan 179-04 (ROOMS-04 / CONTEXT D-25).
+ * DevicePrimaryControl spec: one-tap command on the right of a DeviceCard header
+ * (ROADMAP M84 + M81).
  *
- * Tests 1-9 cover all 5 dispatch branches:
- *   1-2: sonos — play/pause button wired to handlePlay/handlePause
- *   3: camera — LIVE pill (10px caps, letterSpacing) + pulsing dot
- *   4: sensor — OK pill
- *   5: light — InlineToggle → handleRoomToggle(groupId, !device.on)
- *   6: plug — InlineToggle → togglePlug(id, device.on)
- *   7: thermo — InlineToggle → setRoomMode(roomId, 'manual'/'home') [Pitfall 3]
- *   8: valve — same as thermo
- *   9: stove/tv/shade — 40px empty placeholder div
+ *   - light → toggle of the single light (`handleLightToggle(lightId, !on)`)
+ *   - plug  → toggle (`togglePlug(id, on)`), reports an unconfirmed command
+ *   - sonos → play / pause of the zone
+ *   - other kinds and unreachable devices → nothing
  *
- * Critical: setRoomMode must use 'manual' | 'home', NOT 'on' | 'off' (Pitfall 3).
- * Mocks all data + commands hooks to keep the spec isolated.
+ * Command in progress: the control is busy and ignores a second tap until the command settles.
+ * The commands hooks are mocked; InlineToggle and usePendingActions are the real ones.
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { DevicePrimaryControl } from '../DevicePrimaryControl';
-import type { RoomDevice } from '../types';
+import type { DeviceKind, RoomDevice } from '../types';
 
-// --- Sonos mocks ---
-const mockHandlePlay = jest.fn().mockResolvedValue(undefined);
-const mockHandlePause = jest.fn().mockResolvedValue(undefined);
-
-jest.mock('@/app/components/devices/sonos/hooks/useSonosFullData', () => ({
-  useSonosFullData: () => ({ data: null, loading: false, error: null, stale: false, fetchData: jest.fn() }),
+// --- Lights -------------------------------------------------------------
+const mockHandleLightToggle = jest.fn();
+const mockUseRoomLightCommands = jest.fn();
+jest.mock('../useRoomLightCommands', () => ({
+  useRoomLightCommands: (onError?: (message: string | null) => void) => mockUseRoomLightCommands(onError),
 }));
 
-jest.mock('@/app/components/devices/sonos/hooks/useSonosCommands', () => ({
-  useSonosCommands: () => ({
-    handlePlay: mockHandlePlay,
-    handlePause: mockHandlePause,
-    handleNext: jest.fn(),
-    handlePrevious: jest.fn(),
-    handleSetVolume: jest.fn(),
-    handleSetZoneVolume: jest.fn(),
-    handleStop: jest.fn(),
-    handleSetMute: jest.fn(),
-    handleSetPlayMode: jest.fn(),
-    handleSetSleepTimer: jest.fn(),
-    handleSetEq: jest.fn(),
-    handleSetHomeTheater: jest.fn(),
-    handleSwitchSource: jest.fn(),
-    handleJoinGroup: jest.fn(),
-    handleUnjoinGroup: jest.fn(),
-    handleSeek: jest.fn(),
-    sonosTransportCmd: {},
-    sonosVolumeCmd: {},
-    sonosExtendedCmd: {},
-  }),
-}));
-
-// --- Lights mocks ---
-const mockHandleRoomToggle = jest.fn().mockResolvedValue(undefined);
-
-jest.mock('@/app/components/devices/lights/hooks/useLightsData', () => ({
-  useLightsData: () => ({
-    loading: false,
-    error: null,
-    connected: true,
-    stale: false,
-    groups: [],
-    lights: [],
-    scenes: [],
-    selectedGroupId: null,
-    refreshing: false,
-    loadingMessage: '',
-    localBrightness: null,
-    selectedGroup: undefined,
-    selectedGroupId_action: null,
-    roomLights: [],
-    roomScenes: [],
-    effectiveLights: [],
-    hasColorLights: false,
-    lightsOnCount: 0,
-    lightsOffCount: 0,
-    allLightsOn: false,
-    allLightsOff: true,
-    isRoomOn: false,
-    totalLightsOn: 0,
-    totalLightsOff: 0,
-    allHouseLightsOn: false,
-    allHouseLightsOff: true,
-    hasAnyLights: false,
-    avgBrightness: 0,
-    lastUpdatedAt: null,
-    roomColors: [],
-    roomOnBrightness: 0,
-    dynamicRoomStyle: null,
-    contrastMode: 'default',
-    adaptive: {
-      heading: '',
-      text: '',
-      textSecondary: '',
-      badge: '',
-      badgeGlow: '',
-      statusOn: '',
-      statusOff: '',
-      buttonVariant: null,
-      buttonClass: '',
-      slider: '',
-      brightnessPanel: '',
-      brightnessValue: '',
-    },
-    setSelectedGroupId: jest.fn(),
-    setLocalBrightness: jest.fn(),
-    setError: jest.fn(),
-    setRefreshing: jest.fn(),
-    setLoadingMessage: jest.fn(),
-    checkConnection: jest.fn(),
-    fetchData: jest.fn(),
-    handleRefresh: jest.fn(),
-  }),
-}));
-
-jest.mock('@/app/components/devices/lights/hooks/useLightsCommands', () => ({
-  useLightsCommands: () => ({
-    handleRoomToggle: mockHandleRoomToggle,
-    handleBrightnessChange: jest.fn(),
-    handleSceneActivate: jest.fn(),
-    handleAllLightsToggle: jest.fn(),
-    hueRoomCmd: {},
-    hueSceneCmd: {},
-  }),
-}));
-
-// --- Tuya mocks ---
-const mockTogglePlug = jest.fn().mockResolvedValue(null);
-
+// --- Tuya ---------------------------------------------------------------
+const mockTogglePlug = jest.fn();
 jest.mock('@/app/components/devices/tuya/hooks/useTuyaCommands', () => ({
-  useTuyaCommands: () => ({
-    togglePlug: mockTogglePlug,
-    setTimer: jest.fn(),
-    cancelTimer: jest.fn(),
-  }),
+  useTuyaCommands: () => ({ togglePlug: mockTogglePlug, setTimer: jest.fn(), cancelTimer: jest.fn() }),
 }));
 
-// --- Thermostat mocks ---
-const mockSetRoomMode = jest.fn().mockResolvedValue(undefined);
-
-jest.mock('@/app/components/devices/thermostat/hooks/useThermostatData', () => ({
-  useThermostatData: () => ({
-    topology: { home_id: 'home-1', home_name: 'Casa' },
+// --- Sonos --------------------------------------------------------------
+const mockHandlePlay = jest.fn();
+const mockHandlePause = jest.fn();
+const mockSonosFetchData = jest.fn();
+const mockSonosApplyMutation = jest.fn();
+const mockUseSonosCommands = jest.fn();
+jest.mock('@/app/components/devices/sonos/hooks/useSonosFullData', () => ({
+  useSonosFullData: () => ({
+    data: null,
     loading: false,
     error: null,
-    refetch: jest.fn(),
+    stale: false,
+    fetchData: mockSonosFetchData,
+    applyMutation: mockSonosApplyMutation,
   }),
 }));
-
-jest.mock('@/app/components/devices/thermostat/hooks/useThermostatCommands', () => ({
-  useThermostatCommands: () => ({
-    setRoomSetpoint: jest.fn(),
-    setHomeMode: jest.fn(),
-    setRoomMode: mockSetRoomMode,
-    netatmoTempCmd: {},
-    netatmoModeCmd: {},
-  }),
+jest.mock('@/app/components/devices/sonos/hooks/useSonosCommands', () => ({
+  useSonosCommands: (params: unknown) => mockUseSonosCommands(params),
 }));
 
-// --- InlineToggle mock (to detect toggle calls) ---
-// DevicePrimaryControl imports from '../InlineToggle' (relative to rooms/)
-// which resolves to app/components/EmberGlass/InlineToggle.tsx
-jest.mock('../../InlineToggle', () => ({
-  InlineToggle: ({ on, onChange }: { on: boolean; onChange: (e: React.MouseEvent<HTMLButtonElement>) => void }) => (
-    <button
-      data-testid="mock-inline-toggle"
-      data-on={String(on)}
-      onClick={onChange as React.MouseEventHandler<HTMLButtonElement>}
-    />
-  ),
-}));
+// --- Helpers ------------------------------------------------------------
+
+function makeDevice(over: Partial<RoomDevice> = {}): RoomDevice {
+  return {
+    id: 1,
+    kind: 'light',
+    name: 'Lampada',
+    on: true,
+    value: '',
+    tone: '#f5c84a',
+    extra: { lightId: '5', brightness: 80 },
+    ...over,
+  };
+}
+
+const plug = (over: Partial<RoomDevice> = {}) =>
+  makeDevice({ kind: 'plug', name: 'Presa', extra: { id: 'plug-1', power: 12, today_kwh: 1 }, ...over });
+
+const sonos = (over: Partial<RoomDevice> = {}) =>
+  makeDevice({ kind: 'sonos', name: 'Sala', extra: { id: 'RINCON_A:1', track: '', artist: '', volume: 20 }, ...over });
+
+/** A promise the test settles by hand, to hold a command "in progress" */
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
+/** Clicks and lets the command settle */
+async function clickAndSettle(el: HTMLElement) {
+  await act(async () => {
+    fireEvent.click(el);
+  });
+}
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockHandleLightToggle.mockResolvedValue(undefined);
+  mockTogglePlug.mockResolvedValue({ data_confirmed: true });
+  mockHandlePlay.mockResolvedValue(undefined);
+  mockHandlePause.mockResolvedValue(undefined);
+  mockUseRoomLightCommands.mockReturnValue({ handleLightToggle: mockHandleLightToggle });
+  mockUseSonosCommands.mockReturnValue({ handlePlay: mockHandlePlay, handlePause: mockHandlePause });
 });
 
-const makeDevice = (overrides: Partial<RoomDevice>): RoomDevice => ({
-  kind: 'light',
-  name: 'Test Device',
-  on: true,
-  value: '100%',
-  tone: 'var(--accent)',
-  extra: {},
-  ...overrides,
+// --- Light --------------------------------------------------------------
+
+describe('DevicePrimaryControl: light', () => {
+  it('a light that is on: switch checked, labelled "Spegni <name>"; a tap turns off that single light', async () => {
+    render(<DevicePrimaryControl device={makeDevice({ on: true })} />);
+    const toggle = screen.getByRole('switch', { name: 'Spegni Lampada' });
+    expect(toggle).toHaveAttribute('aria-checked', 'true');
+
+    await clickAndSettle(toggle);
+    expect(mockHandleLightToggle).toHaveBeenCalledTimes(1);
+    expect(mockHandleLightToggle).toHaveBeenCalledWith('5', false);
+  });
+
+  it('a light that is off: labelled "Accendi <name>"; a tap turns it on', async () => {
+    render(<DevicePrimaryControl device={makeDevice({ on: false })} />);
+    const toggle = screen.getByRole('switch', { name: 'Accendi Lampada' });
+    expect(toggle).toHaveAttribute('aria-checked', 'false');
+
+    await clickAndSettle(toggle);
+    expect(mockHandleLightToggle).toHaveBeenCalledWith('5', true);
+  });
+
+  it('gives onError to the light commands, so a refused command reaches the card', () => {
+    const onError = jest.fn();
+    render(<DevicePrimaryControl device={makeDevice()} onError={onError} />);
+    expect(mockUseRoomLightCommands).toHaveBeenCalledWith(onError);
+  });
+
+  it('a tap does not reach the card around the toggle', async () => {
+    const onCardClick = jest.fn();
+    render(
+      <div onClick={onCardClick}>
+        <DevicePrimaryControl device={makeDevice()} />
+      </div>,
+    );
+    await clickAndSettle(screen.getByRole('switch'));
+    expect(mockHandleLightToggle).toHaveBeenCalledTimes(1);
+    expect(onCardClick).not.toHaveBeenCalled();
+  });
+
+  it('sends nothing when the device has no light id', async () => {
+    render(<DevicePrimaryControl device={makeDevice({ extra: {} })} />);
+    await clickAndSettle(screen.getByRole('switch'));
+    expect(mockHandleLightToggle).not.toHaveBeenCalled();
+    expect(screen.getByRole('switch')).not.toHaveAttribute('aria-busy');
+  });
+
+  it('command in progress: busy with a spinner, a second tap is ignored, then it settles', async () => {
+    const command = deferred<void>();
+    mockHandleLightToggle.mockReturnValue(command.promise);
+    const onCardClick = jest.fn();
+    render(
+      <div onClick={onCardClick}>
+        <DevicePrimaryControl device={makeDevice({ on: false })} />
+      </div>,
+    );
+    const toggle = screen.getByRole('switch');
+    expect(toggle).not.toHaveAttribute('aria-busy');
+    expect(screen.queryByTestId('inline-toggle-spinner')).not.toBeInTheDocument();
+
+    await clickAndSettle(toggle);
+    expect(toggle).toHaveAttribute('aria-busy', 'true');
+    expect(toggle).toHaveAttribute('aria-disabled', 'true');
+    // Not natively disabled: a disabled button would let the tap reach the card
+    expect(toggle).toBeEnabled();
+    expect(screen.getByTestId('inline-toggle-spinner')).toBeInTheDocument();
+
+    await clickAndSettle(toggle);
+    await clickAndSettle(toggle);
+    expect(mockHandleLightToggle).toHaveBeenCalledTimes(1);
+    expect(onCardClick).not.toHaveBeenCalled();
+
+    await act(async () => {
+      command.resolve();
+    });
+    expect(toggle).not.toHaveAttribute('aria-busy');
+    expect(toggle).not.toHaveAttribute('aria-disabled');
+    expect(screen.queryByTestId('inline-toggle-spinner')).not.toBeInTheDocument();
+
+    // Settled: the next tap sends a new command
+    await clickAndSettle(toggle);
+    expect(mockHandleLightToggle).toHaveBeenCalledTimes(2);
+  });
 });
 
-describe('DevicePrimaryControl (ROOMS-04 / CONTEXT D-25)', () => {
-  // Test 1: sonos playing → Pause button
-  it('Test 1: sonos on (playing) renders pause button; click calls handlePause', async () => {
-    const device = makeDevice({ kind: 'sonos', on: true, extra: { id: 'group-abc', coordinator: 'uid-1', track: 'Song', artist: 'Artist', volume: 50 } });
-    render(<DevicePrimaryControl device={device} />);
-    const btn = screen.getByRole('button', { name: /pausa/i });
-    expect(btn).toBeInTheDocument();
-    fireEvent.click(btn);
-    expect(mockHandlePause).toHaveBeenCalledWith('group-abc');
+// --- Plug ---------------------------------------------------------------
+
+describe('DevicePrimaryControl: plug', () => {
+  it('a tap toggles the plug, passing its current state', async () => {
+    render(<DevicePrimaryControl device={plug({ on: true })} />);
+    await clickAndSettle(screen.getByRole('switch', { name: 'Spegni Presa' }));
+    expect(mockTogglePlug).toHaveBeenCalledTimes(1);
+    expect(mockTogglePlug).toHaveBeenCalledWith('plug-1', true);
   });
 
-  // Test 2: sonos off (paused) → Play button
-  it('Test 2: sonos off (paused) renders play button; click calls handlePlay', async () => {
-    const device = makeDevice({ kind: 'sonos', on: false, extra: { id: 'group-abc', coordinator: 'uid-1', track: 'Song', artist: 'Artist', volume: 50 } });
-    render(<DevicePrimaryControl device={device} />);
-    const btn = screen.getByRole('button', { name: /riproduci/i });
-    expect(btn).toBeInTheDocument();
-    fireEvent.click(btn);
-    expect(mockHandlePlay).toHaveBeenCalledWith('group-abc');
+  it('a plug that is off is labelled "Accendi <name>" and passes on=false', async () => {
+    render(<DevicePrimaryControl device={plug({ on: false })} />);
+    await clickAndSettle(screen.getByRole('switch', { name: 'Accendi Presa' }));
+    expect(mockTogglePlug).toHaveBeenCalledWith('plug-1', false);
   });
 
-  // Test 3: camera → LIVE pill
-  it('Test 3: camera renders LIVE pill and pulsing dot', () => {
-    const device = makeDevice({ kind: 'camera', on: true, extra: { fps: 24, motion: 'none' } });
-    render(<DevicePrimaryControl device={device} />);
-    expect(screen.getByText('LIVE')).toBeInTheDocument();
-    // Pulsing dot should be in DOM (aria-hidden or similar)
-    const container = screen.getByText('LIVE').closest('div');
-    expect(container).not.toBeNull();
+  it('a confirmed command clears the previous error and reports nothing', async () => {
+    const onError = jest.fn();
+    render(<DevicePrimaryControl device={plug()} onError={onError} />);
+    await clickAndSettle(screen.getByRole('switch'));
+    expect(onError.mock.calls).toEqual([[null]]);
   });
 
-  // Test 4: sensor → OK pill
-  it('Test 4: sensor renders OK pill', () => {
-    const device = makeDevice({ kind: 'sensor', on: true, extra: { humidity: 58, trend: 'stabile' } });
-    render(<DevicePrimaryControl device={device} />);
-    expect(screen.getByText('OK')).toBeInTheDocument();
+  it('reports "La presa non ha confermato il comando" when the command resolves null', async () => {
+    mockTogglePlug.mockResolvedValue(null);
+    const onError = jest.fn();
+    render(<DevicePrimaryControl device={plug()} onError={onError} />);
+    await clickAndSettle(screen.getByRole('switch'));
+    expect(onError.mock.calls).toEqual([[null], ['La presa non ha confermato il comando']]);
+    // The control is usable again after the refusal
+    expect(screen.getByRole('switch')).not.toHaveAttribute('aria-busy');
   });
 
-  // Test 5: light → InlineToggle; click fires handleRoomToggle(groupId, !device.on)
-  it('Test 5: light renders InlineToggle; toggle fires handleRoomToggle', () => {
-    const device = makeDevice({ kind: 'light', on: true, extra: { groupId: 'g-soggiorno' } });
-    render(<DevicePrimaryControl device={device} />);
-    const toggle = screen.getByTestId('mock-inline-toggle');
-    expect(toggle).toBeInTheDocument();
-    fireEvent.click(toggle);
-    expect(mockHandleRoomToggle).toHaveBeenCalledWith('g-soggiorno', false);
+  it('works without an onError callback', async () => {
+    mockTogglePlug.mockResolvedValue(null);
+    render(<DevicePrimaryControl device={plug()} />);
+    await clickAndSettle(screen.getByRole('switch'));
+    expect(mockTogglePlug).toHaveBeenCalledTimes(1);
   });
 
-  // Test 6: plug → InlineToggle; click fires togglePlug(id, device.on)
-  it('Test 6: plug renders InlineToggle; toggle fires togglePlug', () => {
-    const device = makeDevice({ kind: 'plug', on: true, extra: { id: 'plug-123', power: 250, today_kwh: 1.2 } });
-    render(<DevicePrimaryControl device={device} />);
-    const toggle = screen.getByTestId('mock-inline-toggle');
-    expect(toggle).toBeInTheDocument();
-    fireEvent.click(toggle);
-    expect(mockTogglePlug).toHaveBeenCalledWith('plug-123', true);
+  it('sends nothing when the device has no plug id', async () => {
+    const onError = jest.fn();
+    render(<DevicePrimaryControl device={plug({ extra: {} })} onError={onError} />);
+    await clickAndSettle(screen.getByRole('switch'));
+    expect(mockTogglePlug).not.toHaveBeenCalled();
+    expect(onError).not.toHaveBeenCalled();
   });
 
-  // Test 7: thermo → InlineToggle; clicking when on fires setRoomMode(roomId, 'home') [Pitfall 3]
-  it('Test 7: thermo on fires setRoomMode(roomId, "home") — Pitfall 3', () => {
-    const device = makeDevice({ kind: 'thermo', on: true, extra: { roomId: 'room-1', current: 21, target: 22 } });
-    render(<DevicePrimaryControl device={device} />);
-    const toggle = screen.getByTestId('mock-inline-toggle');
-    fireEvent.click(toggle);
-    expect(mockSetRoomMode).toHaveBeenCalledWith('room-1', 'home');
-    expect(mockSetRoomMode).not.toHaveBeenCalledWith(expect.anything(), 'on');
-    expect(mockSetRoomMode).not.toHaveBeenCalledWith(expect.anything(), 'off');
+  it('a tap does not reach the card around the toggle', async () => {
+    const onCardClick = jest.fn();
+    render(
+      <div onClick={onCardClick}>
+        <DevicePrimaryControl device={plug()} />
+      </div>,
+    );
+    await clickAndSettle(screen.getByRole('switch'));
+    expect(onCardClick).not.toHaveBeenCalled();
   });
 
-  // Test 8: valve (same as thermo) — when off fires setRoomMode(roomId, 'manual')
-  it('Test 8: valve off fires setRoomMode(roomId, "manual") — Pitfall 3', () => {
-    const device = makeDevice({ kind: 'valve', on: false, extra: { roomId: 'room-2', current: 19, target: 20 } });
-    render(<DevicePrimaryControl device={device} />);
-    const toggle = screen.getByTestId('mock-inline-toggle');
-    fireEvent.click(toggle);
-    expect(mockSetRoomMode).toHaveBeenCalledWith('room-2', 'manual');
-    expect(mockSetRoomMode).not.toHaveBeenCalledWith(expect.anything(), 'on');
-    expect(mockSetRoomMode).not.toHaveBeenCalledWith(expect.anything(), 'off');
+  it('command in progress: busy, a second tap is ignored; the result is reported once it settles', async () => {
+    const command = deferred<null>();
+    mockTogglePlug.mockReturnValue(command.promise);
+    const onError = jest.fn();
+    render(<DevicePrimaryControl device={plug()} onError={onError} />);
+    const toggle = screen.getByRole('switch');
+
+    await clickAndSettle(toggle);
+    expect(toggle).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('inline-toggle-spinner')).toBeInTheDocument();
+
+    await clickAndSettle(toggle);
+    expect(mockTogglePlug).toHaveBeenCalledTimes(1);
+    expect(onError.mock.calls).toEqual([[null]]);
+
+    await act(async () => {
+      command.resolve(null);
+    });
+    expect(toggle).not.toHaveAttribute('aria-busy');
+    expect(screen.queryByTestId('inline-toggle-spinner')).not.toBeInTheDocument();
+    expect(onError).toHaveBeenLastCalledWith('La presa non ha confermato il comando');
+  });
+});
+
+// --- Sonos --------------------------------------------------------------
+
+describe('DevicePrimaryControl: sonos', () => {
+  it('a zone that is playing shows "Pausa"; a tap pauses the zone', async () => {
+    render(<DevicePrimaryControl device={sonos({ on: true })} />);
+    const btn = screen.getByRole('button', { name: 'Pausa' });
+    expect(btn.querySelector('svg.lucide-pause')).not.toBeNull();
+
+    await clickAndSettle(btn);
+    expect(mockHandlePause).toHaveBeenCalledTimes(1);
+    expect(mockHandlePause).toHaveBeenCalledWith('RINCON_A:1');
+    expect(mockHandlePlay).not.toHaveBeenCalled();
   });
 
-  // Test 9: stove/tv/shade → empty 40px placeholder
-  it('Test 9: stove renders empty 40px placeholder (no button)', () => {
-    const device = makeDevice({ kind: 'stove', extra: {} });
+  it('a paused zone shows "Riproduci"; a tap starts the zone', async () => {
+    render(<DevicePrimaryControl device={sonos({ on: false })} />);
+    const btn = screen.getByRole('button', { name: 'Riproduci' });
+    expect(btn.querySelector('svg.lucide-play')).not.toBeNull();
+
+    await clickAndSettle(btn);
+    expect(mockHandlePlay).toHaveBeenCalledWith('RINCON_A:1');
+    expect(mockHandlePause).not.toHaveBeenCalled();
+  });
+
+  it('wires the commands to the Sonos snapshot and forwards their errors to the card', async () => {
+    const onError = jest.fn();
+    render(<DevicePrimaryControl device={sonos()} onError={onError} />);
+
+    const params = mockUseSonosCommands.mock.calls[0]![0] as {
+      fetchData: unknown;
+      applyMutation: unknown;
+      setError: (message: string | null) => void;
+    };
+    expect(params.fetchData).toBe(mockSonosFetchData);
+    expect(params.applyMutation).toBe(mockSonosApplyMutation);
+
+    params.setError('Comando fallito: 503');
+    expect(onError).toHaveBeenLastCalledWith('Comando fallito: 503');
+
+    await clickAndSettle(screen.getByRole('button', { name: 'Pausa' }));
+    expect(onError).toHaveBeenLastCalledWith(null);
+  });
+
+  it('sends nothing when the device has no zone id', async () => {
+    const onError = jest.fn();
+    render(<DevicePrimaryControl device={sonos({ extra: {} })} onError={onError} />);
+    await clickAndSettle(screen.getByRole('button', { name: 'Pausa' }));
+    expect(mockHandlePause).not.toHaveBeenCalled();
+    expect(onError).not.toHaveBeenCalled();
+  });
+
+  it('command in progress: busy with a spinner in place of the icon, a second tap is ignored', async () => {
+    const command = deferred<void>();
+    mockHandlePause.mockReturnValue(command.promise);
+    render(<DevicePrimaryControl device={sonos({ on: true })} />);
+    const btn = screen.getByRole('button', { name: 'Pausa' });
+    expect(btn).not.toHaveAttribute('aria-busy');
+
+    await clickAndSettle(btn);
+    expect(btn).toHaveAttribute('aria-busy', 'true');
+    expect(btn).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByTestId('sonos-control-spinner')).toBeInTheDocument();
+    expect(btn.querySelector('svg.lucide-pause')).toBeNull();
+    // The button keeps its accessible name while the spinner is shown
+    expect(btn).toHaveAccessibleName('Pausa');
+
+    await clickAndSettle(btn);
+    expect(mockHandlePause).toHaveBeenCalledTimes(1);
+    expect(mockHandlePlay).not.toHaveBeenCalled();
+
+    await act(async () => {
+      command.resolve();
+    });
+    expect(btn).not.toHaveAttribute('aria-busy');
+    expect(btn).not.toHaveAttribute('aria-disabled');
+    expect(screen.queryByTestId('sonos-control-spinner')).not.toBeInTheDocument();
+    expect(btn.querySelector('svg.lucide-pause')).not.toBeNull();
+  });
+});
+
+// --- No control ---------------------------------------------------------
+
+describe('DevicePrimaryControl: no one-tap command', () => {
+  it.each<DeviceKind>(['stove', 'thermo', 'valve', 'camera', 'sensor', 'host'])(
+    'a %s renders nothing',
+    (kind) => {
+      const { container } = render(<DevicePrimaryControl device={makeDevice({ kind, extra: {} })} />);
+      expect(container).toBeEmptyDOMElement();
+    },
+  );
+
+  it.each([
+    ['light', makeDevice({ unreachable: true, on: false, statusLabel: 'Non risponde' })],
+    ['plug', plug({ unreachable: true, on: false, statusLabel: 'Non risponde' })],
+    ['sonos', sonos({ unreachable: true, on: false, statusLabel: 'Non risponde' })],
+  ])('an unreachable %s renders nothing: no command on a state that is not known', (_kind, device) => {
     const { container } = render(<DevicePrimaryControl device={device} />);
-    expect(screen.queryByRole('button')).toBeNull();
-    const placeholder = container.querySelector('[aria-hidden="true"]');
-    expect(placeholder).not.toBeNull();
-  });
-
-  it('Test 9b: tv renders empty placeholder', () => {
-    const device = makeDevice({ kind: 'tv', extra: {} });
-    const { container } = render(<DevicePrimaryControl device={device} />);
-    expect(screen.queryByRole('button')).toBeNull();
-    const placeholder = container.querySelector('[aria-hidden="true"]');
-    expect(placeholder).not.toBeNull();
-  });
-
-  it('Test 9c: shade renders empty placeholder', () => {
-    const device = makeDevice({ kind: 'shade', extra: {} });
-    const { container } = render(<DevicePrimaryControl device={device} />);
-    expect(screen.queryByRole('button')).toBeNull();
-    const placeholder = container.querySelector('[aria-hidden="true"]');
-    expect(placeholder).not.toBeNull();
+    expect(container).toBeEmptyDOMElement();
+    expect(screen.queryByRole('switch')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });

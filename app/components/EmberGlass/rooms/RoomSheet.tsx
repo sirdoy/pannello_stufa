@@ -14,6 +14,7 @@
  * RC-clean: pure derivation only, no manual memo hooks (D-66/D-67).
  */
 
+import EmptyState from '@/app/components/ui/EmptyState';
 import { Sheet } from '../Sheet';
 import { ICON_FOR, CATEGORY_ORDER, CATEGORY_LABEL } from './lib/rooms-config';
 import { DeviceCard } from './DeviceCard';
@@ -54,7 +55,7 @@ export function RoomSheet({
 
   return (
     <Sheet open={open} onClose={onClose} title={room.name}>
-      <div data-testid={`stanze-sheet-${room.name.toLowerCase()}`}>
+      <div data-testid={`stanze-sheet-${room.id}`}>
         {/* Summary header — bundle rooms.jsx:234-257 */}
         <div
           style={{
@@ -92,10 +93,18 @@ export function RoomSheet({
             </div>
             {/* D-49: "{N} categorie di dispositivi" at 12px dim */}
             <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2 }}>
-              {categoriesPresent.length} categorie di dispositivi
+              {categoriesPresent.length === 1 ? '1 categoria' : `${categoriesPresent.length} categorie`} di dispositivi
             </div>
           </div>
         </div>
+
+        {total === 0 ? (
+          <EmptyState
+            size="sm"
+            title="Nessun dispositivo"
+            description="Assegna i dispositivi a questa stanza da Gestisci stanze."
+          />
+        ) : null}
 
         {/* Per-category sections — bundle rooms.jsx:259-270 */}
         {categoriesPresent.map((cat) => (
@@ -112,8 +121,8 @@ export function RoomSheet({
               {CATEGORY_LABEL[cat]}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {grouped[cat]!.map((d, i) => (
-                <DeviceCard key={`${cat}-${i}`} device={d} />
+              {grouped[cat]!.map((d) => (
+                <DeviceCard key={d.id} device={d} />
               ))}
             </div>
           </section>

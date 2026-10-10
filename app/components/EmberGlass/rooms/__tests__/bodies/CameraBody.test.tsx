@@ -1,70 +1,91 @@
 /**
- * CameraBody tests — Phase 179 Plan 05
- *
- * No-op: 16:9 preview + LIVE caption + motion footnote + play button.
- * Covers TDD behaviors 7-11 from plan.
+ * CameraBody — state of a Netatmo camera (ROADMAP M84): power and SD card chips, and the button
+ * that opens the camera page.
  */
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
 
-import { CameraBody } from '@/app/components/EmberGlass/rooms/bodies/CameraBody';
-import type { RoomDevice } from '@/app/components/EmberGlass/rooms/types';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import type { RoomDevice } from '../../types';
 
-function makeDevice(fps = 24, motion = 'rilevato 2m fa'): RoomDevice {
+const mockPush = jest.fn();
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mockPush, replace: jest.fn(), refresh: jest.fn(), back: jest.fn() }),
+}));
+
+import { CameraBody } from '../../bodies/CameraBody';
+
+function makeDevice(extra: Record<string, unknown> = {}): RoomDevice {
   return {
+    id: 31,
     kind: 'camera',
-    name: 'Telecamera',
+    name: 'Telecamera garage',
     on: true,
-    value: 'LIVE',
-    tone: 'var(--accent)',
-    extra: { fps, motion },
+    statusLabel: 'Accesa',
+    value: '',
+    tone: '#6aa86a',
+    extra: { cameraId: '70:ee:50:00:00:01', power: 'on', sd: 'on', ...extra },
   };
 }
 
+function chipValue(label: string): string | null {
+  const chip = screen.getByText(label).parentElement!;
+  return within(chip).getByTestId('stat-chip-value').textContent;
+}
+
 describe('CameraBody', () => {
-  test('Test 7: renders 16:9 preview container', () => {
+  beforeEach(() => {
+    mockPush.mockClear();
+  });
+
+  it('shows power and SD card as "Ok" when both are on', () => {
     render(<CameraBody device={makeDevice()} />);
-    const container = screen.getByTestId('stanze-camera-preview');
-    expect(container).toBeInTheDocument();
-    // Check that aspectRatio style is set to 16/9
-    expect(container).toHaveStyle({ aspectRatio: '16 / 9' });
+
+    expect(screen.getAllByTestId('stat-chip')).toHaveLength(2);
+    expect(chipValue('Alimentazione')).toBe('Ok');
+    expect(chipValue('Scheda SD')).toBe('Ok');
   });
 
-  test('Test 8: renders LIVE caption with fps value (D-59)', () => {
-    render(<CameraBody device={makeDevice(30)} />);
-    expect(screen.getByText('LIVE · 30fps')).toBeInTheDocument();
+  it('shows "Assente" for what is off', () => {
+    render(<CameraBody device={makeDevice({ power: 'off', sd: 'off' })} />);
+
+    expect(chipValue('Alimentazione')).toBe('Assente');
+    expect(chipValue('Scheda SD')).toBe('Assente');
   });
 
-  test('Test 8b: default fps=24 renders "LIVE · 24fps"', () => {
+  it('reads the two states independently', () => {
+    render(<CameraBody device={makeDevice({ power: 'on', sd: 'off' })} />);
+
+    expect(chipValue('Alimentazione')).toBe('Ok');
+    expect(chipValue('Scheda SD')).toBe('Assente');
+  });
+
+  it.each([
+    ['null', { power: null, sd: null }],
+    ['missing', { power: undefined, sd: undefined }],
+    ['an unknown value', { power: 'unknown', sd: 'formatting' }],
+  ])('shows a dash, never a made-up state, when the reading is %s', (_label, extra) => {
+    render(<CameraBody device={makeDevice(extra)} />);
+
+    expect(chipValue('Alimentazione')).toBe('—');
+    expect(chipValue('Scheda SD')).toBe('—');
+  });
+
+  it('"Apri telecamera" opens the camera page', () => {
     render(<CameraBody device={makeDevice()} />);
-    expect(screen.getByText('LIVE · 24fps')).toBeInTheDocument();
+
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    expect(mockPush).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apri telecamera' }));
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(mockPush).toHaveBeenCalledWith('/camera');
   });
 
-  test('Test 9: renders Movimento footer with motion value (D-59)', () => {
-    render(<CameraBody device={makeDevice(24, 'rilevato 2m fa')} />);
-    expect(screen.getByText('Movimento rilevato 2m fa')).toBeInTheDocument();
-  });
-
-  test('Test 10: renders centered play button overlay', () => {
+  it('has no preview and no live caption any more', () => {
     render(<CameraBody device={makeDevice()} />);
-    const btn = screen.getByRole('button', { name: /play camera stream/i });
-    expect(btn).toBeInTheDocument();
-  });
 
-  test('Test 11: clicking play button is no-op (does not throw)', () => {
-    render(<CameraBody device={makeDevice()} />);
-    const btn = screen.getByRole('button', { name: /play camera stream/i });
-    expect(() => {
-      fireEvent.click(btn);
-    }).not.toThrow();
-  });
-
-  test('Test 11b: clicking play button does not call any dispatch function', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    render(<CameraBody device={makeDevice()} />);
-    fireEvent.click(screen.getByRole('button', { name: /play camera stream/i }));
-    // Should produce no errors
-    expect(consoleSpy).not.toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    expect(screen.queryByTestId('stanze-camera-preview')).not.toBeInTheDocument();
+    expect(screen.queryByText(/LIVE/)).not.toBeInTheDocument();
   });
 });

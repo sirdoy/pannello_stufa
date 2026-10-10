@@ -48,6 +48,7 @@ export interface UseLightsCommandsParams {
 export interface UseLightsCommandsReturn {
   handleRoomToggle: (groupId: string | null | undefined, on: boolean) => Promise<void>;
   handleLightToggle: (lightId: string, on: boolean) => Promise<void>;
+  handleLightBrightnessChange: (lightId: string, percent: number) => Promise<void>;
   handleBrightnessChange: (groupId: string | null | undefined, brightness: string) => Promise<void>;
   handleSceneActivate: (sceneId: string, groupId: string) => Promise<void>;
   handleAllLightsToggle: (on: boolean) => Promise<void>;
@@ -136,6 +137,38 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
         await lightsData.fetchData();
       }
       // If response is null, request was deduplicated (silently blocked)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      lightsData.setError(message);
+    } finally {
+      lightsData.setRefreshing(false);
+    }
+  };
+
+  /**
+   * Change brightness of a single light (percent 0-100 → Bridge 0-254)
+   * PUT /api/v1/hue/lights/{lightId}/state with flat body: { brightness: 200 }
+   */
+  const handleLightBrightnessChange = async (lightId: string, percent: number) => {
+    try {
+      lightsData.setLoadingMessage('Modifica luminosita...');
+      lightsData.setRefreshing(true);
+      lightsData.setError(null);
+      const response = await hueLightCmd.execute(`/api/v1/hue/lights/${lightId}/state`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brightness: Math.round((percent * 254) / 100) }),
+      });
+      if (response) {
+        if (!response.ok) {
+          if (response.status === 409) throw new Error('Luce non raggiungibile');
+          throw new Error(`Comando fallito: ${response.status}`);
+        }
+        const data = await response.json() as HueCommandResponse;
+        const delayMs = data.data_confirmed ? 0 : 2000;
+        await new Promise<void>(resolve => setTimeout(resolve, delayMs));
+        await lightsData.fetchData();
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       lightsData.setError(message);
@@ -247,6 +280,7 @@ export function useLightsCommands(params: UseLightsCommandsParams): UseLightsCom
     // Room commands
     handleRoomToggle,
     handleLightToggle,
+    handleLightBrightnessChange,
     handleBrightnessChange,
     handleSceneActivate,
     handleAllLightsToggle,

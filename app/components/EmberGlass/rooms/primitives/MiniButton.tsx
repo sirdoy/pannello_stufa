@@ -9,6 +9,7 @@
  */
 import type { CSSProperties } from 'react';
 import type { LucideIcon } from 'lucide-react';
+import Spinner from '@/app/components/ui/Spinner';
 
 export interface MiniButtonProps {
   Icon?: LucideIcon;
@@ -17,6 +18,8 @@ export interface MiniButtonProps {
   tone?: string;
   onClick?: () => void;
   disabled?: boolean;
+  /** Command sent and not yet settled (ROADMAP M81): spinner in place of the icon, taps ignored */
+  pending?: boolean;
   ariaLabel?: string;
 }
 
@@ -31,6 +34,7 @@ export function MiniButton({
   tone = 'var(--accent)',
   onClick,
   disabled = false,
+  pending = false,
   ariaLabel,
 }: MiniButtonProps){
   const slug = label ? slugify(label) : 'icon';
@@ -42,7 +46,7 @@ export function MiniButton({
     border: filled
       ? `0.5px solid color-mix(in oklab, ${tone} 35%, transparent)`
       : '0.5px solid rgba(255,255,255,0.06)', // AUDIT-EXCEPTION (rooms.jsx:596)
-    cursor: disabled ? 'not-allowed' : 'pointer',
+    cursor: disabled ? 'not-allowed' : pending ? 'default' : 'pointer',
     background: filled
       ? `color-mix(in oklab, ${tone} 22%, rgba(255,255,255,0.04))` // AUDIT-EXCEPTION (rooms.jsx:594)
       : 'rgba(255,255,255,0.05)', // AUDIT-EXCEPTION (rooms.jsx:594)
@@ -66,11 +70,17 @@ export function MiniButton({
       data-component="mini-button"
       data-testid={`mini-button-${slug}`}
       style={style}
-      onClick={disabled ? undefined : onClick}
+      onClick={disabled || pending ? undefined : onClick}
       disabled={disabled}
+      aria-busy={pending || undefined}
+      aria-disabled={pending || undefined}
       aria-label={ariaLabel ?? label ?? 'button'}
     >
-      {Icon ? <Icon size={12} strokeWidth={2.4} /> : null}
+      {pending ? (
+        <Spinner size="xs" variant="current" aria-hidden data-testid="mini-button-spinner" />
+      ) : Icon ? (
+        <Icon size={12} strokeWidth={2.4} />
+      ) : null}
       {label ? <span>{label}</span> : null}
     </button>
   );

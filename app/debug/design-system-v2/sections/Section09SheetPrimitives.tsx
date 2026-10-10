@@ -2,8 +2,8 @@
 /**
  * Section09SheetPrimitives — Phase 182 (DSREF-01, DSREF-02)
  *
- * 7 sheet primitive samples: SheetRow, Stepper, Slider, BigSlider, RadialDial,
- * SheetBtn, QuickActionButton. Each sub-block follows D-11 layout with
+ * 8 sheet primitive samples: SheetRow, Stepper, LevelPicker, Slider, BigSlider,
+ * RadialDial, SheetBtn, QuickActionButton. Each sub-block follows D-11 layout with
  * isolated useState per stateful primitive. Inline-style + var(--token).
  *
  * Section number 09 per orchestrator's research_reconciliation override.
@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import {
   SheetRow,
   Stepper,
+  LevelPicker,
   Slider,
   BigSlider,
   RadialDial,
@@ -24,6 +25,7 @@ import { CodeSnippet } from './CodeSnippet';
 export function Section09SheetPrimitives(): React.ReactElement {
   // Isolated useState per stateful primitive.
   const [stepVal, setStepVal] = useState(3);
+  const [levelVal, setLevelVal] = useState(2);
   const [sliderVal, setSliderVal] = useState(40);
   const [bigSliderVal, setBigSliderVal] = useState(72);
   const [dialVal, setDialVal] = useState(22);
@@ -94,6 +96,18 @@ export function Section09SheetPrimitives(): React.ReactElement {
         description="Stepper +/- discreto, onChange emette numero raw."
         sample={<Stepper value={stepVal} min={1} max={5} onChange={setStepVal} />}
         code={'<Stepper value={pwr} min={1} max={5} onChange={setPwr} />'}
+      />
+
+      {/* === LevelPicker (ROADMAP M77) === */}
+      <SubBlock
+        name="LevelPicker"
+        description="Livelli numerati per un intervallo piccolo: un tocco imposta il livello. `pending` blocca la riga finché il dispositivo risponde."
+        sample={
+          <div style={{ width: '100%', maxWidth: 360 }}>
+            <LevelPicker label="Potenza" value={levelVal} min={1} max={5} onChange={setLevelVal} />
+          </div>
+        }
+        code={'<LevelPicker label="Potenza" value={power} min={1} max={5} pending={requested} onChange={setPower} />'}
       />
 
       {/* === 3. Slider === */}

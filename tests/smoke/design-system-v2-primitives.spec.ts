@@ -34,7 +34,7 @@ test.describe('Phase 182 — primitives reference (DSREF-01..03)', () => {
     ).toBeVisible();
   });
 
-  test('all 13 SC-#1 primitive sub-block name labels are visible', async ({ page }) => {
+  test('all 14 SC-#1 primitive sub-block name labels are visible', async ({ page }) => {
     const primitiveNames = [
       'GlassCard',
       'CardHead',
@@ -46,6 +46,7 @@ test.describe('Phase 182 — primitives reference (DSREF-01..03)', () => {
       'PlayingBars',
       'SheetRow',
       'Stepper',
+      'LevelPicker',
       'Slider',
       'BigSlider',
       'RadialDial',

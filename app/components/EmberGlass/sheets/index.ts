@@ -30,6 +30,8 @@ export { Slider } from './primitives/Slider';
 export type { SliderProps } from './primitives/Slider';
 export { RadialDial } from './primitives/RadialDial';
 export type { RadialDialProps } from './primitives/RadialDial';
+export { LevelPicker } from './primitives/LevelPicker';
+export type { LevelPickerProps } from './primitives/LevelPicker';
 export { SheetBtn } from './primitives/SheetBtn';
 export type { SheetBtnProps } from './primitives/SheetBtn';
 export { QuickActionButton } from './primitives/QuickActionButton';

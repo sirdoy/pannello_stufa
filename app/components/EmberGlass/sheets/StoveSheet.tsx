@@ -1,41 +1,31 @@
 'use client';
 
 /**
- * StoveSheet (SHEET-02 / CONTEXT D-05) — body component mounted by Phase 177
- * `<StoveCard>` inside `<Sheet open onClose title="Stufa">`.
+ * StoveSheet (SHEET-02 / CONTEXT D-05, reworked in ROADMAP M77) — body mounted
+ * by `<StoveCard>` inside `<Sheet open onClose title="Stufa">`.
  *
- * Presentational — receives stoveData/cmds from parent (per quick task
- * 260506-d45 perf fix; reverses Phase 178 D-04). The dashboard card already
- * mounts useStoveData; the sheet body re-mounting it doubled the WS subscription
- * + polling cost on every open. The SelfFetch wrapper below preserves the
- * zero-prop contract for the design-system gallery (Section10SheetGallery).
+ * Presentational — receives stoveData/cmds from the parent (quick task
+ * 260506-d45: the card already mounts useStoveData; mounting it again here
+ * doubled the WS subscription and the polling on every open). The SelfFetch
+ * wrapper below keeps the zero-prop contract for the design-system gallery.
  *
- * Visual contract verbatim from bundle
- * `.planning/inbox/ember-glass-design/project/components/sheets.jsx:67-130`,
- * MINUS the dropped temperature / target / pellet hero footnote (RESEARCH
- * Pitfall 11 — the live Thermorossi proxy hook exposes only stove_state /
- * power_level / fan_level; no temp/target/pellet fields). The 54px display
- * therefore renders `{powerLevel}/5` instead of `{temp}°C`.
+ * Top to bottom: what the stove is doing and what the schedule does next,
+ * what is wrong (alarm, pellet reserve, cleaning due, old data), the two
+ * levels while it burns, the links to the stove pages, the on/off action.
+ * A command locks the controls until the stove answers and reports a failure
+ * in place: nothing here fails silently.
  *
- * Italian copy is frozen at CONTEXT D-19. Routing uses literal strings
- * `/stove/scheduler` + `/stove/maintenance` per Pitfall 2 (no STOVE_ROUTES
- * key for the scheduler/maintenance UI routes). The card owns useRouter and
- * threads navigation via the `onNavigate` callback — keeps the prop surface
- * narrow (no router instance crosses the boundary).
+ * The card owns useRouter and threads navigation via `onNavigate`, so no
+ * router instance crosses the prop boundary.
  *
- * Sheet sub-primitives are NOT wrapped in `<Pressable>` (D-24) — they are
- * bare buttons with `data-sheet-focusable="true"` so the global focus-ring
- * rule from app/globals.css applies.
- *
- * RC-clean (D-33): no manual memoization hooks. React Compiler 1.0
- * auto-memoizes — manual memo hooks are forbidden in this namespace.
- *
- * AUDIT-EXCEPTION literals are tagged inline with bundle source line refs.
+ * RC-clean (D-33): no manual memoization hooks.
  */
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/lib/auth/useUser';
-import { AlertTriangle, Calendar, Power, TriangleAlert } from 'lucide-react';
+import { Calendar, Check, Fan, Flame, Gauge, Power, Thermometer, Undo2, Wrench } from 'lucide-react';
+import { Banner, Button } from '@/app/components/ui';
 import {
   useStoveData,
   type UseStoveDataReturn,
@@ -44,10 +34,21 @@ import {
   useStoveCommands,
   type UseStoveCommandsReturn,
 } from '@/app/components/devices/stove/hooks/useStoveCommands';
+import {
+  STOVE_TONE_COLOR,
+  describeStoveSchedule,
+  formatStoveAge,
+  formatStoveWhen,
+  getStoveStateDisplay,
+} from '@/app/components/devices/stove/stoveDisplay';
 import { FlameViz } from '../FlameViz';
-import { SheetRow } from './primitives/SheetRow';
-import { Stepper } from './primitives/Stepper';
+import { LevelPicker } from './primitives/LevelPicker';
 import { SheetBtn } from './primitives/SheetBtn';
+
+const POWER_MAX = 5;
+const FAN_MAX = 6;
+
+type Pending = { kind: 'power' | 'fan'; level: number } | { kind: 'toggle' | 'mode' | 'cleaning' };
 
 export interface StoveSheetProps {
   stoveData: UseStoveDataReturn;
@@ -61,13 +62,15 @@ export interface StoveSheetProps {
 }
 
 export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
-  // Field adapter (RESEARCH §"Field Gaps" — bundle assumed s.temp/s.target/
-  // s.pelletPercent; none exist on the live hook). Fallbacks mirror Phase 177
-  // StoveCard.tsx:76 — null-coalesce powerLevel/fanLevel to 1.
+  const [pending, setPending] = useState<Pending | null>(null);
+  const [commandFailed, setCommandFailed] = useState(false);
+
   const isAccesa = stoveData.isAccesa;
-  const powerLevel = stoveData.powerLevel ?? 1;
-  const fanLevel = stoveData.fanLevel ?? 1;
   const needsCleaning = stoveData.needsMaintenance;
+  const state = getStoveStateDisplay(stoveData.status, isAccesa);
+  const schedule = describeStoveSchedule(stoveData);
+  const isStale = stoveData.staleness?.isStale ?? false;
+  const busy = pending !== null || Boolean(stoveData.loading);
 
   // Loading skeleton (D-26) — first-load only, before any cached data lands.
   if (stoveData.initialLoading && stoveData.powerLevel === null) {
@@ -85,184 +88,238 @@ export function StoveSheet({ stoveData, cmds, onNavigate }: StoveSheetProps) {
     );
   }
 
-  // Error state (D-27) — only when there's no cached level data to fall back
-  // to. `errorDescription` is `string` (defaults to '' so the truthy guard
-  // skips the no-error case). Per RESEARCH Open Q3 the hook surfaces a string
-  // not an Error instance — render verbatim as the secondary line.
-  if (
-    stoveData.errorDescription &&
-    stoveData.powerLevel === null &&
-    stoveData.fanLevel === null
-  ) {
-    return (
-      <div
-        data-testid="stove-sheet-error"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 8,
-          padding: '24px 0',
-        }}
-      >
-        <TriangleAlert size={32} color="var(--text-2)" />
-        <div style={{ fontSize: 14, color: 'var(--text-1)' }}>
-          Non raggiungibile. Riprova più tardi.
-        </div>
-        <div style={{ fontSize: 12, color: 'var(--text-2)' }}>
-          {stoveData.errorDescription}
-        </div>
-      </div>
-    );
-  }
+  // One command at a time: the handlers throw on a refused command (409, 5xx).
+  const run = async (next: Pending, command: () => Promise<void>) => {
+    setCommandFailed(false);
+    setPending(next);
+    try {
+      await command();
+    } catch {
+      setCommandFailed(true);
+    } finally {
+      setPending(null);
+    }
+  };
+
+  const pendingLevel = (kind: 'power' | 'fan') =>
+    pending && pending.kind === kind && 'level' in pending ? pending.level : null;
+
+  const staleAge = stoveData.staleness?.cachedAt ? formatStoveAge(stoveData.staleness.ageSeconds) : null;
 
   return (
     <div data-testid="stove-sheet">
-      {/* Hero block — bundle sheets.jsx:71-92 (minus dropped temp/target/pellet) */}
+      {/* Hero: state, then mode and next scheduled action */}
       <div
         style={{
           borderRadius: 24,
-          padding: '24px 20px',
+          padding: '20px',
           background: isAccesa
             ? 'linear-gradient(160deg, color-mix(in oklab, var(--accent) 25%, transparent) 0%, transparent 70%)'
             : 'rgba(255,255,255,0.03)', // AUDIT-EXCEPTION (sheets.jsx:76)
           border: '0.5px solid rgba(255,255,255,0.06)', // AUDIT-EXCEPTION (sheets.jsx:77)
           display: 'flex',
           alignItems: 'center',
-          gap: 20,
+          gap: 18,
         }}
       >
-        <FlameViz on={isAccesa} intensity={powerLevel / 5} />
-        <div style={{ flex: 1 }}>
+        <FlameViz on={isAccesa} intensity={(stoveData.powerLevel ?? 1) / POWER_MAX} />
+        <div style={{ flex: 1, minWidth: 0 }}>
           <div
             data-testid="stove-sheet-state"
-            style={{
-              fontSize: 12,
-              color: 'var(--text-2)',
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-            }}
-          >
-            {isAccesa ? 'In funzione' : 'Spenta'}
-          </div>
-          <div
-            data-testid="stove-sheet-temp"
+            role="status"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 54,
+              fontSize: 26,
               fontWeight: 600,
-              color: '#fff', // AUDIT-EXCEPTION (sheets.jsx:84)
-              lineHeight: 1,
-              letterSpacing: -2,
+              lineHeight: 1.1,
+              letterSpacing: -0.6,
+              color: state.tone === 'muted' || state.tone === 'accent' ? '#fff' : STOVE_TONE_COLOR[state.tone],
             }}
           >
-            {powerLevel}
-            <span style={{ fontSize: 22, opacity: 0.5 }}>/5</span>
+            {state.label}
           </div>
-          {/* Hero footnote intentionally dropped — Pitfall 11 (no target /
-              pelletPercent on the live hook). */}
+          <div data-testid="stove-sheet-schedule" style={{ marginTop: 6, fontSize: 13, color: 'var(--text-1)' }}>
+            {schedule.nextLong ? `${schedule.mode} · ${schedule.nextLong.toLowerCase()}` : `Modalità ${schedule.mode.toLowerCase()}`}
+          </div>
+          {!isStale && typeof stoveData.lastUpdatedAt === 'number' && (
+            <div data-testid="stove-sheet-updated" style={{ marginTop: 2, fontSize: 12, color: 'var(--text-2)' }}>
+              Aggiornata {formatStoveWhen(stoveData.lastUpdatedAt)}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Livello fiamma + Ventola — stacked on mobile, 2-col on desktop (sm+).
-          Hidden when stove is off (no point showing levels for an off stove). */}
+      {/* What is wrong, most serious first */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
+        {(state.tone === 'danger' || Boolean(stoveData.errorCode)) && (
+          <div data-testid="stove-sheet-alarm">
+            <Banner
+              compact
+              variant="error"
+              title={stoveData.errorCode ? `Allarme ${stoveData.errorCode}` : 'Stufa in allarme'}
+              description={stoveData.errorDescription || 'Controlla la stufa prima di riaccenderla.'}
+              actions={
+                <Button variant="subtle" size="sm" onClick={() => onNavigate('/stove/errors')}>
+                  Storico allarmi
+                </Button>
+              }
+            />
+          </div>
+        )}
+        {isStale && (
+          <div data-testid="stove-sheet-stale">
+            <Banner
+              compact
+              variant="warning"
+              title="Dati non aggiornati"
+              description={
+                staleAge
+                  ? `Ultima lettura ${staleAge} fa: la stufa non risponde, lo stato può essere diverso.`
+                  : 'La stufa non risponde: lo stato può essere diverso.'
+              }
+            />
+          </div>
+        )}
+        {stoveData.pelletLow && (
+          <div data-testid="stove-sheet-pellet-low">
+            <Banner
+              compact
+              variant="warning"
+              title="Pellet in riserva"
+              description="Ricarica il serbatoio della stufa."
+            />
+          </div>
+        )}
+        {needsCleaning && (
+          <div data-testid="stove-sheet-cleaning">
+            <Banner
+              compact
+              variant="warning"
+              icon={<Wrench size={20} />}
+              title="Pulizia richiesta"
+              description={
+                stoveData.maintenanceStatus
+                  ? `${Math.round(stoveData.maintenanceStatus.currentHours)} h di lavoro: pulisci la stufa prima di riaccenderla.`
+                  : 'Pulisci la stufa prima di riaccenderla.'
+              }
+              actions={
+                <Button
+                  variant="success"
+                  size="sm"
+                  icon={<Check size={16} />}
+                  loading={pending?.kind === 'cleaning'}
+                  disabled={busy}
+                  onClick={() => void run({ kind: 'cleaning' }, cmds.handleConfirmCleaning)}
+                >
+                  Ho pulito
+                </Button>
+              }
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Levels — only while the stove burns. One tap = one command. */}
       {isAccesa && (
-      <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-5">
-        {/* Stepper wraps onChange to fit handlePowerChange's synthetic-event signature. */}
-        <div data-testid="stove-sheet-power-stepper">
-          <SheetRow label="Livello fiamma" value={`${powerLevel}/5`}>
-            <Stepper
-              value={powerLevel}
+        <div className="grid grid-cols-1 sm:grid-cols-2 sm:gap-x-5">
+          <div data-testid="stove-sheet-power">
+            <LevelPicker
+              label="Potenza"
+              Icon={Flame}
+              value={stoveData.powerLevel}
               min={1}
-              max={5}
-              onChange={(v) =>
-                void cmds.handlePowerChange({ target: { value: String(v) } })
+              max={POWER_MAX}
+              pending={pendingLevel('power')}
+              disabled={busy}
+              onChange={(level) =>
+                void run({ kind: 'power', level }, () => cmds.handlePowerChange({ target: { value: String(level) } }))
               }
             />
-          </SheetRow>
-        </div>
-
-        <div data-testid="stove-sheet-fan-stepper">
-          <SheetRow label="Ventola" value={`${fanLevel}/5`}>
-            <Stepper
-              value={fanLevel}
+          </div>
+          <div data-testid="stove-sheet-fan">
+            <LevelPicker
+              label="Ventola"
+              Icon={Fan}
+              value={stoveData.fanLevel}
               min={1}
-              max={5}
-              onChange={(v) =>
-                void cmds.handleFanChange({ target: { value: String(v) } })
+              max={FAN_MAX}
+              pending={pendingLevel('fan')}
+              disabled={busy}
+              onChange={(level) =>
+                void run({ kind: 'fan', level }, () => cmds.handleFanChange({ target: { value: String(level) } }))
               }
             />
-          </SheetRow>
+          </div>
         </div>
-      </div>
       )}
 
-      {/* 2-col SheetBtn grid — Pitfall 2: literal route strings, not
-          STOVE_ROUTES.* (the constants object exposes API-route keys, not the
-          /stove/scheduler + /stove/maintenance UI pages). */}
+      {/* Semi-manual: a manual change overrides the schedule until the next slot */}
+      {schedule.mode === 'Semi-manuale' && (
+        <div style={{ marginTop: 18 }}>
+          <Button
+            variant="subtle"
+            size="sm"
+            fullWidth
+            icon={<Undo2 size={16} />}
+            loading={pending?.kind === 'mode'}
+            disabled={busy}
+            data-testid="stove-sheet-back-to-auto"
+            onClick={() => void run({ kind: 'mode' }, cmds.handleClearSemiManual)}
+          >
+            Torna in automatico
+          </Button>
+        </div>
+      )}
+
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: 10,
-          marginTop: 22,
+          marginTop: 18,
         }}
       >
-        <SheetBtn
-          Icon={Calendar}
-          label="Orari"
-          onClick={() => onNavigate('/stove/scheduler')}
-        />
-        <SheetBtn
-          Icon={AlertTriangle}
-          label="Manutenzione"
-          onClick={() => onNavigate('/stove/maintenance')}
-        />
+        <SheetBtn Icon={Calendar} label="Orari" onClick={() => onNavigate('/stove/scheduler')} />
+        <SheetBtn Icon={Thermometer} label="Clima" onClick={() => onNavigate('/settings/thermostat')} />
+        <SheetBtn Icon={Wrench} label="Manutenzione" onClick={() => onNavigate('/stove/maintenance')} />
+        <SheetBtn Icon={Gauge} label="Dettagli" onClick={() => onNavigate('/stove')} />
       </div>
 
-      {/* Primary action — bundle sheets.jsx:113-127. Disabled when
-          needsCleaning so a stove with overdue maintenance cannot ignite (T-178-04-01). */}
-      <button
-        type="button"
-        data-testid="stove-sheet-primary-action"
-        data-sheet-focusable="true"
-        disabled={needsCleaning}
-        onClick={() =>
-          void (isAccesa ? cmds.handleShutdown() : cmds.handleIgnite())
-        }
-        style={{
-          marginTop: 18,
-          width: '100%',
-          height: 56,
-          borderRadius: 18,
-          fontFamily: 'var(--font-display)',
-          fontSize: 16,
-          fontWeight: 600,
-          cursor: needsCleaning ? 'not-allowed' : 'pointer',
-          opacity: needsCleaning ? 0.6 : 1,
-          background: isAccesa
-            ? 'rgba(255, 77, 92, 0.15)' // AUDIT-EXCEPTION (sheets.jsx:119) — destructive ember
-            : 'var(--accent)',
-          color: isAccesa ? '#ff6676' : '#1a0f08', // AUDIT-EXCEPTION (sheets.jsx:120)
-          border: isAccesa
-            ? '0.5px solid rgba(255, 77, 92, 0.25)' // AUDIT-EXCEPTION (sheets.jsx:124)
-            : 'none',
-          boxShadow: isAccesa
-            ? 'none'
-            : '0 0 30px color-mix(in oklab, var(--accent) 40%, transparent)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 10,
-        }}
-      >
-        <Power size={18} strokeWidth={2.2} />
-        {needsCleaning
-          ? 'Manutenzione richiesta'
-          : isAccesa
-            ? 'Spegni stufa'
-            : 'Accendi stufa'}
-      </button>
+      {commandFailed && (
+        <div data-testid="stove-sheet-command-error" style={{ marginTop: 14 }}>
+          <Banner
+            compact
+            variant="error"
+            title="Comando non riuscito"
+            description="La stufa non ha accettato il comando. Riprova tra poco."
+          />
+        </div>
+      )}
+
+      {/* Primary action. Cleaning due blocks the ignition only: shutting down always stays possible. */}
+      <div style={{ marginTop: 18 }}>
+        <Button
+          variant={isAccesa ? 'danger' : 'ember'}
+          size="lg"
+          fullWidth
+          icon={<Power size={18} strokeWidth={2.2} />}
+          loading={pending?.kind === 'toggle'}
+          disabled={busy || (!isAccesa && needsCleaning)}
+          data-testid="stove-sheet-primary-action"
+          onClick={() => void run({ kind: 'toggle' }, isAccesa ? cmds.handleShutdown : cmds.handleIgnite)}
+        >
+          {isAccesa ? 'Spegni stufa' : needsCleaning ? 'Pulizia richiesta' : 'Accendi stufa'}
+        </Button>
+        {pending?.kind === 'toggle' && (
+          <div
+            data-testid="stove-sheet-progress"
+            role="status"
+            style={{ marginTop: 8, textAlign: 'center', fontSize: 12, color: 'var(--text-2)' }}
+          >
+            {isAccesa ? 'Spegnimento in corso…' : 'Accensione in corso…'}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

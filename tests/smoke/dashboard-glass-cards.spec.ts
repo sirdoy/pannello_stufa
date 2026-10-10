@@ -114,8 +114,8 @@ test.describe('DASH-01..DASH-12 — equal-size dashboard glass cards', () => {
         `Expected ${id} to be visible on dashboard`
       ).toBeVisible({ timeout: 15000 });
     }
-    // DASH-02 specific: stove temp readout (powerLevel) is visible.
-    await expect(page.getByTestId('stove-temp')).toBeVisible();
+    // DASH-02 specific: the stove state word is visible.
+    await expect(page.getByTestId('stove-state')).toBeVisible();
   });
 
   // DASH-11 positive — each interactive card opens a Sheet on tap.
@@ -195,17 +195,18 @@ test.describe('SHEET-02 StoveSheet wires command', () => {
     await waitForHydration(page);
   });
 
-  test('clicking + on power stepper fires Thermorossi setPower command', async ({ page }) => {
+  test('tapping another power level fires Thermorossi setPower command', async ({ page }) => {
     const { errors, cleanup } = collectConsoleErrors(page);
     await page.getByTestId('stove-card').click();
     const sheet = page.getByTestId('stove-sheet');
     await expect(sheet).toBeVisible({ timeout: 2000 });
-    const powerWrap = sheet.getByTestId('stove-sheet-power-stepper');
-    // The power stepper renders only while the real stove is lit (isAccesa):
+    const powerWrap = sheet.getByTestId('stove-sheet-power');
+    // The power picker renders only while the real stove is lit (isAccesa):
     // with the stove off there is nothing to wire, so skip instead of timing out.
     const lit = await powerWrap.waitFor({ state: 'visible', timeout: 3000 }).then(() => true, () => false);
-    test.skip(!lit, 'stove is off: power stepper hidden by design');
-    await powerWrap.getByTestId('stepper-plus').click();
+    test.skip(!lit, 'stove is off: power picker hidden by design');
+    // Tapping the current level sends nothing: pick one that is not selected.
+    await powerWrap.locator('[role="radio"][aria-checked="false"]').first().click();
     // Wait for the asynchronous request to land.
     await expect.poll(() => powerRequests.length, { timeout: 3000 }).toBeGreaterThanOrEqual(1);
     cleanup();

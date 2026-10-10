@@ -1,16 +1,9 @@
 /**
- * StoveCard — Phase 177 (DASH-02) — Jest unit tests
+ * StoveCard — Phase 177 (DASH-02), reworked in ROADMAP M77 — Jest unit tests
  *
- * Coverage:
- *   (a) renders 36px power_level readout with NO °C unit when on (A-01 deviation)
- *   (b) renders Spenta subtitle when off
- *   (c) clicking card opens sheet with placeholder body
- *
- * A-01 deviation rationale:
- *   Thermorossi proxy exposes only `power_level` (1..5 dimensionless integer).
- *   Rendering a `°C` superscript would be a semantic lie. The 36px display
- *   shows the digit alone. Test (a) asserts NO `°C` substring in the DOM
- *   near the value.
+ * The tile shows a state word, the two levels while the stove burns, and one
+ * detail line: what is wrong (alarm, old data, pellet reserve) or what the
+ * schedule does next. No temperature: the proxy exposes levels only.
  */
 import { fireEvent, render } from '@testing-library/react';
 
@@ -62,31 +55,56 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     window.scrollTo = originalScrollTo;
   });
 
-  test('(a) renders 36px power_level readout with NO °C unit when on (A-01)', () => {
+  test('(a) on: state word and both levels, no temperature unit', () => {
     useStoveDataMock.mockReturnValue({
+      status: 'working',
       isAccesa: true,
       powerLevel: 3,
       fanLevel: 2,
       staleness: { isStale: false, cachedAt: new Date(), ageSeconds: 1 },
     });
-    const { getByTestId, getByText } = render(<StoveCard />);
-    const tempEl = getByTestId('stove-temp');
-    expect(tempEl.textContent).toContain('3');
-    // A-01: NO temperature unit — power_level is dimensionless 1..5.
-    expect(tempEl.textContent).not.toContain('°C');
-    expect(tempEl.textContent).not.toContain('°');
-    expect(getByText('Fiamma 3 · Ventola 2')).toBeInTheDocument();
+    const { getByTestId } = render(<StoveCard />);
+    expect(getByTestId('stove-state')).toHaveTextContent('Accesa');
+    expect(getByTestId('stove-levels')).toHaveTextContent('Potenza 3 · Ventola 2');
+    expect(getByTestId('stove-card').textContent).not.toContain('°');
+    // No schedule loaded → the detail line falls back to the mode.
+    expect(getByTestId('stove-detail')).toHaveTextContent('Manuale');
   });
 
-  test('(b) renders Spenta subtitle when off', () => {
+  test('(b) off: "Spenta", no levels, next scheduled ignition', () => {
+    const at = new Date();
+    at.setHours(18, 15, 0, 0);
     useStoveDataMock.mockReturnValue({
+      status: 'off',
       isAccesa: false,
-      powerLevel: 0,
-      fanLevel: 0,
+      powerLevel: 1,
+      fanLevel: 1,
       staleness: null,
+      schedulerEnabled: true,
+      semiManualMode: false,
+      returnToAutoAt: null,
+      nextScheduledAction: { timestamp: at.toISOString(), action: 'ignite' },
     });
-    const { getByText } = render(<StoveCard />);
-    expect(getByText('Spenta')).toBeInTheDocument();
+    const { getByTestId, queryByTestId } = render(<StoveCard />);
+    expect(getByTestId('stove-state')).toHaveTextContent('Spenta');
+    expect(queryByTestId('stove-levels')).toBeNull();
+    expect(getByTestId('stove-detail')).toHaveTextContent('Accende alle 18:15');
+  });
+
+  test('(b2) alarm: red state word, error code, lit status dot', () => {
+    useStoveDataMock.mockReturnValue({
+      status: 'alarm',
+      isAccesa: false,
+      powerLevel: 1,
+      fanLevel: 1,
+      staleness: null,
+      errorCode: 12,
+    });
+    const { getByTestId } = render(<StoveCard />);
+    expect(getByTestId('stove-state')).toHaveTextContent('Allarme');
+    expect(getByTestId('stove-detail')).toHaveTextContent('Errore 12');
+    expect(getByTestId('status-dot')).toHaveAttribute('data-on', 'true');
+    expect(getByTestId('status-dot').getAttribute('style') ?? '').toContain('#ff6676');
   });
 
   test('(c) clicking card opens sheet (translateY(0) and stove-sheet body mounted)', () => {
@@ -107,16 +125,17 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     expect(getByTestId('stove-sheet')).toBeInTheDocument();
   });
 
-  test('(d) renders dash placeholder when powerLevel is null', () => {
+  test('(d) missing levels render as a dash', () => {
     useStoveDataMock.mockReturnValue({
-      isAccesa: false,
+      status: 'igniting',
+      isAccesa: true,
       powerLevel: null,
       fanLevel: null,
       staleness: null,
     });
     const { getByTestId } = render(<StoveCard />);
-    const tempEl = getByTestId('stove-temp');
-    expect(tempEl.textContent).toContain('—');
+    expect(getByTestId('stove-state')).toHaveTextContent('Avvio');
+    expect(getByTestId('stove-levels')).toHaveTextContent('Potenza — · Ventola —');
   });
 
   test('(e) StatusDot uses amber stale color when staleness.isStale is true (D-25)', () => {
@@ -129,6 +148,8 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     const { getByTestId } = render(<StoveCard />);
     const dot = getByTestId('status-dot');
     expect(dot.getAttribute('style') ?? '').toContain('#ffb84a');
+    // The age of the reading replaces the schedule on the detail line.
+    expect(getByTestId('stove-detail')).toHaveTextContent('Dati di 10 min fa');
   });
 
   // ROADMAP M9: cleaning due must be visible on the card, not only in the sheet.
@@ -141,14 +162,15 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
       needsMaintenance: true,
       maintenanceStatus: { currentHours: 4577.28, targetHours: 100, needsCleaning: true },
     });
-    const { getByTestId, queryByText } = render(<StoveCard />);
+    const { getByTestId, queryByTestId } = render(<StoveCard />);
 
     expect(getByTestId('stove-cleaning-badge')).toHaveAttribute('aria-label', 'Pulizia richiesta');
     const alert = getByTestId('stove-maintenance-alert');
     expect(alert).toHaveAttribute('role', 'status');
     expect(alert.textContent).toContain('Pulizia richiesta');
     expect(alert.textContent).toContain('4577 h di lavoro');
-    expect(queryByText('Spenta')).toBeNull();
+    expect(getByTestId('stove-state')).toHaveTextContent('Spenta');
+    expect(queryByTestId('stove-detail')).toBeNull();
   });
 
   // ROADMAP D11: reserve sensor of the stove, read by the Pi from the local WiNet module.
@@ -164,6 +186,7 @@ describe('StoveCard (Phase 177 — DASH-02)', () => {
     const { getByTestId, queryByTestId } = render(<StoveCard />);
 
     expect(getByTestId('stove-pellet-low-badge')).toHaveAttribute('aria-label', 'Pellet in riserva');
+    expect(getByTestId('stove-detail')).toHaveTextContent('Pellet in riserva');
     expect(queryByTestId('stove-cleaning-badge')).toBeNull();
   });
 

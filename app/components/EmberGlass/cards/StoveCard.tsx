@@ -1,24 +1,15 @@
 'use client';
 
 /**
- * StoveCard — Phase 177 (DASH-02)
+ * StoveCard — Phase 177 (DASH-02), reworked in ROADMAP M77
  *
- * Dashboard summary tile for the Thermorossi stove. Composes Wave 1 EmberGlass
- * primitives (GlassCard + CardHead + StatusDot) with FlameViz (Phase 176) and
- * the Phase 175 Sheet primitive wrapping the real `<StoveSheet>` body
- * (Phase 178-09 swap; placeholder retired for this card).
+ * Dashboard summary tile for the Thermorossi stove: GlassCard + CardHead +
+ * StatusDot, FlameViz, and the Sheet wrapping `<StoveSheet>`.
  *
- * A-01 deviation (no °C superscript on the value):
- *   The bundle (`cards.jsx:81-107`) renders a `°C` superscript on the 36px
- *   readout. The bundle's `temp` was mock data — Thermorossi's HA proxy
- *   exposes only `power_level` (1..5 dimensionless integer). Rendering a
- *   temperature unit on a power level would be a semantic lie. The 36px
- *   display shows the digit alone. The unit-test asserts NO `°C` substring
- *   in the DOM near the value. A future phase that wires Netatmo room temp
- *   into this card may restore the °C superscript.
- *
- * Bundle source (PRIMARY visual contract):
- *   .planning/inbox/ember-glass-design/project/components/cards.jsx:81-107
+ * The tile answers three questions at a glance: what the stove is doing (one
+ * word), at which levels, and what happens next (schedule) or what is wrong
+ * (alarm, cleaning due, pellet reserve, old data). No temperature: the proxy
+ * exposes levels only.
  *
  * RC-clean (D-28): no useMemo / useCallback. React Compiler 1.0 auto-memoizes.
  */
@@ -37,8 +28,17 @@ import { GlassCardSkeleton } from '../GlassCardSkeleton';
 import { useCardReady } from '../useCardReady';
 import { useStoveData } from '@/app/components/devices/stove/hooks/useStoveData';
 import { useStoveCommands } from '@/app/components/devices/stove/hooks/useStoveCommands';
+import {
+  STOVE_TONE_COLOR,
+  describeStoveSchedule,
+  formatStoveAge,
+  getStoveStateDisplay,
+} from '@/app/components/devices/stove/stoveDisplay';
 
-const WARN = '#ffb84a';
+const WARN = STOVE_TONE_COLOR.warn;
+const DANGER = STOVE_TONE_COLOR.danger;
+
+const lineStyle = { fontSize: 12, lineHeight: '16px', color: 'var(--text-2)' } as const;
 
 // Icon-only: a text badge truncates the "Stufa" label on narrow cards.
 function HeadBadge({ testId, label, children }: { testId: string; label: string; children: ReactNode }) {
@@ -91,14 +91,30 @@ export default function StoveCard() {
     user,
   });
 
+  const state = getStoveStateDisplay(stove.status, stove.isAccesa);
+  const isAlarm = state.tone === 'danger';
+
   // D-25: stale → amber StatusDot. `staleness` is StalenessInfo | null.
   const isStale = stove.staleness?.isStale ?? false;
-  const dotColor = isStale ? WARN : undefined;
+  const dotColor = isAlarm ? DANGER : isStale ? WARN : undefined;
 
   // ROADMAP M9: cleaning due (counted on the Pi) blocks ignition → visible on the card itself.
   const needsCleaning = stove.needsMaintenance;
   const cleaningHours = stove.maintenanceStatus?.currentHours;
-  const tone = needsCleaning ? WARN : 'var(--accent)';
+  const tone = isAlarm ? DANGER : needsCleaning ? WARN : 'var(--accent)';
+
+  // Last line: what is wrong first, otherwise what the schedule does next.
+  const schedule = describeStoveSchedule(stove);
+  const detail: { text: string; warn: boolean } = isAlarm
+    ? { text: stove.errorCode ? `Errore ${stove.errorCode}` : 'Controlla la stufa', warn: false }
+    : isStale
+      ? {
+          text: stove.staleness?.cachedAt ? `Dati di ${formatStoveAge(stove.staleness.ageSeconds)} fa` : 'Dati non aggiornati',
+          warn: true,
+        }
+      : stove.pelletLow
+        ? { text: 'Pellet in riserva', warn: true }
+        : { text: schedule.nextShort ?? schedule.mode, warn: false };
 
   // ROADMAP M15/M16: skeleton until the first fresh data (REST or WS snapshot),
   // and again after a return to foreground until the topic sends a new frame.
@@ -129,7 +145,7 @@ export default function StoveCard() {
                   <Wrench size={11} strokeWidth={2.4} aria-hidden />
                 </HeadBadge>
               )}
-              <StatusDot on={stove.isAccesa} color={dotColor} />
+              <StatusDot on={stove.isAccesa || isAlarm} color={dotColor} />
             </span>
           }
         />
@@ -142,29 +158,34 @@ export default function StoveCard() {
             position: 'relative',
           }}
         >
-          {/* FlameViz absolute-positioned top-right (bundle cards.jsx:88).
-              Bleeds past the card padding by design. */}
+          {/* FlameViz top-right, scaled down so it stays clear of the text column. */}
           <div
-            style={{ position: 'absolute', right: -8, top: -10, opacity: 0.9 }}
+            style={{
+              position: 'absolute',
+              right: -6,
+              top: -14,
+              opacity: 0.9,
+              transform: 'scale(0.72)',
+              transformOrigin: 'top right',
+            }}
             data-testid="flame-viz-wrapper"
           >
             <FlameViz on={stove.isAccesa} intensity={(stove.powerLevel ?? 0) / 5} />
           </div>
-          {/* 36px display — power_level integer, NO temperature unit (A-01). */}
           <div
-            data-testid="stove-temp"
+            data-testid="stove-state"
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 36,
+              fontSize: 22,
               fontWeight: 600,
               lineHeight: 1,
-              color: stove.isAccesa ? '#fff' : 'var(--text-2)',
-              letterSpacing: -1.2,
+              color: isAlarm ? DANGER : stove.isAccesa ? '#fff' : 'var(--text-2)',
+              letterSpacing: -0.4,
               position: 'relative',
               zIndex: 1,
             }}
           >
-            {stove.isAccesa ? (stove.powerLevel ?? '—') : '—'}
+            {state.short}
           </div>
           {needsCleaning ? (
             <div
@@ -191,8 +212,25 @@ export default function StoveCard() {
               </span>
             </div>
           ) : (
-            <div style={{ marginTop: 6, fontSize: 12, color: 'var(--text-2)' }}>
-              {stove.isAccesa ? `Fiamma ${stove.powerLevel} · Ventola ${stove.fanLevel}` : 'Spenta'}
+            <div style={{ marginTop: 6, position: 'relative', zIndex: 1 }}>
+              {stove.isAccesa && (
+                <div data-testid="stove-levels" style={lineStyle}>
+                  {`Potenza ${stove.powerLevel ?? '—'} · Ventola ${stove.fanLevel ?? '—'}`}
+                </div>
+              )}
+              <div
+                data-testid="stove-detail"
+                style={{
+                  ...lineStyle,
+                  color: detail.warn ? WARN : 'var(--text-2)',
+                  fontWeight: detail.warn ? 600 : 400,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {detail.text}
+              </div>
             </div>
           )}
         </div>

@@ -50,6 +50,7 @@ import {
   type UseTuyaCommandsReturn,
 } from '@/app/components/devices/tuya/hooks/useTuyaCommands';
 import { InlineToggle } from '../InlineToggle';
+import { usePendingActions } from '../usePendingActions';
 
 interface SimplePlug {
   id: string;
@@ -94,6 +95,7 @@ export interface PlugsSheetProps {
 }
 
 export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
+  const actions = usePendingActions();
   // Loading skeleton (D-26) — sized to roughly match the final layout.
   if (tuyaData.loading && tuyaData.plugs === null) {
     return (
@@ -318,10 +320,12 @@ export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
                 <InlineToggle
                   on={p.on}
                   color="#ffb84a"
+                  aria-label={`${p.on ? 'Spegni' : 'Accendi'} ${p.name}`}
+                  pending={actions.isPending(p.id)}
                   onChange={() => {
                     const next = !p.on;
                     tuyaData.setPlugOptimistic(p.id, next);
-                    void (async () => {
+                    void actions.run(p.id, async () => {
                       const result = await cmds.togglePlug(p.id, p.on);
                       if (!result) {
                         // Command failed — revert the optimistic flip
@@ -329,7 +333,7 @@ export function PlugsSheet({ tuyaData, cmds }: PlugsSheetProps) {
                       }
                       // Reconcile with proxy state either way
                       void tuyaData.refetch();
-                    })();
+                    });
                   }}
                 />
               </div>

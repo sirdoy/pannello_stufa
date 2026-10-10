@@ -177,3 +177,47 @@ describe('CameraSheet', () => {
     expect(screen.getByTestId('camera-sheet-stale')).toBeInTheDocument();
   });
 });
+
+function deferred<T = void>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
+describe('CameraSheet pending (ROADMAP M80)', () => {
+  test('"Aggiorna" shows a spinner until the refresh ends', async () => {
+    const d = deferred();
+    const onRefresh = jest.fn(() => d.promise);
+    renderSheet({ onRefresh });
+
+    fireEvent.click(screen.getByTestId('sheet-btn-aggiorna'));
+    expect(screen.getByTestId('sheet-btn-aggiorna')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('sheet-btn-spinner')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('sheet-btn-aggiorna'));
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(screen.queryByTestId('sheet-btn-spinner')).toBeNull();
+  });
+
+  test('the monitoring switch shows a spinner while the command is running', async () => {
+    const d = deferred<{ ok: boolean; json: () => Promise<object> }>();
+    global.fetch = jest.fn(() => d.promise) as unknown as typeof fetch;
+    renderSheet();
+
+    fireEvent.click(screen.getByTestId('camera-sheet-monitoring'));
+    expect(screen.getByTestId('camera-sheet-monitoring')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('inline-toggle-spinner')).toBeInTheDocument();
+
+    await act(async () => {
+      d.resolve({ ok: true, json: async () => ({}) });
+      await d.promise;
+    });
+    await waitFor(() => expect(screen.queryByTestId('inline-toggle-spinner')).toBeNull());
+  });
+});

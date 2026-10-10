@@ -11,6 +11,8 @@ import {
   type UseLightsCommandsReturn,
 } from '@/app/components/devices/lights/hooks/useLightsCommands';
 import { InlineToggle } from '../InlineToggle';
+import { usePendingActions } from '../usePendingActions';
+import Spinner from '@/app/components/ui/Spinner';
 import { QuickActionButton } from './primitives/QuickActionButton';
 import { findSceneByName } from './lib/findSceneByName';
 import type { HueGroup, HueLight } from '@/types/hueProxy';
@@ -87,6 +89,11 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
   const lights: HueLight[] = lightsData.lights ?? [];
   const groups: HueGroup[] = lightsData.groups ?? [];
   const scenes = lightsData.scenes ?? [];
+  // ROADMAP M80 — a command on every light (all on/off, scene) locks the whole sheet; a single
+  // light locks only its own toggle, so several lights can be switched one after the other.
+  const groupActions = usePendingActions();
+  const lightActions = usePendingActions();
+  const groupBusy = groupActions.anyPending;
 
   // Loading skeleton (D-26) — first fetch only; later refreshes keep cached UI.
   if (lightsData.loading && lights.length === 0 && groups.length === 0) {
@@ -211,12 +218,16 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
         <QuickActionButton
           active={allOn}
           label="Tutte on"
-          onClick={() => void cmds.handleAllLightsToggle(true)}
+          pending={groupActions.isPending('all:on')}
+          disabled={groupBusy}
+          onClick={() => void groupActions.run('all:on', () => cmds.handleAllLightsToggle(true))}
         />
         <QuickActionButton
           active={false}
           label="Tutte off"
-          onClick={() => void cmds.handleAllLightsToggle(false)}
+          pending={groupActions.isPending('all:off')}
+          disabled={groupBusy}
+          onClick={() => void groupActions.run('all:off', () => cmds.handleAllLightsToggle(false))}
         />
       </div>
 
@@ -242,6 +253,8 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
         {SCENES.map((sc) => {
           const match = findSceneByName(scenes, sc.name);
           const disabled = !match || !primaryGroupId;
+          const sceneKey = `scene:${sc.name}`;
+          const scenePending = groupActions.isPending(sceneKey);
           return (
             <button
               key={sc.name}
@@ -250,16 +263,17 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
               data-sheet-focusable="true"
               data-disabled={disabled ? 'true' : 'false'}
               title={disabled ? `Crea scena '${sc.name}' su Hue` : undefined}
-              disabled={disabled}
+              disabled={disabled || groupBusy}
+              aria-busy={scenePending || undefined}
               onClick={() => {
                 if (disabled || !match || !primaryGroupId) return;
-                void cmds.handleSceneActivate(match.scene_id, primaryGroupId);
+                void groupActions.run(sceneKey, () => cmds.handleSceneActivate(match.scene_id, primaryGroupId));
               }}
               style={{
                 padding: 12,
                 borderRadius: 14,
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                opacity: disabled ? 0.5 : 1,
+                cursor: disabled ? 'not-allowed' : groupBusy ? 'default' : 'pointer',
+                opacity: disabled || (groupBusy && !scenePending) ? 0.5 : 1,
                 background: 'rgba(255,255,255,0.04)', // AUDIT-EXCEPTION (sheets.jsx:256)
                 border: '0.5px solid rgba(255,255,255,0.06)', // AUDIT-EXCEPTION
                 display: 'flex',
@@ -275,8 +289,13 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
                   borderRadius: 9,
                   background: sc.gradient, // AUDIT-EXCEPTION — bundle scene gradient verbatim
                   flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
-              />
+              >
+                {scenePending && <Spinner size="sm" variant="white" aria-hidden data-testid="lights-sheet-scene-spinner" />}
+              </div>
               <div style={{ fontSize: 13, fontWeight: 600, color: '#fff' }}>
                 {sc.name}
               </div>
@@ -372,7 +391,11 @@ export function LightsSheet({ lightsData, cmds }: LightsSheetProps) {
                         on={l.on}
                         color="#f5c84a"
                         aria-label={`${l.on ? 'Spegni' : 'Accendi'} ${l.name}`}
-                        onChange={() => void cmds.handleLightToggle(l.light_id, !l.on)}
+                        pending={lightActions.isPending(l.light_id)}
+                        disabled={groupBusy}
+                        onChange={() =>
+                          void lightActions.run(l.light_id, () => cmds.handleLightToggle(l.light_id, !l.on))
+                        }
                       />
                     </div>
                   </div>

@@ -42,3 +42,26 @@ describe('QuickActionButton (CONTEXT D-15)', () => {
     );
   });
 });
+
+describe('QuickActionButton pending (ROADMAP M80)', () => {
+  test('pending shows a spinner, keeps the label in the layout and blocks the tap', () => {
+    const onClick = jest.fn();
+    render(<QuickActionButton active={false} label="Tutte on" onClick={onClick} pending />);
+    const btn = screen.getByTestId('quick-action-tutte-on');
+    expect(btn).toBeDisabled();
+    expect(btn).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('quick-action-spinner')).toBeInTheDocument();
+    expect(screen.getByText('Tutte on').style.opacity).toBe('0');
+    expect(btn).toHaveAccessibleName('Tutte on');
+    fireEvent.click(btn);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  test('disabled dims the pill without a spinner', () => {
+    render(<QuickActionButton active={false} label="Tutte on" onClick={jest.fn()} disabled />);
+    const btn = screen.getByTestId('quick-action-tutte-on');
+    expect(btn).toBeDisabled();
+    expect(btn.style.opacity).toBe('0.55');
+    expect(screen.queryByTestId('quick-action-spinner')).toBeNull();
+  });
+});

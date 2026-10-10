@@ -1,4 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
+import Spinner from '@/app/components/ui/Spinner';
 
 /**
  * Sheet button primitive (CONTEXT D-14) — 16px-pad rounded 16px box, 0.5px white border,
@@ -13,19 +14,25 @@ export interface SheetBtnProps {
   Icon: LucideIcon;
   label: string;
   onClick?: () => void;
+  /** Command sent and not yet settled (ROADMAP M80): spinner in place of the icon, taps ignored */
+  pending?: boolean;
+  disabled?: boolean;
 }
 
 function slugify(label: string): string {
   return label.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 }
 
-export function SheetBtn({ Icon, label, onClick }: SheetBtnProps) {
+export function SheetBtn({ Icon, label, onClick, pending = false, disabled = false }: SheetBtnProps) {
+  const locked = pending || disabled;
   return (
     <button
       type="button"
       data-component="sheet-btn"
       data-testid={`sheet-btn-${slugify(label)}`}
       data-sheet-focusable="true"
+      disabled={locked}
+      aria-busy={pending || undefined}
       onClick={onClick}
       style={{
         padding: 16,
@@ -38,10 +45,15 @@ export function SheetBtn({ Icon, label, onClick }: SheetBtnProps) {
         color: '#fff', // AUDIT-EXCEPTION
         fontSize: 14,
         fontWeight: 500,
-        cursor: 'pointer',
+        cursor: locked ? 'default' : 'pointer',
+        opacity: locked && !pending ? 0.55 : 1,
       }}
     >
-      <Icon size={18} stroke="var(--text-2)" />
+      {pending ? (
+        <Spinner size="sm" variant="muted" aria-hidden data-testid="sheet-btn-spinner" />
+      ) : (
+        <Icon size={18} stroke="var(--text-2)" />
+      )}
       {label}
     </button>
   );

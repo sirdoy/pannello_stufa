@@ -20,6 +20,8 @@ export type { MiniStatProps } from './MiniStat';
 export { PlayingBars } from './PlayingBars';
 export { InlineToggle } from './InlineToggle';
 export type { InlineToggleProps } from './InlineToggle';
+export { usePendingActions } from './usePendingActions';
+export type { PendingActions } from './usePendingActions';
 export { GlassCardSkeleton } from './GlassCardSkeleton';
 export { PageHeader } from './PageHeader';
 export type { PageHeaderProps } from './PageHeader';

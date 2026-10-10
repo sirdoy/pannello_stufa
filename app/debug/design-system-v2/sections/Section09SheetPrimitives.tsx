@@ -180,13 +180,16 @@ export function Section09SheetPrimitives(): React.ReactElement {
       {/* === 6. SheetBtn === */}
       <SubBlock
         name="SheetBtn"
-        description="Pulsante sheet con icon + label 14/500."
+        description="Pulsante sheet con icon + label 14/500. pending: spinner al posto dell'icona."
         sample={
-          <SheetBtn
-            Icon={Settings}
-            label="Impostazioni"
-            onClick={() => undefined}
-          />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            <SheetBtn
+              Icon={Settings}
+              label="Impostazioni"
+              onClick={() => undefined}
+            />
+            <SheetBtn Icon={Settings} label="Aggiorna" pending />
+          </div>
         }
         code={
           '<SheetBtn Icon={Settings} label="Impostazioni" onClick={() => navigate("/settings")} />'
@@ -196,13 +199,16 @@ export function Section09SheetPrimitives(): React.ReactElement {
       {/* === 7. QuickActionButton === */}
       <SubBlock
         name="QuickActionButton"
-        description="Toggle quick-action; active drive lo stato visuale yellow."
+        description="Toggle quick-action; active drive lo stato visuale yellow. pending: spinner sopra l'etichetta, larghezza invariata."
         sample={
-          <QuickActionButton
-            active={qabActive}
-            onClick={() => setQabActive((p) => !p)}
-            label={qabActive ? 'Timer attivo' : 'Timer'}
-          />
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+            <QuickActionButton
+              active={qabActive}
+              onClick={() => setQabActive((p) => !p)}
+              label={qabActive ? 'Timer attivo' : 'Timer'}
+            />
+            <QuickActionButton active={false} onClick={() => undefined} label="Tutte on" pending />
+          </div>
         }
         code={
           '<QuickActionButton active={timerOn} onClick={() => setTimerOn(p => !p)} label="Timer" />'

@@ -19,7 +19,7 @@
  *   - hex colors are converted to `rgb(R,G,B)` form on read; `#f5c84a` → `rgb(245,200,74)`.
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 // 260506-d45: render the SelfFetch zero-prop variant; existing hook mocks
 // continue to intercept the inner useLightsData/useLightsCommands.
 import { LightsSheet, LightsSheetSelfFetch } from '../LightsSheet';
@@ -282,5 +282,87 @@ describe('LightsSheet (SHEET-04 / CONTEXT D-07)', () => {
     render(<LightsSheet lightsData={propData} cmds={propCmds} />);
     expect(screen.getByTestId('lights-sheet')).toBeInTheDocument();
     expect(screen.getByTestId('lights-sheet-count')).toHaveTextContent('3');
+  });
+});
+
+function deferred<T = void>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
+describe('LightsSheet pending (ROADMAP M80)', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('Tutte on shows a spinner and locks the sheet until the command settles', async () => {
+    const d = deferred();
+    mockHandleAllLightsToggle.mockReturnValueOnce(d.promise);
+    render(<LightsSheetSelfFetch />);
+
+    fireEvent.click(screen.getByTestId('quick-action-tutte-on'));
+    const on = screen.getByTestId('quick-action-tutte-on');
+    expect(on).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('quick-action-spinner')).toBeInTheDocument();
+    expect(screen.getByTestId('quick-action-tutte-off')).toBeDisabled();
+    expect(screen.getByTestId('lights-sheet-scene-rilassante')).toBeDisabled();
+    const toggle = screen
+      .getByTestId('lights-sheet-light-plafoniera-toggle')
+      .querySelector('[role="switch"]') as HTMLElement;
+    expect(toggle).toBeDisabled();
+
+    // A second tap does not send a second command
+    fireEvent.click(on);
+    expect(mockHandleAllLightsToggle).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(screen.queryByTestId('quick-action-spinner')).toBeNull();
+    expect(screen.getByTestId('quick-action-tutte-off')).not.toBeDisabled();
+  });
+
+  test('a scene shows its spinner while it is being activated', async () => {
+    const d = deferred();
+    mockHandleSceneActivate.mockReturnValueOnce(d.promise);
+    render(<LightsSheetSelfFetch />);
+
+    fireEvent.click(screen.getByTestId('lights-sheet-scene-rilassante'));
+    expect(screen.getByTestId('lights-sheet-scene-rilassante')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('lights-sheet-scene-spinner')).toBeInTheDocument();
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(screen.queryByTestId('lights-sheet-scene-spinner')).toBeNull();
+  });
+
+  test('a single light locks only its own toggle', async () => {
+    const d = deferred();
+    mockHandleLightToggle.mockReturnValueOnce(d.promise);
+    render(<LightsSheetSelfFetch />);
+    const toggleOf = (name: string) =>
+      screen.getByTestId(`lights-sheet-light-${name}-toggle`).querySelector('[role="switch"]') as HTMLElement;
+
+    fireEvent.click(toggleOf('plafoniera'));
+    expect(toggleOf('plafoniera')).toHaveAttribute('aria-busy', 'true');
+    expect(toggleOf('faretto')).not.toHaveAttribute('aria-busy');
+    expect(toggleOf('faretto')).not.toBeDisabled();
+
+    fireEvent.click(toggleOf('plafoniera'));
+    expect(mockHandleLightToggle).toHaveBeenCalledTimes(1);
+    fireEvent.click(toggleOf('faretto'));
+    expect(mockHandleLightToggle).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(toggleOf('plafoniera')).not.toHaveAttribute('aria-busy');
   });
 });

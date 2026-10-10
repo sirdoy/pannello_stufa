@@ -254,3 +254,52 @@ describe('SonosSheet ordering and selection (ROADMAP M18)', () => {
     expect(mockHandleSetZoneVolume).not.toHaveBeenCalled();
   });
 });
+
+function deferred<T = void>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
+describe('SonosSheet pending (ROADMAP M80)', () => {
+  it('play/pause shows a spinner on its own group until the command settles', async () => {
+    const d = deferred();
+    mockHandlePause.mockClear();
+    mockHandlePause.mockReturnValueOnce(d.promise);
+    render(<SonosSheetSelfFetch />);
+
+    fireEvent.click(screen.getByTestId('sonos-sheet-group-0-play-pause'));
+    expect(screen.getByTestId('sonos-sheet-group-0-play-pause')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('sonos-sheet-transport-spinner')).toBeInTheDocument();
+    expect(screen.getByTestId('sonos-sheet-group-1-play-pause')).not.toBeDisabled();
+    expect(screen.getByTestId('sonos-sheet-master-action')).toBeDisabled();
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(screen.queryByTestId('sonos-sheet-transport-spinner')).toBeNull();
+    expect(screen.getByTestId('sonos-sheet-master-action')).not.toBeDisabled();
+  });
+
+  it('the master action shows a spinner and locks every group', async () => {
+    const d = deferred();
+    mockHandlePause.mockClear();
+    mockHandlePause.mockReturnValue(d.promise);
+    render(<SonosSheetSelfFetch />);
+
+    fireEvent.click(screen.getByTestId('sonos-sheet-master-action'));
+    expect(screen.getByTestId('sonos-sheet-master-action')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('sonos-sheet-master-spinner')).toBeInTheDocument();
+    expect(screen.getByTestId('sonos-sheet-group-0-play-pause')).toBeDisabled();
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(screen.queryByTestId('sonos-sheet-master-spinner')).toBeNull();
+    mockHandlePause.mockResolvedValue(undefined);
+  });
+});

@@ -11,7 +11,7 @@
  * (not `id`). `useLightsCommands` accepts a Pick<UseLightsDataReturn, ...>
  * subset + router (matches legacy `app/components/devices/lights/LightsCard.tsx:34-45`).
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import LightsCard from '../LightsCard';
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
 import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
@@ -172,5 +172,51 @@ describe('LightsCard (Phase 177 — DASH-04)', () => {
 
     expect(handleAllLightsToggle).toHaveBeenCalledTimes(1);
     expect(handleAllLightsToggle).toHaveBeenCalledWith(true);
+  });
+});
+
+function deferred<T = void>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
+describe('LightsCard pending (ROADMAP M80)', () => {
+  const lights = [
+    { light_id: '1', name: 'Cucina', on: true },
+    { light_id: '2', name: 'Salotto', on: false },
+  ];
+
+  test('the master toggle shows a spinner until the command settles; taps in between do nothing', async () => {
+    const d = deferred();
+    const handleAllLightsToggle = jest.fn(() => d.promise);
+    mockUseLightsData.mockReturnValue(makeData(lights));
+    mockUseLightsCommands.mockReturnValue(makeCmds(handleAllLightsToggle));
+    render(<LightsCard />);
+
+    fireEvent.click(screen.getByTestId('inline-toggle'));
+    expect(screen.getByTestId('inline-toggle')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('inline-toggle-spinner')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('inline-toggle'));
+    expect(handleAllLightsToggle).toHaveBeenCalledTimes(1);
+    // The swallowed tap must not open the sheet either
+    const dialog = document.querySelector('[role="dialog"]');
+    if (dialog) expect(dialog.getAttribute('data-state')).toBe('closed');
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(screen.queryByTestId('inline-toggle-spinner')).toBeNull();
+  });
+
+  test('a command sent from the sheet also shows on the card toggle', () => {
+    mockUseLightsData.mockReturnValue({ ...makeData(lights), refreshing: true });
+    mockUseLightsCommands.mockReturnValue(makeCmds(jest.fn()));
+    render(<LightsCard />);
+    expect(screen.getByTestId('inline-toggle-spinner')).toBeInTheDocument();
   });
 });

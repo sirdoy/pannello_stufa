@@ -262,3 +262,54 @@ describe('ClimateSheet (SHEET-03 / CONTEXT D-06)', () => {
     expect(screen.getByTestId('climate-sheet-zone-chip-0')).toHaveTextContent('Salotto');
   });
 });
+
+function deferred<T = void>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
+describe('ClimateSheet pending (ROADMAP M80)', () => {
+  test('"Applica" shows a spinner and ignores a second tap until the setpoint is written', async () => {
+    const d = deferred();
+    mockSetRoomSetpoint.mockReturnValueOnce(d.promise);
+    render(<ClimateSheetSelfFetch />);
+    fireEvent.click(screen.getByTestId('radial-dial-plus'));
+
+    fireEvent.click(screen.getByTestId('climate-sheet-apply-setpoint'));
+    const apply = screen.getByTestId('climate-sheet-apply-setpoint');
+    expect(apply).toHaveAttribute('aria-busy', 'true');
+    expect(apply).toBeDisabled();
+    expect(screen.getByTestId('climate-sheet-setpoint-spinner')).toBeInTheDocument();
+    fireEvent.click(apply);
+    expect(mockSetRoomSetpoint).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(screen.queryByTestId('climate-sheet-setpoint-spinner')).toBeNull();
+  });
+
+  test('a mode pill pulses and locks the others while the mode is changing', async () => {
+    const d = deferred();
+    mockSetHomeMode.mockReturnValueOnce(d.promise);
+    render(<ClimateSheetSelfFetch />);
+
+    fireEvent.click(screen.getByTestId('climate-sheet-mode-eco'));
+    expect(screen.getByTestId('climate-sheet-mode-eco')).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByTestId('climate-sheet-mode-eco')).toHaveClass('animate-pulse');
+    expect(screen.getByTestId('climate-sheet-mode-auto')).toBeDisabled();
+    fireEvent.click(screen.getByTestId('climate-sheet-mode-auto'));
+    expect(mockSetHomeMode).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      d.resolve();
+      await d.promise;
+    });
+    expect(screen.getByTestId('climate-sheet-mode-eco')).not.toHaveAttribute('aria-busy');
+    expect(screen.getByTestId('climate-sheet-mode-auto')).not.toBeDisabled();
+  });
+});

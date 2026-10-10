@@ -35,6 +35,8 @@ import {
 } from '@/app/components/devices/thermostat/hooks/useThermostatCommands';
 import { SheetRow } from './primitives/SheetRow';
 import { RadialDial } from './primitives/RadialDial';
+import { usePendingActions } from '../usePendingActions';
+import Spinner from '@/app/components/ui/Spinner';
 import type { SetThermmodeRequest } from '@/types/netatmoProxy';
 
 interface Zone {
@@ -254,6 +256,8 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
   });
 
   const [selectedIdx, setSelectedIdx] = useState(0);
+  // ROADMAP M80 — keys: `setpoint:<room>`, `override:<room>`, `mode:<backend mode>`
+  const actions = usePendingActions();
   const safeIdx = Math.min(selectedIdx, Math.max(0, zones.length - 1));
   const zone: Zone | undefined = zones[safeIdx];
 
@@ -297,6 +301,11 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
   // Home-level mode — prefer WS-provided status.mode, fall back to homesdata.therm_mode.
   const homeMode =
     (data.status?.mode as string | undefined) ?? homeThermMode ?? '';
+
+  const setpointPending = zone !== undefined && actions.isPending(`setpoint:${zone.id}`);
+  const overridePending = zone !== undefined && actions.isPending(`override:${zone.id}`);
+  const zoneBusy = setpointPending || overridePending;
+  const modeBusy = MODE_PILLS.some((p) => p.backend !== null && actions.isPending(`mode:${p.backend}`));
 
   // Loading skeleton (D-26 / Open Q4)
   if (data.loading && data.status === null && data.topology === null) {
@@ -472,8 +481,11 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
             type="button"
             data-testid="climate-sheet-clear-override"
             data-sheet-focusable="true"
-            onClick={() => void setRoomMode(zone.id, 'home')}
+            aria-busy={overridePending || undefined}
+            disabled={zoneBusy}
+            onClick={() => void actions.run(`override:${zone.id}`, () => setRoomMode(zone.id, 'home'))}
             style={{
+              position: 'relative',
               flexShrink: 0,
               padding: '8px 12px',
               borderRadius: 10,
@@ -482,11 +494,19 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
               color: '#ffb84a',
               fontSize: 12,
               fontWeight: 600,
-              cursor: 'pointer',
+              cursor: zoneBusy ? 'default' : 'pointer',
+              opacity: zoneBusy && !overridePending ? 0.55 : 1,
               whiteSpace: 'nowrap',
             }}
           >
-            Torna al programma
+            <span style={{ opacity: overridePending ? 0 : 1 }}>Torna al programma</span>
+            {overridePending && (
+              <span
+                style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              >
+                <Spinner size="xs" variant="current" aria-hidden data-testid="climate-sheet-override-spinner" />
+              </span>
+            )}
           </button>
         )}
       </div>
@@ -499,7 +519,9 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
           type="button"
           data-testid="climate-sheet-apply-setpoint"
           data-sheet-focusable="true"
-          onClick={() => void setRoomSetpoint(zone.id, pendingTarget)}
+          aria-busy={setpointPending || undefined}
+          disabled={zoneBusy}
+          onClick={() => void actions.run(`setpoint:${zone.id}`, () => setRoomSetpoint(zone.id, pendingTarget))}
           style={{
             marginTop: 12,
             width: '100%',
@@ -511,7 +533,8 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
             fontFamily: 'var(--font-display)',
             fontSize: 15,
             fontWeight: 600,
-            cursor: 'pointer',
+            cursor: zoneBusy ? 'default' : 'pointer',
+            opacity: zoneBusy && !setpointPending ? 0.55 : 1,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -520,7 +543,11 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
               '0 0 24px color-mix(in oklab, #5eafff 35%, transparent)',
           }}
         >
-          <Check size={18} strokeWidth={2.4} />
+          {setpointPending ? (
+            <Spinner size="sm" variant="current" aria-hidden data-testid="climate-sheet-setpoint-spinner" />
+          ) : (
+            <Check size={18} strokeWidth={2.4} />
+          )}
           Applica {pendingTarget.toFixed(1)}°
         </button>
       )}
@@ -616,6 +643,7 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
             p.label === 'Manuale'
               ? anyRoomManual
               : p.backend !== null && homeMode === p.backend;
+          const modePending = p.backend !== null && actions.isPending(`mode:${p.backend}`);
           return (
             <button
               key={p.label}
@@ -624,14 +652,19 @@ export function ClimateSheet({ data, cmds }: ClimateSheetProps) {
               data-sheet-focusable="true"
               role="radio"
               aria-checked={isSelected}
+              aria-busy={modePending || undefined}
+              disabled={modeBusy}
+              className={modePending ? 'animate-pulse' : undefined}
               onClick={() => {
-                if (p.backend !== null) void setHomeMode(p.backend);
+                const mode = p.backend;
+                if (mode !== null) void actions.run(`mode:${mode}`, () => setHomeMode(mode));
                 // Pitfall 5: 'Manuale' is UI-only — no setHomeMode call.
               }}
               style={{
                 padding: '14px 8px',
                 borderRadius: 14,
-                cursor: 'pointer',
+                cursor: modeBusy ? 'default' : 'pointer',
+                opacity: modeBusy && !modePending ? 0.55 : 1,
                 fontSize: 13,
                 fontWeight: 600,
                 background: isSelected

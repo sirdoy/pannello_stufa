@@ -31,6 +31,8 @@ import HlsPlayer from '@/app/components/devices/camera/HlsPlayer';
 import { useCameraData } from '@/app/components/devices/camera/hooks/useCameraData';
 import { SheetRow } from './primitives/SheetRow';
 import { SheetBtn } from './primitives/SheetBtn';
+import { InlineToggle } from '../InlineToggle';
+import { usePendingActions } from '../usePendingActions';
 
 export interface CameraSheetProps {
   cameras: CameraStatus[];
@@ -79,6 +81,8 @@ export function CameraSheet({
   const [monitoringPending, setMonitoringPending] = useState(false);
   const [monitoringOverride, setMonitoringOverride] = useState<{ key: string; value: boolean } | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const actions = usePendingActions();
+  const refresh = () => void actions.run('refresh', onRefresh);
 
   const cam = cameras.find((c) => c.camera_id === selectedId) ?? cameras[0] ?? null;
   const online = cam?.status === 'on';
@@ -121,7 +125,7 @@ export function CameraSheet({
           {error ? 'Impossibile caricare le videocamere.' : 'Nessuna videocamera Netatmo trovata.'}
         </div>
         {error && <div style={{ fontSize: 12, color: 'var(--text-2)' }}>{error}</div>}
-        <SheetBtn Icon={RefreshCw} label="Riprova" onClick={() => void onRefresh()} />
+        <SheetBtn Icon={RefreshCw} label="Riprova" pending={actions.isPending('refresh')} onClick={refresh} />
       </div>
     );
   }
@@ -378,31 +382,15 @@ export function CameraSheet({
         label="Monitoraggio"
         value={disconnected ? 'Non disponibile: camera disconnessa' : monitoringOn ? 'Attivo' : 'Disattivo'}
       >
-        <button
-          type="button"
-          role="switch"
-          aria-checked={monitoringOn}
+        <InlineToggle
+          on={monitoringOn}
+          color={TONE}
           aria-label="Monitoraggio camera"
           data-testid="camera-sheet-monitoring"
-          disabled={disconnected || monitoringPending || cam.status === null}
-          onClick={() => void toggleMonitoring(cam.camera_id, !monitoringOn)}
-          style={{
-            width: 46,
-            height: 28,
-            borderRadius: 999,
-            border: 'none',
-            padding: 3,
-            flexShrink: 0,
-            cursor: disconnected || monitoringPending ? 'not-allowed' : 'pointer',
-            opacity: disconnected || monitoringPending ? 0.45 : 1,
-            background: monitoringOn ? TONE : 'rgba(255,255,255,0.12)',
-            display: 'flex',
-            justifyContent: monitoringOn ? 'flex-end' : 'flex-start',
-            transition: 'background 160ms ease',
-          }}
-        >
-          <span style={{ width: 22, height: 22, borderRadius: 999, background: '#fff' }} />
-        </button>
+          pending={monitoringPending}
+          disabled={disconnected || cam.status === null}
+          onChange={() => void toggleMonitoring(cam.camera_id, !monitoringOn)}
+        />
       </SheetRow>
 
       {actionError && (
@@ -426,7 +414,7 @@ export function CameraSheet({
           gap: 10,
         }}
       >
-        <SheetBtn Icon={RefreshCw} label="Aggiorna" onClick={() => void onRefresh()} />
+        <SheetBtn Icon={RefreshCw} label="Aggiorna" pending={actions.isPending('refresh')} onClick={refresh} />
         <SheetBtn Icon={History} label="Eventi" onClick={() => onNavigate('/camera/events')} />
         <SheetBtn Icon={ExternalLink} label="Apri pagina" onClick={() => onNavigate('/camera')} />
       </div>

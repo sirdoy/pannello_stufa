@@ -13,6 +13,8 @@ import {
 import { useDebounce } from '@/app/hooks/useDebounce';
 import { sortZonesPlayingFirst } from '@/lib/sonos/sortZones';
 import { PlayingBars } from '../PlayingBars';
+import { usePendingActions } from '../usePendingActions';
+import Spinner from '@/app/components/ui/Spinner';
 import RangeSlider from '@/app/components/ui/RangeSlider';
 
 interface SonosGroup {
@@ -64,6 +66,8 @@ export interface SonosSheetProps {
 
 export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
   const { handleSetZoneVolume, handlePlay, handlePause } = cmds;
+  // ROADMAP M80 — one key per group for play/pause, 'master' for the action on every group
+  const actions = usePendingActions();
 
   // Field adapter (Pitfall 7): zone.coordinator_uid is FLAT, not nested.
   // ROADMAP M18: playing zones first.
@@ -154,6 +158,7 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
 
   const anyPlaying = groups.some((g) => g.playing);
 
+  const masterPending = actions.isPending('master');
   const handleMasterAction = async () => {
     await Promise.allSettled(
       groups.map((g) => (anyPlaying ? handlePause(g.id) : handlePlay(g.id))),
@@ -174,6 +179,7 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
         {groups.map((g, i) => {
           const isLast = i === groups.length - 1;
           const isSelected = selected?.id === g.id;
+          const transportPending = actions.isPending(g.id);
           return (
             <div
               key={g.id}
@@ -236,18 +242,20 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
                 data-testid={`sonos-sheet-group-${i}-play-pause`}
                 data-sheet-focusable="true"
                 aria-label={g.playing ? 'Pausa' : 'Riproduci'}
+                aria-busy={transportPending || undefined}
+                disabled={transportPending || masterPending}
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedId(g.id);
-                  if (g.playing) void handlePause(g.id);
-                  else void handlePlay(g.id);
+                  void actions.run(g.id, () => (g.playing ? handlePause(g.id) : handlePlay(g.id)));
                 }}
                 style={{
                   width: 34,
                   height: 34,
                   borderRadius: 999,
                   border: 'none',
-                  cursor: 'pointer',
+                  cursor: transportPending || masterPending ? 'default' : 'pointer',
+                  opacity: masterPending && !transportPending ? 0.55 : 1,
                   background: g.playing ? '#fff' : 'rgba(255,255,255,0.08)', // AUDIT-EXCEPTION
                   color: g.playing ? '#1a0f08' : '#fff', // AUDIT-EXCEPTION
                   display: 'flex',
@@ -256,7 +264,9 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
                   flexShrink: 0,
                 }}
               >
-                {g.playing ? (
+                {transportPending ? (
+                  <Spinner size="xs" variant="current" aria-hidden data-testid="sonos-sheet-transport-spinner" />
+                ) : g.playing ? (
                   <Pause size={14} strokeWidth={2.4} />
                 ) : (
                   <Play size={14} strokeWidth={2.4} />
@@ -317,7 +327,9 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
         type="button"
         data-testid="sonos-sheet-master-action"
         data-sheet-focusable="true"
-        onClick={() => void handleMasterAction()}
+        aria-busy={masterPending || undefined}
+        disabled={actions.anyPending}
+        onClick={() => void actions.run('master', handleMasterAction)}
         style={{
           marginTop: 22,
           width: '100%',
@@ -329,14 +341,19 @@ export function SonosSheet({ sonosData, cmds }: SonosSheetProps) {
           fontFamily: 'var(--font-display)',
           fontSize: 15,
           fontWeight: 600,
-          cursor: 'pointer',
+          cursor: actions.anyPending ? 'default' : 'pointer',
+          opacity: actions.anyPending && !masterPending ? 0.55 : 1,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           gap: 10,
         }}
       >
-        <Power size={16} strokeWidth={2.2} />
+        {masterPending ? (
+          <Spinner size="sm" variant="current" aria-hidden data-testid="sonos-sheet-master-spinner" />
+        ) : (
+          <Power size={16} strokeWidth={2.2} />
+        )}
         {anyPlaying ? 'Pausa ovunque' : 'Riproduci ovunque'}
       </button>
     </div>

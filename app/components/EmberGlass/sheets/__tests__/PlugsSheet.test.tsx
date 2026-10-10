@@ -11,7 +11,7 @@
  * 178-CONTEXT.md `<deferred>` "PlugsSheet per-row room subtitle".
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 // 260506-d45: render the SelfFetch zero-prop variant; existing hook mocks
 // continue to intercept the inner useTuyaData/useTuyaCommands.
 import { PlugsSheet, PlugsSheetSelfFetch } from '../PlugsSheet';
@@ -230,5 +230,36 @@ describe('PlugsSheet (SHEET-06 / CONTEXT D-09)', () => {
     render(<PlugsSheet tuyaData={propData} cmds={propCmds} />);
     expect(screen.getByTestId('plugs-sheet')).toBeInTheDocument();
     expect(screen.getByTestId('plugs-sheet-count')).toHaveTextContent('2');
+  });
+});
+
+function deferred<T = void>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
+describe('PlugsSheet pending (ROADMAP M80)', () => {
+  it('the toggle shows a spinner until the plug answers and ignores a second tap', async () => {
+    const d = deferred<null>();
+    mockTogglePlug.mockClear();
+    mockTogglePlug.mockReturnValueOnce(d.promise);
+    render(<PlugsSheetSelfFetch />);
+    const toggleOf = (slug: string) =>
+      screen.getByTestId(`plugs-sheet-plug-${slug}-toggle`).querySelector('[role="switch"]') as HTMLElement;
+
+    fireEvent.click(toggleOf('frigo'));
+    expect(toggleOf('frigo')).toHaveAttribute('aria-busy', 'true');
+    expect(toggleOf('lavatrice')).not.toHaveAttribute('aria-busy');
+    fireEvent.click(toggleOf('frigo'));
+    expect(mockTogglePlug).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      d.resolve(null);
+      await d.promise;
+    });
+    expect(toggleOf('frigo')).not.toHaveAttribute('aria-busy');
   });
 });

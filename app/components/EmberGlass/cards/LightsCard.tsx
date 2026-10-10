@@ -38,6 +38,7 @@ import { Sheet } from '../Sheet';
 import { LightsSheet } from '../sheets/LightsSheet';
 import { GlassCardSkeleton } from '../GlassCardSkeleton';
 import { useCardReady } from '../useCardReady';
+import { usePendingActions } from '../usePendingActions';
 import { useLightsData } from '@/app/components/devices/lights/hooks/useLightsData';
 import { useLightsCommands } from '@/app/components/devices/lights/hooks/useLightsCommands';
 
@@ -60,6 +61,8 @@ export default function LightsCard() {
     router,
   });
 
+  const actions = usePendingActions();
+
   const allLights = lightsData.lights ?? [];
   const onLights = allLights.filter((l) => l.on);
   const anyOn = onLights.length > 0;
@@ -70,9 +73,11 @@ export default function LightsCard() {
       on={anyOn}
       color={TONE}
       aria-label={anyOn ? 'Spegni tutte le luci' : 'Accendi tutte le luci'}
+      // Also while a command sent from the sheet is running (ROADMAP M80)
+      pending={actions.isPending('all') || lightsData.refreshing}
       onChange={(e) => {
         e.stopPropagation(); // D-17 — prevent parent Pressable click → sheet open
-        void cmds.handleAllLightsToggle(!anyOn);
+        void actions.run('all', () => cmds.handleAllLightsToggle(!anyOn));
       }}
     />
   );

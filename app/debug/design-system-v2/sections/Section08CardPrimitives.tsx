@@ -132,20 +132,24 @@ export function Section08CardPrimitives(): React.ReactElement {
       {/* === 4. InlineToggle === */}
       <SubBlock
         name="InlineToggle"
-        description="Switch inline 44x26, onChange riceve MouseEvent (NON boolean)."
+        description="Switch inline 44x26, onChange riceve MouseEvent (NON boolean). pending: comando in corso, spinner nel pomello e tocchi ignorati."
         sample={
-          <InlineToggle
-            on={toggleOn}
-            color="var(--accent)"
-            aria-label={toggleOn ? 'Stufa accesa' : 'Stufa spenta'}
-            onChange={(e) => {
-              e.stopPropagation();
-              setToggleOn((prev) => !prev);
-            }}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <InlineToggle
+              on={toggleOn}
+              color="var(--accent)"
+              aria-label={toggleOn ? 'Stufa accesa' : 'Stufa spenta'}
+              onChange={(e) => {
+                e.stopPropagation();
+                setToggleOn((prev) => !prev);
+              }}
+            />
+            <InlineToggle on color="var(--accent)" aria-label="Comando in corso" pending onChange={() => undefined} />
+            <InlineToggle on={false} aria-label="Non disponibile" disabled onChange={() => undefined} />
+          </div>
         }
         code={
-          '<InlineToggle\n  on={on}\n  color="var(--accent)"\n  onChange={(e) => { e.stopPropagation(); setOn(prev => !prev); }}\n/>'
+          '<InlineToggle\n  on={on}\n  color="var(--accent)"\n  pending={actions.isPending(id)}\n  onChange={(e) => { e.stopPropagation(); void actions.run(id, () => toggle(id)); }}\n/>'
         }
       />
 
